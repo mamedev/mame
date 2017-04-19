@@ -281,7 +281,7 @@ uint32_t zeus2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 READ32_MEMBER( zeus2_device::zeus2_r )
 {
 	int logit = (offset != 0x00 && offset != 0x01 &&
-		offset != 0x48 && offset != 0x49
+		offset != 0x18 && offset != 0x19 && offset != 0x48 && offset != 0x49
 		&& offset != 0x54 && offset != 0x58 && offset != 0x59 && offset != 0x5a
 		);
 	logit &= LOG_REGS;
@@ -324,12 +324,10 @@ READ32_MEMBER( zeus2_device::zeus2_r )
 
 		case 0x18:
 			// IFIFO Read Counter
-			result = 0x0;
 			break;
 
 		case 0x19:
 			// MFIFO Read Counter
-			result = 0x0;
 			break;
 
 		case 0x54:
@@ -356,7 +354,8 @@ READ32_MEMBER( zeus2_device::zeus2_r )
 WRITE32_MEMBER( zeus2_device::zeus2_w )
 {
 	int logit = (offset != 0x08 &&
-					(offset != 0x20 || data != 0) &&
+					 offset != 0x18 && offset != 0x19 && (offset != 0x20 || data != 0) &&
+					 offset != 0x35 && offset != 0x36 && offset != 0x37 &&
 					 offset != 0x48 && offset != 0x49 && offset != 0x40 && offset != 0x41 && offset != 0x4e &&
 					 offset != 0x50 && offset != 0x51 && offset != 0x57 && offset != 0x58 && offset != 0x59 && offset != 0x5a && offset != 0x5e
 		);
@@ -608,6 +607,10 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 			break;
 			case 5:
 			{
+				//if (m_zeusbase[0x41] == 0x266) {
+				//	logit = 1;
+				//	log_fifo = 1;
+				//}
 				// Zeus microcode burst from waveram
 				if (logit)
 					logerror("\t-- ucode load: control: %08X addr: %08X", m_zeusbase[0x40], m_zeusbase[0x41]);
@@ -628,72 +631,101 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 						case 0x000000037:
 							// pm4dl: mfifo quads dynamic light
 							zeus_quad_size = 14;
-							logerror(" pm4dl quad size %d\n", zeus_quad_size);
+							if (logit) logerror(" pm4dl quad size %d\n", zeus_quad_size);
 							break;
 						case 0x0000000b3:
 							// pm4sl: mfifo quads static light
 							zeus_quad_size = 12;
-							logerror(" pm4sl quad size %d\n", zeus_quad_size);
+							if (logit) logerror(" pm4sl quad size %d\n", zeus_quad_size);
 							break;
 						case 0x00000015d:
 							// pm4nl: mfifo quads no light
 							m_useZOffset = true;
 							zeus_quad_size = 10;
-							logerror(" pm4nl quad size %d\n", zeus_quad_size);
+							if (logit) logerror(" pm4nl quad size %d\n", zeus_quad_size);
 							break;
 						case 0x0000001d5:
 							// pm4nluv: mfifo quads no light (tga and uv variants)
 							m_useZOffset = true;
 							zeus_quad_size = 10;
-							logerror(" pm4nluv pm4nl_tga quad size %d\n", zeus_quad_size);
+							if (logit) logerror(" pm4nluv pm4nl_tga quad size %d\n", zeus_quad_size);
 							break;
 						case 0x000000266:
 							// pm3dli: mfifo trimesh dynamic light interpolation
-							zeus_quad_size = 14;
-							logerror(" pm3dli quad size %d\n", zeus_quad_size);
+							zeus_quad_size = 8;
+							if (logit) logerror(" pm3dli quad size %d\n", zeus_quad_size);
 							break;
 						case 0x0000002e9:
 							// px3sl: xfifo trimesh static light
 							zeus_quad_size = 10;
-							logerror(" px3sl quad size %d\n", zeus_quad_size);
+							if (logit) logerror(" px3sl quad size %d\n", zeus_quad_size);
 							break;
 						case 0x000000343:
 							// blit24: The Grid direct rendering
 							// Really should be 128 but this works
 							zeus_quad_size = 512;
-							logerror(" blit24 quad size %d\n", zeus_quad_size);
+							if (logit) logerror(" blit24 quad size %d\n", zeus_quad_size);
 							break;
 						default:
 							zeus_quad_size = 10;
-							logerror(" unknown quad size 10\n");
+							logerror(" unknown quad size from source [41]=%08X\n", m_curUCodeSrc);
 							break;
 						}
 					}
-					//else if (m_system == CRUSNEXO) {
-
-					//}
-					else {
-						switch (m_zeusbase[0x40]) {
-						case 0x38550083: case 0x2D550083: case 0x3885007B:
-							zeus_quad_size = 14;
-							break;
-						case 0x3855006F: case 0x38550088: case 0x388500A9:
-							zeus_quad_size = 12;
-							break;
-						case 0x38550075:
-							if (m_zeusbase[0x41] == 0x00000324)
-								zeus_quad_size = 12;
-							else
-								zeus_quad_size = 10;
-							break;
-						case 0x38850077:
+					else if (m_system == CRUSNEXO) {
+						switch (m_curUCodeSrc) {
+						case 0x0000000c0:
 							zeus_quad_size = 10;
+							if (logit) logerror(" c0 quad size %d\n", zeus_quad_size);
+							break;
+						case 0x000000136:
+							zeus_quad_size = 14;
+							if (logit) logerror(" 136 quad size %d\n", zeus_quad_size);
+							break;
+						case 0x0000001ba:
+							zeus_quad_size = 10;
+							if (logit) logerror(" 1ba quad size %d\n", zeus_quad_size);
+							break;
+						case 0x00000022b:
+							zeus_quad_size = 12;
+							if (logit) logerror(" 22b quad size %d\n", zeus_quad_size);
+							break;
+						case 0x00000029b:
+							zeus_quad_size = 12;
+							if (logit) logerror(" 29b quad size %d\n", zeus_quad_size);
+							break;
+						case 0x000000324:
+							zeus_quad_size = 12;
+							if (logit) logerror(" 324 quad size %d\n", zeus_quad_size);
 							break;
 						default:
-							logerror(" default quad size 10\n");
 							zeus_quad_size = 10;
+							logerror(" unknown quad size from source [41]=%08X\n", m_curUCodeSrc);
 							break;
 						}
+
+					}
+					else {
+						switch (m_curUCodeSrc) {
+						case 0x000000000:
+							zeus_quad_size = 14;
+							if (logit) logerror(" 00 quad size %d\n", zeus_quad_size);
+							break;
+						case 0x00000002d:
+							zeus_quad_size = 14;
+							if (logit) logerror(" 2d quad size %d\n", zeus_quad_size);
+							break;
+						case 0x0000001aa:
+							// Direct frame buffer access, render data is rgb565
+							zeus_quad_size = 14;
+							if (logit) logerror(" 1aa quad size %d\n", zeus_quad_size);
+							break;
+						default:
+							zeus_quad_size = 14;
+							logerror(" unknown quad size from source [41]=%08X\n", m_curUCodeSrc);
+							break;
+						}
+
 					}
 				}
 				if (1 && logit) {
@@ -702,12 +734,19 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 					int size = m_zeusbase[0x40] & 0xff;
 					logerror("\n Setup size=%d [40]=%08X [41]=%08X [4e]=%08X\n", zeus_quad_size, m_zeusbase[0x40], m_zeusbase[0x41], m_zeusbase[0x4e]);
 					for (int i = 0; i <= size; ++i) {
-						waveData = wavePtr[1];
-						logerror(" %08X", waveData);
-						waveData = wavePtr[0];
-						logerror("%08X", waveData);
+						if (m_zeusbase[0x41] < 0xc0) {
+							waveData = wavePtr[1];
+							logerror(" %08X", waveData);
+							waveData = wavePtr[0];
+							logerror("%08X", waveData);
+						}
+						else {
+							waveData = wavePtr[0];
+							logerror(" %08X", waveData);
+							waveData = wavePtr[1];
+							logerror(" %08X", waveData);
+						}
 						wavePtr += 2;
-						//logerror(" %08X", waveData);
 						if (0 && (i + 1) % 16 == 0)
 							logerror("\n");
 					}
@@ -806,8 +845,9 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 				if (logit)
 					logerror(" -- Clearing buffer: numPixels: %08X addr: %08X reg51: %08X", numPixels, addr, m_zeusbase[0x51]);
 				for (int count = 0; count < numPixels; count++) {
-					m_frameColor[addr + count] = m_fill_color;
-					m_frameDepth[addr + count] = m_fill_depth;
+					// Crusn wraps the frame buffer during fill so need to mask address
+					m_frameColor[(addr + count) & (WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2 - 1)] = m_fill_color;
+					m_frameDepth[(addr + count) & (WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2 - 1)] = m_fill_depth;
 				}
 			}
 			break;
@@ -1135,6 +1175,9 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 {
 	int dataoffs = 0;
 
+	// Increment ififo counter
+	m_zeusbase[0x18]++;
+
 	/* handle logging */
 	switch (data[0] >> 24)
 	{
@@ -1304,7 +1347,7 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		/* 0x38: direct render quad (crusnexo) */
 		// 0x38: direct write to frame buffer (atlantis)
 		case 0x38:
-			if (data[0] == 0x38000000) {
+			if (m_curUCodeSrc == 0x1aa) {
 				if (numwords < 3)
 					return false;
 				// mwskins direct write to frame buffer
@@ -1386,11 +1429,14 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 			/* if this is enough, process the command */
 			cmd = databuffer[0] >> 24;
 
-			if ((cmd == 0x38) || (cmd == 0x2d)) {
+			if ((cmd == 0x38) || (cmd == 0x2d) || (cmd == 0xa7) || (cmd == 0xaf)) {
 				countneeded = zeus_quad_size;
 			}
 			if (databufcount == countneeded)
 			{
+				// Increment mfifo counter
+				m_zeusbase[0x19] += databufcount;
+
 				/* handle logging of the command */
 				if (logit)
 				{
@@ -1418,7 +1464,7 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 						m_zeusbase[0x68] = (databuffer[0] >> 16) & 0xff;
 						texdata = databuffer[1];
 						if (logit)
-								logerror("(0x68)uvFloat=%02X\n", m_zeusbase[0x68]);
+								logerror(" (0x68)=%02X texMode=%08X\n", m_zeusbase[0x68], texdata);
 					}
 						break;
 
@@ -1456,6 +1502,13 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 						}
 						break;
 
+					// thegrid: triangle mesh, pm3dli
+					case 0xa7:
+					case 0xaf:
+						if (1 || logit)
+							logerror(" unknown triangle data\n");
+						break;
+
 					default:
 						if (logit)
 							logerror("unknown model data\n");
@@ -1484,12 +1537,7 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
  *************************************/
 void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdata, int logit)
 {
-	z2_poly_vertex clipvert[8];
 	z2_poly_vertex vert[4];
-	//  float uscale, vscale;
-	//  int val1, val2, texwshift;
-	int numverts;
-	int i;
 
 	if (logit) {
 		m_state->logerror("quad %d", m_state->zeus_quad_size);
@@ -1610,13 +1658,13 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		unknownFloat[3] = m_state->convert_float(databuffer[13]);
 	}
 
-	int logextra = 1;
+	int logextra = 0;
 
 	int intScale = m_state->m_zeusbase[0x66] - 0x8e;
 	float fScale = pow(2.0f, intScale);
 	int intUVScale = m_state->m_zeusbase[0x68] - 0x9d;
 	float uvScale = pow(2.0f, intUVScale);
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		float x = vert[i].x;
 		float y = vert[i].y;
@@ -1663,7 +1711,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 
 	// Z Clipping, done before clamp to 0
 	float clipVal = reinterpret_cast<float&>(m_state->m_zeusbase[0x78]);
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		if (vert[i].p[0] < clipVal)
 			return;
@@ -1677,9 +1725,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 
 	float oozBase = 1 << m_state->m_zeusbase[0x6c];
 	float ooz;
-	//float maxy, maxx;
-	//maxx = maxy = -1000.0f;
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		// Clamp to zero if negative
 		if (vert[i].p[0] < 0)
@@ -1703,8 +1749,6 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		//clipvert[i].p[0] *= 65536.0f * 16.0f;
 		vert[i].p[0] *= 4096.0f * 1.0f;  // 12.12
 
-		//maxx = std::max(maxx, clipvert[i].x);
-		//maxy = std::max(maxy, clipvert[i].y);
 		if (logextra & logit)
 			m_state->logerror("\t\t\tTranslated=(%f,%f, %f) scale = %f\n", (double)vert[i].x, (double)vert[i].y, (double)vert[i].p[0], ooz);
 	}
@@ -1716,31 +1760,10 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			return;
 	}
 
-	//for (i = 0; i < numverts; i++)
-	//{
-	//	if (clipvert[i].x == maxx)
-	//		clipvert[i].x += 0.0005f;
-	//	if (clipvert[i].y == maxy)
-	//		clipvert[i].y += 0.0005f;
-	//}
-
 	zeus2_poly_extra_data& extra = this->object_data_alloc();
 
-	// Z clip
-	//if (0) {
-	//	float clipVal = m_state->m_zbufmin / 4096.0f;
-	//	numverts = this->zclip_if_less(4, &vert[0], &clipvert[0], 4, clipVal);
-	//	if (numverts < 4)
-	//		return;
-	//}
-	//else {
-		numverts = 4;
-		clipvert[0] = vert[0];
-		clipvert[1] = vert[1];
-		clipvert[2] = vert[2];
-		clipvert[3] = vert[3];
-	//}
-
+	extra.ucode_src = m_state->m_curUCodeSrc;
+	extra.tex_src = m_state->zeus_texbase;
 	int texmode = texdata & 0xffff;
 	extra.texwidth = 0x20 << ((texmode >> 2) & 3);
 	extra.solidcolor = 0;//m_zeusbase[0x00] & 0x7fff;
@@ -1787,16 +1810,9 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		break;
 	}
 
-	// Note: Before being converted to the "poly.h" interface, this used to call the polylgcy function
-	//       poly_render_quad_fan.  The behavior seems to be the same as it once was after a few short
-	//       tests, but the (numverts == 5) statement below may actually be a quad fan instead of a 5-sided
-	//       polygon.
-	if (numverts == 3)
-		render_triangle(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, clipvert[0], clipvert[1], clipvert[2]);
-	else if (numverts == 4)
-		render_polygon<4>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, clipvert);
-	else if (numverts == 5)
-		render_polygon<5>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, clipvert);
+	//if (numverts == 3)
+	//	render_triangle(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, vert[0], vert[1], vert[2]);
+	render_polygon<4>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, vert);
 }
 
 

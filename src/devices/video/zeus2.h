@@ -44,6 +44,8 @@ struct zeus2_poly_extra_data
 	uint32_t          srcAlpha;
 	uint32_t		  dstAlpha;
 	uint32_t          ctrl_word;
+	uint32_t		  ucode_src;
+	uint32_t		  tex_src;
 	bool			texture_alpha;
 	bool			texture_rgb555;
 	bool            blend_enable;
