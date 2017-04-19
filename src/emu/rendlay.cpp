@@ -1216,7 +1216,7 @@ layout_element::led7seg_component::led7seg_component(running_machine &machine, u
 void layout_element::led7seg_component::draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state)
 {
 	const rgb_t onpen = rgb_t(0xff,0xff,0xff,0xff);
-	const rgb_t offpen = rgb_t(0xff,0x20,0x20,0x20);
+	const rgb_t offpen = rgb_t(0xff,0x50,0x50,0x50);
 
 	// sizes for computation
 	int bmwidth = 250;
@@ -1226,7 +1226,7 @@ void layout_element::led7seg_component::draw(running_machine &machine, bitmap_ar
 
 	// allocate a temporary bitmap for drawing
 	bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight);
-	tempbitmap.fill(rgb_t(0xff,0x00,0x00,0x00));
+	tempbitmap.fill(rgb_t(0xff,0x28,0x28,0x28));
 
 	// top bar
 	draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2, segwidth, (state & (1 << 0)) ? onpen : offpen);
