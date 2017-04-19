@@ -530,6 +530,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "cpu/v60/v60.h"
 #include "cpu/nec/v25.h"
 #include "cpu/upd7725/upd7725.h"
+#include "machine/cxd1095.h"
 #include "machine/eepromser.h"
 #include "machine/i8255.h"
 #include "machine/mb8421.h"
@@ -619,6 +620,11 @@ void segas32_v25_state::device_start()
 }
 
 void segas32_upd7725_state::device_start()
+{
+	common_start(0);
+}
+
+void segas32_cd_state::device_start()
 {
 	common_start(0);
 }
@@ -2624,6 +2630,37 @@ machine_config_constructor segas32_upd7725_state::device_mconfig_additions() con
 
 
 
+
+
+static ADDRESS_MAP_START( system32_cd_map, AS_PROGRAM, 16, segas32_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0xc00060, 0xc0006f) AM_DEVREADWRITE8("cxdio", cxd1095_device, read, write, 0x00ff)
+	AM_IMPORT_FROM(system32_map)
+ADDRESS_MAP_END
+
+static MACHINE_CONFIG_FRAGMENT( system32_cd )
+	MCFG_FRAGMENT_ADD( system32 )
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(system32_cd_map)
+
+	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
+MACHINE_CONFIG_END
+
+const device_type SEGA_S32_CD_DEVICE = device_creator<segas32_cd_state>;
+
+segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: segas32_state(mconfig, SEGA_S32_CD_DEVICE, "Sega System 32 CD PCB", tag, owner, clock, "sega32_pcb_cd", __FILE__)
+{
+}
+
+machine_config_constructor segas32_cd_state::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( system32_cd );
+}
+
+
+
 static MACHINE_CONFIG_FRAGMENT( multi32 )
 
 	/* basic machine hardware */
@@ -2829,6 +2866,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sega_system32_4p, segas32_new_state )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_4PLAYER_DEVICE, 0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( sega_system32_cd, segas32_new_state )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_CD_DEVICE, 0)
 MACHINE_CONFIG_END
 
 // for f1en where there is a sub-board containing shared ram sitting underneath the ROM board bridging 2 PCBs (not a network link)
@@ -5700,7 +5741,7 @@ GAME( 1993, jparkj,    jpark,    sega_system32_analog, jpark, segas32_new_state,
 GAME( 1993, jparkja,   jpark,    sega_system32_analog, jpark, segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Deluxe)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, jparkjc,   jpark,    sega_system32_analog, jpark, segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Conversion)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, kokoroj2,  0,        sega_system32,        kokoroj2, segas32_new_state, radr,     ROT0, "Sega",   "Kokoroji 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING) /* uses an Audio CD */
+GAME( 1994, kokoroj2,  0,        sega_system32_cd,  kokoroj2, segas32_new_state, radr,     ROT0, "Sega",   "Kokoroji 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
 
 GAME( 1990, radm,      0,        sega_system32_analog, radm,  segas32_new_state, radm,     ROT0, "Sega",   "Rad Mobile (World)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1991 */
 GAME( 1990, radmu,     radm,     sega_system32_analog, radm,  segas32_new_state, radm,     ROT0, "Sega",   "Rad Mobile (US)", MACHINE_IMPERFECT_GRAPHICS )

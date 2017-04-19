@@ -320,6 +320,17 @@ protected:
 //  virtual void device_reset() override;
 };
 
+class segas32_cd_state :  public segas32_state
+{
+public:
+	segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+//  virtual void device_reset() override;
+};
+
 class sega_multi32_state :  public segas32_state
 {
 public:
