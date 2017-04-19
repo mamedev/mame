@@ -5,7 +5,12 @@
 #include "includes/xbox.h"
 
 #include "cpu/i386/i386.h"
+#ifdef USE_LEGACY_PCI
 #include "machine/lpci.h"
+#else
+#include "machine/pci.h"
+#include "machine/pci-ide.h"
+#endif
 #include "machine/pit8253.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
@@ -585,6 +590,7 @@ uint32_t xbox_base_state::screen_update_callback(screen_device &screen, bitmap_r
 	return nvidia_nv2a->screen_update_callback(screen, bitmap, cliprect);
 }
 
+#ifdef USE_LEGACY_PCI
 READ32_MEMBER(xbox_base_state::geforce_r)
 {
 	return nvidia_nv2a->geforce_r(space, offset, mem_mask);
@@ -609,6 +615,7 @@ static void geforce_pci_w(device_t *busdevice, device_t *device, int function, i
 	busdevice->logerror("  bus:1 device:NV_2A function:%d register:%d data:%08X mask:%08X\n",function,reg,data,mem_mask);
 #endif
 }
+#endif
 
 /*
  * Audio
@@ -808,6 +815,7 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::audio_apu_timer)
 	}
 }
 
+#ifdef USE_LEGACY_PCI
 static uint32_t pcibridghostbridg_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 #ifdef LOG_PCI
@@ -841,11 +849,13 @@ static void hubintisabridg_pci_w(device_t *busdevice, device_t *device, int func
 	busdevice->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
 #endif
 }
+#endif
 
 /*
  * dummy for non connected devices
  */
 
+#ifdef USE_LEGACY_PCI
 static uint32_t dummy_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 #ifdef LOG_PCI
@@ -860,6 +870,7 @@ static void dummy_pci_w(device_t *busdevice, device_t *device, int function, int
 	busdevice->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
 #endif
 }
+#endif
 
 READ32_MEMBER(xbox_base_state::dummy_r)
 {
@@ -1184,7 +1195,9 @@ WRITE32_MEMBER(xbox_base_state::ohci_usb2_w)
 ADDRESS_MAP_START(xbox_base_map, AS_PROGRAM, 32, xbox_base_state)
 	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM AM_SHARE("nv2a_share") // 128 megabytes
 	AM_RANGE(0xf0000000, 0xf7ffffff) AM_RAM AM_SHARE("nv2a_share") // 3d accelerator wants this
+#ifdef USE_LEGACY_PCI
 	AM_RANGE(0xfd000000, 0xfdffffff) AM_RAM AM_READWRITE(geforce_r, geforce_w)
+#endif
 	AM_RANGE(0xfed00000, 0xfed003ff) AM_READWRITE(ohci_usb_r, ohci_usb_w)
 	AM_RANGE(0xfed08000, 0xfed08fff) AM_READWRITE(ohci_usb2_r, ohci_usb2_w)
 	AM_RANGE(0xfe800000, 0xfe87ffff) AM_READWRITE(audio_apu_r, audio_apu_w)
@@ -1199,7 +1212,9 @@ ADDRESS_MAP_START(xbox_base_map_io, AS_IO, 32, xbox_base_state)
 	AM_RANGE(0x00a0, 0x00a3) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, read_cs0, write_cs0)
 	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE8(superiors232_read, superiors232_write, 0xffffffff)
+#ifdef USE_LEGACY_PCI
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
+#endif
 	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(dummy_r, dummy_w) // lpc bridge
 	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(smbus_r, smbus_w)
 	AM_RANGE(0xc200, 0xc21f) AM_READWRITE(smbus2_r, smbus2_w)
@@ -1209,10 +1224,304 @@ ADDRESS_MAP_START(xbox_base_map_io, AS_IO, 32, xbox_base_state)
 	AM_RANGE(0xff60, 0xff6f) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w)
 ADDRESS_MAP_END
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class nv2a_host_device : public pci_host_device {
+public:
+	nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+	void set_cpu_tag(const char *_cpu_tag);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	const char *cpu_tag;
+	cpu_device *cpu;
+};
+
+const device_type NV2A_HOST = device_creator<nv2a_host_device>;
+
+nv2a_host_device::nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_host_device(mconfig, NV2A_HOST, "PCI Bridge Device - Host Bridge", tag, owner, clock, "NV2A_host", __FILE__),
+	  cpu_tag(nullptr),
+	  cpu(nullptr)
+{
+}
+
+void nv2a_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+{
+	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
+}
+
+void nv2a_host_device::set_cpu_tag(const char *_cpu_tag)
+{
+	cpu_tag = _cpu_tag;
+}
+
+void nv2a_host_device::device_start()
+{
+	pci_host_device::device_start();
+	cpu = machine().device<cpu_device>(cpu_tag);
+	memory_space = &cpu->space(AS_PROGRAM);
+	io_space = &cpu->space(AS_IO);
+
+	// do not change the next two
+	memory_window_start = 0xfd000000;
+	memory_window_end = 0xfdffffff;
+	memory_offset = 0;// xfd000000;
+	// next two must define an unused area
+	io_window_start = 0xf000;
+	io_window_end = 0xf00f;
+	io_offset = 0xf000;
+}
+
+void nv2a_host_device::device_reset()
+{
+	pci_host_device::device_reset();
+}
+
+extern const device_type NV2A_HOST;
+#define MCFG_PCI_HOST_CPU(_cpu_tag) downcast<nv2a_host_device *>(device)->set_cpu_tag(_cpu_tag);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class nv2a_ram_device : public pci_device {
+public:
+	nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+
+protected:
+	DECLARE_READ32_MEMBER(config_register_r);
+	DECLARE_WRITE32_MEMBER(config_register_w);
+};
+
+DEVICE_ADDRESS_MAP_START(config_map, 32, nv2a_ram_device)
+	AM_RANGE(0x6c, 0x6f) AM_READWRITE(config_register_r, config_register_w)
+	AM_INHERIT_FROM(pci_device::config_map)
+ADDRESS_MAP_END
+
+const device_type NV2A_RAM = device_creator<nv2a_ram_device>;
+
+nv2a_ram_device::nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, NV2A_RAM, "Memory Controller - SDRAM", tag, owner, clock, "NV2A_ram", __FILE__)
+{
+}
+
+READ32_MEMBER(nv2a_ram_device::config_register_r)
+{
+	return 0x08800044;
+}
+
+WRITE32_MEMBER(nv2a_ram_device::config_register_w)
+{
+	return;
+}
+
+
+extern const device_type NV2A_RAM;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class mcpx_lpc_device : public pci_device {
+public:
+	mcpx_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+const device_type MCPX_LPC = device_creator<mcpx_lpc_device>;
+
+mcpx_lpc_device::mcpx_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, MCPX_LPC, "HUB Interface - ISA Bridge", tag, owner, clock, "MCPX_lpc", __FILE__)
+{
+}
+
+extern const device_type MCPX_LPC;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class mcpx_smbus_device : public pci_device {
+public:
+	mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+const device_type MCPX_SMBUS = device_creator<mcpx_smbus_device>;
+
+mcpx_smbus_device::mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, MCPX_SMBUS, "SMBus Controller", tag, owner, clock, "MCPX_smbus", __FILE__)
+{
+}
+
+extern const device_type MCPX_SMBUS;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class mcpx_ohci_device : public pci_device {
+public:
+	mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+const device_type MCPX_OHCI = device_creator<mcpx_ohci_device>;
+
+mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, MCPX_OHCI, "OHCI USB Controller", tag, owner, clock, "MCPX_OHCI", __FILE__)
+{
+}
+
+extern const device_type MCPX_OHCI;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class mcpx_eth_device : public pci_device {
+public:
+	mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+const device_type MCPX_ETH = device_creator<mcpx_eth_device>;
+
+mcpx_eth_device::mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, MCPX_ETH, "MCP Networking Adapter", tag, owner, clock, "MCPX_ETH", __FILE__)
+{
+}
+
+extern const device_type MCPX_ETH;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class mcpx_apu_device : public pci_device {
+public:
+	mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+const device_type MCPX_APU = device_creator<mcpx_apu_device>;
+
+mcpx_apu_device::mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, MCPX_APU, "MCP APU", tag, owner, clock, "MCPX_APU", __FILE__)
+{
+}
+
+extern const device_type MCPX_APU;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class mcpx_ac97_audio_device : public pci_device {
+public:
+	mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+const device_type MCPX_AC97_AUDIO = device_creator<mcpx_ac97_audio_device>;
+
+mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, MCPX_AC97_AUDIO, "AC`97 Audio Codec Interface", tag, owner, clock, "MCPX_AC97_AUDIO", __FILE__)
+{
+}
+
+extern const device_type MCPX_AC97_AUDIO;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class mcpx_ac97_modem_device : public pci_device {
+public:
+	mcpx_ac97_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+const device_type MCPX_AC97_MODEM = device_creator<mcpx_ac97_modem_device>;
+
+mcpx_ac97_modem_device::mcpx_ac97_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, MCPX_AC97_MODEM, "AC`97 Modem Controller", tag, owner, clock, "MCPX_AC97_MODEM", __FILE__)
+{
+}
+
+extern const device_type MCPX_AC97_MODEM;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class mcpx_ide_device : public pci_device {
+public:
+	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+const device_type MCPX_IDE = device_creator<mcpx_ide_device>;
+
+mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, MCPX_IDE, "IDE Controller", tag, owner, clock, "MCPX_IDE", __FILE__)
+{
+}
+
+extern const device_type MCPX_IDE;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class nv2a_agp_device : public agp_bridge_device {
+public:
+	nv2a_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+};
+
+const device_type NV2A_AGP = device_creator<nv2a_agp_device>;
+
+nv2a_agp_device::nv2a_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: agp_bridge_device(mconfig, NV2A_AGP, "AGP Host to PCI Bridge", tag, owner, clock, "NV2A_agp", __FILE__)
+{
+}
+
+void nv2a_agp_device::device_start()
+{
+	agp_bridge_device::device_start();
+}
+
+void nv2a_agp_device::device_reset()
+{
+	agp_bridge_device::device_reset();
+}
+
+extern const device_type NV2A_AGP;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class nv2a_gpu_device : public pci_device {
+public:
+	nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	DECLARE_READ32_MEMBER(geforce_r);
+	DECLARE_WRITE32_MEMBER(geforce_w);
+	nv2a_renderer *nvidia_nv2a;
+
+	protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	DECLARE_ADDRESS_MAP(nv2a_mmio, 32);
+};
+
+DEVICE_ADDRESS_MAP_START(nv2a_mmio, 32, nv2a_gpu_device)
+	AM_RANGE(0x00000000,0x00ffffff) AM_RAM AM_READWRITE(geforce_r, geforce_w)
+ADDRESS_MAP_END
+
+const device_type NV2A_GPU = device_creator<nv2a_gpu_device>;
+
+nv2a_gpu_device::nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, NV2A_GPU, "Nvidia NV2A GPU", tag, owner, clock, "NV2A_GPU", __FILE__),
+	nvidia_nv2a(nullptr)
+{
+}
+
+void nv2a_gpu_device::device_start()
+{
+	pci_device::device_start();
+	add_map(0x01000000, M_MEM, FUNC(nv2a_gpu_device::nv2a_mmio));
+	//set_map_address(0, 0xfd000000);
+	bank_infos[0].adr = 0xfd000000;
+}
+
+void nv2a_gpu_device::device_reset()
+{
+	pci_device::device_reset();
+}
+
+READ32_MEMBER(nv2a_gpu_device::geforce_r)
+{
+	return nvidia_nv2a->geforce_r(space, offset, mem_mask);
+}
+
+WRITE32_MEMBER(nv2a_gpu_device::geforce_w)
+{
+	nvidia_nv2a->geforce_w(space, offset, data, mem_mask);
+}
+
+extern const device_type NV2A_GPU;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void xbox_base_state::machine_start()
 {
 	find_debug_params(machine());
-	nvidia_nv2a = std::make_unique<nv2a_renderer>(machine());
+	nvidia_nv2a = new nv2a_renderer(machine());
+#ifndef USE_LEGACY_PCI
+	machine().device<nv2a_gpu_device>(":pci:1e.0:00.0")->nvidia_nv2a = nvidia_nv2a;
+#endif
 	memset(pic16lc_buffer, 0, sizeof(pic16lc_buffer));
 	pic16lc_buffer[0] = 'B';
 	pic16lc_buffer[4] = 0; // A/V connector, 0=scart 2=vga 4=svideo 7=none
@@ -1248,7 +1557,7 @@ void xbox_base_state::machine_start()
 	memset(&superiost, 0, sizeof(superiost));
 	superiost.configuration_mode = false;
 	superiost.registers[0][0x26] = 0x2e; // Configuration port address byte 0
-	// savestates
+										 // savestates
 	save_item(NAME(debug_irq_active));
 	save_item(NAME(debug_irq_number));
 	save_item(NAME(smbusst.status));
@@ -1274,19 +1583,39 @@ MACHINE_CONFIG_START(xbox_base, xbox_base_state)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+#ifdef USE_LEGACY_PCI
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, "PCI Bridge Device - Host Bridge", pcibridghostbridg_pci_r, pcibridghostbridg_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, "PCI Bridge Device - Host Bridge", pcibridghostbridg_pci_r, pcibridghostbridg_pci_w) // function 0 host function 3 ram
 	MCFG_PCI_BUS_LEGACY_DEVICE(1, "HUB Interface - ISA Bridge", hubintisabridg_pci_r, hubintisabridg_pci_w) // function 0 lpc function 1 smbus
 	MCFG_PCI_BUS_LEGACY_DEVICE(2, "OHCI USB Controller 1", dummy_pci_r, dummy_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(3, "OHCI USB Controller 2", dummy_pci_r, dummy_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(4, "MCP Networking Adapter", dummy_pci_r, dummy_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(5, "MCP APU", dummy_pci_r, dummy_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(6, "AC`97 Audio Codec Interface", dummy_pci_r, dummy_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(6, "AC`97 Audio Codec Interface", dummy_pci_r, dummy_pci_w) // function 0 ac97 audio function 1 ac97 modem
+	MCFG_PCI_BUS_LEGACY_DEVICE(8, "PCI to PCI Bridge", dummy_pci_r, dummy_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(9, "IDE Controller", dummy_pci_r, dummy_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(30, "AGP Host to PCI Bridge", dummy_pci_r, dummy_pci_w)
 	MCFG_PCI_BUS_LEGACY_ADD("agpbus", 1)
 	MCFG_PCI_BUS_LEGACY_SIBLING("pcibus")
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, "NV2A GeForce 3MX Integrated GPU/Northbridge", geforce_pci_r, geforce_pci_w)
+#else
+	MCFG_PCI_ROOT_ADD(  ":pci")
+	MCFG_PCI_HOST_ADD(  ":pci:00.0", NV2A_HOST, 0x10de02a5, 0, 0)
+	MCFG_PCI_HOST_CPU("maincpu")
+	MCFG_PCI_DEVICE_ADD(":pci:00.3", NV2A_RAM, 0x10de02a6, 0, 0, 0)
+	MCFG_PCI_DEVICE_ADD(":pci:01.0", MCPX_LPC, 0x10de01b2, 0xb4, 0, 0) // revision id must be at least 0xb4, otherwise usb will require a hub
+	MCFG_PCI_DEVICE_ADD(":pci:01.1", MCPX_SMBUS, 0x10de01b4, 0, 0, 0)
+	MCFG_PCI_DEVICE_ADD(":pci:02.0", MCPX_OHCI, 0x10de01c2, 0, 0, 0)
+	MCFG_PCI_DEVICE_ADD(":pci:03.0", MCPX_OHCI, 0x10de01c2, 0, 0, 0)
+	MCFG_PCI_DEVICE_ADD(":pci:04.0", MCPX_ETH, 0x10de01c3, 0, 0, 0)
+	MCFG_PCI_DEVICE_ADD(":pci:05.0", MCPX_APU, 0x10de01b0, 0, 0, 0)
+	MCFG_PCI_DEVICE_ADD(":pci:06.0", MCPX_AC97_AUDIO, 0x10de01b1, 0, 0, 0)
+	MCFG_PCI_DEVICE_ADD(":pci:06.1", MCPX_AC97_MODEM, 0x10de01c1, 0, 0, 0)
+	MCFG_PCI_BRIDGE_ADD(":pci:08.0", 0x10de01b8, 0)
+	MCFG_PCI_DEVICE_ADD(":pci:09.0", MCPX_IDE, 0x10de01bc, 0, 0, 0)
+	MCFG_AGP_BRIDGE_ADD(":pci:1e.0", NV2A_AGP, 0x10de01b7, 0)
+	MCFG_PCI_DEVICE_ADD(":pci:1e.0:00.0", NV2A_GPU, 0x10de02a0, 0, 0, 0)
+#endif
 	MCFG_PIC8259_ADD("pic8259_1", WRITELINE(xbox_base_state, xbox_pic8259_1_set_int_line), VCC, READ8(xbox_base_state, get_slave_ack))
 	MCFG_PIC8259_ADD("pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NOOP)
 

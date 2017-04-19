@@ -115,7 +115,7 @@ public:
 		uint8_t registers[16][256]; // 256 registers for up to 16 devices, registers 0-0x2f common to all
 	} superiost;
 	uint8_t pic16lc_buffer[0xff];
-	std::unique_ptr<nv2a_renderer> nvidia_nv2a;
+	nv2a_renderer *nvidia_nv2a;
 	bool debug_irq_active;
 	int debug_irq_number;
 	required_device<cpu_device> m_maincpu;
