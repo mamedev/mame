@@ -315,7 +315,17 @@ bool emu_options::override_set_value(const char *name, const std::string &value)
 	auto imageiter = m_image_options.find(name);
 	if (imageiter != m_image_options.end())
 	{
-		imageiter->second = value;
+		// We've found a potential image slot for this value.  However, we're only going to specify it
+		// if the current image option is empty.  This is because if there is an image option already
+		// present, it is almost certain that this was because something was specified at the command
+		// line and we're parsing an INI.  Because INIs have less priority than the command line, this
+		// should be ignored
+		//
+		// Obviously, this ignores that INIs themselves have their own prioritization, so this should be
+		// considered to be a hack.  Instead of having image options being just a straight map of std::string
+		// it should really be a structure where the priority can be recorded
+		if (imageiter->second.empty())
+			imageiter->second = value;
 		return true;
 	}
 

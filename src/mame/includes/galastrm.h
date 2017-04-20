@@ -87,6 +87,7 @@ public:
 	struct gs_tempsprite *m_sprite_ptr_pre;
 	bitmap_ind16 m_tmpbitmaps;
 	std::unique_ptr<galastrm_renderer> m_poly;
+	emu_timer *m_interrupt6_timer;
 
 	int m_rsxb;
 	int m_rsyb;
@@ -101,6 +102,7 @@ public:
 	DECLARE_WRITE32_MEMBER(galastrm_adstick_ctrl_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
+	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galastrm_interrupt);

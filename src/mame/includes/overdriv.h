@@ -32,6 +32,7 @@ public:
 	int       m_zoom_colorbase[2];
 	int       m_road_colorbase[2];
 	int       m_sprite_colorbase;
+	emu_timer *m_objdma_end_timer;
 
 	/* misc */
 	uint16_t     m_cpuB_ctrl;

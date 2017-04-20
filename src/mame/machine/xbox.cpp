@@ -5,6 +5,7 @@
 #include "includes/xbox.h"
 
 #include "cpu/i386/i386.h"
+#define USE_LEGACY_PCI
 #ifdef USE_LEGACY_PCI
 #include "machine/lpci.h"
 #else
@@ -1223,7 +1224,7 @@ ADDRESS_MAP_START(xbox_base_map_io, AS_IO, 32, xbox_base_state)
 	AM_RANGE(0xe000, 0xe007) AM_READWRITE(networkio_r, networkio_w)
 	AM_RANGE(0xff60, 0xff6f) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w)
 ADDRESS_MAP_END
-
+#ifndef USE_LEGACY_PCI
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class nv2a_host_device : public pci_host_device {
 public:
@@ -1244,7 +1245,7 @@ private:
 const device_type NV2A_HOST = device_creator<nv2a_host_device>;
 
 nv2a_host_device::nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, NV2A_HOST, "PCI Bridge Device - Host Bridge", tag, owner, clock, "NV2A_host", __FILE__),
+	: pci_host_device(mconfig, NV2A_HOST, "PCI Bridge Device - Host Bridge", tag, owner, clock, "nv2a_host", __FILE__),
 	  cpu_tag(nullptr),
 	  cpu(nullptr)
 {
@@ -1305,7 +1306,7 @@ ADDRESS_MAP_END
 const device_type NV2A_RAM = device_creator<nv2a_ram_device>;
 
 nv2a_ram_device::nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, NV2A_RAM, "Memory Controller - SDRAM", tag, owner, clock, "NV2A_ram", __FILE__)
+	: pci_device(mconfig, NV2A_RAM, "Memory Controller - SDRAM", tag, owner, clock, "nv2a_ram", __FILE__)
 {
 }
 
@@ -1330,7 +1331,7 @@ public:
 const device_type MCPX_LPC = device_creator<mcpx_lpc_device>;
 
 mcpx_lpc_device::mcpx_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_LPC, "HUB Interface - ISA Bridge", tag, owner, clock, "MCPX_lpc", __FILE__)
+	: pci_device(mconfig, MCPX_LPC, "HUB Interface - ISA Bridge", tag, owner, clock, "mcpx_lpc", __FILE__)
 {
 }
 
@@ -1344,7 +1345,7 @@ public:
 const device_type MCPX_SMBUS = device_creator<mcpx_smbus_device>;
 
 mcpx_smbus_device::mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_SMBUS, "SMBus Controller", tag, owner, clock, "MCPX_smbus", __FILE__)
+	: pci_device(mconfig, MCPX_SMBUS, "SMBus Controller", tag, owner, clock, "mcpx_smbus", __FILE__)
 {
 }
 
@@ -1358,7 +1359,7 @@ public:
 const device_type MCPX_OHCI = device_creator<mcpx_ohci_device>;
 
 mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_OHCI, "OHCI USB Controller", tag, owner, clock, "MCPX_OHCI", __FILE__)
+	: pci_device(mconfig, MCPX_OHCI, "MCPX OHCI USB Controller", tag, owner, clock, "mcpx_ohci", __FILE__)
 {
 }
 
@@ -1372,7 +1373,7 @@ public:
 const device_type MCPX_ETH = device_creator<mcpx_eth_device>;
 
 mcpx_eth_device::mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_ETH, "MCP Networking Adapter", tag, owner, clock, "MCPX_ETH", __FILE__)
+	: pci_device(mconfig, MCPX_ETH, "MCP Networking Adapter", tag, owner, clock, "mcpx_eth", __FILE__)
 {
 }
 
@@ -1386,7 +1387,7 @@ public:
 const device_type MCPX_APU = device_creator<mcpx_apu_device>;
 
 mcpx_apu_device::mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_APU, "MCP APU", tag, owner, clock, "MCPX_APU", __FILE__)
+	: pci_device(mconfig, MCPX_APU, "MCP APU", tag, owner, clock, "mcpx_apu", __FILE__)
 {
 }
 
@@ -1400,7 +1401,7 @@ public:
 const device_type MCPX_AC97_AUDIO = device_creator<mcpx_ac97_audio_device>;
 
 mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_AC97_AUDIO, "AC`97 Audio Codec Interface", tag, owner, clock, "MCPX_AC97_AUDIO", __FILE__)
+	: pci_device(mconfig, MCPX_AC97_AUDIO, "AC`97 Audio Codec Interface", tag, owner, clock, "mcpx_av97_audio", __FILE__)
 {
 }
 
@@ -1414,7 +1415,7 @@ public:
 const device_type MCPX_AC97_MODEM = device_creator<mcpx_ac97_modem_device>;
 
 mcpx_ac97_modem_device::mcpx_ac97_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_AC97_MODEM, "AC`97 Modem Controller", tag, owner, clock, "MCPX_AC97_MODEM", __FILE__)
+	: pci_device(mconfig, MCPX_AC97_MODEM, "AC`97 Modem Controller", tag, owner, clock, "mcpx_ac97_modem", __FILE__)
 {
 }
 
@@ -1428,7 +1429,7 @@ public:
 const device_type MCPX_IDE = device_creator<mcpx_ide_device>;
 
 mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_IDE, "IDE Controller", tag, owner, clock, "MCPX_IDE", __FILE__)
+	: pci_device(mconfig, MCPX_IDE, "MCPX IDE Controller", tag, owner, clock, "mcpx_ide", __FILE__)
 {
 }
 
@@ -1446,7 +1447,7 @@ protected:
 const device_type NV2A_AGP = device_creator<nv2a_agp_device>;
 
 nv2a_agp_device::nv2a_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: agp_bridge_device(mconfig, NV2A_AGP, "AGP Host to PCI Bridge", tag, owner, clock, "NV2A_agp", __FILE__)
+	: agp_bridge_device(mconfig, NV2A_AGP, "AGP Host to PCI Bridge", tag, owner, clock, "nv2a_agp", __FILE__)
 {
 }
 
@@ -1484,7 +1485,7 @@ ADDRESS_MAP_END
 const device_type NV2A_GPU = device_creator<nv2a_gpu_device>;
 
 nv2a_gpu_device::nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, NV2A_GPU, "Nvidia NV2A GPU", tag, owner, clock, "NV2A_GPU", __FILE__),
+	: pci_device(mconfig, NV2A_GPU, "Nvidia NV2A GPU", tag, owner, clock, "nv2a_gpu", __FILE__),
 	nvidia_nv2a(nullptr)
 {
 }
@@ -1514,6 +1515,7 @@ WRITE32_MEMBER(nv2a_gpu_device::geforce_w)
 
 extern const device_type NV2A_GPU;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#endif
 
 void xbox_base_state::machine_start()
 {

@@ -1060,6 +1060,21 @@ ROM_START( megatack )
 	ROM_LOAD( "megatsnd.e1",  0xe000, 0x0800, CRC(0c186bdb) SHA1(233af9481a3979971f2d5aa75ec8df4333aa5e0d) )
 ROM_END
 
+ROM_START( megatacka ) // original Centuri PCB
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "meg-e2.bin",  0xc000, 0x0800, CRC(9664c7b1) SHA1(356e7f5f3b2a9b829fac53e7bf9193278b4de2ed) )
+	ROM_LOAD( "meg-f2.bin",  0xc800, 0x0800, CRC(67c42523) SHA1(f9fc88cdea05a2d0e89e3ba9b545bf3476b37d2d) )
+	ROM_LOAD( "meg-g2.bin",  0xd000, 0x0800, CRC(71f36604) SHA1(043988126343b6224e8e1d6c0dbba6b6b08fe493) )
+	ROM_LOAD( "meg-j2.bin",  0xd800, 0x0800, CRC(4ddcc145) SHA1(3a6d42a58c388eaaf6561351fa98936d98975e0b) )
+	ROM_LOAD( "meg-j1.bin",  0xe000, 0x0800, CRC(911d5d9a) SHA1(92bfe0f69a6e563363df59ebee745d7b3cfc0141) )
+	ROM_LOAD( "meg-g1.bin",  0xe800, 0x0800, CRC(22a51c9b) SHA1(556e09216ed85eaf3870f85515c273c7eb1ab13a) )
+	ROM_LOAD( "meg-f1.bin",  0xf000, 0x0800, CRC(2ffa51ac) SHA1(7c5d8295c5e71a9918a02d203139b024bd3bf8f4) )
+	ROM_LOAD( "meg-e1.bin",  0xf800, 0x0800, CRC(01dbe4ad) SHA1(af72778ae112f24a92fb3007bb456331c3896b50) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "megatsnd.e1",  0xe000, 0x0800, CRC(0c186bdb) SHA1(233af9481a3979971f2d5aa75ec8df4333aa5e0d) ) // missing for this board, using the one from the parent
+ROM_END
+
 ROM_START( challeng )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "chall.6",      0xa000, 0x1000, CRC(b30fe7f5) SHA1(ce93a57d626f90d31ddedbc35135f70758949dfa) )
@@ -1160,11 +1175,12 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, killcom,  0,        gameplan, killcom, driver_device,  0, ROT0,   "Game Plan (Centuri license)", "Killer Comet", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, megatack, 0,        gameplan, megatack, driver_device, 0, ROT0,   "Game Plan (Centuri license)", "Megatack", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, challeng, 0,        gameplan, challeng, driver_device, 0, ROT0,   "Game Plan (Centuri license)", "Challenger", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, kaos,     0,        gameplan, kaos, driver_device,     0, ROT270, "Game Plan", "Kaos", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, leprechn, 0,        leprechn, leprechn, driver_device, 0, ROT0,   "Tong Electronic", "Leprechaun", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, potogold, leprechn, leprechn, potogold, driver_device, 0, ROT0,   "Tong Electronic (Game Plan license)", "Pot of Gold", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, leprechp, leprechn, leprechn, potogold, driver_device, 0, ROT0,   "Tong Electronic (Pacific Polytechnical license)", "Leprechaun (Pacific)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, piratetr, 0,        leprechn, piratetr, driver_device, 0, ROT0,   "Tong Electronic", "Pirate Treasure", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, killcom,   0,        gameplan, killcom, driver_device,  0, ROT0,   "Game Plan (Centuri license)", "Killer Comet", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, megatack,  0,        gameplan, megatack, driver_device, 0, ROT0,   "Game Plan (Centuri license)", "Megatack (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, megatacka, megatack, gameplan, megatack, driver_device, 0, ROT0,   "Game Plan (Centuri license)", "Megatack (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, challeng,  0,        gameplan, challeng, driver_device, 0, ROT0,   "Game Plan (Centuri license)", "Challenger", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, kaos,      0,        gameplan, kaos, driver_device,     0, ROT270, "Game Plan", "Kaos", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, leprechn,  0,        leprechn, leprechn, driver_device, 0, ROT0,   "Tong Electronic", "Leprechaun", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, potogold,  leprechn, leprechn, potogold, driver_device, 0, ROT0,   "Tong Electronic (Game Plan license)", "Pot of Gold", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, leprechp,  leprechn, leprechn, potogold, driver_device, 0, ROT0,   "Tong Electronic (Pacific Polytechnical license)", "Leprechaun (Pacific)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, piratetr,  0,        leprechn, piratetr, driver_device, 0, ROT0,   "Tong Electronic", "Pirate Treasure", MACHINE_SUPPORTS_SAVE )

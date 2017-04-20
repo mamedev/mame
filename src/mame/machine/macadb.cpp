@@ -637,6 +637,11 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 	}
 	else
 	{
+		if (!m_adb_direction)
+		{
+			m_via1->write_cb2((m_adb_send & 0x80)>>7);
+			m_adb_send <<= 1;
+		}
 		// do one clock transition on CB1 to advance the VIA shifter
 		m_adb_extclock ^= 1;
 		m_via1->write_cb1(m_adb_extclock);
@@ -644,11 +649,6 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 		if (m_adb_direction)
 		{
 			m_adb_command <<= 1;
-		}
-		else
-		{
-			m_via1->write_cb2((m_adb_send & 0x80)>>7);
-			m_adb_send <<= 1;
 		}
 
 		m_adb_extclock ^= 1;

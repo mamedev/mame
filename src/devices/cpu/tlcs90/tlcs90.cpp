@@ -54,7 +54,7 @@ static ADDRESS_MAP_START(tmp91641_mem, AS_PROGRAM, 8, tlcs90_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tmp90ph44_mem, AS_PROGRAM, 8, tlcs90_device )
-	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB ROM (internal)
+	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB PROM (internal)
 	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+55   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w ) // TODO: has 8 more registers
 ADDRESS_MAP_END
