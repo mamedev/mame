@@ -1792,6 +1792,7 @@ static MACHINE_CONFIG_START( quizwizc, quizwizc_state )
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "quizwiz_cart")
+	MCFG_GENERIC_MANDATORY
 	MCFG_GENERIC_LOAD(quizwizc_state, cartridge)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "quizwiz")
 MACHINE_CONFIG_END
