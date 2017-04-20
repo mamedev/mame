@@ -91,6 +91,8 @@ public:
 	typedef void (segas32_state::*prot_vblank_func)();
 	prot_vblank_func m_system32_prot_vblank;
 	int m_print_count;
+	emu_timer *m_vblank_end_int_timer;
+	emu_timer *m_update_sprites_timer;
 	DECLARE_WRITE16_MEMBER(sonic_level_load_protection);
 	DECLARE_READ16_MEMBER(brival_protection_r);
 	DECLARE_WRITE16_MEMBER(brival_protection_w);
