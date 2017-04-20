@@ -145,6 +145,7 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const { return std::string(); }
 	device_t *get_card_device() { return m_card_device; }
 	void set_card_device(device_t *dev) { m_card_device = dev; }
+	const char *slot_name() const { return device().tag() + 1; }
 
 private:
 	// internal state

@@ -195,6 +195,8 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+struct game_driver;
+
 class slot_option
 {
 public:
@@ -228,18 +230,64 @@ public:
 	const std::string &bios() const { return m_specified_bios; }
 	const std::string &default_card_software() const { return m_default_card_software; }
 	bool specified() const { return m_specified; }
+	core_options::entry *option_entry() const { return m_entry; }
 
 	// seters
 	void specify(std::string &&text);
 	void set_bios(std::string &&text);
 	void set_default_card_software(std::string &&s) { m_default_card_software = std::move(s); }
 
+	// instantiates an option entry (don't call outside of emuopts.cpp)
+	core_options::entry::ptr setup_option_entry(const char *name);
+
 private:
-	bool			m_specified;
-	std::string		m_specified_value;
-	std::string		m_specified_bios;
-	std::string		m_default_card_software;
-	std::string		m_default_value;
+	bool					m_specified;
+	std::string				m_specified_value;
+	std::string				m_specified_bios;
+	std::string				m_default_card_software;
+	std::string				m_default_value;
+	core_options::entry *	m_entry;
+};
+
+
+class image_option
+{
+public:
+	image_option(const std::string &cannonical_instance_name = "");
+	image_option(const image_option &that) = default;
+	image_option(image_option &&that) = default;
+
+	const image_option &operator=(const image_option &that)
+	{
+		m_cannonical_instance_name = that.m_cannonical_instance_name;
+		m_value = that.m_value;
+		m_entry = that.m_entry;
+		return *this;
+	}
+
+	const image_option &operator=(image_option &&that)
+	{
+		m_cannonical_instance_name = std::move(that.m_cannonical_instance_name);
+		m_value = std::move(that.m_value);
+		m_entry = std::move(that.m_entry);
+		return *this;
+	}
+
+	// accessors
+	const std::string &cannonical_instance_name() const { return m_cannonical_instance_name; }
+	const std::string &value() const { return m_value; }
+	core_options::entry *option_entry() const { return m_entry; }
+
+	// mutators
+	template <typename... Params> void specify(Params &&...value) { m_value.assign(std::forward<Params>(value)...); }
+
+	// instantiates an option entry (don't call outside of emuopts.cpp)
+	core_options::entry::ptr setup_option_entry(std::vector<std::string> &&names);
+
+private:
+	std::string				m_cannonical_instance_name;
+	std::string				m_value;
+	core_options::entry	*	m_entry;
 };
 
 
@@ -253,11 +301,16 @@ public:
 	};
 
 	// construction/destruction
-	emu_options();
+	emu_options(bool general_only = false);
+	~emu_options();
+
+	// mutation
+	void set_system_name(const std::string &new_system_name);
+	void set_software(const std::string &new_software);
 
 	// core options
-	const char *system_name() const { return value(OPTION_SYSTEMNAME); }
-	const char *software_name() const { return value(OPTION_SOFTWARENAME); }
+	const game_driver *system() const { return m_system; }
+	const char *system_name() const;
 
 	// core configuration options
 	bool read_config() const { return bool_value(OPTION_READCONFIG); }
@@ -427,36 +480,43 @@ public:
 
 	const char *language() const { return value(OPTION_LANGUAGE); }
 
-	// Web server specific optopns
+	// Web server specific options
 	bool  http() const { return bool_value(OPTION_HTTP); }
 	short http_port() const { return int_value(OPTION_HTTP_PORT); }
 	const char *http_root() const { return value(OPTION_HTTP_ROOT); }
 
 	// slots and devices - the values for these are stored outside of the core_options
 	// structure
-	std::map<std::string, slot_option> &slot_options() { return m_slot_options; }
-	const std::map<std::string, slot_option> &slot_options() const { return m_slot_options; }
-	std::map<std::string, std::string> &image_options() { return m_image_options; }
-	const std::map<std::string, std::string> &image_options() const { return m_image_options; }
-
-protected:
-	virtual void value_changed(const std::string &name, const std::string &value) override;
-	virtual override_get_value_result override_get_value(const char *name, std::string &value) const override;
-	virtual bool override_set_value(const char *name, const std::string &value) override;
+	const ::slot_option &slot_option(const std::string &device_name) const;
+	::slot_option &slot_option(const std::string &device_name);
+	bool has_slot_option(const std::string &device_name) const;
+	const ::image_option &image_option(const std::string &device_name) const;
+	::image_option &image_option(const std::string &device_name);
 
 private:
-	static const options_entry s_option_entries[];
+	// slot/image/softlist calculus
+	std::map<std::string, std::string> evaluate_initial_softlist_options(const std::string &software_identifier);
+	void update_slot_and_image_options();
+	bool add_and_remove_slot_options();
+	bool add_and_remove_image_options();
+
+	// static list of options entries
+	static const options_entry							s_option_entries[];
+
+	// the current driver
+	const game_driver *									m_system;
 
 	// slots and devices
-	std::map<std::string, slot_option>	m_slot_options;
-	std::map<std::string, std::string>	m_image_options;
+	std::unordered_map<std::string, ::slot_option>		m_slot_options;
+	std::unordered_map<std::string, ::image_option>		m_image_options_cannonical;
+	std::unordered_map<std::string, ::image_option *>	m_image_options;
 
 	// cached options, for scenarios where parsing core_options is too slow
-	int									m_coin_impulse;
-	bool								m_joystick_contradictory;
-	bool								m_sleep;
-	bool								m_refresh_speed;
-	ui_option							m_ui;
+	int													m_coin_impulse;
+	bool												m_joystick_contradictory;
+	bool												m_sleep;
+	bool												m_refresh_speed;
+	ui_option											m_ui;
 };
 
 #endif  // MAME_EMU_EMUOPTS_H

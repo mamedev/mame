@@ -326,8 +326,7 @@ std::string machine_info::mandatory_images()
 	{
 		if (image.must_be_loaded())
 		{
-			auto iter = m_machine.options().image_options().find(image.instance_name());
-			if (iter == m_machine.options().image_options().end() || iter->second.empty())
+			if (m_machine.options().image_option(image.instance_name()).value().empty())
 			{
 				if (is_first)
 					is_first = false;

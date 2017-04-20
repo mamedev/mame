@@ -193,9 +193,9 @@ info_xml_creator::info_xml_creator(driver_enumerator &drivlist, bool filter_devi
 	: m_output(nullptr)
 	, m_drivlist(drivlist)
 	, m_filter_devices(filter_devices)
-	, m_lookup_options(m_drivlist.options())
+	, m_lookup_options(true)
 {
-	mame_options::remove_device_options(m_lookup_options);
+	m_lookup_options.copy_from(m_drivlist.options());
 }
 
 
