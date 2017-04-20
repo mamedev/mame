@@ -39,8 +39,8 @@
 #define LOG_READ    (1U <<  3)
 #define LOG_INT     (1U <<  4)
 
-#define VERBOSE (LOG_SHIFT)
-#define LOG_OUTPUT_FUNC printf
+//#define VERBOSE (LOG_SHIFT)
+//#define LOG_OUTPUT_FUNC printf
 
 #include "logmacro.h"
 
