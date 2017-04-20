@@ -28,6 +28,7 @@ public:
 
 protected:
 	virtual bool menu_has_search_active() override { return (m_search[0] != 0); }
+	virtual int reserved_lines() const override;
 
 private:
 	enum

@@ -496,17 +496,134 @@ void *menu::m_pool_alloc(size_t size)
 
 void menu::set_selection(void *selected_itemref)
 {
-	selected = -1;
-	for (int itemnum = 0; itemnum < item.size(); itemnum++)
+	auto iter = std::find_if(
+		item.begin(),
+		item.end(),
+		[selected_itemref](const ui::menu_item &item) { return item.ref == selected_itemref; });
+
+	int new_selection = iter != item.end()
+		? iter - item.begin()
+		: -1;
+
+	set_selection(new_selection);
+}
+
+
+//-------------------------------------------------
+//  set_selection - changes the index
+//  of the currently selected menu item
+//-------------------------------------------------
+
+void menu::set_selection(int new_selection)
+{
+	selected = new_selection;
+	check_top_line();
+}
+
+
+//-------------------------------------------------
+//  check_top_line - if the newly selected position
+//	is not within the current window, move top_line
+//-------------------------------------------------
+
+void menu::check_top_line()
+{
+	if (!is_selection_visible())
+		set_top_line(selected - calculate_visible_lines() / 2);
+}
+
+
+//-------------------------------------------------
+//  move_selection - moves the selection by a
+//  delta and performs required housekeeping
+//-------------------------------------------------
+
+void menu::move_selection(int delta, uint32_t flags)
+{
+	// there is probably a better way to do this (is this actually necessary?)
+	if ((flags & FLAG_UI_DATS) != 0)
 	{
-		if (item[itemnum].ref == selected_itemref)
-		{
-			selected = itemnum;
-			break;
-		}
+		set_top_line(top_line + delta);
+		return;
+	}
+
+	int old_selected = selected;
+	selected += delta;
+
+	// we may need to move further
+	if (delta < 0)
+		validate_selection(-1);
+	else
+		validate_selection(+1);
+
+	// if we're no longer visible, we may need to adjust the top line
+	if (!is_selection_visible())
+	{
+		int new_top_line = top_line + (selected - old_selected);
+
+		// special cases - account for arrows
+		int visible_lines = calculate_visible_lines();
+		if (new_top_line == selected && new_top_line > 0)
+			new_top_line--;
+		else if (new_top_line + visible_lines - 1 == selected && new_top_line + visible_lines < (int)item.size() - reserved_lines())
+			new_top_line++;
+
+		set_top_line(new_top_line);
 	}
 }
 
+
+//-------------------------------------------------
+//  set_top_line
+//-------------------------------------------------
+
+void menu::set_top_line(int new_top_line)
+{
+	top_line = new_top_line;
+
+	// the ordering of the operations below is deliberate; because (clamp.maximum - m_visible_lines)
+	// can be less than clamp.minimum, we rely on that happening before the second clamping
+	int visible_lines = calculate_visible_lines();
+	top_line = std::min(top_line, (int)item.size() - reserved_lines() - visible_lines);
+	top_line = std::max(top_line, 0);
+}
+
+
+//-------------------------------------------------
+//  is_selection_visible
+//-------------------------------------------------
+
+bool menu::is_selection_visible() const
+{
+	return selected >= top_line + (first_item_visible() ? 0 : 1)
+		&& selected < top_line + calculate_visible_lines() - (last_item_visible() ? 0 : 1);
+}
+
+
+//-------------------------------------------------
+//  calculate_visible_lines
+//-------------------------------------------------
+
+int menu::calculate_visible_lines() const
+{
+	// we cannot rely on m_visible_lines being specified
+	const float visible_extra_menu_height = 0; // customtop + custombottom;
+	const float visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
+	const float line_height = ui().get_line_height();
+	const int visible_lines = (int)std::floor(visible_main_menu_height / line_height);
+	return visible_lines - reserved_lines();
+}
+
+
+//-------------------------------------------------
+//  reserved_lines - the amount of "reserved" lines
+//	at the bottom of the view (and items list)
+//-------------------------------------------------
+
+int menu::reserved_lines() const
+{
+	return 0;
+}
 
 
 /***************************************************************************
@@ -963,29 +1080,11 @@ void menu::handle_events(uint32_t flags, event &ev)
 				{
 					if (local_menu_event.zdelta > 0)
 					{
-						if ((flags & FLAG_UI_DATS) != 0)
-						{
-							top_line -= local_menu_event.num_lines;
-							return;
-						}
-						is_first_selected() ? selected = top_line = item.size() - 1 : selected -= local_menu_event.num_lines;
-						validate_selection(-1);
-						top_line -= (selected <= top_line && top_line != 0);
-						if (selected <= top_line && m_visible_items != m_visible_lines)
-							top_line -= local_menu_event.num_lines;
+						move_selection(-local_menu_event.num_lines, flags);
 					}
 					else
 					{
-						if ((flags & FLAG_UI_DATS))
-						{
-							top_line += local_menu_event.num_lines;
-							return;
-						}
-						is_last_selected() ? selected = top_line = 0 : selected += local_menu_event.num_lines;
-						validate_selection(1);
-						top_line += (selected >= top_line + m_visible_items + (top_line != 0));
-						if (selected >= (top_line + m_visible_items + (top_line != 0)))
-							top_line += local_menu_event.num_lines;
+						move_selection(+local_menu_event.num_lines, flags);
 					}
 				}
 				break;
@@ -1060,54 +1159,19 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 
 	// up backs up by one item
 	if (exclusive_input_pressed(iptkey, IPT_UI_UP, 6))
-	{
-		if ((item[0].flags & FLAG_UI_DATS))
-		{
-			top_line--;
-			return;
-		}
-		is_first_selected() ? selected = top_line = item.size() - 1 : --selected;
-		validate_selection(-1);
-		top_line -= (selected <= top_line && top_line != 0);
-		if (selected <= top_line && m_visible_items != m_visible_lines)
-			top_line--;
-	}
+		move_selection(-1);
 
 	// down advances by one item
 	if (exclusive_input_pressed(iptkey, IPT_UI_DOWN, 6))
-	{
-		if ((item[0].flags & FLAG_UI_DATS))
-		{
-			top_line++;
-			return;
-		}
-		is_last_selected() ? selected = top_line = 0 : ++selected;
-		validate_selection(1);
-		top_line += (selected >= top_line + m_visible_items + (top_line != 0));
-		if (selected >= (top_line + m_visible_items + (top_line != 0)))
-			top_line++;
-	}
+		move_selection(+1);
 
 	// page up backs up by m_visible_items
 	if (exclusive_input_pressed(iptkey, IPT_UI_PAGE_UP, 6))
-	{
-		selected -= m_visible_items;
-		top_line -= m_visible_items - (last_item_visible() ? 1 : 0);
-		if (selected < 0)
-			selected = 0;
-		validate_selection(1);
-	}
+		move_selection(-m_visible_items);
 
 	// page down advances by m_visible_items
 	if (exclusive_input_pressed(iptkey, IPT_UI_PAGE_DOWN, 6))
-	{
-		selected += m_visible_lines - 2 + is_first_selected();
-		top_line += m_visible_lines - 2;
-
-		if (selected > item.size() - 1)
-			selected = item.size() - 1;
-		validate_selection(-1);
-	}
+		move_selection(+m_visible_items);
 
 	// home goes to the start
 	if (exclusive_input_pressed(iptkey, IPT_UI_HOME, 0))
@@ -1159,10 +1223,8 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 void menu::validate_selection(int scandir)
 {
 	// clamp to be in range
-	if (selected < 0)
-		selected = 0;
-	else if (selected >= item.size())
-		selected = item.size() - 1;
+	selected = std::max(selected, 0);
+	selected = std::min(selected, (int)item.size() - reserved_lines() - 1);
 
 	// skip past unselectable items
 	while (!is_selectable(item[selected]))

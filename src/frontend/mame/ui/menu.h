@@ -131,11 +131,8 @@ protected:
 	int                     hover;        // which item is being hovered over
 	std::vector<menu_item>  item;         // array of items
 
-	int top_line;           // main box top line
 	int l_sw_hover;
 	int l_hover;
-	int skip_main_items;
-	int selected;           // which item is selected
 
 	int m_visible_lines;    // main box visible lines
 	int m_visible_items;    // number of visible items
@@ -181,9 +178,11 @@ protected:
 
 	// changes the index of the currently selected menu item
 	void set_selection(void *selected_itemref);
+	void set_selection(int new_selection);
+	void move_selection(int delta, uint32_t flags = 0);
 
-	// scroll position control
-	void centre_selection() { top_line = selected - (m_visible_lines / 2); }
+	// accessor for top_line
+	int get_top_line() const { return top_line; }
 
 	// test if the given key is pressed and we haven't already reported a key
 	bool exclusive_input_pressed(int &iptkey, int key, int repeat);
@@ -229,6 +228,7 @@ protected:
 	virtual void handle_events(uint32_t flags, event &ev);
 	virtual void handle_keys(uint32_t flags, int &iptkey);
 	virtual bool custom_mouse_down() { return false; }
+	virtual int reserved_lines() const;
 
 	// test if search is active
 	virtual bool menu_has_search_active() { return false; }
@@ -309,6 +309,12 @@ private:
 
 	bool first_item_visible() const { return top_line <= 0; }
 	bool last_item_visible() const { return (top_line + m_visible_lines) >= item.size(); }
+	bool is_selection_visible() const;
+	int calculate_visible_lines() const;
+	void check_top_line();
+
+	// if selection is no longer visible, adjust top_line
+	void set_top_line(int new_top_line);
 
 	static void exit(running_machine &machine);
 	static global_state_ptr get_global_state(running_machine &machine);
@@ -327,6 +333,8 @@ private:
 	int                     m_resetpos;         // reset position
 	void                    *m_resetref;        // reset reference
 
+	int top_line;								// main box top line
+	int selected;								// which item is selected
 	bool                    m_mouse_hit;
 	bool                    m_mouse_button;
 	float                   m_mouse_x;

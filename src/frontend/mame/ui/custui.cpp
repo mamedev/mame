@@ -1117,12 +1117,9 @@ void menu_palette_sel::draw(uint32_t flags)
 	float const y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER;
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
-	// determine the first visible line based on the current selection
-	int top_line = selected_index() - visible_lines / 2;
-	if (top_line < 0)
-		top_line = 0;
-	if (top_line + visible_lines >= item.size())
-		top_line = item.size() - visible_lines;
+	// determine the first visible line based on the current selection (this theoretically
+	// should be unnecessary; leaving in for now)
+	set_selection(get_selection_ref());
 
 	// determine effective positions taking into account the hilighting arrows
 	float effective_width = visible_width - 2.0f * gutter_width;
@@ -1139,7 +1136,7 @@ void menu_palette_sel::draw(uint32_t flags)
 	for (int linenum = 0; linenum < visible_lines; linenum++)
 	{
 		float const line_y = visible_top + float(linenum) * line_height;
-		int const itemnum = top_line + linenum;
+		int const itemnum = get_top_line() + linenum;
 		menu_item const &pitem = item[itemnum];
 		char const *const itemtext = pitem.text.c_str();
 		float const line_y0 = line_y;
@@ -1168,7 +1165,8 @@ void menu_palette_sel::draw(uint32_t flags)
 		if (bgcolor != UI_TEXT_BG_COLOR)
 			highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 
-		if (linenum == 0 && top_line != 0)
+		// if we're on the top line, display the up arrow
+		if (linenum == 0 && get_top_line() != 0)
 		{
 			// if we're on the top line, display the up arrow
 			draw_arrow(
@@ -1227,7 +1225,7 @@ void menu_palette_sel::draw(uint32_t flags)
 	custom_render(get_selection_ref(), get_customtop(), get_custombottom(), x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	m_visible_items = visible_lines - (top_line != 0) - (top_line + visible_lines != item.size());
+	m_visible_items = visible_lines - (get_top_line() != 0) - (get_top_line() + visible_lines != item.size());
 }
 
 } // namespace ui

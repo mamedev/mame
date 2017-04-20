@@ -504,8 +504,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 
 	if (old_software != -1)
 	{
-		selected = old_software;
-		top_line = selected - (ui_globals::visible_sw_lines / 2);
+		set_selection(old_software);
 	}
 
 	reselect_last::reset();

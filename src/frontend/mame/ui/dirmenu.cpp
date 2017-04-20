@@ -408,7 +408,7 @@ void menu_add_change_folder::handle()
 						if (match > bestmatch)
 						{
 							bestmatch = match;
-							selected = entry;
+							set_selection(entry);
 						}
 					}
 
@@ -427,11 +427,10 @@ void menu_add_change_folder::handle()
 						if (match > bestmatch)
 						{
 							bestmatch = match;
-							selected = entry;
+							set_selection(entry);
 						}
 					}
 				}
-				centre_selection();
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_CANCEL)
