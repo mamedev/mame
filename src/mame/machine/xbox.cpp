@@ -5,6 +5,7 @@
 #include "includes/xbox.h"
 
 #include "cpu/i386/i386.h"
+#define USE_LEGACY_PCI
 #ifdef USE_LEGACY_PCI
 #include "machine/lpci.h"
 #else
@@ -1223,7 +1224,7 @@ ADDRESS_MAP_START(xbox_base_map_io, AS_IO, 32, xbox_base_state)
 	AM_RANGE(0xe000, 0xe007) AM_READWRITE(networkio_r, networkio_w)
 	AM_RANGE(0xff60, 0xff6f) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w)
 ADDRESS_MAP_END
-
+#ifndef USE_LEGACY_PCI
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class nv2a_host_device : public pci_host_device {
 public:
@@ -1514,6 +1515,7 @@ WRITE32_MEMBER(nv2a_gpu_device::geforce_w)
 
 extern const device_type NV2A_GPU;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#endif
 
 void xbox_base_state::machine_start()
 {
