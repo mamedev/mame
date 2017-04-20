@@ -1308,7 +1308,8 @@ static void recompute_texture_params(tmu_state *t)
 	/* Several Voodoo 2 games leave the upper bits of TLOD == 0xff, meaning we think */
 	/* they want multitex mode when they really don't -- disable for now */
 	// Enable for Voodoo 3 or Viper breaks - VL.
-	if (TEXLOD_TMULTIBASEADDR(t->reg[tLOD].u))
+	// Add check for upper nibble not equal to zero to fix funkball -- TG
+	if (TEXLOD_TMULTIBASEADDR(t->reg[tLOD].u) && (t->reg[tLOD].u >> 28) == 0)
 	{
 		base = (t->reg[texBaseAddr_1].u & t->texaddr_mask) << t->texaddr_shift;
 		t->lodoffset[1] = base & t->mask;
@@ -3395,11 +3396,14 @@ int32_t voodoo_device::texture_w(voodoo_device *vd, offs_t offset, uint32_t data
 			tt = (offset >> 7) & 0xff;
 
 			/* old code has a bit about how this is broken in gauntleg unless we always look at TMU0 */
-			if (TEXMODE_SEQ_8_DOWNLD(vd->tmu[0].reg/*t->reg*/[textureMode].u))
-				ts = (offset << 2) & 0xfc;
-			else
-				ts = (offset << 1) & 0xfc;
-
+			if (TEXMODE_SEQ_8_DOWNLD(vd->tmu[0].reg/*t->reg*/[textureMode].u)) {
+				//ts = (offset << 2) & 0xfc;
+				ts = (offset & 0x3f) << 2;
+			}
+			else {
+				//ts = (offset << 1) & 0xfc;
+				ts = (offset & 0x7f) << 1;
+			}
 			/* validate parameters */
 			if (lod > 8)
 				return 0;
