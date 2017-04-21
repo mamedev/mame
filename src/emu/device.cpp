@@ -360,7 +360,9 @@ void device_t::calculate_derived_clock()
 
 attotime device_t::clocks_to_attotime(u64 numclocks) const
 {
-	if (numclocks < m_clock)
+	if (m_clock == 0)
+		return attotime::never;
+	else if (numclocks < m_clock)
 		return attotime(0, numclocks * m_attoseconds_per_clock);
 	else
 	{
@@ -378,7 +380,10 @@ attotime device_t::clocks_to_attotime(u64 numclocks) const
 
 u64 device_t::attotime_to_clocks(const attotime &duration) const
 {
-	return mulu_32x32(duration.seconds(), m_clock) + u64(duration.attoseconds()) / u64(m_attoseconds_per_clock);
+	if (m_clock == 0)
+		return 0;
+	else
+		return mulu_32x32(duration.seconds(), m_clock) + u64(duration.attoseconds()) / u64(m_attoseconds_per_clock);
 }
 
 
