@@ -675,7 +675,7 @@ READ8_MEMBER( via6522_device::read )
 		val = m_sr;
 		m_out_cb1 = 1;
 		m_cb1_handler(m_out_cb1);
-		m_shift_counter = 7;
+		m_shift_counter = 8;
 		clear_int(INT_SR);
 		LOGSHIFT("ACR: %02x ", m_acr);
 		if (SI_O2_CONTROL(m_acr))
@@ -861,7 +861,7 @@ WRITE8_MEMBER( via6522_device::write )
 			m_cb1_handler(m_out_cb1);
 		}
 
-		m_shift_counter = 7;
+		m_shift_counter = 8;
 		clear_int(INT_SR);
 		LOGSHIFT(" - ACR is: %02x ", m_acr);
 		if (SO_O2_CONTROL(m_acr))
