@@ -1635,29 +1635,27 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
 		return x2 + UI_BOX_LR_BORDER;
 	}
-	else
-	{
-		float space = x2 - x1;
-		float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
-		rgb_t fgcolor = UI_TEXT_COLOR;
 
-		// set left-right arrows dimension
-		float ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
-		float ar_y0 = 0.5f * (y2 + y1) + 0.1f * space;
-		float ar_x1 = ar_x0 + lr_arrow_width;
-		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
+    float space = x2 - x1;
+    float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
+    rgb_t fgcolor = UI_TEXT_COLOR;
 
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
+    // set left-right arrows dimension
+    float ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
+    float ar_y0 = 0.5f * (y2 + y1) + 0.1f * space;
+    float ar_x1 = ar_x0 + lr_arrow_width;
+    float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
 
-		if (mouse_in_rect(x1, y1, x2, y2))
-		{
-			fgcolor = UI_MOUSEOVER_COLOR;
-			hover = HOVER_LPANEL_ARROW;
-		}
+    ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
-		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
-		return x2 + UI_BOX_LR_BORDER;
-	}
+    if (mouse_in_rect(x1, y1, x2, y2))
+    {
+        fgcolor = UI_MOUSEOVER_COLOR;
+        hover = HOVER_LPANEL_ARROW;
+    }
+
+    draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
+    return x2 + UI_BOX_LR_BORDER;
 }
 
 

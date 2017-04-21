@@ -64,27 +64,25 @@ bool compare_software(ui_software_info a, ui_software_info b)
 
 	if (!clonex && !cloney)
 		return (strmakelower(x->longname) < strmakelower(y->longname));
-	else if (clonex && cloney)
-	{
-		if (!core_stricmp(x->parentname.c_str(), y->parentname.c_str()) && !core_stricmp(x->instance.c_str(), y->instance.c_str()))
-			return (strmakelower(x->longname) < strmakelower(y->longname));
-		else
-			return (strmakelower(cx) < strmakelower(cy));
-	}
-	else if (!clonex && cloney)
-	{
-		if (!core_stricmp(x->shortname.c_str(), y->parentname.c_str()) && !core_stricmp(x->instance.c_str(), y->instance.c_str()))
-			return true;
-		else
-			return (strmakelower(x->longname) < strmakelower(cy));
-	}
-	else
-	{
-		if (!core_stricmp(x->parentname.c_str(), y->shortname.c_str()) && !core_stricmp(x->instance.c_str(), y->instance.c_str()))
-			return false;
-		else
-			return (strmakelower(cx) < strmakelower(y->longname));
-	}
+
+    if (clonex && cloney)
+    {
+        if (!core_stricmp(x->parentname.c_str(), y->parentname.c_str()) && !core_stricmp(x->instance.c_str(), y->instance.c_str()))
+            return (strmakelower(x->longname) < strmakelower(y->longname));
+        return (strmakelower(cx) < strmakelower(cy));
+    }
+
+    if (!clonex && cloney)
+    {
+        if (!core_stricmp(x->shortname.c_str(), y->parentname.c_str()) && !core_stricmp(x->instance.c_str(), y->instance.c_str()))
+            return true;
+        return (strmakelower(x->longname) < strmakelower(cy));
+    }
+
+    if (!core_stricmp(x->parentname.c_str(), y->shortname.c_str()) && !core_stricmp(x->instance.c_str(), y->instance.c_str()))
+        return false;
+    
+    return (strmakelower(cx) < strmakelower(y->longname));
 }
 
 //-------------------------------------------------
@@ -910,8 +908,8 @@ std::string c_sw_publisher::getname(std::string &str)
 
 	if (found != std::string::npos)
 		return (str.substr(0, found - 1));
-	else
-		return str;
+    
+    return str;
 }
 
 //-------------------------------------------------
@@ -1218,29 +1216,27 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
 		return x2 + UI_BOX_LR_BORDER;
 	}
-	else
-	{
-		float space = x2 - x1;
-		float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
-		rgb_t fgcolor = UI_TEXT_COLOR;
 
-		// set left-right arrows dimension
-		float ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
-		float ar_y0 = 0.5f * (y2 + y1) + 0.1f * space;
-		float ar_x1 = ar_x0 + lr_arrow_width;
-		float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
+    float space = x2 - x1;
+    float lr_arrow_width = 0.4f * space * machine().render().ui_aspect();
+    rgb_t fgcolor = UI_TEXT_COLOR;
 
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
+    // set left-right arrows dimension
+    float ar_x0 = 0.5f * (x2 + x1) - 0.5f * lr_arrow_width;
+    float ar_y0 = 0.5f * (y2 + y1) + 0.1f * space;
+    float ar_x1 = ar_x0 + lr_arrow_width;
+    float ar_y1 = 0.5f * (y2 + y1) + 0.9f * space;
 
-		if (mouse_in_rect(x1, y1, x2, y2))
-		{
-			fgcolor = UI_MOUSEOVER_COLOR;
-			hover = HOVER_LPANEL_ARROW;
-		}
+    ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
-		draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
-		return x2 + UI_BOX_LR_BORDER;
-	}
+    if (mouse_in_rect(x1, y1, x2, y2))
+    {
+        fgcolor = UI_MOUSEOVER_COLOR;
+        hover = HOVER_LPANEL_ARROW;
+    }
+
+    draw_arrow(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor, ROT90);
+    return x2 + UI_BOX_LR_BORDER;
 }
 
 //-------------------------------------------------
