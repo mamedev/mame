@@ -2150,21 +2150,32 @@ void hp9845c_state::video_render_buff(unsigned video_scanline , unsigned line_in
 		bool cursor_line = line_in_row == 12;
 		bool ul_line = line_in_row == 14;
 		unsigned video_frame = (unsigned)m_screen->frame_number();
-		bool cursor_blink = BIT(video_frame , 3);
-		bool char_blink = BIT(video_frame , 4);
+		bool cursor_blink = BIT(video_frame , 4);
+		bool char_blink = !BIT(video_frame , 4);
 
 		for (unsigned i = 0; i < 80; i++) {
 			uint8_t charcode = m_video_buff[ buff_idx ].chars[ i ] & 0x7f;
 			uint8_t attrs = m_video_buff[ buff_idx ].attrs[ i ];
 			uint16_t chrgen_addr = ((uint16_t)(charcode ^ 0x7f) << 4) | line_in_row;
 			uint16_t pixels;
+			uint8_t color = (attrs >> 4) & 7;
 
-			if ((ul_line && BIT(attrs , 3)) ||
-				(cursor_line && cursor_blink && BIT(attrs , 0))) {
+			if (ul_line && BIT(attrs , 3)) {
+				// Color of underline: same as character
+				pixels = ~0;
+			} else if (cursor_line && cursor_blink && BIT(attrs , 0)) {
+				// Color of cursor: white
+				color = 7;
 				pixels = ~0;
 			} else if (char_blink && BIT(attrs , 2)) {
 				pixels = 0;
 			} else if (BIT(m_video_buff[ buff_idx ].chars[ i ] , 7)) {
+				// 98770A has hw support to fill the 1st and the 9th column of character matrix
+				// with pixels in 2nd and 8th columns, respectively. This feature is used in
+				// 98780A to make horizontal lines of line-drawing characters appear continuous
+				// (see hp9845t_state::video_render_buff).
+				// Apparently, though, HP did not use this feature at all in real
+				// machines (i.e. horizontal lines are broken by gaps)
 				pixels = (uint16_t)(m_optional_chargen[ chrgen_addr ] & 0x7f) << 1;
 			} else {
 				pixels = (uint16_t)(m_chargen[ chrgen_addr ] & 0x7f) << 1;
@@ -2181,11 +2192,11 @@ void hp9845c_state::video_render_buff(unsigned video_scanline , unsigned line_in
 				if (m_graphic_sel && x >= VIDEO_770_ALPHA_L_LIM && x < VIDEO_770_ALPHA_R_LIM) {
 					// alpha overlays graphics (non-dominating)
 					if (pixel) {
-						m_bitmap.pix32(video_scanline , x) = pen[ pen_alpha((attrs >> 4) & 7) ];
+						m_bitmap.pix32(video_scanline , x) = pen[ pen_alpha(color) ];
 					}
 				} else {
 					// Graphics disabled or alpha-only zone
-					m_bitmap.pix32(video_scanline , x) = pen[ pixel ? pen_alpha((attrs >> 4) & 7) : pen_alpha(0) ];
+					m_bitmap.pix32(video_scanline , x) = pen[ pixel ? pen_alpha(color) : pen_alpha(0) ];
 				}
 			}
 		}
