@@ -37,8 +37,34 @@ image_manager::image_manager(running_machine &machine)
 		if (!image.user_loadable())
 			continue;
 
-		// is an image specified for this image?
+		// find the image option in image_options()
 		auto iter = machine.options().image_options().find(image.instance_name());
+
+		// GROSS HACK - if we began our journey with a single device configuration (e.g. - a single
+		// cartridge system) but later added a device of that type, image.instance_name() will become
+		// something different.  We're going to try to accomodate that specific scenario here
+		//
+		// Specific example: 'mame snes -cart1 sufami -cart2 poipoi' - the instance_name() starts out
+		// as "cartridge" but at the end becomes "cartridge1"
+		if (iter == machine.options().image_options().end()
+			&& (image.instance_name().rbegin() != image.instance_name().rend())
+			&& (*image.instance_name().rbegin() == '1'))
+		{
+			std::string alternate_instance_name = image.instance_name().substr(0, image.instance_name().size() - 1);
+			iter = machine.options().image_options().find(alternate_instance_name);
+
+			// If we found something, we need to write it back (so later checks work).  We also need to redo
+			// the find; the act of erasing the old value breaks the iterator
+			if (iter != machine.options().image_options().end())
+			{
+				std::string temp = std::move(iter->second);
+				machine.options().image_options()[image.instance_name()] = std::move(temp);
+				machine.options().image_options().erase(alternate_instance_name);
+				iter = machine.options().image_options().find(image.instance_name());
+			}
+		}
+
+		// is an image specified for this image?
 		if (iter != machine.options().image_options().end() && !iter->second.empty())
 		{
 			// we do have a startup image specified - load it
