@@ -2930,6 +2930,7 @@ files {
 
 createMAMEProjects(_target, _subtarget, "nmk")
 files {
+	MAME_DIR .. "src/mame/drivers/acchi.cpp",
 	MAME_DIR .. "src/mame/drivers/acommand.cpp",
 	MAME_DIR .. "src/mame/drivers/cultures.cpp",
 	MAME_DIR .. "src/mame/drivers/ddealer.cpp",
