@@ -56,7 +56,6 @@ const char *const core_options::s_option_unadorned[MAX_UNADORNED_OPTIONS] =
 core_options::entry::entry(const char *name, const char *description, uint32_t flags, const char *defvalue)
 	: m_next(nullptr),
 		m_flags(flags),
-		m_seqid(0),
 		m_error_reported(false),
 		m_priority(OPTION_PRIORITY_DEFAULT),
 		m_description(description),
@@ -111,7 +110,6 @@ void core_options::entry::set_value(const char *newdata, int priority)
 	// set the data and priority, then bump the sequence
 	m_data = newdata;
 	m_priority = priority;
-	m_seqid++;
 }
 
 
@@ -559,12 +557,27 @@ std::string core_options::output_ini(const core_options *diff) const
 	int num_valid_headers = 0;
 	int unadorned_index = 0;
 	const char *last_header = nullptr;
+	std::string overridden_value;
 
 	// loop over all items
 	for (entry &curentry : m_entrylist)
 	{
 		const char *name = curentry.name();
-		const char *value = curentry.value();
+		const char *value;
+		switch (override_get_value(name, overridden_value))
+		{
+			case override_get_value_result::NONE:
+			default:
+				value = curentry.value();
+				break;
+
+			case override_get_value_result::SKIP:
+				continue;
+
+			case override_get_value_result::OVERRIDE:
+				value = overridden_value.c_str();
+				break;
+		}
 		bool is_unadorned = false;
 
 		// check if it's unadorned
@@ -669,16 +682,6 @@ int core_options::priority(const char *name) const
 
 
 //-------------------------------------------------
-//  seqid - return the seqid for a given option
-//-------------------------------------------------
-
-uint32_t core_options::seqid(const char *name) const
-{
-	auto curentry = m_entrymap.find(name);
-	return (curentry != m_entrymap.end()) ? curentry->second->seqid() : 0;
-}
-
-//-------------------------------------------------
 //  exists - return if option exists in list
 //-------------------------------------------------
 
@@ -687,16 +690,7 @@ bool core_options::exists(const char *name) const
 	return (m_entrymap.find(name) != m_entrymap.end());
 }
 
-//-------------------------------------------------
-//  is_changed - return if option have been marked
-//  changed
-//-------------------------------------------------
 
-bool core_options::is_changed(const char *name) const
-{
-	auto curentry = m_entrymap.find(name);
-	return (curentry != m_entrymap.end()) ? curentry->second->is_changed() : false;
-}
 //-------------------------------------------------
 //  set_value - set the raw option value
 //-------------------------------------------------
@@ -847,6 +841,10 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, std::str
 		data.erase(0, 1);
 		data.erase(data.length() - 1, 1);
 	}
+
+	// let derived classes override how we set this data
+	if (override_set_value(curentry.name(), data))
+		return true;
 
 	// validate the type of data and optionally the range
 	float fval;

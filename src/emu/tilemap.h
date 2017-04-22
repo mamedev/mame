@@ -507,8 +507,6 @@ public:
 
 	tilemap_t *next() const { return m_next; }
 	void *user_data() const { return m_user_data; }
-	memory_array &basemem() { return m_basemem; }
-	memory_array &extmem() { return m_extmem; }
 	u32 rows() const { return m_rows; }
 	u32 cols() const { return m_cols; }
 	u16 tilewidth() const { return m_tilewidth; }
@@ -573,12 +571,6 @@ public:
 	tilemap_memory_index scan_cols_flip_y(u32 col, u32 row, u32 num_cols, u32 num_rows);
 	tilemap_memory_index scan_cols_flip_xy(u32 col, u32 row, u32 num_cols, u32 num_rows);
 
-	// optional memory accessors
-	u32 basemem_read(int index) { return m_basemem.read(index); }
-	u32 extmem_read(int index) { return m_extmem.read(index); }
-	void basemem_write(int index, u32 data) { m_basemem.write(index, data); mark_tile_dirty(index); }
-	void extmem_write(int index, u32 data) { m_extmem.write(index, data); mark_tile_dirty(index); }
-
 private:
 	// internal set of transparency states for rendering
 	enum trans_t
@@ -637,10 +629,6 @@ private:
 	device_palette_interface *  m_palette;              // palette used for drawing
 	tilemap_t *                 m_next;                 // pointer to next tilemap
 	void *                      m_user_data;            // user data value
-
-	// optional memory info
-	memory_array                m_basemem;              // info about base memory
-	memory_array                m_extmem;               // info about extension memory
 
 	// basic tilemap metrics
 	u32                         m_rows;                 // number of tile rows
@@ -747,6 +735,10 @@ public:
 	static void static_set_tile_size(device_t &device, u16 width, u16 height);
 	static void static_set_transparent_pen(device_t &device, pen_t pen);
 
+	// getters
+	memory_array &basemem() { return m_basemem; }
+	memory_array &extmem() { return m_extmem; }
+
 	// write handlers
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_WRITE16_MEMBER(write);
@@ -754,6 +746,12 @@ public:
 	DECLARE_WRITE8_MEMBER(write_ext);
 	DECLARE_WRITE16_MEMBER(write_ext);
 	DECLARE_WRITE32_MEMBER(write_ext);
+
+	// optional memory accessors
+	u32 basemem_read(int index) { return m_basemem.read(index); }
+	u32 extmem_read(int index) { return m_extmem.read(index); }
+	void basemem_write(int index, u32 data) { m_basemem.write(index, data); mark_tile_dirty(index); }
+	void extmem_write(int index, u32 data) { m_extmem.write(index, data); mark_tile_dirty(index); }
 
 	// pick one to use to avoid ambiguity errors
 	using device_t::machine;
@@ -777,6 +775,10 @@ private:
 	u32                         m_num_rows;
 	bool                        m_transparent_pen_set;
 	pen_t                       m_transparent_pen;
+
+	// optional memory info
+	memory_array                m_basemem;              // info about base memory
+	memory_array                m_extmem;               // info about extension memory
 };
 
 

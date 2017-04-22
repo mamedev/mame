@@ -9,10 +9,9 @@
     Appears to be a down-grade of the nmk16 HW
 
     TODO:
-    -When you use the "gun card" the game gives "minus" points, but points are always added, inaccurate protection?
-    -Understand better the video emulation and convert it to tilemaps;
-    -Coinage settings based on those listed at www.crazykong.com/dips/DoubleDealer.txt - coin/credit simulation need fixing;
-    -Decap + emulate MCU, required if the random number generation is going to be accurate;
+	- Fix MCU simulation for credit subtractions & add coinage settings (currently set to free play for convenience);
+    - Understand better the video emulation and convert it to tilemaps;
+    - Decap + emulate MCU, required if the random number generation is going to be accurate;
 
 ==========================================================================================================
     --
@@ -433,7 +432,7 @@ WRITE16_MEMBER(ddealer_state::mcu_shared_w)
 		case 0x41e/2: break;//unused
 		case 0x42e/2: PROT_JSR(0x42e,0x8007,0x6004); break;//cards on playfield/hand (ram side)
 		case 0x43e/2: PROT_JSR(0x43e,0x801d,0x6176); break;//second player sub-routine
-		case 0x44e/2: PROT_JSR(0x44e,0x8028,0x6932); break;//"gun card" logic
+		case 0x44e/2: PROT_JSR(0x44e,0x8028,0x6f68); break;//"gun card" logic
 		case 0x45e/2: PROT_JSR(0x45e,0x803e,0x6f90); break;//card delete
 		case 0x46e/2: PROT_JSR(0x46e,0x8033,0x93c2); break;//card movements
 		case 0x47e/2: PROT_JSR(0x47e,0x8026,0x67a0); break;//cards on playfield (vram side)
@@ -474,8 +473,8 @@ static ADDRESS_MAP_START( ddealer, AS_PROGRAM, 16, ddealer_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
+	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("UNK")
 	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSW1")
-	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("UNK")
 	AM_RANGE(0x084000, 0x084003) AM_DEVWRITE8("ymsnd", ym2203_device, write, 0x00ff) // ym ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08cfff) AM_RAM AM_SHARE("vregs") // palette ram
@@ -500,7 +499,7 @@ static INPUT_PORTS_START( ddealer )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) //used, "test" in service mode, unknown purpose
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW ) //used, "test" in service mode, unknown purpose
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -522,11 +521,10 @@ static INPUT_PORTS_START( ddealer )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	/*bits 0-7 are almost surely to be coinage.*/
 	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW1:8" ) /* Listed as "Always Off" */
 	PORT_DIPUNUSED_DIPLOC( 0x0002, IP_ACTIVE_LOW, "SW1:7" ) /* Listed as "Always Off" */
-	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:6,5,4")
+	PORT_DIPNAME( 0x001c, 0x0000, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:6,5,4")
 	PORT_DIPSETTING(      0x0010, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 2C_1C ) )
@@ -535,7 +533,7 @@ static INPUT_PORTS_START( ddealer )
 	PORT_DIPSETTING(      0x0014, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:3,2,1")
+	PORT_DIPNAME( 0x00e0, 0x0000, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:3,2,1")
 	PORT_DIPSETTING(      0x0080, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 2C_1C ) )
@@ -565,6 +563,8 @@ static INPUT_PORTS_START( ddealer )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:1" ) /* Listed as "Always Off" */
 
 	PORT_START("UNK")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // MCU port? 
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -692,4 +692,4 @@ ROM_START( ddealer )
 	ROM_LOAD( "6.ic86", 0x100, 0x100, NO_DUMP )
 ROM_END
 
-GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer_state, ddealer,  ROT0, "NMK", "Double Dealer", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer_state, ddealer,  ROT0, "NMK", "Double Dealer", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )

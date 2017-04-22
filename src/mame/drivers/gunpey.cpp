@@ -215,21 +215,21 @@ public:
 	std::unique_ptr<uint16_t[]> m_blit_buffer;
 	uint16_t m_blit_ram[0x10];
 	uint8_t m_irq_cause, m_irq_mask;
-	DECLARE_WRITE8_MEMBER(gunpey_status_w);
-	DECLARE_READ8_MEMBER(gunpey_status_r);
-	DECLARE_READ8_MEMBER(gunpey_inputs_r);
-	DECLARE_WRITE8_MEMBER(gunpey_blitter_w);
-	DECLARE_WRITE8_MEMBER(gunpey_blitter_upper_w);
-	DECLARE_WRITE8_MEMBER(gunpey_blitter_upper2_w);
-	DECLARE_WRITE8_MEMBER(gunpey_output_w);
-	DECLARE_WRITE16_MEMBER(gunpey_vram_bank_w);
-	DECLARE_WRITE16_MEMBER(gunpey_vregs_addr_w);
+	DECLARE_WRITE8_MEMBER(status_w);
+	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_READ8_MEMBER(inputs_r);
+	DECLARE_WRITE8_MEMBER(blitter_w);
+	DECLARE_WRITE8_MEMBER(blitter_upper_w);
+	DECLARE_WRITE8_MEMBER(blitter_upper2_w);
+	DECLARE_WRITE8_MEMBER(output_w);
+	DECLARE_WRITE16_MEMBER(vram_bank_w);
+	DECLARE_WRITE16_MEMBER(vregs_addr_w);
 	DECLARE_DRIVER_INIT(gunpey);
 	virtual void video_start() override;
-	uint32_t screen_update_gunpey(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(gunpey_scanline);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	TIMER_CALLBACK_MEMBER(blitter_end);
-	void gunpey_irq_check(uint8_t irq_type);
+	void irq_check(uint8_t irq_type);
 	uint8_t draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count,uint8_t scene_gradient);
 	uint16_t m_vram_bank;
 	uint16_t m_vreg_addr;
@@ -238,6 +238,8 @@ public:
 	uint8_t* m_blit_rom2;
 
 	uint8_t* m_vram;
+
+	emu_timer *m_blitter_end_timer;
 
 	// work variables for the decompression
 	int m_srcx;
@@ -261,7 +263,7 @@ public:
 
 	void get_stream_next_byte(void);
 	int get_stream_bit(void);
-	uint32_t gunpey_state_get_stream_bits(int bits);
+	uint32_t get_stream_bits(int bits);
 
 	int write_dest_byte(uint8_t usedata);
 	//uint16_t main_m_vram[0x800][0x800];
@@ -271,6 +273,8 @@ public:
 void gunpey_state::video_start()
 {
 	m_blit_buffer = std::make_unique<uint16_t[]>(512*512);
+
+	m_blitter_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gunpey_state::blitter_end), this));
 }
 
 uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count,uint8_t scene_gradient)
@@ -547,7 +551,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 	return m_wram[count+0] & 0x80;
 }
 
-uint32_t gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gunpey_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//uint16_t *blit_buffer = m_blit_buffer;
 	uint16_t vram_bank = m_vram_bank & 0x7fff;
@@ -596,7 +600,7 @@ uint32_t gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-void gunpey_state::gunpey_irq_check(uint8_t irq_type)
+void gunpey_state::irq_check(uint8_t irq_type)
 {
 	m_irq_cause |= irq_type;
 
@@ -606,22 +610,22 @@ void gunpey_state::gunpey_irq_check(uint8_t irq_type)
 		m_maincpu->set_input_line_and_vector(0, CLEAR_LINE, 0x200/4);
 }
 
-WRITE8_MEMBER(gunpey_state::gunpey_status_w)
+WRITE8_MEMBER(gunpey_state::status_w)
 {
 	if(offset == 1)
 	{
 		m_irq_cause &= ~data;
-		gunpey_irq_check(0);
+		irq_check(0);
 	}
 
 	if(offset == 0)
 	{
 		m_irq_mask = data;
-		gunpey_irq_check(0);
+		irq_check(0);
 	}
 }
 
-READ8_MEMBER(gunpey_state::gunpey_status_r)
+READ8_MEMBER(gunpey_state::status_r)
 {
 	if(offset == 1)
 		return m_irq_cause;
@@ -629,7 +633,7 @@ READ8_MEMBER(gunpey_state::gunpey_status_r)
 	return m_irq_mask;
 }
 
-READ8_MEMBER(gunpey_state::gunpey_inputs_r)
+READ8_MEMBER(gunpey_state::inputs_r)
 {
 	switch(offset+0x7f40)
 	{
@@ -645,7 +649,7 @@ READ8_MEMBER(gunpey_state::gunpey_inputs_r)
 
 TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
 {
-	gunpey_irq_check(4);
+	irq_check(4);
 }
 
 void gunpey_state::get_stream_next_byte(void)
@@ -686,7 +690,7 @@ int gunpey_state::get_stream_bit(void)
 	return bit;
 }
 
-uint32_t gunpey_state::gunpey_state_get_stream_bits(int bits)
+uint32_t gunpey_state::get_stream_bits(int bits)
 {
 	uint32_t output = 0;
 	for (int i=0;i<bits;i++)
@@ -1076,7 +1080,7 @@ ooutcount was 51
 
 
 
-WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
+WRITE8_MEMBER(gunpey_state::blitter_w)
 {
 	uint16_t *blit_ram = m_blit_ram;
 
@@ -1133,7 +1137,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 
 				for (;;)
 				{
-					int test = gunpey_state_get_stream_bits(2);
+					int test = get_stream_bits(2);
 					int data;
 					int getbits = 1;
 					// don't think this is right.. just keeps some streams in alignment, see 959 in char test for example
@@ -1153,7 +1157,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 					{
 						getbits = 7;
 					}
-					data = gunpey_state_get_stream_bits(getbits);
+					data = get_stream_bits(getbits);
 
 					// hack, really I imagine there is exactly enough compressed data to fill the dest bitmap area when decompressed, but to stop us
 					// overrunning into reading other data we terminate on a 0000, which doesn't seem likely to be compressed data.
@@ -1245,7 +1249,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 			}
 		}
 
-		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(m_xsize*m_ysize), timer_expired_delegate(FUNC(gunpey_state::blitter_end),this));
+		m_blitter_end_timer->adjust(m_maincpu->cycles_to_attotime(m_xsize*m_ysize));
 
 
 /*
@@ -1254,20 +1258,20 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 	}
 }
 
-WRITE8_MEMBER(gunpey_state::gunpey_blitter_upper_w)
+WRITE8_MEMBER(gunpey_state::blitter_upper_w)
 {
 	//printf("gunpey_blitter_upper_w %02x %02x\n", offset, data);
 
 }
 
-WRITE8_MEMBER(gunpey_state::gunpey_blitter_upper2_w)
+WRITE8_MEMBER(gunpey_state::blitter_upper2_w)
 {
 	//printf("gunpey_blitter_upper2_w %02x %02x\n", offset, data);
 
 }
 
 
-WRITE8_MEMBER(gunpey_state::gunpey_output_w)
+WRITE8_MEMBER(gunpey_state::output_w)
 {
 	//bit 0 is coin counter
 //  popmessage("%02x",data);
@@ -1275,12 +1279,12 @@ WRITE8_MEMBER(gunpey_state::gunpey_output_w)
 	m_oki->set_rom_bank((data & 0x70) >> 4);
 }
 
-WRITE16_MEMBER(gunpey_state::gunpey_vram_bank_w)
+WRITE16_MEMBER(gunpey_state::vram_bank_w)
 {
 	COMBINE_DATA(&m_vram_bank);
 }
 
-WRITE16_MEMBER(gunpey_state::gunpey_vregs_addr_w)
+WRITE16_MEMBER(gunpey_state::vregs_addr_w)
 {
 	COMBINE_DATA(&m_vreg_addr);
 }
@@ -1295,21 +1299,21 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, gunpey_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 16, gunpey_state )
-	AM_RANGE(0x7f40, 0x7f45) AM_READ8(gunpey_inputs_r,0xffff)
+	AM_RANGE(0x7f40, 0x7f45) AM_READ8(inputs_r,0xffff)
 
-	AM_RANGE(0x7f48, 0x7f49) AM_WRITE8(gunpey_output_w,0x00ff)
+	AM_RANGE(0x7f48, 0x7f49) AM_WRITE8(output_w,0x00ff)
 	AM_RANGE(0x7f80, 0x7f81) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xffff)
 
 	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8(gunpey_status_r,  gunpey_status_w, 0xffff )
-	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8(gunpey_blitter_w, 0xffff )
-	AM_RANGE(0x7fe0, 0x7fe5) AM_WRITE8(gunpey_blitter_upper_w, 0xffff )
-	AM_RANGE(0x7ff0, 0x7ff5) AM_WRITE8(gunpey_blitter_upper2_w, 0xffff )
+	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8(status_r, status_w, 0xffff )
+	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8(blitter_w, 0xffff )
+	AM_RANGE(0x7fe0, 0x7fe5) AM_WRITE8(blitter_upper_w, 0xffff )
+	AM_RANGE(0x7ff0, 0x7ff5) AM_WRITE8(blitter_upper2_w, 0xffff )
 
 	//AM_RANGE(0x7FF0, 0x7FF1) AM_RAM
-	AM_RANGE(0x7fec, 0x7fed) AM_WRITE(gunpey_vregs_addr_w)
-	AM_RANGE(0x7fee, 0x7fef) AM_WRITE(gunpey_vram_bank_w)
+	AM_RANGE(0x7fec, 0x7fed) AM_WRITE(vregs_addr_w)
+	AM_RANGE(0x7fee, 0x7fef) AM_WRITE(vram_bank_w)
 
 ADDRESS_MAP_END
 
@@ -1406,14 +1410,14 @@ INPUT_PORTS_END
 0x40 almost certainly vblank (reads inputs)
 0x80
 */
-TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::gunpey_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::scanline)
 {
 	int scanline = param;
 
 	if(scanline == 240)
 	{
 		//printf("frame\n");
-		gunpey_irq_check(0x50);
+		irq_check(0x50);
 	}
 }
 
@@ -1421,7 +1425,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::gunpey_scanline)
 
 
 
-// this isn't a real decode as such, but the graphic data is all stored in pages 2048 bytes wide at varying BPP levelsl, some (BG data) compressed with what is likely a lossy scheme
+// this isn't a real decode as such, but the graphic data is all stored in pages 2048 bytes wide at varying BPP levels, some (BG data) compressed with what is likely a lossy scheme
 // palette data is in here too, the blocks at the bottom right of all this?
 static GFXLAYOUT_RAW( gunpey, 2048, 1, 2048*8, 2048*8 )
 
@@ -1440,12 +1444,12 @@ static MACHINE_CONFIG_START( gunpey, gunpey_state )
 	MCFG_CPU_ADD("maincpu", V30, 57242400 / 4)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gunpey_state, gunpey_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gunpey_state, scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(57242400/8, 442, 0, 320, 264, 0, 240) /* just to get ~60 Hz */
-	MCFG_SCREEN_UPDATE_DRIVER(gunpey_state, screen_update_gunpey)
+	MCFG_SCREEN_UPDATE_DRIVER(gunpey_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")

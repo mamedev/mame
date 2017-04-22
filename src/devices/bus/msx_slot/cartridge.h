@@ -56,7 +56,7 @@ public:
 	virtual const char *custom_brief_instance_name() const override { return "cart"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// msx_internal_slot-level overrides
 	virtual DECLARE_READ8_MEMBER(read) override;
@@ -68,7 +68,7 @@ protected:
 	devcb_write_line m_irq_handler;
 	msx_cart_interface *m_cartridge;
 
-	int get_cart_type(uint8_t *rom, uint32_t length);
+	static int get_cart_type(const uint8_t *rom, uint32_t length);
 };
 
 

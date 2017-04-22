@@ -1711,6 +1711,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( a1200, amiga_base, a1200_state )
 #endif
 
 	// todo: pcmcia
+
+	MCFG_SOFTWARE_LIST_ADD("aga_floppy_list", "amigaaga_flop")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a1200n, a1200, a1200_state )

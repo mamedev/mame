@@ -1064,36 +1064,65 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 	else
 		err = CHDERR_FILE_NOT_FOUND;
 
-	/* otherwise, look at our parents for a CHD with an identical checksum */
-	/* and try to open that */
+	// Otherwise, look at our parents for a CHD with an identical checksum
+	// and try to open that
+	//
+	// An example of a system that requires this is src/mame/drivers/ksys673.cpp, that has declarations like this:
+	//		...
+	//		DISK_IMAGE_READONLY("889aa", 0, BAD_DUMP SHA1(0b567bf2f03ee8089e0b021ea502a53b3f6fe7ac))
+	//		...
+	//		DISK_IMAGE_READONLY("889ea", 0, BAD_DUMP SHA1(0b567bf2f03ee8089e0b021ea502a53b3f6fe7ac))
+	//		...
+	//		DISK_IMAGE_READONLY("889ja", 0, BAD_DUMP SHA1(0b567bf2f03ee8089e0b021ea502a53b3f6fe7ac))
+	//		...
+	//		DISK_IMAGE_READONLY("889ua", 0, BAD_DUMP SHA1(0b567bf2f03ee8089e0b021ea502a53b3f6fe7ac))
+	//		...
 	util::hash_collection romphashes(ROM_GETHASHDATA(romp));
 	for (int drv = driver_list::find(*gamedrv); drv != -1; drv = driver_list::clone(drv))
 	{
-		machine_config config(driver_list::driver(drv), options);
+		const game_driver &current_driver(driver_list::driver(drv));
+
+		// Create a single use emu_option structure for the purposes of this lookup, just
+		// carrying forward the options that are necessary for CHD lookup.  This is because the
+		// options passed to us may have slot/image configurations that are "poisonous" for these
+		// other drivers
+		//
+		// A side effect of this approach is that the "dragnet" to find CHDs with identical hashes
+		// will only find CHDs for the default configuration.  I believe that this in practice will
+		// be acceptable.
+		emu_options driver_specific_options;
+		std::string error_string;
+		driver_specific_options.set_value(OPTION_SYSTEMNAME, options.system_name(), OPTION_PRIORITY_DEFAULT, error_string);
+		driver_specific_options.set_value(OPTION_MEDIAPATH, options.media_path(), OPTION_PRIORITY_DEFAULT, error_string);
+		driver_specific_options.set_value(OPTION_DIFF_DIRECTORY, options.diff_directory(), OPTION_PRIORITY_DEFAULT, error_string);
+
+		// Now that we have an emu_options structure properly set up, we can create a machine_config
+		machine_config config(current_driver, driver_specific_options);
+
 		for (device_t &device : device_iterator(config.root_device()))
 			for (region = rom_first_region(device); region != nullptr; region = rom_next_region(region))
 				if (ROMREGION_ISDISKDATA(region))
 					for (rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
 
-						/* look for a differing name but with the same hash data */
+						// Look for a differing name but with the same hash data
 						if (strcmp(ROM_GETNAME(romp), ROM_GETNAME(rom)) != 0 &&
 							romphashes == util::hash_collection(ROM_GETHASHDATA(rom)))
 						{
-							/* attempt to open the properly named file, scanning up through parent directories */
+							// Attempt to open the properly named file, scanning up through parent directories
 							filerr = osd_file::error::NOT_FOUND;
 							for (int searchdrv = drv; searchdrv != -1 && filerr != osd_file::error::NONE; searchdrv = driver_list::clone(searchdrv))
-								filerr = common_process_file(options, driver_list::driver(searchdrv).name, ".chd", rom, image_file);
+								filerr = common_process_file(driver_specific_options, driver_list::driver(searchdrv).name, ".chd", rom, image_file);
 
 							if (filerr != osd_file::error::NONE)
-								filerr = common_process_file(options, nullptr, ".chd", rom, image_file);
+								filerr = common_process_file(driver_specific_options, nullptr, ".chd", rom, image_file);
 
-							/* did the file open succeed? */
+							// Did the file open succeed?
 							if (filerr == osd_file::error::NONE)
 							{
 								std::string fullpath(image_file.fullpath());
 								image_file.close();
 
-								/* try to open the CHD */
+								// try to open the CHD
 								err = image_chd.open(fullpath.c_str());
 								if (err == CHDERR_NONE)
 									return err;

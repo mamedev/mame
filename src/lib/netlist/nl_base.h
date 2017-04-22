@@ -821,7 +821,7 @@ namespace netlist
 
 		using list_t =  std::vector<analog_net_t *>;
 
-		friend class net_t;
+		friend class detail::net_t;
 
 		analog_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 

@@ -284,7 +284,7 @@ public:
 
 protected:
 	virtual void palette_init() override;
-	virtual int palette_entries() const override { return 512; }
+	virtual u32 palette_entries() const override { return 512; }
 };
 
 class v9958_device : public v99x8_device
@@ -294,7 +294,7 @@ public:
 
 protected:
 	virtual void palette_init() override;
-	virtual int palette_entries() const override { return 19780; }
+	virtual u32 palette_entries() const override { return 19780; }
 };
 
 

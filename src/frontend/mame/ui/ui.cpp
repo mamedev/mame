@@ -341,8 +341,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 					messagebox_text = machine_info().mandatory_images();
 				if (!messagebox_text.empty())
 				{
-					std::string warning;
-					warning.assign(_("This driver requires images to be loaded in the following device(s): ")).append(messagebox_text.substr(0, messagebox_text.length() - 2));
+					std::string warning = std::string(_("This driver requires images to be loaded in the following device(s): ")) + messagebox_text;
 					ui::menu_file_manager::force_file_manager(*this, machine().render().ui_container(), warning.c_str());
 				}
 				break;

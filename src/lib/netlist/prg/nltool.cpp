@@ -770,6 +770,14 @@ int tool_app_t::execute()
 	{
 		perr("plib exception caught: {}\n", e.text());
 	}
+
+#if 0
+#define str(x) # x
+#define strx(x) str(x)
+#define ttt strx(__cplusplus)
+	printf("%s\n", ttt);
+#endif
+
 	return 0;
 }
 

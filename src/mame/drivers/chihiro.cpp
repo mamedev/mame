@@ -540,8 +540,8 @@ class chihiro_state : public xbox_base_state
 public:
 	chihiro_state(const machine_config &mconfig, device_type type, const char *tag) :
 		xbox_base_state(mconfig, type, tag),
-		usbhack_index(-1),
-		usbhack_counter(0),
+		hack_index(-1),
+		hack_counter(0),
 		dimm_board_memory(nullptr),
 		dimm_board_memory_size(0) { }
 
@@ -560,8 +560,8 @@ public:
 		bus_master_ide_controller_device    *ide;
 		naomi_gdrom_board *dimmboard;
 	} chihiro_devs;
-	int usbhack_index;
-	int usbhack_counter;
+	int hack_index;
+	int hack_counter;
 	uint8_t *dimm_board_memory;
 	uint32_t dimm_board_memory_size;
 
@@ -602,11 +602,11 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	{
 		offs_t base = addr;
 
-		uint32_t opcode = cpu.read_byte(space, address, true);
+		uint32_t opcode = cpu.read_byte(space, addr, true);
 		addr++;
-		uint32_t op1 = cpu.read_dword(space, address, true);
+		uint32_t op1 = cpu.read_dword(space, addr, true);
 		addr += 4;
-		uint32_t op2 = cpu.read_dword(space, address, true);
+		uint32_t op2 = cpu.read_dword(space, addr, true);
 		addr += 4;
 
 		char sop1[16];
@@ -731,26 +731,25 @@ void chihiro_state::hack_eeprom()
 static const struct
 {
 	const char *game_name;
-	const bool disable_usb;
 	struct {
 		uint32_t address;
 		uint8_t write_byte;
 	} modify[16];
-} hacks[HACK_ITEMS] = { { "chihiro",  false, { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0xeb }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
-						{ "outr2",    false, { { 0, 0 } } },
-						{ "crtaxihr", false, { { 0x14ada5/*11fda5*/, 0x90 },{ 0x14ada6/*11fda6*/, 0x90 }, { 0, 0 } } },
-						{ "ghostsqu", false, { { 0x78833/*4d833*/, 0x90 },{ 0x78834/*4d834*/, 0x90 }, { 0, 0 } } },
-						{ "vcop3",    false, { { 0x61a23/*36a23*/, 0x90 },{ 0x61a24/*36a24*/, 0x90 }, { 0, 0 } } },
+} hacks[HACK_ITEMS] = { { "chihiro",  { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0xeb }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
+						{ "outr2",    { { 0, 0 } } },
+						{ "crtaxihr", { { 0x14ada5/*11fda5*/, 0x90 }, { 0x14ada6/*11fda6*/, 0x90 }, { 0, 0 } } },
+						{ "ghostsqu", { { 0x78833/*4d833*/, 0x90 }, { 0x78834/*4d834*/, 0x90 }, { 0, 0 } } },
+						{ "vcop3",    { { 0x61a23/*36a23*/, 0x90 }, { 0x61a24/*36a24*/, 0x90 }, { 0, 0 } } },
 };
 
 void chihiro_state::hack_usb()
 {
 	int p;
 
-	if ((usbhack_counter == 0) && (usb_hack_enabled))
-		p = 0;
-	else if (usbhack_counter == 1) // after game loaded
-		p = usbhack_index;
+	if (hack_counter == 0)
+		p = 0; // need to patch the kernel
+	else if (hack_counter == 1)
+		p = hack_index; // need to patch the game
 	else
 		p = -1;
 	if (p >= 0) {
@@ -760,7 +759,7 @@ void chihiro_state::hack_usb()
 			m_maincpu->space(0).write_byte(hacks[p].modify[a].address, hacks[p].modify[a].write_byte);
 		}
 	}
-	usbhack_counter++;
+	hack_counter++;
 }
 
 //**************************************************************************
@@ -1734,15 +1733,13 @@ void chihiro_state::machine_start()
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 0, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1, _2));
 	}
-	usbhack_index = -1;
+	hack_index = -1;
 	for (int a = 1; a < HACK_ITEMS; a++)
 		if (strcmp(machine().basename(), hacks[a].game_name) == 0) {
-			usbhack_index = a;
-			if (hacks[a].disable_usb == true)
-				usb_hack_enabled = true;
+			hack_index = a;
 			break;
 		}
-	usbhack_counter = 0;
+	hack_counter = 0;
 	usb_device1 = machine().device<ohci_hlean2131qc_device>("ohci_hlean2131qc");
 	usb_device1->initialize(machine(), ohci_usb);
 	usb_device1->set_region_base(memregion(":others")->base()); // temporary
@@ -1752,7 +1749,7 @@ void chihiro_state::machine_start()
 	usb_device2->set_region_base(memregion(":others")->base() + 0x2080); // temporary
 	ohci_usb->usb_ohci_plug(2, usb_device2); // connect
 	// savestates
-	save_item(NAME(usbhack_counter));
+	save_item(NAME(hack_counter));
 }
 
 static SLOT_INTERFACE_START(ide_baseboard)
@@ -1775,7 +1772,7 @@ static MACHINE_CONFIG_DERIVED_CLASS(chihiro_base, xbox_base, chihiro_state)
 	MCFG_DEVICE_ADD("ohci_hlean2131sc", OHCI_HLEAN2131SC, 0)
 	MCFG_DEVICE_ADD("jvs_master", JVS_MASTER, 0)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "jvs_master", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
-	MACHINE_CONFIG_END
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(chihirogd, chihiro_base)
 	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", "^pic", nullptr, NOOP)
@@ -1831,7 +1828,7 @@ ROM_START( hotd3 )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0001", 0, BAD_DUMP  SHA1(174c72f851d0c97e8993227467f16b0781ed2f5c) )
+	DISK_IMAGE_READONLY( "gdx-0001", 0, SHA1(e41a2b236ec26db2d8b07643b8222e64440d1f31) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0348-com.data", 0x00, 0x50, CRC(d28219ef) SHA1(40dbbc092bc9f99b8d2ae67fbefacd62184f90ec) )
@@ -1921,7 +1918,7 @@ ROM_START( mj2c )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0006c", 0, BAD_DUMP SHA1(505653117a73ed8b256ccf19450e7573a4dc57e9) )
+	DISK_IMAGE_READONLY( "gdx-0006c", 0, SHA1(545ef902833d53822a8544dfc3f7538ee6025c9e) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD( "317-0374-jpn.pic", 0x000000, 0x004000, CRC(004f77a1) SHA1(bc5c6950293f3bff60bf7913d20a2046aa19ea69) )
@@ -2043,7 +2040,7 @@ ROM_START( ghostsqu )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0012a", 0, BAD_DUMP  SHA1(d7d78ce4992cb16ee5b4ac6ca7a37c46b07e8c14) )
+	DISK_IMAGE_READONLY( "gdx-0012a", 0, SHA1(d14adac9cdfd8095362fa9600c50bf038d4e5a99) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0398-com.data", 0x00, 0x50, CRC(8c5391a2) SHA1(e64cadeb30c94c3cd4002630cd79cc76c7bde2ed) )
@@ -2053,7 +2050,7 @@ ROM_START( gundamos )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0013", 0, BAD_DUMP SHA1(96b3dafcc2d2d6803fe3bf43a245d43ee5e0e5a6) )
+	DISK_IMAGE_READONLY( "gdx-0013", 0, SHA1(f97dceb9b4c4adff51d222ab2e6b9b0fe36394a8) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0400-jpn.data", 0x00, 0x50, CRC(0479c383) SHA1(7e86a037d2f9d09cec61a38cb19de510bf9482b3) )
@@ -2073,7 +2070,7 @@ ROM_START( outr2st )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0014a", 0, BAD_DUMP SHA1(4f9656634c47631f63eab554a13d19b15558217e) )
+	DISK_IMAGE_READONLY( "gdx-0014a", 0, SHA1(ed60aa1a402bcb01229b18987af199566b930b0b) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD( "317-0396-com.pic", 0x000000, 0x004000, CRC(f94cf26f) SHA1(dd4af2b52935c7b2d8cd196ec1a30c0ef0993322) )
@@ -2083,7 +2080,7 @@ ROM_START( wangmid2j )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0015", 0, BAD_DUMP SHA1(259483fd211a70c23205ffd852316d616c5a2740) )
+	DISK_IMAGE_READONLY( "gdx-0015", 0, SHA1(489bdb96cecaa8c45908a630f64b3cf10e433619) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-5106-jpn.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
@@ -2113,7 +2110,7 @@ ROM_START( wangmid2 )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0016a", 0, BAD_DUMP SHA1(cb306df60550bbd8df312634cb97014bb39f1631) )
+	DISK_IMAGE_READONLY( "gdx-0016a", 0, SHA1(1cbc5e3e9ef1ab26468b9f4ee0fc32a0a320afe7) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-5106-com.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
@@ -2123,7 +2120,7 @@ ROM_START( mj3d )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0017d", 0, BAD_DUMP SHA1(cfbbd452c8f4efe0e99f398f5521fc3574b913bb) )
+	DISK_IMAGE_READONLY( "gdx-0017d", 0, SHA1(d90e06bd1e4c637cb9949d411da11537e72ac3d2) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD( "317-0414-jpn.pic", 0x000000, 0x004000, CRC(27d1c541) SHA1(c85a8229dd769af02ab43c97f09f995743cdb315) )
@@ -2143,7 +2140,7 @@ ROM_START( scg06nt )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0018a", 0, BAD_DUMP SHA1(e6f3dc8066392854ad7d83f81d3cbc81a5e340b3) )
+	DISK_IMAGE_READONLY( "gdx-0018a", 0, SHA1(3c10775aefc5e3e49837bf473fb32e94507ee892) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("gdx-0018.data", 0x00, 0x50, CRC(1a210abd) SHA1(43a54d028315d2dfa9f8ea6fb59265e0b980b02f) )

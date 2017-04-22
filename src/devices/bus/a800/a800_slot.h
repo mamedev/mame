@@ -100,7 +100,7 @@ public:
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_cart_type() { return m_type; };
-	int identify_cart_type(uint8_t *header);
+	int identify_cart_type(const uint8_t *header) const;
 	bool has_cart() { return m_cart != nullptr; }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
@@ -113,7 +113,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin,rom,car"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_80xx);
@@ -142,7 +142,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin,rom,car,a52"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 };
 
 // ======================> xegs_cart_slot_device
@@ -157,7 +157,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin,rom,car"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 };
 
 // device type definition

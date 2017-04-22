@@ -48,6 +48,9 @@
 #define MCFG_SM510_WRITE_SEGBS_CB(_devcb) \
 	devcb = &sm510_base_device::set_write_segbs_callback(*device, DEVCB_##_devcb);
 
+// ACL input pin
+#define SM510_INPUT_LINE_ACL INPUT_LINE_RESET
+
 enum
 {
 	SM510_PORT_SEGA = 0x00,
@@ -100,7 +103,7 @@ public:
 		, m_stack_levels(stack_levels)
 		, m_lcd_ram_a(*this, "lcd_ram_a"), m_lcd_ram_b(*this, "lcd_ram_b"), m_lcd_ram_c(*this, "lcd_ram_c")
 		, m_write_sega(*this), m_write_segb(*this), m_write_segc(*this), m_write_segbs(*this)
-		, m_melody_rom(*this, "music")
+		, m_melody_rom(*this, "melody")
 		, m_read_k(*this)
 		, m_read_ba(*this), m_read_b(*this)
 		, m_write_s(*this)

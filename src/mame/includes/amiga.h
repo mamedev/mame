@@ -651,6 +651,7 @@ private:
 
 	emu_timer *m_irq_timer;
 	emu_timer *m_serial_timer;
+	emu_timer *m_scanline_timer;
 
 	bool m_gayle_reset;
 

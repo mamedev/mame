@@ -1858,7 +1858,7 @@ TABLE_FUNCTION(void, set_line, (int line, int state))
 
 
 /* Get a register from the CPU core */
-TABLE_FUNCTION(uint, get_reg, (int regnum))
+TABLE_FUNCTION(unsigned, get_reg, (int regnum))
 {
 	switch(regnum)
 	{
@@ -1883,7 +1883,7 @@ TABLE_FUNCTION(uint, get_reg, (int regnum))
 
 
 
-TABLE_FUNCTION(void, set_reg, (int regnum, uint val))
+TABLE_FUNCTION(void, set_reg, (int regnum, unsigned val))
 {
 	switch(regnum)
 	{

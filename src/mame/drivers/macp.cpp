@@ -112,19 +112,17 @@ ROM_START(nbamac)
 	ROM_LOAD("mac_snd.bin", 0x0000, 0x8000, CRC(d7aedbac) SHA1(4b59028e08b2d7ff8f19596022ba6e830cf736e2))
 ROM_END
 
+ROM_START(glxplay)
+    ROM_REGION(0x4000, "maincpu", 0)
+    ROM_LOAD("1083-1.cpu", 0x0000, 0x2000, CRC(3df33169) SHA1(657720aab4cccf3364f013acb3f5dbc46fe0e05c))
+    ROM_LOAD("1083-2.cpu", 0x2000, 0x2000, CRC(47b4f49e) SHA1(59853ac56bb9e2dc7b848dc46ebd27c21b9d2e82))
+ROM_END
+
 ROM_START(kidnap)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("kidnap_1.bin", 0x0000, 0x2000, CRC(4b8f9bb1) SHA1(16672c1a5e55ba5963fbd8834443dbead9bdff10) BAD_DUMP)
 	ROM_LOAD("kidnap_2.bin", 0x2000, 0x2000, CRC(4333d9ba) SHA1(362bcc9caaf37ad7efc116c3bee9b99cbbfa0563))
 ROM_END
-
-/*  not dumped yet
-ROM_START(glxplay)
-    ROM_REGION(0x4000, "maincpu", 0)
-    ROM_LOAD("1083-1.cpu", 0x0000, 0x2000, NO_DUMP)
-    ROM_LOAD("1083-2.cpu", 0x2000, 0x2000, NO_DUMP)
-ROM_END
-*/
 
 ROM_START(glxplay2)
 	ROM_REGION(0x4000, "maincpu", 0)
@@ -141,6 +139,6 @@ GAME( 1995, macjungn, 0, macpmsm, macp, driver_device, 0, ROT0, "MAC S.A.", "MAC
 GAME( 1996, nbamac,   0, macpmsm, macp, driver_device, 0, ROT0, "MAC S.A.", "NBA MAC", MACHINE_IS_SKELETON_MECHANICAL )
 
 // CICPlay pinballs
+GAME( 1985, glxplay,  0, macp0,  cicplay, driver_device, 0, ROT0, "CICPlay", "Galaxy Play", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1986, kidnap,   0, macp0,  cicplay, driver_device, 0, ROT0, "CICPlay", "Kidnap", MACHINE_IS_SKELETON_MECHANICAL )
-// GAME( 1986, glxplay,  0, macp0,  cicplay, driver_device, 0, ROT0, "CICPlay", "Galaxy Play", MACHINE_IS_SKELETON_MECHANICAL ) // not dumped yet
 GAME( 1987, glxplay2, 0, macp0,  cicplay, driver_device, 0, ROT0, "CICPlay", "Galaxy Play 2", MACHINE_IS_SKELETON_MECHANICAL )

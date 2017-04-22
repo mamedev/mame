@@ -67,6 +67,7 @@ public:
 	uint8_t m_nsc_latch;
 	uint8_t m_z80_latch;
 	uint8_t m_mux_data;
+	emu_timer *m_z80_wait_ack_timer;
 
 	required_shared_ptr<uint8_t> m_comms_ram;
 
@@ -235,7 +236,7 @@ void nightgal_state::z80_wait_assert_cb()
 
 	// Note: cycles_to_attotime requires z80 context to work, calling for example m_subcpu as context gives a x4 cycle boost in z80 terms (reads execute_cycles_to_clocks() from NCS?) even if they runs at same speed basically.
 	// TODO: needs a getter that tells a given CPU how many cycles requires an executing opcode for the r/w operation, which stacks with wait state penalty for accessing this specific area.
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(nightgal_state::z80_wait_ack_cb),this));
+	m_z80_wait_ack_timer->adjust(m_maincpu->cycles_to_attotime(4));
 }
 
 READ8_MEMBER(nightgal_state::royalqn_comm_r)
@@ -634,6 +635,8 @@ INPUT_PORTS_END
 
 void nightgal_state::machine_start()
 {
+	m_z80_wait_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nightgal_state::z80_wait_ack_cb), this));
+
 	save_item(NAME(m_nsc_latch));
 	save_item(NAME(m_z80_latch));
 	save_item(NAME(m_mux_data));

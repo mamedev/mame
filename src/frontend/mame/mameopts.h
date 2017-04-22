@@ -72,7 +72,7 @@ private:
 	static void update_slot_options(emu_options &options, const software_part *swpart = nullptr);
 	static void parse_slot_devices(emu_options &options, value_specifier_func value_specifier);
 	static std::string get_full_option_name(const device_image_interface &image);
-	static slot_option parse_slot_option(std::string &&text);
+	static std::string get_default_card_software(device_slot_interface &slot, const emu_options &options);
 
 	// INI parsing helper
 	static bool parse_one_ini(emu_options &options, const char *basename, int priority, std::string *error_string = nullptr);

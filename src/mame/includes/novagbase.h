@@ -3,9 +3,16 @@
 /******************************************************************************
 *
 *  Novag chess machines base class
+*  main driver is novag6502.cpp
 *
 ******************************************************************************/
 
+#pragma once
+
+#ifndef DRIVERS_NOVAGBASE_H
+#define DRIVERS_NOVAGBASE_H
+
+#include "sound/dac.h"
 #include "sound/beep.h"
 #include "video/hd44780.h"
 
@@ -15,6 +22,7 @@ public:
 	novagbase_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac"),
 		m_beeper(*this, "beeper"),
 		m_lcd(*this, "hd44780"),
 		m_inp_matrix(*this, "IN.%u", 0),
@@ -25,9 +33,10 @@ public:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	optional_device<dac_bit_interface> m_dac;
 	optional_device<beep_device> m_beeper;
 	optional_device<hd44780_device> m_lcd;
-	optional_ioport_array<8> m_inp_matrix; // max 8
+	optional_ioport_array<9> m_inp_matrix; // max 9
 
 	// misc common
 	u16 m_inp_mux;                  // multiplexed keypad mask
@@ -60,3 +69,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
+
+
+INPUT_PORTS_EXTERN( novag_cb_buttons );
+INPUT_PORTS_EXTERN( novag_cb_magnets );
+
+#endif // DRIVERS_NOVAGBASE_H

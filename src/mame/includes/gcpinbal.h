@@ -45,6 +45,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	emu_timer *m_int1_timer;
+
 	/* video-related */
 	tilemap_t     *m_tilemap[3];
 	uint16_t      m_scrollx[3];

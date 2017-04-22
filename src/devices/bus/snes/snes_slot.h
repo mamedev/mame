@@ -163,8 +163,8 @@ public:
 	virtual void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	void get_cart_type_addon(uint8_t *ROM, uint32_t len, int &type, int &addon);
-	uint32_t snes_skip_header(uint8_t *ROM, uint32_t snes_rom_size);
+	void get_cart_type_addon(const uint8_t *ROM, uint32_t len, int &type, int &addon) const;
+	uint32_t snes_skip_header(const uint8_t *ROM, uint32_t snes_rom_size) const;
 	int get_type() { return m_type; }
 
 	void setup_nvram();
@@ -181,7 +181,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 1; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);

@@ -63,7 +63,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
                             Palette GGGGGRRRRRBBBBBx
 ***************************************************************************/
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_paletteram_w)
+WRITE16_MEMBER(hyprduel_state::paletteram_w)
 {
 	data = COMBINE_DATA(&m_paletteram[offset]);
 	m_palette->set_pen_color(offset, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
@@ -231,7 +231,7 @@ inline void hyprduel_state::get_tile_info_16x16_8bit( tile_data &tileinfo, int t
 	}
 }
 
-inline void hyprduel_state::hyprduel_vram_w( offs_t offset, uint16_t data, uint16_t mem_mask, int layer, uint16_t *vram )
+inline void hyprduel_state::vram_w( offs_t offset, uint16_t data, uint16_t mem_mask, int layer, uint16_t *vram )
 {
 	COMBINE_DATA(&vram[offset]);
 	{
@@ -264,24 +264,24 @@ TILE_GET_INFO_MEMBER(hyprduel_state::get_tile_info_2_8bit)
 	get_tile_info_8bit(tileinfo, tile_index, 2, m_vram_2);
 }
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_vram_0_w)
+WRITE16_MEMBER(hyprduel_state::vram_0_w)
 {
-	hyprduel_vram_w(offset, data, mem_mask, 0, m_vram_0);
+	vram_w(offset, data, mem_mask, 0, m_vram_0);
 }
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_vram_1_w)
+WRITE16_MEMBER(hyprduel_state::vram_1_w)
 {
-	hyprduel_vram_w(offset, data, mem_mask, 1, m_vram_1);
+	vram_w(offset, data, mem_mask, 1, m_vram_1);
 }
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_vram_2_w)
+WRITE16_MEMBER(hyprduel_state::vram_2_w)
 {
-	hyprduel_vram_w(offset, data, mem_mask, 2, m_vram_2);
+	vram_w(offset, data, mem_mask, 2, m_vram_2);
 }
 
 
 /* Dirty the relevant tilemap when its window changes */
-WRITE16_MEMBER(hyprduel_state::hyprduel_window_w)
+WRITE16_MEMBER(hyprduel_state::window_w)
 {
 	uint16_t olddata = m_window[offset];
 	uint16_t newdata = COMBINE_DATA(&m_window[offset]);
@@ -313,7 +313,7 @@ void hyprduel_state::alloc_empty_tiles(  )
 }
 
 
-void hyprduel_state::hyprduel_postload()
+void hyprduel_state::postload()
 {
 	int i;
 
@@ -330,22 +330,22 @@ void hyprduel_state::hyprduel_postload()
 }
 
 
-void hyprduel_state::expand_gfx1(hyprduel_state &state)
+void hyprduel_state::expand_gfx1()
 {
-	uint8_t *base_gfx = state.memregion("gfx1")->base();
-	uint32_t length = 2 * state.memregion("gfx1")->bytes();
-	state.m_expanded_gfx1 = std::make_unique<uint8_t[]>(length);
+	uint8_t *base_gfx = memregion("gfx1")->base();
+	uint32_t length = 2 * memregion("gfx1")->bytes();
+	m_expanded_gfx1 = std::make_unique<uint8_t[]>(length);
 	for (int i = 0; i < length; i += 2)
 	{
 		uint8_t src = base_gfx[i / 2];
-		state.m_expanded_gfx1[i+0] = src & 15;
-		state.m_expanded_gfx1[i+1] = src >> 4;
+		m_expanded_gfx1[i+0] = src & 15;
+		m_expanded_gfx1[i+1] = src >> 4;
 	}
 }
 
 VIDEO_START_MEMBER(hyprduel_state,common_14220)
 {
-	expand_gfx1(*this);
+	expand_gfx1();
 	alloc_empty_tiles();
 	m_tiletable_old = std::make_unique<uint16_t[]>(m_tiletable.bytes() / 2);
 	m_dirtyindex = std::make_unique<uint8_t[]>(m_tiletable.bytes() / 4);
@@ -373,7 +373,7 @@ VIDEO_START_MEMBER(hyprduel_state,common_14220)
 	/* Set up save state */
 	save_item(NAME(m_sprite_xoffs));
 	save_item(NAME(m_sprite_yoffs));
-	machine().save().register_postload(save_prepost_delegate(FUNC(hyprduel_state::hyprduel_postload), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(hyprduel_state::postload), this));
 }
 
 VIDEO_START_MEMBER(hyprduel_state,hyprduel_14220)
@@ -587,7 +587,7 @@ void hyprduel_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
                                 Screen Drawing
 ***************************************************************************/
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_scrollreg_w)
+WRITE16_MEMBER(hyprduel_state::scrollreg_w)
 {
 	uint16_t window = m_window[offset];
 
@@ -599,7 +599,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_scrollreg_w)
 		m_bg_tilemap[offset / 2]->set_scrolly(0, m_scroll[offset] - window - (window & 7));
 }
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_scrollreg_init_w)
+WRITE16_MEMBER(hyprduel_state::scrollreg_init_w)
 {
 	int i;
 
@@ -652,7 +652,7 @@ void hyprduel_state::dirty_tiles( int layer, uint16_t *vram )
 }
 
 
-uint32_t hyprduel_state::screen_update_hyprduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hyprduel_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, pri, layers_ctrl = -1;
 	uint16_t screenctrl = *m_screenctrl;

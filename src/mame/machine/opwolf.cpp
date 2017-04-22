@@ -1070,7 +1070,7 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 	{
 		// Simulate time for command to execute (exact timing unknown, this is close)
 		m_current_cmd = 0xf5;
-		timer_set(m_maincpu->cycles_to_attotime(80000), TIMER_OPWOLF);
+		m_opwolf_timer->adjust(m_maincpu->cycles_to_attotime(80000));
 	}
 	m_cchip_last_7a = m_cchip_ram[0x7a];
 

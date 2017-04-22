@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
 /*
-EA pin - defined by architecture, must implement:
-   1 means external access, bypassing internal ROM
-   reimplement as a push, not a pull
-T0 output clock
+    TODO:
+    - EA pin - defined by architecture, must implement:
+      1 means external access, bypassing internal ROM
+      reimplement as a push, not a pull
+    - T0 output clock
+    - get rid of i/o addressmap, use devcb for mcu pins
+    - add CMOS devices, 1 new opcode(01 HALT)
 */
 
 /***************************************************************************

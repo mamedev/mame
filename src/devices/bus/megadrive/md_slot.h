@@ -164,13 +164,13 @@ public:
 	virtual bool is_reset_on_load() const override { return 1; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
 
 	image_init_result load_list();
 	image_init_result load_nonlist();
-	int get_cart_type(uint8_t *ROM, uint32_t len);
+	static int get_cart_type(const uint8_t *ROM, uint32_t len);
 
 	void setup_custom_mappers();
 	void setup_nvram();

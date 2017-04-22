@@ -155,7 +155,7 @@ image_init_result m5_cart_slot_device::call_load()
 		{
 			const char *pcb_name = get_feature("slot");
 			if (pcb_name) //is it ram cart?
-				m_type = m5_get_pcb_id(m_full_software_name.c_str());
+				m_type = m5_get_pcb_id(full_software_name().c_str());
 			else
 				m_type=M5_STD; //standard cart(no feature line in xml)
 		}
@@ -194,10 +194,10 @@ image_init_result m5_cart_slot_device::call_load()
  get default card software
  -------------------------------------------------*/
 
-std::string m5_cart_slot_device::get_default_card_software()
+std::string m5_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	std::string result;
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string = "std";
 		//uint32_t size = core_fsize(m_file);
@@ -207,7 +207,6 @@ std::string m5_cart_slot_device::get_default_card_software()
 		slot_string = m5_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		result.assign(slot_string);
 		return result;

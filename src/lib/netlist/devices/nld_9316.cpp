@@ -28,10 +28,7 @@ namespace netlist
 		, m_B(*this, "B", NETLIB_DELEGATE(9316, noop))
 		, m_C(*this, "C", NETLIB_DELEGATE(9316, noop))
 		, m_D(*this, "D", NETLIB_DELEGATE(9316, noop))
-		, m_QA(*this, "QA")
-		, m_QB(*this, "QB")
-		, m_QC(*this, "QC")
-		, m_QD(*this, "QD")
+		, m_Q(*this, {{ "QA", "QB", "QC", "QD" }})
 		, m_RC(*this, "RC")
 		{
 		}
@@ -56,20 +53,18 @@ namespace netlist
 		logic_input_t m_C;
 		logic_input_t m_D;
 
-		logic_output_t m_QA;
-		logic_output_t m_QB;
-		logic_output_t m_QC;
-		logic_output_t m_QD;
+		object_array_t<logic_output_t, 4> m_Q;
 		logic_output_t m_RC;
 
 
 	private:
-		void update_outputs_all(const unsigned &cnt, const netlist_time &out_delay) noexcept
+		//inline void update_outputs_all(const unsigned &cnt, const netlist_time &out_delay) noexcept
+		inline void update_outputs_all(const unsigned &cnt, const netlist_time &out_delay) noexcept
 		{
-			m_QA.push((cnt >> 0) & 1, out_delay);
-			m_QB.push((cnt >> 1) & 1, out_delay);
-			m_QC.push((cnt >> 2) & 1, out_delay);
-			m_QD.push((cnt >> 3) & 1, out_delay);
+			m_Q[0].push((cnt >> 0) & 1, out_delay);
+			m_Q[1].push((cnt >> 1) & 1, out_delay);
+			m_Q[2].push((cnt >> 2) & 1, out_delay);
+			m_Q[3].push((cnt >> 3) & 1, out_delay);
 		}
 	};
 
