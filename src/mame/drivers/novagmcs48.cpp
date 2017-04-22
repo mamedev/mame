@@ -11,12 +11,19 @@
     such as Arena(in editmode).
 
     TODO:
-    - x
+    - is presto led handling correct? led data needs to be auto cleared
+      similar to novag6502 sforte/sexpert
 
 ******************************************************************************
 
 Presto:
-- x
+- NEC D80C49C MCU(serial 186), OSC from LC circuit measured ~6MHz
+- buzzer, 16+4 LEDs, 8*8 chessboard buttons
+
+Octo:
+- NEC D80C49HC MCU(serial 111), OSC from LC circuit measured ~12MHz
+The buzzer has a little electronic circuit going on, not sure whatfor.
+Otherwise, it's identical to Presto. The MCU internal ROM is same too.
 
 ******************************************************************************/
 
@@ -58,8 +65,7 @@ WRITE8_MEMBER(novagmcs48_state::presto_mux_w)
 {
 	// D0-D7: input mux low, led data
 	m_inp_mux = (m_inp_mux & ~0xff) | (~data & 0xff);
-	m_led_data = data;
-	display_matrix(8, 3, m_led_data, m_led_select);
+	m_led_data = ~data & 0xff;
 }
 
 WRITE8_MEMBER(novagmcs48_state::presto_control_w)
@@ -71,8 +77,9 @@ WRITE8_MEMBER(novagmcs48_state::presto_control_w)
 	m_dac->write(BIT(data, 2) & BIT(~data, 3));
 	
 	// P24-P26: led select
-	m_led_select = data >> 4 & 7;
+	m_led_select = ~data >> 4 & 7;
 	display_matrix(8, 3, m_led_data, m_led_select);
+	m_led_data = 0; // ?
 }
 
 READ8_MEMBER(novagmcs48_state::presto_input_r)
@@ -106,14 +113,14 @@ static INPUT_PORTS_START( presto )
 	PORT_INCLUDE( novag_cb_buttons )
 
 	PORT_START("IN.8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Black/White") // Octo calls it "Change Color"
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Verify / Pawn")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Set Up / Rook")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Knight")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Set Level / Bishop")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Queen")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Take Back / King")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Go")
 INPUT_PORTS_END
 
 
@@ -138,6 +145,13 @@ static MACHINE_CONFIG_START( presto, novagmcs48_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( octo, presto )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(12000000) // LC circuit, measured
+MACHINE_CONFIG_END
+
 
 
 /******************************************************************************
@@ -149,11 +163,17 @@ ROM_START( npresto )
 	ROM_LOAD("d80c49c_186", 0x0000, 0x0800, CRC(29a0eb4c) SHA1(e058d6018e53ddcaa3b5ec25b33b8bff091b04db) )
 ROM_END
 
+ROM_START( nocto )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD("d80c49hc_111", 0x0000, 0x0800, CRC(29a0eb4c) SHA1(e058d6018e53ddcaa3b5ec25b33b8bff091b04db) ) // same program as npresto
+ROM_END
+
 
 
 /******************************************************************************
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME      PARENT COMPAT  MACHINE    INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1984, npresto, 0,     0,      presto, presto, driver_device, 0, "Novag", "Presto (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT      INIT              COMPANY, FULLNAME, FLAGS */
+CONS( 1984, npresto,  0,       0,      presto,    presto,    driver_device, 0, "Novag", "Presto (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, nocto,    npresto, 0,      octo,      presto,    driver_device, 0, "Novag", "Octo (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

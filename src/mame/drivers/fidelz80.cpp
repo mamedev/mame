@@ -1783,7 +1783,7 @@ static MACHINE_CONFIG_START( vbrc, fidelz80_state )
 	MCFG_CPU_IO_MAP(vbrc_main_io)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("mcu", I8041, XTAL_5MHz) // or XTAL_5MHz/4?
+	MCFG_CPU_ADD("mcu", I8041, XTAL_5MHz)
 	MCFG_CPU_IO_MAP(vbrc_mcu_map)
 
 	MCFG_I8243_ADD("i8243", NOOP, WRITE8(fidelz80_state, vbrc_ioexp_port_w))
