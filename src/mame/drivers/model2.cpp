@@ -2543,12 +2543,12 @@ static MACHINE_CONFIG_DERIVED( srallyc, model2a )
 	MCFG_CPU_IO_MAP(drive_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", model2_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("driveio1", SEGA_315_5296, 16000000/4) //???
+	MCFG_DEVICE_ADD("driveio1", SEGA_315_5296, 0) // unknown clock
 	MCFG_315_5296_OUT_PORTD_CB(WRITE8(model2_state, driveio_port_w))
 	MCFG_315_5296_IN_PORTG_CB(READ8(model2_state, driveio_portg_r))
 	MCFG_315_5296_IN_PORTH_CB(READ8(model2_state, driveio_porth_r))
 
-	MCFG_DEVICE_ADD("driveio2", SEGA_315_5296, 16000000/4) //???
+	MCFG_DEVICE_ADD("driveio2", SEGA_315_5296, 0) // unknown clock
 
 	MCFG_DEVICE_ADD("driveadc", MSM6253, 0)
 MACHINE_CONFIG_END

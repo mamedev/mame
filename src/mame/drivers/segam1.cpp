@@ -92,8 +92,8 @@ static MACHINE_CONFIG_START( segam1, segam1_state )
 	MCFG_CPU_PROGRAM_MAP(segam1_map)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", segam1_state,  irq1_line_hold)
 
-	MCFG_DEVICE_ADD("io1", SEGA_315_5296, 10000000) // ???
-	MCFG_DEVICE_ADD("io2", SEGA_315_5296, 10000000) // ???
+	MCFG_DEVICE_ADD("io1", SEGA_315_5296, 0) // unknown clock
+	MCFG_DEVICE_ADD("io2", SEGA_315_5296, 0) // unknown clock
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

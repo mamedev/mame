@@ -6,7 +6,6 @@
 
 ***************************************************************************/
 
-#include "machine/eepromser.h"
 #include "sound/multipcm.h"
 #include "machine/s32comm.h"
 #include "screen.h"
@@ -26,13 +25,9 @@ public:
 	required_shared_ptr<uint16_t> m_system32_spriteram;
 	optional_shared_ptr_array<uint16_t, 2> m_system32_paletteram;
 
-	optional_ioport_array<8> m_ports_a;
-	optional_ioport_array<8> m_ports_b;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<multipcm_device> m_multipcm;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -70,7 +65,6 @@ public:
 	uint8_t m_sound_irq_input;
 	uint8_t m_sound_dummy_value;
 	uint16_t m_sound_bank;
-	uint8_t m_misc_io_data[2][0x10];
 	sys32_output_callback m_sw1_output;
 	sys32_output_callback m_sw2_output;
 	sys32_output_callback m_sw3_output;
@@ -132,12 +126,13 @@ public:
 	DECLARE_WRITE16_MEMBER(interrupt_control_16_w);
 	DECLARE_READ32_MEMBER(interrupt_control_32_r);
 	DECLARE_WRITE32_MEMBER(interrupt_control_32_w);
-	DECLARE_READ16_MEMBER(io_chip_r);
-	DECLARE_WRITE16_MEMBER(io_chip_w);
-	DECLARE_READ32_MEMBER(io_chip_0_r);
-	DECLARE_WRITE32_MEMBER(io_chip_0_w);
-	DECLARE_READ32_MEMBER(io_chip_1_r);
-	DECLARE_WRITE32_MEMBER(io_chip_1_w);
+	DECLARE_WRITE8_MEMBER(misc_output_0_w);
+	DECLARE_WRITE8_MEMBER(misc_output_1_w);
+	DECLARE_WRITE8_MEMBER(sw2_output_0_w);
+	DECLARE_WRITE8_MEMBER(sw2_output_1_w);
+	DECLARE_WRITE8_MEMBER(tilebank_external_w);
+	DECLARE_WRITE_LINE_MEMBER(display_enable_0_w);
+	DECLARE_WRITE_LINE_MEMBER(display_enable_1_w);
 	DECLARE_WRITE16_MEMBER(random_number_16_w);
 	DECLARE_READ16_MEMBER(random_number_16_r);
 	DECLARE_WRITE32_MEMBER(random_number_32_w);
@@ -188,8 +183,6 @@ public:
 	void update_irq_state();
 	void signal_v60_irq(int which);
 	void int_control_w(address_space &space, int offset, uint8_t data);
-	uint16_t common_io_chip_r(address_space &space, int which, offs_t offset, uint16_t mem_mask);
-	void common_io_chip_w(address_space &space, int which, offs_t offset, uint16_t data, uint16_t mem_mask);
 	void update_sound_irq_state();
 	void segas32_common_init();
 	void radm_sw1_output( int which, uint16_t data );
