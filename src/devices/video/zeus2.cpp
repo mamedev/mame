@@ -855,7 +855,9 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 			{
 				// Fast fill from local regs
 				uint32_t numDWords = (m_zeusbase[0x50] & 0xffff) + 1;
-				//numDWords *= 0x8;
+				// Set autoincrement
+				if (numDWords>1)
+					m_zeusbase[0x5e] |= 0x40;
 				if (logit && numDWords > 1)
 					logerror(" -- Filling buffer: numDWords: %08X addr: %08X reg50: %08X reg5e: %08X\n", numDWords, m_zeusbase[0x51], m_zeusbase[0x50], m_zeusbase[0x5e]);
 				for (int dword = 0; dword < numDWords; dword++)
