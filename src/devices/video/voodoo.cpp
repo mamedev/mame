@@ -3397,12 +3397,10 @@ int32_t voodoo_device::texture_w(voodoo_device *vd, offs_t offset, uint32_t data
 
 			/* old code has a bit about how this is broken in gauntleg unless we always look at TMU0 */
 			if (TEXMODE_SEQ_8_DOWNLD(vd->tmu[0].reg/*t->reg*/[textureMode].u)) {
-				//ts = (offset << 2) & 0xfc;
-				ts = (offset & 0x3f) << 2;
+				ts = (offset << 2) & 0xfc;
 			}
 			else {
-				//ts = (offset << 1) & 0xfc;
-				ts = (offset & 0x7f) << 1;
+				ts = (offset << 1) & 0xfc;
 			}
 			/* validate parameters */
 			if (lod > 8)
