@@ -29456,6 +29456,9 @@ supercon                        //
 @source:novag68k.cpp
 diablo68                        //
 
+@source:novagmcs48.cpp
+npresto                         //
+
 @source:nsm.cpp
 firebird                        //
 
