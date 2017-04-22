@@ -48,6 +48,7 @@ public:
 	tilemap_t    *m_fg_tilemap;
 	DECLARE_WRITE16_MEMBER(acchi_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(acchi_fg_videoram_w);
+	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_acchi_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_acchi_fg_tile_info);
 	virtual void video_start() override;
@@ -55,7 +56,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
-
 
 WRITE16_MEMBER(acchi_state::acchi_bg_videoram_w)
 {
@@ -70,11 +70,15 @@ TILE_GET_INFO_MEMBER(acchi_state::get_acchi_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, tileno&0x1fff, pal, 0);
 }
 
-
 WRITE16_MEMBER(acchi_state::acchi_fg_videoram_w)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE8_MEMBER(acchi_state::flipscreen_w)
+{
+	flip_screen_set(data & 0x01);
 }
 
 TILE_GET_INFO_MEMBER(acchi_state::get_acchi_fg_tile_info)
@@ -83,7 +87,7 @@ TILE_GET_INFO_MEMBER(acchi_state::get_acchi_fg_tile_info)
 
 	int tileno = m_fg_videoram[tile_index];
 	int pal = tileno>>12;
-	
+
 	SET_TILE_INFO_MEMBER(1, (tileno&0x0fff)+(bank*0x1000), pal, 0);
 }
 
@@ -123,7 +127,7 @@ uint32_t acchi_state::screen_update_acchi(screen_device &screen, bitmap_ind16 &b
 
 	m_bg_tilemap->set_scrollx(0, scrollx);
 	m_bg_tilemap->set_scrolly(0, scrolly);
-	
+
 	scrollx = (m_vregs[0]-0xff0)&0xfff;
 	scrolly = (m_vregs[1]-0x7b0)&0xfff;
 	if (scrolly&0x200) scrollx += 0x1000;
@@ -131,11 +135,11 @@ uint32_t acchi_state::screen_update_acchi(screen_device &screen, bitmap_ind16 &b
 
 	m_fg_tilemap->set_scrollx(0, scrollx);
 	m_fg_tilemap->set_scrolly(0, scrolly);	
-	
+
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	
+
 	/*
 	popmessage("%04x %04x %04x %04x\n%04x %04x %04x %04x",
 		m_vregs[0], m_vregs[1],
@@ -161,24 +165,24 @@ also
 
 static ADDRESS_MAP_START( acchi_map, AS_PROGRAM, 16, acchi_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	
-	AM_RANGE(0x110000, 0x1103ff) AM_RAM	AM_SHARE("videoregs")
-	
-	AM_RANGE(0x120000, 0x1205ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	
+
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN0")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("IN1")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
-	
-	AM_RANGE(0x100014, 0x100015) AM_WRITENOP
-	
+
+	AM_RANGE(0x100014, 0x100015) AM_WRITE8(flipscreen_w, 0x00ff)
+
+	AM_RANGE(0x110000, 0x1103ff) AM_RAM	AM_SHARE("videoregs")
+
+	AM_RANGE(0x120000, 0x1205ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+
 	AM_RANGE(0x130000, 0x13ffff) AM_RAM_WRITE(acchi_fg_videoram_w) AM_SHARE("fg_videoram") 
 	AM_RANGE(0x140000, 0x14ffff) AM_RAM_WRITE(acchi_bg_videoram_w) AM_SHARE("bg_videoram") 
-	
+
 	AM_RANGE(0x150000, 0x150001) AM_WRITENOP // ? also reads (oki?)
 	AM_RANGE(0x150010, 0x150011) AM_WRITENOP // ? also reads
- 	
+
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM	// mainram?
 ADDRESS_MAP_END
 
@@ -204,7 +208,9 @@ static INPUT_PORTS_START( acchi ) // inputs register in test mode but not in gam
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "DSW1:8")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "DSW1:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "DSW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "DSW1:5")
@@ -291,11 +297,11 @@ ROM_START( acchi )
 	ROM_REGION( 0x100000, "oki1", 0 ) /* OKIM6295 samples */
 	ROM_LOAD( "rw-93085-1.u3",  0x000000, 0x080000, CRC(d9776d50) SHA1(06e4d2184f687af8380fcb49ce48ce8ec8091050) ) // sound (2 banks)
 	ROM_LOAD( "rw-93085-2.u4",  0x080000, 0x080000, CRC(3698fafa) SHA1(3de54a990478621271285254544f5382d6fd9ca9) ) // sound (2 banks)
-	
+
 	ROM_REGION( 0x100000, "oki2", 0 ) /* OKIM6295 samples */
 	ROM_LOAD( "rw-93085-5.u22", 0x000000, 0x080000, CRC(0c0d2835) SHA1(dc14ebea5f4e0d3f2f8e7bc05e16b8d0f92ce588) ) // sound (2 banks)
 	ROM_LOAD( "rw-93085-6.u23", 0x080000, 0x080000, CRC(882c25d0) SHA1(9cbf21bd5940240440025b4481d96e3db45a676c) ) // sound (2 banks)
-	
+
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s131n.u119", 0x000, 0x200, CRC(33f63fc8) SHA1(24c4a1a7c06e546571c77c7dc7bd87c57aa088d7) )
 	ROM_LOAD( "n82s135n.u137", 0x000, 0x100, CRC(cb90eedc) SHA1(6577cb1999a90b9209b150cbedde11de9ac30018) )
