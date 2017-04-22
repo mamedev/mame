@@ -595,8 +595,6 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
 #define SOUND_IRQ_YM3438    0
 #define SOUND_IRQ_V60       1
 
-#define AM_MIRROR_IS_SLOW(xxx) \
-	/* replace this by AM_MIRROR to cause excessive slowdown in address_space::populate_from_map */
 
 
 
@@ -1172,8 +1170,8 @@ static ADDRESS_MAP_START( system32_map, AS_PROGRAM, 16, segas32_state )
 	AM_RANGE(0x800000, 0x800fff) AM_DEVREADWRITE8("s32comm", s32comm_device, share_r, share_w, 0x00ff)
 	AM_RANGE(0x801000, 0x801001) AM_DEVREADWRITE8("s32comm", s32comm_device, cn_r, cn_w, 0x00ff)
 	AM_RANGE(0x801002, 0x801003) AM_DEVREADWRITE8("s32comm", s32comm_device, fg_r, fg_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR_IS_SLOW(0x0fff80) AM_DEVREADWRITE8("io_chip", sega_315_5296_device, read, write, 0x00ff)
-	AM_RANGE(0xc00040, 0xc0007f) AM_MIRROR_IS_SLOW(0x0fff80) AM_UNMAP // I/O expansion area
+	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("io_chip", sega_315_5296_device, read, write, 0x00ff)
+	// 0xc00040-0xc0007f - I/O expansion area
 	AM_RANGE(0xd00000, 0xd0000f) AM_MIRROR(0x07fff0) AM_READWRITE(interrupt_control_16_r, interrupt_control_16_w)
 	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE(random_number_16_r, random_number_16_w)
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM AM_REGION("maincpu", 0)
@@ -1196,10 +1194,10 @@ static ADDRESS_MAP_START( multi32_map, AS_PROGRAM, 32, segas32_state )
 	AM_RANGE(0x800000, 0x800fff) AM_DEVREADWRITE8("s32comm", s32comm_device, share_r, share_w, 0x00ff00ff)
 	AM_RANGE(0x801000, 0x801003) AM_DEVREADWRITE8("s32comm", s32comm_device, cn_r, cn_w, 0x000000ff)
 	AM_RANGE(0x801000, 0x801003) AM_DEVREADWRITE8("s32comm", s32comm_device, fg_r, fg_w, 0x00ff0000)
-	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR_IS_SLOW(0x07ff80) AM_DEVREADWRITE8("io_chip_0", sega_315_5296_device, read, write, 0x00ff00ff)
-	AM_RANGE(0xc00040, 0xc0007f) AM_MIRROR_IS_SLOW(0x07ff80) AM_UNMAP // I/O expansion area 0
-	AM_RANGE(0xc80000, 0xc8001f) AM_MIRROR_IS_SLOW(0x07ff80) AM_DEVREADWRITE8("io_chip_1", sega_315_5296_device, read, write, 0x00ff00ff)
-	AM_RANGE(0xc80040, 0xc8007f) AM_MIRROR_IS_SLOW(0x07ff80) AM_UNMAP // I/O expansion area 1
+	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x07ff80) AM_DEVREADWRITE8("io_chip_0", sega_315_5296_device, read, write, 0x00ff00ff)
+	// 0xc00040-0xc0007f - I/O expansion area 0
+	AM_RANGE(0xc80000, 0xc8001f) AM_MIRROR(0x07ff80) AM_DEVREADWRITE8("io_chip_1", sega_315_5296_device, read, write, 0x00ff00ff)
+	// 0xc80040-0xc8007f - I/O expansion area 1
 	AM_RANGE(0xd00000, 0xd0000f) AM_MIRROR(0x07fff0) AM_READWRITE(interrupt_control_32_r, interrupt_control_32_w)
 	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE(random_number_32_r, random_number_32_w)
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM AM_REGION("maincpu", 0)
@@ -2361,7 +2359,7 @@ machine_config_constructor segas32_regular_state::device_mconfig_additions() con
 
 static ADDRESS_MAP_START( system32_analog_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xc00050, 0xc00057) AM_MIRROR_IS_SLOW(0x0fff80) AM_DEVREADWRITE8("adc", msm6253_device, d7_r, address_w, 0x00ff)
+	AM_RANGE(0xc00050, 0xc00057) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("adc", msm6253_device, d7_r, address_w, 0x00ff)
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
@@ -2396,7 +2394,7 @@ machine_config_constructor segas32_analog_state::device_mconfig_additions() cons
 
 static ADDRESS_MAP_START( system32_trackball_map, AS_PROGRAM, 16, segas32_trackball_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR_IS_SLOW(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
+	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
@@ -2426,7 +2424,7 @@ machine_config_constructor segas32_trackball_state::device_mconfig_additions() c
 
 static ADDRESS_MAP_START( system32_4player_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xc00060, 0xc00067) AM_MIRROR_IS_SLOW(0x0fff80) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
+	AM_RANGE(0xc00060, 0xc00067) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
@@ -2537,8 +2535,8 @@ WRITE8_MEMBER(segas32_cd_state::lamps2_w)
 
 static ADDRESS_MAP_START( system32_cd_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR_IS_SLOW(0x0fff80) AM_NOP //AM_DEVREADWRITE8("mb89352", mb89352_device, mb89352_r, mb89352_w, 0x00ff)
-	AM_RANGE(0xc00060, 0xc0006f) AM_MIRROR_IS_SLOW(0x0fff80) AM_DEVREADWRITE8("cxdio", cxd1095_device, read, write, 0x00ff)
+	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_NOP //AM_DEVREADWRITE8("mb89352", mb89352_device, mb89352_r, mb89352_w, 0x00ff)
+	AM_RANGE(0xc00060, 0xc0006f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("cxdio", cxd1095_device, read, write, 0x00ff)
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
@@ -2660,8 +2658,8 @@ machine_config_constructor sega_multi32_state::device_mconfig_additions() const
 static ADDRESS_MAP_START( multi32_analog_map, AS_PROGRAM, 32, sega_multi32_analog_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0xc00050, 0xc00057) AM_MIRROR_IS_SLOW(0x07ff80) AM_DEVREADWRITE8("adc", msm6253_device, d7_r, address_w, 0x00ff00ff)
-	AM_RANGE(0xc00060, 0xc00063) AM_MIRROR_IS_SLOW(0x07ff80) AM_WRITE8(analog_bank_w, 0x000000ff)
+	AM_RANGE(0xc00050, 0xc00057) AM_MIRROR(0x07ff80) AM_DEVREADWRITE8("adc", msm6253_device, d7_r, address_w, 0x00ff00ff)
+	AM_RANGE(0xc00060, 0xc00063) AM_MIRROR(0x07ff80) AM_WRITE8(analog_bank_w, 0x000000ff)
 	AM_IMPORT_FROM(multi32_map)
 ADDRESS_MAP_END
 
@@ -2710,7 +2708,7 @@ machine_config_constructor sega_multi32_analog_state::device_mconfig_additions()
 static ADDRESS_MAP_START( multi32_6player_map, AS_PROGRAM, 32, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0xc00060, 0xc00067) AM_MIRROR_IS_SLOW(0x07ff80) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff00ff)
+	AM_RANGE(0xc00060, 0xc00067) AM_MIRROR(0x07ff80) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff00ff)
 	AM_IMPORT_FROM(multi32_map)
 ADDRESS_MAP_END
 
