@@ -111,6 +111,8 @@ const device_type INTEL_28F320J5 = device_creator<intel_28f320j5_device>;
 
 const device_type SST_39VF400A = device_creator<sst_39vf400a_device>;
 
+const device_type ATMEL_49F4096 = device_creator<atmel_49f4096_device>;
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -161,6 +163,13 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_page_size = 0x80;
 		m_maker_id = MFG_ATMEL;
 		m_device_id = 0xd5;
+		break;
+	case FLASH_ATMEL_49F4096:
+		m_bits = 16;
+		m_size = 0x80000;
+		m_maker_id = MFG_ATMEL;
+		m_device_id = 0x92;
+		m_sector_is_16k = true;
 		break;
 	case FLASH_AMD_29F010:
 		m_bits = 8;
@@ -359,6 +368,9 @@ sharp_lh28f016s_16bit_device::sharp_lh28f016s_16bit_device(const machine_config 
 
 atmel_29c010_device::atmel_29c010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, ATMEL_29C010, "Atmel 29C010 Flash", tag, owner, clock, FLASH_ATMEL_29C010, "atmel_29c010", __FILE__) { }
+
+atmel_49f4096_device::atmel_49f4096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, ATMEL_49F4096, "Atmel AT49F4096 Flash", tag, owner, clock, FLASH_ATMEL_49F4096, "atmel_49f4096", __FILE__) { }
 
 amd_29f010_device::amd_29f010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, AMD_29F010, "AMD 29F010 Flash", tag, owner, clock, FLASH_AMD_29F010, "amd_29f010", __FILE__) { }

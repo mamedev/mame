@@ -24,6 +24,9 @@
 #define MCFG_ATMEL_29C010_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, ATMEL_29C010, 0)
 
+#define MCFG_ATMEL_49F4096_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, ATMEL_49F4096, 0)
+
 #define MCFG_AMD_29F010_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AMD_29F010, 0)
 
@@ -145,7 +148,8 @@ public:
 		FLASH_SHARP_UNK128MBIT,
 		FLASH_INTEL_28F320J3D,
 		FLASH_INTEL_28F320J5,
-		FLASH_SST_39VF400A
+		FLASH_SST_39VF400A,
+		FLASH_ATMEL_49F4096
 	};
 
 	uint8_t *base() { return &m_data[0]; }
@@ -412,6 +416,12 @@ public:
 	sst_39vf400a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class atmel_49f4096_device : public intelfsh16_device
+{
+public:
+	atmel_49f4096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 
 // device type definition
 extern const device_type INTEL_28F016S5;
@@ -445,5 +455,6 @@ extern const device_type SHARP_UNK128MBIT;
 extern const device_type INTEL_28F320J3D;
 extern const device_type INTEL_28F320J5;
 extern const device_type SST_39VF400A;
+extern const device_type ATMEL_49F4096;
 
 #endif

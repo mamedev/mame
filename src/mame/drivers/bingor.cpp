@@ -437,11 +437,80 @@
   M = ULN2003A / WB91K9409 / PHIL
 
 
+************************************************************************
+
+  PCB Layout (VIP2000):
+
+     +---------------------------------------------------------------------------------+
+     |                                            +--------+                           |
+     |                                            |74HCT32N|                  BATTERY  |
+     |                           +----+  +----+   +--------+                 3.6V 80mAh|
+     |                           |HY62|  |VIP |                        +-+             |
+     |              +-+ +-+ +-+  |256B|  |BIOS|    +-----+   +-+  +-+  |D|             |
+     |   +-+   +-+  | | | | | |  |    |  |8 H |    |AT49F|   | |  |E|  +-+         +---+
+  +--+   | |   | |  | | | | | |  |    |  |    |    |4096-|   | |  |M|  +-+   +-+   |   +-+
+  |--    |K|   |A|  |B| |C| |C|  |    |  |    |    |12RC |   |C|  |P|  | |   | |   |RS232|
+  |--    | |   | |  | | | | | |  |    |  |M272|    |     |   | |  |T|  |I|   |L|   |     |
+  |--    | |   | |  | | | | | |  |    |  |56  |    |     |   | |  |Y|  | |   | |   |   +-+
+  |--    +-+   +-+  +-+ +-+ +-+  +----+  +----+    +-----+   +-+  +-+  +-+   +-+   +---+
+  |--                                                                                  |
+  |--2              +-+ +-+ +-+  +----+  +----+   +-+ +-+  +-+ +----+ +-+ +----+ +----+|
+  |--2   +-+   +-+  | | | | | |  |HY62|  |VIP |   | | | |  | | |    | | | |HY62| |SLAV||
+  |--P   | |   | |  | | | | | |  |256B|  |BIOS|   | | | |  |M| |P80C| | | |256B| |E   ||
+  |--I   |K|   |A|  |B| |C| |C|  |    |  |8 H |   |C| |C|  | | |31BH| |C| |    | |19.0||
+  |--N   | |   | |  | | | | | |  |    |  |    |   | | | |  +-+ |I   | | | |    | |9.01||
+  |--    | |   | |  | | | | | |  |    |  |    |   | | | |  +-+ |    | | | |    | |    ||
+  |--C   +-+   +-+  +-+ +-+ +-+  |    |  |M272|   +-+ +-+  | | |    | +-+ |    | |2725||
+  |--O                           |    |  |56  |            |N| |    |     |    | |6   ||
+  |--N   +-+        +-+          +----+  +----+            | | |    |     +----+ +----+|
+  |--N   |:|   +-+  | | +-+                                +-+ |    |                  |
+  |--E   |:|   | |  | | | |                                  X |    |                  |
+  |--C   |:|   |A|  |B| |H|                                  T |    |                  |
+  |--T   |:|   | |  | | | |  +----------+    +----------+    A |    |                  |
+  |--O   |:|   | |  | | | |  |  MHS E   | X  |N80C186-12|    L +----+    +-+           |
+  |--R   |:|   +-+  +-+ +-+  | S 82716-4| T  |0037CXC BR|    3           | |  +-+  +-+ |
+  |--    |:|                 |          | A  |          |                |G|  |:|  |:| |
+  |--    |:|            +-+  | 8941     | L  |(c) AMD   |X     +-+  +-+  | |  |:|  |:| |
+  +--+   +-+            | |  |          | 1  |          |T     |E|  |F|  | |  +-+  +-+ |
+     |         +-+      |I|  |          |    |          |A     +-+  +-+  +-+           |
+     |         |J|      | |  +----------+    +----------+L                    +-+ +--+ |
+     |         +-+      +-+                              2     +-+  +-+  +-+  |:| |::| |
+     |                       +----------+                      | |  | |  | |  |:| |::| |
+     |                       |HYB514175B|                      |O|  |O|  |K|  |:| |::| |
+     |                       |J-60      |                      | |  | |  | |  |:| +--+ |
+     |                       +----------+       VIP 2000       +-+  +-+  +-+  +-+      |
+     |                                   (c)PALOMA-ELEKTRONIK                          |
+     +---------------------------------------------------------------------------------+
+
+  XTAL1: 10.0000M
+  XTAL2: R240VB40
+  XTAL3: 11.0592M
+
+  A: 898-3-R10K / 0035
+  B: 74HCT540N
+  C: 74HCT573N
+  D: ADM690
+  E: 24C04A
+  F: EMPTY SOCKET
+  G: HEF40106BP
+  H: YMZ284
+  I: 74HCT00N
+  J: EMI14AB LM 386N-4
+  K: ULN2003JN
+  L: MAX232N
+  M: 74HCT32N
+  N: 74HCT02N
+  O: PIC16F627-04 (protected)
+
+
 ************************************************************************/
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "cpu/mcs51/mcs51.h"
 #include "cpu/pic16c5x/pic16c5x.h"
+#include "machine/intelfsh.h"
+#include "sound/ay8910.h"
 #include "sound/saa1099.h"
 #include "screen.h"
 #include "speaker.h"
@@ -634,6 +703,57 @@ static MACHINE_CONFIG_START( bingor, bingor_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+
+static ADDRESS_MAP_START( vip2000_map, AS_PROGRAM, 16, bingor_state )
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM
+	//AM_RANGE(0x90000, 0x9ffff) AM_ROM AM_REGION("gfx", 0)
+	AM_RANGE(0xa0300, 0xa031f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") //wrong
+	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_SHARE("blit_ram")
+	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( vip2000_io, AS_IO, 16, bingor_state )
+	//AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
+	//AM_RANGE(0x0102, 0x0103) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, bingor_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( slave_io, AS_IO, 8, bingor_state)
+ADDRESS_MAP_END
+
+static MACHINE_CONFIG_START( vip2000, bingor_state )
+	MCFG_CPU_ADD("maincpu", I80186, XTAL_10MHz)
+	MCFG_CPU_PROGRAM_MAP(vip2000_map)
+	MCFG_CPU_IO_MAP(vip2000_io)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bingor_state,  vblank_irq)
+	MCFG_CPU_PERIODIC_INT_DRIVER(bingor_state, nmi_line_pulse,  30)
+	MCFG_CPU_PERIODIC_INT_DRIVER(bingor_state, unk_irq,  30)
+
+	MCFG_ATMEL_49F4096_ADD("flash")
+
+	MCFG_CPU_ADD("slavecpu", I80C31, XTAL_11_0592MHz)
+	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_CPU_IO_MAP(slave_io)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
+	MCFG_SCREEN_UPDATE_DRIVER(bingor_state, screen_update_bingor)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBIIII)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymz", YMZ284, 3000000 ) // unknown clock
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
+
 // I doubt we need to load the eeproms
 
 ROM_START( bingor1 )
@@ -727,9 +847,33 @@ ROM_START( bingor5 )    /* BellStar V3 */
 ROM_END
 
 
+ROM_START( vip2000 )
+	ROM_REGION( 0x20000, "boot_prg", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "VIPBIOS8L.bin", 0x010000, 0x08000, CRC(a4c2b351) SHA1(bb718584bfe32b9ed27fadfd89b4094d4bbd6d7f) )
+	ROM_LOAD16_BYTE( "VIPBIOS8H.bin", 0x010001, 0x08000, CRC(7c42c5ee) SHA1(c419a834ddb245363bacfe70d31cff7c2d4a2d03) )
+
+	ROM_REGION16_BE( 0x80000, "flash", ROMREGION_ERASE00 )
+	ROM_LOAD( "AT49F4096.bin", 0x00000, 0x80000, CRC(1d0fd3cf) SHA1(0ad76ea7efa31049a73cc336130cb5ca15480edd) )
+
+	ROM_REGION( 0x08000, "slavecpu", 0 )
+	ROM_LOAD( "SLAVE190991.bin", 0x0000, 0x8000, CRC(67feb297) SHA1(442b62e62b614bda2d277e4b827cb89677d6fbce) )
+
+	ROM_REGION( 0x00800, "pic1", 0 )
+	ROM_LOAD( "PIC16F627_A.bin", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x00800, "pic2", 0 )
+	ROM_LOAD( "PIC16F627_B.bin", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x20000, "eeprom", 0 )
+	ROM_LOAD( "24C04A.bin", 0x000, 0x200, CRC(4e231420) SHA1(24dcfc90ef9903692030be7de0f04fc9370021fd) )
+ROM_END
+
+
 
 GAME( 2002, bingor1,    0,      bingor,   bingor, driver_device,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 1)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, bingor2,    0,      bingor,   bingor, driver_device,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 2)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, bingor3,    0,      bingor,   bingor, driver_device,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 3)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, bingor4,    0,      bingor,   bingor, driver_device,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 4)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, bingor5,    0,      bingor,   bingor, driver_device,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star V3? (set 5)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+GAME( 2001, vip2000,    0,      vip2000,  bingor, driver_device,   0,       ROT0,  "Paloma-Elektronik?", "Unknown 'VIP 2000' game",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
