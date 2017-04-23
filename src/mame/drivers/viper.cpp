@@ -6,7 +6,7 @@
 
     Driver by Ville Linde
 
-	
+
 
     Software notes (as per Police 911)
     -- VL - 01.06.2011
@@ -73,8 +73,8 @@
     0x00009d00:     LoadProgram(): R3 = ptr to filename
 
 
-	TODO:
-	- needs a proper way to dump security dongles, anything but p9112 has placeholder ROM for ds2430.
+    TODO:
+    - needs a proper way to dump security dongles, anything but p9112 has placeholder ROM for ds2430.
 
     Game status:
         ppp2nd              POST: "DIP SWITCH ERROR", "NO SECURITY ERROR"
@@ -1809,7 +1809,7 @@ READ64_MEMBER(viper_state::input_r)
 #endif
 
 READ8_MEMBER(viper_state::input_r)
-{	
+{
 	return (m_io_ports[offset & 7])->read();
 }
 
@@ -2068,7 +2068,7 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 /*****************************************************************************/
 
 static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
-//	ADDRESS_MAP_UNMAP_HIGH
+//  ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE32(epic_r, epic_w,0xffffffffffffffffU)
 	AM_RANGE(0x82000000, 0x83ffffff) AM_READWRITE(voodoo3_r, voodoo3_w)
@@ -2079,7 +2079,7 @@ static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
 	// 0xff000000, 0xff000fff - cf_card_data_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff300000, 0xff300fff - ata_r/w (installed in DRIVER_INIT(viperhd))
-//	AM_RANGE(0xff400xxx, 0xff400xxx) ppp2nd sense device
+//  AM_RANGE(0xff400xxx, 0xff400xxx) ppp2nd sense device
 	AM_RANGE(0xffe00000, 0xffe00007) AM_READ(e00000_r)
 	AM_RANGE(0xffe00008, 0xffe0000f) AM_READWRITE(e00008_r, e00008_w)
 	AM_RANGE(0xffe08000, 0xffe08007) AM_NOP
@@ -2108,10 +2108,10 @@ CUSTOM_INPUT_MEMBER(viper_state::ds2430_unk_r)
 static INPUT_PORTS_START( viper )
 	PORT_START("IN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x01, 0x01, "DIP4" ) PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
@@ -2129,7 +2129,7 @@ static INPUT_PORTS_START( viper )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, viper_state, ds2430_unk_r, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // if this bit is 0, loads a disk copier instead
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	
+
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW ) /* Test Button */
@@ -2145,7 +2145,7 @@ static INPUT_PORTS_START( viper )
 	PORT_DIPNAME( 0x80, 0x80, "3-3" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("IN4")
 	PORT_DIPNAME( 0x01, 0x01, "4" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -2172,22 +2172,22 @@ static INPUT_PORTS_START( viper )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("IN5")
 	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	
+
 	PORT_START("IN6")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("IN7")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( ppp2nd )
 	PORT_INCLUDE( viper )
-	
+
 	PORT_MODIFY("IN2")
 	PORT_DIPNAME( 0x01, 0x01, "DIP4" ) PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
@@ -2201,14 +2201,14 @@ INPUT_PORTS_START( ppp2nd )
 	PORT_DIPNAME( 0x08, 0x08, "DIP1" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	
+
 	PORT_MODIFY("IN3")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("OK Button")
 
 	PORT_MODIFY("IN4")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Button")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Button")
-	
+
 	PORT_MODIFY("IN5")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // another OK button
 INPUT_PORTS_END
@@ -2218,41 +2218,41 @@ INPUT_PORTS_START( thrild2 )
 
 	PORT_MODIFY("IN3")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Shift Down")
-	
+
 	PORT_MODIFY("IN4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shift Up")
-	
+
 	// TODO: analog channels
 INPUT_PORTS_END
 
 INPUT_PORTS_START( gticlub2 )
 	PORT_INCLUDE( thrild2 )
-	
+
 	// TODO: specific analog channel for hand brake
 INPUT_PORTS_END
 
 INPUT_PORTS_START( boxingm )
 	PORT_INCLUDE( viper )
-	
+
 	PORT_MODIFY("IN5")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // memory card check for boxingm (actually comms enable?)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( p911 )
 	PORT_INCLUDE( viper )
-	
+
 	PORT_MODIFY("IN5")
 	// one of these is P2 SHT2 (checks and fails serial if pressed)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( tsurugi )
 	PORT_INCLUDE( viper )
-	
+
 	PORT_MODIFY("IN4")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Shot Button")
-	
+
 	PORT_MODIFY("IN5")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Foot Pedal")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // deluxe ID? if off tries to check UART & "lampo"/bleeder at POST
@@ -2263,7 +2263,7 @@ INPUT_PORTS_END
 
 
 INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
-{	
+{
 	mpc8240_interrupt(MPC8240_IRQ0);
 	//mpc8240_interrupt(MPC8240_IRQ3);
 }
@@ -2298,7 +2298,7 @@ void viper_state::machine_reset()
 	// Viper expects these settings or the BIOS fails
 	identify_device[51] = 0x0200;           /* 51: PIO data transfer cycle timing mode */
 	identify_device[67] = 0x00f0;           /* 67: minimum PIO transfer cycle time without flow control */
-	
+
 	m_ds2430_unk_status = 1;
 }
 

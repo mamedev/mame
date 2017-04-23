@@ -21,7 +21,7 @@
 
 namespace util {
 /***************************************************************************
-	GLOBAL VARIABLES
+    GLOBAL VARIABLES
 ***************************************************************************/
 
 extern std::chrono::system_clock::duration system_clock_adjustment;
@@ -35,18 +35,18 @@ typedef std::chrono::duration<std::uint64_t, std::ratio<1, 10000000> > ntfs_dura
 
 
 //---------------------------------------------------------
-//	arbitrary_clock - an std::chrono clock that "knows" the
-//	date of the epoch's begining
+//  arbitrary_clock - an std::chrono clock that "knows" the
+//  date of the epoch's begining
 //---------------------------------------------------------
 
 template<typename Rep, int Y, int M, int D, int H, int N, int S, typename Ratio>
 class arbitrary_clock
 {
 public:
-	typedef Rep											rep;
-	typedef Ratio										period;
-	typedef std::chrono::duration<rep, period>			duration;
-	typedef std::chrono::time_point<arbitrary_clock>	time_point;
+	typedef Rep                                         rep;
+	typedef Ratio                                       period;
+	typedef std::chrono::duration<rep, period>          duration;
+	typedef std::chrono::time_point<arbitrary_clock>    time_point;
 	static constexpr int base_year = Y;
 	static constexpr int base_month = M;
 	static constexpr int base_day = D;
@@ -55,8 +55,8 @@ public:
 	static constexpr int base_second = S;
 
 	//---------------------------------------------------------
-	//	from_arbitrary_time_point - converts an arbitrary_clock
-	//	with a different scale to this arbitrary_clock's scale
+	//  from_arbitrary_time_point - converts an arbitrary_clock
+	//  with a different scale to this arbitrary_clock's scale
 	//---------------------------------------------------------
 
 	template<typename Rep2, int Y2, int M2, int D2, int H2, int N2, int S2, typename Ratio2>
@@ -75,8 +75,8 @@ public:
 
 
 	//---------------------------------------------------------
-	//	to_arbitrary_time_point - converts an arbitrary_clock
-	//	of this scale to one of different scale
+	//  to_arbitrary_time_point - converts an arbitrary_clock
+	//  of this scale to one of different scale
 	//---------------------------------------------------------
 
 	template<typename Rep2, int Y2, int M2, int D2, int H2, int N2, int S2, typename Ratio2>
@@ -87,7 +87,7 @@ public:
 
 
 	//---------------------------------------------------------
-	//	to_tm - formats a structure of type 'struct tm'
+	//  to_tm - formats a structure of type 'struct tm'
 	//---------------------------------------------------------
 
 	static struct tm to_tm(const time_point &tp)
@@ -106,7 +106,7 @@ public:
 
 
 	//---------------------------------------------------------
-	//	to_system_clock - converts to a system_clock time_point
+	//  to_system_clock - converts to a system_clock time_point
 	//---------------------------------------------------------
 
 	static std::chrono::time_point<std::chrono::system_clock> to_system_clock(const time_point &tp)
@@ -124,7 +124,7 @@ public:
 	}
 
 	//---------------------------------------------------------
-	//	from_system_clock - converts from a system_clock time_point
+	//  from_system_clock - converts from a system_clock time_point
 	//---------------------------------------------------------
 
 	static time_point from_system_clock(const std::chrono::time_point<std::chrono::system_clock> &tp)
@@ -138,13 +138,13 @@ private:
 	//
 	//   * years with leap years are at the end of every quadyear
 	//   * quadyears without leap years are at the end of every century
-	//	 * centuries where the last quadyear has a leap year at the end are at the
-	//	   end of every quadcentury
+	//   * centuries where the last quadyear has a leap year at the end are at the
+	//     end of every quadcentury
 	typedef arbitrary_clock<std::int64_t, 1601, 1, 1, 0, 0, 0, std::ratio<1, 1> > tm_conversion_clock;
 
 	//---------------------------------------------------------
-	//	internal_to_tm - formats a structure of type 'struct tm'
-	//	based on a normalized clock
+	//  internal_to_tm - formats a structure of type 'struct tm'
+	//  based on a normalized clock
 	//---------------------------------------------------------
 
 	static struct tm internal_to_tm(std::chrono::duration<std::int64_t, std::ratio<1, 1> > duration)
@@ -217,8 +217,8 @@ private:
 	typedef arbitrary_clock<std::int64_t, 1970, 1, 1, 0, 0, 0, std::chrono::system_clock::period > system_conversion_clock;
 
 	//-------------------------------------------------
-	//	absolute_day - returns the absolute day count
-	//	for the specified year/month/day
+	//  absolute_day - returns the absolute day count
+	//  for the specified year/month/day
 	//-------------------------------------------------
 
 	static int64_t absolute_day(int year, int month, int day)

@@ -7,19 +7,19 @@
 /*
 
   Registers
-  
+
   0
     xxxx xxxx  X-Scroll [7:0]
 
   1
     xxxx xxxx  X-Scroll [15:8]
- 
+
   2
     xxxx xxxx  Y-Scroll [7:0]
- 
+
   3
     xxxx xxxx  Y-Scroll [15:8]
- 
+
   4              Control
     .... ...x    0:Swap XY 1:Normal
     .... ..x.    Interrupt related?
@@ -27,13 +27,13 @@
     .... x...    Flip X
     ...x ....    Flip Y
     xxx. ....    Wrap control
- 
+
   5
     .... ....    Unknown
-  
+
   6
     xxxx xxxx    ROM access address [7:0]
- 
+
   7
     xxxx xxxx    ROM access address [15:8]
  */
@@ -72,9 +72,9 @@ void k053250ps_device::device_start()
 	m_ram.resize(0x6000/2);
 	m_buffer[0] = &m_ram[0x0000];
 	m_buffer[1] = &m_ram[0x0800];
-	
-//	m_buffer[0] = &m_ram[0x2000];
-//	m_buffer[1] = &m_ram[0x2800];
+
+//  m_buffer[0] = &m_ram[0x2000];
+//  m_buffer[1] = &m_ram[0x2800];
 
 	unpack_nibbles();
 
@@ -82,7 +82,7 @@ void k053250ps_device::device_start()
 	save_item(NAME(m_regs));
 	save_item(NAME(m_page));
 	save_item(NAME(m_dmairq_on));
-	
+
 	m_dmairq_cb.resolve_safe();
 	m_timer_lvcdma = timer_alloc(0);
 }
@@ -91,10 +91,10 @@ void k053250ps_device::device_reset()
 {
 	m_page = 0;
 	memset(m_regs, 0, sizeof(m_regs));
-	
+
 	m_timer_lvcdma_state = OD_IDLE;
 	m_timer_lvcdma->adjust(attotime::never);
-	
+
 	m_dmairq_on = false;
 }
 
@@ -263,19 +263,19 @@ inline void k053250ps_device::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t
 void k053250ps_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, bitmap_ind8 &priority_bitmap, int priority )
 {
 	static int16_t scroll_x;
-	
+
 	if (machine().input().code_pressed(KEYCODE_A))
 	{
 		scroll_x--;
 		popmessage("SCROLL: %d\n", scroll_x);
 	}
-	
+
 	else if (machine().input().code_pressed(KEYCODE_S))
 	{
 		scroll_x++;
 		popmessage("SCROLL: %d\n", scroll_x);
 	}
-	
+
 	uint8_t *pix_ptr;
 	const pen_t *pal_base, *pal_ptr;
 	uint32_t src_clipmask, src_wrapmask; //, dst_wrapmask;
@@ -308,11 +308,11 @@ void k053250ps_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 	if   (ctrl & 0x10)  orientation |= ORIENTATION_FLIP_Y;
 
 	//printf("CTRL: %x\n", ctrl);
-	
+
 	// 00
 	// 0x12
 	// 0x10
-	
+
 	switch (ctrl >> 5) // the upper four bits of the control register select source and target dimensions
 	{
 		case 0 :
@@ -371,7 +371,7 @@ void k053250ps_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 			linedata_offs += bitmap.height() - 1;   // and get info for the first line from the bottom
 		}
 
-//		dst_wrapmask = ~0;  // scanlines don't seem to wrap horizontally in normal orientation
+//      dst_wrapmask = ~0;  // scanlines don't seem to wrap horizontally in normal orientation
 		passes = 1;         // draw scanline in a single pass
 	}
 	else  // orientaion with X and Y parameters switched
@@ -401,13 +401,13 @@ void k053250ps_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 		if (src_clipmask)
 		{
 			// determine target wrap boundary and draw scanline in two passes if the source is clipped
-//			dst_wrapmask = dst_height - 1;
+//          dst_wrapmask = dst_height - 1;
 			passes = 2;
 		}
 		else
 		{
 			// otherwise disable target wraparound and draw scanline in a single pass
-//			dst_wrapmask = ~0;
+//          dst_wrapmask = ~0;
 			passes = 1;
 		}
 	}
@@ -421,7 +421,7 @@ void k053250ps_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 
 	// load physical palette base
 	pal_base = palette().pens() + (colorbase << 4) % palette().entries();
-	
+
 	//printf("Line Start: %u  Line End: %u  Advance: %u\n", line_start, line_end, linedata_adv);
 
 
@@ -429,7 +429,7 @@ void k053250ps_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 	for (line_pos=line_start; line_pos <= line_end; linedata_offs += linedata_adv, line_pos++)
 	{
 		linedata_offs &= 0x7ff;                     // line info data wraps at the four-kilobyte boundary
-		
+
 		color  = line_ram[linedata_offs];           // get scanline color code
 		if (color == 0xffff) continue;              // reject scanline if color code equals minus one
 
@@ -451,10 +451,10 @@ void k053250ps_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 		zoom    = line_ram[linedata_offs + 2];
 
 		scroll = ((short)line_ram[linedata_offs + 3]);   // get signed local scroll value for the current scanline
-		
+
 		// scavenged from old code; improves Xexex' first level sky
 		if (wrap500 && scroll >= 0x500) scroll -= 0x800;
-		
+
 		if (1 && scroll >= 0x500) scroll -= 0x800;
 
 		scroll += scroll_corr;  // apply final scroll correction
@@ -465,8 +465,8 @@ void k053250ps_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 		{
 			printf("%u: [%x] COLR:%x OFFS:%x ZOOM:%x SCRL:%d (%.4x)\n", line_pos, linedata_offs, color, offset, zoom, scroll, line_ram[linedata_offs + 3]);
 		}
-		
-		
+
+
 		// draw scanlines wrapped at virtual bitmap boundary in two passes
 		// this should not impose too much overhead due to clipping performed by the render code
 		i = passes;
@@ -513,17 +513,17 @@ void k053250ps_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 			m_timer_lvcdma_state = OD_WAIT_END;
 			m_timer_lvcdma->adjust(attotime::from_ticks(4096, clock()));
 			m_dmairq_cb(ASSERT_LINE);
-			
-//			memcpy(m_buffer[m_page], &m_ram[0], 0x1000);
-//			m_page ^= 1;
+
+//          memcpy(m_buffer[m_page], &m_ram[0], 0x1000);
+//          m_page ^= 1;
 
 			break;
-			
+
 		case OD_WAIT_END:
 			m_timer_lvcdma_state = OD_IDLE;
 			m_timer_lvcdma->adjust(attotime::never);
 			m_dmairq_cb(CLEAR_LINE);
-			
+
 			if(/*(m_regs[4] & 0x02) &&*/ !m_dmairq_on)
 			{
 				m_dmairq_on = true;

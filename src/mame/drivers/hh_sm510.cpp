@@ -254,7 +254,7 @@ MACHINE_CONFIG_END
   Konami Contra
   * PCB label BH002
   * Sharp SM511 under epoxy (die label KMS73B, KMS773)
-  
+
   Contra handheld is titled simply "C" in the USA.
 
 ***************************************************************************/
@@ -649,7 +649,7 @@ MACHINE_CONFIG_END
 
   Nintendo Game & Watch: Boxing (model BX-301)
   * Sharp SM511 label BX-301 287C (die label KMS73B, KMS744)
-  
+
   Also known as Punch-Out!! in the USA.
 
 ***************************************************************************/

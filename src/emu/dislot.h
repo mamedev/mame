@@ -99,7 +99,7 @@ class get_default_card_software_hook
 public:
 	get_default_card_software_hook(const std::string &path, std::function<bool(util::core_file &, std::string&)> &&get_hashfile_extrainfo);
 
-	// accesses the image file to be scrutinized by get_default_card_software(); is 
+	// accesses the image file to be scrutinized by get_default_card_software(); is
 	// nullptr in the case of images loaded by software list
 	util::core_file::ptr &image_file() { return m_image_file;  }
 
@@ -110,12 +110,12 @@ public:
 	bool hashfile_extrainfo(std::string &extrainfo);
 
 private:
-	util::core_file::ptr									m_image_file;
-	std::string												m_file_type;
-	std::function<bool(util::core_file &, std::string&)>	m_get_hashfile_extrainfo;
-	bool													m_called_get_hashfile_extrainfo;
-	bool													m_has_hash_extrainfo;
-	std::string												m_hash_extrainfo;
+	util::core_file::ptr                                    m_image_file;
+	std::string                                             m_file_type;
+	std::function<bool(util::core_file &, std::string&)>    m_get_hashfile_extrainfo;
+	bool                                                    m_called_get_hashfile_extrainfo;
+	bool                                                    m_has_hash_extrainfo;
+	std::string                                             m_hash_extrainfo;
 };
 
 

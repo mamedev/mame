@@ -822,7 +822,7 @@ image_option &emu_options::image_option(const std::string &device_name)
 //**************************************************************************
 
 //-------------------------------------------------
-//	slot_option ctor
+//  slot_option ctor
 //-------------------------------------------------
 
 slot_option::slot_option(const char *default_value)
@@ -834,7 +834,7 @@ slot_option::slot_option(const char *default_value)
 
 
 //-------------------------------------------------
-//	slot_option::value
+//  slot_option::value
 //-------------------------------------------------
 
 const std::string &slot_option::value() const
@@ -842,17 +842,17 @@ const std::string &slot_option::value() const
 	// There are a number of ways that the value can be determined; there
 	// is a specific order of precedence:
 	//
-	//	1.  Highest priority is whatever may have been specified by the user (whether it
-	//		was specified at the command line, an INI file, or in the UI).  We keep track
-	//		of whether these values were specified this way
+	//  1.  Highest priority is whatever may have been specified by the user (whether it
+	//      was specified at the command line, an INI file, or in the UI).  We keep track
+	//      of whether these values were specified this way
 	//
-	//		Take note that slots have a notion of being "selectable".  Slots that are not
-	//		marked as selectable cannot be specified with this technique
+	//      Take note that slots have a notion of being "selectable".  Slots that are not
+	//      marked as selectable cannot be specified with this technique
 	//
-	//	2.  Next highest is what is returned from get_default_card_software()
+	//  2.  Next highest is what is returned from get_default_card_software()
 	//
-	//	3.	Last in priority is what was specified as the slot default.  This comes from
-	//		device setup
+	//  3.  Last in priority is what was specified as the slot default.  This comes from
+	//      device setup
 	if (m_specified)
 		return m_specified_value;
 	else if (!m_default_card_software.empty())
@@ -863,7 +863,7 @@ const std::string &slot_option::value() const
 
 
 //-------------------------------------------------
-//	slot_option::specified_value
+//  slot_option::specified_value
 //-------------------------------------------------
 
 std::string slot_option::specified_value() const
@@ -880,7 +880,7 @@ std::string slot_option::specified_value() const
 
 
 //-------------------------------------------------
-//	slot_option::specify
+//  slot_option::specify
 //-------------------------------------------------
 
 void slot_option::specify(std::string &&text)
@@ -905,7 +905,7 @@ void slot_option::specify(std::string &&text)
 
 
 //-------------------------------------------------
-//	slot_option::set_bios
+//  slot_option::set_bios
 //-------------------------------------------------
 
 void slot_option::set_bios(std::string &&text)

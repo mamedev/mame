@@ -9,7 +9,7 @@
     Appears to be a down-grade of the nmk16 HW
 
     TODO:
-	- Fix MCU simulation for credit subtractions & add coinage settings (currently set to free play for convenience);
+    - Fix MCU simulation for credit subtractions & add coinage settings (currently set to free play for convenience);
     - Understand better the video emulation and convert it to tilemaps;
     - Decap + emulate MCU, required if the random number generation is going to be accurate;
 
@@ -563,7 +563,7 @@ static INPUT_PORTS_START( ddealer )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:1" ) /* Listed as "Always Off" */
 
 	PORT_START("UNK")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // MCU port? 
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // MCU port?
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 

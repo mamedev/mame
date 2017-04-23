@@ -1208,9 +1208,9 @@ image_init_result device_image_interface::create(const std::string &path, const 
 
 
 //-------------------------------------------------
-//	reset_and_load - called internally when we try
-//	to load an is_reset_on_load() item; will reset
-//	the emulation and record this image to be loaded
+//  reset_and_load - called internally when we try
+//  to load an is_reset_on_load() item; will reset
+//  the emulation and record this image to be loaded
 //-------------------------------------------------
 
 void device_image_interface::reset_and_load(const std::string &path)

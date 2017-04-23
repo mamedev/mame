@@ -1110,7 +1110,7 @@ WRITE8_MEMBER(fidelz80_state::dsc_select_w)
 {
 	// d4: speaker out
 	m_dac->write(BIT(~data, 4));
-	
+
 	// d0-d3: digit select
 	m_led_select = data & 0xf;
 	dsc_prepare_display();

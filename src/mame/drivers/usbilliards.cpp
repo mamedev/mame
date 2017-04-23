@@ -112,18 +112,18 @@ MACHINE_CONFIG_END
  Game driver(s)
 
  ***************************************************************************/
- 
+
 /*
 Shark by U.S. Billiards
 
-Etched in copper on Top		(C) 1975
-				010
-				1SCOOP J6 2SCOOP
+Etched in copper on Top     (C) 1975
+                010
+                1SCOOP J6 2SCOOP
 
-Handwritten on top		J0037
-				124
+Handwritten on top      J0037
+                124
 
-empty socket at 5M	C etched in copper next to socket
+empty socket at 5M  C etched in copper next to socket
 
 */
 

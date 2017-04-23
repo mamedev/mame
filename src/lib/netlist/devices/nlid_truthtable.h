@@ -44,9 +44,9 @@ namespace netlist
 	struct need_bytes_for_bits
 	{
 		enum { value =
-			bits <= 8       ?	1 :
-			bits <= 16      ?	2 :
-			bits <= 32      ?	4 :
+			bits <= 8       ?   1 :
+			bits <= 16      ?   2 :
+			bits <= 32      ?   4 :
 								8
 		};
 	};

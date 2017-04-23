@@ -65,7 +65,7 @@ Notes:
 
     TODO:
 
-	- PWM sound in ABC-klubben/abc80/grafik/flagga.bac
+    - PWM sound in ABC-klubben/abc80/grafik/flagga.bac
     - proper keyboard controller emulation
     - MyAB TKN80 80-column card
     - GeJo 80-column card

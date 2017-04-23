@@ -23,7 +23,7 @@ maybe close to jalmah.cpp?
 #include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
-
+#include "machine/nmk112.h"
 
 class acchi_state : public driver_device
 {
@@ -42,10 +42,14 @@ public:
 	required_shared_ptr<uint16_t> m_fg_videoram;
 	required_shared_ptr<uint16_t> m_vregs;
 
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+
 	/* video-related */
-	TILEMAP_MAPPER_MEMBER(pagescan);	
+	TILEMAP_MAPPER_MEMBER(pagescan);
 	tilemap_t    *m_bg_tilemap;
 	tilemap_t    *m_fg_tilemap;
+	int m_fg_bank;
+
 	DECLARE_WRITE16_MEMBER(acchi_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(acchi_fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
@@ -83,7 +87,7 @@ WRITE8_MEMBER(acchi_state::flipscreen_w)
 
 TILE_GET_INFO_MEMBER(acchi_state::get_acchi_fg_tile_info)
 {
-	int bank = 2; // must come from somewhere else
+	int bank = m_fg_bank;
 
 	int tileno = m_fg_videoram[tile_index];
 	int pal = tileno>>12;
@@ -94,7 +98,7 @@ TILE_GET_INFO_MEMBER(acchi_state::get_acchi_fg_tile_info)
 TILEMAP_MAPPER_MEMBER(acchi_state::pagescan)
 {
 	return (col &0xff) * (num_rows>>1) + (row & 0xf) + ((row & 0x10)<<8) + ((col & 0x300) << 5);
-//	return (col &0xff) * (num_rows>>1) + (row & 0xf) + ((row & 0x10)<<8) + ((col & 0x100) << 5); // see comment with tilemap creation
+//  return (col &0xff) * (num_rows>>1) + (row & 0xf) + ((row & 0x10)<<8) + ((col & 0x100) << 5); // see comment with tilemap creation
 }
 
 
@@ -107,10 +111,12 @@ void acchi_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(acchi_state::get_acchi_fg_tile_info),this), tilemap_mapper_delegate(FUNC(acchi_state::pagescan),this), 16, 16, 1024,16*2);
 
 // 2nd half of the ram seems unused, maybe it's actually a mirror meaning this would be the correct tilemap sizes
-//	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(acchi_state::get_acchi_bg_tile_info),this), tilemap_mapper_delegate(FUNC(acchi_state::pagescan),this), 16, 16, 1024/2,16*2);
-//	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(acchi_state::get_acchi_fg_tile_info),this), tilemap_mapper_delegate(FUNC(acchi_state::pagescan),this), 16, 16, 1024/2,16*2);
+// m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(acchi_state::get_acchi_bg_tile_info),this), tilemap_mapper_delegate(FUNC(acchi_state::pagescan),this), 16, 16, 1024/2,16*2);
+// m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(acchi_state::get_acchi_fg_tile_info),this), tilemap_mapper_delegate(FUNC(acchi_state::pagescan),this), 16, 16, 1024/2,16*2);
 
 	m_fg_tilemap->set_transparent_pen(0xf);
+
+	save_item(NAME(m_fg_bank));
 }
 
 uint32_t acchi_state::screen_update_acchi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -118,6 +124,8 @@ uint32_t acchi_state::screen_update_acchi(screen_device &screen, bitmap_ind16 &b
 	// vregs
 	// 0/1 are fg scroll?  0x0ff0 , 0x07b0  is no scroll
 	// 2/3 are bg scroll?
+	// 4 is fg bank
+
 	int scrollx,scrolly;
 
 	scrollx = (m_vregs[2]-0xff0)&0xfff;
@@ -134,7 +142,14 @@ uint32_t acchi_state::screen_update_acchi(screen_device &screen, bitmap_ind16 &b
 	scrolly&=0x1ff;
 
 	m_fg_tilemap->set_scrollx(0, scrollx);
-	m_fg_tilemap->set_scrolly(0, scrolly);	
+	m_fg_tilemap->set_scrolly(0, scrolly);
+
+
+	if ((m_vregs[4]&0x3) != m_fg_bank)
+	{
+		m_fg_bank = m_vregs[4]&0x3;
+		m_fg_tilemap->mark_all_dirty();
+	}
 
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -142,24 +157,21 @@ uint32_t acchi_state::screen_update_acchi(screen_device &screen, bitmap_ind16 &b
 
 	/*
 	popmessage("%04x %04x %04x %04x\n%04x %04x %04x %04x",
-		m_vregs[0], m_vregs[1],
-		m_vregs[2], m_vregs[3],
-		m_vregs[4], m_vregs[5],
-		m_vregs[6], m_vregs[7]);
+	    m_vregs[0], m_vregs[1],
+	    m_vregs[2], m_vregs[3],
+	    m_vregs[4], m_vregs[5],
+	    m_vregs[6], m_vregs[7]);
 	*/
 	return 0;
 }
 
 /*
 
-also 
+also
 
 [:maincpu] ':maincpu' (00A284): unmapped program memory write to 110400 = 0000 & FFFF
 [:maincpu] ':maincpu' (00A284): unmapped program memory write to 110402 = 0000 & FFFF
-[:maincpu] ':maincpu' (00BEF0): unmapped program memory write to 150020 = 0000 & FFFF
-[:maincpu] ':maincpu' (00BEF0): unmapped program memory write to 150022 = 0001 & FFFF
-[:maincpu] ':maincpu' (00BEF0): unmapped program memory write to 150024 = 0002 & FFFF
-[:maincpu] ':maincpu' (00BEF0): unmapped program memory write to 150026 = 0003 & FFFF
+
 
 */
 
@@ -173,17 +185,20 @@ static ADDRESS_MAP_START( acchi_map, AS_PROGRAM, 16, acchi_state )
 
 	AM_RANGE(0x100014, 0x100015) AM_WRITE8(flipscreen_w, 0x00ff)
 
-	AM_RANGE(0x110000, 0x1103ff) AM_RAM	AM_SHARE("videoregs")
+	AM_RANGE(0x110000, 0x1103ff) AM_RAM AM_SHARE("videoregs")
 
 	AM_RANGE(0x120000, 0x1205ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
-	AM_RANGE(0x130000, 0x13ffff) AM_RAM_WRITE(acchi_fg_videoram_w) AM_SHARE("fg_videoram") 
-	AM_RANGE(0x140000, 0x14ffff) AM_RAM_WRITE(acchi_bg_videoram_w) AM_SHARE("bg_videoram") 
+	AM_RANGE(0x130000, 0x13ffff) AM_RAM_WRITE(acchi_fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0x140000, 0x14ffff) AM_RAM_WRITE(acchi_bg_videoram_w) AM_SHARE("bg_videoram")
 
-	AM_RANGE(0x150000, 0x150001) AM_WRITENOP // ? also reads (oki?)
-	AM_RANGE(0x150010, 0x150011) AM_WRITENOP // ? also reads
+	AM_RANGE(0x150000, 0x150001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x150010, 0x150011) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM	// mainram?
+	AM_RANGE(0x150020, 0x15002f) AM_DEVWRITE8("nmk112", nmk112_device, okibank_w, 0x00ff)
+
+
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM // mainram?
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( acchi ) // inputs register in test mode but not in game mode?
@@ -198,10 +213,10 @@ static INPUT_PORTS_START( acchi ) // inputs register in test mode but not in gam
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -211,24 +226,38 @@ static INPUT_PORTS_START( acchi ) // inputs register in test mode but not in gam
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "DSW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "DSW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "DSW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "DSW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "DSW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "DSW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "DSW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW1:1")
 
- 
+
 	PORT_START("DSW2")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "DSW2:8")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "DSW2:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "DSW2:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "DSW2:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "DSW2:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "DSW2:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "DSW2:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "DSW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW2:8")
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW2:6,5,4")
+	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_8C ) )
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW2:3,2,1")
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
 
@@ -250,11 +279,18 @@ static GFXDECODE_START( acchi )
 	GFXDECODE_ENTRY( "tilesb", 0, tilelayout, 0x100, 16 )
 GFXDECODE_END
 
+TIMER_DEVICE_CALLBACK_MEMBER(acchi_state::scanline)
+{
+	// reads inputs (half-frame interrupt like NMK16?)
+	if (param==128) m_maincpu->set_input_line(1, HOLD_LINE);
+}
+
 static MACHINE_CONFIG_START( acchi, acchi_state )
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000) // 16 Mhz XTAL, 16 Mhz CPU
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // 16 Mhz XTAL, 16 Mhz CPU
 	MCFG_CPU_PROGRAM_MAP(acchi_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", acchi_state,  irq4_line_hold) // 1 + 4 valid? (4 main VBL)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", acchi_state, scanline, "screen", 0, 1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", acchi)
 
@@ -269,38 +305,40 @@ static MACHINE_CONFIG_START( acchi, acchi_state )
 	MCFG_PALETTE_ADD("palette", 0x600/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/16, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
+	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz / 4, OKIM6295_PIN7_LOW) // not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki2", 16000000/16, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)	
+	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz / 4, OKIM6295_PIN7_LOW) // not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("nmk112", NMK112, 0) // or 212? difficult to read (maybe 212 is 2* 112?)
+	MCFG_NMK112_ROM0("oki1")
+	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
 ROM_START( acchi )
 	ROM_REGION( 0x80000, "maincpu", 0 )  /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rw-93085-7.u132",  0x00000, 0x80000, CRC(f8084e30) SHA1(8ca19fb3d348affbcb89fb4fef0be4614edd14f7) )
 
-	ROM_REGION( 0x080000, "tilesa", 0 ) // bg layer?
-	ROM_LOAD16_BYTE( "rw-93085-9.u5",    0x000001, 0x040000, CRC(c2e243ff) SHA1(492e25ac1f85ac6f815409ce11de9a1fabab6fc1) ) // ok bggfx (2 banks?)
-	ROM_LOAD16_BYTE( "rw-93085-10.u15",  0x000000, 0x040000, CRC(546be459) SHA1(f96b139a1b7c021cd9752d626330ffd6201d7441) )  // ok bggfx (2 banks?)
+	ROM_REGION( 0x080000, "tilesa", 0 ) // bg layer - 1 bank
+	ROM_LOAD16_BYTE( "rw-93085-9.u5",    0x000001, 0x040000, CRC(c2e243ff) SHA1(492e25ac1f85ac6f815409ce11de9a1fabab6fc1) )
+	ROM_LOAD16_BYTE( "rw-93085-10.u15",  0x000000, 0x040000, CRC(546be459) SHA1(f96b139a1b7c021cd9752d626330ffd6201d7441) )
 
-	ROM_REGION( 0x180000, "tilesb", 0 ) // fg layer?
-	ROM_LOAD16_BYTE( "rw-93085-17.u9",  0x000001, 0x080000, CRC(e19afa04) SHA1(0511ac94faa549706d729678b4f26b738cf19059) ) // ok gfx (4 banks?)
-	ROM_LOAD16_BYTE( "rw-93085-18.u19", 0x000000, 0x080000, CRC(5cf4582e) SHA1(98a5a274589aa048fa5809d5bb38326e287e6905) ) // ok gfx (4 banks?)
-	ROM_LOAD16_BYTE( "rw-93085-19.u19", 0x100001, 0x040000, CRC(dfd7bdcf) SHA1(02e46da9a8c938daa180a57f4aca04b2fd655ee0) ) // ok gfx (2 banks?)
-	ROM_LOAD16_BYTE( "rw-93085-20.u20", 0x100000, 0x040000, CRC(dd821f74) SHA1(a63e9979db30d130449f689cc6ba8b4c7d25085a) ) // ok gfx (2 banks?)
+	ROM_REGION( 0x180000, "tilesb", 0 ) // fg layer - 3 banks
+	ROM_LOAD16_BYTE( "rw-93085-17.u9",  0x000001, 0x080000, CRC(e19afa04) SHA1(0511ac94faa549706d729678b4f26b738cf19059) )
+	ROM_LOAD16_BYTE( "rw-93085-18.u19", 0x000000, 0x080000, CRC(5cf4582e) SHA1(98a5a274589aa048fa5809d5bb38326e287e6905) )
+	ROM_LOAD16_BYTE( "rw-93085-19.u19", 0x100001, 0x040000, CRC(dfd7bdcf) SHA1(02e46da9a8c938daa180a57f4aca04b2fd655ee0) )
+	ROM_LOAD16_BYTE( "rw-93085-20.u20", 0x100000, 0x040000, CRC(dd821f74) SHA1(a63e9979db30d130449f689cc6ba8b4c7d25085a) )
 
-	ROM_REGION( 0x100000, "oki1", 0 ) /* OKIM6295 samples */
-	ROM_LOAD( "rw-93085-1.u3",  0x000000, 0x080000, CRC(d9776d50) SHA1(06e4d2184f687af8380fcb49ce48ce8ec8091050) ) // sound (2 banks)
-	ROM_LOAD( "rw-93085-2.u4",  0x080000, 0x080000, CRC(3698fafa) SHA1(3de54a990478621271285254544f5382d6fd9ca9) ) // sound (2 banks)
+	ROM_REGION( 0x100000+0x40000, "oki1", 0 ) /* OKIM6295 samples */
+	ROM_LOAD( "rw-93085-1.u3",  0x000000+0x40000, 0x080000, CRC(d9776d50) SHA1(06e4d2184f687af8380fcb49ce48ce8ec8091050) )
+	ROM_LOAD( "rw-93085-2.u4",  0x080000+0x40000, 0x080000, CRC(3698fafa) SHA1(3de54a990478621271285254544f5382d6fd9ca9) )
 
-	ROM_REGION( 0x100000, "oki2", 0 ) /* OKIM6295 samples */
-	ROM_LOAD( "rw-93085-5.u22", 0x000000, 0x080000, CRC(0c0d2835) SHA1(dc14ebea5f4e0d3f2f8e7bc05e16b8d0f92ce588) ) // sound (2 banks)
-	ROM_LOAD( "rw-93085-6.u23", 0x080000, 0x080000, CRC(882c25d0) SHA1(9cbf21bd5940240440025b4481d96e3db45a676c) ) // sound (2 banks)
+	ROM_REGION( 0x100000+0x40000, "oki2", 0 ) /* OKIM6295 samples */
+	ROM_LOAD( "rw-93085-5.u22", 0x000000+0x40000, 0x080000, CRC(0c0d2835) SHA1(dc14ebea5f4e0d3f2f8e7bc05e16b8d0f92ce588) )
+	ROM_LOAD( "rw-93085-6.u23", 0x080000+0x40000, 0x080000, CRC(882c25d0) SHA1(9cbf21bd5940240440025b4481d96e3db45a676c) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s131n.u119", 0x000, 0x200, CRC(33f63fc8) SHA1(24c4a1a7c06e546571c77c7dc7bd87c57aa088d7) )
@@ -308,4 +346,4 @@ ROM_START( acchi )
 ROM_END
 
 // supposedly an Atlus game, though there's no copyright on the title screen and PCB is NTC / NMK
-GAME( 1993, acchi,    0,        acchi,    acchi, driver_device,    0, ROT0,  "Atlus", "Acchi Muite Hoi", MACHINE_NOT_WORKING )
+GAME( 1993, acchi,    0,        acchi,    acchi, driver_device,    0, ROT0,  "Atlus", "Acchi Muite Hoi", MACHINE_SUPPORTS_SAVE )

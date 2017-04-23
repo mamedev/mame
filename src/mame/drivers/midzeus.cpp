@@ -305,16 +305,16 @@ READ32_MEMBER(midzeus_state::disk_asic_jr_r)
 		/* CMOS/ZPRAM write enable; only low bit is used */
 		case 2:
 			break;
-			//	return disk_asic_jr[offset] | ~1;
+			//  return disk_asic_jr[offset] | ~1;
 
 		/* reset status; bit 0 is watchdog reset; mk4/invasn/thegrid read at startup; invasn freaks if it is 1 at startup */
 		case 3:
 			break;
-		//	return disk_asic_jr[offset] | ~1;
+		//  return disk_asic_jr[offset] | ~1;
 
 		/* ROM bank selection on Zeus 2; two bits are used */
 		case 5:
-		//	return disk_asic_jr[offset] | ~3;
+		//  return disk_asic_jr[offset] | ~3;
 
 		/* disk asic jr id; crusnexo reads at startup: if (val & 0xf0) == 0xa0 it affects */
 		/* how the Zeus is used (reg 0x5d is set to 0x54580006) */
@@ -1226,17 +1226,17 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 
 	PORT_START("KEYPAD")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)		/* keypad 1 */
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)		/* keypad 4 */
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)		/* keypad 7 */
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad *") PORT_CODE(KEYCODE_MINUS_PAD)	/* keypad * */
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)		/* keypad 2 */
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)		/* keypad 5 */
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)		/* keypad 8 */
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)		/* keypad 0 */
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)		/* keypad 3 */
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)		/* keypad 6 */
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)		/* keypad 9 */
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)     /* keypad 1 */
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)     /* keypad 4 */
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)     /* keypad 7 */
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad *") PORT_CODE(KEYCODE_MINUS_PAD) /* keypad * */
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)     /* keypad 2 */
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)     /* keypad 5 */
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)     /* keypad 8 */
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)     /* keypad 0 */
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)     /* keypad 3 */
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)     /* keypad 6 */
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)     /* keypad 9 */
 	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_PLUS_PAD)  /* keypad # */
 
 	PORT_START("TRACKX1")
