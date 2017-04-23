@@ -334,7 +334,7 @@ private:
 	// flags
 	bool m_readonly;
 	bool m_created;
-	
+
 	// special - used when creating
 	int m_create_format;
 	util::option_resolution *m_create_args;

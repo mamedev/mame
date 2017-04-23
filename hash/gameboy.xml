@@ -25153,8 +25153,8 @@
   * GS-?? - Crouching Tiger Hidden Dragon (99% this is Tiger A Dragon below)
 -->
 
-<!-- For GS-01:  You have to enable the "Skip Logo check", at 0x0423 you have to 
-patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to 
+<!-- For GS-01:  You have to enable the "Skip Logo check", at 0x0423 you have to
+patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 0x00....the last routine (0x0B3D) checks if the first one was changed...
  after that "Sound of the Pipa" should run... Magic Ball should not have
  a Protection Check....

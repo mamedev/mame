@@ -185,7 +185,7 @@ public:
 		uint8_t *maskBaseAddr;
 		c123_tilemap_delegate cb;
 	};
-	
+
 	c123_mTilemapInfo m_c123_TilemapInfo;
 
 	// C169 ROZ Layer Emulation

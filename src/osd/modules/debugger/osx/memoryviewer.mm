@@ -88,7 +88,7 @@
 	[memoryScroll setHasVerticalScroller:YES];
 	[memoryScroll setAutohidesScrollers:YES];
 	[memoryScroll setBorderType:NSNoBorder];
-    [memoryScroll setDrawsBackground:NO];
+	[memoryScroll setDrawsBackground:NO];
 	[memoryScroll setDocumentView:memoryView];
 	[memoryView release];
 	[[window contentView] addSubview:memoryScroll];

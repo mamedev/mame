@@ -646,7 +646,7 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 		{
 			m_adb_command <<= 1;
 		}
-		
+
 		// do one clock transition on CB1 to advance the VIA shifter
 		m_via1->write_cb1(m_adb_extclock ^ 1);
 		m_via1->write_cb1(m_adb_extclock);
@@ -659,7 +659,7 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 			if ((m_adb_direction) && (ADB_IS_BITBANG_CLASS))
 			{
 				adb_talk();
-				if((m_adb_last_talk == 2) && m_adb_datasize) 
+				if((m_adb_last_talk == 2) && m_adb_datasize)
 				{
 					m_adb_timer_ticks = 8;
 					m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
@@ -691,7 +691,7 @@ void mac_state::mac_adb_newaction(int state)
 				m_adb_direction = 1;    // Mac is shifting us a command
 				m_adb_waiting_cmd = 1;  // we're going to get a command
 				m_adb_irq_pending = 0;
-				m_adb_extclock = 1;	// VIA output shifts on falling clock
+				m_adb_extclock = 1; // VIA output shifts on falling clock
 				m_via1->write_cb1(m_adb_extclock);
 				m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 				break;
@@ -709,9 +709,9 @@ void mac_state::mac_adb_newaction(int state)
 						m_adb_send = m_adb_buffer[0];
 						m_adb_datasize--;
 
-						m_adb_extclock = 0;	// VIA input shifts on rising clock
+						m_adb_extclock = 0; // VIA input shifts on rising clock
 						m_via1->write_cb1(m_adb_extclock);
-				
+
 						// move down the rest of the buffer, if any
 						for (i = 0; i < m_adb_datasize; i++)
 						{
@@ -1125,7 +1125,7 @@ void mac_state::adb_vblank()
 				this->adb_talk();
 
 				m_adb_timer_ticks = 8;
-				m_adb_extclock = 0;	// VIA input shifts on rising clock
+				m_adb_extclock = 0; // VIA input shifts on rising clock
 				m_via1->write_cb1(m_adb_extclock);
 				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 			}
@@ -1164,7 +1164,7 @@ void mac_state::adb_vblank()
 				this->adb_talk();
 
 				m_adb_timer_ticks = 8;
-				m_adb_extclock = 0;	// VIA input shifts on rising clock
+				m_adb_extclock = 0; // VIA input shifts on rising clock
 				m_via1->write_cb1(m_adb_extclock);
 				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 			}

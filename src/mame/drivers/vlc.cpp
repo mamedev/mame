@@ -206,7 +206,7 @@ public:
 
 	DECLARE_MACHINE_START(nevada);
 	DECLARE_DRIVER_INIT(nevada);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 };
@@ -266,8 +266,8 @@ WRITE16_MEMBER( nevada_state::vram_w )
 {
 // Todo, Just for sample
 
-    m_vram[offset] = data;
-    m_tilemap->mark_tile_dirty(offset / 2);
+	m_vram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset / 2);
 
 }
 
@@ -281,12 +281,12 @@ GFXDECODE_END
 
 TILE_GET_INFO_MEMBER( nevada_state::get_bg_tile_info )
 {
-    //int attr = m_colorram[tile_index];
-    int code = m_vram[tile_index*2+1];
-    //int bank = (attr & 0x02) >> 1;
-    //int color = (attr & 0x3c) >> 2;
+	//int attr = m_colorram[tile_index];
+	int code = m_vram[tile_index*2+1];
+	//int bank = (attr & 0x02) >> 1;
+	//int color = (attr & 0x3c) >> 2;
 
-    SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 
 }
 
@@ -294,13 +294,13 @@ TILE_GET_INFO_MEMBER( nevada_state::get_bg_tile_info )
 /***************************************************************************/
 void nevada_state::video_start()
 {
-    m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nevada_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,31,31);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nevada_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,31,31);
 }
 
 /***************************************************************************/
 uint32_t nevada_state::screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-    m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

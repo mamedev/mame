@@ -235,11 +235,11 @@ public:
 	void set_default_card_software(std::string &&s) { m_default_card_software = std::move(s); }
 
 private:
-	bool			m_specified;
-	std::string		m_specified_value;
-	std::string		m_specified_bios;
-	std::string		m_default_card_software;
-	std::string		m_default_value;
+	bool            m_specified;
+	std::string     m_specified_value;
+	std::string     m_specified_bios;
+	std::string     m_default_card_software;
+	std::string     m_default_value;
 };
 
 
@@ -448,15 +448,15 @@ private:
 	static const options_entry s_option_entries[];
 
 	// slots and devices
-	std::map<std::string, slot_option>	m_slot_options;
-	std::map<std::string, std::string>	m_image_options;
+	std::map<std::string, slot_option>  m_slot_options;
+	std::map<std::string, std::string>  m_image_options;
 
 	// cached options, for scenarios where parsing core_options is too slow
-	int									m_coin_impulse;
-	bool								m_joystick_contradictory;
-	bool								m_sleep;
-	bool								m_refresh_speed;
-	ui_option							m_ui;
+	int                                 m_coin_impulse;
+	bool                                m_joystick_contradictory;
+	bool                                m_sleep;
+	bool                                m_refresh_speed;
+	ui_option                           m_ui;
 };
 
 #endif  // MAME_EMU_EMUOPTS_H

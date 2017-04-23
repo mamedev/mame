@@ -43,7 +43,7 @@ public:
 	required_shared_ptr<uint16_t> m_vregs;
 
 	/* video-related */
-	TILEMAP_MAPPER_MEMBER(pagescan);	
+	TILEMAP_MAPPER_MEMBER(pagescan);
 	tilemap_t    *m_bg_tilemap;
 	tilemap_t    *m_fg_tilemap;
 	DECLARE_WRITE16_MEMBER(acchi_bg_videoram_w);
@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(acchi_state::get_acchi_fg_tile_info)
 TILEMAP_MAPPER_MEMBER(acchi_state::pagescan)
 {
 	return (col &0xff) * (num_rows>>1) + (row & 0xf) + ((row & 0x10)<<8) + ((col & 0x300) << 5);
-//	return (col &0xff) * (num_rows>>1) + (row & 0xf) + ((row & 0x10)<<8) + ((col & 0x100) << 5); // see comment with tilemap creation
+//  return (col &0xff) * (num_rows>>1) + (row & 0xf) + ((row & 0x10)<<8) + ((col & 0x100) << 5); // see comment with tilemap creation
 }
 
 
@@ -107,8 +107,8 @@ void acchi_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(acchi_state::get_acchi_fg_tile_info),this), tilemap_mapper_delegate(FUNC(acchi_state::pagescan),this), 16, 16, 1024,16*2);
 
 // 2nd half of the ram seems unused, maybe it's actually a mirror meaning this would be the correct tilemap sizes
-//	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(acchi_state::get_acchi_bg_tile_info),this), tilemap_mapper_delegate(FUNC(acchi_state::pagescan),this), 16, 16, 1024/2,16*2);
-//	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(acchi_state::get_acchi_fg_tile_info),this), tilemap_mapper_delegate(FUNC(acchi_state::pagescan),this), 16, 16, 1024/2,16*2);
+//  m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(acchi_state::get_acchi_bg_tile_info),this), tilemap_mapper_delegate(FUNC(acchi_state::pagescan),this), 16, 16, 1024/2,16*2);
+//  m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(acchi_state::get_acchi_fg_tile_info),this), tilemap_mapper_delegate(FUNC(acchi_state::pagescan),this), 16, 16, 1024/2,16*2);
 
 	m_fg_tilemap->set_transparent_pen(0xf);
 }
@@ -134,7 +134,7 @@ uint32_t acchi_state::screen_update_acchi(screen_device &screen, bitmap_ind16 &b
 	scrolly&=0x1ff;
 
 	m_fg_tilemap->set_scrollx(0, scrollx);
-	m_fg_tilemap->set_scrolly(0, scrolly);	
+	m_fg_tilemap->set_scrolly(0, scrolly);
 
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -142,17 +142,17 @@ uint32_t acchi_state::screen_update_acchi(screen_device &screen, bitmap_ind16 &b
 
 	/*
 	popmessage("%04x %04x %04x %04x\n%04x %04x %04x %04x",
-		m_vregs[0], m_vregs[1],
-		m_vregs[2], m_vregs[3],
-		m_vregs[4], m_vregs[5],
-		m_vregs[6], m_vregs[7]);
+	    m_vregs[0], m_vregs[1],
+	    m_vregs[2], m_vregs[3],
+	    m_vregs[4], m_vregs[5],
+	    m_vregs[6], m_vregs[7]);
 	*/
 	return 0;
 }
 
 /*
 
-also 
+also
 
 [:maincpu] ':maincpu' (00A284): unmapped program memory write to 110400 = 0000 & FFFF
 [:maincpu] ':maincpu' (00A284): unmapped program memory write to 110402 = 0000 & FFFF
@@ -173,17 +173,17 @@ static ADDRESS_MAP_START( acchi_map, AS_PROGRAM, 16, acchi_state )
 
 	AM_RANGE(0x100014, 0x100015) AM_WRITE8(flipscreen_w, 0x00ff)
 
-	AM_RANGE(0x110000, 0x1103ff) AM_RAM	AM_SHARE("videoregs")
+	AM_RANGE(0x110000, 0x1103ff) AM_RAM AM_SHARE("videoregs")
 
 	AM_RANGE(0x120000, 0x1205ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
-	AM_RANGE(0x130000, 0x13ffff) AM_RAM_WRITE(acchi_fg_videoram_w) AM_SHARE("fg_videoram") 
-	AM_RANGE(0x140000, 0x14ffff) AM_RAM_WRITE(acchi_bg_videoram_w) AM_SHARE("bg_videoram") 
+	AM_RANGE(0x130000, 0x13ffff) AM_RAM_WRITE(acchi_fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0x140000, 0x14ffff) AM_RAM_WRITE(acchi_bg_videoram_w) AM_SHARE("bg_videoram")
 
 	AM_RANGE(0x150000, 0x150001) AM_WRITENOP // ? also reads (oki?)
 	AM_RANGE(0x150010, 0x150011) AM_WRITENOP // ? also reads
 
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM	// mainram?
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM // mainram?
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( acchi ) // inputs register in test mode but not in game mode?
@@ -219,7 +219,7 @@ static INPUT_PORTS_START( acchi ) // inputs register in test mode but not in gam
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "DSW1:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "DSW1:1")
 
- 
+
 	PORT_START("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "DSW2:8")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "DSW2:7")
@@ -277,7 +277,7 @@ static MACHINE_CONFIG_START( acchi, acchi_state )
 
 	MCFG_OKIM6295_ADD("oki2", 16000000/16, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)	
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
 
 ROM_START( acchi )
