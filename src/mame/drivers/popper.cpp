@@ -588,4 +588,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS          INIT  ROTATION  COMPANY  FULLNAME  FLAGS
-GAME( 1983, popper, 0,      popper,  popper, driver_device, 0,    ROT90,    "Omori", "Popper", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, popper, 0,      popper,  popper, driver_device, 0,    ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )
