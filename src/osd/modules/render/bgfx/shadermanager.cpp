@@ -41,42 +41,45 @@ bgfx::ShaderHandle shader_manager::shader(std::string name)
 
 bgfx::ShaderHandle shader_manager::load_shader(std::string name)
 {
-	std::string shader_path;
+	std::string shader_path(m_options.bgfx_path());
+	shader_path += PATH_SEPARATOR "shaders" PATH_SEPARATOR;
 	switch (bgfx::getRendererType())
 	{
 		case bgfx::RendererType::Noop:
 		case bgfx::RendererType::Direct3D9:
-			shader_path = m_options.bgfx_path() + std::string("/shaders/dx9/");
+			shader_path += "dx9";
 			break;
 
 		case bgfx::RendererType::Direct3D11:
 		case bgfx::RendererType::Direct3D12:
-			shader_path = m_options.bgfx_path() + std::string("/shaders/dx11/");
+			shader_path += "dx11";
 			break;
 
 		case bgfx::RendererType::Gnm:
-			shader_path = m_options.bgfx_path() + std::string("/shaders/pssl/");
+			shader_path += "pssl";
 			break;
 
 		case bgfx::RendererType::Metal:
-			shader_path = m_options.bgfx_path() + std::string("/shaders/metal/");
+			shader_path += "metal";
 			break;
 
 		case bgfx::RendererType::OpenGL:
-			shader_path = m_options.bgfx_path() + std::string("/shaders/glsl/");
+			shader_path += "glsl";
 			break;
 
 		case bgfx::RendererType::OpenGLES:
-			shader_path = m_options.bgfx_path() + std::string("/shaders/essl/");
+			shader_path += "essl";
 			break;
 
 		case bgfx::RendererType::Vulkan:
-			shader_path = m_options.bgfx_path() + std::string("/shaders/spirv/");
+			shader_path += "spirv";
 			break;
 
 		default:
 			fatalerror("Unknown BGFX renderer type %d", bgfx::getRendererType());
 	}
+	shader_path += PATH_SEPARATOR;
+	osd_subst_env(shader_path, shader_path);
 
 	const bgfx::Memory* mem = load_mem(shader_path + name + ".bin");
 	if (mem != nullptr)
