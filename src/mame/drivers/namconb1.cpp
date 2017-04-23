@@ -883,74 +883,6 @@ static INPUT_PORTS_START( gunbulet )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( outfxies )
-	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
-
-	PORT_START("MISC")
-	PORT_DIPNAME( 0x01, 0x01, "Freeze Screen" ) PORT_DIPLOCATION("SW1: 2")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(0x02, 0x02, "SW1: 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 ) /* Under Coin Options, it shows COIN1 through COIN4 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 ) /* When the Coin Mode is set to COMMON, each coin slot can be set to specific values and will be used during game play */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( nbsports )
-	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
-
-	PORT_START("MISC")
-	PORT_DIPNAME( 0x01, 0x01, "Freeze Screen" ) PORT_DIPLOCATION("SW1: 2")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(0x02, 0x02, "SW1: 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 ) /* Under Coin Options, it shows COIN1 through COIN4 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 ) /* When the Coin Mode is set to COMMON, each coin slot can be set to specific values and will be used during game play */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( namconb1 )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -2057,16 +1989,16 @@ GAME( 1994, ptblank,  0,        namconb1, gunbulet, namconb1_state, gunbulet, RO
 GAME( 1994, ptblanka, ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, gunbuletj,ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, gunbuletw,ptblank,  namconb1, gunbulet, namconb1_state, gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gslugrsj, 0,        namconb1, nbsports, namconb1_state, gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gslgr94u, 0,        namconb1, nbsports, namconb1_state, gslgr94u, ROT0,  "Namco", "Great Sluggers '94", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gslgr94j, gslgr94u, namconb1, nbsports, namconb1_state, gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sws95,    0,        namconb1, nbsports, namconb1_state, sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, sws96,    0,        namconb1, nbsports, namconb1_state, sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, sws97,    0,        namconb1, nbsports, namconb1_state, sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gslugrsj, 0,        namconb1, namconb1, namconb1_state, gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94u, 0,        namconb1, namconb1, namconb1_state, gslgr94u, ROT0,  "Namco", "Great Sluggers '94", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94j, gslgr94u, namconb1, namconb1, namconb1_state, gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sws95,    0,        namconb1, namconb1, namconb1_state, sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sws96,    0,        namconb1, namconb1, namconb1_state, sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sws97,    0,        namconb1, namconb1, namconb1_state, sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, vshoot,   0,        namconb1, namconb1, namconb1_state, vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_SUPPORTS_SAVE )
 
 /*     YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MNTR,  COMPANY, FULLNAME,   FLAGS */
-GAME( 1994, outfxies, 0,        namconb2, outfxies, namconb1_state, outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, outfxiesj,outfxies, namconb2, outfxies, namconb1_state, outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxies, 0,        namconb2, namconb1, namconb1_state, outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxiesj,outfxies, namconb2, namconb1, namconb1_state, outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, machbrkr, 0,        namconb2, namconb1, namconb1_state, machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
 GAME( 1995, machbrkrj,machbrkr, namconb2, namconb1, namconb1_state, machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )
