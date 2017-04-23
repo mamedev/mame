@@ -260,7 +260,7 @@ const options_entry windows_options::s_option_entries[] =
 
 	// input options
 	{ nullptr,                                        nullptr,    OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
-	{ WINOPTION_GLOBAL_INPUTS ";global_inputs",       "0",        OPTION_BOOLEAN,    "enables global inputs" },
+	{ WINOPTION_GLOBAL_INPUTS,                        "0",        OPTION_BOOLEAN,    "enables global inputs" },
 	{ WINOPTION_DUAL_LIGHTGUN ";dual",                "0",        OPTION_BOOLEAN,    "enables dual lightgun input" },
 
 	{ nullptr }
