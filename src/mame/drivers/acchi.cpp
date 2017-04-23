@@ -156,11 +156,11 @@ uint32_t acchi_state::screen_update_acchi(screen_device &screen, bitmap_ind16 &b
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/*
-    popmessage("%04x %04x %04x %04x\n%04x %04x %04x %04x",
-        m_vregs[0], m_vregs[1],
-        m_vregs[2], m_vregs[3],
-        m_vregs[4], m_vregs[5],
-        m_vregs[6], m_vregs[7]);
+	popmessage("%04x %04x %04x %04x\n%04x %04x %04x %04x",
+	    m_vregs[0], m_vregs[1],
+	    m_vregs[2], m_vregs[3],
+	    m_vregs[4], m_vregs[5],
+	    m_vregs[6], m_vregs[7]);
 	*/
 	return 0;
 }
@@ -324,7 +324,7 @@ ROM_START( acchi )
 
 	ROM_REGION( 0x100000+0x40000, "oki2", 0 ) /* OKIM6295 samples */
 	ROM_LOAD( "rw-93085-5.u22", 0x000000+0x40000, 0x080000, CRC(0c0d2835) SHA1(dc14ebea5f4e0d3f2f8e7bc05e16b8d0f92ce588) )
-	ROM_LOAD( "rw-93085-6.u23", 0x080000+0x40000, 0x080000, CRC(882c25d0) SHA1(9cbf21bd5940240440025b4481d96e3db45a676c) ) 
+	ROM_LOAD( "rw-93085-6.u23", 0x080000+0x40000, 0x080000, CRC(882c25d0) SHA1(9cbf21bd5940240440025b4481d96e3db45a676c) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s131n.u119", 0x000, 0x200, CRC(33f63fc8) SHA1(24c4a1a7c06e546571c77c7dc7bd87c57aa088d7) )
