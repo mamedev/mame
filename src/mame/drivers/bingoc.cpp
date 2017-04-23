@@ -33,6 +33,7 @@ SOUND : YM2151 uPD7759C
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/i8251.h"
 #include "sound/ym2151.h"
 #include "sound/upd7759.h"
 #include "screen.h"
@@ -121,8 +122,23 @@ WRITE8_MEMBER(bingoc_state::sound_play_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bingoc_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10007f) AM_READ(unknown_r) //comms? lamps?
-	AM_RANGE(0x180000, 0x18007f) AM_READ(unknown_r) //comms? lamps?
+	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE8("uart1", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("uart1", i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0x100008, 0x100009) AM_DEVREADWRITE8("uart2", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x10000a, 0x10000b) AM_DEVREADWRITE8("uart2", i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0x100010, 0x100011) AM_DEVREADWRITE8("uart3", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x100012, 0x100013) AM_DEVREADWRITE8("uart3", i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0x100018, 0x100019) AM_DEVREADWRITE8("uart4", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x10001a, 0x10001b) AM_DEVREADWRITE8("uart4", i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0x100020, 0x100021) AM_DEVREADWRITE8("uart5", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x100022, 0x100023) AM_DEVREADWRITE8("uart5", i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0x100028, 0x100029) AM_DEVREADWRITE8("uart6", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x10002a, 0x10002b) AM_DEVREADWRITE8("uart6", i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0x100030, 0x100031) AM_DEVREADWRITE8("uart7", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x100032, 0x100033) AM_DEVREADWRITE8("uart7", i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0x100038, 0x100039) AM_DEVREADWRITE8("uart8", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x10003a, 0x10003b) AM_DEVREADWRITE8("uart8", i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0x180000, 0x18007f) AM_READ(unknown_r) //lamps?
 #if !SOUND_TEST
 	AM_RANGE(0x180010, 0x180011) AM_WRITE(main_sound_latch_w) //WRONG there...
 #endif
@@ -163,6 +179,15 @@ static MACHINE_CONFIG_START( bingoc, bingoc_state )
 #if SOUND_TEST
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bingoc_state,  nmi_line_pulse)
 #endif
+
+	MCFG_DEVICE_ADD("uart1", I8251, 4000000) // unknown
+	MCFG_DEVICE_ADD("uart2", I8251, 4000000) // unknown
+	MCFG_DEVICE_ADD("uart3", I8251, 4000000) // unknown
+	MCFG_DEVICE_ADD("uart4", I8251, 4000000) // unknown
+	MCFG_DEVICE_ADD("uart5", I8251, 4000000) // unknown
+	MCFG_DEVICE_ADD("uart6", I8251, 4000000) // unknown
+	MCFG_DEVICE_ADD("uart7", I8251, 4000000) // unknown
+	MCFG_DEVICE_ADD("uart8", I8251, 4000000) // unknown
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

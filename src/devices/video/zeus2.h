@@ -299,8 +299,6 @@ public:
 		if (m_zeusbase[0x5e] & 0x40)
 		{
 			m_zeusbase[0x51]++;
-			//m_zeusbase[0x51] += (m_zeusbase[0x51] & 0x200) << 7;
-			//m_zeusbase[0x51] &= ~0xfe00;
 			m_zeusbase[0x51] += (m_zeusbase[0x51] & 0x200) << 7;
 			m_zeusbase[0x51] &= ~0xfe00;
 		}
