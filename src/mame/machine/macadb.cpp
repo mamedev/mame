@@ -646,7 +646,7 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 				m_adb_send <<= 1;
 			}
 		}
-	
+
 		// do one clock transition on CB1 to advance the VIA shifter
 		m_adb_extclock ^= 1;
 		m_via1->write_cb1(m_adb_extclock);
