@@ -103,7 +103,7 @@ void wolfpack_state::video_start()
 	for (int i = 0; i < 0x8000; i++)
 	{
 		uint16_t val = 0;
-		
+
 		int bit = (val >> 0x0) ^ (val >> 0xe) ^ 1;
 
 		val = (val << 1) | (bit & 1);

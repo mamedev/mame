@@ -344,7 +344,7 @@
 		<part name="cart" interface="tourvision_cart">
 			<dataarea name="rom" size="1048576">
 		<!-- 0x80000 matches PCE dragnegg -->
-				<rom name="dragon_egg.tv" size="1048576" crc="fa24bc20" sha1="d6da2f5c95bb25d15918e01de951bbf35de9de7b" offset="000000" /> 
+				<rom name="dragon_egg.tv" size="1048576" crc="fa24bc20" sha1="d6da2f5c95bb25d15918e01de951bbf35de9de7b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

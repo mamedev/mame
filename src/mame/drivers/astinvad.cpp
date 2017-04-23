@@ -204,7 +204,7 @@ uint32_t astinvad_state::screen_update_spcking2(screen_device &screen, bitmap_rg
 uint32_t astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t x,y;
-	
+
 	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
 		uint8_t data = m_videoram[offs];

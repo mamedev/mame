@@ -155,7 +155,7 @@ struct OPL3_SLOT
 	uint32_t  Cnt;        /* frequency counter            */
 	uint32_t  Incr;       /* frequency counter step       */
 	uint8_t   FB;         /* feedback shift value         */
-	uint8_t	  conn_enum;  /* slot output route            */
+	uint8_t   conn_enum;  /* slot output route            */
 	int32_t   *connect;   /* slot output pointer          */
 	int32_t   op1_out[2]; /* slot1 output for feedback    */
 	uint8_t   CON;        /* connection (algorithm) type  */

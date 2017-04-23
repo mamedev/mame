@@ -553,10 +553,10 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 		}
 		/*
 		m_zeusbase[0x4e] :
-			bit 0 - 1 : which register triggers write through
-			bit 3 : enable write through via these registers
-			bit 4 : seems to be set during reads, when 0x41 is used for latching
-			bit 6 : enable autoincrement on write through
+		    bit 0 - 1 : which register triggers write through
+		    bit 3 : enable write through via these registers
+		    bit 4 : seems to be set during reads, when 0x41 is used for latching
+		    bit 6 : enable autoincrement on write through
 		*/
 		if ((offset & 0xf) == (m_zeusbase[0x4e] & 0xf)) {
 			// If the address is auto-increment then don't load new value
@@ -608,8 +608,8 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 			case 5:
 			{
 				//if (m_zeusbase[0x41] == 0x266) {
-				//	logit = 1;
-				//	log_fifo = 1;
+				//  logit = 1;
+				//  log_fifo = 1;
 				//}
 				// Zeus microcode burst from waveram
 				if (logit)
@@ -754,7 +754,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 			}
 			break;
 			//case 6: {
-			//	// Zeus model fifo burst from waveram
+			//  // Zeus model fifo burst from waveram
 			//}
 			//break;
 			case 9:
@@ -855,7 +855,9 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 			{
 				// Fast fill from local regs
 				uint32_t numDWords = (m_zeusbase[0x50] & 0xffff) + 1;
-				//numDWords *= 0x8;
+				// Set autoincrement
+				if (numDWords>1)
+					m_zeusbase[0x5e] |= 0x40;
 				if (logit && numDWords > 1)
 					logerror(" -- Filling buffer: numDWords: %08X addr: %08X reg50: %08X reg5e: %08X\n", numDWords, m_zeusbase[0x51], m_zeusbase[0x50], m_zeusbase[0x5e]);
 				for (int dword = 0; dword < numDWords; dword++)
@@ -1811,7 +1813,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	}
 
 	//if (numverts == 3)
-	//	render_triangle(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, vert[0], vert[1], vert[2]);
+	//  render_triangle(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, vert[0], vert[1], vert[2]);
 	render_polygon<4>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, vert);
 }
 
@@ -1857,9 +1859,9 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 			curDepthVal = curz;
 		}
 		//if (curz < object.zbuf_min)
-		//	curDepthVal = object.zbuf_min;
+		//  curDepthVal = object.zbuf_min;
 		//else
-		//	curDepthVal = curz;
+		//  curDepthVal = curz;
 		if (curDepthVal < 0)
 			curDepthVal = 0;
 		bool depth_pass = true;
@@ -1972,16 +1974,16 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 				}
 			// Rendering for textures with transparent color
 			//} else {
-			//	// Add rounding
-			//	u0 += (curu >> 7) & 1;
-			//	v0 += (curv >> 7) & 1;
-			//	uint8_t texel0 = object.get_texel(texbase, v0, u0, texwidth);
-			//	if (texel0 != transcolor) {
-			//		uint32_t color0 = m_state->m_pal_table[texel0];
-			//		colorptr[x] = color0;
-			//		if (object.depth_write_enable)
-			//			depthptr[x] = curz; // Should limit to 24 bits
-			//	}
+			//  // Add rounding
+			//  u0 += (curu >> 7) & 1;
+			//  v0 += (curv >> 7) & 1;
+			//  uint8_t texel0 = object.get_texel(texbase, v0, u0, texwidth);
+			//  if (texel0 != transcolor) {
+			//      uint32_t color0 = m_state->m_pal_table[texel0];
+			//      colorptr[x] = color0;
+			//      if (object.depth_write_enable)
+			//          depthptr[x] = curz; // Should limit to 24 bits
+			//  }
 			}
 		}
 		curz += dzdx;
@@ -2230,31 +2232,31 @@ std::string zeus2_device::tex_info(void)
 		case 0x0003ff20:    retVal = "0, s=64, t=8_alpha"; break;
 		case 0x00130300:    retVal = "People in stands, s=64, t=8_4x2"; break;
 		case 0x0007c8e0:    retVal = "Greenish blob, s=64, t=8_alpha"; break;
-		case 0x0015c940:	retVal = "Red +"; break;
-		case 0x0015bf40:	retVal = "Blue circle with green outline"; break;
-		case 0x0015c740:	retVal = "Radiation symbol"; break;
-		case 0x0015cb80:	retVal = "Grey square"; break;
-		case 0x0015d380:	retVal = "Green circle inside grey square"; break;
-		case 0x00159f40:	retVal = "Shinny green square"; break;
-		case 0x001a6340:	retVal = "Yellow ski tip"; break;
-		case 0x001a65a0:	retVal = "Metal vest"; break;
-		case 0x001a6a00:	retVal = "Head hole metal vest"; break;
-		case 0x001a6b70:	retVal = "Yellow WES badge"; break;
-		case 0x001a6140:	retVal = "Backwards Yellow WES badge"; break;
-		case 0x001a6d70:	retVal = "Maybe stomach"; break;
-		case 0x001a6e60:	retVal = "Maybe back"; break;
-		case 0x001a6f20:	retVal = "Hand with black glove"; break;
-		case 0x001a7090:	retVal = "Wes Face"; break;
-		case 0x001a72c0:	retVal = "Dark red strip"; break;
-		case 0x001a7340:	retVal = "Wes shoulder pad"; break;
-		case 0x001a7460:	retVal = "Orange circle"; break;
-		case 0x001a5e20:	retVal = "Wes belt"; break;
-		case 0x001a5f40:	retVal = "Wes orange strip on side"; break;
-		case 0x001a7770:	retVal = "Grey something"; break;
-		case 0x001a74e0:	retVal = "Grey maybe top of boot"; break;
-		case 0x001a76e0:	retVal = "Grey hexagon"; break;
-		case 0x001a7800:	retVal = "Belt pouches"; break;
-		case 0x0015a340:	retVal = "Green shinny block"; break;
+		case 0x0015c940:    retVal = "Red +"; break;
+		case 0x0015bf40:    retVal = "Blue circle with green outline"; break;
+		case 0x0015c740:    retVal = "Radiation symbol"; break;
+		case 0x0015cb80:    retVal = "Grey square"; break;
+		case 0x0015d380:    retVal = "Green circle inside grey square"; break;
+		case 0x00159f40:    retVal = "Shinny green square"; break;
+		case 0x001a6340:    retVal = "Yellow ski tip"; break;
+		case 0x001a65a0:    retVal = "Metal vest"; break;
+		case 0x001a6a00:    retVal = "Head hole metal vest"; break;
+		case 0x001a6b70:    retVal = "Yellow WES badge"; break;
+		case 0x001a6140:    retVal = "Backwards Yellow WES badge"; break;
+		case 0x001a6d70:    retVal = "Maybe stomach"; break;
+		case 0x001a6e60:    retVal = "Maybe back"; break;
+		case 0x001a6f20:    retVal = "Hand with black glove"; break;
+		case 0x001a7090:    retVal = "Wes Face"; break;
+		case 0x001a72c0:    retVal = "Dark red strip"; break;
+		case 0x001a7340:    retVal = "Wes shoulder pad"; break;
+		case 0x001a7460:    retVal = "Orange circle"; break;
+		case 0x001a5e20:    retVal = "Wes belt"; break;
+		case 0x001a5f40:    retVal = "Wes orange strip on side"; break;
+		case 0x001a7770:    retVal = "Grey something"; break;
+		case 0x001a74e0:    retVal = "Grey maybe top of boot"; break;
+		case 0x001a76e0:    retVal = "Grey hexagon"; break;
+		case 0x001a7800:    retVal = "Belt pouches"; break;
+		case 0x0015a340:    retVal = "Green shinny block"; break;
 		default: retVal = "Unknown"; break;
 		}
 	}

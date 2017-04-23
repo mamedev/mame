@@ -2,9 +2,9 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-	coco_multi.cpp
+    coco_multi.cpp
 
-	Code for emulating CoCo's Multi-Pak Interface
+    Code for emulating CoCo's Multi-Pak Interface
 
      The Multi-Pak interface multiplexes all I/O lines from the Color
      Computer's expansion port to four identical ports. All I/O lines
@@ -47,9 +47,9 @@
      $FF9F. No software is known to take advantage of this. After the
      introduction of the CoCo 3, which uses $FF9F internally, Tandy provided
      free upgrades to any MPI to fix this problem.  This behavior is not
-	 emulated (yet).
+     emulated (yet).
 
-	 Slots seem to be one-counted (i.e. - 1-4, not 0-3) by convention
+     Slots seem to be one-counted (i.e. - 1-4, not 0-3) by convention
 
 ***************************************************************************/
 
@@ -355,15 +355,15 @@ WRITE8_MEMBER(coco_multipak_device::write)
 //  multiX_slotX_[cart|nmi|halt] trampolines
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_cart_w)	{ update_line(1, cococart_slot_device::line::CART); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_nmi_w)	{ update_line(1, cococart_slot_device::line::NMI); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_halt_w)	{ update_line(1, cococart_slot_device::line::HALT); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_cart_w)	{ update_line(2, cococart_slot_device::line::CART); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_nmi_w)	{ update_line(2, cococart_slot_device::line::NMI); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_halt_w)	{ update_line(2, cococart_slot_device::line::HALT); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_cart_w)	{ update_line(3, cococart_slot_device::line::CART); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_nmi_w)	{ update_line(3, cococart_slot_device::line::NMI); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_halt_w)	{ update_line(3, cococart_slot_device::line::HALT); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_cart_w)	{ update_line(4, cococart_slot_device::line::CART); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_nmi_w)	{ update_line(4, cococart_slot_device::line::NMI); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_halt_w)	{ update_line(4, cococart_slot_device::line::HALT); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_cart_w) { update_line(1, cococart_slot_device::line::CART); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_nmi_w)  { update_line(1, cococart_slot_device::line::NMI); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_halt_w) { update_line(1, cococart_slot_device::line::HALT); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_cart_w) { update_line(2, cococart_slot_device::line::CART); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_nmi_w)  { update_line(2, cococart_slot_device::line::NMI); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_halt_w) { update_line(2, cococart_slot_device::line::HALT); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_cart_w) { update_line(3, cococart_slot_device::line::CART); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_nmi_w)  { update_line(3, cococart_slot_device::line::NMI); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_halt_w) { update_line(3, cococart_slot_device::line::HALT); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_cart_w) { update_line(4, cococart_slot_device::line::CART); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_nmi_w)  { update_line(4, cococart_slot_device::line::NMI); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_halt_w) { update_line(4, cococart_slot_device::line::HALT); }

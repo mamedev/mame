@@ -6011,10 +6011,10 @@ uint8_t saturn_state::get_odd_bit( void )
 	{
 		if((STV_VDP2_HRES & 1) == 0)
 			return STV_VDP2_DISP;
-		
+
 		return 1;
 	}
-	
+
 	return machine().first_screen()->frame_number() & 1;
 }
 

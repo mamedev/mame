@@ -1040,7 +1040,7 @@ WRITE8_MEMBER(nes_waixing_sgz_device::write_h)
  iNES: mapper 178
 
  In MESS: Supported.
- 
+
  Implementations wildly vary between emulators, but
  Cah4e3's implementation boots up both the games and
  the educational carts that assumedly use this board.
@@ -1085,7 +1085,7 @@ WRITE8_MEMBER(nes_waixing_sgzlz_device::write_l)
 			}
 		}
 		else
-		{	// NROM mode
+		{   // NROM mode
 			if (BIT(m_reg[0], 3))
 			{
 				prg16_89ab(bank);
