@@ -50,7 +50,7 @@ static const char *const nsub_sample_names[] =
 };
 
 /* sample ids - must match sample file name table above */
-enum 
+enum
 {
 	SND_EXPL_L0 = 0,
 	SND_EXPL_L1,

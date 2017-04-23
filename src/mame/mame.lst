@@ -13480,7 +13480,7 @@ hapytour                        // (c) 2005 GAV Company (on Eolith's Ghost hardw
 touryuu                         // (c) 200? Yuki Enterprise
 
 @source:giclassic.cpp
-giclasex	
+giclasex
 giclassvr
 
 @source:gijoe.cpp
@@ -27651,14 +27651,14 @@ yis60464                        //
 mt735                           //
 
 @source:mtouchxl.cpp
-mtouchxl						// 1997 Merit Industries
-mtchxl5k						// 1998 Merit Industries
-mtchxl5ko						// 1998 Merit Industries
-mtchxl5ko2						// 1998 Merit Industries
-mtchxl6k						// 1999 Merit Industries
-mtchxl6ko						// 1999 Merit Industries
-mtchxlgld						// 2000 Merit Industries
-mtchxlgldo						// 2000 Merit Industries
+mtouchxl                        // 1997 Merit Industries
+mtchxl5k                        // 1998 Merit Industries
+mtchxl5ko                       // 1998 Merit Industries
+mtchxl5ko2                      // 1998 Merit Industries
+mtchxl6k                        // 1999 Merit Industries
+mtchxl6ko                       // 1999 Merit Industries
+mtchxlgld                       // 2000 Merit Industries
+mtchxlgldo                      // 2000 Merit Industries
 
 @source:mtx.cpp
 mtx500                          // 1983 Memotech MTX 500
@@ -29616,7 +29616,7 @@ othunderu                       // B67 (c) 1988 Taito America Corporation (US, r
 othunderuo                      // B67 (c) 1988 Taito America Corporation (US)
 
 @source:otomedius.cpp
-otomedius						// (c) 2007 Konami
+otomedius                       // (c) 2007 Konami
 
 @source:overdriv.cpp
 overdriv                        // GX789 (c) 1990
@@ -30920,7 +30920,7 @@ pirates                         // (c) 1994 NIX
 piratesb                        // bootleg?
 
 @source:piratesh.cpp
-piratesh						// (c) 1995 Konami
+piratesh                        // (c) 1995 Konami
 
 @source:pitagjr.cpp
 pitagjr                         // Pitagorin Junior
@@ -37001,7 +37001,7 @@ votrtnt                         // 1980 Votrax Type-'N-Talk
 
 @source:voyager.cpp
 voyager                         // (c) 2002 Team Play, Inc.
-policet2						// (c) 2003 Team Play, Inc.
+policet2                        // (c) 2003 Team Play, Inc.
 
 @source:vp101.cpp
 jnero                           // (c) 2004 ICE/Play Mechanix

@@ -141,7 +141,7 @@ Notes:
 
     TODO:
 
-	- option ROM/HR video RAM access needs refactor of memory banking
+    - option ROM/HR video RAM access needs refactor of memory banking
     - cassette
     - abc806 RTC
     - abc806 disks except ufd631 won't boot

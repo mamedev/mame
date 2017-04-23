@@ -72,10 +72,10 @@ WRITE8_MEMBER(novagmcs48_state::presto_control_w)
 {
 	// P21: input mux high
 	m_inp_mux = (m_inp_mux & 0xff) | (~data << 7 & 0x100);
-	
+
 	// P22,P23: speaker lead 1,2
 	m_dac->write(BIT(data, 2) & BIT(~data, 3));
-	
+
 	// P24-P26: led select
 	m_led_select = ~data >> 4 & 7;
 	display_matrix(8, 3, m_led_data, m_led_select);

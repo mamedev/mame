@@ -3,20 +3,20 @@
 /***************************************************************************
 
   mtouchxl.cpp: Merit Industries MegaTouch XL
-  
+
   Hardware includes a base 486 PC with VGA and a customized ISA I/O
   card.  The I/O card includes audio and an option ROM which patches int 19h
   (POST Completed) to instead jump back to the option ROM which loads
-  "ROM-DOS", installs drivers for the Microtouch screen, and then boots 
+  "ROM-DOS", installs drivers for the Microtouch screen, and then boots
   from the CD-ROM drive.
-  
+
   Audio is a CS4231 combination CODEC/Mixer also found in Gravis Ultraound MAX
   and some SPARCstations.
 
   Some boards use the DS1205 chip for security, others use the DS1991 iButton
-  
-  Megatouch XL (Software) (* indicated verified dumps of CD + Boot ROM, 
-  						   - means we have it working but would like a redump)
+
+  Megatouch XL (Software) (* indicated verified dumps of CD + Boot ROM,
+                           - means we have it working but would like a redump)
   Megatouch XL (1997) (CD versions: R0, R0A, R0B, R0C, R0D, R1, R2, R3, R3A, R3B, R3C)
   Megatouch XL 5000 (1998) (CD versions: R5A, *R5B, R5D, *R5E, R5G, R5H, *R5I)
   Megatouch XL 6000 (1999) (CD versions: *R02, R04, R05, *R07)
@@ -205,18 +205,18 @@ static MACHINE_CONFIG_START( at486, mtxl_state )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32M")	// Early XL games had 8 MB RAM, 6000 and later require 32MB
-		
+	MCFG_RAM_DEFAULT_SIZE("32M")    // Early XL games had 8 MB RAM, 6000 and later require 32MB
+
 	/* bankdev for dxxxx */
 	MCFG_DEVICE_ADD("dbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(dbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
-	
+
 	/* Flash ROM */
 	MCFG_AMD_29F040_ADD("flash")
-	
+
 	/* Security key */
 	MCFG_DS1205_ADD("multikey")
 MACHINE_CONFIG_END
@@ -229,65 +229,65 @@ MACHINE_CONFIG_END
 
 ROM_START( mtouchxl )
 	MOTHERBOARD_ROMS
-	
+
 	ROM_REGION(0x100000, "ioboard", 0)
-	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) ) 
+	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
-	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) ) 
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) )
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
-	DISK_IMAGE_READONLY("r1", 0, SHA1(874545bfc48eacba4c4887d1c45a40ebc7da456a))	
+	DISK_IMAGE_READONLY("r1", 0, SHA1(874545bfc48eacba4c4887d1c45a40ebc7da456a))
 ROM_END
 
 ROM_START( mtchxl5k )
 	MOTHERBOARD_ROMS
-	
+
 	ROM_REGION(0x100000, "ioboard", 0)
-	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) ) 
+	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
-	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) ) 
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) )
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
-	DISK_IMAGE_READONLY("r5i", 0, SHA1(e776a842b557f402e179862397b2ded5cf926702))	
+	DISK_IMAGE_READONLY("r5i", 0, SHA1(e776a842b557f402e179862397b2ded5cf926702))
 ROM_END
 
 ROM_START( mtchxl5ko )
 	MOTHERBOARD_ROMS
-	
+
 	ROM_REGION(0x100000, "ioboard", 0)
-	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) ) 
+	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
-	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) ) 
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) )
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
-	DISK_IMAGE_READONLY("r5b", 0, SHA1(37c2562053f0f4ed18c72a8ea04be371a6ac8413))	
+	DISK_IMAGE_READONLY("r5b", 0, SHA1(37c2562053f0f4ed18c72a8ea04be371a6ac8413))
 ROM_END
 
 ROM_START( mtchxl5ko2 )
 	MOTHERBOARD_ROMS
-	
+
 	ROM_REGION(0x100000, "ioboard", 0)
-	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) ) 
+	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
-	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) ) 
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) )
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
-	DISK_IMAGE_READONLY("r5e", 0, SHA1(a07dc6da346bee999f822a3517ea1d65a68dd4a2))	
+	DISK_IMAGE_READONLY("r5e", 0, SHA1(a07dc6da346bee999f822a3517ea1d65a68dd4a2))
 ROM_END
 
 ROM_START( mtchxl6k )
 	MOTHERBOARD_ROMS
 
 	ROM_REGION(0x100000, "ioboard", 0)
-	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) ) 
-		
+	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
+
 	ROM_REGION(192, "multikey", 0)
 	ROM_LOAD( "multikey", 0, 192, BAD_DUMP CRC(a7d118c1) SHA1(c1a08315a2ddaee1fa626a22553b1560b255a59e) ) // hand made
-		
+
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r07", 0, SHA1(95599e181d9249db09464420522180d753857f3b))
 ROM_END
@@ -296,11 +296,11 @@ ROM_START( mtchxl6ko )
 	MOTHERBOARD_ROMS
 
 	ROM_REGION(0x100000, "ioboard", 0)
-	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) ) 
-		
+	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
+
 	ROM_REGION(192, "multikey", 0)
 	ROM_LOAD( "multikey", 0, 192, BAD_DUMP CRC(a7d118c1) SHA1(c1a08315a2ddaee1fa626a22553b1560b255a59e) ) // hand made
-		
+
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r02", 0, SHA1(eaaf26d2b700f16138090de7f372b40b93e8dba9))
 ROM_END
@@ -309,13 +309,13 @@ ROM_START( mtchxlgld )
 	MOTHERBOARD_ROMS
 
 	ROM_REGION(0x100000, "ioboard", 0)
-	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) ) 
+	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(0x8000, "nvram", 0)
-	ROM_LOAD( "u12-nvram-ds1235", 0x000000, 0x008000, CRC(b3b5379d) SHA1(91b3d8b7eb2df127ba35700317aa1aac14e49bb9) ) 
+	ROM_LOAD( "u12-nvram-ds1235", 0x000000, 0x008000, CRC(b3b5379d) SHA1(91b3d8b7eb2df127ba35700317aa1aac14e49bb9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
-	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(b9c6aa26) SHA1(23af5b85e19cde700ac045d4770a22bf5d380076) ) 
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(b9c6aa26) SHA1(23af5b85e19cde700ac045d4770a22bf5d380076) )
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r01", 0, SHA1(9946bb14d3f77eadbbc606ca9c79f233e402189b))
@@ -325,13 +325,13 @@ ROM_START( mtchxlgldo )
 	MOTHERBOARD_ROMS
 
 	ROM_REGION(0x100000, "ioboard", 0)
-	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) ) 
+	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(0x8000, "nvram", 0)
-	ROM_LOAD( "u12-nvram-ds1235", 0x000000, 0x008000, CRC(b3b5379d) SHA1(91b3d8b7eb2df127ba35700317aa1aac14e49bb9) ) 
+	ROM_LOAD( "u12-nvram-ds1235", 0x000000, 0x008000, CRC(b3b5379d) SHA1(91b3d8b7eb2df127ba35700317aa1aac14e49bb9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
-	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(b9c6aa26) SHA1(23af5b85e19cde700ac045d4770a22bf5d380076) ) 
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(b9c6aa26) SHA1(23af5b85e19cde700ac045d4770a22bf5d380076) )
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r00", 0, SHA1(635e267f1abea060ce813eb7e78b88d57ea3f951))

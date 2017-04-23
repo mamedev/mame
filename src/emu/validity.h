@@ -100,7 +100,7 @@ private:
 	driver_enumerator       m_drivlist;
 
 	// blank options for use during validation
-	emu_options				m_blank_options;
+	emu_options             m_blank_options;
 
 	// error tracking
 	int                     m_errors;

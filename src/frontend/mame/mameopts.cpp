@@ -115,7 +115,7 @@ void mame_options::update_slot_options(emu_options &options, const software_part
 
 
 //-------------------------------------------------
-//	get_default_card_software
+//  get_default_card_software
 //-------------------------------------------------
 
 std::string mame_options::get_default_card_software(device_slot_interface &slot, const emu_options &options)
@@ -130,7 +130,7 @@ std::string mame_options::get_default_card_software(device_slot_interface &slot,
 		auto iter = options.image_options().find(image->instance_name());
 		if (iter != options.image_options().end())
 			image_path = iter->second;
-		
+
 		get_hashfile_extrainfo = [image, &options](util::core_file &file, std::string &extrainfo)
 		{
 			util::hash_collection hashes = image->calculate_hash_on_file(file);

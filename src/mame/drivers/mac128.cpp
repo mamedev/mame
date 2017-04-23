@@ -202,7 +202,7 @@ public:
 	/* keycode buffer (used for keypad/arrow key transition) */
 	int m_keycode_buf[2];
 	int m_keycode_buf_index;
-	
+
 	int m_cb2_in;
 #endif
 
@@ -974,7 +974,7 @@ TIMER_CALLBACK_MEMBER(mac128_state::kbd_clock)
 
 			m_via->write_cb1(0);
 			m_via->write_cb1(1);
-			
+
 			if (m_kbd_receive == TRUE)
 			{
 				if (i < 8)

@@ -150,31 +150,31 @@
 
 // Constants of 98770A video
 // HBEND & VBEND probably are not really 0
-#define VIDEO_770_PIXEL_CLOCK	29798400
-#define VIDEO_770_HTOTAL		1024
-#define VIDEO_770_HBEND			0
-#define VIDEO_770_HBSTART		(VIDEO_CHAR_COLUMNS * VIDEO_CHAR_WIDTH)
-#define VIDEO_770_VTOTAL		485
-#define VIDEO_770_VBEND			0
-#define VIDEO_770_VBSTART		(VIDEO_770_VBEND + GVIDEO_VPIXELS)
-#define VIDEO_770_ALPHA_L_LIM	80	// Left-side limit of alpha-only horizontal part
-#define VIDEO_770_ALPHA_R_LIM	640	// Right-side limit of alpha-only horizontal part
+#define VIDEO_770_PIXEL_CLOCK   29798400
+#define VIDEO_770_HTOTAL        1024
+#define VIDEO_770_HBEND         0
+#define VIDEO_770_HBSTART       (VIDEO_CHAR_COLUMNS * VIDEO_CHAR_WIDTH)
+#define VIDEO_770_VTOTAL        485
+#define VIDEO_770_VBEND         0
+#define VIDEO_770_VBSTART       (VIDEO_770_VBEND + GVIDEO_VPIXELS)
+#define VIDEO_770_ALPHA_L_LIM   80  // Left-side limit of alpha-only horizontal part
+#define VIDEO_770_ALPHA_R_LIM   640 // Right-side limit of alpha-only horizontal part
 
 // Constants of 98780A video
-#define VIDEO_780_PIXEL_CLOCK	28224000
-#define VIDEO_780_HTOTAL		896
-#define VIDEO_780_VTOTAL		525
-#define VIDEO_780_HBEND			0
-#define VIDEO_780_HBSTART		(VIDEO_CHAR_COLUMNS * VIDEO_CHAR_WIDTH)
-#define VIDEO_780_VBEND			0
-#define VIDEO_780_VBSTART		(VIDEO_780_VBEND + GVIDEO_VPIXELS)
-#define VIDEO_780_ALPHA_L_LIM	80	// Left-side limit of alpha-only horizontal part
-#define VIDEO_780_ALPHA_R_LIM	640	// Right-side limit of alpha-only horizontal part
+#define VIDEO_780_PIXEL_CLOCK   28224000
+#define VIDEO_780_HTOTAL        896
+#define VIDEO_780_VTOTAL        525
+#define VIDEO_780_HBEND         0
+#define VIDEO_780_HBSTART       (VIDEO_CHAR_COLUMNS * VIDEO_CHAR_WIDTH)
+#define VIDEO_780_VBEND         0
+#define VIDEO_780_VBSTART       (VIDEO_780_VBEND + GVIDEO_VPIXELS)
+#define VIDEO_780_ALPHA_L_LIM   80  // Left-side limit of alpha-only horizontal part
+#define VIDEO_780_ALPHA_R_LIM   640 // Right-side limit of alpha-only horizontal part
 
-#define I_GR	0xb0	// graphics intensity
-#define I_AL	0xd0	// alpha intensity
-#define I_CU	0xf0	// graphics cursor intensity
-#define I_LP	0xff	// light pen cursor intensity
+#define I_GR    0xb0    // graphics intensity
+#define I_AL    0xd0    // alpha intensity
+#define I_CU    0xf0    // graphics cursor intensity
+#define I_LP    0xff    // light pen cursor intensity
 
 // Palette indexes (for monochromatic screens)
 #define PEN_BLACK   0   // Black
@@ -188,10 +188,10 @@ constexpr unsigned LP_FOV = 9;  // Field of view
 constexpr unsigned LP_XOFFSET = 5;  // x-offset of LP (due to delay in hit recognition)
 
 // Peripheral Addresses (PA)
-#define IO_SLOT_FIRST_PA	1
-#define IO_SLOT_LAST_PA		12
+#define IO_SLOT_FIRST_PA    1
+#define IO_SLOT_LAST_PA     12
 #define GVIDEO_PA           13
-#define T14_PA           	14
+#define T14_PA              14
 #define T15_PA              15
 
 #define KEY_SCAN_OSCILLATOR     327680
@@ -2649,11 +2649,11 @@ void hp9845t_state::machine_start()
 	m_graphic_mem.resize(GVIDEO_MEM_SIZE);
 
 	// initialize palette
-	m_palette->set_pen_color(PEN_BLACK  , 0x00, 0x00, 0x00);	// black
-	m_palette->set_pen_color(PEN_GRAPHIC, 0x00, I_GR, 0x00);	// graphics
-	m_palette->set_pen_color(PEN_ALPHA  , 0x00, I_AL, 0x00);	// alpha
-	m_palette->set_pen_color(PEN_CURSOR , 0x00, I_CU, 0x00);	// graphics cursor
-	m_palette->set_pen_color(PEN_LP     , 0x00, I_LP, 0x00);	// lightpen cursor
+	m_palette->set_pen_color(PEN_BLACK  , 0x00, 0x00, 0x00);    // black
+	m_palette->set_pen_color(PEN_GRAPHIC, 0x00, I_GR, 0x00);    // graphics
+	m_palette->set_pen_color(PEN_ALPHA  , 0x00, I_AL, 0x00);    // alpha
+	m_palette->set_pen_color(PEN_CURSOR , 0x00, I_CU, 0x00);    // graphics cursor
+	m_palette->set_pen_color(PEN_LP     , 0x00, I_LP, 0x00);    // lightpen cursor
 }
 
 void hp9845t_state::machine_reset()
@@ -2697,18 +2697,18 @@ READ16_MEMBER(hp9845t_state::graphic_r)
 			BIT_SET(res, 6);
 		}
 		if (m_gv_lp_status && m_gv_lp_int_en) {
-			BIT_SET(res, 0);	// Lightpen service request
+			BIT_SET(res, 0);    // Lightpen service request
 		}
 		// TODO: gsr/
 		// TODO: fix sk status
 		if (m_gv_sk_status) {
-			BIT_SET(res, 1);	// Softkey service request
+			BIT_SET(res, 1);    // Softkey service request
 			m_gv_sk_status = false;
 		}
-		BIT_SET(res, 9);		// ID
-		BIT_SET(res, 11);		// ID
+		BIT_SET(res, 9);        // ID
+		BIT_SET(res, 11);       // ID
 		if (m_gv_stat) {
-			BIT_SET(res, 13);	// error indication
+			BIT_SET(res, 13);   // error indication
 		}
 
 		update_graphic_bits();
@@ -2758,8 +2758,8 @@ WRITE16_MEMBER(hp9845t_state::graphic_w)
 		m_gv_gr_en = BIT(data , 8);       // enables graphics controller & vector generator command processing and IRQs
 		m_gv_sk_en = BIT(data , 9);       // enables reads on R4 to return SK keycode, also enables SK IRQs
 		m_gv_opt_en = BIT(data , 11);     // not really used
-		m_gv_dsa_en = BIT(data , 12);	  // for factory use only (function unknown)
-		m_gv_fsm_state = GV_STAT_RESET;		// command/reset state machine
+		m_gv_dsa_en = BIT(data , 12);     // for factory use only (function unknown)
+		m_gv_fsm_state = GV_STAT_RESET;     // command/reset state machine
 		lp_r5_w(data);
 		advance_gv_fsm(false , false);
 		break;
@@ -2808,7 +2808,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845t_state::scanline_timer)
 
 void hp9845t_state::set_graphic_mode(bool graphic , bool alpha)
 {
-	m_back_arrow_cursor = graphic;		// triggers back arrow cursor, 98780A uses video on/off command for enabling/disabling graphics
+	m_back_arrow_cursor = graphic;      // triggers back arrow cursor, 98780A uses video on/off command for enabling/disabling graphics
 	m_alpha_sel = alpha;
 }
 
@@ -2955,20 +2955,20 @@ void hp9845t_state::plot(uint16_t x, uint16_t y, bool draw_erase)
 	if (BIT(m_gv_rb_control, 1)) {
 		// save graphics memory to rubber band memory
 		if (m_graphic_mem[ addr ] & pixel_mask)
-			m_gv_rb_memory[m_gv_rb_counter/16] |= 0x1 << (m_gv_rb_counter % 16);		// set
+			m_gv_rb_memory[m_gv_rb_counter/16] |= 0x1 << (m_gv_rb_counter % 16);        // set
 		else
-			m_gv_rb_memory[m_gv_rb_counter/16] &= ~(0x1 << (m_gv_rb_counter % 16));		// clear
+			m_gv_rb_memory[m_gv_rb_counter/16] &= ~(0x1 << (m_gv_rb_counter % 16));     // clear
 		m_gv_rb_counter++;
 		if (m_gv_rb_counter > 4095) {
-			m_gv_stat = true;	// we might prevent data corruption here, but the original hardware doesn't
+			m_gv_stat = true;   // we might prevent data corruption here, but the original hardware doesn't
 			m_gv_rb_counter = 0;
 		}
 	} else if (BIT(m_gv_rb_control, 0)) {
 		// restore graphics memory from rubber band memory
 		if (BIT(m_gv_rb_memory[m_gv_rb_counter / 16], m_gv_rb_counter % 16))
-			m_graphic_mem[ addr ] |= pixel_mask;		// set
+			m_graphic_mem[ addr ] |= pixel_mask;        // set
 		else
-			m_graphic_mem[ addr ] &= ~pixel_mask;	// clear
+			m_graphic_mem[ addr ] &= ~pixel_mask;   // clear
 		m_gv_rb_counter++;
 		if (m_gv_rb_counter > 4095) {
 			m_gv_stat = true;
@@ -3020,16 +3020,16 @@ void hp9845t_state::draw_arc(uint16_t x0, uint16_t y0, int xstart, int ystart, u
 		if (do_plot) {
 			switch (quadrant) {
 			case 0:
-				plot(x0 + x1, y0 - y1, draw_erase);		// quadrant 0
+				plot(x0 + x1, y0 - y1, draw_erase);     // quadrant 0
 				break;
 			case 1:
-				plot(x0 - y1, y0 - x1, draw_erase);		// quadrant 1
+				plot(x0 - y1, y0 - x1, draw_erase);     // quadrant 1
 				break;
 			case 2:
-				plot(x0 - x1, y0 + y1, draw_erase);		// quadrant 2
+				plot(x0 - x1, y0 + y1, draw_erase);     // quadrant 2
 				break;
 			case 3:
-				plot(x0 + y1, y0 + x1, draw_erase);		// quadrant 3
+				plot(x0 + y1, y0 + x1, draw_erase);     // quadrant 3
 				break;
 			}
 		}
@@ -3112,7 +3112,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 					m_gv_io_counter = get_gv_mem_addr(m_gv_word_x_position , m_gv_word_y_position);
 				}
 				LOG(("read words, last = %x\n", m_gv_last_cmd));
-				m_gv_fsm_state = GV_STAT_WAIT_MEM_0;	// -> read stream
+				m_gv_fsm_state = GV_STAT_WAIT_MEM_0;    // -> read stream
 				m_gv_last_cmd = m_gv_cmd;
 			} else if (m_gv_cmd == 0xd) {
 				// fast clear/set command
@@ -3125,10 +3125,10 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 						m_gv_io_counter = get_gv_mem_addr(m_gv_word_x_position , m_gv_word_y_position);
 					}
 					LOG(("write words\n"));
-					m_gv_fsm_state = GV_STAT_WAIT_TRIG_1;	// -> write stream
+					m_gv_fsm_state = GV_STAT_WAIT_TRIG_1;   // -> write stream
 				} else {
 					// any other command
-					m_gv_fsm_state = GV_STAT_WAIT_TRIG_0;	// -> wait for trigger
+					m_gv_fsm_state = GV_STAT_WAIT_TRIG_0;   // -> wait for trigger
 				}
 				m_gv_last_cmd = m_gv_cmd;
 			} else {
@@ -3139,21 +3139,21 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 		case GV_STAT_WAIT_TRIG_0:
 			// process data on R4 or R6
 			switch (m_gv_cmd) {
-			case 0x1:	// load end points
+			case 0x1:   // load end points
 				m_gv_ypt = m_gv_data_w & 0x3ff;
 				LOG(("load end points y = %d\n", m_gv_ypt));
 				break;
-			case 0x3:	// load arc
+			case 0x3:   // load arc
 				m_gv_arc_parm = 0;
 				m_gv_arc[ m_gv_arc_parm ] = m_gv_data_w;
 				LOG(("load arc parm%d = %04x\n", m_gv_arc_parm, m_gv_arc[m_gv_arc_parm]));
 				m_gv_arc_parm++;
 				break;
-			case 0x5:	// load scan
-				m_gv_scan_start_x = m_gv_data_w & 0x3ff;	// 0..559
+			case 0x5:   // load scan
+				m_gv_scan_start_x = m_gv_data_w & 0x3ff;    // 0..559
 				LOG(("load scan x = %d\n", m_gv_scan_start_x));
 				break;
-			case 0x6:	// set line type/area fill
+			case 0x6:   // set line type/area fill
 				m_gv_line_type_area_fill = m_gv_data_w & 0x1ff;
 				if (BIT(m_gv_line_type_area_fill, 4)) {
 					m_gv_line_type_mask = m_line_type[ m_gv_line_type_area_fill & 0x7 ];
@@ -3161,29 +3161,29 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 				}
 				LOG(("set line type = %04x\n", m_gv_line_type_area_fill));
 				break;
-			case 0x7:	// load X/Y I/O address
-				m_gv_word_y_position = m_gv_data_w & 0x1ff;	// 0..454
+			case 0x7:   // load X/Y I/O address
+				m_gv_word_y_position = m_gv_data_w & 0x1ff; // 0..454
 				LOG(("load X/Y I/O adress y = %04x\n", m_gv_word_y_position));
 				break;
-			case 0xa:	// load memory control
+			case 0xa:   // load memory control
 				// A single bit is saved (InvBit)
 				m_gv_memory_control = (m_gv_data_w & 0x9) == 9 || (m_gv_data_w & 0x12) == 0x12 || (m_gv_data_w & 0x24) == 0x24;
 				LOG(("load memory control = %04x\n", m_gv_memory_control));
 				break;
-			case 0xb:	// video on/off - enable graphics video output (1=on 2=off)
+			case 0xb:   // video on/off - enable graphics video output (1=on 2=off)
 				m_graphic_sel = BIT(m_gv_data_w, 0);
 				LOG(("video on/off parm = %d\n", m_gv_data_w & 0x3));
 				break;
-			case 0xc:	// load color mask (no effect, just for compatibility with 9845c), takes a single word as parameter
+			case 0xc:   // load color mask (no effect, just for compatibility with 9845c), takes a single word as parameter
 				break;
-			case 0xe:	// Y cursor position
+			case 0xe:   // Y cursor position
 				m_gv_cursor_fs = (m_gv_data_w & 0x3) == 0;
 				m_gv_cursor_gc = ((m_gv_data_w & 0x3) == 1) || m_gv_cursor_fs;
 				m_gv_cursor_y = 559 - (m_gv_data_w >> 7);
 				if (m_gv_cursor_fs) m_gv_cursor_y -= 4;
 				LOG(("Y cursor position = %d, fs = %d, gc = %d\n", m_gv_cursor_y, m_gv_cursor_fs, m_gv_cursor_gc));
 				break;
-			case 0xf:	// X cursor position
+			case 0xf:   // X cursor position
 				m_gv_cursor_x = ((m_gv_data_w >> 6) & 0x3ff) - 121;
 				LOG(("X cursor position = %d\n", m_gv_cursor_x));
 				break;
@@ -3191,10 +3191,10 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 				LOG(("unknown 98780A command = %d, parm = 0x%04x\n", m_gv_cmd, m_gv_data_w));
 			}
 			if ((m_gv_cmd == 0x1) || (m_gv_cmd == 0x3) || (m_gv_cmd == 0x5) || (m_gv_cmd == 0x7)) {
-				m_gv_fsm_state = GV_STAT_WAIT_DS_2;		// -> get second data word
+				m_gv_fsm_state = GV_STAT_WAIT_DS_2;     // -> get second data word
 			} else {
 				get_out = true;
-				m_gv_fsm_state = GV_STAT_WAIT_DS_0;		// -> done
+				m_gv_fsm_state = GV_STAT_WAIT_DS_0;     // -> done
 			}
 			break;
 
@@ -3206,7 +3206,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 				m_gv_data_r = m_graphic_mem[ m_gv_io_counter ];
 				LOG(("read words @%04x = %04x\n" , m_gv_io_counter , m_gv_data_r));
 				m_gv_io_counter = (m_gv_io_counter + 1) & GVIDEO_ADDR_MASK;
-				m_gv_fsm_state = GV_STAT_WAIT_DS_1;		// -> proceed with read stream
+				m_gv_fsm_state = GV_STAT_WAIT_DS_1;     // -> proceed with read stream
 			} else {
 				m_gv_timer->adjust(time_mem_av);
 				get_out = true;
@@ -3217,7 +3217,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 			// wait for data word to be read
 			if (ds) {
 				// -- next word
-				m_gv_fsm_state = GV_STAT_WAIT_MEM_0;	// -> process data word
+				m_gv_fsm_state = GV_STAT_WAIT_MEM_0;    // -> process data word
 			} else {
 				// -- done
 				get_out = true;
@@ -3228,7 +3228,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 			// wait for data word to be written
 			if (ds) {
 				// -- next word
-				m_gv_fsm_state = GV_STAT_WAIT_TRIG_1;	// -> process data word
+				m_gv_fsm_state = GV_STAT_WAIT_TRIG_1;   // -> process data word
 			} else {
 				// done
 				get_out = true;
@@ -3250,12 +3250,12 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 				if (BIT(m_gv_data_w, 11)) {
 					// draw vector
 					LOG(("load end points x = %d, rb = %d (draw)\n", m_gv_xpt, m_gv_rb_control));
-					m_gv_fsm_state = GV_STAT_WAIT_MEM_2;	// -> proceed with draw vector
+					m_gv_fsm_state = GV_STAT_WAIT_MEM_2;    // -> proceed with draw vector
 				} else {
 					LOG(("load end points x = %d, rb = %d (move)\n", m_gv_xpt, m_gv_rb_control));
 					m_gv_last_xpt = m_gv_xpt;
 					m_gv_last_ypt = m_gv_ypt;
-					m_gv_fsm_state = GV_STAT_WAIT_DS_0;		// -> proceed with next word pair
+					m_gv_fsm_state = GV_STAT_WAIT_DS_0;     // -> proceed with next word pair
 				}
 				break;
 
@@ -3265,22 +3265,22 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 				LOG(("load arc parm%d = %04x\n", m_gv_arc_parm, m_gv_arc[m_gv_arc_parm]));
 				m_gv_arc_parm++;
 				if (m_gv_arc_parm < 4) {
-					m_gv_fsm_state = GV_STAT_WAIT_DS_2;		// -> proceed with next word
+					m_gv_fsm_state = GV_STAT_WAIT_DS_2;     // -> proceed with next word
 				} else {
-					m_gv_fsm_state = GV_STAT_WAIT_MEM_2;	// -> proceed with draw vector
+					m_gv_fsm_state = GV_STAT_WAIT_MEM_2;    // -> proceed with draw vector
 				}
 				break;
 
 			case 0x5:
 				// load scan
-				m_gv_scan_start_y = m_gv_data_w & 0x3ff;	// 0..454
+				m_gv_scan_start_y = m_gv_data_w & 0x3ff;    // 0..454
 				LOG(("load scan y = %d\n", m_gv_scan_start_y));
 				m_gv_fsm_state = GV_STAT_WAIT_DS_0;
 				break;
 
 			case 0x7:
 				// load X/Y I/O address
-				m_gv_word_x_position = (m_gv_data_w & 0x3f0) >> 4;	// 0..34
+				m_gv_word_x_position = (m_gv_data_w & 0x3f0) >> 4;  // 0..34
 				m_gv_increment_to_next_row = BIT(m_gv_data_w, 11);
 				m_gv_io_counter = get_gv_mem_addr(m_gv_word_x_position , m_gv_word_y_position);
 				LOG(("load X/Y I/O adress x = %04x increment = %d\n", m_gv_word_x_position, m_gv_increment_to_next_row));
@@ -3289,7 +3289,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 
 			case 0x8:
 				// write words command
-				m_gv_fsm_state = GV_STAT_WAIT_MEM_1;		// -> proceed with next word
+				m_gv_fsm_state = GV_STAT_WAIT_MEM_1;        // -> proceed with next word
 				break;
 			}
 			break;
@@ -3304,7 +3304,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 				if (!m_gv_increment_to_next_row || (m_gv_word_x_position < 34)) {
 					m_gv_io_counter = (m_gv_io_counter + 1) & GVIDEO_ADDR_MASK;
 				}
-				m_gv_fsm_state = GV_STAT_WAIT_DS_2;				// -> proceed with write stream
+				m_gv_fsm_state = GV_STAT_WAIT_DS_2;             // -> proceed with write stream
 			} else {
 				m_gv_timer->adjust(time_mem_av);
 				get_out = true;
@@ -3470,31 +3470,31 @@ static MACHINE_CONFIG_START( hp9835a, hp9845_state )
 MACHINE_CONFIG_END
 
 /*
-	Global memory map in blocks of 32 kwords / 64 kbytes each:
+    Global memory map in blocks of 32 kwords / 64 kbytes each:
 
-	block  0: 0x000000 - 0x007fff (LPU RAM)
-	block  1: 0x008000 - 0x00ffff (PPU RAM, only 0x00c000 - 0x00ffff used)
-	block  2: 0x010000 - 0x017fff (unused)
-	block  3: 0x018000 - 0x01ffff (LPU system ROM)
-	block  4: 0x020000 - 0x027fff (LPU RAM)
-	block  5: 0x028000 - 0x02ffff (PPU system ROM)
-	block  6: 0x030000 - 0x037fff (LPU RAM)
-	block  7: 0x038000 - 0x03ffff (LPU option ROM)
-	block 10: 0x040000 - 0x047fff (LPU RAM)
-	block 11: 0x048000 - 0x04ffff (PPU option ROM)
-	block 12: 0x050000 - 0x057fff (LPU RAM)
-	block 13: 0x058000 - 0x05ffff (LPU option ROM)
-	block 14: 0x060000 - 0x067fff (LPU RAM)
-	block 15: 0x068000 - 0x06ffff (PPU option ROM)
-	block 16: 0x070000 - 0x077fff (LPU RAM)
-	block 17: 0x078000 - 0x07ffff (unused)
+    block  0: 0x000000 - 0x007fff (LPU RAM)
+    block  1: 0x008000 - 0x00ffff (PPU RAM, only 0x00c000 - 0x00ffff used)
+    block  2: 0x010000 - 0x017fff (unused)
+    block  3: 0x018000 - 0x01ffff (LPU system ROM)
+    block  4: 0x020000 - 0x027fff (LPU RAM)
+    block  5: 0x028000 - 0x02ffff (PPU system ROM)
+    block  6: 0x030000 - 0x037fff (LPU RAM)
+    block  7: 0x038000 - 0x03ffff (LPU option ROM)
+    block 10: 0x040000 - 0x047fff (LPU RAM)
+    block 11: 0x048000 - 0x04ffff (PPU option ROM)
+    block 12: 0x050000 - 0x057fff (LPU RAM)
+    block 13: 0x058000 - 0x05ffff (LPU option ROM)
+    block 14: 0x060000 - 0x067fff (LPU RAM)
+    block 15: 0x068000 - 0x06ffff (PPU option ROM)
+    block 16: 0x070000 - 0x077fff (LPU RAM)
+    block 17: 0x078000 - 0x07ffff (unused)
 
-	notes:
-	- all block numbers are octal
-	- blocks 20 to 76 are reserved for 512 kbyte RAM boards (p/n 09845-66590)
-	- block 45 is reserved for the Test ROM
-	- memory addresses are continuous (for convenience, the mapping below uses block numbers as
-	  address part above 0xffff, so there are gaps between 0x8000 and 0xffff which are masked out).
+    notes:
+    - all block numbers are octal
+    - blocks 20 to 76 are reserved for 512 kbyte RAM boards (p/n 09845-66590)
+    - block 45 is reserved for the Test ROM
+    - memory addresses are continuous (for convenience, the mapping below uses block numbers as
+      address part above 0xffff, so there are gaps between 0x8000 and 0xffff which are masked out).
     - all LPU RAM is dynamically mapped at machine start according to -ramsize option
 */
 

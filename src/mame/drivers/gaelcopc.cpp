@@ -93,7 +93,7 @@ else on it because when I ripped the entire drive and compressed it, the compres
 to upload. So I just ripped the partitions (it had 3) and the size was reasonable. This rip was burned into another drive and
 tested working on the real hardware. It uses the same hardware and bios as the kit version.*/
 
-	DISK_REGION( "disks" ) 
+	DISK_REGION( "disks" )
 	DISK_IMAGE( "tokyocop", 0, SHA1(f3b60046da7094743822191473e05ee9cbc1af86) )
 ROM_END
 

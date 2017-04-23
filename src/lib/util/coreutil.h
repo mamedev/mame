@@ -38,7 +38,7 @@ constexpr bool gregorian_is_leap_year(int year)
 
 //-------------------------------------------------
 //  gregorian_days_in_month - given a year and a one-counted
-//	month, return the amount of days in that month
+//  month, return the amount of days in that month
 //-------------------------------------------------
 
 inline int gregorian_days_in_month(int month, int year)
