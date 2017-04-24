@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /******************************************************************************
 
-    Flower (c) 1986 Komax
+    Flower (c) 1986 Clarue
 
     driver by Angelo Salese,
 	original "wiped off due of not anymore licenseable" driver by insideoutboy.
