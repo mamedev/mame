@@ -3676,7 +3676,7 @@ GAME( 1987, garyoret, 0,        garyoret, garyoret, dec8_state,  garyoret,    RO
 GAME( 1987, ghostb,   0,        ghostb,   ghostb, dec8_state,    ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ghostb2a, ghostb,   ghostb,   ghostb2a, dec8_state,  ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ghostb3,  ghostb,   ghostb,   ghostb3, dec8_state,   ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 3 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3a, ghostb,   ghostb,   ghostb3, dec8_state,   ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 3 Players, revision ?)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB, suspected problem with the fake MCU ROM
+GAME( 1987, ghostb3a, ghostb,   ghostb,   ghostb3, dec8_state,   ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 3 Players, revision ?)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB, confirmed problem with the fake MCU ROM
 GAME( 1987, meikyuh,  ghostb,   meikyuh,  meikyuh, dec8_state,   meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, meikyuha, ghostb,   meikyuh,  meikyuh, dec8_state,   meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, csilver,  0,        csilver,  csilver, dec8_state,   csilver,     ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )

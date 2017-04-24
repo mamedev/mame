@@ -14429,6 +14429,7 @@ uspbball                        // US Games
 gnw_bx301                       // Nintendo
 gnw_dm53                        // Nintendo
 gnw_jr55                        // Nintendo
+gnw_ml102                       // Nintendo
 kcontra                         // Konami
 kgradius                        // Konami
 kloneran                        // Konami
@@ -32708,6 +32709,9 @@ scregg                          // TA-0001 (c) 1983
 @source:scv.cpp
 scv                             //
 scv_pal                         //
+
+@source:scyclone.cpp
+scyclone                        // (c) 1980 Taito Corporation
 
 @source:sderby.cpp
 croupier                        // (c) 1997 Playmark
