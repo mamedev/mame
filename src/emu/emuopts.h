@@ -196,6 +196,7 @@
 //**************************************************************************
 
 struct game_driver;
+class device_slot_interface;
 
 class slot_option
 {
@@ -253,12 +254,13 @@ private:
 class image_option
 {
 public:
-	image_option(const std::string &cannonical_instance_name = "");
+	image_option(std::function<void()> changed = nullptr, const std::string &cannonical_instance_name = "");
 	image_option(const image_option &that) = default;
 	image_option(image_option &&that) = default;
 
 	const image_option &operator=(const image_option &that)
 	{
+		m_changed = that.m_changed;
 		m_cannonical_instance_name = that.m_cannonical_instance_name;
 		m_value = that.m_value;
 		m_entry = that.m_entry;
@@ -267,6 +269,7 @@ public:
 
 	const image_option &operator=(image_option &&that)
 	{
+		m_changed = that.m_changed;
 		m_cannonical_instance_name = std::move(that.m_cannonical_instance_name);
 		m_value = std::move(that.m_value);
 		m_entry = std::move(that.m_entry);
@@ -279,12 +282,14 @@ public:
 	core_options::entry *option_entry() const { return m_entry; }
 
 	// mutators
-	template <typename... Params> void specify(Params &&...value) { m_value.assign(std::forward<Params>(value)...); }
+	void specify(const std::string &value);
+	void specify(std::string &&value);
 
 	// instantiates an option entry (don't call outside of emuopts.cpp)
 	core_options::entry::ptr setup_option_entry(std::vector<std::string> &&names);
 
 private:
+	std::function<void()>	m_changed;	// TODO - change this to emu_options
 	std::string				m_cannonical_instance_name;
 	std::string				m_value;
 	core_options::entry	*	m_entry;
@@ -494,11 +499,19 @@ public:
 	::image_option &image_option(const std::string &device_name);
 
 private:
+	struct software_options
+	{
+		std::unordered_map<std::string, std::string>	slot;
+		std::unordered_map<std::string, std::string>	image;
+	};
+
 	// slot/image/softlist calculus
-	std::map<std::string, std::string> evaluate_initial_softlist_options(const std::string &software_identifier);
+	software_options evaluate_initial_softlist_options(const std::string &software_identifier);
 	void update_slot_and_image_options();
 	bool add_and_remove_slot_options();
 	bool add_and_remove_image_options();
+	void reevaluate_default_card_software();
+	std::string get_default_card_software(device_slot_interface &slot);
 
 	// static list of options entries
 	static const options_entry							s_option_entries[];

@@ -12,6 +12,7 @@
 #include "emuopts.h"
 #include "drivenum.h"
 #include "softlist_dev.h"
+#include "hashfile.h"
 
 #include <stack>
 
@@ -292,6 +293,31 @@ namespace
 		slot_option &m_host;
 	};
 
+	// custom option entry for images
+	class image_option_entry : public core_options::entry
+	{
+	public:
+		image_option_entry(std::vector<std::string> &&names, image_option &host)
+			: entry(std::move(names))
+			, m_host(host)
+		{
+		}
+
+		virtual const char *value() const override
+		{
+			return m_host.value().c_str();
+		}
+
+	protected:
+		virtual void internal_set_value(std::string &&newvalue) override
+		{
+			m_host.specify(std::move(newvalue));
+		}
+
+	private:
+		image_option &m_host;
+	};
+
 	// existing option tracker class; used by slot/image calculus to identify existing
 	// options for later purging
 	template<typename T>
@@ -451,6 +477,10 @@ void emu_options::update_slot_and_image_options()
 		// second, we perform an analgous operation with m_image_options
 		if (add_and_remove_image_options())
 			changed = true;
+
+		// if we changed anything, we should reevaluate existing options
+		if (changed)
+			reevaluate_default_card_software();
 	} while (changed);
 }
 
@@ -573,7 +603,6 @@ bool emu_options::add_and_remove_image_options()
 		// iterate through all image devices
 		for (device_image_interface &image : image_interface_iterator(config.root_device()))
 		{
-			const std::string &name(image.instance_name());
 			const std::string &cannonical_name(image.cannonical_instance_name());
 
 			// erase this option from existing (so we don't purge it later)
@@ -585,7 +614,9 @@ bool emu_options::add_and_remove_image_options()
 			if (!this_option)
 			{
 				// we do - add it to both m_image_options_cannonical and m_image_options
-				m_image_options_cannonical[cannonical_name] = ::image_option(image.cannonical_instance_name());
+				m_image_options_cannonical[cannonical_name] = ::image_option(
+					[this] { reevaluate_default_card_software(); },
+					image.cannonical_instance_name());
 				this_option = &m_image_options_cannonical[cannonical_name];
 				changed = true;
 
@@ -633,6 +664,81 @@ bool emu_options::add_and_remove_image_options()
 
 
 //-------------------------------------------------
+//	reevaluate_default_card_software - based on recent
+//	changes in what images are mounted, give drivers
+//	a chance to specify new default slot options
+//-------------------------------------------------
+
+void emu_options::reevaluate_default_card_software()
+{
+	if (m_system)
+	{
+		machine_config config(*m_system, *this);
+
+		// iterate through all slot devices
+		for (device_slot_interface &slot : slot_interface_iterator(config.root_device()))
+		{
+			// retrieve info about the device instance
+			auto &slot_opt(slot_option(slot.slot_name()));
+
+			// device_slot_interface::get_default_card_software() is essentially a hook
+			// that lets devices provide a feedback loop to force a specified software
+			// list entry to be loaded
+			//
+			// In the repeated cycle of adding slots and slot devices, this gives a chance
+			// for devices to "plug in" default software list items.  Of course, the fact
+			// that this is all shuffling options is brittle and roundabout, but such is
+			// the nature of software lists.
+			//
+			// In reality, having some sort of hook into the pipeline of slot/device evaluation
+			// makes sense, but the fact that it is joined at the hip to device_image_interface
+			// and device_slot_interface is unfortunate
+			std::string default_card_software = get_default_card_software(slot);
+			if (slot_opt.default_card_software() != default_card_software)
+			{
+				slot_opt.set_default_card_software(std::move(default_card_software));
+			}
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  get_default_card_software
+//-------------------------------------------------
+
+std::string emu_options::get_default_card_software(device_slot_interface &slot)
+{
+	std::string image_path;
+	std::function<bool(util::core_file &, std::string&)> get_hashfile_extrainfo;
+
+	// figure out if an image option has been specified, and if so, get the image path out of the options
+	device_image_interface *image = dynamic_cast<device_image_interface *>(&slot);
+	if (image)
+	{
+		image_path = image_option(image->instance_name()).value();
+
+		get_hashfile_extrainfo = [image, this](util::core_file &file, std::string &extrainfo)
+		{
+			util::hash_collection hashes = image->calculate_hash_on_file(file);
+
+			return hashfile_extrainfo(
+				hash_path(),
+				image->device().mconfig().gamedrv(),
+				hashes,
+				extrainfo);
+		};
+	}
+
+	// create the hook
+	get_default_card_software_hook hook(image_path, std::move(get_hashfile_extrainfo));
+
+	// and invoke the slot's implementation of get_default_card_software()
+	return slot.get_default_card_software(hook);
+}
+
+
+//-------------------------------------------------
 //  set_software - called to load "unqualified"
 //	software out of a software list (e.g. - "mame nes 'zelda'")
 //-------------------------------------------------
@@ -640,10 +746,45 @@ bool emu_options::add_and_remove_image_options()
 void emu_options::set_software(const std::string &new_software)
 {
 	// identify any options as a result of softlists
-	auto softlist_opts = evaluate_initial_softlist_options(new_software);
+	software_options softlist_opts = evaluate_initial_softlist_options(new_software);
 
-	// NYI
-	throw false;
+	while (!softlist_opts.slot.empty() || !softlist_opts.image.empty())
+	{
+		// track how many options we have
+		size_t before_size = softlist_opts.slot.size() + softlist_opts.image.size();
+
+		// keep a list of deferred options, in case anything is applied
+		// out of order
+		software_options deferred_opts;
+
+		// distribute slot options
+		for (auto &slot_opt : softlist_opts.slot)
+		{
+			auto iter = m_slot_options.find(slot_opt.first);
+			if (iter != m_slot_options.end())
+				iter->second.specify(std::move(slot_opt.second));
+			else
+				deferred_opts.slot[slot_opt.first] = std::move(slot_opt.second);
+		}
+
+		// distribute image options
+		for (auto &image_opt : softlist_opts.image)
+		{
+			auto iter = m_image_options.find(image_opt.first);
+			if (iter != m_image_options.end())
+				iter->second->specify(std::move(image_opt.second));
+			else
+				deferred_opts.image[image_opt.first] = std::move(image_opt.second);
+		}
+
+		// keep any deferred options for the next round
+		softlist_opts = std::move(deferred_opts);
+
+		// do we have any pending options after failing to distribute any?
+		size_t after_size = softlist_opts.slot.size() + softlist_opts.image.size();
+		if ((after_size > 0) && after_size >= before_size)
+			throw options_exception("Could not assign software option");
+	}
 }
 
 
@@ -651,9 +792,9 @@ void emu_options::set_software(const std::string &new_software)
 //  evaluate_initial_softlist_options
 //-------------------------------------------------
 
-std::map<std::string, std::string> emu_options::evaluate_initial_softlist_options(const std::string &software_identifier)
+emu_options::software_options emu_options::evaluate_initial_softlist_options(const std::string &software_identifier)
 {
-	std::map<std::string, std::string> results;
+	software_options results;
 
 	// load software specified at the command line (if any of course)
 	if (!software_identifier.empty())
@@ -713,13 +854,13 @@ std::map<std::string, std::string> emu_options::evaluate_initial_softlist_option
 								device_image_interface *image = software_list_device::find_mountable_image(
 									config,
 									swpart,
-									[&results](const device_image_interface &candidate) { return results.count(candidate.instance_name()) == 0; });
+									[&results](const device_image_interface &candidate) { return results.image.count(candidate.instance_name()) == 0; });
 
 								// did we find a slot to put this part into?
 								if (image != nullptr)
 								{
 									// we've resolved this software
-									results[image->instance_name()] = string_format("%s:%s:%s", swlistdev.list_name(), software_name, swpart.name());
+									results.image[image->instance_name()] = string_format("%s:%s:%s", swlistdev.list_name(), software_name, swpart.name());
 
 									// does this software part have a requirement on another part?
 									const char *requirement = swpart.feature("requirement");
@@ -746,7 +887,7 @@ std::map<std::string, std::string> emu_options::evaluate_initial_softlist_option
 								&& fi.name().compare(fi.name().size() - default_suffix.size(), default_suffix.size(), default_suffix) == 0)
 							{
 								std::string slot_name = fi.name().substr(0, fi.name().size() - default_suffix.size());
-								results[slot_name] = fi.value();
+								results.slot[slot_name] = fi.value();
 							}
 						}
 					}
@@ -942,9 +1083,34 @@ core_options::entry::ptr slot_option::setup_option_entry(const char *name)
 //	image_option ctor
 //-------------------------------------------------
 
-image_option::image_option(const std::string &cannonical_instance_name)
-	: m_cannonical_instance_name(cannonical_instance_name)
+image_option::image_option(std::function<void()> changed, const std::string &cannonical_instance_name)
+	: m_changed(std::move(changed))
+	, m_cannonical_instance_name(cannonical_instance_name)
+	, m_entry(nullptr)
 {
+}
+
+
+//-------------------------------------------------
+//	image_option::specify
+//-------------------------------------------------
+
+void image_option::specify(const std::string &value)
+{
+	if (value != m_value)
+	{
+		m_value = value;
+		m_changed();
+	}
+}
+
+void image_option::specify(std::string &&value)
+{
+	if (value != m_value)
+	{
+		m_value = std::move(value);
+		m_changed();
+	}
 }
 
 
@@ -954,6 +1120,10 @@ image_option::image_option(const std::string &cannonical_instance_name)
 
 core_options::entry::ptr image_option::setup_option_entry(std::vector<std::string> &&names)
 {
-	throw false;
-}
+	// this should only be called once
+	assert(!m_entry);
 
+	// create the entry and return it
+	m_entry = new image_option_entry(std::move(names), *this);
+	return std::unique_ptr<core_options::entry>(m_entry);
+}

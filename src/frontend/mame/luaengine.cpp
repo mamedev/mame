@@ -923,7 +923,9 @@ void lua_engine::initialize()
 				int unadorned_index = 0;
 				for (auto &curentry : options.entries())
 				{
-					const char *name = curentry->name().c_str();
+					const char *name = curentry->names().size() > 0
+						? curentry->name().c_str()
+						: nullptr;
 					bool is_unadorned = false;
 					// check if it's unadorned
 					if (name && strlen(name) && !strcmp(name, options.unadorned(unadorned_index)))
