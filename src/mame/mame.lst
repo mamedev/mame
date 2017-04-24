@@ -32710,6 +32710,9 @@ scregg                          // TA-0001 (c) 1983
 scv                             //
 scv_pal                         //
 
+@source:scyclone.cpp
+scyclone                        // (c) 1980 Taito Corporation
+
 @source:sderby.cpp
 croupier                        // (c) 1997 Playmark
 croupiera                       // (c) 1997 Playmark
