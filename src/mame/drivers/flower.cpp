@@ -8,7 +8,7 @@
 	original "wiped off due of not anymore licenseable" driver by insideoutboy.
 	
 	TODO:
-	- sprite zooming/sizes;
+	- sprite zooming;
 	- some video glitches;
 	- $a000 outputs;
 	- sound, third z80 not hooked up;
@@ -201,7 +201,7 @@ void flower_state::legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &clip
  [0] YYYY YYYY Y offset
  [1] YXoo oooo Flip Y/X, tile number
  [2] ---- b--b tile bank select
- [3] Xxxx Yyyy X size, X zoom, Y size, Y zoom
+ [3] Yyyy Xxxx Y size, Y zoom, X size, X zoom
  [4] xxxx xxxx X offset LSB
  [5] XXXX XXXX X offset MSB
  [6] cccc ---- color base
@@ -220,11 +220,27 @@ void flower_state::sprites_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		uint8_t attr = spr_ptr[i+2];
 		uint8_t fy = spr_ptr[i+1] & 0x80;
 		uint8_t fx = spr_ptr[i+1] & 0x40;
+		uint8_t ysize = ((spr_ptr[i+3] & 0x80) >> 7) + 1;
+		uint8_t xsize = ((spr_ptr[i+3] & 0x08) >> 3) + 1;
+
+		if(ysize == 2)
+			y-=16;
 		
 		tile |= (attr & 1) << 6;
 		tile |= (attr & 8) << 4;
-		// TODO: size and zoom
-		gfx_2->transpen(bitmap,cliprect, tile, color, fx, fy, x, y, 15);
+		// TODO: zoom
+		for(int yi=0;yi<ysize;yi++)
+		{
+			for(int xi=0;xi<xsize;xi++)
+			{
+				int tile_offs;
+				
+				tile_offs = fx ? (xsize-xi-1) * 8 : xi*8;
+				tile_offs+= fy ? (ysize-yi-1) : yi;
+				
+				gfx_2->transpen(bitmap,cliprect, tile+tile_offs, color, fx, fy, x+xi*16, y+yi*16, 15);
+			}
+		}
 	}
 }
 
@@ -458,5 +474,5 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 ROM_END
 
 
-GAME( 1986, flower,  0,      flower, flower, driver_device, 0, ROT0, "Clarue (Komax license)", "Flower (US)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, flowerj, flower, flower, flower, driver_device, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, flower,  0,      flower, flower, driver_device, 0, ROT0, "Clarue (Komax license)", "Flower (US)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flowerj, flower, flower, flower, driver_device, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
