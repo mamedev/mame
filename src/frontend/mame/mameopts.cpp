@@ -111,18 +111,18 @@ const game_driver *mame_options::system(const emu_options &options)
 //  parse_one_ini - parse a single INI file
 //-------------------------------------------------
 
-bool mame_options::parse_one_ini(emu_options &options, const char *basename, int priority, std::ostream *error_stream)
+void mame_options::parse_one_ini(emu_options &options, const char *basename, int priority, std::ostream *error_stream)
 {
 	// don't parse if it has been disabled
 	if (!options.read_config())
-		return false;
+		return;
 
 	// open the file; if we fail, that's ok
 	emu_file file(options.ini_path(), OPEN_FLAG_READ);
 	osd_printf_verbose("Attempting load of %s.ini\n", basename);
 	osd_file::error filerr = file.open(basename, ".ini");
 	if (filerr != osd_file::error::NONE)
-		return false;
+		return;
 
 	// parse the file
 	osd_printf_verbose("Parsing %s.ini\n", basename);
@@ -134,8 +134,7 @@ bool mame_options::parse_one_ini(emu_options &options, const char *basename, int
 	{
 		if (error_stream)
 			util::stream_format(*error_stream, "While parsing %s:\n%s\n", ex.message(), file.fullpath(), ex.message());
-		return false;
+		return;
 	}
 
-	return true;
 }

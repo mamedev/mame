@@ -57,7 +57,7 @@ public:
 
 private:
 	// INI parsing helper
-	static bool parse_one_ini(emu_options &options, const char *basename, int priority, std::ostream *error_stream = nullptr);
+	static void parse_one_ini(emu_options &options, const char *basename, int priority, std::ostream *error_stream = nullptr);
 };
 
 #endif  /* __MAMEOPTS_H__ */

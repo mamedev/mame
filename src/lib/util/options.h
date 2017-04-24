@@ -34,22 +34,41 @@ const int OPTION_PRIORITY_MAXIMUM   = 255;          // maximum priority
 
 struct options_entry;
 
+// avoid obnoxious DirectSound issue
+#ifdef ERROR
+#undef ERROR
+#endif
 
 // exception thrown by core_options when an illegal request is made
 class options_exception
 {
 public:
-	template <typename... Params>	options_exception(const char *fmt, Params &&...args) : m_message(util::string_format(fmt, std::forward<Params>(args)...)) { }
-	options_exception(const std::ostringstream &stream);
+	enum class condition_type
+	{
+		NONE,
+		WARNING,
+		ERROR
+	};
+
+	template <typename... Params>	options_exception(condition_type condition, const char *fmt, Params &&...args)
+		: m_condition(condition)
+		, m_message(util::string_format(fmt, std::forward<Params>(args)...))
+	{
+		assert(m_condition == condition_type::WARNING || m_condition == condition_type::ERROR);
+	}
+
+	options_exception(condition_type condition, const std::ostringstream &stream);
 	options_exception(const options_exception &) = default;
 	options_exception(options_exception &&) = default;
 	options_exception& operator=(const options_exception &) = default;
 	options_exception& operator=(options_exception &&) = default;
 
 	const std::string &message() const { return m_message; }
+	condition_type condition() const { return m_condition; }
 
 private:
-	std::string m_message;
+	condition_type	m_condition;
+	std::string	m_message;
 };
 
 
@@ -202,7 +221,7 @@ private:
 
 	// internal helpers
 	void add_to_entry_map(std::string &&name, entry::ptr &entry);
-	void prettify_and_set_value(entry &curentry, std::string &&data, int priority, std::ostream &error_stream);
+	void prettify_and_set_value(entry &curentry, std::string &&data, int priority, std::ostream &error_stream, options_exception::condition_type &condition);
 
 	// internal state
 	std::vector<entry::ptr>						m_entries;				// cannonical list of entries

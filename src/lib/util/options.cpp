@@ -52,9 +52,11 @@ const char *const core_options::s_option_unadorned[MAX_UNADORNED_OPTIONS] =
 //  options_exception - constructor
 //-------------------------------------------------
 
-options_exception::options_exception(const std::ostringstream &stream)
-	: m_message(stream.str())
+options_exception::options_exception(condition_type condition, const std::ostringstream &stream)
+	: m_condition(condition)
+	, m_message(stream.str())
 {
+	assert(m_condition == condition_type::WARNING || m_condition == condition_type::ERROR);
 }
 
 
@@ -154,13 +156,13 @@ void core_options::entry::validate(const std::string &data)
 	case option_type::BOOLEAN:
 		// booleans must be 0 or 1
 		if (sscanf(data.c_str(), "%d", &ival) != 1 || ival < 0 || ival > 1)
-			throw options_exception("Illegal boolean value for %s: \"%s\"; reverting to %s\n", name(), data, value());
+			throw options_exception(options_exception::condition_type::WARNING, "Illegal boolean value for %s: \"%s\"; reverting to %s\n", name(), data, value());
 		break;
 
 	case option_type::INTEGER:
 		// integers must be integral
 		if (sscanf(data.c_str(), "%d", &ival) != 1)
-			throw options_exception("Illegal integer value for %s: \"%s\"; reverting to %s\n", name(), data, value());
+			throw options_exception(options_exception::condition_type::WARNING, "Illegal integer value for %s: \"%s\"; reverting to %s\n", name(), data, value());
 
 		// range checking
 		if (has_range())
@@ -168,13 +170,13 @@ void core_options::entry::validate(const std::string &data)
 			minimum_integer = atoi(minimum());
 			maximum_integer = atoi(maximum());
 			if (ival < minimum_integer || ival > maximum_integer)
-				throw options_exception("Out-of-range integer value for %s: \"%s\" (must be between %d and %d); reverting to %s\n", name(), data, minimum_integer, maximum_integer, value());
+				throw options_exception(options_exception::condition_type::WARNING, "Out-of-range integer value for %s: \"%s\" (must be between %d and %d); reverting to %s\n", name(), data, minimum_integer, maximum_integer, value());
 		}
 		break;
 
 	case option_type::FLOAT:
 		if (sscanf(data.c_str(), "%f", &fval) != 1)
-			throw options_exception("Illegal float value for %s: \"%s\"; reverting to %s\n", name(), data, value());
+			throw options_exception(options_exception::condition_type::WARNING, "Illegal float value for %s: \"%s\"; reverting to %s\n", name(), data, value());
 
 		// range checking
 		if (has_range())
@@ -182,7 +184,7 @@ void core_options::entry::validate(const std::string &data)
 			minimum_float = atof(minimum());
 			maximum_float = atof(maximum());
 			if (fval < minimum_float || fval > maximum_float)
-				throw options_exception("Out-of-range float value for %s: \"%s\" (must be between %f and %f); reverting to %s\n", name(), data, minimum_float, maximum_float, value());
+				throw options_exception(options_exception::condition_type::WARNING, "Out-of-range float value for %s: \"%s\" (must be between %f and %f); reverting to %s\n", name(), data, minimum_float, maximum_float, value());
 		}
 		break;
 
@@ -194,7 +196,7 @@ void core_options::entry::validate(const std::string &data)
 	case OPTION_HEADER:
 	default:
 		// anything else is invalid
-		throw options_exception("Attempted to set invalid option %s\n", name());
+		throw options_exception(options_exception::condition_type::ERROR, "Attempted to set invalid option %s\n", name());
 	}
 }
 
@@ -548,6 +550,7 @@ void core_options::set_description(const char *name, const char *description)
 void core_options::parse_command_line(std::vector<std::string> &args, int priority)
 {
 	std::ostringstream error_stream;
+	options_exception::condition_type condition = options_exception::condition_type::NONE;
 
 	// reset the errors and the command
 	m_command.clear();
@@ -589,7 +592,7 @@ void core_options::parse_command_line(std::vector<std::string> &args, int priori
 		{
 			// can only have one command
 			if (!m_command.empty())
-				throw options_exception("Error: multiple commands specified -%s and %s\n", m_command, curarg);
+				throw options_exception(options_exception::condition_type::ERROR, "Error: multiple commands specified -%s and %s\n", m_command, curarg);
 
 			m_command = curentry->name();
 			continue;
@@ -612,19 +615,19 @@ void core_options::parse_command_line(std::vector<std::string> &args, int priori
 		}
 		else
 		{
-			throw options_exception("Error: option %s expected a parameter\n", curarg);
+			throw options_exception(options_exception::condition_type::ERROR, "Error: option %s expected a parameter\n", curarg);
 		}
 		args[arg].clear();
 
 		// set the new data
-		prettify_and_set_value(*curentry, std::move(newdata), priority, error_stream);
+		prettify_and_set_value(*curentry, std::move(newdata), priority, error_stream, condition);
 	}
 
 	args.resize(new_argc);
 
 	// did we have any errors that may need to be aggregated?
-	if (error_stream.tellp() > 0)
-		throw options_exception(error_stream);
+	if (condition != options_exception::condition_type::NONE)
+		throw options_exception(condition, error_stream);
 }
 
 
@@ -636,6 +639,7 @@ void core_options::parse_command_line(std::vector<std::string> &args, int priori
 void core_options::parse_ini_file(util::core_file &inifile, int priority, bool always_override)
 {
 	std::ostringstream error_stream;
+	options_exception::condition_type condition = options_exception::condition_type::NONE;
 
 	// loop over lines in the file
 	char buffer[4096];
@@ -660,6 +664,7 @@ void core_options::parse_ini_file(util::core_file &inifile, int priority, bool a
 		// if we hit the end early, print a warning and continue
 		if (*temp == 0)
 		{
+			condition = std::max(condition, options_exception::condition_type::WARNING);
 			util::stream_format(error_stream, "Warning: invalid line in INI: %s", buffer);
 			continue;
 		}
@@ -683,17 +688,18 @@ void core_options::parse_ini_file(util::core_file &inifile, int priority, bool a
 		entry *curentry = get_entry(optionname);
 		if (!curentry)
 		{
+			condition = std::max(condition, options_exception::condition_type::WARNING);
 			util::stream_format(error_stream, "Warning: unknown option in INI: %s\n", optionname);
 			continue;
 		}
 
 		// set the new data
-		prettify_and_set_value(*curentry, optiondata, priority, error_stream);
+		prettify_and_set_value(*curentry, optiondata, priority, error_stream, condition);
 	}
 
 	// did we have any errors that may need to be aggregated?
-	if (error_stream.tellp() > 0)
-		throw options_exception(error_stream);
+	if (condition != options_exception::condition_type::NONE)
+		throw options_exception(condition, error_stream);
 }
 
 
@@ -873,7 +879,7 @@ void core_options::remove_entry(core_options::entry &delentry)
 //  prettify_and_set_value
 //-------------------------------------------------
 
-void core_options::prettify_and_set_value(entry &curentry, std::string &&data, int priority, std::ostream &error_stream)
+void core_options::prettify_and_set_value(entry &curentry, std::string &&data, int priority, std::ostream &error_stream, options_exception::condition_type &condition)
 {
 	// trim any whitespace
 	strtrimspace(data);
@@ -895,6 +901,8 @@ void core_options::prettify_and_set_value(entry &curentry, std::string &&data, i
 	{
 		// we want to aggregate option exceptions
 		error_stream << ex.message();
+		if (ex.condition() > condition)
+			condition = ex.condition();
 	}
 }
 
