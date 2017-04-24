@@ -266,6 +266,7 @@ if BASE_TARGETOS=="unix" then
 		if _OPTIONS["with-bundled-sdl2"]~=nil then
 			linkoptions {
 				"-framework AudioUnit",
+				"-framework AudioToolbox",
 				"-framework CoreAudio",
 				"-framework Carbon",
 				"-framework ForceFeedback",
@@ -281,7 +282,7 @@ if BASE_TARGETOS=="unix" then
 					"SDL2.framework",
 				}
 			else
-				local str = backtick(sdlconfigcmd() .. " --libs --static | sed 's/-lSDLmain//'")
+				local str = backtick(sdlconfigcmd() .. " --libs")
 				addlibfromstring(str)
 				addoptionsfromstring(str)
 			end
