@@ -85,7 +85,7 @@ public:
 	DECLARE_PALETTE_INIT(chinsan);
 	uint32_t screen_update_chinsan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(chin_adpcm_int);
-	required_device<cpu_device> m_maincpu;
+	required_device<mc8123_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -597,7 +597,7 @@ void chinsan_state::machine_reset()
 static MACHINE_CONFIG_START( chinsan, chinsan_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,10000000/2)      /* ? MHz */
+	MCFG_CPU_ADD("maincpu", MC8123, 10000000/2)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(chinsan_map)
 	MCFG_CPU_IO_MAP(chinsan_io)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -650,7 +650,7 @@ ROM_START( chinsan )
 	ROM_CONTINUE(        0x00000, 0x08000 ) // first half is blank
 	ROM_LOAD( "mm01.8d", 0x08000, 0x10000, CRC(c69ddbf5) SHA1(9533365c1761b113174d53a2e23ce6a7baca7dfe) )
 
-	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-5012.key",  0x0000, 0x2000, CRC(2ecfb132) SHA1(3110ef82080dd7d908cc6bf34c6643f187f90b29) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
@@ -680,7 +680,7 @@ ROM_END
 DRIVER_INIT_MEMBER(chinsan_state,chinsan)
 {
 	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0x18000);
-	mc8123_decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), memregion("user1")->base(), 0x18000);
+	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), 0x18000);
 }
 
 

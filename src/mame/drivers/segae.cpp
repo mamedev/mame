@@ -960,7 +960,7 @@ ROM_START( fantzn2 )
 	ROM_LOAD( "epr-11414.ic4",  0x30000, 0x10000, CRC(6f7a9f5f) SHA1(b53aa2eded781c80466a79b7d81383b9a875d0be) )
 	ROM_LOAD( "epr-11412.ic2",  0x40000, 0x10000, CRC(b14db5af) SHA1(04c7fb659385438b3d8f9fb66800eb7b6373bda9) )
 
-	ROM_REGION( 0x2000, "key", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0057.key",  0x0000, 0x2000, CRC(ee43d0f0) SHA1(72cb75a4d8352fe372db12046a59ea044360d5c3) )
 ROM_END
 
@@ -975,7 +975,7 @@ ROM_START( opaopa )
 	ROM_LOAD( "epr-11051.ic3",  0x20000, 0x08000, CRC(4ca132a2) SHA1(cb4e4c01b6ab070eef37c0603190caafe6236ccd) ) /* encrypted */
 	ROM_LOAD( "epr-11050.ic2",  0x28000, 0x08000, CRC(a165e2ef) SHA1(498ff4c5d3a2658567393378c56be6ed86ac0384) ) /* encrypted */
 
-	ROM_REGION( 0x2000, "key", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0042.key",  0x0000, 0x2000, CRC(d6312538) SHA1(494ac7f080775c21dc7d369e6ea78f3299e6975a) )
 ROM_END
 
@@ -1052,7 +1052,9 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( systemex, systeme )
-	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
+	MCFG_CPU_PROGRAM_MAP(systeme_map)
+	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
@@ -1065,7 +1067,9 @@ static MACHINE_CONFIG_DERIVED( systemex_315_5177, systeme )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( systemeb, systeme )
-	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
+	MCFG_CPU_PROGRAM_MAP(systeme_map)
+	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
@@ -1073,7 +1077,7 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(systeme_state, opaopa)
 {
 	uint8_t *banked_decrypted_opcodes = auto_alloc_array(machine(), uint8_t, m_maincpu_region->bytes());
-	mc8123_decode(m_maincpu_region->base(), banked_decrypted_opcodes, memregion("key")->base(), m_maincpu_region->bytes());
+	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), banked_decrypted_opcodes, m_maincpu_region->bytes());
 
 	m_bank0d->set_base(banked_decrypted_opcodes);
 	m_bank1d->configure_entries(0, 16, banked_decrypted_opcodes + 0x10000, 0x4000);
@@ -1082,7 +1086,7 @@ DRIVER_INIT_MEMBER(systeme_state, opaopa)
 
 DRIVER_INIT_MEMBER(systeme_state, fantzn2)
 {
-	mc8123_decode(m_maincpu_region->base(), m_decrypted_opcodes, memregion("key")->base(), 0x8000);
+	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_decrypted_opcodes, 0x8000);
 }
 
 
