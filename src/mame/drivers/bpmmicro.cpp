@@ -6,19 +6,28 @@
 *
 *       All models:
 *       Legacy:
-*           EP-series (pre-bp-1148)
+*           EP-1 - 28 pin eproms, has adapter for 32 pin?
+*           PLD-1100 - ndip plds/pals only?
+*           EP-1140 - 32 pin eproms only?
 *       286 based:
-*           BP-1148 - fixed 512k? ram
-*           BP-1200 - fixed 512k ram, (different tech adapter from 1148)
-*           BP-2000, BP-2100, BP-2500, BP-2510, BP-2600M - ganged/bulk/autofeed programmers?
-*       286 expandable:
+*           BP-1148 - fixed 512k ram, uses a special BP-1148 socket instead of a tech adapter+socket module
+*           BP-1200 - fixed 512k ram, uses a TP-48 or TP-84 tech adapter, otherwise identical to above, same firmware
+*       286 based w/extra header for >84 (up to 240?) pin drivers, expandable ram:
 *           BP-1400 - uses a 30? pin SIMM for up to 8MB? of ram
-*       486 based:
-*           BP-1600 - 486DX based, uses a 72 pin SIMM for up to 16MB of ram (does NOT support 32MB SIMMs!)
-*           Silicon Sculptor - same as above, custom firmware locked to Actel devices, has an extra button
+*       Unclear whether 286 or 486, all have extra button per programmer:
+*           BP-2100/84x4 - four BP-1?00s ganged together [1400?]
+*           BP-2200/240x2 - two BP-1?00s ganged together [1600?]
+*           BP-2200/240x4 - four BP-1?00s ganged together
+*           BP-2200/240x6 - six BP-1?00s ganged together
+*           BP-2500/240x4 - four BP-1?00s ganged together
+*           BP-2000, BP-2600M - ganged/bulk/autofeed programmers?
+*           Silicon Sculptor - custom firmware locked to Actel fpga/pld devices, may have a custom MB
 *           Silicon Sculptor 6X - as above but 6 programmers ganged together
-*       486+USB expansion pcb:
-*           Silicon Sculptor II - same as silicon sculptor but has a parallel-to-USB board
+*           Silicon Sculptor II
+*       486 based:
+*           BP-1600 - 486DX2 based, uses a 72 pin SIMM for up to 16MB of ram (does NOT support 32MB SIMMs!)
+*       probably 'universal platform':
+*           BP-2510
 *       486+USB 2nd gen 'universal platform':
 *           BP-1610 - 486DX2 based, uses a laptop SODIMM for up to 512MB? of ram?, has USB
 *           BP-1410 - 486DX2 based, uses a laptop SODIMM for up to 512MB? of ram?, has USB
