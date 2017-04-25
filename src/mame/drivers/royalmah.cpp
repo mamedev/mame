@@ -4903,6 +4903,26 @@ ROM_START( jansoua )
 	ROM_LOAD( "n82s123an", 0x0000, 0x0020, CRC(e9598146) SHA1(619e7eb76cc3e882b5b3e55cdd23fe00b0a1fe45) )
 ROM_END
 
+ROM_START( rkjanoh2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+    ROM_LOAD( "pf_1",         0x000000, 0x00800, CRC(1a5018d2) SHA1(ff68689591760d0bfafa80f8c124b25892b3b05b) )
+	ROM_IGNORE( 0x800 )
+    ROM_LOAD( "pf_2",         0x000800, 0x00800, CRC(9220a0a5) SHA1(cf14f20f59d1a72b507580a724373bd5e656f265) )
+	ROM_IGNORE( 0x800 )
+    ROM_LOAD( "pf_3_1",       0x001000, 0x00800, CRC(c6a998ea) SHA1(f8e9fe253da2e78357f9e97ba2ba1689ab2d8a51) )
+	ROM_IGNORE( 0x800 )
+    ROM_LOAD( "pf_4",         0x001800, 0x00800, CRC(f80f43a4) SHA1(0253850b8d09b58074a06040df5c99c135d2202c) )
+	ROM_IGNORE( 0x800 )
+	ROM_LOAD( "pf_5",         0x002000, 0x00800, CRC(75cf215f) SHA1(7f2442574b1b5faa22b1e4cc70d11d8304dc9085) )
+	ROM_IGNORE( 0x800 )
+    ROM_LOAD( "pf_6",         0x002800, 0x00800, CRC(e54d2369) SHA1(b233f9f4658417c336d8c1cc7d1e55efdf34d651) )
+	ROM_IGNORE( 0x800 )
+    ROM_LOAD( "pf_7",         0x003000, 0x001000, CRC(c4fdd2ac) SHA1(76c5645534b87dde87acfb4140d0f3ba18c95cd2) )
+    ROM_LOAD( "pf_8",         0x004000, 0x002000, CRC(c789e2b3) SHA1(33b5c8f22a1e337816a61fd2c91bc175a412d10e) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+    ROM_LOAD( "82s123",       0x000000, 0x000020, CRC(74a53e94) SHA1(ca9114bd9b2b07f5abe82616b41ae9fdb9537a4f) )	
+ROM_END
 
 DRIVER_INIT_MEMBER(royalmah_state,ippatsu)
 {
@@ -4916,6 +4936,8 @@ DRIVER_INIT_MEMBER(royalmah_state,janptr96)
 	machine().device<nvram_device>("nvram")->set_base(m_janptr96_nvram.get(), 0x1000 * 9);
 }
 
+
+
 // the original Janputer (Sanritsu) is not yet dumped, basically Royal Mahjong but non-BET type
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, driver_device,  0,        ROT0,   "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
@@ -4923,6 +4945,7 @@ GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, driver_device,  0,        R
 GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, driver_device,  0,        ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1985,  tahjong,  royalmj,  tahjong,  tahjong,  driver_device,  0,        ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17
 GAME( 1981,  janputer, 0,        royalmah, royalmah, driver_device,  0,        ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong) [BET]", 0 ) // MT #05392
+GAME( 198?, rkjanoh2,  0,		 royalmah, royalmah, driver_device,  0,        ROT0,  "<unknown>",                   "Royal King Jan-Oh 2", MACHINE_NOT_WORKING )
 GAME( 1984,  janoh,    0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        MACHINE_NOT_WORKING )
 GAME( 1984,  janoha,   janoh,    janoh,    royalmah, driver_device,  0,        ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        MACHINE_NOT_WORKING ) // this one is complete?
 GAME( 1985,  jansou,   0,        jansou,   jansou,   driver_device,  0,        ROT0,   "Dyna",                       "Jansou (set 1)",                        MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
