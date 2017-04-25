@@ -1039,7 +1039,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( hangonjr, systeme )
 	MCFG_DEVICE_MODIFY("ppi")
 	MCFG_I8255_IN_PORTA_CB(READ8(systeme_state, hangonjr_port_f8_read))
-	MCFG_I8255_IN_PORTC_CB(CONSTANT(0)) // bit 4 = ???
+	MCFG_I8255_IN_PORTC_CB(CONSTANT(0)) // bit 4 ought to be ADC /INTR signal
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(systeme_state, hangonjr_port_fa_write))
 MACHINE_CONFIG_END
 
