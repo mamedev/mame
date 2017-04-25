@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, Bartman/Abyss (HD6345)
 /**********************************************************************
 
     Motorola MC6845 and compatible CRT controller emulation
@@ -419,6 +419,60 @@ WRITE8_MEMBER( mos8563_device::register_w )
 	recompute_parameters(false);
 }
 
+WRITE8_MEMBER( hd6345_device::address_w )
+{
+	m_register_address_latch = data & 0x3f;
+}
+
+
+READ8_MEMBER( hd6345_device::register_r )
+{
+	uint8_t ret = 0xff;
+
+	switch (m_register_address_latch)
+	{
+		case 0x0c:  ret = m_supports_disp_start_addr_r ? (m_disp_start_addr >> 8) & 0xff : 0; break;
+		case 0x0d:  ret = m_supports_disp_start_addr_r ? (m_disp_start_addr >> 0) & 0xff : 0; break;
+		case 0x0e:  ret = (m_cursor_addr    >> 8) & 0xff; break;
+		case 0x0f:  ret = (m_cursor_addr    >> 0) & 0xff; break;
+		case 0x10:  ret = (m_light_pen_addr >> 8) & 0xff; m_light_pen_latched = false; break;
+		case 0x11:  ret = (m_light_pen_addr >> 0) & 0xff; m_light_pen_latched = false; break;
+		// TODO: REST
+	}
+
+	return ret;
+}
+
+WRITE8_MEMBER( hd6345_device::register_w )
+{
+	if (LOG)  logerror("%s:HD6345 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
+
+	switch (m_register_address_latch)
+	{
+		case 0x00:  m_horiz_char_total =   data & 0xff; break;
+		case 0x01:  m_horiz_disp       =   data & 0xff; break;
+		case 0x02:  m_horiz_sync_pos   =   data & 0xff; break;
+		case 0x03:  m_sync_width       =   data & 0xff; break;
+		case 0x04:  m_vert_char_total  =   data & 0xff; break;
+		case 0x05:  m_vert_total_adj   =   data & 0x1f; break;
+		case 0x06:  m_vert_disp        =   data & 0xff; break;
+		case 0x07:  m_vert_sync_pos    =   data & 0xff; break;
+		case 0x08:  m_mode_control     =   data & 0xff; break;
+		case 0x09:  m_max_ras_addr     =   data & 0x1f; break;
+		case 0x0a:  m_cursor_start_ras =   data & 0x7f; break;
+		case 0x0b:  m_cursor_end_ras   =   data & 0x1f; break;
+		case 0x0c:  m_disp_start_addr  = ((data & 0x3f) << 8) | (m_disp_start_addr & 0x00ff); break;
+		case 0x0d:  m_disp_start_addr  = ((data & 0xff) << 0) | (m_disp_start_addr & 0xff00); break;
+		case 0x0e:  m_cursor_addr      = ((data & 0x3f) << 8) | (m_cursor_addr & 0x00ff); break;
+		case 0x0f:  m_cursor_addr      = ((data & 0xff) << 0) | (m_cursor_addr & 0xff00); break;
+		case 0x10: /* read-only */ break;
+		case 0x11: /* read-only */ break;
+		// TODO: rest
+	}
+
+	recompute_parameters(false);
+}
+
 
 inline uint8_t mos8563_device::read_videoram(offs_t offset)
 {
@@ -533,7 +587,7 @@ void mc6845_device::recompute_parameters(bool postload)
 			else
 				visarea.set(0 + m_visarea_adjust_min_x, max_visible_x + m_visarea_adjust_max_x, 0 + m_visarea_adjust_min_y, max_visible_y + m_visarea_adjust_max_y);
 
-			if (LOG) logerror("M6845 config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
+			if (LOG) logerror("M6845 config screen: HTOTAL: %d  VTOTAL: %d  MAX_X: %d  MAX_Y: %d  HSYNC: %d-%d  VSYNC: %d-%d  Freq: %ffps\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
 			if ( m_screen != nullptr )
@@ -1222,7 +1276,7 @@ void hd6345_device::device_start()
 	m_supports_status_reg_d5 = true;
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = true;
-	m_supports_transparent = true;
+	//m_supports_transparent = true;
 }
 
 
