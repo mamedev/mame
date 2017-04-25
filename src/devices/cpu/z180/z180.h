@@ -116,16 +116,23 @@ enum
 	Z180_TABLE_ex    /* cycles counts for taken jr/jp/call and interrupt latency (rst opcodes) */
 };
 
-#define Z180_IRQ0       0           /* Execute IRQ1 */
-#define Z180_IRQ1       1           /* Execute IRQ1 */
-#define Z180_IRQ2       2           /* Execute IRQ2 */
-
+// input lines
+enum {
+	Z180_INPUT_LINE_IRQ0,           /* Execute IRQ1 */
+	Z180_INPUT_LINE_IRQ1,           /* Execute IRQ1 */
+	Z180_INPUT_LINE_IRQ2,           /* Execute IRQ2 */
+	Z180_INPUT_LINE_DREQ0,          /* Start DMA0 */
+	Z180_INPUT_LINE_DREQ1           /* Start DMA1 */
+};
 
 class z180_device : public cpu_device, public z80_daisy_chain_interface
 {
 public:
 	// construction/destruction
 	z180_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+
+	bool get_tend0();
+	bool get_tend1();
 
 protected:
 	// device-level overrides
@@ -135,7 +142,7 @@ protected:
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 16; }
-	virtual uint32_t execute_input_lines() const override { return 3; }
+	virtual uint32_t execute_input_lines() const override { return 5; }
 	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
 	virtual void execute_run() override;
 	virtual void execute_burn(int32_t cycles) override;
