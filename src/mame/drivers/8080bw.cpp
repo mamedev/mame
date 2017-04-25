@@ -515,6 +515,35 @@ static MACHINE_CONFIG_DERIVED_CLASS( spcewars, mw8080bw_root, _8080bw_state )
 MACHINE_CONFIG_END
 
 
+/*******************************************************/
+/*                                                     */
+/* Space War (Leisure and Allied)                      */
+/*                                                     */
+/*******************************************************/
+
+// has a slightly rearranged io map and has PROMs and watchdog
+
+static ADDRESS_MAP_START( spcewarla_io_map, AS_IO, 8, _8080bw_state )
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
+	AM_RANGE(0x04, 0x04) AM_WRITE(spcewars_sh_port_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(invadpt2_sh_port_2_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("mb14241", mb14241_device, shift_result_r) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
+ADDRESS_MAP_END
+
+static MACHINE_CONFIG_DERIVED(spcewarla, spcewars)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(spcewarla_io_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
+
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
+MACHINE_CONFIG_END
+
 
 /*******************************************************/
 /*                                                     */
@@ -3700,6 +3729,23 @@ ROM_START( spcewars )
 	ROM_LOAD( "sanritsu.9",   0x4000, 0x0400, CRC(b2f29601) SHA1(ce855e312f50df7a74682974803cb4f9b2d184f3) )
 ROM_END
 
+ROM_START( spcewarla ) // PCB was in a Space Invarders Part II cabinet
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ps1.bin",   0x0000, 0x0400, CRC(222f6913) SHA1(c0ae8fa8a3b21ebd10cd16952a1c84da1bbd44e3) )
+	ROM_LOAD( "ps2.bin",   0x0400, 0x0400, CRC(48dc791c) SHA1(91a98205c83ca38961e6ba2ac43a41e6e8bc2675) )
+	ROM_LOAD( "ps3.bin",   0x0800, 0x0400, CRC(58ddc18c) SHA1(3d96ec3e6abd1430754083503af623fb388146f6) )
+	ROM_LOAD( "ps4.bin",   0x0c00, 0x0400, CRC(1da5e383) SHA1(8fe84cf290baddad57872092c31abf76950ce00b) )
+	ROM_LOAD( "ps5.bin",   0x1000, 0x0400, CRC(3b6d9f23) SHA1(39d5144e1636caca89e3694ba3ab3a1ed241128c) )
+	ROM_LOAD( "ps6.bin",   0x1400, 0x0400, CRC(50be9b7a) SHA1(8372929d71d9a1efc0963cd952ab6c1f574eee32) )
+	ROM_LOAD( "ps7.bin",   0x1800, 0x0400, CRC(7b8efd7c) SHA1(c2a8d7ddea6f15e483914f032ae6b8aab87b4c14) )
+	ROM_LOAD( "ps8.bin",   0x1c00, 0x0400, CRC(64fdc3e1) SHA1(c3c278bc236ced7fc85e1a9b018e80be6ab33402) )
+	ROM_LOAD( "ps9.bin",   0x4000, 0x0400, CRC(b2f29601) SHA1(ce855e312f50df7a74682974803cb4f9b2d184f3) )
+
+	ROM_REGION( 0x0800, "proms", 0 )        /* color map */
+	ROM_LOAD( "pv06.1",   0x0000, 0x0400, BAD_DUMP CRC(a732810b) SHA1(a5fabffa73ca740909e23b9530936f9274dff356) ) // not dumped yet, currently using the invadpt2 one
+	ROM_LOAD( "pv07.2",   0x0400, 0x0400, BAD_DUMP CRC(2c5b91cb) SHA1(7fa4d4aef85473b1b4f18734230c164e72be44e7) ) // not dumped yet, currently using the invadpt2 one
+ROM_END
+
 ROM_START( spacewr3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic36.bin",     0x0000, 0x0800, CRC(9e30f88a) SHA1(314dfb2920d9b43b977cc19e40ac315e6933c3b9) )
@@ -4938,6 +4984,7 @@ GAME( 1979, sicv1,      invaders, invadpt2,  sicv,      driver_device, 0, ROT270
 GAMEL(1978, invadrmr,   invaders, invaders,  invadrmr,  driver_device, 0, ROT270, "Taito / Model Racing", "Space Invaders (Model Racing)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, invaderl,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "Taito / Logitec", "Space Invaders (Logitec)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, spcewars,   invaders, spcewars,  spcewars,  driver_device, 0, ROT270, "Taito / Sanritsu", "Space War (Sanritsu)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
+GAMEL(1979, spcewarla,  invaders, spcewarla, spcewars,  driver_device, 0, ROT270, "bootleg (Leisure and Allied)", "Space War (Leisure and Allied)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, spceking,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "Taito / Leijac Corporation", "Space King", MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1979, cosmicmo,   invaders, cosmicmo,  cosmicmo,  driver_device, 0, ROT270, "Taito / Universal", "Cosmic Monsters (version II)", MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // unclassified, licensed or bootleg?
 GAMEL(1979, cosmicm2,   invaders, cosmicmo,  cosmicmo,  driver_device, 0, ROT270, "Taito / Universal", "Cosmic Monsters 2", MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // unclassified, licensed or bootleg?
