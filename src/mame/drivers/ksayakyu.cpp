@@ -10,8 +10,7 @@ TODO:
 - sprite glitches (sometimes) .. missing vertical flip flag? <- (*)
 - sound cpu int freq (timer ? $a010 writes ?)
 
-(*) this looks a BTANB, when the player slide the relative sand drawing is made with the text tilemap and it's virtually impossible
-to fix it without breaking anything else. -AS
+(*) this was caused by flip Y being hooked up as bit 6 in text videoram attribute. -AS
 
 M6100097A
 
