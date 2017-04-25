@@ -212,6 +212,7 @@ spacewr3                        // bootleg
 spacmiss                        // bootleg?
 spceking                        // (c) 1978 Leijac Corporation (Konami)
 spcewarl                        // (c) 1979 Leijac Corporation (Konami)
+spcewarla                       //
 spcewars                        // (c) 1978 Sanritsu
 spclaser                        // (c) 1980 GamePlan (Taito)
 starw                           // bootleg
@@ -287,6 +288,9 @@ abc806                          //
 ac1                             // 1984 Amateurcomputer AC1
 ac1_32                          // 1984 Amateurcomputer AC1 (32 lines)
 ac1scch                         // 1984 Amateurcomputer AC1 SCCH
+
+@source:acchi.cpp
+acchi                           // 1993 NTC / NMK
 
 @source:aceex.cpp
 aceex2814
@@ -8607,6 +8611,7 @@ bingor2                         // (c) 2002 Unknown
 bingor3                         // (c) 2002 Unknown
 bingor4                         // (c) 2002 Unknown
 bingor5                         // (c) 2002 Unknown
+vip2000                         // (c) Paloma-Elektronik
 
 @source:bionicc.cpp
 bionicc                         // 3/1987 (c) 1987 (Euro)
@@ -8766,6 +8771,9 @@ bowltry                         // (c) 200? Atlus
 
 @source:boxer.cpp
 boxer                           // ?????? prototype 1978    [6502]
+
+@source:bpmmicro.cpp
+bp1200                          // (c) 1991 BP Microsystems
 
 @source:br8641.cpp
 br8641                          //
@@ -13476,7 +13484,7 @@ hapytour                        // (c) 2005 GAV Company (on Eolith's Ghost hardw
 touryuu                         // (c) 200? Yuki Enterprise
 
 @source:giclassic.cpp
-giclasex	
+giclasex
 giclassvr
 
 @source:gijoe.cpp
@@ -14425,6 +14433,7 @@ uspbball                        // US Games
 gnw_bx301                       // Nintendo
 gnw_dm53                        // Nintendo
 gnw_jr55                        // Nintendo
+gnw_ml102                       // Nintendo
 kcontra                         // Konami
 kgradius                        // Konami
 kloneran                        // Konami
@@ -27647,14 +27656,14 @@ yis60464                        //
 mt735                           //
 
 @source:mtouchxl.cpp
-mtouchxl						// 1997 Merit Industries
-mtchxl5k						// 1998 Merit Industries
-mtchxl5ko						// 1998 Merit Industries
-mtchxl5ko2						// 1998 Merit Industries
-mtchxl6k						// 1999 Merit Industries
-mtchxl6ko						// 1999 Merit Industries
-mtchxlgld						// 2000 Merit Industries
-mtchxlgldo						// 2000 Merit Industries
+mtouchxl                        // 1997 Merit Industries
+mtchxl5k                        // 1998 Merit Industries
+mtchxl5ko                       // 1998 Merit Industries
+mtchxl5ko2                      // 1998 Merit Industries
+mtchxl6k                        // 1999 Merit Industries
+mtchxl6ko                       // 1999 Merit Industries
+mtchxlgld                       // 2000 Merit Industries
+mtchxlgldo                      // 2000 Merit Industries
 
 @source:mtx.cpp
 mtx500                          // 1983 Memotech MTX 500
@@ -28086,7 +28095,8 @@ gslgr94u                        // (c) 1994
 gslugrsj                        // (c) 1993 (Japan)
 gunbuletj                       // (c) 1994 (GN1 Japan)
 gunbuletw                       // (c) 1994 (GN3 World)
-machbrkr                        // (c) 1995 (Japan)
+machbrkr                        // (c) 1995 (World)
+machbrkrj                       // (c) 1995 (Japan)
 nebulray                        // (c) 1994 (World)
 nebulrayj                       // (c) 1994 (Japan)
 outfxies                        // (c) 1994 (World)
@@ -29455,6 +29465,10 @@ supercon                        //
 @source:novag68k.cpp
 diablo68                        //
 
+@source:novagmcs48.cpp
+nocto                           //
+npresto                         //
+
 @source:nsm.cpp
 firebird                        //
 
@@ -29607,7 +29621,7 @@ othunderu                       // B67 (c) 1988 Taito America Corporation (US, r
 othunderuo                      // B67 (c) 1988 Taito America Corporation (US)
 
 @source:otomedius.cpp
-otomedius						// (c) 2007 Konami
+otomedius                       // (c) 2007 Konami
 
 @source:overdriv.cpp
 overdriv                        // GX789 (c) 1990
@@ -30911,7 +30925,7 @@ pirates                         // (c) 1994 NIX
 piratesb                        // bootleg?
 
 @source:piratesh.cpp
-piratesh						// (c) 1995 Konami
+piratesh                        // (c) 1995 Konami
 
 @source:pitagjr.cpp
 pitagjr                         // Pitagorin Junior
@@ -32699,6 +32713,9 @@ scregg                          // TA-0001 (c) 1983
 @source:scv.cpp
 scv                             //
 scv_pal                         //
+
+@source:scyclone.cpp
+scyclone                        // (c) 1980 Taito Corporation
 
 @source:sderby.cpp
 croupier                        // (c) 1997 Playmark
@@ -36992,7 +37009,7 @@ votrtnt                         // 1980 Votrax Type-'N-Talk
 
 @source:voyager.cpp
 voyager                         // (c) 2002 Team Play, Inc.
-policet2						// (c) 2003 Team Play, Inc.
+policet2                        // (c) 2003 Team Play, Inc.
 
 @source:vp101.cpp
 jnero                           // (c) 2004 ICE/Play Mechanix

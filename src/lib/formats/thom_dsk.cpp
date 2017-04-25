@@ -377,42 +377,42 @@ static floperr_t fd_construct(floppy_image_legacy *floppy, int tracks, int secto
 
 static FLOPPY_IDENTIFY(fd_80_256_identify)
 {
-        return fd_identify(floppy, vote, 80, 256);
+		return fd_identify(floppy, vote, 80, 256);
 }
 
 static FLOPPY_CONSTRUCT(fd_80_256_construct)
 {
-        return fd_construct(floppy, 80, 256);
+		return fd_construct(floppy, 80, 256);
 }
 
 static FLOPPY_IDENTIFY(fd_40_256_identify)
 {
-        return fd_identify(floppy, vote, 40, 256);
+		return fd_identify(floppy, vote, 40, 256);
 }
 
 static FLOPPY_CONSTRUCT(fd_40_256_construct)
 {
-        return fd_construct(floppy, 40, 256);
+		return fd_construct(floppy, 40, 256);
 }
 
 static FLOPPY_IDENTIFY(fd_80_128_identify)
 {
-        return fd_identify(floppy, vote, 80, 128);
+		return fd_identify(floppy, vote, 80, 128);
 }
 
 static FLOPPY_CONSTRUCT(fd_80_128_construct)
 {
-        return fd_construct(floppy, 80, 128);
+		return fd_construct(floppy, 80, 128);
 }
 
 static FLOPPY_IDENTIFY(fd_40_128_identify)
 {
-        return fd_identify(floppy, vote, 40, 128);
+		return fd_identify(floppy, vote, 40, 128);
 }
 
 static FLOPPY_CONSTRUCT(fd_40_128_construct)
 {
-        return fd_construct(floppy, 40, 128);
+		return fd_construct(floppy, 40, 128);
 }
 
 
@@ -421,24 +421,24 @@ static FLOPPY_CONSTRUCT(fd_40_128_construct)
 LEGACY_FLOPPY_OPTIONS_START(thomson)
 
 LEGACY_FLOPPY_OPTION(fdmfm2, "fd", "Thomson FD (MFM) 80 tracks disk image (3\"1/2 DD)",
-                     fd_80_256_identify, fd_80_256_construct, nullptr, nullptr)
+					 fd_80_256_identify, fd_80_256_construct, nullptr, nullptr)
 
 // Note: no way to distinguish between FD files for 5"1/4 DD and 3"1/2 SD actually, as they have the same size
 // however, we expect 3"1/2 SD to be rather rare, so, we simply put it after 5"1/4 DD
 
 LEGACY_FLOPPY_OPTION(fdmfm, "fd", "Thomson FD (MFM) 40 tracks disk image (5\"1/4 DD)",
-                     fd_40_256_identify, fd_40_256_construct, nullptr, nullptr)
+					 fd_40_256_identify, fd_40_256_construct, nullptr, nullptr)
 
 LEGACY_FLOPPY_OPTION(fd2, "fd", "Thomson FD (FM) 80 tracks disk image (3\"1/2 SD)",
-                     fd_80_128_identify, fd_80_128_construct, nullptr, nullptr)
+					 fd_80_128_identify, fd_80_128_construct, nullptr, nullptr)
 
 LEGACY_FLOPPY_OPTION(fd, "fd", "Thomson FD (FM) 40 tracks disk image (5\"1/4 SD)",
-                     fd_40_128_identify, fd_40_128_construct, nullptr, nullptr)
+					 fd_40_128_identify, fd_40_128_construct, nullptr, nullptr)
 
 LEGACY_FLOPPY_OPTION(sap,"sap", "Thomson SAP floppy disk image",
-                     sap_dsk_identify, sap_dsk_construct, nullptr, nullptr)
+					 sap_dsk_identify, sap_dsk_construct, nullptr, nullptr)
 
 LEGACY_FLOPPY_OPTION(qdd,"qd", "Thomson QDD floppy disk image (2\"8 SD)",
-                     qdd_dsk_identify, qdd_dsk_construct, nullptr, nullptr)
+					 qdd_dsk_identify, qdd_dsk_construct, nullptr, nullptr)
 
 LEGACY_FLOPPY_OPTIONS_END

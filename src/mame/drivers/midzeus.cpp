@@ -305,16 +305,16 @@ READ32_MEMBER(midzeus_state::disk_asic_jr_r)
 		/* CMOS/ZPRAM write enable; only low bit is used */
 		case 2:
 			break;
-			//	return disk_asic_jr[offset] | ~1;
+			//  return disk_asic_jr[offset] | ~1;
 
 		/* reset status; bit 0 is watchdog reset; mk4/invasn/thegrid read at startup; invasn freaks if it is 1 at startup */
 		case 3:
 			break;
-		//	return disk_asic_jr[offset] | ~1;
+		//  return disk_asic_jr[offset] | ~1;
 
 		/* ROM bank selection on Zeus 2; two bits are used */
 		case 5:
-		//	return disk_asic_jr[offset] | ~3;
+		//  return disk_asic_jr[offset] | ~3;
 
 		/* disk asic jr id; crusnexo reads at startup: if (val & 0xf0) == 0xa0 it affects */
 		/* how the Zeus is used (reg 0x5d is set to 0x54580006) */
@@ -1133,72 +1133,52 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( thegrid )
 	PORT_START("DIPS")      /* DS1 */
-	PORT_DIPNAME( 0x0001, 0x0001, "Show Blood" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) /* Manual states that switches 2-7 are Unused */
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "Show Blood" )
+	PORT_DIPSETTING(      0x0100, "Show Blood" )
+	PORT_DIPSETTING(      0x0000, "Do not show blood" )
+	PORT_DIPUNUSED( 0xfe00, 0xfe00)
+	PORT_DIPNAME( 0x0001, 0x0001, "Coinage Source" )
+	PORT_DIPSETTING(      0x0001, "Dipswitch" )
+	PORT_DIPSETTING(      0x0000, "CMOS" )
+	PORT_DIPNAME( 0x003e, 0x003e, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x003e, "USA-1" )
+	PORT_DIPSETTING(      0x0038, "USA-2" )
+	PORT_DIPSETTING(      0x003c, "USA-10" )
+	PORT_DIPSETTING(      0x003a, "USA-14" )
+	PORT_DIPSETTING(      0x0036, "USA-DC1" )
+	PORT_DIPSETTING(      0x0030, "USA-DC2" )
+	PORT_DIPSETTING(      0x0032, "USA-DC4" )
+	PORT_DIPSETTING(      0x0034, "USA-DC5" )
+	PORT_DIPSETTING(      0x002e, "French-ECA1" )
+	PORT_DIPSETTING(      0x002c, "French-ECA2" )
+	PORT_DIPSETTING(      0x002a, "French-ECA3" )
+	PORT_DIPSETTING(      0x0028, "French-ECA4" )
+	PORT_DIPSETTING(      0x0026, "French-ECA5" )
+	PORT_DIPSETTING(      0x0024, "French-ECA6" )
+	PORT_DIPSETTING(      0x0022, "French-ECA7" )
+	PORT_DIPSETTING(      0x0020, "French-ECA8" )
+	PORT_DIPSETTING(      0x001e, "German-1" )
+	PORT_DIPSETTING(      0x001c, "German-2" )
+	PORT_DIPSETTING(      0x001a, "German-3" )
+	PORT_DIPSETTING(      0x0018, "German-4" )
+	PORT_DIPSETTING(      0x0016, "German-5" )
+	PORT_DIPSETTING(      0x0014, "German-ECA1" )
+	PORT_DIPSETTING(      0x0012, "German-ECA2" )
+	PORT_DIPSETTING(      0x0010, "German-ECA3" )
+	PORT_DIPSETTING(      0x0008, "UK-4" )
+	PORT_DIPSETTING(      0x0006, "UK-5" )
+	PORT_DIPSETTING(      0x000e, "UK-1 ECA" )
+	PORT_DIPSETTING(      0x000c, "UK-2 ECA" )
+	PORT_DIPSETTING(      0x000a, "UK-3 ECA" )
+	PORT_DIPSETTING(      0x0004, "UK-6 ECA" )
+	PORT_DIPSETTING(      0x0002, "UK-7 ECA" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )  /* Manual states switches 7 & 8 are Unused */
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "Coinage Source" )
-	PORT_DIPSETTING(      0x0100, "Dipswitch" )
-	PORT_DIPSETTING(      0x0000, "CMOS" )
-	PORT_DIPNAME( 0x3e00, 0x3e00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(      0x3e00, "USA-1" )
-	PORT_DIPSETTING(      0x3800, "USA-2" )
-	PORT_DIPSETTING(      0x3c00, "USA-10" )
-	PORT_DIPSETTING(      0x3a00, "USA-14" )
-	PORT_DIPSETTING(      0x3600, "USA-DC1" )
-	PORT_DIPSETTING(      0x3000, "USA-DC2" )
-	PORT_DIPSETTING(      0x3200, "USA-DC4" )
-	PORT_DIPSETTING(      0x3400, "USA-DC5" )
-	PORT_DIPSETTING(      0x2e00, "French-ECA1" )
-	PORT_DIPSETTING(      0x2c00, "French-ECA2" )
-	PORT_DIPSETTING(      0x2a00, "French-ECA3" )
-	PORT_DIPSETTING(      0x2800, "French-ECA4" )
-	PORT_DIPSETTING(      0x2600, "French-ECA5" )
-	PORT_DIPSETTING(      0x2400, "French-ECA6" )
-	PORT_DIPSETTING(      0x2200, "French-ECA7" )
-	PORT_DIPSETTING(      0x2000, "French-ECA8" )
-	PORT_DIPSETTING(      0x1e00, "German-1" )
-	PORT_DIPSETTING(      0x1c00, "German-2" )
-	PORT_DIPSETTING(      0x1a00, "German-3" )
-	PORT_DIPSETTING(      0x1800, "German-4" )
-	PORT_DIPSETTING(      0x1600, "German-5" )
-	PORT_DIPSETTING(      0x1400, "German-ECA1" )
-	PORT_DIPSETTING(      0x1200, "German-ECA2" )
-	PORT_DIPSETTING(      0x1000, "German-ECA3" )
-	PORT_DIPSETTING(      0x0800, "UK-4" )
-	PORT_DIPSETTING(      0x0600, "UK-5" )
-	PORT_DIPSETTING(      0x0e00, "UK-1 ECA" )
-	PORT_DIPSETTING(      0x0c00, "UK-2 ECA" )
-	PORT_DIPSETTING(      0x0a00, "UK-3 ECA" )
-	PORT_DIPSETTING(      0x0400, "UK-6 ECA" )
-	PORT_DIPSETTING(      0x0200, "UK-7 ECA" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )  /* Manual states switches 7 & 8 are Unused */
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Game Mode" )
+	PORT_DIPSETTING(      0x0080, "Normal" )
+	PORT_DIPSETTING(      0x0000, "Test" )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1246,17 +1226,17 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 
 	PORT_START("KEYPAD")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)		/* keypad 1 */
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)		/* keypad 4 */
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)		/* keypad 7 */
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad *") PORT_CODE(KEYCODE_MINUS_PAD)	/* keypad * */
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)		/* keypad 2 */
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)		/* keypad 5 */
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)		/* keypad 8 */
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)		/* keypad 0 */
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)		/* keypad 3 */
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)		/* keypad 6 */
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)		/* keypad 9 */
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)     /* keypad 1 */
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)     /* keypad 4 */
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)     /* keypad 7 */
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad *") PORT_CODE(KEYCODE_MINUS_PAD) /* keypad * */
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)     /* keypad 2 */
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)     /* keypad 5 */
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)     /* keypad 8 */
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)     /* keypad 0 */
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)     /* keypad 3 */
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)     /* keypad 6 */
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)     /* keypad 9 */
 	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_PLUS_PAD)  /* keypad # */
 
 	PORT_START("TRACKX1")

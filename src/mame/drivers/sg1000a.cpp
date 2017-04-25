@@ -164,7 +164,7 @@ On top copper layer:
 On bottom copper layer:
 "171-5200"
 
-On a sticker: 
+On a sticker:
 "REV C"
 
 On a sticker:
@@ -184,7 +184,7 @@ All ICs have a date code of either 1983 or 1984.
  IC6 - SN74LS244N
  IC7 - SN73LS244N
  IC8 - Toshiba TC5517APL (backed by a super capacitor)
- IC9 - NEC D8255AC-2 
+ IC9 - NEC D8255AC-2
 IC10 - 28-pin socket (silkscreen is "27128") for "EPR-6450D" (Fujitsu MB27128-30)
 IC11 - 28-pin socket (silkscreen is "27128") for "EPR-6504D" (Fujitsu MB27128-30)
 IC12 - Toshiba TC4053BP
@@ -206,7 +206,7 @@ IC27 - Motorola NE592N
 IC28 - Motorola NE592N
 IC29 - NEC 7808
 
-PC1  - GI B 5102 321J "TLP521-1" 
+PC1  - GI B 5102 321J "TLP521-1"
 PC2  - GI D 5102 423J
 PC3  - GI D 5102 423J
 PC4  - GI D 5102 423J
@@ -251,18 +251,18 @@ Source code and text in EPR-6450D
 
 POWER DOWN CHANGE
 TSEL:
-	LD	A,(BETFLG)	; READ CREDIT
-	RRCA			; CREDIT IN ?
-	JR	C,BETSELZ
+    LD  A,(BETFLG)  ; READ CREDIT
+    RRCA            ; CREDIT IN ?
+    JR  C,BETSELZ
 
-	LD	A,(SELOLD)
-	OR	A
-	LD	C,A
-	CALL	NZ,OLDCLCG
-	LD	HL,0
-	LD	(SELOLD),HL
-	LD	(DBLSWCT),HL
-	LD	(LMPCNT),1
+    LD  A,(SELOLD)
+    OR  A
+    LD  C,A
+    CALL    NZ,OLDCLCG
+    LD  HL,0
+    LD  (SELOLD),HL
+    LD  (DBLSWCT),HL
+    LD  (LMPCNT),1
 
 ================================================================================
 End

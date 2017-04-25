@@ -2185,6 +2185,9 @@ ROM_START( cupsoc )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 ROM_START( cupsoca )
@@ -2222,6 +2225,9 @@ ROM_START( cupsoca )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 ROM_START( cupsocb )
@@ -2259,6 +2265,9 @@ ROM_START( cupsocb )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 ROM_START( cupsocs )
@@ -2296,6 +2305,9 @@ ROM_START( cupsocs )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 
@@ -2335,6 +2347,9 @@ ROM_START( cupsocs2 )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 ROM_START( olysoc92 )
@@ -2372,6 +2387,9 @@ ROM_START( olysoc92 )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 ROM_START( olysoc92a )
@@ -2409,6 +2427,9 @@ ROM_START( olysoc92a )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 
@@ -2447,6 +2468,9 @@ ROM_START( olysoc92b )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 

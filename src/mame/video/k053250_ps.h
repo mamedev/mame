@@ -26,7 +26,7 @@ public:
 
 	static void static_set_offsets(device_t &device, int offx, int offy);
 	template<class _cb> static devcb_base &set_dmairq_cb(device_t &device, _cb cb) { return downcast<k053250ps_device &>(device).m_dmairq_cb.set_callback(cb); }
-	
+
 	DECLARE_READ16_MEMBER(reg_r);
 	DECLARE_WRITE16_MEMBER(reg_w);
 	DECLARE_READ16_MEMBER(ram_r);
@@ -44,7 +44,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	
+
 	enum {
 		OD_IDLE,
 		OD_WAIT_START,
@@ -54,7 +54,7 @@ private:
 	devcb_write_line m_dmairq_cb;
 	int m_timer_lvcdma_state;
 	bool m_dmairq_on;
-	
+
 	// configuration
 	int m_offx, m_offy;
 

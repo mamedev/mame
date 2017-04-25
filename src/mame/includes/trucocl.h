@@ -26,7 +26,7 @@ public:
 
 	uint8_t m_irq_mask;
 	emu_timer *m_dac_irq_timer;
-	
+
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	DECLARE_WRITE8_MEMBER(trucocl_videoram_w);
 	DECLARE_WRITE8_MEMBER(trucocl_colorram_w);

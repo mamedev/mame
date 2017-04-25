@@ -105,7 +105,7 @@ void electron_expansion_slot_device::device_reset()
 //#include "jafamode7.h"
 //#include "plus1.h"
 #include "plus3.h"
-//#include "pwrjoy.h"
+#include "pwrjoy.h"
 //#include "rombox.h"
 //#include "romboxplus.h"
 #include "m2105.h"
@@ -119,7 +119,7 @@ SLOT_INTERFACE_START( electron_expansion_devices )
 	//SLOT_INTERFACE("jafamode7", ELECTRON_JAFAMODE7)
 	//SLOT_INTERFACE("plus1", ELECTRON_PLUS1)
 	SLOT_INTERFACE("plus3", ELECTRON_PLUS3)
-	//SLOT_INTERFACE("pwrjoy", ELECTRON_PWRJOY)
+	SLOT_INTERFACE("pwrjoy", ELECTRON_PWRJOY)
 	//SLOT_INTERFACE("rombox", ELECTRON_ROMBOX)
 	//SLOT_INTERFACE("romboxplus", ELECTRON_ROMBOXPLUS)
 	SLOT_INTERFACE("m2105", ELECTRON_M2105)

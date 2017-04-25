@@ -5,7 +5,6 @@
 #include "includes/xbox.h"
 
 #include "cpu/i386/i386.h"
-#define USE_LEGACY_PCI
 #ifdef USE_LEGACY_PCI
 #include "machine/lpci.h"
 #else
@@ -1242,6 +1241,7 @@ private:
 	cpu_device *cpu;
 };
 
+extern const device_type NV2A_HOST;
 const device_type NV2A_HOST = device_creator<nv2a_host_device>;
 
 nv2a_host_device::nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1284,7 +1284,6 @@ void nv2a_host_device::device_reset()
 	pci_host_device::device_reset();
 }
 
-extern const device_type NV2A_HOST;
 #define MCFG_PCI_HOST_CPU(_cpu_tag) downcast<nv2a_host_device *>(device)->set_cpu_tag(_cpu_tag);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class nv2a_ram_device : public pci_device {
@@ -1303,6 +1302,7 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, nv2a_ram_device)
 	AM_INHERIT_FROM(pci_device::config_map)
 ADDRESS_MAP_END
 
+extern const device_type NV2A_RAM;
 const device_type NV2A_RAM = device_creator<nv2a_ram_device>;
 
 nv2a_ram_device::nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1319,121 +1319,110 @@ WRITE32_MEMBER(nv2a_ram_device::config_register_w)
 {
 	return;
 }
-
-
-extern const device_type NV2A_RAM;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class mcpx_lpc_device : public pci_device {
 public:
 	mcpx_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+extern const device_type MCPX_LPC;
 const device_type MCPX_LPC = device_creator<mcpx_lpc_device>;
 
 mcpx_lpc_device::mcpx_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_LPC, "HUB Interface - ISA Bridge", tag, owner, clock, "mcpx_lpc", __FILE__)
 {
 }
-
-extern const device_type MCPX_LPC;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class mcpx_smbus_device : public pci_device {
 public:
 	mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+extern const device_type MCPX_SMBUS;
 const device_type MCPX_SMBUS = device_creator<mcpx_smbus_device>;
 
 mcpx_smbus_device::mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_SMBUS, "SMBus Controller", tag, owner, clock, "mcpx_smbus", __FILE__)
 {
 }
-
-extern const device_type MCPX_SMBUS;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class mcpx_ohci_device : public pci_device {
 public:
 	mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+extern const device_type MCPX_OHCI;
 const device_type MCPX_OHCI = device_creator<mcpx_ohci_device>;
 
 mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_OHCI, "MCPX OHCI USB Controller", tag, owner, clock, "mcpx_ohci", __FILE__)
 {
 }
-
-extern const device_type MCPX_OHCI;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class mcpx_eth_device : public pci_device {
 public:
 	mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+extern const device_type MCPX_ETH;
 const device_type MCPX_ETH = device_creator<mcpx_eth_device>;
 
 mcpx_eth_device::mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_ETH, "MCP Networking Adapter", tag, owner, clock, "mcpx_eth", __FILE__)
 {
 }
-
-extern const device_type MCPX_ETH;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class mcpx_apu_device : public pci_device {
 public:
 	mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+extern const device_type MCPX_APU;
 const device_type MCPX_APU = device_creator<mcpx_apu_device>;
 
 mcpx_apu_device::mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_APU, "MCP APU", tag, owner, clock, "mcpx_apu", __FILE__)
 {
 }
-
-extern const device_type MCPX_APU;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class mcpx_ac97_audio_device : public pci_device {
 public:
 	mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+extern const device_type MCPX_AC97_AUDIO;
 const device_type MCPX_AC97_AUDIO = device_creator<mcpx_ac97_audio_device>;
 
 mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_AC97_AUDIO, "AC`97 Audio Codec Interface", tag, owner, clock, "mcpx_av97_audio", __FILE__)
 {
 }
-
-extern const device_type MCPX_AC97_AUDIO;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class mcpx_ac97_modem_device : public pci_device {
 public:
 	mcpx_ac97_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+extern const device_type MCPX_AC97_MODEM;
 const device_type MCPX_AC97_MODEM = device_creator<mcpx_ac97_modem_device>;
 
 mcpx_ac97_modem_device::mcpx_ac97_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_AC97_MODEM, "AC`97 Modem Controller", tag, owner, clock, "mcpx_ac97_modem", __FILE__)
 {
 }
-
-extern const device_type MCPX_AC97_MODEM;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class mcpx_ide_device : public pci_device {
 public:
 	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+extern const device_type MCPX_IDE;
 const device_type MCPX_IDE = device_creator<mcpx_ide_device>;
 
 mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_IDE, "MCPX IDE Controller", tag, owner, clock, "mcpx_ide", __FILE__)
 {
 }
-
-extern const device_type MCPX_IDE;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class nv2a_agp_device : public agp_bridge_device {
 public:
@@ -1444,6 +1433,7 @@ protected:
 	virtual void device_reset() override;
 };
 
+extern const device_type NV2A_AGP;
 const device_type NV2A_AGP = device_creator<nv2a_agp_device>;
 
 nv2a_agp_device::nv2a_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1460,8 +1450,6 @@ void nv2a_agp_device::device_reset()
 {
 	agp_bridge_device::device_reset();
 }
-
-extern const device_type NV2A_AGP;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class nv2a_gpu_device : public pci_device {
 public:
@@ -1482,6 +1470,7 @@ DEVICE_ADDRESS_MAP_START(nv2a_mmio, 32, nv2a_gpu_device)
 	AM_RANGE(0x00000000,0x00ffffff) AM_RAM AM_READWRITE(geforce_r, geforce_w)
 ADDRESS_MAP_END
 
+extern const device_type NV2A_GPU;
 const device_type NV2A_GPU = device_creator<nv2a_gpu_device>;
 
 nv2a_gpu_device::nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1512,8 +1501,6 @@ WRITE32_MEMBER(nv2a_gpu_device::geforce_w)
 {
 	nvidia_nv2a->geforce_w(space, offset, data, mem_mask);
 }
-
-extern const device_type NV2A_GPU;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 

@@ -1539,7 +1539,7 @@
 		<rom name="msdetecticve1.ccd" size="772" crc="92ccce73" sha1="717957cf8f02b585c5845347035cafca1be9613c"/>
 		<rom name="msdetecticve1.img" size="361540032" crc="bdea9ba7" sha1="dee4ab701aba51df0ebd635131f0b040d5ab81d9"/>
 		<rom name="msdetecticve1.sub" size="14756736" crc="d02e1e88" sha1="8aa6ebe48b95a36b725748eb43b92d3c90aef63c"/>
-		
+
 		*after conversion with IsoBuster+EAC *
 		<rom name="msdet1.cue" size="263" crc="d2572803" sha1="095924856d2540617e11b88790ad3d50d71b7553"/>
 		<rom name="Track01.bin" size="470811600" crc="a56fd0c7" sha1="7d1a05f94a1959f28bc5b4f2c9074ea5b0f0488d"/>

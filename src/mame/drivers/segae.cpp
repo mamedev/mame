@@ -296,6 +296,7 @@ GND  8A 8B GND
 #include "includes/segaipt.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "machine/mc8123.h"
 #include "machine/segacrp2_device.h"
 #include "sound/sn76496.h"
@@ -320,16 +321,14 @@ public:
 		m_bank0d(*this, "bank0d"),
 		m_bank1d(*this, "bank1d") { }
 
-	DECLARE_WRITE8_MEMBER( bank_write );
+	DECLARE_WRITE8_MEMBER(bank_write);
+	DECLARE_WRITE8_MEMBER(coin_counters_write);
 
 	DECLARE_READ8_MEMBER( ridleofp_port_f8_read );
 	DECLARE_WRITE8_MEMBER( ridleofp_port_fa_write );
 	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
 	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
 
-	DECLARE_DRIVER_INIT( hangonjr );
-	DECLARE_DRIVER_INIT( astrofl );
-	DECLARE_DRIVER_INIT( ridleofp );
 	DECLARE_DRIVER_INIT( opaopa );
 	DECLARE_DRIVER_INIT( fantzn2 );
 
@@ -360,10 +359,6 @@ public:
 
 /****************************************************************************************
  Memory Maps
-
- most of the memory map / IO maps are filled in at run time - this is due to the SMS
- code that this is based on being designed that way due to weird features of the MD.
-
 ****************************************************************************************/
 
 /* we have to fill in the ROM addresses for systeme due to the encrypted games */
@@ -389,19 +384,20 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8, systeme_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x7b, 0x7b) AM_DEVWRITE("sn1", segapsg_device, write )
-	AM_RANGE(0x7e, 0x7f) AM_DEVWRITE("sn2", segapsg_device, write )
-	AM_RANGE(0x7e, 0x7e) AM_DEVREAD( "vdp1", sega315_5124_device, vcount_read )
-	AM_RANGE(0xba, 0xba) AM_DEVREADWRITE( "vdp1", sega315_5124_device, vram_read, vram_write )
-	AM_RANGE(0xbb, 0xbb) AM_DEVREADWRITE( "vdp1", sega315_5124_device, register_read, register_write )
-	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE( "vdp2", sega315_5124_device, vram_read, vram_write )
-	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE( "vdp2", sega315_5124_device, register_read, register_write )
-	AM_RANGE(0xe0, 0xe0) AM_READ_PORT( "e0" )
-	AM_RANGE(0xe1, 0xe1) AM_READ_PORT( "e1" )
-	AM_RANGE(0xe2, 0xe2) AM_READ_PORT( "e2" )
-	AM_RANGE(0xf2, 0xf2) AM_READ_PORT( "f2" )
-	AM_RANGE(0xf3, 0xf3) AM_READ_PORT( "f3" )
-	AM_RANGE(0xf7, 0xf7) AM_WRITE( bank_write )
+	AM_RANGE(0x7b, 0x7b) AM_DEVWRITE("sn1", segapsg_device, write)
+	AM_RANGE(0x7e, 0x7f) AM_DEVWRITE("sn2", segapsg_device, write)
+	AM_RANGE(0x7e, 0x7e) AM_DEVREAD("vdp1", sega315_5124_device, vcount_read)
+	AM_RANGE(0xba, 0xba) AM_DEVREADWRITE("vdp1", sega315_5124_device, vram_read, vram_write)
+	AM_RANGE(0xbb, 0xbb) AM_DEVREADWRITE("vdp1", sega315_5124_device, register_read, register_write)
+	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE("vdp2", sega315_5124_device, vram_read, vram_write)
+	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE("vdp2", sega315_5124_device, register_read, register_write)
+	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("e0")
+	AM_RANGE(0xe1, 0xe1) AM_READ_PORT("e1")
+	AM_RANGE(0xe2, 0xe2) AM_READ_PORT("e2")
+	AM_RANGE(0xf2, 0xf2) AM_READ_PORT("f2")
+	AM_RANGE(0xf3, 0xf3) AM_READ_PORT("f3")
+	AM_RANGE(0xf7, 0xf7) AM_WRITE(bank_write)
+	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -415,14 +411,24 @@ static ADDRESS_MAP_START( vdp2_map, AS_0, 8, systeme_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER( systeme_state::bank_write )
+WRITE8_MEMBER(systeme_state::bank_write)
 {
 	membank("vdp1_bank")->set_entry((data >> 7) & 1);
 	membank("vdp2_bank")->set_entry((data >> 6) & 1);
 	membank("vram_write")->set_entry(data >> 5);
 	m_bank1->set_entry(data & 0x0f);
-	if(m_bank1d)
+	if (m_bank1d.found())
 		m_bank1d->set_entry(data & 0x0f);
+}
+
+WRITE8_MEMBER(systeme_state::coin_counters_write)
+{
+	if (data == 0xff)
+		return;
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // only one counter used in most games?
+	machine().output().set_lamp_value(0, BIT(data, 2)); // used only by hangonjr?
 }
 
 
@@ -476,7 +482,7 @@ READ8_MEMBER( systeme_state::hangonjr_port_f8_read )
 WRITE8_MEMBER( systeme_state::hangonjr_port_fa_write)
 {
 	/* Seems to write the same pattern again and again bits ---- xx-x used */
-	m_port_select = data;
+	m_port_select = data & 0x0f;
 }
 
 /*- Riddle of Pythagoras Specific -*/
@@ -1002,6 +1008,9 @@ static MACHINE_CONFIG_START( systeme, systeme_state )
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)
 
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(systeme_state, coin_counters_write))
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
 		SEGA315_5124_WIDTH , SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256, \
@@ -1027,6 +1036,20 @@ static MACHINE_CONFIG_START( systeme, systeme_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( hangonjr, systeme )
+	MCFG_DEVICE_MODIFY("ppi")
+	MCFG_I8255_IN_PORTA_CB(READ8(systeme_state, hangonjr_port_f8_read))
+	MCFG_I8255_IN_PORTC_CB(CONSTANT(0)) // bit 4 ought to be ADC /INTR signal
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(systeme_state, hangonjr_port_fa_write))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ridleofp, systeme )
+	MCFG_DEVICE_MODIFY("ppi")
+	MCFG_I8255_IN_PORTA_CB(READ8(systeme_state, ridleofp_port_f8_read))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(systeme_state, ridleofp_port_fa_write))
+MACHINE_CONFIG_END
+
+
 
 static MACHINE_CONFIG_DERIVED( systemex, systeme )
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -1046,21 +1069,6 @@ static MACHINE_CONFIG_DERIVED( systemeb, systeme )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(systeme_state, hangonjr)
-{
-	m_maincpu->space(AS_IO).install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(systeme_state::hangonjr_port_f8_read), this));
-	m_maincpu->space(AS_IO).install_write_handler(0xfa, 0xfa, write8_delegate(FUNC(systeme_state::hangonjr_port_fa_write), this));
-}
-
-
-
-
-DRIVER_INIT_MEMBER(systeme_state, ridleofp)
-{
-	m_maincpu->space(AS_IO).install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(systeme_state::ridleofp_port_f8_read), this));
-	m_maincpu->space(AS_IO).install_write_handler(0xfa, 0xfa, write8_delegate(FUNC(systeme_state::ridleofp_port_fa_write), this));
-}
-
 
 DRIVER_INIT_MEMBER(systeme_state, opaopa)
 {
@@ -1079,10 +1087,10 @@ DRIVER_INIT_MEMBER(systeme_state, fantzn2)
 
 
 //    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1985, hangonjr, 0,        systeme,  hangonjr, systeme_state, hangonjr, ROT0,   "Sega", "Hang-On Jr.", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hangonjr, 0,        hangonjr, hangonjr, driver_device, 0,        ROT0,   "Sega", "Hang-On Jr.", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, transfrm, 0,        systeme,  transfrm, driver_device, 0,        ROT0,   "Sega", "Transformer", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, astrofl,  transfrm, systemex_315_5177, transfrm, driver_device, 0,        ROT0,   "Sega", "Astro Flash (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ridleofp, 0,        systeme,  ridleofp, systeme_state, ridleofp, ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ridleofp, 0,        ridleofp, ridleofp, driver_device, 0,        ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opaopa,   0,        systemeb, opaopa,   systeme_state, opaopa,   ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, fantzn2,  0,        systemex, fantzn2,  systeme_state, fantzn2,  ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tetrisse, 0,        systeme,  tetrisse, driver_device, 0,        ROT0,   "Sega", "Tetris (Japan, System E)", MACHINE_SUPPORTS_SAVE )

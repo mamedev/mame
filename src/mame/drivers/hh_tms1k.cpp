@@ -1664,6 +1664,9 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+
+protected:
+	virtual void machine_start() override;
 };
 
 // handlers
@@ -1763,6 +1766,14 @@ static INPUT_PORTS_START( quizwizc )
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+void quizwizc_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// register for savestates
+	save_item(NAME(m_pinout));
+}
+
 static MACHINE_CONFIG_START( quizwizc, quizwizc_state )
 
 	/* basic machine hardware */
@@ -1781,6 +1792,7 @@ static MACHINE_CONFIG_START( quizwizc, quizwizc_state )
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "quizwiz_cart")
+	MCFG_GENERIC_MANDATORY
 	MCFG_GENERIC_LOAD(quizwizc_state, cartridge)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "quizwiz")
 MACHINE_CONFIG_END
@@ -1829,6 +1841,9 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+
+protected:
+	virtual void machine_start() override;
 };
 
 // handlers
@@ -1926,6 +1941,14 @@ static INPUT_PORTS_START( tc4 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Pass/Shoot Button 2") // middle
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 D/K Button")
 INPUT_PORTS_END
+
+void tc4_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// register for savestates
+	save_item(NAME(m_pinout));
+}
 
 static MACHINE_CONFIG_START( tc4, tc4_state )
 

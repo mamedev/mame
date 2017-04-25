@@ -92,8 +92,8 @@ static MACHINE_CONFIG_START( segam1, segam1_state )
 	MCFG_CPU_PROGRAM_MAP(segam1_map)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", segam1_state,  irq1_line_hold)
 
-	MCFG_DEVICE_ADD("io1", SEGA_315_5296, 10000000) // ???
-	MCFG_DEVICE_ADD("io2", SEGA_315_5296, 10000000) // ???
+	MCFG_DEVICE_ADD("io1", SEGA_315_5296, 0) // unknown clock
+	MCFG_DEVICE_ADD("io2", SEGA_315_5296, 0) // unknown clock
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -134,7 +134,7 @@ ROM_START( unkm1 ) // 1992.01.31 string
 	ROM_LOAD( "epr-14429.ic104", 0x00000, 0x20000, CRC(1ff8262d) SHA1(fb90bd877b2dc65eb3e5495d6e21dee1f871fb44) )
 
 	// ROM_REGION( 0x8000, "m1comm", 0 ) // not present?
-	
+
 	ROM_REGION( 0x100, "plds", 0 )
 	ROM_LOAD( "315-5472-01.ic22", 0x000, 0x0eb, CRC(828ee6e2) SHA1(f32dd0f6297cc8bd3049be4bca502c0f8ec738cf) )
 	// dumps of the X-Board part, and the LINK PCB are missing.

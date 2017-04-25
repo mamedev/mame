@@ -160,7 +160,7 @@ void cpc_multiface2_device::multiface_stop()
 		m_slot->nmi_w(0);
 
 		/* initialise 0065 override to monitor calls to 0065 */
-		//		machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&cpc_multiface2_device::amstrad_multiface_directoverride,this));
+		//      machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&cpc_multiface2_device::amstrad_multiface_directoverride,this));
 	}
 }
 

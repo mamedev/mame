@@ -214,7 +214,7 @@ void ucom4_cpu_device::device_reset()
 
 	// clear i/o
 	for (int i = NEC_UCOM4_PORTC; i <= NEC_UCOM4_PORTI; i++)
-		output_w(i, 0xf);
+		output_w(i, 0);
 }
 
 
