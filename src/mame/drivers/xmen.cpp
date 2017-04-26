@@ -395,11 +395,10 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 
 	MCFG_K053251_ADD("k053251")
 
+	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
