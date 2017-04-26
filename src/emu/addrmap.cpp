@@ -274,23 +274,32 @@ address_map_entry &address_map_entry::set_handler(setoffset_delegate func)
 //  provided unitmask is valid and expected
 //-------------------------------------------------
 
-bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const char *string)
+bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const char *string) const
 {
 	// if no mask, this must match the default width of the map
 	if (unitmask == 0)
 	{
 		if (m_map.m_databits != width)
-			throw emu_fatalerror("Handler %s is a %d-bit handler but was specified in a %d-bit address map", string, width, m_map.m_databits);
+		{
+			osd_printf_error("Handler %s is a %d-bit handler but was specified in a %d-bit address map\n", string, width, m_map.m_databits);
+			return false;
+		}
 		return true;
 	}
 
 	// if we have a mask, we must be smaller than the default width of the map
 	if (m_map.m_databits < width)
-		throw emu_fatalerror("Handler %s is a %d-bit handler and is too wide to be used in a %d-bit address map", string, width, m_map.m_databits);
+	{
+		osd_printf_error("Handler %s is a %d-bit handler and is too wide to be used in a %d-bit address map\n", string, width, m_map.m_databits);
+		return false;
+	}
 
 	// if map is narrower than 64 bits, check the mask width as well
 	if (m_map.m_databits < 64 && (unitmask >> m_map.m_databits) != 0)
-		throw emu_fatalerror("Handler %s specified a mask of %08X%08X, too wide to be used in a %d-bit address map", string, (u32)(unitmask >> 32), (u32)unitmask, m_map.m_databits);
+	{
+		osd_printf_error("Handler %s specified a mask of %08X%08X, too wide to be used in a %d-bit address map\n", string, (u32)(unitmask >> 32), (u32)unitmask, m_map.m_databits);
+		return false;
+	}
 
 	// the mask must represent whole units of width
 	u32 basemask = (width == 8) ? 0xff : (width == 16) ? 0xffff : 0xffffffff;
@@ -301,13 +310,19 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 		if ((unitmask & singlemask) == singlemask)
 			count++;
 		else if ((unitmask & singlemask) != 0)
-			throw emu_fatalerror("Handler %s specified a mask of %08X%08X; needs to be in even chunks of %X", string, (u32)(unitmask >> 32), (u32)unitmask, basemask);
+		{
+			osd_printf_error("Handler %s specified a mask of %08X%08X; needs to be in even chunks of %X\n", string, (u32)(unitmask >> 32), (u32)unitmask, basemask);
+			return false;
+		}
 		singlemask <<= width;
 	}
 
 	// subunit count must be a power of 2
 	if (count != 1 && count != 2 && count != 4 && count != 8)
-		throw emu_fatalerror("Handler %s specifies %d subunits with a mask of %08X%08X; needs to be a power of 2", string, count, (u32)(unitmask >> 32), (u32)unitmask);
+	{
+		osd_printf_error("Handler %s specifies %d subunits with a mask of %08X%08X; needs to be a power of 2\n", string, count, (u32)(unitmask >> 32), (u32)unitmask);
+		return false;
+	}
 
 	// the mask must be symmetrical
 	u64 unitmask_bh = unitmask >> 8 & 0x00ff00ff00ff00ffU;
@@ -319,7 +334,10 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 	if ((unitmask_bh != 0 && unitmask_bl != 0 && unitmask_bh != unitmask_bl)
 		|| (unitmask_wh != 0 && unitmask_wl != 0 && unitmask_wh != unitmask_wl)
 		|| (unitmask_dh != 0 && unitmask_dl != 0 && unitmask_dh != unitmask_dl))
-		throw emu_fatalerror("Handler %s specified an asymmetrical mask of %08X%08X", string, (u32)(unitmask >> 32), (u32)unitmask);
+	{
+		osd_printf_error("Handler %s specified an asymmetrical mask of %08X%08X\n", string, (u32)(unitmask >> 32), (u32)unitmask);
+		return false;
+	}
 
 	return true;
 }
@@ -731,6 +749,9 @@ void address_map::map_validity_check(validity_checker &valid, address_spacenum s
 			if (entry.m_devbase.subdevice(devtag) == nullptr)
 				osd_printf_error("%s space memory map entry reads from nonexistent device '%s'\n", spaceconfig.m_name,
 					devtag != nullptr ? devtag : "<unspecified>");
+#ifndef MAME_DEBUG // assert will catch this earlier
+			(void)entry.unitmask_is_appropriate(entry.m_read.m_bits, entry.m_read.m_mask, entry.m_read.m_name);
+#endif
 		}
 		if (entry.m_write.m_type == AMH_DEVICE_DELEGATE)
 		{
@@ -746,6 +767,9 @@ void address_map::map_validity_check(validity_checker &valid, address_spacenum s
 			if (entry.m_devbase.subdevice(devtag) == nullptr)
 				osd_printf_error("%s space memory map entry writes to nonexistent device '%s'\n", spaceconfig.m_name,
 					devtag != nullptr ? devtag : "<unspecified>");
+#ifndef MAME_DEBUG // assert will catch this earlier
+			(void)entry.unitmask_is_appropriate(entry.m_write.m_bits, entry.m_write.m_mask, entry.m_write.m_name);
+#endif
 		}
 		if (entry.m_setoffsethd.m_type == AMH_DEVICE_DELEGATE)
 		{
