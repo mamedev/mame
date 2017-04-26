@@ -16,7 +16,7 @@
   output.
 
   The 054321 manages three latches (maybe four) to allow communication
-  between the main cpu and the soud cpu, and provides two independant
+  between the main cpu and the sound cpu, and provides two independent
   busses to ensure decoupling.  It also manages one global volume and
   a per-channel mute for two channels.
 
