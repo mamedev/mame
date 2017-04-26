@@ -53,7 +53,7 @@ READ8_MEMBER(cedar_magnet_flop_device::port61_r)
 
 READ8_MEMBER(cedar_magnet_flop_device::port63_r)
 {
-	uint8_t ret = rand();
+	uint8_t ret = machine().rand();
 
 	// printf("%s: port63_r (DATA) (%02x)\n", machine().describe_context(), ret);
 

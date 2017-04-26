@@ -169,7 +169,7 @@ void msisaac_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		if (attributes & 4)
 		{
-			//color = rand() & 15;
+			//color = machine().rand() & 15;
 			gfx = m_gfxdecode->gfx(3);
 		}
 

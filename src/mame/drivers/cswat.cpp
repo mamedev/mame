@@ -132,7 +132,7 @@ READ8_MEMBER(cswat_state::dipswitch_r)
 READ8_MEMBER(cswat_state::sensors_r)
 {
 	// ?
-	return rand();
+	return machine().rand();
 }
 
 static ADDRESS_MAP_START( cswat_map, AS_PROGRAM, 8, cswat_state )

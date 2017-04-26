@@ -1080,7 +1080,7 @@ READ8_MEMBER(fidelz80_state::vbrc_mcu_t0_r)
 READ8_MEMBER(fidelz80_state::vbrc_mcu_t1_r)
 {
 	// T1: ? (locks up on const 0 or 1)
-	return rand() & 1;
+	return machine().rand() & 1;
 }
 
 

@@ -887,7 +887,7 @@ READ16_MEMBER(subsino2_state::bishjan_serial_r)
 	return
 		(machine().rand() & 0x9800) |                     // bit 7 - serial communication
 		(((m_bishjan_sound == 0x12) ? 0x40:0x00) << 8) |  // bit 6 - sound communication
-//      (machine.rand() & 0xff);
+//      (machine().rand() & 0xff);
 //      (((m_screen->frame_number()%60)==0)?0x18:0x00);
 		0x18;
 }

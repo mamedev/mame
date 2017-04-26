@@ -135,7 +135,7 @@ WRITE8_MEMBER(scyclone_state::scyclone_port06_w)
 READ8_MEMBER(scyclone_state::scyclone_port01_r)
 {
 	// TILT is in here at least
-	return 0x00;//machine().rand();
+	return 0x00;
 }
 
 
