@@ -12,7 +12,7 @@
 
     TODO:
     - is presto led handling correct? mux data needs to be auto cleared
-      similar to diablo/sexpert
+      similar to diablo/sexpert. cpu color led should be on while thinking
 
 ******************************************************************************
 
@@ -49,6 +49,9 @@ public:
 	DECLARE_WRITE8_MEMBER(presto_mux_w);
 	DECLARE_WRITE8_MEMBER(presto_control_w);
 	DECLARE_READ8_MEMBER(presto_input_r);
+	DECLARE_MACHINE_RESET(octo);
+	DECLARE_INPUT_CHANGED_MEMBER(octo_cpu_freq);
+	void octo_set_cpu_freq();
 };
 
 
@@ -59,7 +62,7 @@ public:
     Presto/Octo
 ******************************************************************************/
 
-// MCU ports
+// MCU ports/generic
 
 WRITE8_MEMBER(novagmcs48_state::presto_mux_w)
 {
@@ -85,6 +88,18 @@ READ8_MEMBER(novagmcs48_state::presto_input_r)
 {
 	// P10-P17: multiplexed inputs
 	return ~read_inputs(9) & 0xff;
+}
+
+void novagmcs48_state::octo_set_cpu_freq()
+{
+	// Octo was released with either 12MHz or 15MHz CPU
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (15000000) : (12000000));
+}
+
+MACHINE_RESET_MEMBER(novagmcs48_state, octo)
+{
+	novagbase_state::machine_reset();
+	octo_set_cpu_freq();
 }
 
 
@@ -122,6 +137,20 @@ static INPUT_PORTS_START( presto )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Go")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( octo )
+	PORT_INCLUDE( presto )
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, novagmcs48_state, octo_cpu_freq, nullptr) // factory set
+	PORT_CONFSETTING(    0x00, "12MHz" )
+	PORT_CONFSETTING(    0x01, "15MHz" )
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(novagmcs48_state::octo_cpu_freq)
+{
+	octo_set_cpu_freq();
+}
+
 
 
 /******************************************************************************
@@ -148,7 +177,9 @@ static MACHINE_CONFIG_DERIVED( octo, presto )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(12000000) // LC circuit, measured
+	MCFG_DEVICE_CLOCK(12000000) // LC circuit, measured, see octo_set_cpu_freq
+
+	MCFG_MACHINE_RESET_OVERRIDE(novagmcs48_state, octo)
 MACHINE_CONFIG_END
 
 
@@ -175,4 +206,4 @@ ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1984, npresto,  0,       0,      presto,    presto,    driver_device, 0, "Novag", "Presto (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, nocto,    npresto, 0,      octo,      presto,    driver_device, 0, "Novag", "Octo (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, nocto,    npresto, 0,      octo,      octo,      driver_device, 0, "Novag", "Octo (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
