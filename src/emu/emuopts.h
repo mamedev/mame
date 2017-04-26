@@ -197,33 +197,14 @@
 
 struct game_driver;
 class device_slot_interface;
+class emu_options;
 
 class slot_option
 {
 public:
-	slot_option(const char *default_value = nullptr);
-	slot_option(const slot_option &that) = default;
+	slot_option(emu_options &host, const char *default_value);
+	slot_option(const slot_option &that) = delete;
 	slot_option(slot_option &&that) = default;
-
-	const slot_option &operator=(const slot_option &that)
-	{
-		m_specified = that.m_specified;
-		m_specified_value = that.m_specified_value;
-		m_specified_bios = that.m_specified_bios;
-		m_default_card_software = that.m_default_card_software;
-		m_default_value = that.m_default_value;
-		return *this;
-	}
-
-	const slot_option &operator=(slot_option &&that)
-	{
-		m_specified = that.m_specified;
-		m_specified_value = std::move(that.m_specified_value);
-		m_specified_bios = std::move(that.m_specified_bios);
-		m_default_card_software = std::move(that.m_default_card_software);
-		m_default_value = std::move(that.m_default_value);
-		return *this;
-	}
 
 	// accessors
 	const std::string &value() const;
@@ -236,12 +217,15 @@ public:
 	// seters
 	void specify(std::string &&text);
 	void set_bios(std::string &&text);
-	void set_default_card_software(std::string &&s) { m_default_card_software = std::move(s); }
+	void set_default_card_software(std::string &&s);
 
 	// instantiates an option entry (don't call outside of emuopts.cpp)
 	core_options::entry::ptr setup_option_entry(const char *name);
 
 private:
+	void possibly_changed(const std::string &old_value);
+
+	emu_options &			m_host;
 	bool					m_specified;
 	std::string				m_specified_value;
 	std::string				m_specified_bios;
@@ -254,27 +238,9 @@ private:
 class image_option
 {
 public:
-	image_option(std::function<void()> changed = nullptr, const std::string &cannonical_instance_name = "");
+	image_option(emu_options &host, const std::string &cannonical_instance_name);
 	image_option(const image_option &that) = default;
 	image_option(image_option &&that) = default;
-
-	const image_option &operator=(const image_option &that)
-	{
-		m_changed = that.m_changed;
-		m_cannonical_instance_name = that.m_cannonical_instance_name;
-		m_value = that.m_value;
-		m_entry = that.m_entry;
-		return *this;
-	}
-
-	const image_option &operator=(image_option &&that)
-	{
-		m_changed = that.m_changed;
-		m_cannonical_instance_name = std::move(that.m_cannonical_instance_name);
-		m_value = std::move(that.m_value);
-		m_entry = std::move(that.m_entry);
-		return *this;
-	}
 
 	// accessors
 	const std::string &cannonical_instance_name() const { return m_cannonical_instance_name; }
@@ -289,7 +255,7 @@ public:
 	core_options::entry::ptr setup_option_entry(std::vector<std::string> &&names);
 
 private:
-	std::function<void()>	m_changed;	// TODO - change this to emu_options
+	emu_options &			m_host;
 	std::string				m_cannonical_instance_name;
 	std::string				m_value;
 	core_options::entry	*	m_entry;
@@ -298,6 +264,8 @@ private:
 
 class emu_options : public core_options
 {
+	friend class slot_option;
+	friend class image_option;
 public:
 	enum ui_option
 	{

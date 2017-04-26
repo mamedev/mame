@@ -517,7 +517,8 @@ bool emu_options::add_and_remove_slot_options()
 			if (!has_slot_option(slot_option_name))
 			{
 				// we do - add it to m_slot_options
-				m_slot_options[slot_option_name] = ::slot_option(slot.default_option());
+				auto pair = std::make_pair(slot_option_name, ::slot_option(*this, slot.default_option()));
+				::slot_option &new_option(m_slot_options.emplace(std::move(pair)).first->second);
 				changed = true;
 
 				// for non-fixed slots, this slot needs representation in the options collection
@@ -529,7 +530,7 @@ bool emu_options::add_and_remove_slot_options()
 						add_header(header);
 
 					// create a new entry in the options
-					auto new_entry = m_slot_options[slot_option_name].setup_option_entry(slot_option_name);
+					auto new_entry = new_option.setup_option_entry(slot_option_name);
 
 					// and add it
 					add_entry(std::move(new_entry), header);
@@ -614,10 +615,8 @@ bool emu_options::add_and_remove_image_options()
 			if (!this_option)
 			{
 				// we do - add it to both m_image_options_cannonical and m_image_options
-				m_image_options_cannonical[cannonical_name] = ::image_option(
-					[this] { reevaluate_default_card_software(); },
-					image.cannonical_instance_name());
-				this_option = &m_image_options_cannonical[cannonical_name];
+				auto pair = std::make_pair(cannonical_name, ::image_option(*this, image.cannonical_instance_name()));
+				this_option = &m_image_options_cannonical.emplace(std::move(pair)).first->second;
 				changed = true;
 
 				// if this image is user loadable, we have to surface it in the core_options
@@ -673,32 +672,44 @@ void emu_options::reevaluate_default_card_software()
 {
 	if (m_system)
 	{
-		machine_config config(*m_system, *this);
-
-		// iterate through all slot devices
-		for (device_slot_interface &slot : slot_interface_iterator(config.root_device()))
+		bool found;
+		do
 		{
-			// retrieve info about the device instance
-			auto &slot_opt(slot_option(slot.slot_name()));
+			// set up the machine_config
+			machine_config config(*m_system, *this);
+			found = false;
 
-			// device_slot_interface::get_default_card_software() is essentially a hook
-			// that lets devices provide a feedback loop to force a specified software
-			// list entry to be loaded
-			//
-			// In the repeated cycle of adding slots and slot devices, this gives a chance
-			// for devices to "plug in" default software list items.  Of course, the fact
-			// that this is all shuffling options is brittle and roundabout, but such is
-			// the nature of software lists.
-			//
-			// In reality, having some sort of hook into the pipeline of slot/device evaluation
-			// makes sense, but the fact that it is joined at the hip to device_image_interface
-			// and device_slot_interface is unfortunate
-			std::string default_card_software = get_default_card_software(slot);
-			if (slot_opt.default_card_software() != default_card_software)
+			// iterate through all slot devices
+			for (device_slot_interface &slot : slot_interface_iterator(config.root_device()))
 			{
-				slot_opt.set_default_card_software(std::move(default_card_software));
+				// retrieve info about the device instance
+				auto &slot_opt(slot_option(slot.slot_name()));
+
+				// device_slot_interface::get_default_card_software() is essentially a hook
+				// that lets devices provide a feedback loop to force a specified software
+				// list entry to be loaded
+				//
+				// In the repeated cycle of adding slots and slot devices, this gives a chance
+				// for devices to "plug in" default software list items.  Of course, the fact
+				// that this is all shuffling options is brittle and roundabout, but such is
+				// the nature of software lists.
+				//
+				// In reality, having some sort of hook into the pipeline of slot/device evaluation
+				// makes sense, but the fact that it is joined at the hip to device_image_interface
+				// and device_slot_interface is unfortunate
+				std::string default_card_software = get_default_card_software(slot);
+				if (slot_opt.default_card_software() != default_card_software)
+				{
+					slot_opt.set_default_card_software(std::move(default_card_software));
+
+					// calling set_default_card_software() can cause a cascade of slot/image
+					// evaluations; we need to bail out of this loop because the iterator
+					// may be bad
+					found = true;
+					break;
+				}
 			}
-		}
+		} while (found);
 	}
 }
 
@@ -966,8 +977,9 @@ image_option &emu_options::image_option(const std::string &device_name)
 //  slot_option ctor
 //-------------------------------------------------
 
-slot_option::slot_option(const char *default_value)
-	: m_specified(false)
+slot_option::slot_option(emu_options &host, const char *default_value)
+	: m_host(host)
+	, m_specified(false)
 	, m_default_value(default_value ? default_value : "")
 	, m_entry(nullptr)
 {
@@ -1026,9 +1038,11 @@ std::string slot_option::specified_value() const
 
 void slot_option::specify(std::string &&text)
 {
+	// record the old value; we may need to trigger an update
+	std::string old_value = value();
+
 	// we need to do some elementary parsing here
 	const char *bios_arg = ",bios=";
-
 	size_t pos = text.find(bios_arg);
 	if (pos != std::string::npos)
 	{
@@ -1042,6 +1056,37 @@ void slot_option::specify(std::string &&text)
 		m_specified_value = std::move(text);
 		m_specified_bios = "";
 	}
+
+	// we may have changed
+	possibly_changed(old_value);
+}
+
+
+//-------------------------------------------------
+//  slot_option::set_default_card_software
+//-------------------------------------------------
+
+void slot_option::set_default_card_software(std::string &&s)
+{
+	// record the old value; we may need to trigger an update
+	std::string old_value = value();
+
+	// update the default card software
+	m_default_card_software = std::move(s);
+
+	// we may have changed
+	possibly_changed(old_value);
+}
+
+
+//-------------------------------------------------
+//  slot_option::possibly_changed
+//-------------------------------------------------
+
+void slot_option::possibly_changed(const std::string &old_value)
+{
+	if (value() != old_value)
+		m_host.update_slot_and_image_options();
 }
 
 
@@ -1083,8 +1128,8 @@ core_options::entry::ptr slot_option::setup_option_entry(const char *name)
 //	image_option ctor
 //-------------------------------------------------
 
-image_option::image_option(std::function<void()> changed, const std::string &cannonical_instance_name)
-	: m_changed(std::move(changed))
+image_option::image_option(emu_options &host, const std::string &cannonical_instance_name)
+	: m_host(host)
 	, m_cannonical_instance_name(cannonical_instance_name)
 	, m_entry(nullptr)
 {
@@ -1100,7 +1145,7 @@ void image_option::specify(const std::string &value)
 	if (value != m_value)
 	{
 		m_value = value;
-		m_changed();
+		m_host.reevaluate_default_card_software();
 	}
 }
 
@@ -1109,7 +1154,7 @@ void image_option::specify(std::string &&value)
 	if (value != m_value)
 	{
 		m_value = std::move(value);
-		m_changed();
+		m_host.reevaluate_default_card_software();
 	}
 }
 

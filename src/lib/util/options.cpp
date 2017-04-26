@@ -870,8 +870,19 @@ void core_options::set_value(const std::string &name, float value, int priority)
 
 void core_options::remove_entry(core_options::entry &delentry)
 {
-	// NYI
-	throw false;
+	// find this in m_entries
+	auto iter = std::find_if(
+		m_entries.begin(),
+		m_entries.end(),
+		[&delentry](const auto &x) { return &*x == &delentry; });
+	assert(iter != m_entries.end());
+
+	// erase each of the items out of the entry map
+	for (const std::string &name : delentry.names())
+		m_entrymap.erase(name);
+
+	// finally erase it
+	m_entries.erase(iter);
 }
 
 

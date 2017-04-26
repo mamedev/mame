@@ -921,7 +921,7 @@ void lua_engine::initialize()
 			"entries", sol::property([this](core_options &options) {
 				sol::table table = sol().create_table();
 				int unadorned_index = 0;
-				for (auto &curentry : options.entries())
+				for (core_options::entry::ptr &curentry : options.entries())
 				{
 					const char *name = curentry->names().size() > 0
 						? curentry->name().c_str()
@@ -934,7 +934,7 @@ void lua_engine::initialize()
 						is_unadorned = true;
 					}
 					if (curentry->type() != core_options::option_type::HEADER && curentry->type() != core_options::option_type::COMMAND && !is_unadorned)
-						table[name] = &curentry;
+						table[name] = &*curentry;
 				}
 				return table;
 			}));
