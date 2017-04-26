@@ -262,34 +262,9 @@ WRITE16_MEMBER(xexex_state::control2_w)
 	parse_control2();
 }
 
-
-WRITE16_MEMBER(xexex_state::sound_cmd1_w)
-{
-	if(ACCESSING_BITS_0_7)
-	{
-		// anyone knows why 0x1a keeps lurking the sound queue in the world version???
-		if (m_strip_0x1a)
-			if (m_soundlatch2->read(space, 0) == 1 && data == 0x1a)
-				return;
-
-		m_soundlatch->write(space, 0, data & 0xff);
-	}
-}
-
-WRITE16_MEMBER(xexex_state::sound_cmd2_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_soundlatch2->write(space, 0, data & 0xff);
-}
-
 WRITE16_MEMBER(xexex_state::sound_irq_w)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
-READ16_MEMBER(xexex_state::sound_status_r)
-{
-	return m_soundlatch3->read(space, 0);
 }
 
 WRITE8_MEMBER(xexex_state::sound_bankswitch_w)
@@ -378,10 +353,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xexex_state )
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("k053251", k053251_device, lsb_w)               // priority encoder
 //  AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                // CCU
 	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
-	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
-	AM_RANGE(0x0d6014, 0x0d6015) AM_READ(sound_status_r)
-	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM                                 // sound regs fall through
+	AM_RANGE(0x0d6000, 0x0d601f) AM_DEVICE8("k054321", k054321_device, main_map, 0x00ff)
 	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE("k056832", k056832_device, b_word_w)                // VSCCS regs
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2")
@@ -412,9 +384,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xexex_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch3", generic_latch_8_device, write)
-	AM_RANGE(0xf002, 0xf002) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf003, 0xf003) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
+	AM_RANGE(0xf000, 0xf003) AM_DEVICE("k054321", k054321_device, sound_map)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -545,9 +515,7 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) // 4MHz
 	MCFG_SOUND_ROUTE(0, "filter1l", 0.50)

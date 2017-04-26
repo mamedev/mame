@@ -212,6 +212,7 @@ spacewr3                        // bootleg
 spacmiss                        // bootleg?
 spceking                        // (c) 1978 Leijac Corporation (Konami)
 spcewarl                        // (c) 1979 Leijac Corporation (Konami)
+spcewarla                       //
 spcewars                        // (c) 1978 Sanritsu
 spclaser                        // (c) 1980 GamePlan (Taito)
 starw                           // bootleg
@@ -8770,6 +8771,9 @@ bowltry                         // (c) 200? Atlus
 
 @source:boxer.cpp
 boxer                           // ?????? prototype 1978    [6502]
+
+@source:bpmmicro.cpp
+bp1200                          // (c) 1991 BP Microsystems
 
 @source:br8641.cpp
 br8641                          //
@@ -32093,6 +32097,7 @@ mjyarou                         // (c) 1986 Visco / Video System
 openmj                          // (c) 1982 Nichibutsu
 royalmah                        // Falcon bootleg
 royalmj                         // (c) 1982 Nichibutsu
+rkjanoh2
 suzume                          // 04? (c) 1986 Dyna Electronics
 tahjong                         // (c) 1985 Bally Pond / Nasco
 tontonb                         // "09" (c) 1987 Dynax

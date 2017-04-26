@@ -604,6 +604,7 @@ MACHINES["SONY_DRIVE"] = true
 MACHINES["SCNXX562"] = true
 MACHINES["FGA002"] = true
 MACHINES["INPUT_MERGER"] = true
+-- MACHINES["K054321"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -3335,6 +3336,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/binbug.cpp",
 	MAME_DIR .. "src/mame/drivers/besta.cpp",
 	MAME_DIR .. "src/mame/drivers/bitgraph.cpp",
+	MAME_DIR .. "src/mame/drivers/bpmmicro.cpp",
 	MAME_DIR .. "src/mame/drivers/br8641.cpp",
 	MAME_DIR .. "src/mame/drivers/busicom.cpp",
 	MAME_DIR .. "src/mame/includes/busicom.h",

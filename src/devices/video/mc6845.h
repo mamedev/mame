@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, Bartman/Abyss (HD6345)
 /**********************************************************************
 
     Motorola MC6845 and compatible CRT controller emulation
@@ -395,10 +395,16 @@ protected:
 	virtual void device_reset() override;
 };
 
+// HD6345/HD6445 CRTC-II
+// http://bitsavers.informatik.uni-stuttgart.de/pdf/hitachi/_dataBooks/1987_Hitachi_8_16_Bit_Peripheral_LSI_Data_Book.pdf, pp. 99
 class hd6345_device : public mc6845_device
 {
 public:
 	hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_WRITE8_MEMBER(address_w);
+	DECLARE_READ8_MEMBER(register_r);
+	DECLARE_WRITE8_MEMBER(register_w);
 
 protected:
 	virtual void device_start() override;

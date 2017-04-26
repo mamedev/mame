@@ -602,6 +602,7 @@ MACHINES["GENPC"] = true
 MACHINES["GEN_LATCH"] = true
 MACHINES["WATCHDOG"] = true
 MACHINES["INPUT_MERGER"] = true
+MACHINES["K054321"] = true
 
 --------------------------------------------------
 -- specify available bus cores
