@@ -7,7 +7,6 @@
 *************************************************************************/
 #include "sound/okim6295.h"
 #include "sound/k054539.h"
-#include "machine/gen_latch.h"
 #include "machine/k053252.h"
 #include "video/k053251.h"
 #include "video/k054156_k054157_k056832.h"

@@ -6,7 +6,6 @@
 
 *************************************************************************/
 
-#include "machine/gen_latch.h"
 #include "sound/k054539.h"
 #include "video/k053251.h"
 #include "video/k054156_k054157_k056832.h"

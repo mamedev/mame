@@ -69,6 +69,11 @@ void k054321_device::set_gain_devices(const char *_left, const char *_right)
 
 void k054321_device::device_start()
 {
+	save_item(NAME(m_main1));
+	save_item(NAME(m_main2));
+	save_item(NAME(m_sound1));
+	save_item(NAME(m_volume));
+	save_item(NAME(m_active));
 }
 
 READ8_MEMBER( k054321_device::main1_r)
