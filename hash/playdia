@@ -1,0 +1,305 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="playdia" description="Bandai Playdia CD-ROM images">
+<!--Author: Shideravan-->
+<!--The purpose of this list is to document all software properly dumped for this system until now-->
+<!--Known sets used to compose this softwarelist until now: Trurip Bandai - Playdia set-->
+	<software name="aquaadvb">
+		<description>Aqua Adventure - Blue Lilty</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="aqua adventure - blue lilty.chd" sha1="d08f932fb01177fe6eaab94072893665c5a9dd9f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="banitcol">
+		<description>Bandai Item Collection 70' Playdia Bandai</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bandai item collection 70' playdia bandai.chd" sha1="b0ed9b6bb47da9ef46e5409f2d207b91bf373131"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="bssmquiz">
+		<description>Bishoujo Senshi Sailor Moon S - Quiz Taiketsu! Sailor Power Shuketsu!!</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bishoujo senshi sailor moon s - quiz taiketsu! sailor power shuketsu!!.chd" sha1="da12d70c9cdc221ae04711c32ad6eea19d96138a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="bssmhira">
+		<description>Bishoujo Senshi Sailor Moon SuperS - Sailor Moon to Hiragana Lesson!</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bishoujo senshi sailor moon supers - sailor moon to hiragana lesson!.chd" sha1="e16510dc2a445e2de1d9edaaf4cf7f04e0b82c1e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="bssmyouc">
+		<description>Bishoujo Senshi Sailor Moon SuperS - Youkoso! Sailor Youchien</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bishoujo senshi sailor moon supers - youkoso! sailor youchien.chd" sha1="0f7ff2f822b1b314aac51da19d1f247c4780304d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dbzchiku">
+		<description>Dragon Ball Z - Shin Saiyajin Zetsumetsu Keikaku - Chikyuu Hen</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dragon ball z - shin saiyajin zetsumetsu keikaku - chikyuu hen.chd" sha1="f28c268d2dc605ac877141a0d7194d6b0586cb9d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dbzuchuu">
+		<description>Dragon Ball Z - Shin Saiyajin Zetsumetsu Keikaku - Uchuu Hen</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dragon ball z - shin saiyajin zetsumetsu keikaku - uchuu hen.chd" sha1="eb659c33bf590684a3d2e19eb1f855e9499aff18"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="evs1">
+		<description>Elements Voice Series vol.1 Mika Kanai - Wind &amp; Breeze</description>
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="elements voice series vol.1 mika kanai - wind &amp; breeze.chd" sha1="eb1b9d9272d9aa5e440b62fc86aef65cc580e717"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="evs2">
+		<description>Elements Voice Series vol.2 Rica Fukami - Private Step</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="elements voice series vol.2 rica fukami - private step.chd" sha1="c29ad4f57d2e93fc9f6dbbe2b83c7ea4bc2be332"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="evcs3">
+		<description>Elements Voice Series vol.3 Aya Hisakawa - Forest Sways</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="elements voice series vol.3 aya hisakawa - forest sways.chd" sha1="30a71567dc2da625ce79b8c0d86e0c95840528c8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="evcs5d1">
+		<description>Elements Voice Series vol.5 Mariko Koda - Welcome to the Marikotown! (Disc 1)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="elements voice series vol.5 mariko koda - welcome to the marikotown! (disc 1).chd" sha1="c8697ea2d4b5d568ca37109075f142c445f69de5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gamera">
+		<description>Gamera - The Time Adventure</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="gamera - the time adventure.chd" sha1="edd7f33d26aa32a808c3591df4749b192e16b742"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="hellok">
+		<description>Hello Kitty - Yume no Kuni Daiboken</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="hello kitty - yume no kuni daiboken.chd" sha1="facc80b8bc84e07f957cf4c4c4c7568b2ec1ca0e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ienakiko">
+		<description>Ie Naki Ko - Suzu no Sentaku</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ie naki ko - suzu no sentaku.chd" sha1="bd5db6b88fbb15430279d126c0667615a7b9c5c0"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nmkohen">
+		<description>Newton museum - Kyoryu Nendaiki Kohen</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="newton museum - kyoryu nendaiki kohen.chd" sha1="e60717b080abb89f20e2d8bbf3467ac6c82a3f6d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nmzenpen">
+		<description>Newton museum - Kyoryu Nendaiki Zenpen</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="newton museum - kyoryu nendaiki zenpen.chd" sha1="60bb12b663949ab9772d10c99128138c8fe3835d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nbdensha">
+		<description>Norimono Banzai!! - Densha Daishugo!!</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norimono banzai!! - densha daishugo!!.chd" sha1="ae8346cb4c0d1f94d6417698e622529cde85bf5d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nbkuruma">
+		<description>Norimono Banzai!! - Kuruma Daishugo!!</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norimono banzai!! - kuruma daishugo!!.chd" sha1="8894a8f13c93b459ac9365d3b7bf44588a50f3f3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sdgundam">
+		<description>SD Gundam - Daizukan</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sd gundam - daizukan.chd" sha1="1e19b67f1abf2bb6ab071d6e1c976591eff65d69"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="shuppats">
+		<description>Shuppatsu! Dobutsu Tankentai</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="shuppatsu! dobutsu tankentai.chd" sha1="ae7e52842b065ebe630f9a68f1f4ee163b9da85c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="soreike">
+		<description>Soreike! Anpanman - Picnic de Obenkyou</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="soreike! anpanman - picnic de obenkyou.chd" sha1="b86e605704c8666302a133a89b55b6c216e75032"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ultraalp">
+		<description>Ultraman - Alphabet TV e Youkoso</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultraman - alphabet tv e youkoso.chd" sha1="f1fdb47f5cd6dc361b2b5a2e1316e4362172e9af"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ultrahir">
+		<description>Ultraman - Hiragana Dai Sakusen</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultraman - hiragana dai sakusen.chd" sha1="f949d879b38cdcde8eb136bcd78dc5a0aaa5368e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ultrayoc">
+		<description>Ultraman - Oide yo! Ultra Yochien</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultraman - oide yo! ultra yochien.chd" sha1="7a1cc7ee24a4501959e7c39a9b43db4a28db6cce"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ultrachn">
+		<description>Ultraman - Ultraman Chino UP Dai Sakusen</description>
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultraman - ultraman chino up dai sakusen.chd" sha1="6a9cda319362ff08b884e781e11d7ac8b27305da"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ultrapkg">
+		<description>Ultraman Powered - Kaiju Gekimetsu Sakusen</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultraman powered - kaiju gekimetsu sakusen.chd" sha1="4c139abbe003be1cc72187e26d8ffef87788d0b1"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="urutoras">
+		<description>Urutora Sebun - Chikyuu Bouei Sakusen</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="urutora sebun - chikyuu bouei sakusen.chd" sha1="30d93697bb40f5b20013f5d103da56835d4d6e44"/>
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
