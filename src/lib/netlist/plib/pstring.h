@@ -33,7 +33,7 @@ public:
 	typedef typename T::traits_type traits_type;
 
 	pstring_const_iterator() noexcept : p() { }
-	explicit constexpr pstring_const_iterator(const typename string_type::const_iterator &x) noexcept : p(x) { }
+	explicit constexpr pstring_const_iterator(const typename string_type::const_iterator &x) : p(x) { }
 	pstring_const_iterator(const pstring_const_iterator &rhs) = default;
 	pstring_const_iterator(pstring_const_iterator &&rhs) = default;
 	pstring_const_iterator &operator=(const pstring_const_iterator &rhs) = default;

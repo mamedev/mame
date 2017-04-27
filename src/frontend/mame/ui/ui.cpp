@@ -2283,10 +2283,13 @@ void mame_ui_manager::save_main_option()
 			{
 				options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, true);
 			}
-			catch(options_exception &)
+			catch(options_exception &ex)
 			{
-				osd_printf_error("**Error loading %s.ini**", emulator_info::get_configname());
-				return;
+				if (ex.condition() >= options_exception::condition_type::ERROR)
+				{
+					osd_printf_error("**Error loading %s.ini**: %s\n", emulator_info::get_configname(), ex.message().c_str());
+					return;
+				}
 			}
 		}
 	}

@@ -280,7 +280,13 @@ namespace
 
 		virtual const char *value() const override
 		{
-			return m_host.specified_value().c_str();
+			const char *result = nullptr;
+			if (m_host.specified())
+			{
+				m_temp = m_host.specified_value();
+				result = m_temp.c_str();
+			}
+			return result;
 		}
 
 	protected:
@@ -290,7 +296,8 @@ namespace
 		}
 
 	private:
-		slot_option &m_host;
+		slot_option &		m_host;
+		mutable std::string	m_temp;
 	};
 
 	// custom option entry for images

@@ -745,43 +745,47 @@ std::string core_options::output_ini(const core_options *diff) const
 	// loop over all items
 	for (auto &curentry : m_entries)
 	{
-		const std::string &name(curentry->name());
-		const char *value(curentry->value());
-
-		// check if it's unadorned
-		bool is_unadorned = false;
-		if (name == core_options::unadorned(unadorned_index))
-		{
-			unadorned_index++;
-			is_unadorned = true;
-		}
-
-		// header: record description
 		if (curentry->type() == option_type::HEADER)
-			last_header = curentry->description();
-
-		// otherwise, output entries for all non-command items
-		else if (value)
 		{
-			// look up counterpart in diff, if diff is specified
-			if (!diff || strcmp(value, diff->value(name.c_str())))
-			{
-				// output header, if we have one
-				if (last_header)
-				{
-					if (num_valid_headers++)
-						buffer << '\n';
-					util::stream_format(buffer, "#\n# %s\n#\n", last_header);
-					last_header = nullptr;
-				}
+			// header: record description
+			last_header = curentry->description();
+		}
+		else
+		{
+			const std::string &name(curentry->name());
+			const char *value(curentry->value());
 
-				// and finally output the data, skip if unadorned
-				if (!is_unadorned)
+			// check if it's unadorned
+			bool is_unadorned = false;
+			if (name == core_options::unadorned(unadorned_index))
+			{
+				unadorned_index++;
+				is_unadorned = true;
+			}
+
+			// output entries for all non-command items (items with value)
+			if (value)
+			{
+				// look up counterpart in diff, if diff is specified
+				if (!diff || strcmp(value, diff->value(name.c_str())))
 				{
-					if (strchr(value, ' '))
-						util::stream_format(buffer, "%-25s \"%s\"\n", name, value);
-					else
-						util::stream_format(buffer, "%-25s %s\n", name, value);
+					// output header, if we have one
+					if (last_header)
+					{
+						if (num_valid_headers++)
+							buffer << '\n';
+						util::stream_format(buffer, "#\n# %s\n#\n", last_header);
+						last_header = nullptr;
+					}
+
+					// and finally output the data, skip if unadorned
+					if (!is_unadorned)
+					{
+						if (strchr(value, ' '))
+							util::stream_format(buffer, "%-25s \"%s\"\n", name, value);
+						else
+							util::stream_format(buffer, "%-25s %s\n", name, value);
+					}
 				}
 			}
 		}
