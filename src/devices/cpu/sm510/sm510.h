@@ -10,7 +10,6 @@
 #define _SM510_H_
 
 
-
 // I/O ports setup
 
 // 4-bit K input port (pull-down)
@@ -47,6 +46,13 @@
 // LCD bs output: same as above, but only up to 2 bits used
 #define MCFG_SM510_WRITE_SEGBS_CB(_devcb) \
 	devcb = &sm510_base_device::set_write_segbs_callback(*device, DEVCB_##_devcb);
+
+// LCD output lazy combination
+#define MCFG_SM510_WRITE_SEGS_CB(_devcb) \
+	MCFG_SM510_WRITE_SEGA_CB(_devcb) \
+	MCFG_SM510_WRITE_SEGB_CB(_devcb) \
+	MCFG_SM510_WRITE_SEGC_CB(_devcb) \
+	MCFG_SM510_WRITE_SEGBS_CB(_devcb)
 
 // ACL input pin
 #define SM510_INPUT_LINE_ACL INPUT_LINE_RESET

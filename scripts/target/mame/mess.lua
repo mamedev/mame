@@ -2740,6 +2740,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "sharp")
 files {
+	MAME_DIR .. "src/mame/drivers/hh_sm500.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_sm510.cpp",
 	MAME_DIR .. "src/mame/video/mz700.cpp",
 	MAME_DIR .. "src/mame/drivers/mz700.cpp",

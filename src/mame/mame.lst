@@ -14430,6 +14430,9 @@ ttfballa                        // Toytronic
 us2pfball                       // US Games
 uspbball                        // US Games
 
+@source:hh_sm500.cpp
+nupogodi                        //
+
 @source:hh_sm510.cpp
 gnw_bx301                       // Nintendo
 gnw_dm53                        // Nintendo
@@ -14440,7 +14443,6 @@ kgradius                        // Konami
 kloneran                        // Konami
 ktmnt                           // Konami
 ktopgun                         // Konami
-nupogodi                        //
 
 @source:hh_tms1k.cpp
 7in1ss                          // Tiger Electronics

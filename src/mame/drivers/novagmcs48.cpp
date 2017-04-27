@@ -69,7 +69,6 @@ WRITE8_MEMBER(novagmcs48_state::presto_mux_w)
 	// D0-D7: input mux low, led data
 	m_inp_mux = (m_inp_mux & ~0xff) | (~data & 0xff);
 	display_matrix(8, 3, m_inp_mux, m_led_select);
-	m_led_select = 0; // ?
 }
 
 WRITE8_MEMBER(novagmcs48_state::presto_control_w)

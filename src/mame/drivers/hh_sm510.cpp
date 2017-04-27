@@ -225,9 +225,7 @@ static MACHINE_CONFIG_START( ktopgun, ktopgun_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
@@ -296,9 +294,7 @@ static MACHINE_CONFIG_START( kcontra, kcontra_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
@@ -367,9 +363,7 @@ static MACHINE_CONFIG_START( ktmnt, ktmnt_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
@@ -432,9 +426,7 @@ static MACHINE_CONFIG_START( kgradius, kgradius_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
@@ -497,9 +489,7 @@ static MACHINE_CONFIG_START( kloneran, kloneran_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
@@ -562,9 +552,7 @@ static MACHINE_CONFIG_START( dm53, dm53_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r2_w))
@@ -626,9 +614,7 @@ static MACHINE_CONFIG_START( jr55, jr55_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
@@ -685,9 +671,7 @@ static MACHINE_CONFIG_START( ml102, ml102_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
@@ -768,9 +752,7 @@ static MACHINE_CONFIG_START( bx301, bx301_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
-	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
-	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
@@ -781,46 +763,6 @@ static MACHINE_CONFIG_START( bx301, bx301_state )
 	MCFG_SCREEN_SIZE(1920, 529)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 529-1)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
-
-
-
-
-
-/***************************************************************************
-
-  IM-02 Nu, Pogodi!
-  * KB1013VK1-2, die label V2-2 VK1-2
-
-***************************************************************************/
-
-class nupogodi_state : public hh_sm510_state
-{
-public:
-	nupogodi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_sm510_state(mconfig, type, tag)
-	{
-		m_inp_lines = 2;
-	}
-};
-
-// handlers
-
-
-// config
-
-static INPUT_PORTS_START( nupogodi )
-INPUT_PORTS_END
-
-static MACHINE_CONFIG_START( nupogodi, nupogodi_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KB1013VK12, XTAL_32_768kHz)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -934,12 +876,6 @@ ROM_START( gnw_bx301 )
 ROM_END
 
 
-ROM_START( nupogodi )
-	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "nupogodi.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-ROM_END
-
-
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1989, ktopgun,   0,        0, ktopgun,   ktopgun,   driver_device, 0, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
@@ -952,5 +888,3 @@ CONS( 1982, gnw_dm53,  0,        0, dm53,      dm53,      driver_device, 0, "Nin
 CONS( 1983, gnw_jr55,  0,        0, jr55,      jr55,      driver_device, 0, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1983, gnw_ml102, 0,        0, ml102,     ml102,     driver_device, 0, "Nintendo", "Game & Watch: Mario's Cement Factory", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1984, gnw_bx301, 0,        0, bx301,     bx301,     driver_device, 0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-
-CONS( 1984, nupogodi,  0,        0, nupogodi,  nupogodi,  driver_device, 0, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
