@@ -1407,11 +1407,10 @@ static MACHINE_CONFIG_START( can09, can09_state )
 
 	// CRTC  init
 	MCFG_MC6845_ADD("crtc", H46505, "screen", CAN09_CPU_CLOCK) // TODO: Check actual clock source, An 8MHz UKI crystal is also nearby
-#if 0
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(can09_state, crtc_update_row)
-#endif
+	//MCFG_MC6845_UPDATE_ROW_CB(can09_state, crtc_update_row) // not written yet
+
 	/* Setup loop from data table in ROM: 0xFFCB 0xE020 (CRTC register number), 0xFFD0 0xE021 (CRTC register value)
 	    Reg  Value Comment
 	    0x00 0x55  Horizontal Total number of characters,
@@ -1530,7 +1529,7 @@ static MACHINE_CONFIG_START( e100, e100_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* There is a 50Hz signal from the video circuit to CA1 which generates interrupts and drives a software RTC */
-MCFG_TIMER_DRIVER_ADD_PERIODIC("video50hz", e100_state, rtc_w, attotime::from_hz(100)) /* Will be divided by two through toggle in the handler */
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("video50hz", e100_state, rtc_w, attotime::from_hz(100)) /* Will be divided by two through toggle in the handler */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( md6802, md6802_state )
