@@ -2215,11 +2215,6 @@ static MACHINE_CONFIG_DERIVED( sys1pio, sys1ppi )
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(system1_state, videomode_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sys1piox, sys1pio )
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
-
 #define ENCRYPTED_SYS1PPI_MAPS \
 	MCFG_CPU_PROGRAM_MAP(system1_map) \
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map) \
@@ -2232,6 +2227,17 @@ MACHINE_CONFIG_END
 	MCFG_CPU_IO_MAP(system1_pio_io_map) \
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
 
+#define ENCRYPTED_SYS2_MC8123_MAPS \
+	MCFG_CPU_PROGRAM_MAP(system1_map) \
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map) \
+	MCFG_CPU_IO_MAP(system1_ppi_io_map) \
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
+
+
+static MACHINE_CONFIG_DERIVED( sys1pioxb, sys1pio )
+	MCFG_CPU_REPLACE("maincpu", MC8123, MASTER_CLOCK)
+	ENCRYPTED_SYS1PIO_MAPS
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sys1ppix_315_5178, sys1ppi )
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5178, MASTER_CLOCK)
@@ -2463,7 +2469,12 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( sys2xb, sys2 )
-	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", MC8123, MASTER_CLOCK)
+	ENCRYPTED_SYS2_MC8123_MAPS
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sys2xboot, sys2 )
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
@@ -2480,7 +2491,12 @@ static MACHINE_CONFIG_DERIVED( sys2row, sys2 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sys2rowxb, sys2row )
-	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", MC8123, MASTER_CLOCK)
+	ENCRYPTED_SYS2_MC8123_MAPS
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sys2rowxboot, sys2row )
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
@@ -4533,7 +4549,7 @@ ROM_START( wbml )
 	ROM_LOAD( "epr11032.91",  0x10000, 0x8000, CRC(9d03bdb2) SHA1(7dbab23e7c7972d9b51a0d3d046374720b7d6af5) ) /* encrypted */
 	ROM_LOAD( "epr11033.92",  0x18000, 0x8000, CRC(7076905c) SHA1(562fbd9bd60851f7e4e60b725193395b4f193479) ) /* encrypted */
 
-	ROM_REGION( 0x2000, "key", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0043.key",  0x0000, 0x2000, CRC(e354abfc) SHA1(07b0d3c51301ebb25909234b6220a3ed20dbcc7d) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -4565,7 +4581,7 @@ ROM_START( wbmljo )
 	ROM_LOAD( "epr11032.91",  0x10000, 0x8000, CRC(9d03bdb2) SHA1(7dbab23e7c7972d9b51a0d3d046374720b7d6af5) ) /* encrypted */
 	ROM_LOAD( "epr11033.92",  0x18000, 0x8000, CRC(7076905c) SHA1(562fbd9bd60851f7e4e60b725193395b4f193479) ) /* encrypted */
 
-	ROM_REGION( 0x2000, "key", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0043.key",  0x0000, 0x2000, CRC(e354abfc) SHA1(07b0d3c51301ebb25909234b6220a3ed20dbcc7d) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -4847,7 +4863,7 @@ ROM_START( dakkochn )
 	ROM_LOAD( "epr-11225.ic91",  0x10000, 0x8000, CRC(c540f9e2) SHA1(dbda9355e8b796bcfaee2789714d248c4d7ad58c) ) /* encrypted */
 	/* 18000-1ffff empty */
 
-	ROM_REGION( 0x2000, "key", 0 ) /* MC8123B key */
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123B key */
 	ROM_LOAD( "317-5014.key",    0x0000, 0x2000, CRC(bb9df5ad) SHA1(7e7b7255149ae01d19883ecf4a88989f8a9bf4c6) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -4883,7 +4899,7 @@ ROM_START( ufosensi )
 	ROM_LOAD( "epr11662.91",  0x10000, 0x8000, CRC(0c2e4120) SHA1(d81fbefa95868e3efd29ef3bacf108329781ca17) ) /* encrypted */
 	ROM_LOAD( "epr11663.92",  0x18000, 0x8000, CRC(4515ebae) SHA1(9b823f10999746292762c2f0a1ca9039efa22506) ) /* encrypted */
 
-	ROM_REGION( 0x2000, "key", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0064.key",  0x0000, 0x2000, CRC(da326f36) SHA1(0871b351379a094ac578e0eca5cb17797f9085aa) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -4959,7 +4975,7 @@ ROM_START( blockgal )
 	ROM_LOAD( "bg.109",       0x4000, 0x4000, CRC(a6b573d5) SHA1(33547a3895bbe65d5a6c40453eeb93e1fedad6de) ) /* encrypted */
 	/* 0x8000-0xbfff empty (was same as My Hero) */
 
-	ROM_REGION( 0x2000, "key", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0029.key",  0x0000, 0x2000, CRC(350d7f93) SHA1(7ef12d63b2c7150f8e74f65ec8340471d72b1c03) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -5233,7 +5249,7 @@ DRIVER_INIT_MEMBER(system1_state,myherok)
 DRIVER_INIT_MEMBER(system1_state,blockgal)
 {
 	DRIVER_INIT_CALL(bank00);
-	mc8123_decode(m_maincpu_region->base(), m_decrypted_opcodes, memregion("key")->base(), 0x8000);
+	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_decrypted_opcodes, 0x8000);
 }
 
 
@@ -5245,14 +5261,14 @@ DRIVER_INIT_MEMBER(system1_state,wbml)
 {
 	DRIVER_INIT_CALL(bank0c);
 	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
-	mc8123_decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), memregion("key")->base(), m_maincpu_region->bytes());
+	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), m_maincpu_region->bytes());
 }
 
 DRIVER_INIT_MEMBER(system1_state,ufosensi)
 {
 	DRIVER_INIT_CALL(bank0c);
 	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
-	mc8123_decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), memregion("key")->base(), m_maincpu_region->bytes());
+	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), m_maincpu_region->bytes());
 }
 
 
@@ -5261,7 +5277,7 @@ DRIVER_INIT_MEMBER(system1_state,dakkochn)
 {
 	m_videomode_custom = &system1_state::dakkochn_custom_w;
 	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
-	mc8123_decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), memregion("key")->base(), m_maincpu_region->bytes());
+	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), m_maincpu_region->bytes());
 }
 
 
@@ -5430,7 +5446,7 @@ GAME( 1986, wboy4,      wboy,     sys1piox_315_5162, wboy,      system1_state, b
 GAME( 1986, wboyu,      wboy,     sys1pio,           wboyu,     system1_state, bank00,        ROT0,   "Escape (Sega license)", "Wonder Boy (prototype?)", MACHINE_SUPPORTS_SAVE ) // appears to be a very early / unfinished version.
 GAME( 1986, wboy5,      wboy,     sys1piox_315_5135, wboy3,     system1_state, bank00,        ROT0,   "bootleg", "Wonder Boy (set 5, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboyub,     wboy,     sys1piox_315_5177, wboy,      system1_state, bank00,        ROT0,   "bootleg", "Wonder Boy (US bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blockgal,   0,        sys1piox,          blockgal,  system1_state, blockgal,      ROT90,  "Sega / Vic Tokai","Block Gal (MC-8123B, 317-0029)", MACHINE_SUPPORTS_SAVE)
+GAME( 1987, blockgal,   0,        sys1pioxb,         blockgal,  system1_state, blockgal,      ROT90,  "Sega / Vic Tokai","Block Gal (MC-8123B, 317-0029)", MACHINE_SUPPORTS_SAVE)
 
 /* PIO-based System 1 with ROM banking */
 GAME( 1985, hvymetal,   0,        sys1piox_315_5135, hvymetal,  system1_state, bank44,        ROT0,   "Sega", "Heavy Metal (315-5135)", MACHINE_SUPPORTS_SAVE )
@@ -5450,15 +5466,15 @@ GAME( 1986, wboysys2a,  wboy,     sys2_315_5176,     wboysys2,  system1_state, b
 GAME( 1987, tokisens,   0,        sys2,              tokisens,  system1_state, bank0c,          ROT90,  "Sega", "Toki no Senshi - Chrono Soldier", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, wbml,       0,        sys2xb,            wbml,      system1_state, wbml,            ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, wbmljo,     wbml,     sys2xb,            wbml,      system1_state, wbml,            ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbmljb,     wbml,     sys2xb,            wbml,      system1_state, bootsys2,        ROT0,   "bootleg", "Wonder Boy in Monster Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbmlb,      wbml,     sys2xb,            wbml,      system1_state, bootsys2,        ROT0,   "bootleg", "Wonder Boy in Monster Land (English bootleg set 1)", MACHINE_SUPPORTS_SAVE)
-GAME( 1987, wbmlbg,     wbml,     sys2xb,            wbml,      system1_state, bootsys2,        ROT0,   "bootleg (Galaxy Electronics)", "Wonder Boy in Monster Land (English bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbmlbge,    wbml,     sys2xb,            wbml,      system1_state, bootsys2,        ROT0,   "bootleg (Gecas)", "Wonder Boy in Monster Land (English bootleg set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 2009, wbmlvc,     wbml,     sys2xb,            wbml,      system1_state, bootsys2,        ROT0,   "Sega", "Wonder Boy in Monster Land (English, Virtual Console)", MACHINE_SUPPORTS_SAVE )
-GAME( 2009, wbmlvcd,    wbml,     sys2xb,            wbml,      system1_state, bootsys2d,       ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of English, Virtual Console release)", MACHINE_SUPPORTS_SAVE ) // fully decrypted version
-GAME( 1987, wbmld,      wbml,     sys2xb,            wbml,      system1_state, bootsys2d,       ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbmljod,    wbml,     sys2xb,            wbml,      system1_state, bootsys2d,       ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbmljb,     wbml,     sys2xboot,         wbml,      system1_state, bootsys2,        ROT0,   "bootleg", "Wonder Boy in Monster Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbmlb,      wbml,     sys2xboot,         wbml,      system1_state, bootsys2,        ROT0,   "bootleg", "Wonder Boy in Monster Land (English bootleg set 1)", MACHINE_SUPPORTS_SAVE)
+GAME( 1987, wbmlbg,     wbml,     sys2xboot,         wbml,      system1_state, bootsys2,        ROT0,   "bootleg (Galaxy Electronics)", "Wonder Boy in Monster Land (English bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbmlbge,    wbml,     sys2xboot,         wbml,      system1_state, bootsys2,        ROT0,   "bootleg (Gecas)", "Wonder Boy in Monster Land (English bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 2009, wbmlvc,     wbml,     sys2xboot,         wbml,      system1_state, bootsys2,        ROT0,   "Sega", "Wonder Boy in Monster Land (English, Virtual Console)", MACHINE_SUPPORTS_SAVE )
+GAME( 2009, wbmlvcd,    wbml,     sys2xboot,         wbml,      system1_state, bootsys2d,       ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of English, Virtual Console release)", MACHINE_SUPPORTS_SAVE ) // fully decrypted version
+GAME( 1987, wbmld,      wbml,     sys2xboot,         wbml,      system1_state, bootsys2d,       ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbmljod,    wbml,     sys2xboot,         wbml,      system1_state, bootsys2d,       ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, dakkochn,   0,        sys2xb,            dakkochn,  system1_state, dakkochn,        ROT0,   "White Board", "DakkoChan House (MC-8123B, 317-5014)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blockgalb,  blockgal, sys2x,             blockgal,  system1_state, bootleg,         ROT90,  "bootleg", "Block Gal (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ufosensi,   0,        sys2rowxb,         ufosensi,  system1_state, ufosensi,        ROT0,   "Sega", "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ufosensib,  ufosensi, sys2rowxb,         ufosensi,  system1_state, bootsys2,        ROT0,   "bootleg", "Ufo Senshi Yohko Chan (bootleg, not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ufosensib,  ufosensi, sys2rowxboot,      ufosensi,  system1_state, bootsys2,        ROT0,   "bootleg", "Ufo Senshi Yohko Chan (bootleg, not encrypted)", MACHINE_SUPPORTS_SAVE )

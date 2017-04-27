@@ -1059,15 +1059,15 @@ WRITE8_MEMBER(fidelz80_state::vbrc_ioexp_port_w)
 
 WRITE8_MEMBER(fidelz80_state::vbrc_mcu_p1_w)
 {
-	// d0-d7: select digits, input mux
+	// P10-P17: select digits, input mux
 	m_inp_mux = m_led_select = data;
 	vbrc_prepare_display();
 }
 
 READ8_MEMBER(fidelz80_state::vbrc_mcu_p2_r)
 {
-	// d0-d3: I8243 P2
-	// d4-d7: multiplexed inputs (active low)
+	// P20-P23: I8243 P2
+	// P24-P27: multiplexed inputs (active low)
 	return (m_i8243->i8243_p2_r(space, offset) & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
 }
 
@@ -1080,7 +1080,7 @@ READ8_MEMBER(fidelz80_state::vbrc_mcu_t0_r)
 READ8_MEMBER(fidelz80_state::vbrc_mcu_t1_r)
 {
 	// T1: ? (locks up on const 0 or 1)
-	return rand() & 1;
+	return machine().rand() & 1;
 }
 
 

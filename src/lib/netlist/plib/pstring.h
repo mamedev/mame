@@ -34,10 +34,12 @@ public:
 
 	pstring_const_iterator() noexcept : p() { }
 	explicit constexpr pstring_const_iterator(const typename string_type::const_iterator &x) noexcept : p(x) { }
+#if !defined(_MSC_VER) || !defined(_ITERATOR_DEBUG_LEVEL) || (0 == _ITERATOR_DEBUG_LEVEL) // debug iterators are broken
 	pstring_const_iterator(const pstring_const_iterator &rhs) noexcept = default;
 	pstring_const_iterator(pstring_const_iterator &&rhs) noexcept = default;
 	pstring_const_iterator &operator=(const pstring_const_iterator &rhs) noexcept = default;
 	pstring_const_iterator &operator=(pstring_const_iterator &&rhs) noexcept = default;
+#endif
 
 	pstring_const_iterator& operator++() noexcept { p += static_cast<difference_type>(traits_type::codelen(&(*p))); return *this; }
 	pstring_const_iterator operator++(int) noexcept { pstring_const_iterator tmp(*this); operator++(); return tmp; }

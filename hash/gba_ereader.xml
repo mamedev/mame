@@ -4076,6 +4076,1336 @@
 			</dataarea>
 		</part>
 	</software>
+	<software name="dnmra001">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A001 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a001 (japan).raw" size="2912" crc="4b6cd9a7" sha1="6bae00e168d7c54a03143c4c960a495abdd2c6e5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra002">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A002 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a002 (japan).raw" size="2912" crc="277da71c" sha1="61821b65287515e35bd0431b3fc69a8252e8b013"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra003">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A003 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a003 (japan).raw" size="2912" crc="d286bdf7" sha1="11f5507ce082dccc0bfdd3da23e22adc22b9431b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra004">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A004 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a004 (japan).raw" size="2912" crc="31d227a8" sha1="fd02039abb56c111319e3b67709bb6d075c2643b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra005">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A005 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a005 (japan).raw" size="2912" crc="c376f22f" sha1="39620a9a405892e34f33a94a7aae9392dd1b4e3a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra006">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A006 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a006 (japan).raw" size="2912" crc="24ad8ae6" sha1="a81b9d6c48b85528947ee63d04faab72d4fd0224"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra007">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A007 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a007 (japan).raw" size="2912" crc="908319bd" sha1="810f7cac2a67bbef58017bd265fbd6cd1a6bb274"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra008">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A008 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a008 (japan).raw" size="2912" crc="c9156b1d" sha1="daf511292ce369abc41913cd3146963dba375ad7"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra009">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A009 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a009 (japan).raw" size="2912" crc="d8728909" sha1="1aeca03ea8d5af1740c202970af26e2414489d72"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra010">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A010 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a010 (japan).raw" size="2912" crc="6988e4b2" sha1="7ff7c91ec4fff95832fd62e9c585b3f0aff1997a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra011">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A011 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a011 (japan).raw" size="2912" crc="692adb2f" sha1="9adbbaa268491bbd2aaaced0b95f4d6cf6278ee0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra012">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A012 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a012 (japan).raw" size="2912" crc="60ce4de3" sha1="86ccf330c96576803016d56afe8573cc1f95b6e0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra013">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A013 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a013 (japan).raw" size="2912" crc="8bf64baa" sha1="274b659a382905bbb03c0e97aad7da408b46113e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra014">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A014 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a014 (japan).raw" size="2912" crc="945ea796" sha1="8ad03771f648e72a047ed24562490d45c06b2a63"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra015">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A015 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a015 (japan).raw" size="2912" crc="f007a316" sha1="2464ef48e9075f3a5ef67ce4aca41204327f5957"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra016">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A016 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a016 (japan).raw" size="2912" crc="7abb2fce" sha1="23c49dee03f273df8329a20cacb2c90ba12c86d9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra017">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A017 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a017 (japan).raw" size="2912" crc="0f7e3578" sha1="fc522dacf5da0de3807950e407e55a7ec1c1bb89"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra018">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A018 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a018 (japan).raw" size="2912" crc="7c52d73a" sha1="84977e6d5c8eb6b06e037b2a4f93bc159e47d7eb"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra019">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A019 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a019 (japan).raw" size="2912" crc="6123c219" sha1="5d7ff25583f2104d5f75e4ffc30a43985447f5af"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra020">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A020 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a020 (japan).raw" size="2912" crc="7f8609ac" sha1="9213d1575a69cbe114effb2b995594714ba6dc8a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra021">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A021 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a021 (japan).raw" size="2912" crc="c8845141" sha1="ab036538cea29840e1e8fcb19e04651c3200fe48"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra022">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A022 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a022 (japan).raw" size="2912" crc="ebf3b679" sha1="68f390740e8280cb33f5f5dc4fd66631fef6604d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra023">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A023 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a023 (japan).raw" size="2912" crc="19bdaf0e" sha1="8e29850b3445af890292d8f6580e7fe98a0527ca"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra024">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A024 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a024 (japan).raw" size="2912" crc="4d419a78" sha1="a300a510063cbb91227fbd5b607d1201f44a50a8"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra025">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A025 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a025 (japan).raw" size="2912" crc="23da47e5" sha1="e97d312935be2ea607f99663de8ab04ffb9cd708"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra026">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A026 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a026 (japan).raw" size="2912" crc="f0151b38" sha1="b0d38cd03cb8ab5599caaaa049ac272f2bd8e0b5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra027">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A027 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a027 (japan).raw" size="2912" crc="019054bc" sha1="d6f13bc199beb2f68b9ad266426394827fb490dc"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra028">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A028 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a028 (japan).raw" size="2912" crc="393fb96a" sha1="f469d7cfd7969974da55ebb466dc99471af6efa2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra029">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A029 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a029 (japan).raw" size="2912" crc="c889acd0" sha1="e14e835accb5cfe0b1d5cf7ce1d72ad3cc3496fd"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra030">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A030 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a030 (japan).raw" size="2912" crc="06a2d406" sha1="73476231b27d74b3f4fd490915913371c371ca45"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra031">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A031 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a031 (japan).raw" size="2912" crc="c2b13a43" sha1="b7a2d87acf98ed1d000fc8ab05d12f4af33ef602"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra032">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A032 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a032 (japan).raw" size="2912" crc="ecb79968" sha1="683915f076d03d05404a2e97244d64ee0ebf0fa8"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra033">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A033 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a033 (japan).raw" size="2912" crc="43979d84" sha1="edd0d0806b2a747f88fe7169ca26c64d0dedb64a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra034">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A034 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a034 (japan).raw" size="2912" crc="a1ed17eb" sha1="e5690d28df5f61782c66fbf8ca10c609bb2ff0e0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra035">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A035 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a035 (japan).raw" size="2912" crc="3456c260" sha1="46e57b380cc5b415e0bf9efb97387adc07fccc33"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra036">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A036 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a036 (japan).raw" size="2912" crc="7bf532b2" sha1="eb08cd2cd8afa2c88888427b2361745ef0a67fec"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra037">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A037 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a037 (japan).raw" size="2912" crc="a28171fd" sha1="d010e7537184c3292c4039f5e78a4a8d571b4612"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra038">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A038 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a038 (japan).raw" size="2912" crc="ee4cb27f" sha1="f9da373e37d86b1fbfd16a072c2511a623a6c739"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra039">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A039 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a039 (japan).raw" size="2912" crc="93225510" sha1="f7d51e40d47c016c18a8225993510102e068f4cf"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra040">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A040 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a040 (japan).raw" size="2912" crc="f9267adc" sha1="717cebbd17ee1a424a5213fc5ecc31d4102a86e2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra041">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A041 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a041 (japan).raw" size="2912" crc="2be99094" sha1="22e40099a1a74ad16c540fc5b1e4ddd5056a3110"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra042">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A042 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a042 (japan).raw" size="2912" crc="468e9507" sha1="7462d3c0f35757afc3f5542e9dc2118be51db012"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra043">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A043 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a043 (japan).raw" size="2912" crc="b6122a0a" sha1="5148e9157bf01de0f748692fa6a32e7447d00c1d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra044">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A044 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a044 (japan).raw" size="2912" crc="613c05a5" sha1="28ca77950f1e189c2b26c0e2f703a45e36e71e93"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra045">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A045 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a045 (japan).raw" size="2912" crc="a60f112e" sha1="8e1f83d43f183acf71d48cb07dfc61ba90649311"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra046">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A046 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a046 (japan).raw" size="2912" crc="b3c3bc7e" sha1="e262d5a2388f56e38fecc05c167b4237349135e5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra047">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A047 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a047 (japan).raw" size="2912" crc="a7601c1d" sha1="2d493eb3efe7ba5215ae20ae5e438be0da0c199d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra048">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A048 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a048 (japan).raw" size="2912" crc="0bac4e7d" sha1="2b07b7d927020f2637f21a0d8b92ea14d6149a01"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra049">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A049 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a049 (japan).raw" size="2912" crc="5b3725bd" sha1="9eba37ce4505093396635f96dc875152b596f239"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra050">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A050 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a050 (japan).raw" size="2912" crc="71dc0d4f" sha1="044e9c43f27601e2bea43106b4e841e597c8a5f6"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra051">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A051 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a051 (japan).raw" size="2912" crc="945a2211" sha1="a7feb826b606ee05bcdee9d22aa07107f9f8dafc"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra052">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A052 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a052 (japan).raw" size="2912" crc="fdac1b26" sha1="a7a46b848437701a5a3583e522dff1f5476a5fd7"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra053">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A053 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a053 (japan).raw" size="2912" crc="2e4658a5" sha1="3d416d1180ba4da0f7c03b2627b5ad4850b406b5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra054">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A054 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a054 (japan).raw" size="2912" crc="5c4d3d29" sha1="2814a368775f3c7b349c8ec0dffe447433147e17"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra055">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A055 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a055 (japan).raw" size="2912" crc="dc69058f" sha1="f21b14298b9d2526de9f3e2991007e0613ddeeb8"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra056">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A056 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a056 (japan).raw" size="2912" crc="f07d7713" sha1="9e35cbca6a7984db239831933c3b92a59fa4b0e9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra057">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A057 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a057 (japan).raw" size="2912" crc="dd7bd1a9" sha1="dd86ec512093e91c8c9403dfd2221d4aada51a9f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra058">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A058 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a058 (japan).raw" size="2912" crc="a5a0b7b4" sha1="5b4d78650eb12e14772df8f0bc651421be762f18"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra059">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A059 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a059 (japan).raw" size="2912" crc="1af743a8" sha1="490d9d80a91d38dda44408c0b620b100bc6fa334"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra060">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A060 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a060 (japan).raw" size="2912" crc="498e9b06" sha1="0f37d1e480f0c203cc352a7bef49cc364936d656"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra061">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A061 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a061 (japan).raw" size="2912" crc="adf6719f" sha1="967d89bb88edf3b48bccd3efdcf2c6047bcffb65"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra062">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A062 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a062 (japan).raw" size="2912" crc="060e5f90" sha1="d243a5a355857234a8180c93b2b5a2031caa7bfe"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra063">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A063 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a063 (japan).raw" size="2912" crc="ceddf19e" sha1="dd12bab52dcdda4f8c1bbc28277a36a55f335593"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra064">
+		<description>Doubutsu no Mori Card-e - Series 1 - 04-A064 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 1 - 04-a064 (japan).raw" size="2912" crc="3d4e381b" sha1="f78446a90b21fc8c4cc2fa896dd45450394f84d2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra065">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A065 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a065 (japan).raw" size="2912" crc="352bbfd6" sha1="37054811083df7c14d34867cd1fdc14558780f1e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra066">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A066 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a066 (japan).raw" size="2912" crc="b19956bb" sha1="19011e5e8318744840c48126f3841f40a582abff"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra067">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A067 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a067 (japan).raw" size="2912" crc="da193a74" sha1="cd9d5db4566a7ff4c320987a5152c560d498b97a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra068">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A068 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a068 (japan).raw" size="2912" crc="fd7c079c" sha1="b4bda5f2cc7c17d5ec141e813335bd15a11991f8"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra069">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A069 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a069 (japan).raw" size="2912" crc="7e9566e4" sha1="9e1c79e529407c889a3e7b405f4eafb383b8e093"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra070">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A070 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a070 (japan).raw" size="2912" crc="662c5b14" sha1="94c5066dc9a7159f7ea109e8795afdf0c22d0122"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra071">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A071 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a071 (japan).raw" size="2912" crc="6abb43da" sha1="fcb1cd1de300cee86ae2b7126d97328164767166"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra072">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A072 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a072 (japan).raw" size="2912" crc="7c813602" sha1="81a082262ae80d20c391208b06e5be0e08e0fd8e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra073">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A073 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a073 (japan).raw" size="2912" crc="b0f8d0bf" sha1="d8c14739989ad9c17910ebd314f38fb254431e00"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra074">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A074 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a074 (japan).raw" size="2912" crc="0ffb08fd" sha1="0968b56f6f87c36e91eaa40f7c6157ae79710a08"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra075">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A075 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a075 (japan).raw" size="2912" crc="c9b9e975" sha1="3101f415b36ff2f8a8932b6cd9c3322e2ed7d44c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra076">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A076 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a076 (japan).raw" size="2912" crc="861a5d5e" sha1="97a0c13e9b9aad217bf3f869b576e8b6b50ebe35"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra077">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A077 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a077 (japan).raw" size="2912" crc="8c1895aa" sha1="faf8c1a872f34669661c484f423e6fcca99a90f4"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra078">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A078 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a078 (japan).raw" size="2912" crc="04e1df6e" sha1="7dd67e1943ce38ac17ae694bb3b15b81583c1657"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra079">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A079 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a079 (japan).raw" size="2912" crc="8104cfa5" sha1="cc85eb4d83291938c650bbf8e7ad5dd9a1c7a414"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra080">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A080 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a080 (japan).raw" size="2912" crc="855abbae" sha1="8ce3c4c915d1e2a99a045fc871becf17ab03b76a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra081">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A081 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a081 (japan).raw" size="2912" crc="b66464f6" sha1="17c5762cb28ea81db10f0ea3719d38afca6a75d6"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra082">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A082 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a082 (japan).raw" size="2912" crc="3451f808" sha1="dd0f0c71aad4d98cd3c5244adbfcd6fa82694182"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra083">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A083 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a083 (japan).raw" size="2912" crc="cb188b61" sha1="9b10e0b886b57e231da2877b2415de132cd193be"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra084">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A084 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a084 (japan).raw" size="2912" crc="e2eea472" sha1="1a689bcc32b0e4d202b4c73f949981a728e2acfe"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra085">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A085 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a085 (japan).raw" size="2912" crc="e4404a75" sha1="9c244f09ef4085369e75d7b3b17a599a7095a260"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra086">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A086 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a086 (japan).raw" size="2912" crc="10024251" sha1="dcadbc85ce9bce46d1ed9f3de08fd2212bda06bc"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra087">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A087 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a087 (japan).raw" size="2912" crc="e4ee7c9c" sha1="e5283a64dcbb8b4ef3850c8af285e783e953ddd2"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra088">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A088 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a088 (japan).raw" size="2912" crc="87b0cd3a" sha1="0a9e19eeefcd301974d5c91268825b92a9f8d157"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra089">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A089 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a089 (japan).raw" size="2912" crc="f656a089" sha1="b774a1b51942eef4289d44c130149aeb4e2e4715"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra090">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A090 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a090 (japan).raw" size="2912" crc="143c2ea8" sha1="efec5eae9c538d7be9d9078c5952c075ac2aef05"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra091">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A091 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a091 (japan).raw" size="2912" crc="a57cbe42" sha1="864de61a8597d7666beb73eeb99a9611a59a08ac"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra092">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A092 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a092 (japan).raw" size="2912" crc="954f5a65" sha1="0b535eabdcc59e0cd33d8862b640d1b2e93c33b1"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra093">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A093 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a093 (japan).raw" size="2912" crc="437e1e45" sha1="6583a17a266560e9da40152bc3e6944d5d3c10c7"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra094">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A094 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a094 (japan).raw" size="2912" crc="18757e0c" sha1="ed2752b5cd71550483862b9cf6572b8699ed967c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra095">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A095 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a095 (japan).raw" size="2912" crc="70694846" sha1="562871046ff8b12638f9f0cd3fd3857558dea875"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra096">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A096 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a096 (japan).raw" size="2912" crc="bffab3d1" sha1="05daad9e54dae9c29a6ca63728bacabcad88e242"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra097">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A097 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a097 (japan).raw" size="2912" crc="ebd1c3ca" sha1="e94ba72fb0fb8ebebb0c800e5739937897d1ac50"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra098">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A098 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a098 (japan).raw" size="2912" crc="93f44a85" sha1="5151591c54b1624296159700c3e1bd77096d4a74"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra099">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A099 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a099 (japan).raw" size="2912" crc="7efd1a51" sha1="221e97bb6fb1fbf130302105c1d1eb807b6dd5be"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra100">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A100 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a100 (japan).raw" size="2912" crc="3986a77e" sha1="c430b532081ed48a67eb53bcae400871dc44d99f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra101">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A101 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a101 (japan).raw" size="2912" crc="9e09ccec" sha1="728d233fabdfae4ba4b9da8e29a66b3d74b82b10"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra102">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A102 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a102 (japan).raw" size="2912" crc="aef35162" sha1="2cbbd35c9ffa1199cb2fd2c9dfe0b72a5753f32e"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra103">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A103 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a103 (japan).raw" size="2912" crc="8454853c" sha1="e0ce9b042307ce972e7cf400b1c1e8476ae08b08"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra104">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A104 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a104 (japan).raw" size="2912" crc="9d0b9aba" sha1="8de9993859f7f3c098737e8a2811af571cfb3745"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra105">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A105 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a105 (japan).raw" size="2912" crc="6955db36" sha1="31ee66622bd46f7a5ba6dff997f82f05fce18f50"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra106">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A106 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a106 (japan).raw" size="2912" crc="ae79ef3d" sha1="d1c158bfaa1affcf961f4c825857cd9662cacc2f"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra107">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A107 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a107 (japan).raw" size="2912" crc="fb166774" sha1="7c82c9ceeb5cc99ae4a2e3efe3716c4dd1e8af67"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra108">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A108 (Japan)</description>>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a108 (japan).raw" size="2912" crc="8366153c" sha1="975c7c6b0da05ef737b4c619bf66dc7bd46b9d47"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra109">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A109 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a109 (japan).raw" size="2912" crc="511aa560" sha1="9776e71be794a25763c8acad149e5cc6242b7b73"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra110">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A110 (Japan)</description>>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a110 (japan).raw" size="2912" crc="8a50682d" sha1="12849a2a89b216cd9c6876f4337ea5ec78556d57"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra111">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A111 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a111 (japan).raw" size="2912" crc="5fe48566" sha1="e9e8648393e6cce084d1098603f10c268e5105e8"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra112">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A112 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a112 (japan).raw" size="2912" crc="636a695a" sha1="25eaa72399d42cfc71f6d807d7f3df49bb2f5d9b"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra113">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A113 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a113 (japan).raw" size="2912" crc="ecf2435c" sha1="161cd663c22380ebeb9c26835a186ac2d6fa3c06"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra114">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A114 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a114 (japan).raw" size="2912" crc="37dd946f" sha1="29faf724b24e5dc6bea1f7682e756a67fed2ce71"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra115">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A115 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a115 (japan).raw" size="2912" crc="f926c4cd" sha1="bfddaa6d433a48a3ee245cac418afb8ef8c0a4d9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra116">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A116 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a116 (japan).raw" size="2912" crc="89f909ad" sha1="da711f972fc584825a9fe9899cb9b6a07039e079"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra117">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A117 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a117 (japan).raw" size="2912" crc="268b12e7" sha1="bb5cc69182e19b64b61d5e47abbc646b644fffef"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra118">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A118 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a118 (japan).raw" size="2912" crc="7e54ad6a" sha1="e73fd7156950afc8950506cc2b1779ff991a19f1"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmra119">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-A119 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-a119 (japan).raw" size="2912" crc="049ca79a" sha1="934941c8247bfd1880596f8053371dce57f8558d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmrb1s1">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-B01 (Japan) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-b01 (japan) (strip 1).raw" size="2912" crc="6c554d91" sha1="f8d19399dcd4ffb6343f8817532dd413e2b24737"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmrb1s2">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-B01 (Japan) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-b01 (japan) (strip 2).raw" size="2912" crc="0b41810a" sha1="7933ffe400c3472ab76d646ba449d134eaf38ede"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmrm001">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-M01 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-m01 (japan).raw" size="2912" crc="698628e2" sha1="44443986388303b1b4dc417c2ea40a885a924fe5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmrm002">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-M02 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-m02 (japan).raw" size="2912" crc="3d6a164c" sha1="04f2a5fe13dc54ed269c9f9f1679d792eb157872"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmrm003">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-M03 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-m03 (japan).raw" size="2912" crc="fdf21d05" sha1="a317c03269ebc0bb1b1dc8876d562880223441eb"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmrm004">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-M04 (Japan)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-m04 (japan).raw" size="2912" crc="15e5e19a" sha1="e708c3ca4cf7ad11a5f752f41c525a74fc1a29d5"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmrp1s1">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-P01 (Japan) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-p01 (japan) (strip 1).raw" size="2912" crc="a86a4221" sha1="574a38f286592b0bd5c48a4856c7b800aaa08506"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmrp1s2">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-P01 (Japan) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-p01 (japan) (strip 2).raw" size="2912" crc="74bb6f38" sha1="761c6cd4b1cf8672c7ab2f9f670f3f8186791b79"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmrp2s1">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-P02 (Japan) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-p02 (japan) (strip 1).raw" size="2912" crc="d79f4a55" sha1="2ba578498f2549864bb183afb3bfc03ffe074963"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmrp2s2">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-P02 (Japan) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-p02 (japan) (strip 2).raw" size="2912" crc="609f83d6" sha1="8071246f8b7609129a8a90aef09e3a001102a311"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmrp3s1">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-P03 (Japan) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-p03 (japan) (strip 1).raw" size="2912" crc="bab41a8a" sha1="0556970388c3efbcebb764c645e09d8e99900d31"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmrp3s2">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-P03 (Japan) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-p03 (japan) (strip 2).raw" size="2912" crc="c245c781" sha1="52d267a9b02d52d694585d09617c8d876542198a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmrp4s1">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-P04 (Japan) (Strip 1)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-p04 (japan) (strip 1).raw" size="2912" crc="14b945bc" sha1="7dbbed4cb71f6f1094b0f943ac3621e074629b12"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dnmrp4s2">
+		<description>Doubutsu no Mori Card-e - Series 2 - 04-P04 (Japan) (Strip 2)</description>
+		<year>200?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="ereader">
+			<dataarea name="rom" size="2912">
+				<rom name="doubutsu no mori card-e - series 2 - 04-p04 (japan) (strip 2).raw" size="2912" crc="e7900d4f" sha1="01fa3091927cd23fa6da45988428eaf1298b202d"/>
+			</dataarea>
+		</part>
+	</software>	
 	<software name="mpebbu1">
 		<description>Mario Party-e - Big Boo (USA) (Strip 1)</description>
 		<year>200?</year>

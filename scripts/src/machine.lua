@@ -3147,3 +3147,14 @@ if (MACHINES["INPUT_MERGER"]~=null) then
 		MAME_DIR .. "src/devices/machine/input_merger.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/k054321.h,MACHINES["K054321"] = true
+---------------------------------------------------
+if (MACHINES["K054321"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/k054321.cpp",
+		MAME_DIR .. "src/devices/machine/k054321.h",
+	}
+end

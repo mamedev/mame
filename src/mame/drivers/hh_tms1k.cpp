@@ -5567,7 +5567,7 @@ WRITE16_MEMBER(bshipb_state::write_o)
 	m_sn->vco_w(data >> 4 & 1);
 
 	// O5: R11 27K to SN76477 pin 23
-	m_sn->one_shot_cap_w((data & 0x20) ? RES_K(27) : RES_INF);
+	m_sn->one_shot_cap_w((data & 0x20) ? RES_K(27) : 0);
 
 	// O6: SN76477 pin 25
 	m_sn->mixer_b_w(data >> 6 & 1);

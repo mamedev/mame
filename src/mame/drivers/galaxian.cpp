@@ -1325,7 +1325,7 @@ CUSTOM_INPUT_MEMBER(galaxian_state::kingball_noise_r)
 {
 	/* bit 5 is the NOISE line from the sound circuit.  The code just verifies
 	   that it's working, doesn't actually use return value, so we can just use
-	   rand() */
+	   machine().rand() */
 	return machine().rand() & 1;
 }
 

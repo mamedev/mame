@@ -144,6 +144,7 @@
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ym2151.h"
 #include "screen.h"
@@ -229,7 +230,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( apache3_v20_map, AS_PROGRAM, 8, tatsumi_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM
-	AM_RANGE(0x04000, 0x04003) AM_NOP // piu select .. ?
+	AM_RANGE(0x04000, 0x04003) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x06000, 0x06001) AM_READ_PORT("IN0") // esw
 	AM_RANGE(0x08000, 0x08001) AM_READ(tatsumi_hack_ym2151_r) AM_DEVWRITE("ymsnd", ym2151_device, write)
 	AM_RANGE(0x0a000, 0x0a000) AM_READ(tatsumi_hack_oki_r) AM_DEVWRITE("oki", okim6295_device, write)
@@ -268,7 +269,7 @@ static ADDRESS_MAP_START( roundup5_68000_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0xa0000, 0xa0fff) AM_RAM AM_SHARE("roundup_r_ram") // Road control data
 	AM_RANGE(0xb0000, 0xb0fff) AM_RAM AM_SHARE("roundup_p_ram") // Road pixel data
 	AM_RANGE(0xc0000, 0xc0fff) AM_RAM AM_SHARE("roundup_l_ram") // Road colour data
-	AM_RANGE(0xd0002, 0xd0003) AM_WRITE(roundup5_d0000_w) AM_SHARE("ru5_d0000_ram")
+	AM_RANGE(0xd0000, 0xd0003) AM_WRITE(roundup5_d0000_w) AM_SHARE("ru5_d0000_ram")
 	AM_RANGE(0xe0000, 0xe0001) AM_WRITE(roundup5_e0000_w) AM_SHARE("ru5_e0000_ram")
 ADDRESS_MAP_END
 
@@ -277,11 +278,8 @@ static ADDRESS_MAP_START( roundup5_z80_map, AS_PROGRAM, 8, tatsumi_state )
 	AM_RANGE(0xe000, 0xffef) AM_RAM
 	AM_RANGE(0xfff0, 0xfff1) AM_READ(tatsumi_hack_ym2151_r) AM_DEVWRITE("ymsnd", ym2151_device, write)
 	AM_RANGE(0xfff4, 0xfff4) AM_READ(tatsumi_hack_oki_r) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xfff8, 0xfff8) AM_READ_PORT("IN0")
-	AM_RANGE(0xfff9, 0xfff9) AM_READ_PORT("IN1")
+	AM_RANGE(0xfff8, 0xfffb) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xfffc, 0xfffc) AM_READ_PORT("STICKX")
-	AM_RANGE(0xfff9, 0xfff9) AM_WRITENOP //irq ack?
-	AM_RANGE(0xfffa, 0xfffa) AM_WRITENOP //irq ack?
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -453,14 +451,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( roundup5 )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Accelerator")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Brake")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Shift") PORT_TOGGLE
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Turbo")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Accelerator")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Brake")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Shift") PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Turbo")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
@@ -866,6 +864,8 @@ static MACHINE_CONFIG_START( apache3, tatsumi_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_MACHINE_RESET_OVERRIDE(tatsumi_state,apache3)
 
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 280, 0, 240) // TODO: Hook up CRTC
@@ -912,6 +912,10 @@ static MACHINE_CONFIG_START( roundup5, tatsumi_state )
 	MCFG_CPU_PROGRAM_MAP(roundup5_z80_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

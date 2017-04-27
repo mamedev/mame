@@ -132,30 +132,10 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 	}
 }
 
-WRITE16_MEMBER(rungun_state::sound_cmd1_w)
-{
-	if (ACCESSING_BITS_8_15)
-		m_soundlatch->write(space, 0, data >> 8);
-}
-
-WRITE16_MEMBER(rungun_state::sound_cmd2_w)
-{
-	if (ACCESSING_BITS_8_15)
-		m_soundlatch2->write(space, 0, data >> 8);
-}
-
 WRITE16_MEMBER(rungun_state::sound_irq_w)
 {
 	if (ACCESSING_BITS_8_15)
 		m_soundcpu->set_input_line(0, HOLD_LINE);
-}
-
-READ16_MEMBER(rungun_state::sound_status_msb_r)
-{
-	if (ACCESSING_BITS_8_15)
-		return(m_sound_status << 8);
-
-	return 0;
 }
 
 INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
@@ -204,12 +184,7 @@ static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r, rng_sysregs_w) AM_SHARE("sysreg")
 	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                        // CCU (for scanline and vblank polling)
 	AM_RANGE(0x540000, 0x540001) AM_WRITE(sound_irq_w)
-	// 0x580006 written at POST.
-	AM_RANGE(0x58000c, 0x58000d) AM_WRITE(sound_cmd1_w)
-	AM_RANGE(0x58000e, 0x58000f) AM_WRITE(sound_cmd2_w)
-	// 0x580010 status for $580006 writes at POST
-	AM_RANGE(0x580014, 0x580015) AM_READ(sound_status_msb_r)
-	AM_RANGE(0x580000, 0x58001f) AM_RAM                                         // sound regs read/write fall-through
+	AM_RANGE(0x580000, 0x58001f) AM_DEVICE8("k054321", k054321_device, main_map, 0xff00)
 	AM_RANGE(0x5c0000, 0x5c000f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)                       // 246A ROM readback window
 	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVWRITE("k055673", k055673_device, k055673_reg_word_w)
 	AM_RANGE(0x600000, 0x601fff) AM_RAMBANK("spriteram_bank")                                                // OBJ RAM
@@ -269,9 +244,7 @@ static ADDRESS_MAP_START( rungun_sound_map, AS_PROGRAM, 8, rungun_state )
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
 	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("k054539_2", k054539_device, read, write)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_status_w)
-	AM_RANGE(0xf002, 0xf002) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf003, 0xf003) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
+	AM_RANGE(0xf000, 0xf003) AM_DEVICE("k054321", k054321_device, sound_map)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_ctrl_w)
 	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP
 ADDRESS_MAP_END
@@ -464,8 +437,7 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
 	MCFG_K054539_REGION_OVERRRIDE("shared")

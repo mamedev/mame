@@ -135,13 +135,13 @@ WRITE8_MEMBER(scyclone_state::scyclone_port06_w)
 READ8_MEMBER(scyclone_state::scyclone_port01_r)
 {
 	// TILT is in here at least
-	return 0x00;//rand();
+	return 0x00;
 }
 
 
 READ8_MEMBER(scyclone_state::scyclone_port03_r)
 {
-	return rand();
+	return machine().rand();
 }
 
 static const gfx_layout tiles32x32_layout =

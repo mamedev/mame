@@ -16,10 +16,13 @@ Sound Chips :   Custom (NAMCO)
 
 XTAL        :   18.432 MHz
 
-Notes:
-
-- firebatl video (https://tmblr.co/ZgJvzv2E2C_z-) shows transparency for the
-  text layer is not correctly emulated.
+TODO:
+- few unused video registers (2 and 3);
+- clshroad: erratic gameplay speed;
+- firebatl: video (https://tmblr.co/ZgJvzv2E2C_z-) shows transparency for the
+  text layer is not correctly emulated, fixed by initializing VRAM to 0xf0? (that layer seems unused by this game);
+- firebatl: bad sprite colors;
+- firebatl: remove ROM patch;
 
 ***************************************************************************/
 
@@ -31,11 +34,16 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
+/* unknown divider, assume /5 */
+#define MAIN_CLOCK XTAL_18_432MHz/5 
 
 void clshroad_state::machine_reset()
 {
 	flip_screen_set(0);
 	m_main_irq_mask = m_sound_irq_mask = 0;
+	// not initialized by HW, matches grey background on first title screen
+	for(int i = 0;i<0x800;i++)
+		m_vram_0[i] = 0xf0;
 }
 
 
@@ -271,11 +279,11 @@ INTERRUPT_GEN_MEMBER(clshroad_state::sound_timer_irq)
 static MACHINE_CONFIG_START( firebatl, clshroad_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3000000)   /* ? */
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(clshroad_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)  /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
 
@@ -305,14 +313,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( clshroad, clshroad_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/4)  /* ? real speed unknown. 3MHz is too low and causes problems */
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)  /* ? real speed unknown. 3MHz is too low and causes problems */
 	MCFG_CPU_PROGRAM_MAP(clshroad_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6) /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK) /* ? */
 	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
-
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
+	MCFG_CPU_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 60)    /* periodic interrupt, don't know about the frequency */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

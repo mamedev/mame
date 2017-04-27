@@ -101,7 +101,7 @@ void nubus_mac8390_device::device_start()
 {
 	uint32_t slotspace;
 	char mac[7];
-	uint32_t num = rand();
+	uint32_t num = machine().rand();
 	memset(m_prom, 0x57, 16);
 	sprintf(mac+2, "\x1b%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
 	mac[0] = mac[1] = 0;  // avoid gcc warning

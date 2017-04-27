@@ -1085,7 +1085,8 @@ WRITE_LINE_MEMBER( sn76477_device::vco_w )
 
 void sn76477_device::one_shot_res_w(double data)
 {
-	CHECK_POSITIVE;
+	if (data != RES_INF)
+		CHECK_POSITIVE;
 
 	if (data != m_one_shot_res)
 	{
@@ -1162,7 +1163,8 @@ void sn76477_device::one_shot_cap_voltage_w(double data)
 
 void sn76477_device::slf_res_w(double data)
 {
-	CHECK_POSITIVE;
+	if (data != RES_INF)
+		CHECK_POSITIVE;
 
 	if (data != m_slf_res)
 	{
@@ -1241,7 +1243,8 @@ void sn76477_device::slf_cap_voltage_w(double data)
 
 void sn76477_device::vco_res_w(double data)
 {
-	CHECK_POSITIVE;
+	if (data != RES_INF)
+		CHECK_POSITIVE;
 
 	if (data != m_vco_res)
 	{
@@ -1385,7 +1388,8 @@ WRITE_LINE_MEMBER( sn76477_device::noise_clock_w )
 
 void sn76477_device::noise_clock_res_w(double data)
 {
-	CHECK_POSITIVE;
+	if (data != RES_INF)
+		CHECK_POSITIVE;
 
 	if (((data == 0) && !m_noise_clock_ext) ||
 		((data != 0) && (data != m_noise_clock_res)))
@@ -1415,7 +1419,8 @@ void sn76477_device::noise_clock_res_w(double data)
 
 void sn76477_device::noise_filter_res_w(double data)
 {
-	CHECK_POSITIVE;
+	if (data != RES_INF)
+		CHECK_POSITIVE;
 
 	if (data != m_noise_filter_res)
 	{
@@ -1492,7 +1497,8 @@ void sn76477_device::noise_filter_cap_voltage_w(double data)
 
 void sn76477_device::attack_res_w(double data)
 {
-	CHECK_POSITIVE;
+	if (data != RES_INF)
+		CHECK_POSITIVE;
 
 	if (data != m_attack_res)
 	{
@@ -1512,7 +1518,8 @@ void sn76477_device::attack_res_w(double data)
 
 void sn76477_device::decay_res_w(double data)
 {
-	CHECK_POSITIVE;
+	if (data != RES_INF)
+		CHECK_POSITIVE;
 
 	if (data != m_decay_res)
 	{
@@ -1592,7 +1599,8 @@ void sn76477_device::attack_decay_cap_voltage_w(double data)
 
 void sn76477_device::amplitude_res_w(double data)
 {
-	CHECK_POSITIVE;
+	if (data != RES_INF)
+		CHECK_POSITIVE;
 
 	if (data != m_amplitude_res)
 	{
@@ -1612,7 +1620,8 @@ void sn76477_device::amplitude_res_w(double data)
 
 void sn76477_device::feedback_res_w(double data)
 {
-	CHECK_POSITIVE;
+	if (data != RES_INF)
+		CHECK_POSITIVE;
 
 	if (data != m_feedback_res)
 	{

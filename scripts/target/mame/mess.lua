@@ -604,6 +604,7 @@ MACHINES["SONY_DRIVE"] = true
 MACHINES["SCNXX562"] = true
 MACHINES["FGA002"] = true
 MACHINES["INPUT_MERGER"] = true
+-- MACHINES["K054321"] = true
 
 --------------------------------------------------
 -- specify available bus cores
