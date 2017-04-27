@@ -31,6 +31,7 @@ class ef9345_device :   public device_t,
 public:
 	// construction/destruction
 	ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
@@ -58,6 +59,12 @@ protected:
 	inline uint16_t indexrom(uint8_t r);
 	inline void inc_x(uint8_t r);
 	inline void inc_y(uint8_t r);
+
+	enum
+	{
+		TYPE_EF9345    = 0x001,
+		TYPE_TS9347    = 0x002
+	};
 
 private:
 
@@ -109,10 +116,19 @@ private:
 	emu_timer *m_busy_timer;
 	emu_timer *m_blink_timer;
 
+	int m_variant;
+
 	required_device<palette_device> m_palette;
+};
+
+class ts9347_device : public ef9345_device
+{
+public :
+	ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 // device type definition
 extern const device_type EF9345;
+extern const device_type TS9347;
 
 #endif
