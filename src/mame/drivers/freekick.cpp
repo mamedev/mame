@@ -837,6 +837,8 @@ static MACHINE_CONFIG_DERIVED( gigasm, base )
 	MCFG_CPU_PROGRAM_MAP(gigas_map)
 	MCFG_CPU_IO_MAP(gigas_io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)

@@ -117,7 +117,7 @@ void cedar_magnet_sprite_device::do_blit()
 			uint8_t data = m_ram[source + ((m_uppersprite & 0x3) * 0x10000)];
 
 			if (!(pio0_pb_data & 0x02))
-				data = rand();
+				data = machine().rand();
 
 			source++;
 

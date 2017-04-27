@@ -252,7 +252,6 @@ maybe some sprite placement issues
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
-#include "machine/gen_latch.h"
 #include "machine/eepromser.h"
 #include "sound/k054539.h"
 #include "screen.h"

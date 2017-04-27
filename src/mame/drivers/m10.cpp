@@ -170,6 +170,8 @@ PALETTE_INIT_MEMBER(m10_state,m10)
 
 MACHINE_START_MEMBER(m10_state,m10)
 {
+	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
+
 	save_item(NAME(m_bottomline));
 	save_item(NAME(m_flip));
 	save_item(NAME(m_last));
@@ -475,12 +477,12 @@ TIMER_CALLBACK_MEMBER(m10_state::interrupt_callback)
 	if (param == 0)
 	{
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-		timer_set(m_screen->time_until_pos(IREMM10_VBSTART + 16), TIMER_INTERRUPT, 1);
+		m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBSTART + 16), 1);
 	}
 	if (param == 1)
 	{
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-		timer_set(m_screen->time_until_pos(IREMM10_VBSTART + 24), TIMER_INTERRUPT, 2);
+		m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBSTART + 24), 2);
 	}
 	if (param == -1)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -502,7 +504,7 @@ void m10_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 INTERRUPT_GEN_MEMBER(m10_state::m11_interrupt)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	//timer_set(m_screen->time_until_pos(IREMM10_VBEND), TIMER_INTERRUPT, -1);
+	//m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBEND), -1);
 }
 
 INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
@@ -514,7 +516,7 @@ INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
 INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	timer_set(m_screen->time_until_pos(IREMM10_VBSTART + 1, 80), TIMER_INTERRUPT, -1);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBSTART + 1, 80), -1);
 }
 
 /*************************************

@@ -233,7 +233,7 @@ public:
 
 	DECLARE_READ32_MEMBER(leapster_random_r)
 	{
-		return rand() | (rand()<<16); // there is a loop checking that this is above a certain value
+		return machine().rand() | (machine().rand()<<16); // there is a loop checking that this is above a certain value
 	}
 
 	DECLARE_WRITE32_MEMBER(leapster_aux004b_w)

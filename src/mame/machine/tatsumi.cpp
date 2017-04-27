@@ -290,7 +290,7 @@ READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
 {
 	const uint16_t* rom=(uint16_t*)memregion("sub")->base();
 
-logerror("%05X:68000_r(%04X),cw=%04X\n", space.device().safe_pc(), offset*2, m_control_word);
+//logerror("%05X:68000_r(%04X),cw=%04X\n", space.device().safe_pc(), offset*2, m_control_word);
 	/* Read from 68k RAM */
 	if ((m_control_word&0x1f)==0x18)
 	{

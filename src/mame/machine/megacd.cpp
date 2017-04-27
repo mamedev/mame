@@ -1433,7 +1433,7 @@ inline uint8_t sega_segacd_device::read_pixel_from_stampmap(bitmap_ind16* srcbit
 /*
     if (!srcbitmap)
     {
-        return machine.rand();
+        return machine().rand();
     }
 
     if (x >= srcbitmap->width) return 0;

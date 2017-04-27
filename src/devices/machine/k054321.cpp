@@ -16,7 +16,7 @@
   output.
 
   The 054321 manages three latches (maybe four) to allow communication
-  between the main cpu and the soud cpu, and provides two independant
+  between the main cpu and the sound cpu, and provides two independent
   busses to ensure decoupling.  It also manages one global volume and
   a per-channel mute for two channels.
 
@@ -69,6 +69,11 @@ void k054321_device::set_gain_devices(const char *_left, const char *_right)
 
 void k054321_device::device_start()
 {
+	save_item(NAME(m_main1));
+	save_item(NAME(m_main2));
+	save_item(NAME(m_sound1));
+	save_item(NAME(m_volume));
+	save_item(NAME(m_active));
 }
 
 READ8_MEMBER( k054321_device::main1_r)

@@ -871,7 +871,7 @@ ADDRESS_MAP_END
 READ8_MEMBER(arkanoid_state::hexaa_f000_r)
 {
 //  return m_hexaa_from_sub;
-	return rand();
+	return machine().rand();
 }
 
 WRITE8_MEMBER(arkanoid_state::hexaa_f000_w)
@@ -905,7 +905,7 @@ WRITE8_MEMBER(arkanoid_state::hexaa_sub_80_w)
 READ8_MEMBER(arkanoid_state::hexaa_sub_90_r)
 {
 	return m_hexaa_from_main;
-//  return rand();
+//  return machine().rand();
 }
 
 static ADDRESS_MAP_START( hexaa_sub_iomap, AS_IO, 8, arkanoid_state )

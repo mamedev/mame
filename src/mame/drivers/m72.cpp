@@ -407,7 +407,7 @@ READ8_MEMBER(m72_state::mcu_data_r)
 INTERRUPT_GEN_MEMBER(m72_state::mcu_int)
 {
 	//m_mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
-	m_mcu_snd_cmd_latch = 0x11;// | (machine.rand() & 1); /* 0x10 is special as well - FIXME */
+	m_mcu_snd_cmd_latch = 0x11;// | (machine().rand() & 1); /* 0x10 is special as well - FIXME */
 	device.execute().set_input_line(1, ASSERT_LINE);
 }
 
