@@ -385,8 +385,8 @@ WRITE8_MEMBER(gts1_state::gts1_solenoid_w)
 		break;
 	case 14:    // RAM control W/R
 		LOG(("%s: RAM control W/R <- %x\n", __FUNCTION__, data));
-		break;
 		m_nvram_wr = (data & 1) ? true : false;
+		break;
 	case 15:    // spare
 		LOG(("%s: spare [%x] <- %x\n", __FUNCTION__, offset, data));
 		break;

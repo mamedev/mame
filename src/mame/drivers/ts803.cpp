@@ -215,10 +215,11 @@ d7 Drive select 3 (active low)
 
 	m_fdc->set_floppy(floppy);
 
-	floppy->mon_w(BIT(data, 1));
-
-	floppy->ss_w(BIT(data, 2) ? 0: 1);
-
+	if (floppy)
+	{
+		floppy->mon_w(BIT(data, 1));
+		floppy->ss_w(BIT(data, 2) ? 0: 1);
+	}
 	m_fdc->dden_w(BIT(data, 3));
 }
 
