@@ -84,18 +84,22 @@ public:
 		{
 		}
 
-	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_READ8_MEMBER(port_r);
-
-	DECLARE_WRITE8_MEMBER(dev_crtl_reg_w);
-	DECLARE_READ8_MEMBER(dev_keyb_ser_r);
-
-	DECLARE_READ8_MEMBER ( ts9347_io_r );
-	DECLARE_WRITE8_MEMBER ( ts9347_io_w );
 	required_device<cpu_device> m_maincpu;
 	required_device<ts9347_device> m_ts9347;
 	required_device<palette_device> m_palette;
 
+	TIMER_DEVICE_CALLBACK_MEMBER(minitel_scanline);
+
+	DECLARE_WRITE8_MEMBER ( port_w );
+	DECLARE_READ8_MEMBER ( port_r );
+	
+	DECLARE_WRITE8_MEMBER ( dev_crtl_reg_w );
+	DECLARE_READ8_MEMBER ( dev_keyb_ser_r );
+
+	DECLARE_READ8_MEMBER ( ts9347_io_r );
+	DECLARE_WRITE8_MEMBER ( ts9347_io_w );
+
+protected:
 	virtual void machine_start() override;
 
 	char port0, port1, port2, port3;
@@ -104,8 +108,6 @@ public:
 	unsigned char keyboard_x_row_reg;
 
 	unsigned char last_ctrl_reg;
-
-	TIMER_DEVICE_CALLBACK_MEMBER(minitel_scanline);
 };
 
 void minitel_state::machine_start()
