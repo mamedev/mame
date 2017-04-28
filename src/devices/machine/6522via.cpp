@@ -39,9 +39,8 @@
 #define LOG_READ    (1U <<  3)
 #define LOG_INT     (1U <<  4)
 
-#define VERBOSE (LOG_SETUP | LOG_SHIFT | LOG_INT)
 //#define VERBOSE (LOG_SHIFT)
-#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC printf
 
 #include "logmacro.h"
 
@@ -179,8 +178,7 @@ via6522_device::via6522_device(const machine_config &mconfig, const char *tag, d
 		m_pcr(0),
 		m_acr(0),
 		m_ier(0),
-		m_ifr(0),
-		m_shift_state(SHIFTER_IDLE)
+		m_ifr(0)
 {
 }
 
@@ -414,75 +412,17 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_out_cb1 ^= 1;
 			m_cb1_handler(m_out_cb1);
 
-#if 0
-//			if ((SO_O2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr)) && m_shift_state == SHIFTER_FINISH)
-			if (m_shift_state == SHIFTER_FINISH)
-			{
-				if (m_out_cb1 & 1)  // last raising flank
-				{
-#if 0
-                    if (SO_O2_CONTROL(m_acr))
-                        shift_out();
-                    else
-#endif
-                    if (SI_O2_CONTROL(m_acr))
-                        shift_in();
-					m_shift_state = SHIFTER_IDLE;
-					m_shift_timer->adjust(attotime::never);
-					LOGSHIFT("Timer stops");
-				}
-				else // last falling flank (just for shift in)
-				{
-					m_shift_timer->adjust(clocks_to_attotime(1));
-				}
-				break;
-			}
-#endif
-#if 1
             // we call shift methods for all flanks
-				if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
-                {
-					shift_out();
-                }
-                else if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
-				{
-					shift_in();
-                }
-#else
-			if (m_out_cb1 & 1) // raising flank
-			{
-				if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
-				{
-					shift_in(); // close latch
+            if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
+            {
+                shift_out();
+            }
+            else if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
+            {
+                shift_in();
+            }
 
-					// Shift in also on the last flanks
-					if (m_shift_counter == 0)
-					{
-						m_shift_state = SHIFTER_FINISH;
-						m_shift_timer->adjust(clocks_to_attotime(1));
-					}
-				}
-                else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
-                    m_shift_counter = (m_shift_counter - 1) & 7;
-			}
-			else // falling flank
-			{
-				if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
-				{
-					shift_out(); // close latch
-				}
-				else if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
-                    m_shift_counter = (m_shift_counter - 1) & 7;
-
-				// Let external devices latch also on last raising edge.
-				if ((SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr)) && m_shift_counter == 0)
-				{
-					m_shift_state = SHIFTER_FINISH;
-					m_shift_timer->adjust(clocks_to_attotime(1));
-				}
-			}
-#endif
-
+            // If in continous mode or the shifter is still shifting we re-arm the timer
 			if (SO_T2_RATE(m_acr) || (m_shift_counter != 0x0f))
 			{
 				if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
@@ -493,9 +433,9 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				{
 					m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
 				}
-                else
+                else // otherwise we stop it
                 {
-                    m_shift_timer->adjust(attotime::never); // In case we change mode before counter expire
+                    m_shift_timer->adjust(attotime::never);
                 }
             }
 			break;
@@ -719,7 +659,6 @@ READ8_MEMBER( via6522_device::read )
 		if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 		{
 			m_shift_timer->adjust(clocks_to_attotime(8)); // 8 flanks to start shifter from a read
-//			shift_in();
 			LOGSHIFT(" - read SR starts O2 timer ");
 		}
 		else if (SI_T2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr))
@@ -912,7 +851,7 @@ WRITE8_MEMBER( via6522_device::write )
 			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
 			LOGSHIFT(" - write starts T2 timer");
 		}
-		else // if (! (SI_O2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr)))
+		else
 		{
 			m_shift_timer->adjust(attotime::never); // In case we change mode before counter expire
 			LOGSHIFT(" - timer stops");
@@ -1089,19 +1028,6 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 			{
 				m_latch_b = input_pb();
 			}
-#if 0
-			if (!state && SO_EXT_CONTROL(m_acr))
-			{
-                LOGSHIFT("SHIFT OUT EXT/CB1 %s edge, %d\n", m_in_cb1 & 1 ? "raising" : "falling", m_shift_counter);
-				shift_out();
-			}
-
-			if (state && SI_EXT_CONTROL(m_acr))
-			{
-                LOGSHIFT("SHIFT IN EXT/CB1 %s edge, %d\n", m_in_cb1 & 1 ? "raising" : "falling", m_shift_counter);
-				shift_in();
-			}
-#endif
 			LOGINT("CB1 INT request ");
 			set_int(INT_CB1);
 
@@ -1111,29 +1037,18 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 				m_cb2_handler(1);
 			}
 		}
-#if 0
-		else // shift is not controlled by m_pcr
-		{
-#endif
-//			if (!state && SO_EXT_CONTROL(m_acr))
-			if (SO_EXT_CONTROL(m_acr))
-			{
-                LOGSHIFT("SHIFT OUT EXT/CB1 falling edge, %d\n",  m_shift_counter);
-				shift_out();
-			}
-//			else if (state && SI_EXT_CONTROL(m_acr))
-			else if (SI_EXT_CONTROL(m_acr))
-			{
-                LOGSHIFT("SHIFT IN EXT/CB1 raising edge, %d\n", m_shift_counter);
-				shift_in();
-			}
-#if 0
-			else if ( (!state && SI_EXT_CONTROL(m_acr)) || (state && SO_EXT_CONTROL(m_acr)) )
-			{
-                m_shift_counter = (m_shift_counter - 1) & 7;
-            }
-#endif
-//		}
+
+		// The shifter shift is not controlled by PCR
+        if (SO_EXT_CONTROL(m_acr))
+        {
+            LOGSHIFT("SHIFT OUT EXT/CB1 falling edge, %d\n",  m_shift_counter);
+            shift_out();
+        }
+        else if (SI_EXT_CONTROL(m_acr))
+        {
+            LOGSHIFT("SHIFT IN EXT/CB1 raising edge, %d\n", m_shift_counter);
+            shift_in();
+        }
 	}
 }
 
