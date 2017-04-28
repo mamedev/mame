@@ -54,6 +54,8 @@
 #include "screen.h"
 #include "softlist.h"
 
+#include "logmacro.h"
+
 // IO expander latch usage definitions
 #define CTRL_REG_DTMF  0x02
 #define CTRL_REG_MCBC  0x04
@@ -70,8 +72,6 @@
 #define PORT_1_KBLOAD  0x20
 #define PORT_1_SCL     0x40
 #define PORT_1_SDA     0x80
-
-//#define DEBUG_MINITEL 1
 
 class minitel_state : public driver_device
 {
@@ -122,9 +122,7 @@ void minitel_state::machine_start()
 
 WRITE8_MEMBER(minitel_state::port_w)
 {
-	#ifdef DEBUG_MINITEL
-	printf("port_w: write %02X to PORT (offset=%02X)\n", data, offset);
-	#endif
+	LOG("port_w: write %02X to PORT (offset=%02X)\n", data, offset);
 
 	switch(offset| 0x20000)
 	{
@@ -135,44 +133,32 @@ WRITE8_MEMBER(minitel_state::port_w)
 
 			if( (port1 ^ data) & PORT_1_KBSERIN )
 			{
-				#ifdef DEBUG_MINITEL
-				printf("PORT_1_KBSERIN : %d \n", data & PORT_1_KBSERIN );
-				#endif
+				LOG("PORT_1_KBSERIN : %d \n", data & PORT_1_KBSERIN );
 			}
 
 			if( (port1 ^ data) & PORT_1_MDM_DCD )
 			{
-				#ifdef DEBUG_MINITEL
-				printf("PORT_1_MDM_DCD : %d \n", data & PORT_1_MDM_DCD );
-				#endif
+				LOG("PORT_1_MDM_DCD : %d \n", data & PORT_1_MDM_DCD );
 			}
 
 			if( (port1 ^ data) & PORT_1_MDM_PRD )
 			{
-				#ifdef DEBUG_MINITEL
-				printf("PORT_1_MDM_PRD : %d \n", data & PORT_1_MDM_PRD );
-				#endif
+				LOG("PORT_1_MDM_PRD : %d \n", data & PORT_1_MDM_PRD );
 			}
 
 			if( (port1 ^ data) & PORT_1_MDM_TXD )
 			{
-				#ifdef DEBUG_MINITEL
-				printf("PORT_1_MDM_TXD : %d \n", data & PORT_1_MDM_TXD );
-				#endif
+				LOG("PORT_1_MDM_TXD : %d \n", data & PORT_1_MDM_TXD );
 			}
 
 			if( (port1 ^ data) & PORT_1_MDM_RTS )
 			{
-				#ifdef DEBUG_MINITEL
-				printf("PORT_1_MDM_RTS : %d \n", data & PORT_1_MDM_RTS );
-				#endif
+				LOG("PORT_1_MDM_RTS : %d \n", data & PORT_1_MDM_RTS );
 			}
 
 			if( (port1 ^ data) & PORT_1_KBLOAD )
 			{
-				#ifdef DEBUG_MINITEL
-				printf("PORT_1_KBLOAD : %d PC:0x%x\n", data & PORT_1_KBLOAD,m_maincpu->pc() );
-				#endif
+				LOG("PORT_1_KBLOAD : %d PC:0x%x\n", data & PORT_1_KBLOAD,m_maincpu->pc() );
 
 				if(data & PORT_1_KBLOAD)
 					keyboard_para_ser = 1;
@@ -182,16 +168,12 @@ WRITE8_MEMBER(minitel_state::port_w)
 
 			if( (port1 ^ data) & PORT_1_SCL )
 			{
-				#ifdef DEBUG_MINITEL
-				printf("PORT_1_SCL : %d \n", data & PORT_1_SCL );
-				#endif
+				LOG("PORT_1_SCL : %d \n", data & PORT_1_SCL );
 			}
 
 			if( (port1 ^ data) & PORT_1_SDA )
 			{
-				#ifdef DEBUG_MINITEL
-				printf("PORT_1_SDA : %d \n", data & PORT_1_SDA );
-				#endif
+				LOG("PORT_1_SDA : %d \n", data & PORT_1_SDA );
 			}
 
 			port1=data;
@@ -209,31 +191,21 @@ WRITE8_MEMBER(minitel_state::port_w)
 
 READ8_MEMBER(minitel_state::port_r)
 {
-	#ifdef DEBUG_MINITEL
-	printf("port_r: read PORT (offset=%02X) %x\n", offset,m_maincpu->pc());
-	#endif
+	LOG("port_r: read PORT (offset=%02X) %x\n", offset,m_maincpu->pc());
 
 	switch(offset | 0x20000)
 	{
 		case MCS51_PORT_P0:
-			#ifdef DEBUG_MINITEL
-			printf("port_r: read %02X from PORT0\n", port0);
-			#endif
+			LOG("port_r: read %02X from PORT0\n", port0);
 			return port0;
 		case MCS51_PORT_P1:
-			#ifdef DEBUG_MINITEL
-			printf("port_r: read %02X from PORT1 - Keyboard -> %x\n", port1,((keyboard_x_row_reg>>7)&1));
-			#endif
+			LOG("port_r: read %02X from PORT1 - Keyboard -> %x\n", port1,((keyboard_x_row_reg>>7)&1));
 			return ( (port1&0xFE) | ((keyboard_x_row_reg>>7)&1) ) ;
 		case MCS51_PORT_P2:
-			#ifdef DEBUG_MINITEL
-			printf("port_r: read %02X from PORT2\n", port2);
-			#endif
+			LOG("port_r: read %02X from PORT2\n", port2);
 			return port2;
 		case MCS51_PORT_P3:
-			#ifdef DEBUG_MINITEL
-			printf("port_r: read %02X from PORT3\n", port3);
-			#endif
+			LOG("port_r: read %02X from PORT3\n", port3);
 			return port3;
 	}
 	return 0;
@@ -243,43 +215,31 @@ WRITE8_MEMBER(minitel_state::dev_crtl_reg_w)
 {
 	if( last_ctrl_reg != data)
 	{
-		#ifdef DEBUG_MINITEL
-		printf("minitel_state::hw_ctrl_reg : %x %x\n",offset, data);
-		#endif
+		LOG("minitel_state::hw_ctrl_reg : %x %x\n",offset, data);
 
 		if( (last_ctrl_reg ^ data) & CTRL_REG_DTMF )
 		{
-			#ifdef DEBUG_MINITEL
-			printf("CTRL_REG_DTMF : %d \n", data & CTRL_REG_DTMF );
-			#endif
+			LOG("CTRL_REG_DTMF : %d \n", data & CTRL_REG_DTMF );
 		}
 
 		if( (last_ctrl_reg ^ data) & CTRL_REG_MCBC )
 		{
-			#ifdef DEBUG_MINITEL
-			printf("CTRL_REG_MCBC : %d \n", data & CTRL_REG_MCBC );
-			#endif
+			LOG("CTRL_REG_MCBC : %d \n", data & CTRL_REG_MCBC );
 		}
 
 		if( (last_ctrl_reg ^ data) & CTRL_REG_OPTO )
 		{
-			#ifdef DEBUG_MINITEL
-			printf("CTRL_REG_OPTO : %d \n", data & CTRL_REG_OPTO );
-			#endif
+			LOG("CTRL_REG_OPTO : %d \n", data & CTRL_REG_OPTO );
 		}
 
 		if( (last_ctrl_reg ^ data) & CTRL_REG_RELAY )
 		{
-			#ifdef DEBUG_MINITEL
-			printf("CTRL_REG_RELAY : %d \n", data & CTRL_REG_RELAY );
-			#endif
+			LOG("CTRL_REG_RELAY : %d \n", data & CTRL_REG_RELAY );
 		}
 
 		if( (last_ctrl_reg ^ data) & CTRL_REG_CRTON )
 		{
-			#ifdef DEBUG_MINITEL
-			printf("CTRL_REG_CRTON : %d \n", data & CTRL_REG_CRTON );
-			#endif
+			LOG("CTRL_REG_CRTON : %d \n", data & CTRL_REG_CRTON );
 		}
 	}
 
@@ -290,18 +250,14 @@ READ8_MEMBER(minitel_state::dev_keyb_ser_r)
 {
 	char kbdrow[8];
 
-	#ifdef DEBUG_MINITEL
-	printf("minitel_state::keyb read : %x\n",offset);
-	#endif
+	LOG("minitel_state::keyb read : %x\n",offset);
 
 	if ( keyboard_para_ser )
 	{
 		// load the 4014 with the keyboard row state
 		sprintf(kbdrow,"Y%.2X",offset>>8);
 		keyboard_x_row_reg = ioport(kbdrow)->read();
-		#ifdef DEBUG_MINITEL
-		printf("4014 Load : %s 0x%.2X\n",kbdrow,keyboard_x_row_reg);
-		#endif
+		LOG("4014 Load : %s 0x%.2X\n",kbdrow,keyboard_x_row_reg);
 	}
 	else
 	{
@@ -319,9 +275,7 @@ READ8_MEMBER ( minitel_state::ts9347_io_r )
 
 WRITE8_MEMBER ( minitel_state::ts9347_io_w )
 {
-	#ifdef DEBUG_MINITEL
-	printf("minitel_state::ts9347_io_w : %x %x\n",offset, data);
-	#endif
+	LOG("minitel_state::ts9347_io_w : %x %x\n",offset, data);
 
 	m_ts9347->data_w(space, offset, data, 0xff);
 }
@@ -438,7 +392,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( minitel2, minitel_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32,XTAL_14_31818MHz) //verified on pcb
+	MCFG_CPU_ADD("maincpu", I80C32, XTAL_14_31818MHz) //verified on pcb
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
 	MCFG_CPU_IO_MAP(mem_io)
 
@@ -451,7 +405,7 @@ static MACHINE_CONFIG_START( minitel2, minitel_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE("ts9347", ts9347_device, screen_update)
 	MCFG_SCREEN_SIZE(512-1, 312-1)
-	MCFG_SCREEN_VISIBLE_AREA(00, 512-1, 00, 266-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 266-1)
 	MCFG_PALETTE_ADD("palette", 8+1)
 	/*MCFG_PALETTE_INIT_OWNER(minitel_state, minitel)*/
 
