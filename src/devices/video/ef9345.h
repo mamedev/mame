@@ -42,8 +42,14 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+
+	enum class EF9345_MODE {
+		TYPE_EF9345    = 0x001,
+		TYPE_TS9347    = 0x002
+	};
+
 	// pass-through constructor
-	ef9345_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
+	ef9345_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, EF9345_MODE variant, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -61,12 +67,6 @@ protected:
 	inline uint16_t indexrom(uint8_t r);
 	inline void inc_x(uint8_t r);
 	inline void inc_y(uint8_t r);
-
-	enum
-	{
-		TYPE_EF9345    = 0x001,
-		TYPE_TS9347    = 0x002
-	};
 
 private:
 
@@ -118,7 +118,7 @@ private:
 	emu_timer *m_busy_timer;
 	emu_timer *m_blink_timer;
 
-	const int m_variant;
+	const EF9345_MODE m_variant;
 
 	required_device<palette_device> m_palette;
 };

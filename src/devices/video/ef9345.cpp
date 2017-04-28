@@ -107,12 +107,12 @@ ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, dev
 	device_video_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(ef9345)),
 	m_charset(*this, DEVICE_SELF),
-	m_variant(TYPE_EF9345),
+	m_variant(EF9345_MODE::TYPE_EF9345),
 	m_palette(*this, finder_base::DUMMY_TAG)
 {
 }
 
-ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source) :
+ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, EF9345_MODE variant, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -124,7 +124,7 @@ ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, co
 }
 
 ts9347_device::ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ef9345_device(mconfig, TS9347, "TS9347",tag, owner, clock, TYPE_TS9347,"ts9347",__FILE__){ }
+	: ef9345_device(mconfig, TS9347, "TS9347",tag, owner, clock, EF9345_MODE::TYPE_TS9347,"ts9347",__FILE__){ }
 
 //-------------------------------------------------
 //  static_set_palette_tag: Set the tag of the
@@ -256,7 +256,7 @@ void ef9345_device::draw_char_80(uint8_t *c, uint16_t x, uint16_t y)
 // set then ef9345 mode
 void ef9345_device::set_video_mode(void)
 {
-	if (m_variant == TYPE_TS9347)
+	if (m_variant == EF9345_MODE::TYPE_TS9347)
 	{
 		// Only TGS 7 & 6 used for the char mode with the TS9347
 		m_char_mode = ((m_tgs & 0xc0) >> 6);
@@ -412,7 +412,7 @@ void ef9345_device::bichrome40(uint8_t type, uint16_t address, uint8_t dial, uin
 	uint16_t i;
 	uint8_t pix[80];
 
-	if (m_variant == TYPE_TS9347)
+	if (m_variant == EF9345_MODE::TYPE_TS9347)
 	{
 		c0 = 0;
 	}
@@ -504,7 +504,7 @@ void ef9345_device::quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, 
 	uint8_t lowresolution = (b & 0x02) >> 1, ramx, ramy, ramblock;
 	uint16_t ramindex;
 
-	if (m_variant == TYPE_TS9347)
+	if (m_variant == EF9345_MODE::TYPE_TS9347)
 	{
 		// No quadrichrome support into the TS9347
 		return;
@@ -726,7 +726,7 @@ void ef9345_device::makechar(uint16_t x, uint16_t y)
 			makechar_24x40(x, y);
 			break;
 		case MODEVAR40:
-			if (m_variant == TYPE_TS9347)
+			if (m_variant == EF9345_MODE::TYPE_TS9347)
 			{ // TS9347 char mode definition is different.
 				makechar_16x40(x, y);
 				break;
@@ -738,7 +738,7 @@ void ef9345_device::makechar(uint16_t x, uint16_t y)
 			makechar_12x80(x, y);
 			break;
 		case MODE16x40:
-			if (m_variant == TYPE_TS9347)
+			if (m_variant == EF9345_MODE::TYPE_TS9347)
 			{
 				logerror("Unemulated EF9345 mode: %02x\n", m_char_mode);
 			}
@@ -1041,7 +1041,7 @@ void ef9345_device::update_scanline(uint16_t scanline)
 	}
 	else if (scanline < 250)
 	{
-		if (m_variant == TYPE_TS9347)
+		if (m_variant == EF9345_MODE::TYPE_TS9347)
 		{
 			for(i = 0; i < 40; i++)
 				makechar(i, (scanline / 10));
