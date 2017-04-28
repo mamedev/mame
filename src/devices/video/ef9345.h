@@ -31,7 +31,6 @@ class ef9345_device :   public device_t,
 public:
 	// construction/destruction
 	ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
@@ -43,6 +42,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+	// pass-through constructor
+	ef9345_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;

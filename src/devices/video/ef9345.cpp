@@ -112,8 +112,8 @@ ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t variant) :
-	device_t(mconfig, EF9345, "EF9345", tag, owner, clock, "ef9345", __FILE__),
+ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(ef9345)),
@@ -124,7 +124,7 @@ ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, dev
 }
 
 ts9347_device::ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ef9345_device(mconfig, tag, owner, clock, TYPE_TS9347){ }
+	: ef9345_device(mconfig, TS9347, "TS9347",tag, owner, clock, TYPE_TS9347,"ts9347",__FILE__){ }
 
 //-------------------------------------------------
 //  static_set_palette_tag: Set the tag of the
