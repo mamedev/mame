@@ -47,6 +47,7 @@ Note
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "sound/ym2413.h"
 #include "screen.h"
 #include "speaker.h"
@@ -403,11 +404,8 @@ static ADDRESS_MAP_START( jackie_io_map, AS_IO, 8, jackie_state )
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")           /* DSW3 */
 	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")           /* DSW4 */
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")           /* DSW5 */
-	AM_RANGE(0x5080, 0x5080) AM_WRITE(nmi_and_coins_w)
-	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("COINS")
-	AM_RANGE(0x5090, 0x5090) AM_READ_PORT("BUTTONS1")
-	AM_RANGE(0x5091, 0x5091) AM_WRITE(lamps_w )
+	AM_RANGE(0x5080, 0x5083) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
+	AM_RANGE(0x5090, 0x5093) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
 	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE("ymsnd", ym2413_device, write)
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
@@ -605,6 +603,14 @@ static MACHINE_CONFIG_START( jackie, jackie_state )
 	MCFG_CPU_IO_MAP(jackie_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jackie_state, irq, "screen", 0, 1)
 
+	MCFG_DEVICE_ADD("ppi1", I8255A, 0) // D8255AC
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(jackie_state, nmi_and_coins_w))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
+
+	MCFG_DEVICE_ADD("ppi2", I8255A, 0) // D8255AC
+	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(jackie_state, lamps_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
