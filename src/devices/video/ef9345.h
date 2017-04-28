@@ -118,7 +118,7 @@ private:
 	emu_timer *m_busy_timer;
 	emu_timer *m_blink_timer;
 
-	int m_variant;
+	const int m_variant;
 
 	required_device<palette_device> m_palette;
 };

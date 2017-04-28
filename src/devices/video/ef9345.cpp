@@ -171,7 +171,6 @@ void ef9345_device::device_start()
 	save_item(NAME(m_latchm));
 	save_item(NAME(m_latchi));
 	save_item(NAME(m_latchu));
-	save_item(NAME(m_variant));
 
 	save_item(NAME(m_screen_out));
 }
