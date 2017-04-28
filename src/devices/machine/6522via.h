@@ -135,6 +135,7 @@ private:
 	static const device_timer_id TIMER_T1 = 1;
 	static const device_timer_id TIMER_T2 = 2;
 	static const device_timer_id TIMER_CA2 = 3;
+	static const device_timer_id TIMER_SHIFT_IRQ = 4;
 
 	uint16_t get_counter1_value();
 
@@ -206,15 +207,8 @@ private:
 	emu_timer *m_ca2_timer;
 
 	emu_timer *m_shift_timer;
+	emu_timer *m_shift_irq_timer;
 	uint8_t m_shift_counter;
-	enum m_shift_state_t
-	{
-		SHIFTER_IDLE,
-		SHIFTER_SHIFT,
-		SHIFTER_FINISH,
-		SHIFTER_IRQ
-	};
-	m_shift_state_t m_shift_state;
 };
 
 
