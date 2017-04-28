@@ -64,15 +64,19 @@ static cybiko_file_system *get_cfs(imgtool::image &image)
 }
 
 // 2208988800 is the number of seconds between 1900/01/01 and 1970/01/01
+typedef util::arbitrary_clock<std::uint32_t, 1900, 1, 1, 0, 0, 0, std::ratio<1, 1> > cybiko_clock;
 
-static time_t time_crack( uint32_t cfs_time)
+imgtool::datetime cybiko_time_crack(uint32_t cfs_time)
 {
-	return (time_t)(cfs_time - 2208988800UL);
+	cybiko_clock::duration d(cfs_time);
+	std::chrono::time_point<cybiko_clock> tp(d);
+	return imgtool::datetime(imgtool::datetime::datetime_type::LOCAL, tp);
 }
 
-static uint32_t time_setup( time_t ansi_time)
+uint32_t cybiko_time_setup(const imgtool::datetime &t)
 {
-	return (uint32_t)(ansi_time + 2208988800UL);
+	auto cybiko_time_point = cybiko_clock::from_arbitrary_time_point(t.time_point());
+	return cybiko_time_point.time_since_epoch().count();
 }
 
 static uint32_t buffer_read_32_be( uint8_t *buffer)
@@ -412,7 +416,7 @@ static imgtoolerr_t cybiko_image_next_enum(imgtool::directory &enumeration, imgt
 	{
 		strcpy(ent.filename, file.name);
 		ent.filesize = file.size;
-		ent.lastmodified_time = time_crack(file.date);
+		ent.lastmodified_time = cybiko_time_crack(file.date);
 		ent.filesize = file.size;
 	}
 	else
@@ -501,7 +505,7 @@ static imgtoolerr_t cybiko_image_write_file(imgtool::partition &partition, const
 			{
 				buffer[6] = 0;
 				strcpy(BLOCK_FILENAME(buffer), filename);
-				buffer_write_32_be( buffer + 6 + FILE_HEADER_SIZE - 4, time_setup( time( NULL)));
+				buffer_write_32_be(buffer + 6 + FILE_HEADER_SIZE - 4, cybiko_time_setup(imgtool::datetime::now(imgtool::datetime::datetime_type::LOCAL)));
 				sourcef.read(buffer + 6 + FILE_HEADER_SIZE, buffer[1]);
 			}
 			else
