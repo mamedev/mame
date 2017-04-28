@@ -57,21 +57,27 @@
 #include "logmacro.h"
 
 // IO expander latch usage definitions
-#define CTRL_REG_DTMF  0x02
-#define CTRL_REG_MCBC  0x04
-#define CTRL_REG_OPTO  0x08
-#define CTRL_REG_RELAY 0x10
-#define CTRL_REG_CRTON 0x20
+enum
+{
+	CTRL_REG_DTMF = 0x02,
+	CTRL_REG_MCBC = 0x04,
+	CTRL_REG_OPTO = 0x08,
+	CTRL_REG_RELAY = 0x10,
+	CTRL_REG_CRTON = 0x20
+};
 
 // 80C32 Port IO usage definitions
-#define PORT_1_KBSERIN 0x01
-#define PORT_1_MDM_DCD 0x02
-#define PORT_1_MDM_PRD 0x04
-#define PORT_1_MDM_TXD 0x08
-#define PORT_1_MDM_RTS 0x10
-#define PORT_1_KBLOAD  0x20
-#define PORT_1_SCL     0x40
-#define PORT_1_SDA     0x80
+enum
+{
+	PORT_1_KBSERIN = 0x01,
+	PORT_1_MDM_DCD = 0x02,
+	PORT_1_MDM_PRD = 0x04,
+	PORT_1_MDM_TXD = 0x08,
+	PORT_1_MDM_RTS = 0x10,
+	PORT_1_KBLOAD = 0x20,
+	PORT_1_SCL = 0x40,
+	PORT_1_SDA = 0x80
+};
 
 class minitel_state : public driver_device
 {
