@@ -1299,7 +1299,7 @@ protected:
 	void pattern_fill(uint16_t x0 , uint16_t y0 , uint16_t x1 , uint16_t y1 , unsigned fill_idx);
 	static uint16_t get_gv_mem_addr(unsigned x , unsigned y);
 	virtual void update_graphic_bits(void) = 0;
-	int get_lp_cursor_y_top(void) const;
+	static int get_wrapped_scanline(unsigned scanline);
 	void render_lp_cursor(unsigned video_scanline , unsigned pen_idx);
 
 	void lp_r4_w(uint16_t data);
@@ -1308,6 +1308,8 @@ protected:
 	bool lp_segment_intersect(unsigned yline) const;
 	void compute_lp_data(void);
 	void lp_scanline_update(unsigned video_scanline);
+
+	virtual void update_gcursor(void) = 0;
 
 	bool m_alpha_sel;
 	bool m_gv_sk_en;
@@ -1348,6 +1350,8 @@ protected:
 	bool m_gv_lp_int_en;
 	bool m_gv_lp_hit_lt192;
 	bool m_gv_lp_int_256;
+	uint16_t m_gv_lxc;
+	uint16_t m_gv_lyc;
 
 	static const uint16_t m_line_type[];
 	static const uint16_t m_area_fill[];
@@ -1443,6 +1447,7 @@ WRITE_LINE_MEMBER(hp9845ct_state::vblank_w)
 		}
 	} else {
 		m_gv_lp_vblank = false;
+		update_gcursor();
 	}
 }
 
@@ -1577,13 +1582,13 @@ uint16_t hp9845ct_state::get_gv_mem_addr(unsigned x , unsigned y)
 	return (uint16_t)((x + y * 35) & GVIDEO_ADDR_MASK);
 }
 
-int hp9845ct_state::get_lp_cursor_y_top(void) const
+int hp9845ct_state::get_wrapped_scanline(unsigned scanline)
 {
 	// The 770's VTOTAL applies to 780, too.
 	// The 780 hw generates a line clock (GVclk in Duell's schematics) that's suppressed
 	// for lines in [485..524] range so that the total number of lines per frame counted
 	// by this clock matches the total count of lines in 770 (i.e. 485).
-	int wrapped_cursor_y = m_gv_lp_cursor_y;
+	int wrapped_cursor_y = (int)scanline;
 	if (wrapped_cursor_y >= GVIDEO_VPIXELS && wrapped_cursor_y < VIDEO_770_VTOTAL) {
 		wrapped_cursor_y -= VIDEO_770_VTOTAL;
 	}
@@ -1593,7 +1598,7 @@ int hp9845ct_state::get_lp_cursor_y_top(void) const
 
 void hp9845ct_state::render_lp_cursor(unsigned video_scanline , unsigned pen_idx)
 {
-	int cursor_y_top = get_lp_cursor_y_top();
+	int cursor_y_top = get_wrapped_scanline(m_gv_lp_cursor_y);
 
 	bool yw;
 	if (m_gv_lp_cursor_fs) {
@@ -1751,7 +1756,7 @@ void hp9845ct_state::compute_lp_data(void)
 	uint16_t ylo = 0;
 	uint16_t xp = m_gv_lp_x;                    // light gun pointer
 	uint16_t yp = m_gv_lp_y;
-	int yc = get_lp_cursor_y_top() + 24;
+	int yc = get_wrapped_scanline(m_gv_lp_cursor_y) + 24;
 
 	if (m_gv_lp_selftest) {
 		constexpr int offset = 57 - VIDEO_770_ALPHA_L_LIM;
@@ -1917,6 +1922,8 @@ protected:
 	void advance_io_counter(void);
 	virtual void advance_gv_fsm(bool ds , bool trigger) override;
 	virtual void update_graphic_bits(void) override;
+
+	virtual void update_gcursor(void) override;
 
 	// Palette indexes
 	static constexpr unsigned pen_graphic(unsigned rgb) { return rgb; }
@@ -2207,11 +2214,9 @@ void hp9845c_state::graphic_video_render(unsigned video_scanline)
 {
 	// video_scanline is 0-based, i.e. the topmost visible line of graphic screen is 0
 	const pen_t *pen = m_palette->pens();
-	bool yc, yw, blink;
+	bool yc, yw;
 	uint16_t word0, word1, word2;
 	uint8_t pen0, pen1, pen2;
-
-	yc = (video_scanline + 42) == m_gv_cursor_y;
 
 	// apply music memory
 	pen0 = (m_gv_music_memory & 0x001) | ((m_gv_music_memory & 0x008) >> 2) | ((m_gv_music_memory & 0x040) >> 4);
@@ -2219,21 +2224,22 @@ void hp9845c_state::graphic_video_render(unsigned video_scanline)
 	pen2 = ((m_gv_music_memory & 0x004) >> 2) | ((m_gv_music_memory & 0x020) >> 4) | ((m_gv_music_memory & 0x100) >> 6);
 
 	if (m_gv_cursor_fs) {
-		yw = true;
-		// Steady cursor
-		blink = true;
+		// Full-screen cursor
+		yw = false;
+		yc = video_scanline == m_gv_cursor_y;
+	} else if (m_gv_cursor_gc) {
+		// 15 x 15 crosshair
+		int cursor_y_top = get_wrapped_scanline(m_gv_cursor_y);
+		int int_scanline = (int)video_scanline;
+		yw = (int_scanline >= (cursor_y_top + 1) && int_scanline <= (cursor_y_top + 6)) ||
+			(int_scanline >= (cursor_y_top + 10) && int_scanline <= (cursor_y_top + 15));
+		yc = int_scanline == cursor_y_top + 8;
 	} else {
-		// 15 pixel
-		yw = ((video_scanline + 50) > m_gv_cursor_y &&
-			  (video_scanline + 50) < (m_gv_cursor_y + 7)) ||
-			((video_scanline + 50) > (m_gv_cursor_y + 9) &&
-			 (video_scanline + 50) < (m_gv_cursor_y + 16));
-		if (m_gv_cursor_gc) {
-			blink = true;
-		} else {
-			// Blinking cursor (frame freq. / 16)
-			blink = BIT(m_screen->frame_number() , 3) != 0;
-		}
+		// 9-pixel blinking line
+		int cursor_y_top = get_wrapped_scanline(m_gv_cursor_y);
+		int int_scanline = (int)video_scanline;
+		yw = false;
+		yc = int_scanline == cursor_y_top + 8;
 	}
 
 	unsigned mem_idx = get_gv_mem_addr(0 , video_scanline);
@@ -2244,15 +2250,24 @@ void hp9845c_state::graphic_video_render(unsigned video_scanline)
 		mem_idx++;
 		unsigned x = i;
 		for (uint16_t mask = 0x8000; mask != 0; mask >>= 1) {
-			bool xc = false;
-			bool xw = false;
+			bool cursor = false;
 			unsigned pixel;
 
-			if (m_gv_cursor_gc) {
-				xc = (x + 61) == m_gv_cursor_x;
-				xw = m_gv_cursor_fs || ((x + 69) > m_gv_cursor_x && (x + 53) < m_gv_cursor_x && ((x + 62) < m_gv_cursor_x || (x + 60) > m_gv_cursor_x));
+			if (m_gv_cursor_fs) {
+				// Full-screen cursor
+				cursor = yc || (x + 111) == m_gv_cursor_x;
+			} else if (m_gv_cursor_gc) {
+				bool xc = (x + 103) == m_gv_cursor_x;
+				bool xw = ((x + 96) <= m_gv_cursor_x && (x + 101) >= m_gv_cursor_x) ||
+					((x + 105) <= m_gv_cursor_x && (x + 110) >= m_gv_cursor_x);
+
+				// 15 x 15 crosshair
+				cursor = (yc && xw) || (yw && xc);
+			} else if (BIT(m_screen->frame_number() , 3)) {
+				// 9-pixel blinking line
+				cursor = yc && (x + 107) >= m_gv_cursor_x && (x + 99) <= m_gv_cursor_x;
 			}
-			if (blink && ((xw && yc) || (yw && xc && m_gv_cursor_gc))) {
+			if (cursor) {
 				// Cursor
 				pixel = pen_cursor(m_gv_cursor_color);
 			} else {
@@ -2419,18 +2434,10 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 					LOG(("load end points y = %d\n", m_gv_ypt));
 					break;
 				case 0xe:   // Y cursor position & color
-					m_gv_cursor_color = ~m_gv_data_w & 0x7;
-					m_gv_cursor_y = 1073 - (m_gv_data_w >> 6);
-					if (m_gv_cursor_fs) m_gv_cursor_y -= 8;
-					LOG(("Y cursor position = %d, color = %d\n", m_gv_cursor_y, m_gv_cursor_color));
+					m_gv_lyc = m_gv_data_w;
 					break;
 				case 0xf:   // X cursor position & type
-					m_gv_cursor_fs = BIT(m_gv_data_w, 0);
-					m_gv_cursor_gc = BIT(m_gv_data_w, 1) || m_gv_cursor_fs;
-					m_gv_cursor_x = ((m_gv_data_w >> 6) & 0x3ff) - 42;
-					if (m_gv_cursor_fs) m_gv_cursor_x -= 8;
-
-					LOG(("X cursor position = %d, fs = %d, gc = %d\n", m_gv_cursor_x, m_gv_cursor_fs, m_gv_cursor_gc));
+					m_gv_lxc = m_gv_data_w;
 					break;
 				default:
 					logerror("unknown 98770A command = %d, parm = 0x%04x\n", m_gv_cmd, m_gv_data_w);
@@ -2603,6 +2610,25 @@ void hp9845c_state::update_graphic_bits(void)
 	m_ppu->dmar_w(dmar);
 }
 
+void hp9845c_state::update_gcursor(void)
+{
+	m_gv_cursor_color = ~m_gv_lyc & 0x7;
+	m_gv_cursor_y = (~m_gv_lyc >> 6) & 0x1ff;
+	m_gv_cursor_fs = BIT(m_gv_lxc, 0);
+	m_gv_cursor_gc = BIT(m_gv_lxc, 1);
+	m_gv_cursor_x = (m_gv_lxc >> 6) & 0x3ff;
+
+#if 0
+	// DEBUG DEBUG DEBUG
+	static uint16_t last_lxc , last_lyc;
+	if (last_lxc != m_gv_lxc || last_lyc != m_gv_lyc) {
+		logerror("Cursor position = (%d,%d), fs = %d, gc = %d, col = %u, %04x %04x\n", m_gv_cursor_x, m_gv_cursor_y, m_gv_cursor_fs, m_gv_cursor_gc, m_gv_cursor_color, m_gv_lxc , m_gv_lyc);
+		last_lxc = m_gv_lxc;
+		last_lyc = m_gv_lyc;
+	}
+#endif
+}
+
 // ***************
 //  hp9845t_state
 // ***************
@@ -2629,6 +2655,8 @@ protected:
 
 	virtual void advance_gv_fsm(bool ds , bool trigger) override;
 	virtual void update_graphic_bits(void) override;
+
+	virtual void update_gcursor(void) override;
 
 	std::vector<uint16_t> m_graphic_mem;
 
@@ -2909,25 +2937,25 @@ void hp9845t_state::graphic_video_render(unsigned video_scanline)
 {
 	// video_scanline is 0-based, i.e. the topmost visible line of graphic screen is 0
 	const pen_t *pen = m_palette->pens();
-	bool yc, yw, blink;
+	bool yc, yw;
 	uint16_t word;
 
-	yc = (video_scanline + 44) == m_gv_cursor_y;
-
 	if (m_gv_cursor_fs) {
-		yw = true;
-		// Steady cursor
-		blink = true;
+		// Full-screen cursor
+		yw = false;
+		yc = video_scanline == m_gv_cursor_y;
+	} else if (m_gv_cursor_gc) {
+		// 9 x 9 crosshair
+		int cursor_y_top = get_wrapped_scanline(m_gv_cursor_y);
+		int int_scanline = (int)video_scanline;
+		yw = int_scanline >= cursor_y_top && int_scanline <= (cursor_y_top + 8);
+		yc = int_scanline == cursor_y_top + 4;
 	} else {
-		// 9 pixel
-		yw = (video_scanline + 44 > m_gv_cursor_y - 5) &&
-			  (video_scanline + 44 < m_gv_cursor_y + 5);
-		if (m_gv_cursor_gc) {
-			blink = true;
-		} else {
-			// Blinking cursor (frame freq. / 16)
-			blink = BIT(m_screen->frame_number() , 3) != 0;
-		}
+		// 9-pixel blinking line
+		int cursor_y_top = get_wrapped_scanline(m_gv_cursor_y);
+		int int_scanline = (int)video_scanline;
+		yw = false;
+		yc = int_scanline == cursor_y_top + 4;
 	}
 
 	unsigned mem_idx = get_gv_mem_addr(m_gv_scan_start_x >> 4, video_scanline + m_gv_scan_start_y);
@@ -2938,11 +2966,22 @@ void hp9845t_state::graphic_video_render(unsigned video_scanline)
 		if (mem_idx > GVIDEO_ADDR_MASK) return;
 		unsigned x = i;
 		for (uint16_t mask = 0x8000; mask != 0; mask >>= 1) {
-			bool xc = (x + 63) == m_gv_cursor_x;
-			bool xw = m_gv_cursor_fs || ((x + 67 >= m_gv_cursor_x) && (x + 59 <= m_gv_cursor_x));
+			bool cursor = false;
 			unsigned pixel;
+			if (m_gv_cursor_fs) {
+				// Full-screen cursor
+				cursor = yc || (x + 184) == m_gv_cursor_x;
+			} else if (m_gv_cursor_gc) {
+				bool xc = (x + 184) == m_gv_cursor_x;
+				bool xw = (x + 180) <= m_gv_cursor_x && (x + 188) >= m_gv_cursor_x;
 
-			if (blink && ((xw && yc) || (yw && xc && m_gv_cursor_gc))) {
+				// 9 x 9 crosshair
+				cursor = (yc && xw) || (yw && xc);
+			} else if (BIT(m_screen->frame_number() , 3)) {
+				// 9-pixel blinking line
+				cursor = yc && (x + 188) >= m_gv_cursor_x && (x + 180) <= m_gv_cursor_x;
+			}
+			if (cursor) {
 				pixel = PEN_CURSOR;
 			} else {
 				// Normal pixel
@@ -3187,16 +3226,11 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 				break;
 			case 0xc:   // load color mask (no effect, just for compatibility with 9845c), takes a single word as parameter
 				break;
-			case 0xe:   // Y cursor position
-				m_gv_cursor_fs = (m_gv_data_w & 0x3) == 0;
-				m_gv_cursor_gc = ((m_gv_data_w & 0x3) == 1) || m_gv_cursor_fs;
-				m_gv_cursor_y = 559 - (m_gv_data_w >> 7);
-				if (m_gv_cursor_fs) m_gv_cursor_y -= 4;
-				LOG(("Y cursor position = %d, fs = %d, gc = %d\n", m_gv_cursor_y, m_gv_cursor_fs, m_gv_cursor_gc));
+			case 0xe:	// Y cursor position
+				m_gv_lyc = m_gv_data_w;
 				break;
-			case 0xf:   // X cursor position
-				m_gv_cursor_x = ((m_gv_data_w >> 6) & 0x3ff) - 121;
-				LOG(("X cursor position = %d\n", m_gv_cursor_x));
+			case 0xf:	// X cursor position
+				m_gv_lxc = m_gv_data_w;
 				break;
 			default:
 				LOG(("unknown 98780A command = %d, parm = 0x%04x\n", m_gv_cmd, m_gv_data_w));
@@ -3443,6 +3477,23 @@ void hp9845t_state::update_graphic_bits(void)
 	bool dmar = gv_ready && m_gv_dma_en;
 
 	m_ppu->dmar_w(dmar);
+}
+
+void hp9845t_state::update_gcursor(void)
+{
+	m_gv_cursor_fs = (m_gv_lyc & 0x3) == 0;
+	m_gv_cursor_gc = !BIT(m_gv_lyc , 1);
+	m_gv_cursor_y = (~m_gv_lyc >> 7) & 0x1ff;
+	m_gv_cursor_x = (m_gv_lxc >> 6) & 0x3ff;
+#if 0
+	// DEBUG DEBUG DEBUG
+	static uint16_t last_lxc , last_lyc;
+	if (last_lxc != m_gv_lxc || last_lyc != m_gv_lyc) {
+		logerror("Cursor position = (%d,%d), fs = %d, gc = %d, %04x %04x\n", m_gv_cursor_x, m_gv_cursor_y, m_gv_cursor_fs, m_gv_cursor_gc, m_gv_lxc , m_gv_lyc);
+		last_lxc = m_gv_lxc;
+		last_lyc = m_gv_lyc;
+	}
+#endif
 }
 
 const uint8_t hp9845t_state::m_back_arrow_shape[] = {
