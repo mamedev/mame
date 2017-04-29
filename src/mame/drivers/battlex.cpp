@@ -19,6 +19,40 @@
 
      - Setting the flipscreen dip to ON also hides the copyright message (?)
 
+    Notes from Tomasz Slanina:
+
+	Tile decoding:
+
+	Each 8x8 BG tile is defined by:
+	- 1 bit  8x8 mask  (one tile - 8 consecutive bytes - user2 region)
+	- 4+4  bits of color ( one tile - 8 consecutive bytes - user1 region) 
+	- bit 3 of color  = brightness ?
+
+	Single mask byte defines one row of tile pixels (FG or BG)
+	Single color byte defines color of FG (4 bits) and color of BG (4 bits)
+	of high (odd address in user1) or low (even address in user1) 
+	nibbles of two tile pixels rows.
+
+	Here's an example (single tile):
+
+     user2      user1   colors
+    ----------------------------
+    00011100    0x32   33321144    
+	00111100    0x41   33221144 
+
+	00111100    0x32   33227744 
+	00011000    0x47   33327444
+
+	00011000    0x56   55566555
+	00011000    0x56   55566555
+
+	00011000    0x84   88844777
+	00011000    0x74   88844777
+
+	
+
+	
+
     TO DO :
 
     - missing starfield
@@ -26,7 +60,10 @@
     - game speed, its seems to be controlled by the IRQ's, how fast should it
       be? firing seems frustratingly inconsistant (better with PORT_IMPULSE)
 
-    - background tile colors, not understood well
+    - BG tilemap palette bits (in most cases paltte 0 is used, 
+      only highlights ( battlex logo, hiscore table) uses different palettes(?).
+      Current implementation gives different highlight colors than on real 
+      hardware (i.e. battlex logo should have yellow highights)
 
 ****************************************************************************
 
@@ -201,12 +238,12 @@ INPUT_PORTS_END
 static const gfx_layout battlex_charlayout =
 {
 	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
-	{ 7,6,5,4,3,2,1,0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 0, 4, 8, 12, 16, 20, 24, 28  },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	8*8*4
 };
 
 static const gfx_layout battlex_spritelayout =
@@ -223,7 +260,7 @@ static const gfx_layout battlex_spritelayout =
 };
 
 static GFXDECODE_START( battlex )
-	GFXDECODE_ENTRY( "gfx1", 0, battlex_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, battlex_charlayout,   64, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, battlex_spritelayout, 0, 8 )
 GFXDECODE_END
 
@@ -270,7 +307,7 @@ static MACHINE_CONFIG_START( battlex, battlex_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlex)
-	MCFG_PALETTE_ADD("palette", 64)
+	MCFG_PALETTE_ADD("palette", 64 + 128)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -289,6 +326,7 @@ static MACHINE_CONFIG_DERIVED( dodgeman, battlex )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
+
 /*************************************
  *
  *  ROM definition
@@ -304,7 +342,7 @@ ROM_START( battlex )
 	ROM_LOAD( "p-rom5.2",    0x4000, 0x1000, CRC(ceb63d38) SHA1(92cab905d009c59115f52172ba7d01c8ff8991d7) )
 	ROM_LOAD( "p-rom6.1",    0x5000, 0x1000, CRC(6923f601) SHA1(e6c33cbd8d8679299d7b2c568d56f96ed3073971) )
 
-	ROM_REGION( 0x3000, "gfx1", ROMREGION_ERASE00 ) // filled in later
+	ROM_REGION( 0x4000, "gfx1", ROMREGION_ERASE00 ) // filled in later
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
 	ROM_LOAD( "1a_f.6f",     0x0000, 0x1000, CRC(2b69287a) SHA1(30c0edaec44118b95ec390bd41c1bd49a2802451) )
@@ -327,7 +365,7 @@ ROM_START( dodgeman )
 	ROM_LOAD( "dg4.2f",       0x4000, 0x001000, CRC(14169361) SHA1(86d3cd1fa0aa4f21029daea2eba99bdaa34372e8) )
 	ROM_LOAD( "dg5.1f",       0x5000, 0x001000, CRC(8f83ae2f) SHA1(daad41b61ba3d55531021d444bbe4acfc275cfc9) )
 
-	ROM_REGION( 0x6000, "gfx1", ROMREGION_ERASE00 ) // filled in later
+	ROM_REGION( 0x8000, "gfx1", ROMREGION_ERASE00 ) // filled in later
 
 	ROM_REGION( 0x6000, "gfx2", ROMREGION_ERASE00 )
 	ROM_LOAD( "f.6f",         0x0000, 0x002000, CRC(dfaaf4c8) SHA1(1e09f1d72e7e5e6782d73ae60bca7982fc04df0e) )
@@ -353,32 +391,37 @@ DRIVER_INIT_MEMBER(battlex_state,battlex)
 	uint8_t *colormask = memregion("user1")->base();
 	uint8_t *gfxdata = memregion("user2")->base();
 	uint8_t *dest = memregion("gfx1")->base();
-	int tile_size = memregion("gfx1")->bytes() / 24;
-	int tile_shift = (tile_size / 512) + 11;
-	int tile, line, bit;
+	int tile_size = memregion("gfx1")->bytes() / 32;
 
-	/* convert gfx data from 1bpp + color block mask to straight 3bpp */
+	int tile, line, bit;
+	int offset = 0;
+
 	for (tile = 0; tile < tile_size; tile++)
 	{
 		for (line = 0; line < 8; line ++)
 		{
 			for (bit = 0; bit < 8 ; bit ++)
 			{
-				int plane;
-				int color = colormask[tile << 3 | line];
-				int data = gfxdata[tile << 3 | line] >> bit & 1;
-				if (!data) color >>= 4;
+				
+				int color = colormask[(tile << 3 )| ((line&0x6) + (bit>3?1:0))  ];
+				int data = (gfxdata[(tile << 3 )| line] >> bit) & 1;
 
-				for (plane = 2; plane >= 0; plane--)
-				{
-					dest[tile << 3 | line | (plane << tile_shift)] |= (color & 1) << bit;
-					color >>= 1;
+				if(!data){
+					color>>=4;
 				}
+
+				color&=0x0f;
+
+				if(offset&1){
+					dest[ offset>>1 ] |= color;
+				} else {
+					dest[ offset>>1 ] = color<<4;
+				}
+				++offset;
 			}
 		}
 	}
 }
-
 
 /*************************************
  *
@@ -387,4 +430,4 @@ DRIVER_INIT_MEMBER(battlex_state,battlex)
  *************************************/
 
 GAME( 1982, battlex,   0,   battlex,  battlex,  battlex_state,  battlex, ROT180, "Omori Electric Co., Ltd.", "Battle Cross", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1983, dodgeman,  0,   dodgeman, dodgeman, battlex_state,  battlex, ROT180, "Omori Electric Co., Ltd.",  "Dodge Man", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1983, dodgeman,  0,   dodgeman, dodgeman, battlex_state,  battlex, ROT180, "Omori Electric Co., Ltd.",  "Dodge Man", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
