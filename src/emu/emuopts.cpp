@@ -953,7 +953,7 @@ slot_option &emu_options::slot_option(const std::string &device_name)
 
 bool emu_options::has_slot_option(const std::string &device_name) const
 {
-	return m_slot_options.count(device_name) > 0;
+	return m_slot_options.find(device_name) != m_slot_options.end();
 }
 
 
@@ -1046,11 +1046,11 @@ std::string slot_option::specified_value() const
 void slot_option::specify(std::string &&text)
 {
 	// record the old value; we may need to trigger an update
-	std::string old_value = value();
+	const std::string old_value = value();
 
 	// we need to do some elementary parsing here
 	const char *bios_arg = ",bios=";
-	size_t pos = text.find(bios_arg);
+	const size_t pos = text.find(bios_arg);
 	if (pos != std::string::npos)
 	{
 		m_specified = true;
