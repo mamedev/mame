@@ -291,6 +291,12 @@ INTERRUPT_GEN_MEMBER(lethal_state::lethalen_interrupt)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
+READ8_MEMBER(lethal_state::sound_irq_r)
+{
+	m_soundcpu->set_input_line(0, HOLD_LINE);
+	return 0x00;
+}
+
 WRITE8_MEMBER(lethal_state::sound_irq_w)
 {
 	m_soundcpu->set_input_line(0, HOLD_LINE);
@@ -340,7 +346,7 @@ static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x4000, 0x403f) AM_DEVWRITE("k056832", k056832_device, write)
 	AM_RANGE(0x4040, 0x404f) AM_DEVWRITE("k056832", k056832_device, b_w)
 	AM_RANGE(0x4080, 0x4080) AM_READNOP     // watchdog
-	AM_RANGE(0x4090, 0x4090) AM_WRITE(sound_irq_w)
+	AM_RANGE(0x4090, 0x4090) AM_READWRITE(sound_irq_r, sound_irq_w)
 	AM_RANGE(0x40a0, 0x40a0) AM_READNOP
 	AM_RANGE(0x40c4, 0x40c4) AM_WRITE(control2_w)
 	AM_RANGE(0x40c8, 0x40d0) AM_WRITE(lethalen_palette_control) // PCU1-PCU3 on the schematics

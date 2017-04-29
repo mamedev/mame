@@ -46,17 +46,19 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 		/* bit 3 is clock (active high) */
 		/* bit 4 is cs (active low) */
 		/* bit 5 is enabled in IRQ3, disabled in IRQ5 (sprite DMA start?) */
-		/* bit 6 is sound irq, but with some kind of hold */
 		ioport("EEPROMOUT")->write(data, 0xff);
-		if(data & 0x40)
-			m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		/* bit 8 = enable sprite ROM reading */
 		m_k053246->k053246_set_objcha_line( (data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
 		/* bit 9 = enable char ROM reading through the video RAM */
+		/* bit 10 = sound irq, but with some kind of hold */
 		m_k052109->set_rmrd_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
+		if(data & 0x4) {
+			logerror("tick!\n");
+			m_audiocpu->set_input_line(0, HOLD_LINE);
+		}
 	}
 }
 

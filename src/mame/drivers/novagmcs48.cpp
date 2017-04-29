@@ -12,7 +12,7 @@
 
     TODO:
     - is presto led handling correct? mux data needs to be auto cleared
-      similar to diablo/sexpert. cpu color led should be on while thinking
+      similar to diablo/sexpert
 
 ******************************************************************************
 
@@ -68,6 +68,7 @@ WRITE8_MEMBER(novagmcs48_state::presto_mux_w)
 {
 	// D0-D7: input mux low, led data
 	m_inp_mux = (m_inp_mux & ~0xff) | (~data & 0xff);
+	display_matrix(8, 3, m_inp_mux, m_led_select);
 }
 
 WRITE8_MEMBER(novagmcs48_state::presto_control_w)
@@ -80,7 +81,6 @@ WRITE8_MEMBER(novagmcs48_state::presto_control_w)
 
 	// P24-P26: led select
 	m_led_select = ~data >> 4 & 7;
-	display_matrix(8, 3, m_inp_mux, m_led_select);
 	m_inp_mux &= ~0xff; // ?
 }
 

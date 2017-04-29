@@ -45,6 +45,7 @@ public:
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(control2_w);
+	DECLARE_READ8_MEMBER(sound_irq_r);
 	DECLARE_WRITE8_MEMBER(sound_irq_w);
 	DECLARE_WRITE8_MEMBER(le_bankswitch_w);
 	DECLARE_READ8_MEMBER(guns_r);

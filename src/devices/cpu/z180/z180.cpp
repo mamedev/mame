@@ -2539,7 +2539,7 @@ void z180_device::execute_set_input(int irqline, int state)
 			if(state == ASSERT_LINE)
 				iol |= Z180_DREQ0;
 			z180_write_iolines(iol);
-		} else if(irqline == Z180_INPUT_LINE_DREQ0) {
+		} else if(irqline == Z180_INPUT_LINE_DREQ1) {
 			auto iol = m_iol & ~Z180_DREQ1;
 			if(state == ASSERT_LINE)
 				iol |= Z180_DREQ1;

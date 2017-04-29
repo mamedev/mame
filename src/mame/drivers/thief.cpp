@@ -15,8 +15,6 @@ Credits:
     Shark Driver by Victor Trucco and Mike Balfour
     Driver for Thief and NATO Defense by Phil Stroffolino
 
-- 8255 emulation (ports 0x30..0x3f) could be better abstracted
-
 - minor blitting glitches in playfield of Thief (XOR vs copy?)
 
 - Nato Defense gfx ROMs may be hooked up wrong;
@@ -28,13 +26,11 @@ Credits:
 #include "includes/thief.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "screen.h"
 #include "speaker.h"
-
-
-#define MASTER_CLOCK    XTAL_20MHz
 
 
 
@@ -98,60 +94,40 @@ void thief_state::tape_set_motor( int bOn )
 
 /***********************************************************/
 
-WRITE8_MEMBER(thief_state::thief_input_select_w)
+WRITE8_MEMBER( thief_state::thief_input_select_w )
 {
 	m_input_select = data;
 }
 
-WRITE8_MEMBER(thief_state::tape_control_w)
+WRITE8_MEMBER( thief_state::tape_control_w )
 {
-	switch( data )
-	{
-	case 0x02: /* coin meter on */
-		break;
+	// avoid bogus coin counts after reset
+	if (data == 0x00)
+		return;
 
-	case 0x03: /* nop */
-		break;
+	// 7---32-0  not used
+	// -6------  speaker right (crash track)
+	// --5-----  tape motor
+	// ---4----  speaker left (talk track)
+	// ------1-  coin meter
 
-	case 0x04: /* coin meter off */
-		break;
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 1) ? 0 : 1);
 
-	case 0x08: /* talk track on */
-		tape_set_audio( kTalkTrack, 1 );
-		break;
-
-	case 0x09: /* talk track off */
-		tape_set_audio( kTalkTrack, 0 );
-		break;
-
-	case 0x0a: /* motor on */
-		tape_set_motor( 1 );
-		break;
-
-	case 0x0b: /* motor off */
-		tape_set_motor( 0 );
-		break;
-
-	case 0x0c: /* crash track on */
-		tape_set_audio( kCrashTrack, 1 );
-		break;
-
-	case 0x0d: /* crash track off */
-		tape_set_audio( kCrashTrack, 0 );
-		break;
-	}
+	tape_set_audio(kTalkTrack, BIT(data, 4) ? 0 : 1);
+	tape_set_motor(BIT(data, 5) ? 0 : 1);
+	tape_set_audio(kCrashTrack, BIT(data, 6) ? 0 : 1);
 }
 
-READ8_MEMBER(thief_state::thief_io_r)
+READ8_MEMBER( thief_state::thief_io_r )
 {
-	switch( m_input_select )
-	{
-		case 0x01: return ioport("DSW1")->read();
-		case 0x02: return ioport("DSW2")->read();
-		case 0x04: return ioport("P1")->read();
-		case 0x08: return ioport("P2")->read();
-	}
-	return 0x00;
+	uint8_t data = 0xff;
+
+	if (BIT(m_input_select, 0)) data &= ioport("DSW1")->read();
+	if (BIT(m_input_select, 1)) data &= ioport("DSW2")->read();
+	if (BIT(m_input_select, 2)) data &= ioport("P1")->read();
+	if (BIT(m_input_select, 3)) data &= ioport("P2")->read();
+
+	return data;
 }
 
 static ADDRESS_MAP_START( sharkatt_main_map, AS_PROGRAM, 8, thief_state )
@@ -177,9 +153,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, thief_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x10, 0x10) AM_WRITE(thief_video_control_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(thief_input_select_w) /* 8255 */
-	AM_RANGE(0x31, 0x31) AM_READ(thief_io_r)    /* 8255 */
-	AM_RANGE(0x33, 0x33) AM_WRITE(tape_control_w)
+	AM_RANGE(0x30, 0x33) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x41, 0x41) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x42, 0x43) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
@@ -413,53 +387,18 @@ static const char *const natodef_sample_names[] =
 };
 
 
-static MACHINE_CONFIG_START( sharkatt, thief_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz? */
-	MCFG_CPU_PROGRAM_MAP(sharkatt_main_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thief_state,  thief_interrupt)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(thief_state, screen_update_thief)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("tms", TMS9927, MASTER_CLOCK/4)
-	MCFG_TMS9927_CHAR_WIDTH(8)
-
-	MCFG_PALETTE_ADD("palette", 16)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ay1", AY8910, 4000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("ay2", AY8910, 4000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(2)
-	MCFG_SAMPLES_NAMES(sharkatt_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-
 static MACHINE_CONFIG_START( thief, thief_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(thief_main_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thief_state,  thief_interrupt)
 
-	/* video hardware */
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(thief_state, thief_input_select_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(thief_state, thief_io_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(thief_state, tape_control_w))
+
+	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -468,18 +407,18 @@ static MACHINE_CONFIG_START( thief, thief_state )
 	MCFG_SCREEN_UPDATE_DRIVER(thief_state, screen_update_thief)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("tms", TMS9927, MASTER_CLOCK/4)
+	MCFG_DEVICE_ADD("tms", TMS9927, XTAL_20MHz/4)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
 	MCFG_PALETTE_ADD("palette", 16)
 
-	/* sound hardware */
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 4000000/4)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_8MHz/2/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 4000000/4)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_8MHz/2/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -488,43 +427,22 @@ static MACHINE_CONFIG_START( thief, thief_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( sharkatt, thief )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sharkatt_main_map)
 
-static MACHINE_CONFIG_START( natodef, thief_state )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
-	MCFG_CPU_PROGRAM_MAP(thief_main_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thief_state,  thief_interrupt)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(thief_state, screen_update_thief)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("tms", TMS9927, MASTER_CLOCK/4)
-	MCFG_TMS9927_CHAR_WIDTH(8)
-
-	MCFG_PALETTE_ADD("palette", 16)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ay1", AY8910, 4000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("ay2", AY8910, 4000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(2)
-	MCFG_SAMPLES_NAMES(natodef_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_DEVICE_MODIFY("samples")
+	MCFG_SAMPLES_NAMES(sharkatt_sample_names)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( natodef, thief )
+	MCFG_DEVICE_MODIFY("samples")
+	MCFG_SAMPLES_NAMES(natodef_sample_names)
+MACHINE_CONFIG_END
+
 
 /**********************************************************/
 
