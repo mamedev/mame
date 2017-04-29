@@ -239,7 +239,7 @@ class image_option
 {
 public:
 	image_option(emu_options &host, const std::string &cannonical_instance_name);
-	image_option(const image_option &that) = default;
+	image_option(const image_option &that) = delete;
 	image_option(image_option &&that) = default;
 
 	// accessors
