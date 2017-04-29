@@ -1,0 +1,284 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_red"><rect><color red="0.7" green="0.2" blue="0.2" /></rect></element>
+	<element name="static_brown"><rect><color red="0.6" green="0.3" blue="0.2" /></rect></element>
+	<element name="static_blue"><rect><color red="0.2" green="0.2" blue="0.6" /></rect></element>
+	<element name="static_green"><rect><color red="0.2" green="0.6" blue="0.2" /></rect></element>
+
+	<element name="e_jr" defstate="0">
+		<text string="JR" state="0"><color red="0.06" green="0.06" blue="0.06" /></text>
+		<text string="JR" state="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="e_dk" defstate="0">
+		<text string="DK" state="0"><color red="0.07" green="0.07" blue="0.0" /></text>
+		<text string="DK" state="1"><color red="1.0" green="1.0" blue="0.0" /></text>
+	</element>
+	<element name="e_mario" defstate="0">
+		<text string="M" state="0"><color red="0.07" green="0.07" blue="0.0" /></text>
+		<text string="M" state="1"><color red="1.0" green="1.0" blue="0.0" /></text>
+	</element>
+	<element name="e_alarm" defstate="0">
+		<text string="A" state="0"><color red="0.07" green="0.07" blue="0.0" /></text>
+		<text string="A" state="1"><color red="1.0" green="1.0" blue="0.0" /></text>
+	</element>
+	<element name="e_lock" defstate="0">
+		<text string="L" state="0"><color red="0.07" green="0.07" blue="0.0" /></text>
+		<text string="L" state="1"><color red="1.0" green="1.0" blue="0.0" /></text>
+	</element>
+	<element name="e_key" defstate="0">
+		<text string="k" state="0"><color red="0.0" green="0.07" blue="0.0" /></text>
+		<text string="k" state="1"><color red="0.0" green="1.0" blue="0.0" /></text>
+	</element>
+	<element name="e_x" defstate="0">
+		<text string="X" state="0"><color red="0.1" green="0.05" blue="0.0" /></text>
+		<text string="X" state="1"><color red="1.0" green="0.05" blue="0.0" /></text>
+	</element>
+	<element name="e_s" defstate="0">
+		<text string="&lt;s" state="0"><color red="0.1" green="0.05" blue="0.0" /></text>
+		<text string="&lt;s" state="1"><color red="1.0" green="0.05" blue="0.0" /></text>
+	</element>
+	<element name="e_b1" defstate="0">
+		<text string="b&gt;" state="0"><color red="0.1" green="0.05" blue="0.0" /></text>
+		<text string="b&gt;" state="1"><color red="1.0" green="0.05" blue="0.0" /></text>
+	</element>
+	<element name="e_b2" defstate="0">
+		<text string="&lt;b" state="0"><color red="0.1" green="0.05" blue="0.0" /></text>
+		<text string="&lt;b" state="1"><color red="1.0" green="0.05" blue="0.0" /></text>
+	</element>
+	<element name="e_gamea" defstate="0">
+		<text string="GAME A" state="0"><color red="0.06" green="0.06" blue="0.06" /></text>
+		<text string="GAME A" state="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="e_gameb" defstate="0">
+		<text string="GAME B" state="0"><color red="0.06" green="0.06" blue="0.06" /></text>
+		<text string="GAME B" state="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="e_am" defstate="0">
+		<text string="AM" state="0"><color red="0.06" green="0.06" blue="0.06" /></text>
+		<text string="AM" state="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="e_pm" defstate="0">
+		<text string="PM" state="0"><color red="0.06" green="0.06" blue="0.06" /></text>
+		<text string="PM" state="1"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="e_seg" defstate="0">
+		<rect state="0"><color red="0.06" green="0.06" blue="0.06" /></rect>
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-5" right="93" top="0" bottom="133" />
+
+		<bezel element="static_green"><bounds x="12" y="46" width="1" height="42" /></bezel>
+		<bezel element="static_green"><bounds x="71" y="89.5" width="1" height="18" /></bezel>
+
+		<bezel element="static_blue"><bounds x="24" y="9.5" width="1" height="27" /></bezel>
+		<bezel element="static_blue"><bounds x="39" y="9.5" width="1" height="27" /></bezel>
+		<bezel element="static_blue"><bounds x="54" y="9.5" width="1" height="27" /></bezel>
+		<bezel element="static_blue"><bounds x="69" y="9.5" width="1" height="27" /></bezel>
+
+		<bezel element="static_red"><bounds x="-6" y="79" width="100" height="1" /></bezel>
+		<bezel element="static_red"><bounds x="-6" y="99" width="100" height="1" /></bezel>
+		<bezel element="static_red"><bounds x="69" y="89" width="26" height="1" /></bezel>
+		
+		<bezel element="static_brown"><bounds x="-6" y="9" width="100" height="1" /></bezel>
+		<bezel element="static_brown"><bounds x="80" y="39" width="15" height="1" /></bezel>
+		<bezel element="static_brown"><bounds x="-6" y="49" width="100" height="1" /></bezel>
+		<bezel element="static_brown"><bounds x="-6" y="119" width="100" height="1" /></bezel>
+
+	<!-- upper screen -->
+
+	<!-- alarm -->
+		<bezel name="1.9.3" element="e_mario"><bounds x="-2" y="3" width="4" height="4" /></bezel> <!-- arm back -->
+		<bezel name="0.9.3" element="e_mario"><bounds x="0" y="0" width="10" height="10" /></bezel> <!-- mario -->
+		<bezel name="0.9.2" element="e_mario"><bounds x="8" y="3" width="4" height="4" /></bezel> <!-- arm front -->
+		<bezel name="2.0.2" element="e_alarm"><bounds x="11" y="0" width="7" height="7" /></bezel> <!-- bell -->
+
+	<!-- donkey kong -->
+		<bezel name="0.9.1" element="e_dk"><bounds x="40" y="0" width="10" height="10" /></bezel> <!-- top -->
+		<bezel name="2.0.3" element="e_dk"><bounds x="80" y="0" width="10" height="10" /></bezel> <!-- top-right -->
+		<bezel name="1.15.2" element="e_dk"><bounds x="80" y="30" width="10" height="10" /></bezel> <!-- jr catch dk -->
+
+	<!-- locks -->
+		<bezel name="1.9.2" element="e_lock"><bounds x="20" y="5" width="5" height="5" /></bezel>
+		<bezel name="1.9.1" element="e_lock"><bounds x="35" y="5" width="5" height="5" /></bezel>
+		<bezel name="2.0.0" element="e_lock"><bounds x="50" y="5" width="5" height="5" /></bezel>
+		<bezel name="2.0.1" element="e_lock"><bounds x="65" y="5" width="5" height="5" /></bezel>
+
+	<!-- keys -->
+		<bezel name="0.10.2" element="e_key"><bounds x="22" y="6" width="5" height="5" /></bezel>
+		<bezel name="0.9.0" element="e_key"><bounds x="37" y="6" width="5" height="5" /></bezel>
+		<bezel name="1.15.1" element="e_key"><bounds x="52" y="6" width="5" height="5" /></bezel>
+		<bezel name="1.15.0" element="e_key"><bounds x="67" y="6" width="5" height="5" /></bezel>
+
+		<bezel name="0.10.1" element="e_key"><bounds x="2" y="28" width="5" height="5" /></bezel> <!-- upper screen -->
+		<bezel name="1.10.1" element="e_key"><bounds x="7" y="22" width="5" height="5" /></bezel> <!-- upper screen throw -->
+		<bezel name="0.7.2" element="e_key"><bounds x="2" y="100" width="5" height="5" /></bezel> <!-- lower screen -->
+		<bezel name="0.7.0" element="e_key"><bounds x="5" y="88" width="5" height="5" /></bezel> <!-- lower screen throw -->
+
+	<!-- jr row 1 -->
+		<bezel name="1.11.0" element="e_jr"><bounds x="20" y="10" width="10" height="10" /></bezel>
+		<bezel name="1.12.0" element="e_jr"><bounds x="35" y="10" width="10" height="10" /></bezel>
+		<bezel name="1.13.0" element="e_jr"><bounds x="50" y="10" width="10" height="10" /></bezel>
+		<bezel name="1.14.0" element="e_jr"><bounds x="65" y="10" width="10" height="10" /></bezel>
+
+	<!-- jr row 2 -->
+		<bezel name="1.11.1" element="e_jr"><bounds x="20" y="20" width="10" height="10" /></bezel>
+		<bezel name="1.12.1" element="e_jr"><bounds x="35" y="20" width="10" height="10" /></bezel>
+		<bezel name="1.13.1" element="e_jr"><bounds x="50" y="20" width="10" height="10" /></bezel>
+		<bezel name="1.14.1" element="e_jr"><bounds x="65" y="20" width="10" height="10" /></bezel>
+
+	<!-- jr row 3 -->
+		<bezel name="1.10.2" element="e_jr"><bounds x="5" y="30" width="10" height="10" /></bezel>
+		<bezel name="1.11.2" element="e_jr"><bounds x="20" y="30" width="10" height="10" /></bezel>
+		<bezel name="1.12.2" element="e_jr"><bounds x="35" y="30" width="10" height="10" /></bezel>
+		<bezel name="1.13.2" element="e_jr"><bounds x="50" y="30" width="10" height="10" /></bezel>
+		<bezel name="1.14.2" element="e_jr"><bounds x="65" y="30" width="10" height="10" /></bezel>
+
+		<bezel name="0.10.0" element="e_jr"><bounds x="7" y="28" width="4" height="4" /></bezel> <!-- hand up -->
+		<bezel name="1.10.0" element="e_jr"><bounds x="2" y="33" width="4" height="4" /></bezel> <!-- hand left -->
+
+	<!-- jr row 4 -->
+		<bezel name="1.10.3" element="e_jr"><bounds x="5" y="40" width="10" height="10" /></bezel>
+		<bezel name="1.11.3" element="e_jr"><bounds x="20" y="40" width="10" height="10" /></bezel>
+		<bezel name="1.12.3" element="e_jr"><bounds x="35" y="40" width="10" height="10" /></bezel>
+		<bezel name="1.13.3" element="e_jr"><bounds x="50" y="40" width="10" height="10" /></bezel>
+		<bezel name="1.14.3" element="e_jr"><bounds x="65" y="40" width="10" height="10" /></bezel>
+
+	<!-- bird row 1 -->
+		<bezel name="1.9.0" element="e_b1"><bounds x="5" y="13" width="5" height="5" /></bezel>
+		<bezel name="0.11.0" element="e_b1"><bounds x="15" y="13" width="5" height="5" /></bezel>
+		<bezel name="0.12.0" element="e_b1"><bounds x="30" y="13" width="5" height="5" /></bezel>
+		<bezel name="0.13.0" element="e_b1"><bounds x="45" y="13" width="5" height="5" /></bezel>
+		<bezel name="0.14.0" element="e_b1"><bounds x="60" y="13" width="5" height="5" /></bezel>
+		<bezel name="0.15.0" element="e_b1"><bounds x="75" y="13" width="5" height="5" /></bezel>
+
+	<!-- bird row 2 -->
+		<bezel name="0.11.1" element="e_b2"><bounds x="15" y="23" width="5" height="5" /></bezel>
+		<bezel name="0.12.1" element="e_b2"><bounds x="30" y="23" width="5" height="5" /></bezel>
+		<bezel name="0.13.1" element="e_b2"><bounds x="45" y="23" width="5" height="5" /></bezel>
+		<bezel name="0.14.1" element="e_b2"><bounds x="60" y="23" width="5" height="5" /></bezel>
+		<bezel name="0.15.1" element="e_b2"><bounds x="75" y="23" width="5" height="5" /></bezel>
+
+	<!-- bird row 3 -->
+		<bezel name="0.11.2" element="e_b1"><bounds x="15" y="33" width="5" height="5" /></bezel>
+		<bezel name="0.12.2" element="e_b1"><bounds x="30" y="33" width="5" height="5" /></bezel>
+		<bezel name="0.13.2" element="e_b1"><bounds x="45" y="33" width="5" height="5" /></bezel>
+		<bezel name="0.14.2" element="e_b1"><bounds x="60" y="33" width="5" height="5" /></bezel>
+		<bezel name="0.15.2" element="e_b1"><bounds x="75" y="33" width="5" height="5" /></bezel>
+
+	<!-- snap row 1 -->
+		<bezel name="0.10.3" element="e_s"><bounds x="0" y="44" width="5" height="5" /></bezel>
+		<bezel name="0.11.3" element="e_s"><bounds x="15" y="44" width="5" height="5" /></bezel>
+		<bezel name="0.12.3" element="e_s"><bounds x="30" y="44" width="5" height="5" /></bezel>
+		<bezel name="0.13.3" element="e_s"><bounds x="45" y="44" width="5" height="5" /></bezel>
+		<bezel name="0.14.3" element="e_s"><bounds x="60" y="44" width="5" height="5" /></bezel>
+		<bezel name="0.15.3" element="e_s"><bounds x="75" y="44" width="5" height="5" /></bezel>
+		<bezel name="1.15.3" element="e_s"><bounds x="85" y="44" width="5" height="5" /></bezel>
+
+	<!-- lower screen -->
+
+	<!-- spark row 1 -->
+		<bezel name="1.7.3" element="e_x"><bounds x="10" y="77" width="10" height="5" /></bezel>
+		<bezel name="0.8.3" element="e_x"><bounds x="25" y="77" width="10" height="5" /></bezel>
+		<bezel name="1.8.3" element="e_x"><bounds x="40" y="77" width="10" height="5" /></bezel>
+		<bezel name="0.0.3" element="e_x"><bounds x="55" y="77" width="10" height="5" /></bezel>
+		<bezel name="1.0.3" element="e_x"><bounds x="70" y="77" width="10" height="5" /></bezel>
+
+	<!-- spark row 2 -->
+		<bezel name="0.7.1" element="e_x"><bounds x="-7" y="97" width="10" height="5" /></bezel>
+		<bezel name="1.7.1" element="e_x"><bounds x="4" y="97" width="10" height="5" /></bezel>
+		<bezel name="0.8.1" element="e_x"><bounds x="19" y="97" width="10" height="5" /></bezel>
+		<bezel name="1.8.1" element="e_x"><bounds x="34" y="97" width="10" height="5" /></bezel>
+		<bezel name="0.0.1" element="e_x"><bounds x="49" y="97" width="10" height="5" /></bezel>
+		<bezel name="0.4.0" element="e_x"><bounds x="64" y="97" width="10" height="5" /></bezel>
+		<bezel name="1.0.2" element="e_x"><bounds x="79" y="97" width="10" height="5" /></bezel>
+
+	<!-- jr row 5 -->
+		<bezel name="1.7.2" element="e_jr"><bounds x="10" y="80" width="10" height="10" /></bezel>
+		<bezel name="0.8.2" element="e_jr"><bounds x="25" y="80" width="10" height="10" /></bezel>
+		<bezel name="1.8.2" element="e_jr"><bounds x="40" y="80" width="10" height="10" /></bezel>
+		<bezel name="0.0.2" element="e_jr"><bounds x="55" y="80" width="10" height="10" /></bezel>
+
+	<!-- jr row 6 -->
+		<bezel name="1.7.0" element="e_jr"><bounds x="10" y="90" width="10" height="10" /></bezel>
+		<bezel name="0.8.0" element="e_jr"><bounds x="25" y="90" width="10" height="10" /></bezel>
+		<bezel name="1.8.0" element="e_jr"><bounds x="40" y="90" width="10" height="10" /></bezel>
+		<bezel name="0.0.0" element="e_jr"><bounds x="55" y="90" width="10" height="10" /></bezel>
+		<bezel name="1.0.0" element="e_jr"><bounds x="70" y="90" width="10" height="10" /></bezel>
+
+	<!-- jr row 7 -->
+		<bezel name="1.6.1" element="e_jr"><bounds x="5" y="100" width="10" height="10" /></bezel>
+		<bezel name="0.6.1" element="e_jr"><bounds x="20" y="100" width="10" height="10" /></bezel>
+		<bezel name="1.5.1" element="e_jr"><bounds x="35" y="100" width="10" height="10" /></bezel>
+		<bezel name="0.5.1" element="e_jr"><bounds x="50" y="100" width="10" height="10" /></bezel>
+		<bezel name="0.4.1" element="e_jr"><bounds x="65" y="100" width="10" height="10" /></bezel>
+
+	<!-- jr row 8 -->
+		<bezel name="1.6.2" element="e_jr"><bounds x="5" y="110" width="10" height="10" /></bezel>
+		<bezel name="0.6.2" element="e_jr"><bounds x="20" y="110" width="10" height="10" /></bezel>
+		<bezel name="1.5.2" element="e_jr"><bounds x="35" y="110" width="10" height="10" /></bezel>
+		<bezel name="1.4.1" element="e_jr"><bounds x="50" y="110" width="10" height="10" /></bezel>
+		<bezel name="0.4.2" element="e_jr"><bounds x="65" y="110" width="10" height="10" /></bezel>
+
+	<!-- snap row 2 -->
+		<bezel name="1.6.3" element="e_s"><bounds x="0" y="114" width="5" height="5" /></bezel>
+		<bezel name="0.6.3" element="e_s"><bounds x="15" y="114" width="5" height="5" /></bezel>
+		<bezel name="1.5.3" element="e_s"><bounds x="30" y="114" width="5" height="5" /></bezel>
+		<bezel name="0.5.2" element="e_s"><bounds x="45" y="114" width="5" height="5" /></bezel>
+		<bezel name="1.4.2" element="e_s"><bounds x="60" y="114" width="5" height="5" /></bezel>
+		<bezel name="0.1.0" element="e_s"><bounds x="75" y="114" width="5" height="5" /></bezel>
+		<bezel name="1.0.1" element="e_s"><bounds x="85" y="114" width="5" height="5" /></bezel>
+
+	<!-- jr row 9 (lives) -->
+		<bezel name="1.6.0" element="e_jr"><bounds x="5" y="120" width="10" height="10" /></bezel>
+		<bezel name="0.6.0" element="e_jr"><bounds x="16" y="120" width="10" height="10" /></bezel>
+		<bezel name="1.5.0" element="e_jr"><bounds x="27" y="120" width="10" height="10" /></bezel>
+
+	<!-- game a/b, AM/PM -->
+		<bezel name="0.5.3" element="e_gamea"><bounds x="38" y="120" width="12" height="5" /></bezel>
+		<bezel name="0.5.0" element="e_gameb"><bounds x="38" y="125" width="12" height="5" /></bezel>
+		<bezel name="1.4.3" element="e_am"><bounds x="52" y="120" width="5" height="5" /></bezel>
+		<bezel name="1.4.0" element="e_pm"><bounds x="52" y="125" width="5" height="5" /></bezel>
+
+	<!-- digit 2 -->
+		<bezel name="0.3.1" element="e_seg"><bounds x="65" y="121" width="4" height="1" /></bezel> <!-- a -->
+		<bezel name="0.3.2" element="e_seg"><bounds x="69" y="122" width="1" height="4" /></bezel> <!-- b -->
+		<bezel name="0.3.3" element="e_seg"><bounds x="69" y="127" width="1" height="4" /></bezel> <!-- c -->
+		<bezel name="1.3.0" element="e_seg"><bounds x="65" y="131" width="4" height="1" /></bezel> <!-- d -->
+		<bezel name="1.3.3" element="e_seg"><bounds x="64" y="127" width="1" height="4" /></bezel> <!-- e -->
+		<bezel name="1.3.1" element="e_seg"><bounds x="64" y="122" width="1" height="4" /></bezel> <!-- f -->
+		<bezel name="1.3.2" element="e_seg"><bounds x="65" y="126" width="4" height="1" /></bezel> <!-- g -->
+
+		<bezel name="0.4.3" element="e_seg"><bounds x="60" y="122" width="1" height="9" /></bezel> <!-- digit 1: 1 -->
+		<bezel name="0.7.3" element="e_seg"><bounds x="72" y="124" width="1" height="1" /></bezel> <!-- colon -->
+		<bezel name="0.7.3" element="e_seg"><bounds x="72" y="128" width="1" height="1" /></bezel> <!-- colon -->
+
+	<!-- digit 3 -->
+		<bezel name="0.2.1" element="e_seg"><bounds x="76" y="121" width="4" height="1" /></bezel> <!-- a -->
+		<bezel name="0.2.2" element="e_seg"><bounds x="80" y="122" width="1" height="4" /></bezel> <!-- b -->
+		<bezel name="0.2.3" element="e_seg"><bounds x="80" y="127" width="1" height="4" /></bezel> <!-- c -->
+		<bezel name="1.2.0" element="e_seg"><bounds x="76" y="131" width="4" height="1" /></bezel> <!-- d -->
+		<bezel name="1.2.3" element="e_seg"><bounds x="75" y="127" width="1" height="4" /></bezel> <!-- e -->
+		<bezel name="1.2.1" element="e_seg"><bounds x="75" y="122" width="1" height="4" /></bezel> <!-- f -->
+		<bezel name="1.2.2" element="e_seg"><bounds x="76" y="126" width="4" height="1" /></bezel> <!-- g -->
+
+	<!-- digit 4 -->
+		<bezel name="0.1.1" element="e_seg"><bounds x="85" y="121" width="4" height="1" /></bezel> <!-- a -->
+		<bezel name="0.1.2" element="e_seg"><bounds x="89" y="122" width="1" height="4" /></bezel> <!-- b -->
+		<bezel name="0.1.3" element="e_seg"><bounds x="89" y="127" width="1" height="4" /></bezel> <!-- c -->
+		<bezel name="1.1.0" element="e_seg"><bounds x="85" y="131" width="4" height="1" /></bezel> <!-- d -->
+		<bezel name="1.1.3" element="e_seg"><bounds x="84" y="127" width="1" height="4" /></bezel> <!-- e -->
+		<bezel name="1.1.1" element="e_seg"><bounds x="84" y="122" width="1" height="4" /></bezel> <!-- f -->
+		<bezel name="1.1.2" element="e_seg"><bounds x="85" y="126" width="4" height="1" /></bezel> <!-- g -->
+
+	<!-- unused: 0.2.0, 0.3.0 -->
+
+	</view>
+</mamelayout>
