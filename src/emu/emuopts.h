@@ -225,13 +225,13 @@ public:
 private:
 	void possibly_changed(const std::string &old_value);
 
-	emu_options &			m_host;
-	bool					m_specified;
-	std::string				m_specified_value;
-	std::string				m_specified_bios;
-	std::string				m_default_card_software;
-	std::string				m_default_value;
-	core_options::entry *	m_entry;
+	emu_options &           m_host;
+	bool                    m_specified;
+	std::string             m_specified_value;
+	std::string             m_specified_bios;
+	std::string             m_default_card_software;
+	std::string             m_default_value;
+	core_options::entry *   m_entry;
 };
 
 
@@ -255,10 +255,10 @@ public:
 	core_options::entry::ptr setup_option_entry(std::vector<std::string> &&names);
 
 private:
-	emu_options &			m_host;
-	std::string				m_cannonical_instance_name;
-	std::string				m_value;
-	core_options::entry	*	m_entry;
+	emu_options &           m_host;
+	std::string             m_cannonical_instance_name;
+	std::string             m_value;
+	core_options::entry *   m_entry;
 };
 
 
@@ -469,8 +469,8 @@ public:
 private:
 	struct software_options
 	{
-		std::unordered_map<std::string, std::string>	slot;
-		std::unordered_map<std::string, std::string>	image;
+		std::unordered_map<std::string, std::string>    slot;
+		std::unordered_map<std::string, std::string>    image;
 	};
 
 	// slot/image/softlist calculus
@@ -482,22 +482,22 @@ private:
 	std::string get_default_card_software(device_slot_interface &slot);
 
 	// static list of options entries
-	static const options_entry							s_option_entries[];
+	static const options_entry                          s_option_entries[];
 
 	// the current driver
-	const game_driver *									m_system;
+	const game_driver *                                 m_system;
 
 	// slots and devices
-	std::unordered_map<std::string, ::slot_option>		m_slot_options;
-	std::unordered_map<std::string, ::image_option>		m_image_options_cannonical;
-	std::unordered_map<std::string, ::image_option *>	m_image_options;
+	std::unordered_map<std::string, ::slot_option>      m_slot_options;
+	std::unordered_map<std::string, ::image_option>     m_image_options_cannonical;
+	std::unordered_map<std::string, ::image_option *>   m_image_options;
 
 	// cached options, for scenarios where parsing core_options is too slow
-	int													m_coin_impulse;
-	bool												m_joystick_contradictory;
-	bool												m_sleep;
-	bool												m_refresh_speed;
-	ui_option											m_ui;
+	int                                                 m_coin_impulse;
+	bool                                                m_joystick_contradictory;
+	bool                                                m_sleep;
+	bool                                                m_refresh_speed;
+	ui_option                                           m_ui;
 };
 
 #endif  // MAME_EMU_EMUOPTS_H

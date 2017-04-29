@@ -137,7 +137,7 @@ void core_options::entry::set_default_value(std::string &&newvalue)
 {
 	// set_default_value() is not necessarily supported for all entry types
 	throw false;
-} 
+}
 
 
 //-------------------------------------------------
@@ -391,7 +391,7 @@ void core_options::add_entry(entry::ptr &&entry, const char *after_header)
 
 //-------------------------------------------------
 //  add_to_entry_map - adds an entry to the entry
-//	map
+//  map
 //-------------------------------------------------
 
 void core_options::add_to_entry_map(std::string &&name, entry::ptr &entry)
@@ -406,7 +406,7 @@ void core_options::add_to_entry_map(std::string &&name, entry::ptr &entry)
 
 //-------------------------------------------------
 //  add_entry - adds an entry based on an
-//	options_entry
+//  options_entry
 //-------------------------------------------------
 
 void core_options::add_entry(const options_entry &opt, bool override_existing)
@@ -496,7 +496,7 @@ void core_options::add_entry(std::vector<std::string> &&names, const char *descr
 
 
 //-------------------------------------------------
-//	add_header
+//  add_header
 //-------------------------------------------------
 
 void core_options::add_header(const char *description)
@@ -704,7 +704,7 @@ void core_options::parse_ini_file(util::core_file &inifile, int priority, bool a
 
 
 //-------------------------------------------------
-//	copy_from
+//  copy_from
 //-------------------------------------------------
 
 void core_options::copy_from(const core_options &that)

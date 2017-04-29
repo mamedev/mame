@@ -342,9 +342,9 @@ private:
 
 	util::hash_collection m_hash;
 
-	std::string m_instance_name;				// e.g. - "cartridge", "floppydisk2"
-	std::string m_brief_instance_name;			// e.g. - "cart", "flop2"
-	std::string m_cannonical_instance_name;		// e.g. - "cartridge1", "floppydisk2" - only used internally in emuopts.cpp
+	std::string m_instance_name;                // e.g. - "cartridge", "floppydisk2"
+	std::string m_brief_instance_name;          // e.g. - "cart", "flop2"
+	std::string m_cannonical_instance_name;     // e.g. - "cartridge1", "floppydisk2" - only used internally in emuopts.cpp
 
 	// in the case of arcade cabinet with fixed carts inserted,
 	// we want to disable command line cart loading...

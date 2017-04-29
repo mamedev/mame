@@ -296,8 +296,8 @@ namespace
 		}
 
 	private:
-		slot_option &		m_host;
-		mutable std::string	m_temp;
+		slot_option &       m_host;
+		mutable std::string m_temp;
 	};
 
 	// custom option entry for images
@@ -403,10 +403,10 @@ emu_options::emu_options(bool general_only)
 	add_entries(emu_options::s_option_entries);
 
 	// adding handlers to keep copies of frequently requested options in member variables
-	set_value_changed_handler(OPTION_COIN_IMPULSE,				[this](const char *value) { m_coin_impulse = int_value(OPTION_COIN_IMPULSE); });
-	set_value_changed_handler(OPTION_JOYSTICK_CONTRADICTORY,	[this](const char *value) { m_joystick_contradictory = bool_value(OPTION_JOYSTICK_CONTRADICTORY); });
-	set_value_changed_handler(OPTION_SLEEP,						[this](const char *value) { m_sleep = bool_value(OPTION_SLEEP); });
-	set_value_changed_handler(OPTION_REFRESHSPEED,				[this](const char *value) { m_sleep = bool_value(OPTION_REFRESHSPEED); });
+	set_value_changed_handler(OPTION_COIN_IMPULSE,              [this](const char *value) { m_coin_impulse = int_value(OPTION_COIN_IMPULSE); });
+	set_value_changed_handler(OPTION_JOYSTICK_CONTRADICTORY,    [this](const char *value) { m_joystick_contradictory = bool_value(OPTION_JOYSTICK_CONTRADICTORY); });
+	set_value_changed_handler(OPTION_SLEEP,                     [this](const char *value) { m_sleep = bool_value(OPTION_SLEEP); });
+	set_value_changed_handler(OPTION_REFRESHSPEED,              [this](const char *value) { m_sleep = bool_value(OPTION_REFRESHSPEED); });
 	set_value_changed_handler(OPTION_UI, [this](const std::string &value)
 	{
 		if (value == "simple")
@@ -427,7 +427,7 @@ emu_options::~emu_options()
 
 
 //-------------------------------------------------
-//	system_name
+//  system_name
 //-------------------------------------------------
 
 const char *emu_options::system_name() const
@@ -438,7 +438,7 @@ const char *emu_options::system_name() const
 
 //-------------------------------------------------
 //  set_system_name - called to set the system
-//	name; will adjust slot/image options as appropriate
+//  name; will adjust slot/image options as appropriate
 //-------------------------------------------------
 
 void emu_options::set_system_name(const std::string &new_system_name)
@@ -466,7 +466,7 @@ void emu_options::set_system_name(const std::string &new_system_name)
 
 
 //-------------------------------------------------
-//	update_slot_and_image_options
+//  update_slot_and_image_options
 //-------------------------------------------------
 
 void emu_options::update_slot_and_image_options()
@@ -493,8 +493,8 @@ void emu_options::update_slot_and_image_options()
 
 
 //-------------------------------------------------
-//	add_and_remove_slot_options - add any missing
-//	and/or purge extraneous slot options
+//  add_and_remove_slot_options - add any missing
+//  and/or purge extraneous slot options
 //-------------------------------------------------
 
 bool emu_options::add_and_remove_slot_options()
@@ -567,8 +567,8 @@ bool emu_options::add_and_remove_slot_options()
 
 
 //-------------------------------------------------
-//	add_and_remove_slot_options - add any missing
-//	and/or purge extraneous slot options
+//  add_and_remove_slot_options - add any missing
+//  and/or purge extraneous slot options
 //-------------------------------------------------
 
 bool emu_options::add_and_remove_image_options()
@@ -585,8 +585,8 @@ bool emu_options::add_and_remove_image_options()
 	//
 	// The need for this behavior was identified by Tafoid when the following command line
 	// regressed:
-	//		
-	//		mame snes bsxsore -cart2 bszelda
+	//
+	//      mame snes bsxsore -cart2 bszelda
 	//
 	// Before we were accounting for this behavior, 'bsxsore' got stored in "cartridge" and
 	// the association got lost when the second cartridge was added.
@@ -670,9 +670,9 @@ bool emu_options::add_and_remove_image_options()
 
 
 //-------------------------------------------------
-//	reevaluate_default_card_software - based on recent
-//	changes in what images are mounted, give drivers
-//	a chance to specify new default slot options
+//  reevaluate_default_card_software - based on recent
+//  changes in what images are mounted, give drivers
+//  a chance to specify new default slot options
 //-------------------------------------------------
 
 void emu_options::reevaluate_default_card_software()
@@ -758,7 +758,7 @@ std::string emu_options::get_default_card_software(device_slot_interface &slot)
 
 //-------------------------------------------------
 //  set_software - called to load "unqualified"
-//	software out of a software list (e.g. - "mame nes 'zelda'")
+//  software out of a software list (e.g. - "mame nes 'zelda'")
 //-------------------------------------------------
 
 void emu_options::set_software(const std::string &new_software)
@@ -929,7 +929,7 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 
 
 //-------------------------------------------------
-//	slot_option
+//  slot_option
 //-------------------------------------------------
 
 const slot_option &emu_options::slot_option(const std::string &device_name) const
@@ -948,7 +948,7 @@ slot_option &emu_options::slot_option(const std::string &device_name)
 
 
 //-------------------------------------------------
-//	has_slot_option
+//  has_slot_option
 //-------------------------------------------------
 
 bool emu_options::has_slot_option(const std::string &device_name) const
@@ -958,7 +958,7 @@ bool emu_options::has_slot_option(const std::string &device_name) const
 
 
 //-------------------------------------------------
-//	image_option
+//  image_option
 //-------------------------------------------------
 
 const image_option &emu_options::image_option(const std::string &device_name) const
@@ -1113,7 +1113,7 @@ void slot_option::set_bios(std::string &&text)
 
 
 //-------------------------------------------------
-//	slot_option::setup_option_entry
+//  slot_option::setup_option_entry
 //-------------------------------------------------
 
 core_options::entry::ptr slot_option::setup_option_entry(const char *name)
@@ -1132,7 +1132,7 @@ core_options::entry::ptr slot_option::setup_option_entry(const char *name)
 //**************************************************************************
 
 //-------------------------------------------------
-//	image_option ctor
+//  image_option ctor
 //-------------------------------------------------
 
 image_option::image_option(emu_options &host, const std::string &cannonical_instance_name)
@@ -1144,7 +1144,7 @@ image_option::image_option(emu_options &host, const std::string &cannonical_inst
 
 
 //-------------------------------------------------
-//	image_option::specify
+//  image_option::specify
 //-------------------------------------------------
 
 void image_option::specify(const std::string &value)
@@ -1167,7 +1167,7 @@ void image_option::specify(std::string &&value)
 
 
 //-------------------------------------------------
-//	image_option::setup_option_entry
+//  image_option::setup_option_entry
 //-------------------------------------------------
 
 core_options::entry::ptr image_option::setup_option_entry(std::vector<std::string> &&names)

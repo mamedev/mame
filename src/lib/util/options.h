@@ -50,7 +50,7 @@ public:
 		ERROR
 	};
 
-	template <typename... Params>	options_exception(condition_type condition, const char *fmt, Params &&...args)
+	template <typename... Params>   options_exception(condition_type condition, const char *fmt, Params &&...args)
 		: m_condition(condition)
 		, m_message(util::string_format(fmt, std::forward<Params>(args)...))
 	{
@@ -67,8 +67,8 @@ public:
 	condition_type condition() const { return m_condition; }
 
 private:
-	condition_type	m_condition;
-	std::string	m_message;
+	condition_type  m_condition;
+	std::string m_message;
 };
 
 
@@ -128,11 +128,11 @@ public:
 	private:
 		void validate(const std::string &value);
 
-		std::vector<std::string>					m_names;
-		int											m_priority;
-		core_options::option_type					m_type;
-		const char *								m_description;
-		std::function<void(const char *)>			m_value_changed_handler;
+		std::vector<std::string>                    m_names;
+		int                                         m_priority;
+		core_options::option_type                   m_type;
+		const char *                                m_description;
+		std::function<void(const char *)>           m_value_changed_handler;
 	};
 
 	// construction/destruction
@@ -224,20 +224,20 @@ private:
 	void prettify_and_set_value(entry &curentry, std::string &&data, int priority, std::ostream &error_stream, options_exception::condition_type &condition);
 
 	// internal state
-	std::vector<entry::ptr>						m_entries;				// cannonical list of entries
-	std::unordered_map<std::string, entry *>	m_entrymap;             // map for fast lookup
-	std::string									m_command;              // command found
-	static const char *const					s_option_unadorned[];	// array of unadorned option "names"
+	std::vector<entry::ptr>                     m_entries;              // cannonical list of entries
+	std::unordered_map<std::string, entry *>    m_entrymap;             // map for fast lookup
+	std::string                                 m_command;              // command found
+	static const char *const                    s_option_unadorned[];   // array of unadorned option "names"
 };
 
 
 // static structure describing a single option with its description and default value
 struct options_entry
 {
-	const char *				name;               // name on the command line
-	const char *				defvalue;           // default value of this argument
-	core_options::option_type	type;               // type of option
-	const char *				description;        // description for -showusage
+	const char *                name;               // name on the command line
+	const char *                defvalue;           // default value of this argument
+	core_options::option_type   type;               // type of option
+	const char *                description;        // description for -showusage
 };
 
 // legacy option types
