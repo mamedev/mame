@@ -782,8 +782,13 @@ void cli_frontend::listmedia(const char *gamename)
 //-------------------------------------------------
 void cli_frontend::verifyroms(const char *gamename)
 {
+	// create our own copy of options for the purposes of ROM validation
+	// so we are not "polluted" with driver-specific slot/image options
+	emu_options options(true);
+	options.copy_from(m_options);
+
 	// determine which drivers to output;
-	driver_enumerator drivlist(m_options, gamename);
+	driver_enumerator drivlist(options, gamename);
 
 	unsigned correct = 0;
 	unsigned incorrect = 0;
