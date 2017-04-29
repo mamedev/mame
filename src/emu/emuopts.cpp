@@ -448,8 +448,12 @@ void emu_options::set_system_name(const std::string &new_system_name)
 	// was a system name specified?
 	if (!new_system_name.empty())
 	{
-		// if so, find it (and error if it cannot be found)
-		int index = driver_list::find(core_filename_extract_base(new_system_name, true).c_str());
+		// if so, first extract the base name (the reason for this is drag-and-drop on Windows; a side
+		// effect is a command line like 'mame pacman.foo' will work correctly, but so be it)
+		std::string new_system_base_name = core_filename_extract_base(new_system_name, true);
+
+		// perform the lookup (and error if it cannot be found)
+		int index = driver_list::find(new_system_base_name.c_str());
 		if (index < 0)
 			throw options_error_exception("Unknown system '%s'", new_system_name);
 		new_system = &driver_list::driver(index);
