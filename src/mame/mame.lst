@@ -20608,6 +20608,9 @@ minicom                         //
 @source:miniforce.cpp
 miniforce                       // D26 cabinet test board
 
+@source:minitel_2_rpic.cpp
+minitel2                        //
+
 @source:minivadr.cpp
 minivadr                        // D26 cabinet test board
 
