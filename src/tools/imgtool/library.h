@@ -62,7 +62,7 @@ namespace imgtool
 	class datetime
 	{
 	public:
-		typedef util::arbitrary_clock<std::int64_t, 1600, 1, 1, 0, 0, 0, std::ratio<1, 1000> > imgtool_clock;
+		typedef util::arbitrary_clock<std::int64_t, 1600, 1, 1, 0, 0, 0, std::ratio<1, 10000000> > imgtool_clock;
 
 		enum datetime_type
 		{
