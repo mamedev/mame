@@ -299,7 +299,7 @@ ROM_START( mtchxl6k )
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(192, "multikey", 0)
-	ROM_LOAD( "multikey", 0, 192, BAD_DUMP CRC(094f44a6) SHA1(65054c80c38edd7f66516d3a19d432b1b60e0f79) ) // hand made
+	ROM_LOAD( "multikey", 0, 192, BAD_DUMP CRC(d54ed86c) SHA1(83557dc604b2c7e8ab0787a3c3d73e1fb2556515) ) // hand made
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r07", 0, SHA1(95599e181d9249db09464420522180d753857f3b))
@@ -312,7 +312,7 @@ ROM_START( mtchxl6ko )
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(192, "multikey", 0)
-	ROM_LOAD( "multikey", 0, 192, BAD_DUMP CRC(094f44a6) SHA1(65054c80c38edd7f66516d3a19d432b1b60e0f79) ) // hand made
+	ROM_LOAD( "multikey", 0, 192, BAD_DUMP CRC(d54ed86c) SHA1(83557dc604b2c7e8ab0787a3c3d73e1fb2556515) ) // hand made
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r02", 0, SHA1(eaaf26d2b700f16138090de7f372b40b93e8dba9))
