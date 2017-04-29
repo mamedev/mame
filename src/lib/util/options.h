@@ -34,41 +34,48 @@ const int OPTION_PRIORITY_MAXIMUM   = 255;          // maximum priority
 
 struct options_entry;
 
-// avoid obnoxious DirectSound issue
-#ifdef ERROR
-#undef ERROR
-#endif
-
 // exception thrown by core_options when an illegal request is made
-class options_exception
+class options_exception : public std::exception
 {
 public:
-	enum class condition_type
-	{
-		NONE,
-		WARNING,
-		ERROR
-	};
-
-	template <typename... Params>   options_exception(condition_type condition, const char *fmt, Params &&...args)
-		: m_condition(condition)
-		, m_message(util::string_format(fmt, std::forward<Params>(args)...))
-	{
-		assert(m_condition == condition_type::WARNING || m_condition == condition_type::ERROR);
-	}
-
-	options_exception(condition_type condition, const std::ostringstream &stream);
-	options_exception(const options_exception &) = default;
-	options_exception(options_exception &&) = default;
-	options_exception& operator=(const options_exception &) = default;
-	options_exception& operator=(options_exception &&) = default;
-
 	const std::string &message() const { return m_message; }
-	condition_type condition() const { return m_condition; }
+	virtual const char *what() const noexcept override { return message().c_str(); }
+
+protected:
+	options_exception(std::string &&message);
 
 private:
-	condition_type  m_condition;
 	std::string m_message;
+};
+
+class options_warning_exception : public options_exception
+{
+public:
+	template <typename... Params> options_warning_exception(const char *fmt, Params &&...args)
+		: options_warning_exception(util::string_format(fmt, std::forward<Params>(args)...))
+	{
+	}
+
+	options_warning_exception(std::string &&message);
+	options_warning_exception(const options_warning_exception &) = default;
+	options_warning_exception(options_warning_exception &&) = default;
+	options_warning_exception& operator=(const options_warning_exception &) = default;
+	options_warning_exception& operator=(options_warning_exception &&) = default;
+};
+
+class options_error_exception : public options_exception
+{
+public:
+	template <typename... Params> options_error_exception(const char *fmt, Params &&...args)
+		: options_error_exception(util::string_format(fmt, std::forward<Params>(args)...))
+	{
+	}
+
+	options_error_exception(std::string &&message);
+	options_error_exception(const options_error_exception &) = default;
+	options_error_exception(options_error_exception &&) = default;
+	options_error_exception& operator=(const options_error_exception &) = default;
+	options_error_exception& operator=(options_error_exception &&) = default;
 };
 
 
@@ -219,9 +226,18 @@ private:
 		std::string             m_maximum;          // maximum value
 	};
 
+	// used internally in core_options
+	enum class condition_type
+	{
+		NONE,
+		WARN,
+		ERR
+	};
+
 	// internal helpers
 	void add_to_entry_map(std::string &&name, entry::ptr &entry);
-	void prettify_and_set_value(entry &curentry, std::string &&data, int priority, std::ostream &error_stream, options_exception::condition_type &condition);
+	void prettify_and_set_value(entry &curentry, std::string &&data, int priority, std::ostream &error_stream, condition_type &condition);
+	void throw_options_exception_if_appropriate(condition_type condition, std::ostringstream &error_stream);
 
 	// internal state
 	std::vector<entry::ptr>                     m_entries;              // cannonical list of entries

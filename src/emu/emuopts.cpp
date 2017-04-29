@@ -451,7 +451,7 @@ void emu_options::set_system_name(const std::string &new_system_name)
 		// if so, find it (and error if it cannot be found)
 		int index = driver_list::find(core_filename_extract_base(new_system_name, true).c_str());
 		if (index < 0)
-			throw options_exception(options_exception::condition_type::ERROR, "Unknown system '%s'", new_system_name);
+			throw options_error_exception("Unknown system '%s'", new_system_name);
 		new_system = &driver_list::driver(index);
 	}
 
@@ -801,7 +801,7 @@ void emu_options::set_software(const std::string &new_software)
 		// do we have any pending options after failing to distribute any?
 		size_t after_size = softlist_opts.slot.size() + softlist_opts.image.size();
 		if ((after_size > 0) && after_size >= before_size)
-			throw options_exception(options_exception::condition_type::ERROR, "Could not assign software option");
+			throw options_error_exception("Could not assign software option");
 	}
 }
 
@@ -819,7 +819,7 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 	{
 		// we have software; first identify the proper game_driver
 		if (!m_system)
-			throw options_exception(options_exception::condition_type::ERROR, "Cannot specify software without specifying system");
+			throw options_error_exception("Cannot specify software without specifying system");
 
 		// and set up a configuration
 		machine_config config(*m_system, *this);
@@ -918,9 +918,9 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 			{
 				software_list_device::display_matches(config, nullptr, software_name);
 				if (!found)
-					throw options_exception(options_exception::condition_type::ERROR, "");
+					throw options_error_exception("");
 				else
-					throw options_exception(options_exception::condition_type::ERROR, "Software '%s' is incompatible with system '%s'\n", software_name, m_system->name);
+					throw options_error_exception("Software '%s' is incompatible with system '%s'\n", software_name, m_system->name);
 			}
 		}
 	}
