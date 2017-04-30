@@ -4829,6 +4829,29 @@ ROM_START( mjyarou )
 	ROM_LOAD( "82s129n.ic4",   0x0100, 0x0100, CRC(f09d3c4c) SHA1(a9e752d75e7f3ebd05add4ccf2f9f15d8f9a8d15) )
 ROM_END
 
+ROM_START( mjyarou2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "my_1",    0x0000, 0x1000, CRC(c303a013) SHA1(1360aa8657740036f017eba864eed2cbc3c9ad62) )
+	ROM_LOAD( "my_2",    0x1000, 0x1000, CRC(0c7f87cc) SHA1(2e56656b2dd860471eab9dfcb1dfd4e0b23a8df9) )
+	ROM_LOAD( "my_3",    0x2000, 0x1000, CRC(e94d5f9a) SHA1(c8365991aecf0b1d22c7ce38dd15f6d4a5f70cac) )
+	ROM_LOAD( "my_4",    0x3000, 0x1000, CRC(a6a078c8) SHA1(936be36c7c938c705e7054a42c1908bb5a5ee1bb) )
+	ROM_LOAD( "my_5",    0x4000, 0x1000, CRC(3179657e) SHA1(703fc57ae71554345754267c31809cf7af7f1639) )
+	ROM_LOAD( "my_6",    0x5000, 0x1000, CRC(0ca1cedc) SHA1(bd5d54b185e6ff5633d59df4c06a2094fca9cbf2) )
+	ROM_LOAD( "7",       0x6000, 0x2000, CRC(de6bfdd8) SHA1(dd9727d4d7de4add48cde229b8aa194f0492af7e) )
+
+	/*encrypted z80*/
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "my_8",    0x0000, 0x2000, CRC(1adef246) SHA1(b5f5598daf71694effffbfb486b03fcda5a593ee) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "82s123",         0x0000, 0x0020, CRC(41bd4d69) SHA1(4d2da761b338b62b2ea151c201063a24d6e4cc97) )
+	ROM_LOAD( "82s123n.ic7",  0x0020, 0x0020, CRC(46014727) SHA1(eec451f292ee319fa6bfbbf223aaa12b231692c1) ) // not dumped for this board
+
+	ROM_REGION( 0x0200, "user1", 0 ) //?
+	ROM_LOAD( "82s129n.ic15",  0x0000, 0x0100, CRC(86aeafd1) SHA1(c4e5c56ce5baf2be3962675ae333e28bd8108a00) )  // not dumped for this board
+	ROM_LOAD( "82s129n.ic4",   0x0100, 0x0100, CRC(f09d3c4c) SHA1(a9e752d75e7f3ebd05add4ccf2f9f15d8f9a8d15) )  // not dumped for this board
+ROM_END
+
 /*
 
 Jansou
@@ -4953,10 +4976,11 @@ GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  royalmah_state, ippatsu,  R
 GAME( 1986,  suzume,   0,        suzume,   suzume,   driver_device,  0,        ROT0,   "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
 GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                MACHINE_NOT_WORKING )
 GAME( 1986,  mjsenka,  0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 MACHINE_NOT_WORKING )
-GAME( 1986,  mjyarou,  0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan)",           MACHINE_NOT_WORKING )
+GAME( 1986,  mjyarou,  0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 1)",    MACHINE_NOT_WORKING )
+GAME( 1986,  mjyarou2, mjyarou,  royalmah, royalmah, driver_device,  0,        ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 2)",    MACHINE_NOT_WORKING )
 GAME( 1986?, mjclub,   0,        mjclub,   mjclub,   driver_device,  0,        ROT0,   "Xex",                        "Mahjong Club [BET] (Japan)",            0 )
 GAME( 1987,  mjdiplob, 0,        mjdiplob, mjdiplob, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Diplomat [BET] (Japan)",        0 )
-GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  driver_device,  0,        ROT0,   "Dynax",                      "Tonton [BET] (Japan set 1)",            0 )
+GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  driver_device,  0,        ROT0,   "Dynax",                      "Tonton [BET] (Japan, set 1)",           0 )
 GAME( 1987,  makaijan, 0,        makaijan, makaijan, driver_device,  0,        ROT0,   "Dynax",                      "Makaijan [BET] (Japan)",                0 )
 GAME( 1988,  majs101b, 0,        majs101b, majs101b, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Studio 101 [BET] (Japan)",      0 )
 GAME( 1988,  mjapinky, 0,        mjapinky, mjapinky, driver_device,  0,        ROT0,   "Dynax",                      "Almond Pinky [BET] (Japan)",            0 )

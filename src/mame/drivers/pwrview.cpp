@@ -12,6 +12,7 @@
 #include "machine/i8251.h"
 #include "machine/z80dart.h"
 #include "machine/pit8253.h"
+#include "machine/bankdev.h"
 #include "screen.h"
 #include "video/mc6845.h"
 #include "bus/rs232/rs232.h"
@@ -24,7 +25,9 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_pit(*this, "pit"),
 	m_bios(*this, "bios"),
-	m_ram(*this, "ram")
+	m_ram(*this, "ram"),
+	m_biosbank(*this, "bios_bank"),
+	m_vram(64*1024)
 	{ }
 
 	DECLARE_READ16_MEMBER(bank0_r);
@@ -40,6 +43,13 @@ public:
 	DECLARE_READ16_MEMBER(nmiio_r);
 	DECLARE_WRITE16_MEMBER(nmiio_w);
 	DECLARE_WRITE16_MEMBER(nmimem_w);
+	DECLARE_READ16_MEMBER(bios_r);
+	DECLARE_WRITE16_MEMBER(bios_w);
+	DECLARE_READ16_MEMBER(vram1_r);
+	DECLARE_WRITE16_MEMBER(vram1_w);
+	DECLARE_READ16_MEMBER(vram2_r);
+	DECLARE_WRITE16_MEMBER(vram2_w);
+	DECLARE_READ16_MEMBER(fbios_r);
 	DECLARE_READ8_MEMBER(rotary_r);
 	DECLARE_READ8_MEMBER(err_r);
 	MC6845_UPDATE_ROW(update_row);
@@ -53,14 +63,19 @@ private:
 	required_device<pit8253_device> m_pit;
 	required_memory_region m_bios;
 	required_shared_ptr<u16> m_ram;
+	required_device<address_map_bank_device> m_biosbank;
+	std::vector<u16> m_vram;
 	u8 m_leds[2];
-	u8 m_switch, m_c001, m_c009, m_c280, m_errcode;
+	u8 m_switch, m_c001, m_c009, m_c280, m_errcode, m_vramwin[2];
 	emu_timer *m_dmahack;
 };
 
 void pwrview_state::device_start()
 {
+	save_item(NAME(m_vram));
 	m_dmahack = timer_alloc();
+	membank("vram1")->configure_entries(0, 0x400, &m_vram[0], 0x80);
+	membank("vram2")->configure_entries(0, 0x400, &m_vram[0], 0x80);
 }
 
 void pwrview_state::device_reset()
@@ -69,6 +84,10 @@ void pwrview_state::device_reset()
 	m_switch = 0xe0;
 	m_c001 = m_c009 = 0;
 	m_errcode = 0x31;
+	membank("vram1")->set_entry(0);
+	membank("vram2")->set_entry(0);
+	m_vramwin[0] = m_vramwin[1] = 0;
+	m_biosbank->set_bank(0);
 }
 
 void pwrview_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -131,9 +150,48 @@ WRITE16_MEMBER(pwrview_state::nmiio_w)
 
 WRITE16_MEMBER(pwrview_state::nmimem_w)
 {
-	logerror("%s: mem nmi at %05x\n",machine().describe_context(), offset*2);
+	logerror("%s: mem nmi at %05x\n",machine().describe_context(), ((offset & 0x7fff) * 2) + 0xf8000);
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	m_errcode = 0xae; // TODO: ?
+}
+
+READ16_MEMBER(pwrview_state::fbios_r)
+{
+	switch(m_c009 & 0xc)
+	{
+		case 0x0:
+		case 0x4:
+			return m_bios->as_u16(offset);
+		case 0x8:
+			return m_ram[offset + 0xf8000/2];
+		case 0xc:
+			return 0;
+	}
+	return 0;
+}
+
+READ16_MEMBER(pwrview_state::vram1_r)
+{
+	return m_vramwin[0];
+}
+
+WRITE16_MEMBER(pwrview_state::vram1_w)
+{
+	data &= 0x3ff;
+	membank("vram1")->set_entry(data);
+	m_vramwin[0] = data;
+}
+
+READ16_MEMBER(pwrview_state::vram2_r)
+{
+	return m_vramwin[1];
+}
+
+WRITE16_MEMBER(pwrview_state::vram2_w)
+{
+	data &= 0x3ff;
+	membank("vram2")->set_entry(data);
+	m_vramwin[1] = data;
 }
 
 READ8_MEMBER(pwrview_state::unk1_r)
@@ -157,6 +215,7 @@ WRITE8_MEMBER(pwrview_state::unk2_w)
 		m_dmahack->adjust(attotime::zero, 0, attotime::from_nsec(50));
 	else
 		m_dmahack->adjust(attotime::never);
+	m_biosbank->set_bank((data >> 2) & 3);
 	m_c009 = data;
 }
 
@@ -212,12 +271,38 @@ WRITE8_MEMBER(pwrview_state::led_w)
 	}
 }
 
+static ADDRESS_MAP_START(bios_bank, AS_0, 16, pwrview_state)
+	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("bios", 0)
+	AM_RANGE(0x00000, 0x07fff) AM_WRITE(nmimem_w)
+
+	AM_RANGE(0x0be00, 0x0be7f) AM_RAMBANK("vram1")
+	AM_RANGE(0x0befe, 0x0beff) AM_READWRITE(vram1_r, vram1_w);
+	AM_RANGE(0x0bf00, 0x0bf7f) AM_RAMBANK("vram2")
+	AM_RANGE(0x0bffe, 0x0bfff) AM_READWRITE(vram2_r, vram2_w);
+	AM_RANGE(0x0c000, 0x0ffff) AM_ROM AM_REGION("bios", 0x4000)
+	AM_RANGE(0x0c000, 0x0ffff) AM_WRITE(nmimem_w)
+
+	AM_RANGE(0x10000, 0x17fff) AM_RAM
+
+	AM_RANGE(0x1be00, 0x1be7f) AM_RAMBANK("vram1")
+	AM_RANGE(0x1befe, 0x1beff) AM_READWRITE(vram1_r, vram1_w);
+	AM_RANGE(0x1bf00, 0x1bf7f) AM_RAMBANK("vram2")
+	AM_RANGE(0x1bffe, 0x1bfff) AM_READWRITE(vram2_r, vram2_w);
+	AM_RANGE(0x1c000, 0x1ffff) AM_ROM AM_REGION("bios", 0x4000)
+	AM_RANGE(0x1c000, 0x1ffff) AM_WRITE(nmimem_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START(pwrview_map, AS_PROGRAM, 16, pwrview_state)
 	AM_RANGE(0x00000, 0x003ff) AM_READWRITE(bank0_r, bank0_w)
 	AM_RANGE(0x00000, 0xf7fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xf8000, 0xfffff) AM_WRITE(nmimem_w)
+	AM_RANGE(0xf8000, 0xfffff) AM_DEVICE("bios_bank", address_map_bank_device, amap16)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(pwrview_fetch_map, AS_DECRYPTED_OPCODES, 16, pwrview_state)
+	AM_RANGE(0x00000, 0x003ff) AM_READ(bank0_r)
+	AM_RANGE(0x00000, 0xf7fff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0xf8000, 0xfffff) AM_READ(fbios_r)
+ADDRESS_MAP_END	
 
 static ADDRESS_MAP_START(pwrview_io, AS_IO, 16, pwrview_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -247,6 +332,7 @@ SLOT_INTERFACE_END
 static MACHINE_CONFIG_START( pwrview, pwrview_state )
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(pwrview_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(pwrview_fetch_map)
 	MCFG_CPU_IO_MAP(pwrview_io)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -270,6 +356,13 @@ static MACHINE_CONFIG_START( pwrview, pwrview_state )
 	MCFG_DEVICE_ADD("crtc", HD6845, XTAL_64MHz/64) // clock unknown
 	MCFG_MC6845_CHAR_WIDTH(32) // ??
 	MCFG_MC6845_UPDATE_ROW_CB(pwrview_state, update_row)
+
+	MCFG_DEVICE_ADD("bios_bank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bios_bank)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(17)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 MACHINE_CONFIG_END
 
 ROM_START(pwrview)

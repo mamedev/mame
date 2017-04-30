@@ -478,7 +478,7 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x484000, 0x484003) AM_WRITE(ddd_053936_clip_w)
 	AM_RANGE(0x486000, 0x48601f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)
 	AM_RANGE(0x488000, 0x4880ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
-	AM_RANGE(0x48a000, 0x48a01f) AM_DEVICE8("k054321", k054321_device, main_map, 0x00ff)
+	AM_RANGE(0x48a000, 0x48a01f) AM_DEVICE8("k054321", k054321_device, main_map, 0xff00)
 	AM_RANGE(0x48c000, 0x48c01f) AM_DEVWRITE("k054338", k054338_device, word_w)
 	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1") // bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ(dddeeprom_r)

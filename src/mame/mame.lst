@@ -10854,6 +10854,7 @@ tftc_302                        //
 tftc_303                        //
 tmnt_103                        //
 tmnt_104                        //
+tmnt_104g                       //
 tomy_102                        //
 tomy_400                        //
 tomy_h30                        //
@@ -14430,6 +14431,9 @@ ttfballa                        // Toytronic
 us2pfball                       // US Games
 uspbball                        // US Games
 
+@source:hh_sm500.cpp
+nupogodi                        //
+
 @source:hh_sm510.cpp
 gnw_bx301                       // Nintendo
 gnw_dm53                        // Nintendo
@@ -14440,7 +14444,6 @@ kgradius                        // Konami
 kloneran                        // Konami
 ktmnt                           // Konami
 ktopgun                         // Konami
-nupogodi                        //
 
 @source:hh_tms1k.cpp
 7in1ss                          // Tiger Electronics
@@ -20605,6 +20608,9 @@ minicom                         //
 
 @source:miniforce.cpp
 miniforce                       // D26 cabinet test board
+
+@source:minitel_2_rpic.cpp
+minitel2                        //
 
 @source:minivadr.cpp
 minivadr                        // D26 cabinet test board
@@ -28496,7 +28502,8 @@ crzytaxi                        // 1999.02 Crazy Taxi
 csmash                          // 2000.?? Cosmic Smash (Rev A)
 csmasho                         // 2000.?? Cosmic Smash
 cspike                          // 2000.10 Gun Spike / Cannon Spike
-cvs2gd                          // 2001.07.05 Capcom Vs. SNK 2 Millionaire Fighting 2001 (Rev A)
+cvs2mf                          // 2001.07.05 Capcom Vs. SNK 2 Millionaire Fighting 2001 (Rev A)
+cvs2                            // 2001.08.04 Capcom Vs. SNK 2 Mark Of The Millennium 2001
 cvsgd                           // 2001.05 Capcom Vs. SNK Millennium Fight 2000 Pro
 deathcox                        // 2000.10 Death Crimson OX
 demofist                        // 2003.06 Demolish Fist
@@ -32095,6 +32102,7 @@ mjtensin                        // "100" (c) 1995 Dynax
 mjvegas                         // "50" 1991 Dynax
 mjvegasa                        // "50" 1991 Dynax
 mjyarou                         // (c) 1986 Visco / Video System
+mjyarou2                        // (c) 1986 Visco / Video System
 openmj                          // (c) 1982 Nichibutsu
 royalmah                        // Falcon bootleg
 royalmj                         // (c) 1982 Nichibutsu

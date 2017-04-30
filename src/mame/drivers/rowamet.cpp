@@ -167,7 +167,7 @@ READ8_MEMBER( rowamet_state::sound_r )
 
 WRITE8_MEMBER( rowamet_state::mute_w )
 {
-	machine().sound().system_enable(~data);
+	machine().sound().system_enable(data ? 0 : 1);
 }
 
 READ8_MEMBER( rowamet_state::io_r )

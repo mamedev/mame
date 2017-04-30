@@ -270,8 +270,9 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ); }
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 6; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
+	static constexpr uint32_t OPCODE_BYTES = 8; // actually 6, but emulation requires padding to 64 bits
+	virtual uint32_t disasm_min_opcode_bytes() const override { return OPCODE_BYTES; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return OPCODE_BYTES; }
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:

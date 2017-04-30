@@ -82,7 +82,7 @@ READ8_MEMBER(mtxl_state::key_r)
 
 READ8_MEMBER(mtxl_state::coin_r)
 {
-	return 0xff;
+	return ioport("Coin")->read();
 }
 
 WRITE8_MEMBER(mtxl_state::key_w)
@@ -113,10 +113,10 @@ static ADDRESS_MAP_START( at32_io, AS_IO, 32, mtxl_state )
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("mb:pic8259_slave", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("mb:dma8237_2", am9517a_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x0224, 0x0227) AM_DEVREADWRITE8("cs4231", ad1848_device, read, write, 0xffffffff)
-	AM_RANGE(0x0228, 0x022b) AM_READ8(coin_r, 0xffffffff)
+	AM_RANGE(0x0228, 0x022b) AM_READ_PORT("Unknown")
 	AM_RANGE(0x022c, 0x022f) AM_WRITE8(bank_w, 0xff000000)
 	AM_RANGE(0x022c, 0x022f) AM_READWRITE8(key_r, key_w, 0x0000ff00)
-	AM_RANGE(0x022c, 0x022f) AM_READ8(coin_r, 0x00ff00ff)
+	AM_RANGE(0x022c, 0x022f) AM_READ8(coin_r, 0x000000ff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16550", ns16550_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
@@ -124,6 +124,19 @@ static ADDRESS_MAP_START( dbank_map, AS_PROGRAM, 32, mtxl_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("ioboard", 0)
 	AM_RANGE(0x100000, 0x17ffff) AM_DEVREADWRITE8("flash", intelfsh8_device, read, write, 0xffffffff)
 ADDRESS_MAP_END
+
+static INPUT_PORTS_START(mtouchxl)
+	PORT_START("Coin")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_NAME("Setup")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_SERVICE2) PORT_NAME("Calibrate")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_COIN1)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_COIN2)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN3)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN4)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("Unknown")
+	PORT_BIT(0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+INPUT_PORTS_END
 
 /**********************************************************
  *
@@ -286,7 +299,7 @@ ROM_START( mtchxl6k )
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(192, "multikey", 0)
-	ROM_LOAD( "multikey", 0, 192, BAD_DUMP CRC(a7d118c1) SHA1(c1a08315a2ddaee1fa626a22553b1560b255a59e) ) // hand made
+	ROM_LOAD( "multikey", 0, 192, BAD_DUMP CRC(d54ed86c) SHA1(83557dc604b2c7e8ab0787a3c3d73e1fb2556515) ) // hand made
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r07", 0, SHA1(95599e181d9249db09464420522180d753857f3b))
@@ -299,7 +312,7 @@ ROM_START( mtchxl6ko )
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(192, "multikey", 0)
-	ROM_LOAD( "multikey", 0, 192, BAD_DUMP CRC(a7d118c1) SHA1(c1a08315a2ddaee1fa626a22553b1560b255a59e) ) // hand made
+	ROM_LOAD( "multikey", 0, 192, BAD_DUMP CRC(d54ed86c) SHA1(83557dc604b2c7e8ab0787a3c3d73e1fb2556515) ) // hand made
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r02", 0, SHA1(eaaf26d2b700f16138090de7f372b40b93e8dba9))
@@ -349,6 +362,6 @@ COMP ( 1998, mtchxl5k,      0,    0,       at486,     at_keyboard,    driver_dev
 COMP ( 1998, mtchxl5ko,  mtchxl5k,0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000 (Version R5B)", MACHINE_NOT_WORKING )
 COMP ( 1998, mtchxl5ko2, mtchxl5k,0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000 (Version R5E)", MACHINE_NOT_WORKING )
 COMP ( 1999, mtchxl6k,      0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000 (Version r07)", MACHINE_NOT_WORKING )
-COMP ( 1999, mtchxl6ko,  mtchxl6k,0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000 (Version r02)", MACHINE_NOT_WORKING )
+COMP ( 1999, mtchxl6ko,  mtchxl6k,0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000 (Version r02)", MACHINE_NOT_WORKING )
 COMP ( 2000, mtchxlgld,     0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Gold (Version r01)", MACHINE_NOT_WORKING )
 COMP ( 2000, mtchxlgldo, mtchxlgld, 0,     at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Gold (Version r00)", MACHINE_NOT_WORKING )
