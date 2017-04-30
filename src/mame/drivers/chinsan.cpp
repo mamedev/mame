@@ -46,6 +46,7 @@ MM63.10N
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/mc8123.h"
+#include "machine/i8255.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "screen.h"
@@ -72,9 +73,9 @@ public:
 	uint8_t    m_adpcm_data;
 	uint8_t    m_trigger;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(chinsan_port00_w);
-	DECLARE_READ8_MEMBER(chinsan_input_port_0_r);
-	DECLARE_READ8_MEMBER(chinsan_input_port_1_r);
+	DECLARE_WRITE8_MEMBER(input_select_w);
+	DECLARE_READ8_MEMBER(input0_r);
+	DECLARE_READ8_MEMBER(input1_r);
 	DECLARE_WRITE8_MEMBER(ym_port_w1);
 	DECLARE_WRITE8_MEMBER(ym_port_w2);
 	DECLARE_WRITE8_MEMBER(chin_adpcm_w);
@@ -156,7 +157,7 @@ WRITE8_MEMBER(chinsan_state::ym_port_w2)
 	logerror("ym_write port 2 %02x\n", data);
 }
 
-WRITE8_MEMBER(chinsan_state::chinsan_port00_w)
+WRITE8_MEMBER( chinsan_state::input_select_w )
 {
 	m_port_select = data;
 
@@ -172,7 +173,7 @@ WRITE8_MEMBER(chinsan_state::chinsan_port00_w)
 
 }
 
-READ8_MEMBER(chinsan_state::chinsan_input_port_0_r)
+READ8_MEMBER( chinsan_state::input0_r )
 {
 	//return 0xff; // the inputs don't seem to work, so just return ff for now
 
@@ -203,7 +204,7 @@ READ8_MEMBER(chinsan_state::chinsan_input_port_0_r)
 	return machine().rand();
 }
 
-READ8_MEMBER(chinsan_state::chinsan_input_port_1_r)
+READ8_MEMBER( chinsan_state::input1_r )
 {
 	switch (m_port_select)
 	{
@@ -259,9 +260,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinsan_io, AS_IO, 8, chinsan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(chinsan_port00_w)
-	AM_RANGE(0x01, 0x01) AM_READ(chinsan_input_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_READ(chinsan_input_port_1_r)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(chin_adpcm_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)   // ROM bank + unknown stuff (input mutliplex?)
@@ -603,6 +602,10 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", chinsan_state,  irq0_line_hold)
 
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(chinsan_state, input_select_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(chinsan_state, input0_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(chinsan_state, input1_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
