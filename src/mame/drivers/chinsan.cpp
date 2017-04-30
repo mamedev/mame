@@ -1,47 +1,21 @@
-// license:BSD-3-Clause
-// copyright-holders:David Haywood
-/* Ganbare Chinsan Ooshoubu (がんばれ珍さん！大勝負)
- driver by David Haywood
+// license: BSD-3-Clause
+// copyright-holders: David Haywood, Dirk Best
+/***************************************************************************
 
-ToDo:
-Figure out dip switches
+	Ganbare Chinsan Ooshoubu (がんばれ珍さん！大勝負)
 
-Notes:
--ADPCM hook-up is virtually identical to the other Sanritsu games (Jantotsu, Appoooh, Dr. Micro etc.).
+    © 1987 Sanritsu
 
-*/
+    TODO:
+    - Figure out dip switches
+    - Verify clock speeds
+    - Raw screen params
 
-/*
+    Notes:
+    - ADPCM hook-up is virtually identical to the other Sanritsu games
+      (Jantotsu, Appoooh, Dr. Micro etc.).
 
-Ganbare Chinsan Ooshoubu
-(c)1987 Sanritsu
-
-C1-00114-B
-
-CPU:    317-5012 (MC-8123A)
-SOUND:  YM2203
-        M5205
-OSC:    10.000MHz
-        384KHz
-Chips:  8255AC-2
-
-
-MM00.7D   prg.
-MM01.8D
-
-MM20.7K   chr.
-MM21.8K
-MM22.9K
-
-MM40.13D  samples
-
-MM60.2C   ?
-
-MM61.9M   color
-MM62.9N
-MM63.10N
-
-*/
+***************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -52,170 +26,76 @@ MM63.10N
 #include "screen.h"
 #include "speaker.h"
 
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
 class chinsan_state : public driver_device
 {
 public:
 	chinsan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_video(*this, "video"),
 		m_maincpu(*this, "maincpu"),
-		m_adpcm(*this, "adpcm"),
+		m_video_ram(*this, "video_ram"), m_color_ram(*this, "color_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
+		m_adpcm(*this, "adpcm"),
 		m_inputs_p1{ {*this, "p1_0"}, {*this, "p1_1"}, {*this, "p1_2"}, {*this, "p1_3"}, {*this, "p1_4"} },
-		m_inputs_p2{ {*this, "p2_0"}, {*this, "p2_1"}, {*this, "p2_2"}, {*this, "p2_3"}, {*this, "p2_4"} }
+		m_inputs_p2{ {*this, "p2_0"}, {*this, "p2_1"}, {*this, "p2_2"}, {*this, "p2_3"}, {*this, "p2_4"} },
+		m_tilemap(nullptr),
+		m_port_select(0xff),
+		m_adpcm_pos(0), m_adpcm_idle(1), m_adpcm_data(0), m_trigger(0)
 	{ }
 
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_video;
-
-	/* misc */
-	uint8_t    m_port_select;
-	uint32_t   m_adpcm_pos;
-	uint8_t    m_adpcm_idle;
-	uint8_t    m_adpcm_data;
-	uint8_t    m_trigger;
-	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(input_select_w);
 	DECLARE_READ8_MEMBER(input_p2_r);
 	DECLARE_READ8_MEMBER(input_p1_r);
-	DECLARE_WRITE8_MEMBER(ym_port_w1);
-	DECLARE_WRITE8_MEMBER(ym_port_w2);
-	DECLARE_WRITE8_MEMBER(chin_adpcm_w);
+
+	DECLARE_PALETTE_INIT(chinsan);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TILE_GET_INFO_MEMBER(tile_info);
+
+	DECLARE_WRITE8_MEMBER(adpcm_w);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int_w);
+
+	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_DRIVER_INIT(chinsan);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(chinsan);
-	uint32_t screen_update_chinsan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(chin_adpcm_int);
-	required_device<mc8123_device> m_maincpu;
-	required_device<msm5205_device> m_adpcm;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	std::unique_ptr<uint8_t[]> m_decrypted_opcodes;
 
 private:
+	required_device<mc8123_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_color_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<msm5205_device> m_adpcm;
 	required_ioport m_inputs_p1[5];
 	required_ioport m_inputs_p2[5];
+
+	std::unique_ptr<uint8_t[]> m_decrypted_opcodes;
+
+	tilemap_t *m_tilemap;
+
+	uint8_t m_port_select;
+	uint32_t m_adpcm_pos;
+	uint8_t m_adpcm_idle;
+	uint8_t m_adpcm_data;
+	uint8_t m_trigger;
 };
 
 
-/*************************************
- *
- *  Video emulation
- *
- *************************************/
-
-PALETTE_INIT_MEMBER(chinsan_state, chinsan)
-{
-	uint8_t *src = memregion( "color_proms" )->base();
-	int i;
-
-	for (i = 0; i < 0x100; i++)
-		palette.set_pen_color(i, pal4bit(src[i + 0x200]), pal4bit(src[i + 0x100]), pal4bit(src[i + 0x000]));
-}
-
-void chinsan_state::video_start()
-{
-}
-
-uint32_t chinsan_state::screen_update_chinsan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int y, x, count;
-	count = 0;
-	for (y = 0; y < 32; y++)
-	{
-		for (x = 0; x < 64; x++)
-		{
-			int tileno, colour;
-			tileno = m_video[count] | (m_video[count + 0x800] << 8);
-			colour = m_video[count + 0x1000] >> 3;
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tileno,colour,0,0,x*8,y*8);
-			count++;
-		}
-	}
-
-	return 0;
-}
-
-
-
-/*************************************
- *
- *  Memory handlers
- *
- *************************************/
-
-WRITE8_MEMBER(chinsan_state::ctrl_w)
-{
-	membank("bank1")->set_entry(data >> 6);
-	membank("bank1d")->set_entry(data >> 6);
-}
-
-WRITE8_MEMBER(chinsan_state::ym_port_w1)
-{
-	logerror("ym_write port 1 %02x\n", data);
-}
-
-
-WRITE8_MEMBER(chinsan_state::ym_port_w2)
-{
-	logerror("ym_write port 2 %02x\n", data);
-}
-
-WRITE8_MEMBER( chinsan_state::input_select_w )
-{
-	// 765-----  unknown
-	// ---43210  input select (shared for player 1 and 2)
-
-	m_port_select = data;
-}
-
-READ8_MEMBER( chinsan_state::input_p1_r )
-{
-	uint8_t data = 0xff;
-
-	if (BIT(m_port_select, 0) == 0) data &= m_inputs_p1[0]->read();
-	if (BIT(m_port_select, 1) == 0) data &= m_inputs_p1[1]->read();
-	if (BIT(m_port_select, 2) == 0) data &= m_inputs_p1[2]->read();
-	if (BIT(m_port_select, 3) == 0) data &= m_inputs_p1[3]->read();
-	if (BIT(m_port_select, 4) == 0) data &= m_inputs_p1[4]->read();
-
-	return data;
-}
-
-READ8_MEMBER( chinsan_state::input_p2_r )
-{
-	uint8_t data = 0xff;
-
-	if (BIT(m_port_select, 0) == 0) data &= m_inputs_p2[0]->read();
-	if (BIT(m_port_select, 1) == 0) data &= m_inputs_p2[1]->read();
-	if (BIT(m_port_select, 2) == 0) data &= m_inputs_p2[2]->read();
-	if (BIT(m_port_select, 3) == 0) data &= m_inputs_p2[3]->read();
-	if (BIT(m_port_select, 4) == 0) data &= m_inputs_p2[4]->read();
-
-	return data;
-}
-
-WRITE8_MEMBER(chinsan_state::chin_adpcm_w)
-{
-	m_adpcm_pos = (data & 0xff) * 0x100;
-	m_adpcm_idle = 0;
-	m_adpcm->reset_w(0);
-}
-
-/*************************************
- *
- *  Address maps
- *
- *************************************/
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
 
 static ADDRESS_MAP_START( chinsan_map, AS_PROGRAM, 8, chinsan_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("video")
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("video_ram")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("color_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, chinsan_state )
@@ -227,16 +107,14 @@ static ADDRESS_MAP_START( chinsan_io, AS_IO, 8, chinsan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_WRITE(chin_adpcm_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)   // ROM bank + unknown stuff (input mutliplex?)
+	AM_RANGE(0x20, 0x20) AM_WRITE(adpcm_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)
 ADDRESS_MAP_END
 
 
-/*************************************
- *
- *  Input ports
- *
- *************************************/
+//**************************************************************************
+//  INPUTS
+//**************************************************************************
 
 static INPUT_PORTS_START( chinsan )
 	PORT_START("DSW1")
@@ -361,35 +239,103 @@ static INPUT_PORTS_START( chinsan )
 INPUT_PORTS_END
 
 
+//**************************************************************************
+//  INPUT PORT HANDLING
+//**************************************************************************
 
-/*************************************
- *
- *  Graphics definitions
- *
- *************************************/
-
-static const gfx_layout tiles8x8_layout =
+WRITE8_MEMBER( chinsan_state::input_select_w )
 {
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
+	// 765-----  unknown
+	// ---43210  input select (shared for player 1 and 2)
+
+	m_port_select = data;
+}
+
+READ8_MEMBER( chinsan_state::input_p1_r )
+{
+	uint8_t data = 0xff;
+
+	if (BIT(m_port_select, 0) == 0) data &= m_inputs_p1[0]->read();
+	if (BIT(m_port_select, 1) == 0) data &= m_inputs_p1[1]->read();
+	if (BIT(m_port_select, 2) == 0) data &= m_inputs_p1[2]->read();
+	if (BIT(m_port_select, 3) == 0) data &= m_inputs_p1[3]->read();
+	if (BIT(m_port_select, 4) == 0) data &= m_inputs_p1[4]->read();
+
+	return data;
+}
+
+READ8_MEMBER( chinsan_state::input_p2_r )
+{
+	uint8_t data = 0xff;
+
+	if (BIT(m_port_select, 0) == 0) data &= m_inputs_p2[0]->read();
+	if (BIT(m_port_select, 1) == 0) data &= m_inputs_p2[1]->read();
+	if (BIT(m_port_select, 2) == 0) data &= m_inputs_p2[2]->read();
+	if (BIT(m_port_select, 3) == 0) data &= m_inputs_p2[3]->read();
+	if (BIT(m_port_select, 4) == 0) data &= m_inputs_p2[4]->read();
+
+	return data;
+}
+
+
+//**************************************************************************
+//  PALETTE
+//**************************************************************************
+
+PALETTE_INIT_MEMBER( chinsan_state, chinsan )
+{
+	uint8_t *src = memregion("color_proms")->base();
+
+	for (int i = 0; i < 0x100; i++)
+		palette.set_pen_color(i, pal4bit(src[i + 0x200]), pal4bit(src[i + 0x100]), pal4bit(src[i + 0x000]));
+}
+
+
+//**************************************************************************
+//  VIDEO EMULATION
+//**************************************************************************
+
+uint32_t chinsan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_tilemap->mark_all_dirty();
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
+//**************************************************************************
+//  DRAWGFX LAYOUTS
+//**************************************************************************
 
 static GFXDECODE_START( chinsan )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 32 )
+	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x3_planar, 0, 32)
 GFXDECODE_END
 
-/*************************************
- *
- *  Sound interface
- *
- *************************************/
+TILE_GET_INFO_MEMBER( chinsan_state::tile_info )
+{
+	uint16_t code = m_video_ram[tile_index] | (m_video_ram[tile_index + 0x800] << 8);
 
-WRITE_LINE_MEMBER(chinsan_state::chin_adpcm_int)
+	// 76543---  color
+	// -----210  unknown
+	uint8_t color = m_color_ram[tile_index] >> 3;
+
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
+}
+
+
+//**************************************************************************
+//  AUDIO
+//**************************************************************************
+
+WRITE8_MEMBER( chinsan_state::adpcm_w )
+{
+	m_adpcm_pos = data << 8;
+	m_adpcm_idle = 0;
+	m_adpcm->reset_w(0);
+}
+
+WRITE_LINE_MEMBER( chinsan_state::adpcm_int_w )
 {
 	if (m_adpcm_pos >= 0x10000 || m_adpcm_idle)
 	{
@@ -404,7 +350,7 @@ WRITE_LINE_MEMBER(chinsan_state::chin_adpcm_int)
 		m_adpcm_data = ((m_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
 		m_adpcm->data_w(m_adpcm_data & 0xf);
 		m_trigger ^= 1;
-		if(m_trigger == 0)
+		if (m_trigger == 0)
 		{
 			m_adpcm_pos++;
 			if ((ROM[m_adpcm_pos] & 0xff) == 0x70)
@@ -414,88 +360,100 @@ WRITE_LINE_MEMBER(chinsan_state::chin_adpcm_int)
 }
 
 
-/*************************************
- *
- *  Machine driver
- *
- *************************************/
+//**************************************************************************
+//  MACHINE EMULATION
+//**************************************************************************
+
+WRITE8_MEMBER( chinsan_state::ctrl_w )
+{
+	// 76------  rom bank
+	// --543210  unknown
+
+	membank("bank1")->set_entry(data >> 6);
+	membank("bank1d")->set_entry(data >> 6);
+}
 
 void chinsan_state::machine_start()
 {
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinsan_state::tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
 	membank("bank0d")->set_base(m_decrypted_opcodes.get());
 	membank("bank1d")->configure_entries(0, 4, m_decrypted_opcodes.get() + 0x8000, 0x4000);
 
-	save_item(NAME(m_adpcm_idle));
 	save_item(NAME(m_port_select));
 	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_idle));
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_trigger));
 }
 
 void chinsan_state::machine_reset()
 {
-	m_adpcm_idle = 1;
-	m_port_select = 0;
+	m_port_select = 0xff;
 	m_adpcm_pos = 0;
+	m_adpcm_idle = 1;
 	m_adpcm_data = 0;
 	m_trigger = 0;
 }
 
+DRIVER_INIT_MEMBER( chinsan_state, chinsan )
+{
+	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0x18000);
+	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), 0x18000);
+}
+
+
+//**************************************************************************
+//  MACHINE DEFINTIONS
+//**************************************************************************
 
 static MACHINE_CONFIG_START( chinsan, chinsan_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC8123, 10000000/2)      /* ? MHz */
+	MCFG_CPU_ADD("maincpu", MC8123, XTAL_10MHz/2) // 317-5012
 	MCFG_CPU_PROGRAM_MAP(chinsan_map)
 	MCFG_CPU_IO_MAP(chinsan_io)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", chinsan_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", chinsan_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(chinsan_state, input_select_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(chinsan_state, input_p2_r))
 	MCFG_I8255_IN_PORTC_CB(READ8(chinsan_state, input_p1_r))
 
-	/* video hardware */
+	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_VISIBLE_AREA(24, 512-24-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(chinsan_state, screen_update_chinsan)
+	MCFG_SCREEN_UPDATE_DRIVER(chinsan_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinsan)
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(chinsan_state, chinsan)
 
-	/* sound hardware */
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000) /* ? Mhz */
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000) // ? Mhz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(chinsan_state, ym_port_w1))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(chinsan_state, ym_port_w2))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("adpcm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(chinsan_state, chin_adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)  /* 8kHz */
+	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(chinsan_state, adpcm_int_w))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B) // 8kHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
-
-/*************************************
- *
- *  ROM definition(s)
- *
- *************************************/
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
 
 ROM_START( chinsan )
 	ROM_REGION( 0x18000, "maincpu", 0 ) /* encrypted code / data */
@@ -507,9 +465,9 @@ ROM_START( chinsan )
 	ROM_LOAD( "317-5012.key",  0x0000, 0x2000, CRC(2ecfb132) SHA1(3110ef82080dd7d908cc6bf34c6643f187f90b29) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
-	ROM_LOAD( "mm20.7k", 0x00000, 0x10000, CRC(54efb409) SHA1(333adadd7f3dc3393dbe334303bae544b3d26c00) )
+	ROM_LOAD( "mm22.9k", 0x00000, 0x10000, CRC(6092f6e1) SHA1(32f53027dc954e314d7c5d04ff53f17358bbcf77) )
 	ROM_LOAD( "mm21.8k", 0x10000, 0x10000, CRC(25f6c827) SHA1(add72a3cfa2f24105e36d0464c2db6a6bedd4139) )
-	ROM_LOAD( "mm22.9k", 0x20000, 0x10000, CRC(6092f6e1) SHA1(32f53027dc954e314d7c5d04ff53f17358bbcf77) )
+	ROM_LOAD( "mm20.7k", 0x20000, 0x10000, CRC(54efb409) SHA1(333adadd7f3dc3393dbe334303bae544b3d26c00) )
 
 	ROM_REGION( 0x10000, "adpcm", 0 ) /* M5205 samples */
 	ROM_LOAD( "mm40.13d", 0x00000, 0x10000, CRC(a408b8f7) SHA1(60a2644922cb60c0a1a3409761c7e50924360313) )
@@ -524,23 +482,9 @@ ROM_START( chinsan )
 ROM_END
 
 
-/*************************************
- *
- *  Driver initialization
- *
- *************************************/
+//**************************************************************************
+//  SYSTEM DRIVERS
+//**************************************************************************
 
-DRIVER_INIT_MEMBER(chinsan_state,chinsan)
-{
-	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0x18000);
-	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), 0x18000);
-}
-
-
-/*************************************
- *
- *  Game driver(s)
- *
- *************************************/
-
-GAME( 1987, chinsan,  0,    chinsan, chinsan, chinsan_state, chinsan, ROT0, "Sanritsu", "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE  INPUT    CLASS          INIT     ROTATION  COMPANY     FULLNAME                                         FLAGS
+GAME( 1987, chinsan,  0,      chinsan, chinsan, chinsan_state, chinsan, ROT0,     "Sanritsu", "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", MACHINE_SUPPORTS_SAVE )
