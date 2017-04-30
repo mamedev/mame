@@ -86,7 +86,7 @@ namespace imgtool
 
 		datetime(datetime_type type, std::chrono::time_point<std::chrono::system_clock> tp);
 		datetime(datetime_type type, time_t t);
-		datetime(datetime_type type, tm &t);
+		datetime(datetime_type type, const util::arbitrary_datetime &dt, bool clamp = true);
 		datetime(const datetime &that) = default;
 		datetime(datetime &&that) = default;
 

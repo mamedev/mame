@@ -35,6 +35,21 @@ typedef std::chrono::duration<std::uint64_t, std::ratio<1, 10000000> > ntfs_dura
 
 
 //---------------------------------------------------------
+//	arbitrary_datetime
+//---------------------------------------------------------
+
+struct arbitrary_datetime
+{
+	int year;			// absolute year (1900 AD = 1900)
+	int month;			// month (1-12)
+	int day_of_month;	// day of month (1-31)
+	int hour;			// hour (0-23)
+	int minute;			// minute (0-59)
+	int second;			// second (0-59)
+};
+
+
+//---------------------------------------------------------
 //  arbitrary_clock - an std::chrono clock that "knows" the
 //  date of the epoch's begining
 //---------------------------------------------------------
@@ -55,6 +70,17 @@ public:
 	static constexpr int base_second = S;
 
 	//---------------------------------------------------------
+	//  from_arbitrary_datetime - converts an 
+	//  from_arbitrary_datetime to this arbitrary_clock's scale
+	//---------------------------------------------------------
+
+	static time_point from_arbitrary_datetime(const arbitrary_datetime &dt, bool clamp)
+	{
+		return time_point(duration_from_arbitrary_datetime(dt, clamp));
+	}
+
+
+	//---------------------------------------------------------
 	//  from_arbitrary_time_point - converts an arbitrary_clock
 	//  with a different scale to this arbitrary_clock's scale
 	//---------------------------------------------------------
@@ -62,13 +88,15 @@ public:
 	template<typename Rep2, int Y2, int M2, int D2, int H2, int N2, int S2, typename Ratio2>
 	static time_point from_arbitrary_time_point(const std::chrono::time_point<arbitrary_clock<Rep2, Y2, M2, D2, H2, N2, S2, Ratio2> > &tp)
 	{
-		const int64_t our_absolute_day = absolute_day(Y, M, D);
-		const int64_t their_absolute_day = absolute_day(Y2, M2, D2);
+		arbitrary_datetime dt;
+		dt.year = Y2;
+		dt.month = M2;
+		dt.day_of_month = D2;
+		dt.hour = H2;
+		dt.minute = N2;
+		dt.second = S2;
 
-		const auto our_fract_day = std::chrono::hours(H) + std::chrono::minutes(N) + std::chrono::seconds(S);
-		const auto their_fract_day = std::chrono::hours(H2) + std::chrono::minutes(N2) + std::chrono::seconds(S2);
-
-		const std::chrono::duration<Rep, Ratio> adjustment(std::chrono::hours(24) * (their_absolute_day - our_absolute_day) + (their_fract_day - our_fract_day));
+		const duration adjustment = duration_from_arbitrary_datetime(dt, false);
 		const duration result_duration = std::chrono::duration_cast<duration>(tp.time_since_epoch() + adjustment);
 		return time_point(result_duration);
 	}
@@ -141,6 +169,46 @@ private:
 	//   * centuries where the last quadyear has a leap year at the end are at the
 	//     end of every quadcentury
 	typedef arbitrary_clock<std::int64_t, 1601, 1, 1, 0, 0, 0, std::ratio<1, 1> > tm_conversion_clock;
+
+
+	//---------------------------------------------------------
+	//	clamp_or_throw
+	//---------------------------------------------------------
+
+	static int clamp_or_throw(int value, int minimum, int maximum, bool clamp, const char *out_of_range_message)
+	{
+		if (value < minimum || value > maximum)
+		{
+			if (clamp)
+				value = std::min(std::max(value, minimum), maximum);
+			else
+				throw std::out_of_range(out_of_range_message);
+		}
+		return value;
+	}
+
+	//---------------------------------------------------------
+	//  duration_from_arbitrary_datetime - converts an 
+	//  arbitrary_datetime to this arbitrary_clock's duration
+	//---------------------------------------------------------
+
+	static duration duration_from_arbitrary_datetime(const arbitrary_datetime &dt, bool clamp)
+	{
+		// range checking
+		const int month			= clamp_or_throw(dt.month, 1, 12, clamp, "invalid dt.month");
+		const int day_of_month	= clamp_or_throw(dt.day_of_month, 1, gregorian_days_in_month(month, dt.year), clamp, "invalid dt.day_of_month");
+		const int hour			= clamp_or_throw(dt.hour, 0, 23, clamp, "invalid dt.hour");
+		const int minute		= clamp_or_throw(dt.minute, 0, 59, clamp, "invalid dt.minute");
+		const int second		= clamp_or_throw(dt.second, 0, 59, clamp, "invalid dt.second");
+
+		const int64_t our_absolute_day = absolute_day(Y, M, D);
+		const int64_t their_absolute_day = absolute_day(dt.year, month, day_of_month);
+
+		const auto our_fract_day = std::chrono::hours(H) + std::chrono::minutes(N) + std::chrono::seconds(S);
+		const auto their_fract_day = std::chrono::hours(hour) + std::chrono::minutes(minute) + std::chrono::seconds(second);
+
+		return std::chrono::duration<Rep, Ratio>(std::chrono::hours(24) * (their_absolute_day - our_absolute_day) + (their_fract_day - our_fract_day));
+	}
 
 	//---------------------------------------------------------
 	//  internal_to_tm - formats a structure of type 'struct tm'

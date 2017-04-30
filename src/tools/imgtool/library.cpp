@@ -45,8 +45,9 @@ datetime::datetime(datetime_type type, time_t t)
 //  datetime ctor
 //-------------------------------------------------
 
-datetime::datetime(datetime_type type, tm &t)
-	: datetime(type, mktime(&t))
+datetime::datetime(datetime_type type, const util::arbitrary_datetime &dt, bool clamp)
+	: m_type(type)
+	, m_time_point(imgtool_clock::from_arbitrary_datetime(dt, clamp))
 {
 }
 

@@ -785,6 +785,77 @@ void imgtool::partition::get_attribute_name(uint32_t attribute, const imgtool_at
 
 
 //-------------------------------------------------
+//	test_imgtool_datetime - unit test for imgtool::datetime
+//-------------------------------------------------
+
+static bool test_imgtool_datetime(int second, int minute, int hour, int day_of_month, int month, int year)
+{
+	bool error = false;
+
+	util::arbitrary_datetime t;
+	t.second = second;
+	t.minute = minute;
+	t.hour = hour;
+	t.day_of_month = day_of_month;
+	t.month = month;
+	t.year = year;
+
+	imgtool::datetime dt(imgtool::datetime::datetime_type::GMT, t);
+	std::tm t2 = dt.gmtime();
+
+	if (t2.tm_sec != second)
+	{
+		util::stream_format(std::wcerr, L"test_imgtool_datetime():  Expected t2.tm_sec to be %d, instead got %d\n", second, t2.tm_sec);
+		error = true;
+	}
+	if (t2.tm_min != minute)
+	{
+		util::stream_format(std::wcerr, L"test_imgtool_datetime():  Expected t2.tm_min to be %d, instead got %d\n", minute, t2.tm_min);
+		error = true;
+	}
+	if (t2.tm_hour != hour)
+	{
+		util::stream_format(std::wcerr, L"test_imgtool_datetime():  Expected t2.tm_hour to be %d, instead got %d\n", hour, t2.tm_hour);
+		error = true;
+	}
+	if (t2.tm_mday != day_of_month)
+	{
+		util::stream_format(std::wcerr, L"test_imgtool_datetime():  Expected t2.tm_mday to be %d, instead got %d\n", day_of_month, t2.tm_mday);
+		error = true;
+	}
+	if (t2.tm_mon != month - 1)
+	{
+		util::stream_format(std::wcerr, L"test_imgtool_datetime():  Expected t2.tm_mon to be %d, instead got %d\n", month - 1, t2.tm_mon);
+		error = true;
+	}
+	if (t2.tm_year != year - 1900)
+	{
+		util::stream_format(std::wcerr, L"test_imgtool_datetime():  Expected t2.tm_mon to be %d, instead got %d\n", year - 1900, t2.tm_year);
+		error = true;
+	}
+	return error;
+}
+
+
+//-------------------------------------------------
+//	test_imgtool_datetime - unit tests for imgtool::datetime
+//-------------------------------------------------
+
+static bool test_imgtool_datetime()
+{
+	bool error = false;
+
+	// various test cases for imgtool::datetime
+	if (test_imgtool_datetime(34, 23, 12, 18, 3, 1993))		// March 18th, 1993 12:23:34
+		error = true;
+	if (test_imgtool_datetime(0, 20, 16, 25, 12, 1976))		// December 25th, 1976 16:20:00
+		error = true;
+
+	return error;
+}
+
+
+//-------------------------------------------------
 //	imgtool_validitychecks - checks the validity
 //	of the imgtool modules
 //-------------------------------------------------
@@ -795,6 +866,10 @@ bool imgtool_validitychecks(void)
 	imgtoolerr_t err = (imgtoolerr_t)IMGTOOLERR_SUCCESS;
 	imgtool_module_features features;
 	int created_library = false;
+
+	// various test cases for imgtool::datetime
+	if (test_imgtool_datetime())
+		error = true;
 
 	if (!global_imgtool_library)
 	{
