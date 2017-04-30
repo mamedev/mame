@@ -40,11 +40,10 @@ public:
 	DECLARE_WRITE8_MEMBER(unk3_w);
 	DECLARE_READ8_MEMBER(led_r);
 	DECLARE_WRITE8_MEMBER(led_w);
+	DECLARE_READ8_MEMBER(pitclock_r);
 	DECLARE_READ16_MEMBER(nmiio_r);
 	DECLARE_WRITE16_MEMBER(nmiio_w);
 	DECLARE_WRITE16_MEMBER(nmimem_w);
-	DECLARE_READ16_MEMBER(bios_r);
-	DECLARE_WRITE16_MEMBER(bios_w);
 	DECLARE_READ16_MEMBER(vram1_r);
 	DECLARE_WRITE16_MEMBER(vram1_w);
 	DECLARE_READ16_MEMBER(vram2_r);
@@ -152,7 +151,18 @@ WRITE16_MEMBER(pwrview_state::nmimem_w)
 {
 	logerror("%s: mem nmi at %05x\n",machine().describe_context(), ((offset & 0x7fff) * 2) + 0xf8000);
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	m_errcode = 0xae; // TODO: ?
+	switch(((offset & 0x7fff) * 2) + 0x8000) // TODO: some connection with faulting address?
+	{
+		case 0x82e4:
+			m_errcode = 0xae;
+			break;
+		case 0xbe80:
+			m_errcode = 0xa6;
+			break;
+		case 0xbefc:
+			m_errcode = 0xb6;
+			break;
+	}
 }
 
 READ16_MEMBER(pwrview_state::fbios_r)
@@ -271,6 +281,13 @@ WRITE8_MEMBER(pwrview_state::led_w)
 	}
 }
 
+READ8_MEMBER(pwrview_state::pitclock_r)
+{
+	m_pit->write_clk0(ASSERT_LINE);
+	m_pit->write_clk0(CLEAR_LINE);
+	return 0;
+}
+
 static ADDRESS_MAP_START(bios_bank, AS_0, 16, pwrview_state)
 	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x00000, 0x07fff) AM_WRITE(nmimem_w)
@@ -280,7 +297,7 @@ static ADDRESS_MAP_START(bios_bank, AS_0, 16, pwrview_state)
 	AM_RANGE(0x0bf00, 0x0bf7f) AM_RAMBANK("vram2")
 	AM_RANGE(0x0bffe, 0x0bfff) AM_READWRITE(vram2_r, vram2_w);
 	AM_RANGE(0x0c000, 0x0ffff) AM_ROM AM_REGION("bios", 0x4000)
-	AM_RANGE(0x0c000, 0x0ffff) AM_WRITE(nmimem_w)
+	AM_RANGE(0x08000, 0x0ffff) AM_WRITE(nmimem_w)
 
 	AM_RANGE(0x10000, 0x17fff) AM_RAM
 
@@ -289,7 +306,7 @@ static ADDRESS_MAP_START(bios_bank, AS_0, 16, pwrview_state)
 	AM_RANGE(0x1bf00, 0x1bf7f) AM_RAMBANK("vram2")
 	AM_RANGE(0x1bffe, 0x1bfff) AM_READWRITE(vram2_r, vram2_w);
 	AM_RANGE(0x1c000, 0x1ffff) AM_ROM AM_REGION("bios", 0x4000)
-	AM_RANGE(0x1c000, 0x1ffff) AM_WRITE(nmimem_w)
+	AM_RANGE(0x18000, 0x1ffff) AM_WRITE(nmimem_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pwrview_map, AS_PROGRAM, 16, pwrview_state)
@@ -312,7 +329,7 @@ static ADDRESS_MAP_START(pwrview_io, AS_IO, 16, pwrview_state)
 	AM_RANGE(0xc008, 0xc009) AM_READWRITE8(unk2_r, unk2_w, 0xff00)
 	AM_RANGE(0xc00a, 0xc00b) AM_READ8(err_r, 0xff00)
 	AM_RANGE(0xc00c, 0xc00d) AM_RAM
-	AM_RANGE(0xc080, 0xc081) AM_UNMAP
+	AM_RANGE(0xc080, 0xc081) AM_RAM
 	AM_RANGE(0xc088, 0xc089) AM_DEVWRITE8("crtc", hd6845_device, address_w, 0x00ff)
 	AM_RANGE(0xc08a, 0xc08b) AM_DEVREADWRITE8("crtc", hd6845_device, register_r, register_w, 0x00ff)
 	AM_RANGE(0xc280, 0xc287) AM_READWRITE8(unk3_r, unk3_w, 0x00ff)
@@ -321,7 +338,8 @@ static ADDRESS_MAP_START(pwrview_io, AS_IO, 16, pwrview_state)
 	AM_RANGE(0xc2c0, 0xc2c1) AM_DEVREADWRITE8("uart", i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xc2c2, 0xc2c3) AM_DEVREADWRITE8("uart", i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xc2e0, 0xc2e3) AM_DEVICE8("fdc", upd765a_device, map, 0x00ff)
-	AM_RANGE(0xc2e4, 0xc2e7) AM_RAM
+	AM_RANGE(0xc2e4, 0xc2e5) AM_RAM
+	AM_RANGE(0xc2e6, 0xc2e7) AM_READ8(pitclock_r, 0x00ff)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmiio_r, nmiio_w)
 ADDRESS_MAP_END
 
