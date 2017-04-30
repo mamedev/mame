@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* Ganbare Chinsan Ooshoubu
+/* Ganbare Chinsan Ooshoubu (がんばれ珍さん！大勝負)
  driver by David Haywood
 
 ToDo:
-Improve Inputs
+Figure out dip switches
 
 Notes:
 -ADPCM hook-up is virtually identical to the other Sanritsu games (Jantotsu, Appoooh, Dr. Micro etc.).
@@ -61,7 +61,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_adpcm(*this, "adpcm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_inputs_p1{ {*this, "p1_0"}, {*this, "p1_1"}, {*this, "p1_2"}, {*this, "p1_3"}, {*this, "p1_4"} },
+		m_inputs_p2{ {*this, "p2_0"}, {*this, "p2_1"}, {*this, "p2_2"}, {*this, "p2_3"}, {*this, "p2_4"} }
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_video;
@@ -74,8 +77,8 @@ public:
 	uint8_t    m_trigger;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(input_select_w);
-	DECLARE_READ8_MEMBER(input0_r);
-	DECLARE_READ8_MEMBER(input1_r);
+	DECLARE_READ8_MEMBER(input_p2_r);
+	DECLARE_READ8_MEMBER(input_p1_r);
 	DECLARE_WRITE8_MEMBER(ym_port_w1);
 	DECLARE_WRITE8_MEMBER(ym_port_w2);
 	DECLARE_WRITE8_MEMBER(chin_adpcm_w);
@@ -91,6 +94,10 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	std::unique_ptr<uint8_t[]> m_decrypted_opcodes;
+
+private:
+	required_ioport m_inputs_p1[5];
+	required_ioport m_inputs_p2[5];
 };
 
 
@@ -159,78 +166,36 @@ WRITE8_MEMBER(chinsan_state::ym_port_w2)
 
 WRITE8_MEMBER( chinsan_state::input_select_w )
 {
+	// 765-----  unknown
+	// ---43210  input select (shared for player 1 and 2)
+
 	m_port_select = data;
-
-	if (
-		(data != 0x40) &&
-		(data != 0x4f) &&
-		(data != 0x53) &&
-		(data != 0x57) &&
-		(data != 0x5b) &&
-		(data != 0x5d) &&
-		(data != 0x5e))
-		logerror("write port 00 %02x\n", data);
-
 }
 
-READ8_MEMBER( chinsan_state::input0_r )
+READ8_MEMBER( chinsan_state::input_p1_r )
 {
-	//return 0xff; // the inputs don't seem to work, so just return ff for now
+	uint8_t data = 0xff;
 
-	switch (m_port_select)
-	{
-		/* i doubt these are both really the same.. */
-		case 0x40:
-		case 0x4f:
-			return ioport("MAHJONG_P2_1")->read();
+	if (BIT(m_port_select, 0) == 0) data &= m_inputs_p1[0]->read();
+	if (BIT(m_port_select, 1) == 0) data &= m_inputs_p1[1]->read();
+	if (BIT(m_port_select, 2) == 0) data &= m_inputs_p1[2]->read();
+	if (BIT(m_port_select, 3) == 0) data &= m_inputs_p1[3]->read();
+	if (BIT(m_port_select, 4) == 0) data &= m_inputs_p1[4]->read();
 
-		case 0x53:
-			return ioport("MAHJONG_P2_2")->read();
-
-		case 0x57:
-			return ioport("MAHJONG_P2_3")->read();
-
-		case 0x5b:
-			return ioport("MAHJONG_P2_4")->read();
-
-		case 0x5d:
-			return ioport("MAHJONG_P2_5")->read();
-
-		case 0x5e:
-			return ioport("MAHJONG_P2_6")->read();
-	}
-
-	printf("chinsan_input_port_0_r unk_r %02x\n", m_port_select);
-	return machine().rand();
+	return data;
 }
 
-READ8_MEMBER( chinsan_state::input1_r )
+READ8_MEMBER( chinsan_state::input_p2_r )
 {
-	switch (m_port_select)
-	{
-		/* i doubt these are both really the same.. */
-		case 0x40:
-		case 0x4f:
-			return ioport("MAHJONG_P1_1")->read();
+	uint8_t data = 0xff;
 
-		case 0x53:
-			return ioport("MAHJONG_P1_2")->read();
+	if (BIT(m_port_select, 0) == 0) data &= m_inputs_p2[0]->read();
+	if (BIT(m_port_select, 1) == 0) data &= m_inputs_p2[1]->read();
+	if (BIT(m_port_select, 2) == 0) data &= m_inputs_p2[2]->read();
+	if (BIT(m_port_select, 3) == 0) data &= m_inputs_p2[3]->read();
+	if (BIT(m_port_select, 4) == 0) data &= m_inputs_p2[4]->read();
 
-		case 0x57:
-			return ioport("MAHJONG_P1_3")->read();
-
-		case 0x5b:
-			return ioport("MAHJONG_P1_4")->read();
-
-		case 0x5d:
-			return ioport("MAHJONG_P1_5")->read();
-
-		case 0x5e:
-			return ioport("MAHJONG_P1_6")->read();
-	}
-
-	printf("chinsan_input_port_1_r unk_r %02x\n", m_port_select);
-	return machine().rand();
+	return data;
 }
 
 WRITE8_MEMBER(chinsan_state::chin_adpcm_w)
@@ -275,239 +240,124 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( chinsan )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW-1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW-1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW-1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW-1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW-1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW-1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW-1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW-1:8")
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW-2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW-2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW-2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW-2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW-2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW-2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW-2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW-2:8")
 
-
-	PORT_START("MAHJONG_P1_1")
-	PORT_DIPNAME( 0x01, 0x01, "1-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "P1 FF" ) // labaled FF in test mode, is this coin1?
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) // adds coins?, but maybe its the service switch?
-
-	PORT_START("MAHJONG_P1_2")
-	PORT_DIPNAME( 0x01, 0x01, "1-2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("MAHJONG_P1_3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-
-	PORT_START("MAHJONG_P1_4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-
-	PORT_START("MAHJONG_P1_5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-
-	PORT_START("MAHJONG_P1_6")
+	PORT_START("p1_0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_I )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("MAHJONG_P2_1")
-	PORT_DIPNAME( 0x01, 0x01, "2-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "P2 FF" ) // labaled FF in test mode, is this coin2 or some other button ?
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Test ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("p1_1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("MAHJONG_P2_2")
-	PORT_DIPNAME( 0x01, 0x01, "2-2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("p1_2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("MAHJONG_P2_3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
+	PORT_START("p1_3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("MAHJONG_P2_4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
+	PORT_START("p1_4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) // labeled ff in test mode, i assume this means flip flop
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("MAHJONG_P2_5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-
-	PORT_START("MAHJONG_P2_6")
+	PORT_START("p2_0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_M )   PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_I )   PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E )   PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A )   PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("p2_1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N )     PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J )     PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F )     PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B )     PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("p2_2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_K )   PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G )   PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C )   PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("p2_3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )   PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H )   PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D )   PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("p2_4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2) // labeled ff in test mode, i assume this means flip flop
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Statistics")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )
 INPUT_PORTS_END
 
 
@@ -604,8 +454,8 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(chinsan_state, input_select_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(chinsan_state, input0_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(chinsan_state, input1_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(chinsan_state, input_p2_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(chinsan_state, input_p1_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
