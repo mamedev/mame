@@ -212,7 +212,7 @@ public:
 	const std::string &bios() const { return m_specified_bios; }
 	const std::string &default_card_software() const { return m_default_card_software; }
 	bool specified() const { return m_specified; }
-	core_options::entry *option_entry() const { return m_entry; }
+	core_options::entry::shared_ptr option_entry() const { return m_entry; }
 
 	// seters
 	void specify(std::string &&text);
@@ -220,18 +220,18 @@ public:
 	void set_default_card_software(std::string &&s);
 
 	// instantiates an option entry (don't call outside of emuopts.cpp)
-	core_options::entry::ptr setup_option_entry(const char *name);
+	core_options::entry::shared_ptr setup_option_entry(const char *name);
 
 private:
 	void possibly_changed(const std::string &old_value);
 
-	emu_options &           m_host;
-	bool                    m_specified;
-	std::string             m_specified_value;
-	std::string             m_specified_bios;
-	std::string             m_default_card_software;
-	std::string             m_default_value;
-	core_options::entry *   m_entry;
+	emu_options &                   m_host;
+	bool                            m_specified;
+	std::string                     m_specified_value;
+	std::string                     m_specified_bios;
+	std::string                     m_default_card_software;
+	std::string                     m_default_value;
+	core_options::entry::shared_ptr m_entry;
 };
 
 
@@ -245,20 +245,20 @@ public:
 	// accessors
 	const std::string &cannonical_instance_name() const { return m_cannonical_instance_name; }
 	const std::string &value() const { return m_value; }
-	core_options::entry *option_entry() const { return m_entry; }
+	core_options::entry::shared_ptr option_entry() const { return m_entry; }
 
 	// mutators
 	void specify(const std::string &value);
 	void specify(std::string &&value);
 
 	// instantiates an option entry (don't call outside of emuopts.cpp)
-	core_options::entry::ptr setup_option_entry(std::vector<std::string> &&names);
+	core_options::entry::shared_ptr setup_option_entry(std::vector<std::string> &&names);
 
 private:
-	emu_options &           m_host;
-	std::string             m_cannonical_instance_name;
-	std::string             m_value;
-	core_options::entry *   m_entry;
+	emu_options &                   m_host;
+	std::string                     m_cannonical_instance_name;
+	std::string                     m_value;
+	core_options::entry::shared_ptr m_entry;
 };
 
 

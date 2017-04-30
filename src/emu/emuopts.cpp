@@ -397,8 +397,8 @@ emu_options::emu_options(bool general_only)
 	// add entries
 	if (!general_only)
 	{
-		add_entry(std::make_unique<system_name_option_entry>(*this));
-		add_entry(std::make_unique<software_name_option_entry>(*this));
+		add_entry(std::make_shared<system_name_option_entry>(*this));
+		add_entry(std::make_shared<software_name_option_entry>(*this));
 	}
 	add_entries(emu_options::s_option_entries);
 
@@ -1120,14 +1120,14 @@ void slot_option::set_bios(std::string &&text)
 //  slot_option::setup_option_entry
 //-------------------------------------------------
 
-core_options::entry::ptr slot_option::setup_option_entry(const char *name)
+core_options::entry::shared_ptr slot_option::setup_option_entry(const char *name)
 {
 	// this should only be called once
 	assert(!m_entry);
 
 	// create the entry and return it
-	m_entry = new slot_option_entry(name, *this);
-	return std::unique_ptr<core_options::entry>(m_entry);
+	m_entry = std::make_shared<slot_option_entry>(name, *this);
+	return m_entry;
 }
 
 
@@ -1174,12 +1174,12 @@ void image_option::specify(std::string &&value)
 //  image_option::setup_option_entry
 //-------------------------------------------------
 
-core_options::entry::ptr image_option::setup_option_entry(std::vector<std::string> &&names)
+core_options::entry::shared_ptr image_option::setup_option_entry(std::vector<std::string> &&names)
 {
 	// this should only be called once
 	assert(!m_entry);
 
 	// create the entry and return it
-	m_entry = new image_option_entry(std::move(names), *this);
-	return std::unique_ptr<core_options::entry>(m_entry);
+	m_entry = std::make_shared<image_option_entry>(std::move(names), *this);
+	return m_entry;
 }

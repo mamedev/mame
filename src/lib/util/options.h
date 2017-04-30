@@ -100,7 +100,8 @@ public:
 	class entry
 	{
 	public:
-		typedef std::unique_ptr<entry> ptr;
+		typedef std::shared_ptr<entry> shared_ptr;
+		typedef std::weak_ptr<entry> weak_ptr;
 
 		// constructor/destructor
 		entry(std::vector<std::string> &&names, option_type type = option_type::STRING, const char *description = nullptr);
@@ -152,15 +153,15 @@ public:
 
 	// getters
 	const std::string &command() const { return m_command; }
-	const entry *get_entry(const std::string &name) const;
-	entry *get_entry(const std::string &name);
-	std::vector<entry::ptr> &entries() { return m_entries; }
-	const std::vector<entry::ptr> &entries() const { return m_entries; }
+	const entry::shared_ptr get_entry(const std::string &name) const;
+	entry::shared_ptr get_entry(const std::string &name);
+	std::vector<entry::shared_ptr> &entries() { return m_entries; }
+	const std::vector<entry::shared_ptr> &entries() const { return m_entries; }
 	bool exists(const std::string &name) const { return get_entry(name) != nullptr; }
 	bool header_exists(const char *description) const;
 
 	// configuration
-	void add_entry(entry::ptr &&entry, const char *after_header = nullptr);
+	void add_entry(entry::shared_ptr &&entry, const char *after_header = nullptr);
 	void add_entry(const options_entry &entry, bool override_existing = false);
 	void add_entry(std::vector<std::string> &&names, const char *description, option_type type, std::string &&default_value = "", std::string &&minimum = "", std::string &&maximum = "");
 	void add_header(const char *description);
@@ -235,15 +236,15 @@ private:
 	};
 
 	// internal helpers
-	void add_to_entry_map(std::string &&name, entry::ptr &entry);
+	void add_to_entry_map(std::string &&name, entry::shared_ptr &entry);
 	void prettify_and_set_value(entry &curentry, std::string &&data, int priority, std::ostream &error_stream, condition_type &condition);
 	void throw_options_exception_if_appropriate(condition_type condition, std::ostringstream &error_stream);
 
 	// internal state
-	std::vector<entry::ptr>                     m_entries;              // cannonical list of entries
-	std::unordered_map<std::string, entry *>    m_entrymap;             // map for fast lookup
-	std::string                                 m_command;              // command found
-	static const char *const                    s_option_unadorned[];   // array of unadorned option "names"
+	std::vector<entry::shared_ptr>                      m_entries;              // cannonical list of entries
+	std::unordered_map<std::string, entry::weak_ptr>    m_entrymap;             // map for fast lookup
+	std::string                                         m_command;              // command found
+	static const char *const                            s_option_unadorned[];   // array of unadorned option "names"
 };
 
 

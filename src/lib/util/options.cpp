@@ -389,7 +389,7 @@ core_options::~core_options()
 //  add_entry - adds an entry
 //-------------------------------------------------
 
-void core_options::add_entry(entry::ptr &&entry, const char *after_header)
+void core_options::add_entry(entry::shared_ptr &&entry, const char *after_header)
 {
 	// update the entry map
 	for (const std::string &name : entry->names())
@@ -412,13 +412,13 @@ void core_options::add_entry(entry::ptr &&entry, const char *after_header)
 //  map
 //-------------------------------------------------
 
-void core_options::add_to_entry_map(std::string &&name, entry::ptr &entry)
+void core_options::add_to_entry_map(std::string &&name, entry::shared_ptr &entry)
 {
 	// it is illegal to call this method for something that already ex0ists
 	assert(m_entrymap.find(name) == m_entrymap.end());
 
 	// append the entry
-	m_entrymap.emplace(std::make_pair(name, &*entry));
+	m_entrymap.emplace(std::make_pair(name, entry::weak_ptr(entry)));
 }
 
 
@@ -460,7 +460,7 @@ void core_options::add_entry(const options_entry &opt, bool override_existing)
 	}
 
 	// we might be called with an existing entry
-	entry *existing_entry = nullptr;
+	entry::shared_ptr existing_entry;
 	do
 	{
 		for (const std::string &name : names)
@@ -500,13 +500,13 @@ void core_options::add_entry(const options_entry &opt, bool override_existing)
 void core_options::add_entry(std::vector<std::string> &&names, const char *description, option_type type, std::string &&default_value, std::string &&minimum, std::string &&maximum)
 {
 	// create the entry
-	auto new_entry = std::unique_ptr<entry>(new simple_entry(
+	entry::shared_ptr new_entry = std::make_shared<simple_entry>(
 		std::move(names),
 		description,
 		type,
 		std::move(default_value),
 		std::move(minimum),
-		std::move(maximum)));
+		std::move(maximum));
 
 	// and add it
 	add_entry(std::move(new_entry));
@@ -702,7 +702,7 @@ void core_options::parse_ini_file(util::core_file &inifile, int priority, bool a
 		*temp = 0;
 
 		// find our entry
-		entry *curentry = get_entry(optionname);
+		entry::shared_ptr curentry = get_entry(optionname);
 		if (!curentry)
 		{
 			condition = std::max(condition, condition_type::WARN);
@@ -755,7 +755,7 @@ void core_options::copy_from(const core_options &that)
 		if (dest_entry->names().size() > 0)
 		{
 			// identify the source entry
-			const entry *source_entry = that.get_entry(dest_entry->name());
+			const entry::shared_ptr source_entry = that.get_entry(dest_entry->name());
 			if (source_entry)
 			{
 				const char *value = source_entry->value();
@@ -972,16 +972,16 @@ void core_options::prettify_and_set_value(entry &curentry, std::string &&data, i
 //  get_entry
 //-------------------------------------------------
 
-const core_options::entry *core_options::get_entry(const std::string &name) const
+const core_options::entry::shared_ptr core_options::get_entry(const std::string &name) const
 {
 	auto curentry = m_entrymap.find(name);
-	return (curentry != m_entrymap.end()) ? curentry->second : nullptr;
+	return (curentry != m_entrymap.end()) ? curentry->second.lock() : nullptr;
 }
 
-core_options::entry *core_options::get_entry(const std::string &name)
+core_options::entry::shared_ptr core_options::get_entry(const std::string &name)
 {
 	auto curentry = m_entrymap.find(name);
-	return (curentry != m_entrymap.end()) ? curentry->second : nullptr;
+	return (curentry != m_entrymap.end()) ? curentry->second.lock() : nullptr;
 }
 
 

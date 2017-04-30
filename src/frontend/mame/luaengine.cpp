@@ -921,7 +921,7 @@ void lua_engine::initialize()
 			"entries", sol::property([this](core_options &options) {
 				sol::table table = sol().create_table();
 				int unadorned_index = 0;
-				for (core_options::entry::ptr &curentry : options.entries())
+				for (auto &curentry : options.entries())
 				{
 					const char *name = curentry->names().size() > 0
 						? curentry->name().c_str()
