@@ -170,6 +170,7 @@ const device_type I80286 = device_creator<i80286_cpu_device>;
 i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8086_common_cpu_device(mconfig, I80286, "I80286", tag, owner, clock, "i80286", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
+	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
 	, m_out_shutdown_func(*this)
 {

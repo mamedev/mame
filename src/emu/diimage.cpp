@@ -1082,6 +1082,13 @@ image_init_result device_image_interface::load(const std::string &path)
 
 image_init_result device_image_interface::load_software(const std::string &software_identifier)
 {
+	// Is this a software part that forces a reset and we're at runtime?  If so, get this loaded through reset_and_load
+	if (is_reset_on_load() && !init_phase())
+	{
+		reset_and_load(software_identifier);
+		return image_init_result::PASS;
+	}
+
 	// Prepare to load
 	unload();
 	clear_error();
@@ -1408,13 +1415,6 @@ bool device_image_interface::load_software_part(const std::string &identifier)
 	{
 		software_list_device::display_matches(device().machine().config(), image_interface(), identifier);
 		return false;
-	}
-
-	// Is this a software part that forces a reset and we're at runtime?  If so, get this loaded through reset_and_load
-	if (is_reset_on_load() && !init_phase())
-	{
-		reset_and_load(identifier);
-		return true;
 	}
 
 	// Load the software part

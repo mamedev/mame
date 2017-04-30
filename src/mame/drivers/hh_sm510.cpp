@@ -20,6 +20,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "gnw_jr55.lh"
 #include "hh_sm510_test.lh" // common test-layout - use external artwork
 
 
@@ -619,7 +620,7 @@ static MACHINE_CONFIG_START( jr55, jr55_state )
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
 
-	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
+	MCFG_DEFAULT_LAYOUT(layout_gnw_jr55)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

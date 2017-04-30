@@ -317,13 +317,7 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 		singlemask <<= width;
 	}
 
-	// subunit count must be a power of 2
-	if (count != 1 && count != 2 && count != 4 && count != 8)
-	{
-		osd_printf_error("Handler %s specifies %d subunits with a mask of %08X%08X; needs to be a power of 2\n", string, count, (u32)(unitmask >> 32), (u32)unitmask);
-		return false;
-	}
-
+#if 0
 	// the mask must be symmetrical
 	u64 unitmask_bh = unitmask >> 8 & 0x00ff00ff00ff00ffU;
 	u64 unitmask_bl = unitmask & 0x00ff00ff00ff00ffU;
@@ -338,6 +332,7 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 		osd_printf_error("Handler %s specified an asymmetrical mask of %08X%08X\n", string, (u32)(unitmask >> 32), (u32)unitmask);
 		return false;
 	}
+#endif
 
 	return true;
 }

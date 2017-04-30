@@ -10,6 +10,7 @@
 
 #include <string.h>
 #include <ctype.h>
+#include <iostream>
 
 #include "imgtool.h"
 #include "formats/imageutl.h"
@@ -783,15 +784,14 @@ void imgtool::partition::get_attribute_name(uint32_t attribute, const imgtool_at
 }
 
 
+//-------------------------------------------------
+//	imgtool_validitychecks - checks the validity
+//	of the imgtool modules
+//-------------------------------------------------
 
-/*-------------------------------------------------
-    imgtool_validitychecks - checks the validity
-    of the imgtool modules
--------------------------------------------------*/
-
-int imgtool_validitychecks(void)
+bool imgtool_validitychecks(void)
 {
-	int error = 0;
+	bool error = false;
 	imgtoolerr_t err = (imgtoolerr_t)IMGTOOLERR_SUCCESS;
 	imgtool_module_features features;
 	int created_library = false;
@@ -808,18 +808,18 @@ int imgtool_validitychecks(void)
 
 		if (!module->name)
 		{
-			printf("imgtool module %s has null 'name'\n", module->name);
-			error = 1;
+			util::stream_format(std::wcerr, L"imgtool module %s has null 'name'\n", wstring_from_utf8(module->name));
+			error = true;
 		}
 		if (!module->description)
 		{
-			printf("imgtool module %s has null 'description'\n", module->name);
-			error = 1;
+			util::stream_format(std::wcerr, L"imgtool module %s has null 'description'\n", wstring_from_utf8(module->name));
+			error = true;
 		}
 		if (!module->extensions)
 		{
-			printf("imgtool module %s has null 'extensions'\n", module->extensions);
-			error = 1;
+			util::stream_format(std::wcerr, L"imgtool module %s has null 'extensions'\n", wstring_from_utf8(module->extensions));
+			error = true;
 		}
 
 #if 0
@@ -828,23 +828,23 @@ int imgtool_validitychecks(void)
 		{
 			if (module->alternate_path_separator)
 			{
-				printf("imgtool module %s specified alternate_path_separator but not path_separator\n", module->name);
-				error = 1;
+				util::stream_format(std::wcerr, L"imgtool module %s specified alternate_path_separator but not path_separator\n", wstring_from_utf8(module->name));
+				error = true;
 			}
 			if (module->initial_path_separator)
 			{
-				printf("imgtool module %s specified initial_path_separator without directory support\n", module->name);
-				error = 1;
+				util::stream_format(std::wcerr, L"imgtool module %s specified initial_path_separator without directory support\n", wstring_from_utf8(module->name));
+				error = true;
 			}
 			if (module->create_dir)
 			{
-				printf("imgtool module %s implements create_dir without directory support\n", module->name);
-				error = 1;
+				util::stream_format(std::wcerr, L"imgtool module %s implements create_dir without directory support\n", wstring_from_utf8(module->name));
+				error = true;
 			}
 			if (module->delete_dir)
 			{
-				printf("imgtool module %s implements delete_dir without directory support\n", module->name);
-				error = 1;
+				util::stream_format(std::wcerr, L"imgtool module %s implements delete_dir without directory support\n", wstring_from_utf8(module->name));
+				error = true;
 			}
 		}
 #endif
@@ -854,14 +854,14 @@ int imgtool_validitychecks(void)
 		{
 			if (!module->create)
 			{
-				printf("imgtool module %s has creation options without supporting create\n", module->name);
-				error = 1;
+				util::stream_format(std::wcerr, L"imgtool module %s has creation options without supporting create\n", wstring_from_utf8(module->name));
+				error = true;
 			}
 			if ((!module->createimage_optguide && module->createimage_optspec)
 				|| (module->createimage_optguide && !module->createimage_optspec))
 			{
-				printf("imgtool module %s does has partially incomplete creation options\n", module->name);
-				error = 1;
+				util::stream_format(std::wcerr, L"imgtool module %s does has partially incomplete creation options\n", wstring_from_utf8(module->name));
+				error = true;
 			}
 
 			if (module->createimage_optguide && module->createimage_optspec)
@@ -876,8 +876,8 @@ int imgtool_validitychecks(void)
 		imgtool_exit();
 	if (err)
 	{
-		printf("imgtool: %s\n", imgtool_error(err));
-		error = 1;
+		util::stream_format(std::wcerr, L"imgtool: %s\n", wstring_from_utf8(imgtool_error(err)));
+		error = true;
 	}
 	return error;
 }

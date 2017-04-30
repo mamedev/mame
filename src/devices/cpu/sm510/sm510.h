@@ -174,7 +174,7 @@ protected:
 	u8 m_c;
 	bool m_skip;
 	u8 m_w;
-	u8 m_r;
+	u8 m_r, m_r_out;
 	bool m_k_active;
 	bool m_halt;
 
@@ -199,8 +199,8 @@ protected:
 	u8 m_melody_duty_index;
 	u8 m_melody_address;
 
-	void clock_melody();
-	void init_melody();
+	virtual void clock_melody() { }
+	virtual void init_melody() { }
 
 	// interrupt/divider
 	emu_timer *m_div_timer;
@@ -311,6 +311,8 @@ protected:
 	virtual void get_opcode_param() override;
 
 	virtual void update_w_latch() override { m_write_s(0, m_w, 0xff); } // W is connected directly to S
+
+	virtual void clock_melody() override;
 };
 
 
@@ -324,6 +326,9 @@ protected:
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
+
+	virtual void clock_melody() override;
+	virtual void init_melody() override;
 };
 
 class sm512_device : public sm511_device
