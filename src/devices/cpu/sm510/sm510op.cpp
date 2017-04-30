@@ -263,11 +263,7 @@ void sm510_base_device::op_atfc()
 void sm510_base_device::op_atr()
 {
 	// ATR: output ACC to R
-	if (m_r != (m_acc & 3))
-	{
-		m_r = m_acc & 3;
-		m_write_r(0, m_r, 0xff);
-	}
+	m_r = m_acc;
 }
 
 
