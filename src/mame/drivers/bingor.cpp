@@ -510,6 +510,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/intelfsh.h"
+#include "machine/msm6242.h"
 #include "sound/ay8910.h"
 #include "sound/saa1099.h"
 #include "screen.h"
@@ -706,15 +707,15 @@ MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( vip2000_map, AS_PROGRAM, 16, bingor_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	//AM_RANGE(0x90000, 0x9ffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0xa0300, 0xa031f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") //wrong
-	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_SHARE("blit_ram")
+	AM_RANGE(0x40300, 0x4031f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") //wrong
+	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_SHARE("blit_ram")
+	//AM_RANGE(0x50000, 0x5ffff) AM_ROM AM_REGION("gfx", 0)
+	AM_RANGE(0x80000, 0xbffff) AM_DEVREADWRITE("flash", intelfsh16_device, read, write)
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vip2000_io, AS_IO, 16, bingor_state )
-	//AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
-	//AM_RANGE(0x0102, 0x0103) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
+	AM_RANGE(0x0080, 0x009f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, bingor_state )
@@ -737,6 +738,8 @@ static MACHINE_CONFIG_START( vip2000, bingor_state )
 	MCFG_CPU_ADD("slavecpu", I80C31, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_IO_MAP(slave_io)
+
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
