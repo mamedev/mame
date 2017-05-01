@@ -62,6 +62,69 @@
 *       Links:
 *       http://www3.bpmmicro.com/web/helpandsupport.nsf/69f301ee4e15195486256fcf0062c2eb/8194a48179484c9f862573220065d38e!OpenDocument
 *       ftp://ftp.bpmmicro.com/Dnload/
+******************************************************************************
+*       SM48D socket module:
+*       The SM48D socket module has two DIN 41612/IEC 60603-2 sockets on the
+          bottom, each of which has two rows of pins, with the middle "B" row
+          unpopulated. It contains six 74HCT164 Serial-in Parallel-out shift
+          registers, for 48 bits of serially drivable state, which is used to
+          drive the gates of transistors which act as a pull-down to GND for
+          each of the 48 pins.
+          There is also a relay, of unknown purpose.
+          There are several versions of the SM48D pcb which existed:
+          Rev B uses all through-hole components, and extra passive resistor arrays for every pin (1992)
+          Rev C uses all through-hole components (1992)
+          Rev E "CPCBS48D" uses all surface mount/soic components (1998)
+          For revision E, assuming IC1 is the upper leftmost IC, and IC7 is
+          the lower rightmost ic, from left to right then top to bottom
+          and ic4 being the 93c46;
+          The 74hct164s are chained in this order and drive the following pins:
+		  IC3: TODO: ADD ME
+		  IC2: "
+		  IC7: "
+		  IC5: "
+		  IC6: "
+		  IC1: "
+          
+*       Looking "through" the pcb from the top, the connectors are arranged
+          as such:
+(note: J3 may be the wrong label, it could be J5)
+
+           ___J3___                                             ___J4___ 
+   GND -- |A32  C32|                                           |A32  C32| -- GND
+   VCC -- |A31  C31|                                           |A31  C31| <> J3 A03
+J4 C30 <> |A30  C30|                           ?Relay control? |A30  C30| <> J3 A30
+   GND -- |A29  C29|                                           |A29  C29|
+Pin 01 <> |A28  C28|                                           |A28  C28| <> Pin 48
+Pin 02 <> |A27  C27|                                           |A27  C27| <> Pin 47
+Pin 03 <> |A26  C26|                                           |A26  C26| <> Pin 46
+Pin 04 <> |A25  C25|                                           |A25  C25| <> Pin 45
+Pin 05 <> |A24  C24|                                           |A24  C24| <> Pin 44
+Pin 06 <> |A23  C23| -- GND                             GND -- |A23  C23| <> Pin 43
+Pin 07 <> |A22  C22|                                           |A22  C22| <> Pin 42
+Pin 08 <> |A21  C21|                                           |A21  C21| <> Pin 41
+Pin 09 <> |A20  C20|                                           |A20  C20| <> Pin 40
+Pin 10 <> |A19  C19|                                           |A19  C19| <> Pin 39
+Pin 11 <> |A18  C18|                                           |A18  C18| <> Pin 38
+Pin 12 <> |A17  C17| -- GND                             GND -- |A17  C17| <> Pin 37
+Pin 13 <> |A16  C16|                                           |A16  C16| <> Pin 36
+Pin 14 <> |A15  C15|                                           |A15  C15| <> Pin 35
+Pin 15 <> |A14  C14|                                           |A14  C14| <> Pin 34
+Pin 16 <> |A13  C13|                                           |A13  C13| <> Pin 33
+Pin 17 <> |A12  C12|                                           |A12  C12| <> Pin 32
+Pin 18 <> |A11  C11| -- GND                             GND -- |A11  C11| <> Pin 31
+Pin 19 <> |A10  C10|                                           |A10  C10| <> Pin 30
+Pin 20 <> |A09  C09|                                           |A09  C09| <> Pin 29
+Pin 21 <> |A08  C08|                                           |A08  C08| <> Pin 28
+Pin 22 <> |A07  C07|                                     ?? <> |A07  C07| <> Pin 27
+Pin 23 <> |A06  C06|                                           |A06  C06| <> Pin 26
+Pin 24 <> |A05  C05|                                           |A05  C05| <> Pin 25
+          |A04  C04|                               93c46 CS -> |A04  C04| -- VCC
+J4 C31 <> |A03  C03|                              93c46 CLK -> |A03  C03|
+J4 C02 <> |A02  C02| <- '164 CP   93c46 DI AND '164 IC3 DSB -> |A02  C02| <> J3 A02
+   GND -- |A01  C01| <- '164 /MR                   93c46 DO <- |A01  C01| -- GND
+          ----------                                           ----------
+
 ******************************************************************************/
 
 /* Core includes */
