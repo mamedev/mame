@@ -38,19 +38,15 @@ static const char *const usbregnames[] = {
 };
 #endif
 
-const device_type OHCI_USB_CONTROLLER = device_creator<ohci_usb_controller>;
-
-ohci_usb_controller::ohci_usb_controller(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, OHCI_USB_CONTROLLER, "OHCI USB CONTROLLER", tag, owner, clock, "ohciusb", __FILE__),
-	m_interrupt_handler(*this)
+ohci_usb_controller::ohci_usb_controller()
 {
 	memset(&ohcist, 0, sizeof(ohcist));
+	m_maincpu = nullptr;
+	irq_callback = nullptr;
 }
 
-void ohci_usb_controller::device_start()
+void ohci_usb_controller::start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_interrupt_handler.resolve_safe();
 	ohcist.hc_regs[HcRevision] = 0x10;
 	ohcist.hc_regs[HcFmInterval] = 0x2edf;
 	ohcist.hc_regs[HcLSThreshold] = 0x628;
@@ -64,11 +60,10 @@ void ohci_usb_controller::device_start()
 	for (int n = 0; n < 256; n++)
 		ohcist.address[n].port = -1;
 	ohcist.space = &(m_maincpu->space());
-	ohcist.timer = timer_alloc(0);
 	ohcist.timer->enable(false);
 }
 
-void ohci_usb_controller::device_reset()
+void ohci_usb_controller::reset()
 {
 }
 
@@ -219,7 +214,7 @@ WRITE32_MEMBER(ohci_usb_controller::write)
 	ohcist.hc_regs[offset] = data;
 }
 
-void ohci_usb_controller::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ohci_usb_controller::timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	uint32_t hcca;
 	uint32_t plh;
@@ -726,12 +721,12 @@ void ohci_usb_controller::usb_ohci_interrupts()
 {
 	if (((ohcist.hc_regs[HcInterruptStatus] & ohcist.hc_regs[HcInterruptEnable]) != 0) && ((ohcist.hc_regs[HcInterruptEnable] & MasterInterruptEnable) != 0))
 	{
-		//pic8259_1->ir1_w(1);
-		m_interrupt_handler(1);
+		//m_interrupt_handler(1);
+		irq_callback(1);
 	} else
 	{
-		//pic8259_1->ir1_w(0);
-		m_interrupt_handler(0);
+		//m_interrupt_handler(0);
+		irq_callback(0);
 	}
 }
 
@@ -1518,9 +1513,4 @@ void ohci_game_controller_device::device_start()
 ioport_constructor ohci_game_controller_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(xbox_controller);
-}
-
-WRITE_LINE_MEMBER(xbox_base_state::xbox_ohci_usb_interrupt_changed)
-{
-	xbox_base_devs.pic8259_1->ir1_w(state);
 }

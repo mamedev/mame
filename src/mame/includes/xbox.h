@@ -11,6 +11,53 @@
 #include "machine/idectrl.h"
 #include "machine/pic8259.h"
 
+struct apu_state {
+	uint32_t memory[0x60000 / 4];
+	uint32_t gpdsp_sgaddress; // global processor scatter-gather
+	uint32_t gpdsp_sgblocks;
+	uint32_t gpdsp_address;
+	uint32_t epdsp_sgaddress; // encoder processor scatter-gather
+	uint32_t epdsp_sgblocks;
+	uint32_t unknown_sgaddress;
+	uint32_t unknown_sgblocks;
+	int voice_number;
+	uint32_t voices_heap_blockaddr[1024];
+	uint64_t voices_active[4]; //one bit for each voice: 1 playing 0 not
+	uint32_t voicedata_address;
+	int voices_frequency[256]; // sample rate
+	int voices_position[256]; // position in samples * 1000
+	int voices_position_start[256]; // position in samples * 1000
+	int voices_position_end[256]; // position in samples * 1000
+	int voices_position_increment[256]; // position increment every 1ms * 1000
+	emu_timer *timer;
+	address_space *space;
+};
+
+struct ac97_state {
+	uint32_t mixer_regs[0x84 / 4];
+	uint32_t controller_regs[0x40 / 4];
+};
+
+class xbox_base_state; // forward declaration
+
+struct smbus_state {
+	int status;
+	int control;
+	int address;
+	int data;
+	int command;
+	int rw;
+	std::function<int(int command, int rw, int data)> devices[128];
+	uint32_t words[256 / 4];
+};
+
+struct superio_state
+{
+	bool configuration_mode;
+	int index;
+	int selected;
+	uint8_t registers[16][256]; // 256 registers for up to 16 devices, registers 0-0x2f common to all
+};
 
 class xbox_base_state : public driver_device
 {
@@ -22,32 +69,11 @@ public:
 		debug_irq_number(0),
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_READ32_MEMBER(geforce_r);
-	DECLARE_WRITE32_MEMBER(geforce_w);
-	DECLARE_READ32_MEMBER(smbus_r);
-	DECLARE_WRITE32_MEMBER(smbus_w);
-	DECLARE_READ32_MEMBER(smbus2_r);
-	DECLARE_WRITE32_MEMBER(smbus2_w);
-	DECLARE_READ32_MEMBER(networkio_r);
-	DECLARE_WRITE32_MEMBER(networkio_w);
 	DECLARE_READ8_MEMBER(superio_read);
 	DECLARE_WRITE8_MEMBER(superio_write);
 	DECLARE_READ8_MEMBER(superiors232_read);
 	DECLARE_WRITE8_MEMBER(superiors232_write);
-	DECLARE_READ32_MEMBER(audio_apu_r);
-	DECLARE_WRITE32_MEMBER(audio_apu_w);
-	DECLARE_READ32_MEMBER(audio_ac93_r);
-	DECLARE_WRITE32_MEMBER(audio_ac93_w);
-	DECLARE_READ32_MEMBER(dummy_r);
-	DECLARE_WRITE32_MEMBER(dummy_w);
-	DECLARE_READ32_MEMBER(ohci_usb_r);
-	DECLARE_WRITE32_MEMBER(ohci_usb_w);
-	DECLARE_READ32_MEMBER(ohci_usb2_r);
-	DECLARE_WRITE32_MEMBER(ohci_usb2_w);
-	DECLARE_READ32_MEMBER(network_r);
-	DECLARE_WRITE32_MEMBER(network_w);
 
-	void smbus_register_device(int address, int(*handler)(xbox_base_state &chs, int command, int rw, int data));
 	int smbus_pic16lc(int command, int rw, int data);
 	int smbus_cx25871(int command, int rw, int data);
 	int smbus_eeprom(int command, int rw, int data);
@@ -64,56 +90,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(xbox_pit8254_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(xbox_pit8254_out2_changed);
 	DECLARE_WRITE_LINE_MEMBER(xbox_ohci_usb_interrupt_changed);
+	DECLARE_WRITE_LINE_MEMBER(xbox_smbus_interrupt_changed);
 	IRQ_CALLBACK_MEMBER(irq_callback);
-	TIMER_CALLBACK_MEMBER(audio_apu_timer);
 
 	struct xbox_devices {
 		pic8259_device    *pic8259_1;
 		pic8259_device    *pic8259_2;
 		bus_master_ide_controller_device    *ide;
 	} xbox_base_devs;
-	struct smbus_state {
-		int status;
-		int control;
-		int address;
-		int data;
-		int command;
-		int rw;
-		int(*devices[128])(xbox_base_state &chs, int command, int rw, int data);
-		uint32_t words[256 / 4];
-	} smbusst;
-	struct apu_state {
-		uint32_t memory[0x60000 / 4];
-		uint32_t gpdsp_sgaddress; // global processor scatter-gather
-		uint32_t gpdsp_sgblocks;
-		uint32_t gpdsp_address;
-		uint32_t epdsp_sgaddress; // encoder processor scatter-gather
-		uint32_t epdsp_sgblocks;
-		uint32_t unknown_sgaddress;
-		uint32_t unknown_sgblocks;
-		int voice_number;
-		uint32_t voices_heap_blockaddr[1024];
-		uint64_t voices_active[4]; //one bit for each voice: 1 playing 0 not
-		uint32_t voicedata_address;
-		int voices_frequency[256]; // sample rate
-		int voices_position[256]; // position in samples * 1000
-		int voices_position_start[256]; // position in samples * 1000
-		int voices_position_end[256]; // position in samples * 1000
-		int voices_position_increment[256]; // position increment every 1ms * 1000
-		emu_timer *timer;
-		address_space *space;
-	} apust;
-	struct ac97_state {
-		uint32_t mixer_regs[0x80 / 4];
-		uint32_t controller_regs[0x38 / 4];
-	} ac97st;
-	struct superio_state
-	{
-		bool configuration_mode;
-		int index;
-		int selected;
-		uint8_t registers[16][256]; // 256 registers for up to 16 devices, registers 0-0x2f common to all
-	} superiost;
+	superio_state superiost;
 	uint8_t pic16lc_buffer[0xff];
 	nv2a_renderer *nvidia_nv2a;
 	bool debug_irq_active;

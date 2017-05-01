@@ -170,9 +170,9 @@ static MACHINE_CONFIG_DERIVED_CLASS(xbox, xbox_base, xbox_state)
 	MCFG_CPU_PROGRAM_MAP(xbox_map)
 	MCFG_CPU_IO_MAP(xbox_map_io)
 
-	MCFG_DEVICE_MODIFY("ide:0")
+	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")
 	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "hdd", true)
-	MCFG_DEVICE_MODIFY("ide:1")
+	MCFG_DEVICE_MODIFY(":pci:09.0:ide:1")
 	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "cdrom", true)
 
 	/* sound hardware */
