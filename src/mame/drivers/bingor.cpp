@@ -710,11 +710,13 @@ static ADDRESS_MAP_START( vip2000_map, AS_PROGRAM, 16, bingor_state )
 	AM_RANGE(0x40300, 0x4031f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") //wrong
 	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_SHARE("blit_ram")
 	//AM_RANGE(0x50000, 0x5ffff) AM_ROM AM_REGION("gfx", 0)
+	AM_RANGE(0x60000, 0x60003) AM_DEVWRITE8("ymz", ymz284_device, address_data_w, 0x00ff)
 	AM_RANGE(0x80000, 0xbffff) AM_DEVREADWRITE("flash", intelfsh16_device, read, write)
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vip2000_io, AS_IO, 16, bingor_state )
+	AM_RANGE(0x0000, 0x0001) AM_READNOP // watchdog
 	AM_RANGE(0x0080, 0x009f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
