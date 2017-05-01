@@ -9531,6 +9531,7 @@ saiyugoub2                      // bootleg
 
 @source:chinsan.cpp
 chinsan                         // (c) 1987 Sanritsu
+mayumi                          // (c) 1988 Victory L.L.C.,  made by Sanritsu
 
 @source:chqflag.cpp
 chqflag                         // GX717 (c) 1988
@@ -19886,9 +19887,6 @@ screenp3                        //
 screenp3a                       //
 screenp4                        //
 screenpl                        // Screenplay
-
-@source:mayumi.cpp
-mayumi                          // (c) 1988 Victory L.L.C.,  made by Sanritsu
 
 @source:mazerbla.cpp
 greatgun                        // (c) 1983
