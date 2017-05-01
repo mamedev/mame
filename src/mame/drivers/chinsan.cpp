@@ -295,7 +295,7 @@ PALETTE_INIT_MEMBER( chinsan_state, chinsan )
 	uint8_t *src = memregion("color_proms")->base();
 
 	for (int i = 0; i < 0x100; i++)
-		palette.set_pen_color(i, pal4bit(src[i + 0x200]), pal4bit(src[i + 0x100]), pal4bit(src[i + 0x000]));
+		palette.set_pen_color(i, pal4bit(src[i + 0x000]), pal4bit(src[i + 0x100]), pal4bit(src[i + 0x200]));
 }
 
 
@@ -416,6 +416,7 @@ DRIVER_INIT_MEMBER( chinsan_state, chinsan )
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
+// C1-00114-B
 static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_CPU_ADD("maincpu", MC8123, XTAL_10MHz/2) // 317-5012
 	MCFG_CPU_PROGRAM_MAP(chinsan_map)
@@ -444,7 +445,7 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000) // ? Mhz
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_10MHz/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
@@ -484,9 +485,9 @@ ROM_START( chinsan )
 	ROM_LOAD( "mm60.2c", 0x000, 0x020, CRC(88477178) SHA1(03c1c9e3e88a5ae9970cb4b872ad4b6e4d77a6da) )
 
 	ROM_REGION( 0x300, "color_proms", 0 )
-	ROM_LOAD( "mm61.9m",  0x000, 0x100, CRC(57024262) SHA1(e084e6baa3c529217f6f8e37c9dd5f0687ba2fc4) ) // b
+	ROM_LOAD( "mm63.10n", 0x000, 0x100, CRC(b65e3567) SHA1(f146af51dfaa5b4bf44c4e27f1a0292f8fd07ce9) ) // r
 	ROM_LOAD( "mm62.9n",  0x100, 0x100, CRC(b5a1dbe5) SHA1(770a791c061ce422f860bb8d32f82bbbf9b4d12a) ) // g
-	ROM_LOAD( "mm63.10n", 0x200, 0x100, CRC(b65e3567) SHA1(f146af51dfaa5b4bf44c4e27f1a0292f8fd07ce9) ) // r
+	ROM_LOAD( "mm61.9m",  0x200, 0x100, CRC(57024262) SHA1(e084e6baa3c529217f6f8e37c9dd5f0687ba2fc4) ) // b
 ROM_END
 
 
