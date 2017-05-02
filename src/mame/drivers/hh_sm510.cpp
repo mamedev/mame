@@ -5,22 +5,20 @@
   Sharp SM510/SM511 handhelds.
 
   TODO:
-  - svg lcd screen backdrop (not supported in core)
-  - svg lcd screen for dm53, jr55, ml102
+  - svg lcd screen background/foreground (not supported in core)
+  - svg lcd screen for ml102
 
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/sm510/sm510.h"
-#include "cpu/sm510/kb1013vk1-2.h"
 #include "sound/spkrdev.h"
 
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
-#include "gnw_jr55.lh"
 #include "hh_sm510_test.lh" // common test-layout - use external artwork
 
 
@@ -558,7 +556,12 @@ static MACHINE_CONFIG_START( dm53, dm53_state )
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r2_w))
 
-	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(802, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 802-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -620,7 +623,12 @@ static MACHINE_CONFIG_START( jr55, jr55_state )
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
 
-	MCFG_DEFAULT_LAYOUT(layout_gnw_jr55)
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(802, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 802-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -842,8 +850,8 @@ ROM_START( gnw_dm53 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dm53_cms54c_cms565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
 
-	ROM_REGION( 100000, "svg", 0)
-	ROM_LOAD( "gnw_dm53.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 193821, "svg", 0)
+	ROM_LOAD( "gnw_dm53.svg", 0, 193821, BAD_DUMP CRC(e242fe9b) SHA1(a5b364c21b1f2b3e0de6e82175b46e95abb24018) ) // by OG/hap, ver. 2 may 2017
 ROM_END
 
 
@@ -851,8 +859,8 @@ ROM_START( gnw_jr55 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "jr55_cms54c_kms560", 0x0000, 0x1000, CRC(46aed0ae) SHA1(72f75ccbd84aea094148c872fc7cc1683619a18a) )
 
-	ROM_REGION( 100000, "svg", 0)
-	ROM_LOAD( "gnw_jr55.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 402577, "svg", 0)
+	ROM_LOAD( "gnw_jr55.svg", 0, 402577, BAD_DUMP CRC(aa85bb34) SHA1(1d41867093cc98862ae1e1cd898a6eee26014eff) ) // by Reinier/hap, ver. 2 may 2017
 ROM_END
 
 
