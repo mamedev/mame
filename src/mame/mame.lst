@@ -12421,6 +12421,9 @@ feagv7                          //
 feagv9                          //
 fexcel68k                       //
 
+@source:fidelmcs48.cpp
+fscc6                           //
+
 @source:fidelz80.cpp
 bridgec3                        //
 cc10                            //

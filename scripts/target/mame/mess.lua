@@ -1940,6 +1940,7 @@ files {
 	MAME_DIR .. "src/mame/includes/fidelbase.h",
 	MAME_DIR .. "src/mame/drivers/fidel6502.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel68k.cpp",
+	MAME_DIR .. "src/mame/drivers/fidelmcs48.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "force")
