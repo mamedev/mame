@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Wilbert Pol, Miodrag Milanovic
+// copyright-holders: Carl, R. Belmont, Wilbert Pol, Miodrag Milanovic
 /***************************************************************************
 
   mtouchxl.cpp: Merit Industries MegaTouch XL
@@ -17,9 +17,9 @@
 
   Megatouch XL (Software) (* indicated verified dumps of CD + Boot ROM,
                            - means we have it working but would like a redump)
-  Megatouch XL (1997) (CD versions: R0, R0A, R0B, R0C, R0D, R1, R2, R3, R3A, R3B, R3C)
+  Megatouch XL (1997) (CD versions: R0, R0A, R0B, R0C, R0D, *R1, R2, R3, R3A, R3B, R3C)
   Megatouch XL 5000 (1998) (CD versions: R5A, *R5B, R5D, *R5E, R5G, R5H, *R5I)
-  Megatouch XL 6000 (1999) (CD versions: *R02, R04, R05, *R07)
+  Megatouch XL 6000 (1999) (CD versions: *R02, *R04, R05, *R07)
   Megatouch XL Gold (2000) (CD versions: *R00, *R01.  HDD versions: R01)
   Megatouch XL Platinum / Double Platinum (2001)
   Megatouch XL Titanium / Titanium 2 (2002)
@@ -247,7 +247,7 @@ ROM_START( mtouchxl )
 	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
-	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) )
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(2bdaf557) SHA1(be7f5cab5b6565f7bf8066282cfe3b42c7d7b7fd) )
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r1", 0, SHA1(874545bfc48eacba4c4887d1c45a40ebc7da456a))
@@ -260,7 +260,7 @@ ROM_START( mtchxl5k )
 	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
-	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) )
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(32cd3bab) SHA1(b31f05c3819c74a29a46bbcf4de3722bae874df2) )
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r5i", 0, SHA1(e776a842b557f402e179862397b2ded5cf926702))
@@ -273,7 +273,7 @@ ROM_START( mtchxl5ko )
 	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
-	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) )
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(32cd3bab) SHA1(b31f05c3819c74a29a46bbcf4de3722bae874df2) )
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r5b", 0, SHA1(37c2562053f0f4ed18c72a8ea04be371a6ac8413))
@@ -286,7 +286,7 @@ ROM_START( mtchxl5ko2 )
 	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
-	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(4ad37efa) SHA1(aa7d0347df61a9fdcc283f362e64e70300eb927f) )
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(32cd3bab) SHA1(b31f05c3819c74a29a46bbcf4de3722bae874df2) )
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r5e", 0, SHA1(a07dc6da346bee999f822a3517ea1d65a68dd4a2))
@@ -303,6 +303,19 @@ ROM_START( mtchxl6k )
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r07", 0, SHA1(95599e181d9249db09464420522180d753857f3b))
+ROM_END
+
+ROM_START( mtchxl6ko4 )
+	MOTHERBOARD_ROMS
+
+	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
+
+	ROM_REGION(192, "multikey", 0)
+	ROM_LOAD( "multikey", 0, 192, BAD_DUMP CRC(d54ed86c) SHA1(83557dc604b2c7e8ab0787a3c3d73e1fb2556515) ) // hand made
+
+	DISK_REGION("board1:ide:ide:0:cdrom")
+	DISK_IMAGE_READONLY("r04", 0, SHA1(c4a40bb84de4a54fd4ee6f5d2179a1cb9fac2b09))
 ROM_END
 
 ROM_START( mtchxl6ko )
@@ -328,7 +341,7 @@ ROM_START( mtchxlgld )
 	ROM_LOAD( "u12-nvram-ds1235", 0x000000, 0x008000, CRC(b3b5379d) SHA1(91b3d8b7eb2df127ba35700317aa1aac14e49bb9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
-	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(b9c6aa26) SHA1(23af5b85e19cde700ac045d4770a22bf5d380076) )
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(b7c85d00) SHA1(c91dcafd8138d504acdc6ce9621f6cc3119cdb67) )
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r01", 0, SHA1(9946bb14d3f77eadbbc606ca9c79f233e402189b))
@@ -344,7 +357,7 @@ ROM_START( mtchxlgldo )
 	ROM_LOAD( "u12-nvram-ds1235", 0x000000, 0x008000, CRC(b3b5379d) SHA1(91b3d8b7eb2df127ba35700317aa1aac14e49bb9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
-	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(b9c6aa26) SHA1(23af5b85e19cde700ac045d4770a22bf5d380076) )
+	ROM_LOAD( "multikey",     0x000000, 0x0000c0, BAD_DUMP CRC(b7c85d00) SHA1(c91dcafd8138d504acdc6ce9621f6cc3119cdb67) )
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r00", 0, SHA1(635e267f1abea060ce813eb7e78b88d57ea3f951))
@@ -356,12 +369,14 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT       INIT    COMPANY     FULLNAME */
-COMP ( 1998, mtouchxl,      0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL (Italy Version R1)", MACHINE_NOT_WORKING )
-COMP ( 1998, mtchxl5k,      0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000 (Version R5I)", MACHINE_NOT_WORKING )
-COMP ( 1998, mtchxl5ko,  mtchxl5k,0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000 (Version R5B)", MACHINE_NOT_WORKING )
-COMP ( 1998, mtchxl5ko2, mtchxl5k,0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000 (Version R5E)", MACHINE_NOT_WORKING )
-COMP ( 1999, mtchxl6k,      0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000 (Version r07)", MACHINE_NOT_WORKING )
-COMP ( 1999, mtchxl6ko,  mtchxl6k,0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000 (Version r02)", MACHINE_NOT_WORKING )
-COMP ( 2000, mtchxlgld,     0,    0,       at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Gold (Version r01)", MACHINE_NOT_WORKING )
-COMP ( 2000, mtchxlgldo, mtchxlgld, 0,     at486,     at_keyboard,    driver_device,      0,      "Merit Industries",  "MegaTouch XL Gold (Version r00)", MACHINE_NOT_WORKING )
+/*     YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT           DEVICE              INIT    COMPANY              FULLNAME */
+// Any indicates this is from a CD-R at a trade show that was claimed to be a prototype, but R1 is several versions in?
+COMP ( 1997, mtouchxl,      0,    0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL (Version R1, prototype?)", 0 )
+COMP ( 1998, mtchxl5k,      0,    0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000 (Version R5I)", MACHINE_NOT_WORKING )
+COMP ( 1998, mtchxl5ko,  mtchxl5k,0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000 (Version R5B)", MACHINE_NOT_WORKING )
+COMP ( 1998, mtchxl5ko2, mtchxl5k,0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000 (Version R5E)", MACHINE_NOT_WORKING )
+COMP ( 1999, mtchxl6k,      0,    0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000 (Version r07)", 0 )
+COMP ( 1999, mtchxl6ko4, mtchxl6k,0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000 (Version r04)", 0 )
+COMP ( 1999, mtchxl6ko,  mtchxl6k,0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000 (Version r02)", 0 )
+COMP ( 2000, mtchxlgld,     0,    0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL Gold (Version r01)", MACHINE_NOT_WORKING )
+COMP ( 2000, mtchxlgldo, mtchxlgld, 0,     at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL Gold (Version r00)", MACHINE_NOT_WORKING )
