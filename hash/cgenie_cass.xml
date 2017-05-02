@@ -399,7 +399,7 @@ distributor of the Colour Genie EG2000 computers.
 		<info name="usage" value="Type SYSTEM and load with DIGBOY, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="14924">
-				<rom name="eagle.cas" size="14924" crc="86fd3b59" sha1="f4531d3f8d8f2d4b0fd539a69a7ce0ca7ed19066" offset="0" />
+				<rom name="digboy_tcs.cas" size="14924" crc="86fd3b59" sha1="f4531d3f8d8f2d4b0fd539a69a7ce0ca7ed19066" offset="0" />
 			</dataarea>
 		</part>
 	</software>
