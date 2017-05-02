@@ -118,7 +118,7 @@ uint32_t rmhaihai_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 
 
-
+// TODO: this device is shared with Speed Attack
 READ8_MEMBER(rmhaihai_state::keyboard_r)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1" };
@@ -127,6 +127,7 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 	switch(space.device().safe_pc())
 	{
 		/* read keyboard */
+		case 0x0280:
 		case 0x0aba:    // rmhaihai, rmhaisei
 		case 0x0b2a:    // rmhaihib
 		case 0x0ab4:    // rmhaijin
@@ -141,6 +142,7 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 			if (ioport("KEY1")->read() & 0x8000) return 0x80;   // coin
 			return 0;
 		}
+		case 0x02aa:
 		case 0x5c7b:    // rmhaihai, rmhaisei, rmhaijin
 		case 0x5950:    // rmhaihib
 		case 0x5bf3:    // themj, but the test is NOPed out!
