@@ -606,13 +606,15 @@ protected:
 	int m_ri;       // ring indicator latch
 
 	// transmitter state
-	uint8_t m_tx_data_fifo[4];   // data FIFO
-	uint8_t m_tx_error_fifo[4];  // error FIFO
+	uint8_t m_tx_data_fifo[4];  // data FIFO
+	uint8_t m_tx_error_fifo[4]; // error FIFO
 	int m_tx_fifo_rp;           // FIFO read pointer
 	int m_tx_fifo_wp;           // FIFO write pointer
 	int m_tx_fifo_sz;           // FIFO size
-	uint8_t m_tx_error;           // current error
-	int m_tx_clock;     // transmit clock pulse count
+	uint8_t m_tx_error;         // current error
+	int m_tx_clock;     		// transmit clock pulse count
+	int	m_tx_int_disarm;		// temp Tx int disarm until next byte written
+
 
 	int m_dtr;      // data terminal ready
 	int m_rts;      // request to send

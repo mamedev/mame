@@ -91,7 +91,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 #define LOG_DCD     (1U <<  9)
 #define LOG_SYNC    (1U << 10)
 
-//#define VERBOSE (LOG_GENERAL | LOG_SETUP)
+//#define VERBOSE (LOG_CMD|LOG_INT|LOG_SETUP|LOG_TX|LOG_READ|LOG_CTS|LOG_DCD)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
@@ -854,6 +854,7 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
 		m_extint_states(0),
 		m_rxd(0),
 		m_tx_clock(0),
+		m_tx_int_disarm(0),
 		m_dtr(0),
 		m_rts(0),
 		m_sync_pattern(0)
@@ -956,6 +957,7 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_tx_clock));
 	save_item(NAME(m_dtr));
 	save_item(NAME(m_rts));
+	save_item(NAME(m_tx_int_disarm));
 	save_item(NAME(m_sync_pattern));
 
 	device_serial_interface::register_save_state(machine().save(), this);
@@ -1124,7 +1126,7 @@ void z80scc_channel::tra_complete()
 				set_rts(1);
 		}
 
-		if (m_wr1 & WR1_TX_INT_ENABLE)
+		if (m_wr1 & WR1_TX_INT_ENABLE && m_tx_int_disarm == 0)
 		{
 			if ((m_uart->m_variant & SET_ESCC) &&
 				(m_wr7p & WR7P_TX_FIFO_EMPTY)  &&
@@ -1389,11 +1391,16 @@ uint8_t z80scc_channel::do_sccreg_rr2()
 RR3 is the interrupt Pending register. The status of each of the interrupt Pending bits in the SCC is
 reported in this register. This register exists only in Channel A. If this register is accessed in Channel
 B, all 0s are returned. The two unused bits are always returned as 0. Figure displays the bit positions for RR3."
+
+     Chan B    |Chan A    | Unused
+-------------------------------------
+Bit: D0  D1 D2 |D3  D4 D5 |D6 D7
+     Ext Tx Rx |Ext Tx Rx | 0  0
 */
 uint8_t z80scc_channel::do_sccreg_rr3()
 {
-	LOGINT("%s(%02x)\n", FUNCNAME, m_rr3);
-	return m_rr3; // TODO Update all bits of this status register
+	LOGR("%s(%02x)\n", FUNCNAME, m_rr3);
+	return m_index == z80scc_device::CHANNEL_A ? m_rr3 & 0x3f : 0; // TODO Update all bits of this status register
 }
 
 
@@ -1716,7 +1723,18 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		m_rx_first = 1;
 		break;
 	case WR0_RESET_TX_INT: // reset transmitter interrupt pending
-		LOGCMD("%s: %c : WR0_RESET_TX_INT - not implemented\n", m_owner->tag(), 'A' + m_index);
+        /*Reset Tx Interrupt Pending Command (101). This command is used in cases where there are no
+          more characters to be sent; e.g., at the end of a message. This command prevents further transmit
+          interrupts until after the next character has been loaded into the transmit buffer or until CRC has
+          been completely sent. This command is necessary to prevent the transmitter from requesting an
+          interrupt when the transmit buffer becomes empty (with Transmit Interrupt Enabled).*/
+		m_tx_int_disarm = 1;
+		LOGCMD("%s: %c : WR0_RESET_TX_INT\n", m_owner->tag(), 'A' + m_index);
+		m_uart->m_int_state[INT_TRANSMIT_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3 )] = 0;
+		// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
+		m_uart->m_chanA->m_rr3 &=  ~((1 << INT_TRANSMIT_PRIO) + (m_index == z80scc_device::CHANNEL_A ? 3 : 0 ));
+        // Update interrupt line
+		m_uart->check_interrupts();
 		break;
 	default:
 		break;
@@ -2020,7 +2038,7 @@ void z80scc_channel::do_sccreg_wr11(uint8_t data)
 		switch (data & WR11_TRXSRC_SRC_MASK)
 		{
 		case WR11_TRXSRC_SRC_XTAL: LOG("the Oscillator - not implemented\n"); break;
-		case WR11_TRXSRC_SRC_TRA:  LOG("Transmit clock - not_implemented\n"); break;
+		case WR11_TRXSRC_SRC_TRA:  LOG("Transmit clock - not implemented\n"); break;
 		case WR11_TRXSRC_SRC_BR:   LOG("Baudrate Generator\n"); break;
 		case WR11_TRXSRC_SRC_DPLL: LOG("DPLL - not implemented\n"); break;
 		default: logerror("Wrong!\n");/* Will not happen unless someone messes with the mask */
@@ -2232,8 +2250,11 @@ void z80scc_channel::control_write(uint8_t data)
 		m_wr0 &= ~regmask;
 	}
 
-	//LOG("\n%s(%02x) reg %02x, regmask %02x\n", FUNCNAME, data, reg, regmask);
-	LOGSETUP(" * %s %c Reg %02x <- %02x  \n", m_owner->tag(), 'A' + m_index, reg, data);
+	LOGSETUP(" * %s %c Reg %02x <- %02x - %s\n", m_owner->tag(), 'A' + m_index, reg, data, std::array<char const *, 16>
+             {{	"Command register", 			 	"Tx/Rx Interrupt and Data Transfer Modes",	"Interrupt Vector", 					"Rx Parameters and Control",
+				"Tx/Rx Misc Parameters and Modes",	"Tx Parameters and Controls",				"Sync Characters or SDLC Address Field","Sync Character or SDLC Flag/Prime",
+				"Tx Buffer",						"Master Interrupt Control",					"Miscellaneous Tx/Rx Control Bits",		"Clock Mode Control",
+				"Lower Byte of BRG Time Constant",	"Upper Byte of BRg Time Constant",			"Miscellaneous Control Bits", 			"External/Status Interrupt Control"}}[reg]);
 
 	scc_register_write(reg, data);
 }
@@ -2395,6 +2416,10 @@ void z80scc_channel::data_write(uint8_t data)
 	   will not be set until after the first character is written to the nmos/cmos." */
 	// check if to fire interrupt
 	LOG("- TX interrupt are %s\n", (m_wr1 & WR1_TX_INT_ENABLE) ? "enabled" : "disabled" );
+
+	/* Arm interrupts since we wrote another data byte, however it may be set by the reset tx int pending 
+       command before the shifter is done and the disarm flag is evaluated again in tra_complete()  */
+	m_tx_int_disarm = 0; 
 	if (m_wr1 & WR1_TX_INT_ENABLE)
 	{
 		if ((m_uart->m_variant & SET_ESCC) &&
