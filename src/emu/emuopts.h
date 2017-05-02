@@ -212,7 +212,7 @@ public:
 	const std::string &bios() const { return m_specified_bios; }
 	const std::string &default_card_software() const { return m_default_card_software; }
 	bool specified() const { return m_specified; }
-	core_options::entry::shared_ptr option_entry() const { return m_entry; }
+	core_options::entry::shared_ptr option_entry() const { return m_entry.lock(); }
 
 	// seters
 	void specify(std::string &&text);
@@ -231,7 +231,7 @@ private:
 	std::string                     m_specified_bios;
 	std::string                     m_default_card_software;
 	std::string                     m_default_value;
-	core_options::entry::shared_ptr m_entry;
+	core_options::entry::weak_ptr   m_entry;
 };
 
 
@@ -245,7 +245,7 @@ public:
 	// accessors
 	const std::string &cannonical_instance_name() const { return m_cannonical_instance_name; }
 	const std::string &value() const { return m_value; }
-	core_options::entry::shared_ptr option_entry() const { return m_entry; }
+	core_options::entry::shared_ptr option_entry() const { return m_entry.lock(); }
 
 	// mutators
 	void specify(const std::string &value);
@@ -258,7 +258,7 @@ private:
 	emu_options &                   m_host;
 	std::string                     m_cannonical_instance_name;
 	std::string                     m_value;
-	core_options::entry::shared_ptr m_entry;
+	core_options::entry::weak_ptr   m_entry;
 };
 
 

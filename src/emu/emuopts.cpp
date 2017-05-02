@@ -992,7 +992,6 @@ slot_option::slot_option(emu_options &host, const char *default_value)
 	: m_host(host)
 	, m_specified(false)
 	, m_default_value(default_value ? default_value : "")
-	, m_entry(nullptr)
 {
 }
 
@@ -1123,11 +1122,12 @@ void slot_option::set_bios(std::string &&text)
 core_options::entry::shared_ptr slot_option::setup_option_entry(const char *name)
 {
 	// this should only be called once
-	assert(!m_entry);
+	assert(!m_entry.lock());
 
 	// create the entry and return it
-	m_entry = std::make_shared<slot_option_entry>(name, *this);
-	return m_entry;
+	core_options::entry::shared_ptr entry = std::make_shared<slot_option_entry>(name, *this);
+	m_entry = entry;
+	return entry;
 }
 
 
@@ -1142,7 +1142,6 @@ core_options::entry::shared_ptr slot_option::setup_option_entry(const char *name
 image_option::image_option(emu_options &host, const std::string &cannonical_instance_name)
 	: m_host(host)
 	, m_cannonical_instance_name(cannonical_instance_name)
-	, m_entry(nullptr)
 {
 }
 
@@ -1177,9 +1176,10 @@ void image_option::specify(std::string &&value)
 core_options::entry::shared_ptr image_option::setup_option_entry(std::vector<std::string> &&names)
 {
 	// this should only be called once
-	assert(!m_entry);
+	assert(!m_entry.lock());
 
 	// create the entry and return it
-	m_entry = std::make_shared<image_option_entry>(std::move(names), *this);
-	return m_entry;
+	core_options::entry::shared_ptr entry = std::make_shared<image_option_entry>(std::move(names), *this);
+	m_entry = entry;
+	return entry;
 }

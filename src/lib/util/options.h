@@ -155,7 +155,6 @@ public:
 	const std::string &command() const { return m_command; }
 	const entry::shared_ptr get_entry(const std::string &name) const;
 	entry::shared_ptr get_entry(const std::string &name);
-	std::vector<entry::shared_ptr> &entries() { return m_entries; }
 	const std::vector<entry::shared_ptr> &entries() const { return m_entries; }
 	bool exists(const std::string &name) const { return get_entry(name) != nullptr; }
 	bool header_exists(const char *description) const;
