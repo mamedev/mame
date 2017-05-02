@@ -220,6 +220,21 @@ i8080a_cpu_device::i8080a_cpu_device(const machine_config &mconfig, const char *
 }
 
 
+void i8085a_cpu_device::device_config_complete()
+{
+	m_clk_out_func.bind_relative_to(*owner());
+	if (!m_clk_out_func.isnull())
+		m_clk_out_func(clock() / 2);
+}
+
+
+void i8085a_cpu_device::device_clock_changed()
+{
+	if (!m_clk_out_func.isnull())
+		m_clk_out_func(clock() / 2);
+}
+
+
 void i8085a_cpu_device::set_sod(int state)
 {
 	if (state != 0 && m_sod_state == 0)
