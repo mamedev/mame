@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
 /******************************************************************************
-*       BPMMicro (formerly BPMicro) universal device programmers
-*       Models supported in this driver: (BP=1148) BP-1200
-*
-*       All models:
+*       BPM Microsystems (formerly BP Microsystems, before 20060828)
+          universal device programmers
+*       Models supported in this driver so far: BP-1148/BP-1200
+
+*       1000-series (non-ganged, manual feed) models:
 *       EP-series:
 *           EP-1 - 28 pin, eproms only? has adapter for 32 pin?
 *           EP-1132 - 32 pin, eproms only?
@@ -12,38 +13,42 @@
 *       PLD-series:
 *           PLD-1100 - ndip plds/pals only?
 *           PLD-1128 - ndip plds/pals only?
-*       286 based:
-*           BP-1148 - fixed 512k ram, uses a special BP-1148 socket instead
-              of a tech adapter+socket module
-*           BP-1200 - fixed 512k ram, uses a TP-48 or TP-84 tech adapter,
-              otherwise identical to above, same firmware
-*       286 based w/extra header for >84 (up to 240?) pin drivers, expandable ram:
-*           BP-1400/84 - uses a 30 OR 72 pin SIMM (some programmers may have
+*       286 based w/512k ram, fixed: (1992ish)
+*           BP-1148 - fixed 512k ram, uses a special 'low cost' BP-1148 socket
+              instead of a tech adapter+socket module
+*           BP-1200 - fixed 512k ram, uses a TA-84 or TA-240 tech adapter plus
+              a socket module, otherwise identical to above, same firmware
+*       286 based w/240 pin tech adapter integrated as a "mezzanine board", expandable ram:
+*           BP-1400/240 - uses a 30 OR 72 pin SIMM (some programmers may have
               the 30 pin SIMM socket populated) for up to 8MB? of ram
-*           BP-1400/240 - same as above, different mezzanine board
+*           BP-1400/84 - more or less a 1200/84 with expandable ram, very rare.
+*           Silicon Sculptor - custom firmware locked to Actel fpga/pld [1400?]
+              devices, may have a custom MB
+*           Silicon Sculptor 6X - as above but 6 programmers ganged together
+*       486 based:
+*           BP-1600 - 486DX4 100Mhz based, uses a 72 pin SIMM for up to 16MB of
+              ram (does NOT support 32MB SIMMs!), supports 1.5vdd devices
+*           Silicon Sculptor II - same as BP-1600 except it has the extra
+              button and different firmware and a different mezzanine
+              board/tech adapter; comes with a 72-pin SIMM installed
+*       probably 'universal platform':
+*           BP-2510
+*       486+USB "6th Gen":
+*           BP-1410 - 486DX4 based, uses a laptop SODIMM for up to 512MB? of ram?, has USB
+*           BP-1610 - unclear what the difference to 1410 is
+*           BP-1710 - same as BP1610, but two programmers ganged together in a single case
+*           Silicon Sculptor III - 486DX4 100Mhz
+*       There exist "7th" "8th" and "9th" gen programmers as well.
+
+*       2000-series (ganged, manual programmers)
 *       Unclear whether 286 or 486, all have extra button per programmer:
 *           BP-2100/84x4 - four BP-1?00s ganged together [1400/84 based?]
 *           BP-2200/240x2 - two BP-1?00s ganged together [1400/240 based?]
 *           BP-2200/240x4 - four BP-1?00s ganged together
 *           BP-2200/240x6 - six BP-1?00s ganged together
 *           BP-2500/240x4 - four BP-1?00s ganged together [1600 based?]
-*           BP-2000, BP-2600M - ganged/bulk/autofeed programmers?
-*           Silicon Sculptor - custom firmware locked to Actel fpga/pld [1400?]
-              devices, may have a custom MB
-*           Silicon Sculptor 6X - as above but 6 programmers ganged together
-*       486 based:
-*           BP-1600 - 486DX4 100Mhz based, uses a 72 pin SIMM for up to 16MB of
-              ram (does NOT support 32MB SIMMs!)
-*           Silicon Sculptor II - same as BP-1600 except it has the extra
-              button and different firmware and a different mezzanine
-              board/tech adapter; comes with a 72-pin SIMM installed
-*       probably 'universal platform':
-*           BP-2510
-*       486+USB 2nd gen 'universal platform':
-*           BP-1610 - 486DX4 based, uses a laptop SODIMM for up to 512MB? of ram?, has USB
-*           BP-1410 - 486DX4 based, uses a laptop SODIMM for up to 512MB? of ram?, has USB
-*           BP-1710 - same as BP1610, but two programmers ganged together in a single case
-*           Silicon Sculptor III - 486DX4 100Mhz
+*           BP-2000, BP-2600M - ganged programmers?
+
 *
 ******************************************************************************
 *       TODO:
@@ -62,6 +67,34 @@
 *       Links:
 *       http://www3.bpmmicro.com/web/helpandsupport.nsf/69f301ee4e15195486256fcf0062c2eb/8194a48179484c9f862573220065d38e!OpenDocument
 *       ftp://ftp.bpmmicro.com/Dnload/
+******************************************************************************
+*       Analog driver cards:
+        The BP-1200, 1400 and 1600 have up to 6 of these cards in them.
+        Each card can drive exactly 8 pins with analog (pwm-controlled?)
+        voltages. The BP-1200 is probably usable with as few as one of these
+        cards installed, but can only be used with 8-pin devices in that case!
+******************************************************************************
+*       Tech adapters for BP-1148 and BP-1200:
+*       Note: Regardless of tech adapter, only up to 48 pins are drivable with
+         analog (pseudo-dac-per-pin) voltages, the remainder are pulled high or
+         low by the tech adapter.
+*       TA-84: 84 pin tech adapter
+         Rev C: Small board which doesn't cover the whole front of the BP-1200.
+          no screen printing on the case, only identifiable by the pcb marking
+          this PCB can be populated with either 48 or 84 relays; if the former,
+          it is known as an STD48 pcb; the latter is presumably STD84 and may
+          have an otherwise unpopulated PGA FPGA or ASIC on it as well.
+         Rev E: Marked "CPCBTA84V", a larger board which covers the entire
+          front of the BP-1200 including the LEDs, but has its own 3 LEDs on
+          it (why not plastic light pipes?) controlled probably through the
+          93c46 bus. This board again has either 48 relays on it, or 84 relays
+          and an FPGA or ASIC on it.
+*        TA-240: 240 pin tech adapter, this is a full sized shield which
+          like the CPCBTA84V covers the entire front of the BP1200.
+          It likely has even more relays in it, and it provides the same
+          "three" connectors that the bp1400 and 1600 do natively, to allow
+          for 240 pins to be driven. It almost certainly has an FPGA or ASIC
+          on it as well, possibly several.
 ******************************************************************************
 *       SM48D socket module:
 *       The SM48D socket module has two DIN 41612/IEC 60603-2 sockets on the
