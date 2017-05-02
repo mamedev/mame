@@ -229,26 +229,24 @@ void ef9345_device::set_busy_flag(int period)
 // draw a char in 40 char line mode
 void ef9345_device::draw_char_40(uint8_t *c, uint16_t x, uint16_t y)
 {
-	//verify size limit
-	if (y * 10 >= m_screen->height() || x * 8 >= m_screen->width())
-		return;
-
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	for(int i = 0; i < 10; i++)
-		for(int j = 0; j < 8; j++)
+	const int scan_xsize = std::min( m_screen->width() - (x * 8), 8);
+	const int scan_ysize = std::min( m_screen->height() - (y * 10), 10);
+
+	for(int i = 0; i < scan_ysize; i++)
+		for(int j = 0; j < scan_xsize; j++)
 				m_screen_out.pix32(y * 10 + i, x * 8 + j)  = palette[c[8 * i + j] & 0x07];
 }
 
 // draw a char in 80 char line mode
 void ef9345_device::draw_char_80(uint8_t *c, uint16_t x, uint16_t y)
 {
-	// verify size limit
-	if (y * 10 >= m_screen->height() || x * 6 >= m_screen->width())
-		return;
-
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	for(int i = 0; i < 10; i++)
-		for(int j = 0; j < 6; j++)
+	const int scan_xsize = std::min( m_screen->width() - (x * 6), 6);
+	const int scan_ysize = std::min( m_screen->height() - (y * 10), 10);
+
+	for(int i = 0; i < scan_ysize; i++)
+		for(int j = 0; j < scan_xsize; j++)
 				m_screen_out.pix32(y * 10 + i, x * 6 + j)  = palette[c[6 * i + j] & 0x07];
 }
 
