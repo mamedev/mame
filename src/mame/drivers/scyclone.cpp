@@ -34,8 +34,6 @@ public:
 	required_shared_ptr<uint8_t> m_mainram;
 
 	DECLARE_WRITE8_MEMBER(scyclone_port06_w);
-	DECLARE_READ8_MEMBER(scyclone_port01_r);	
-	DECLARE_READ8_MEMBER(scyclone_port03_r);
 
 	/* video-related */
 	virtual void machine_start() override;
@@ -44,9 +42,7 @@ public:
 	uint32_t screen_update_scyclone(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
-	DECLARE_DRIVER_INIT(scyclone);
-	
+
 	INTERRUPT_GEN_MEMBER(irq);
 };
 
@@ -89,24 +85,26 @@ uint32_t scyclone_state::screen_update_scyclone(screen_device &screen, bitmap_rg
 
 static ADDRESS_MAP_START( scyclone_map, AS_PROGRAM, 8, scyclone_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM	AM_SHARE("mainram")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( scyclone_iomap, AS_IO, 8, scyclone_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(scyclone_port01_r)	
-	AM_RANGE(0x03, 0x03) AM_READ(scyclone_port03_r) AM_WRITENOP
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("mb14241", mb14241_device, shift_result_r) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITENOP
 	AM_RANGE(0x04, 0x04) AM_WRITENOP
 	AM_RANGE(0x05, 0x05) AM_WRITENOP
 	AM_RANGE(0x06, 0x06) AM_WRITE(scyclone_port06_w)
 	AM_RANGE(0x08, 0x08) AM_WRITENOP
 	AM_RANGE(0x09, 0x09) AM_WRITENOP
-	AM_RANGE(0x0a, 0x0a) AM_WRITENOP	
+	AM_RANGE(0x0a, 0x0a) AM_WRITENOP
 	AM_RANGE(0x0e, 0x0e) AM_WRITENOP
 	AM_RANGE(0x0f, 0x0f) AM_WRITENOP
 	AM_RANGE(0x40, 0x40) AM_WRITENOP
-	AM_RANGE(0x80, 0x80) AM_WRITENOP	
+	AM_RANGE(0x80, 0x80) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -114,8 +112,8 @@ static ADDRESS_MAP_START( scyclone_sub_map, AS_PROGRAM, 8, scyclone_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x1fff) AM_ROM // maybe
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	
-	AM_RANGE(0x3000, 0x3005) AM_RAM	// comms?
+
+	AM_RANGE(0x3000, 0x3005) AM_RAM // comms?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scyclone_sub_iomap, AS_IO, 8, scyclone_state )
@@ -124,24 +122,45 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( scyclone )
-INPUT_PORTS_END
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_CONDITION("DSW0",0x04,EQUALS,0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL PORT_CONDITION("DSW0",0x04,EQUALS,0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL PORT_CONDITION("DSW0",0x04,EQUALS,0x00)
+
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )   PORT_DIPLOCATION("DSW0:1,2")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW0:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "DSW0:4" ) // seems to disable collisions
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW0:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW0:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW0:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW0:8" )
+INPUT_PORTS_END
 
 WRITE8_MEMBER(scyclone_state::scyclone_port06_w)
 {
 
-}
-
-READ8_MEMBER(scyclone_state::scyclone_port01_r)
-{
-	// TILT is in here at least
-	return 0x00;
-}
-
-
-READ8_MEMBER(scyclone_state::scyclone_port03_r)
-{
-	return machine().rand();
 }
 
 static const gfx_layout tiles32x32_layout =
@@ -179,13 +198,13 @@ INTERRUPT_GEN_MEMBER(scyclone_state::irq)
 static MACHINE_CONFIG_START( scyclone, scyclone_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000) // MOSTEK Z80-CPU   ? MHz  (there's also a 9.987MHz XTAL)
+	MCFG_CPU_ADD("maincpu", Z80, 8000000) // MOSTEK Z80-CPU   ? MHz  (there's also a 9.987MHz XTAL)
 	MCFG_CPU_PROGRAM_MAP(scyclone_map)
 	MCFG_CPU_IO_MAP(scyclone_iomap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", scyclone_state,  irq)
 
 	// sound ?
-	MCFG_CPU_ADD("subcpu", Z80,5000000/2) // LH0080 Z80-CPU SHARP  ? MHz   (5Mhz XTAL on this sub-pcb)
+	MCFG_CPU_ADD("subcpu", Z80, 5000000/2) // LH0080 Z80-CPU SHARP  ? MHz   (5Mhz XTAL on this sub-pcb)
 	MCFG_CPU_PROGRAM_MAP(scyclone_sub_map)
 	MCFG_CPU_IO_MAP(scyclone_sub_iomap)
 
@@ -205,14 +224,14 @@ static MACHINE_CONFIG_START( scyclone, scyclone_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-    // 2x SN76477N
+	// 2x SN76477N
 MACHINE_CONFIG_END
 
 ROM_START( scyclone )
 	ROM_REGION( 0x3000, "maincpu", 0 )
 	ROM_LOAD( "DE07.1H.2716", 0x0000, 0x0800, CRC(fa9c93a3) SHA1(701a3196ee67533d69f1264e14085d04dfb1b915) ) 
 	ROM_LOAD( "DE08.3H.2716", 0x0800, 0x0800, CRC(bdff3e77) SHA1(e3fc6840348fa6df834cb1fb8b3832db05b5c585) ) 
-	ROM_LOAD( "DE09.4H.2716", 0x1000, 0x0800, BAD_DUMP CRC(2fd791a0) SHA1(41b7d42bef338c0a0f19efcbf1a49a75aaab5993) ) 
+	ROM_LOAD( "DE09.4H.2716", 0x1000, 0x0800, CRC(eed05875) SHA1(e00a1b2d2d723c2deedf5f5e3159936a5d27891d) ) 
 	ROM_LOAD( "DE10.5H.2716", 0x1800, 0x0800, CRC(71301be6) SHA1(70c1983d256a6a9e18c7a15b93f5e3781d884fdb) ) 
 	ROM_LOAD( "DE11.6H.2716", 0x2000, 0x0800, CRC(d241db51) SHA1(53c6489d715baf5f03032a7ac367a6af64bce040) ) 
 	ROM_LOAD( "DE12.7H.2716", 0x2800, 0x0800, CRC(208e3e9a) SHA1(07f0e6c5417584eef171d8dcad83d741f88c9348) ) 
@@ -226,45 +245,12 @@ ROM_START( scyclone )
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // 32x32x2 sprites?
 	ROM_LOAD( "DE01.11C.2716", 0x0000, 0x0800, CRC(bf770730) SHA1(1d0f9235b0618e3f4dd6db47efbdf92e2b00f5f6) )
-	
-	// undumped proms (DE02 and DE15 on the sprite board?, something in the sound section? DE17 on the main board? DE16 somewhere)
+
+	ROM_REGION( 0x0840, "proms", 0 )
+	ROM_LOAD( "DE02.5B.82S137", 0x0000, 0x0400, CRC(fe4b278c) SHA1(c03080ab4d3fb84b8eec7087b925d1a1d8565fcc) )
+	ROM_LOAD( "DE15.3A.82S137", 0x0400, 0x0400, CRC(c2816161) SHA1(2d0e7b4dbdb2af1481a4b7e45b1f9e3640f69aec) )
+	ROM_LOAD( "DE16.4A.82S123", 0x0800, 0x0020, CRC(5178e9c5) SHA1(dd2f81894069282f37feae21c5cfacf50f77dcd5) )
+	ROM_LOAD( "DE17.2E.82S123", 0x0820, 0x0020, CRC(3c8572e4) SHA1(c908c4ed99828fff576c3d0963cd8b99edeb993b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(scyclone_state,scyclone)
-{
-	// this code jumped to here does not look good at all, infinite loop corrupting memory, see below
-	// should it never happen or is there a rom problem or rom mapping problem?
-	uint8_t *rom = memregion("maincpu")->base();
-	rom[0x11d] = 0x00;
-	rom[0x11e] = 0x00;
-	rom[0x11f] = 0x00;
-
-	/*
-	code ends up trashing the stack
-
-	0116: FE 09         cp   $09
-	0118: 3E 02         ld   a,$02
-	011A: D2 79 14      jp   nc,$1479
-	011D: C3 82 14      jp   $1482  -- this jump
-	0120: CD 6A 19      call $196A
-
-	-- doesn't look like it's really meant to go here?
-	147F: 18 CD         jr   $144E
-	1481: 4A            ld   c,d
-	1482: 14            inc  d  -- to here
-	1483: CD F1 18      call $18F1
-	1486: C3 D8 00      jp   $00D8
-	1489: 2E C4         ld   l,$C4
-
-	18EE: CD EA 10      call $10EA
-	18F1: 3E 04         ld   a,$04 -- to here
-	18F3: CD 82 14      call $1482 -- back to where we just came from...
-	18F6: 3E 04         ld   a,$04
-	18F8: C3 79 14      jp   $1479
-	18FB: CD 28 2B      call $2B28
-
-	*/
-
-}		
-	
-GAME( 1980, scyclone,  0,    scyclone, scyclone, scyclone_state,  scyclone, ROT270, "Taito Corporation", "Space Cyclone", MACHINE_NOT_WORKING )
+GAME( 1980, scyclone,  0,    scyclone, scyclone, driver_device, 0, ROT270, "Taito Corporation", "Space Cyclone", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_NO_SOUND )

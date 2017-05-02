@@ -278,7 +278,6 @@ protected:
 	void image_checkhash();
 
 	const software_part *find_software_item(const std::string &identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
-	bool load_software_part(const std::string &identifier);
 	std::string software_get_default_slot(const char *default_card_slot) const;
 
 	void add_format(std::unique_ptr<image_device_format> &&format);
@@ -311,6 +310,7 @@ private:
 	static image_error_t image_error_from_file_error(osd_file::error filerr);
 	std::vector<u32> determine_open_plan(bool is_create);
 	void update_names();
+	bool load_software_part(const std::string &identifier);
 
 	bool init_phase() const;
 	static void run_hash(util::core_file &file, void(*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *), util::hash_collection &hashes, const char *types);

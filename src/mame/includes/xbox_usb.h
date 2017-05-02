@@ -340,24 +340,23 @@ struct usb_device_configuration
 
 class ohci_function_device; // forward declaration
 
-class ohci_usb_controller : public device_t
+class ohci_usb_controller
 {
 public:
-	ohci_usb_controller(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ohci_usb_controller();
 	~ohci_usb_controller() {}
 	void usb_ohci_plug(int port, ohci_function_device *function);
 	void usb_ohci_device_address_changed(int old_address, int new_address);
+	void set_cpu(cpu_device *cpu) { m_maincpu = cpu; }
+	void set_timer(emu_timer *timer) { ohcist.timer = timer; }
+	void set_irq_callbaclk(std::function<void(int state)> callback) { irq_callback = callback; }
 
-	template<class _Object> static devcb_base &set_interrupt_handler(device_t &device, _Object object) { return downcast<ohci_usb_controller &>(device).m_interrupt_handler.set_callback(object); }
+	void start();
+	void reset();
+	void timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	DECLARE_READ32_MEMBER(read);
 	DECLARE_WRITE32_MEMBER(write);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	void usb_ohci_interrupts();
@@ -367,8 +366,8 @@ private:
 	void usb_ohci_writeback_transfer_descriptor(uint32_t address);
 	void usb_ohci_read_isochronous_transfer_descriptor(uint32_t address);
 	void usb_ohci_writeback_isochronous_transfer_descriptor(uint32_t address);
+	std::function<void (int state)> irq_callback;
 	cpu_device *m_maincpu;
-	//required_device<pic8259_device> pic8259_1;
 	struct {
 		uint32_t hc_regs[256];
 		struct {
@@ -394,15 +393,7 @@ private:
 		OHCITransferDescriptor transfer_descriptor;
 		OHCIIsochronousTransferDescriptor isochronous_transfer_descriptor;
 	} ohcist;
-	devcb_write_line m_interrupt_handler;
 };
-
-extern const device_type OHCI_USB_CONTROLLER;
-
-#define MCFG_OHCI_USB_CONTROLLER_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, OHCI_USB_CONTROLLER, 0)
-#define MCFG_OHCI_USB_CONTROLLER_INTERRUPT_HANDLER(_devcb) \
-	devcb = &ohci_usb_controller::set_interrupt_handler(*device, DEVCB_##_devcb);
 
 class ohci_function_device {
 public:

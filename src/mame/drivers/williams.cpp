@@ -1869,8 +1869,7 @@ ROM_END
 ROM_START( defenderj )
 	ROM_REGION( 0x19000, "maincpu", 0 )
 	ROM_LOAD( "DF1-1.E3",     0x0d000, 0x1000, CRC(8c04602b) SHA1(a8ed5afd0b276cebb479b1717666eaabbf75c6a5) ) //2532
-	ROM_LOAD( "DF2-1.E2",     0x0e000, 0x1000, BAD_DUMP CRC(b1018914) SHA1(f036f3ef21e8992a1e086024c95ce7950230069e) ) //2532
-	//ROM_LOAD( "defend.2",     0x0e000, 0x1000, CRC(89b75984) SHA1(a9481478da38f99efb67f0ecf82d084e14b93b42) ) // original defender ROM passes ROM test
+	ROM_LOAD( "DF2-1.E2",     0x0e000, 0x1000, CRC(89b75984) SHA1(a9481478da38f99efb67f0ecf82d084e14b93b42) ) //2532
 	ROM_LOAD( "DF3-1.E1",     0x0f000, 0x1000, CRC(94f51e9b) SHA1(a24cfc55de56a72758c76fe2a55f1ec6c353b16f) ) //2532
 	ROM_LOAD( "DF10-1.A1",    0x10000, 0x0800, CRC(12e2bd1c) SHA1(c2fdf2fced003a0acf037aa6fab141b04c1c81bd) ) //2716
 	ROM_LOAD( "DF7-1.B1",     0x10800, 0x0800, CRC(f1f88938) SHA1(26e48dfeefa0766837b1e762695b9532dbc8bc5e) ) //2716
@@ -3179,7 +3178,7 @@ GAME( 1980, defender,   0,        defender,       defender, williams_state, defe
 GAME( 1980, defenderg,  defender, defender,       defender, williams_state, defender, ROT0,   "Williams", "Defender (Green label)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, defenderb,  defender, defender,       defender, williams_state, defender, ROT0,   "Williams", "Defender (Blue label)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, defenderw,  defender, defender,       defender, williams_state, defender, ROT0,   "Williams", "Defender (White label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defenderj,  defender, defender,       defender, williams_state, defender, ROT0,   "Taito Corporation", "T.T. Defender", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump
+GAME( 1980, defenderj,  defender, defender,       defender, williams_state, defender, ROT0,   "Taito Corporation", "T.T. Defender", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, defndjeu,   defender, defender,       defender, williams_state, defndjeu, ROT0,   "bootleg (Jeutel)", "Defender (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, tornado1,   defender, defender,       defender, williams_state, defndjeu, ROT0,   "bootleg (Jeutel)", "Tornado (set 1, Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, tornado2,   defender, defender,       defender, williams_state, defndjeu, ROT0,   "bootleg (Jeutel)", "Tornado (set 2, Defender bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump?

@@ -1,38 +1,54 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
 /******************************************************************************
-*       BPMMicro (formerly BPMicro) universal device programmers
-*       Models supported in this driver: (BP=1148) BP-1200
-*
-*       All models:
-*       Legacy:
-*           EP-1 - 28 pin eproms, has adapter for 32 pin?
+*       BPM Microsystems (formerly BP Microsystems, before 20060828)
+          universal device programmers
+*       Models supported in this driver so far: BP-1148/BP-1200
+
+*       1000-series (non-ganged, manual feed) models:
+*       EP-series:
+*           EP-1 - 28 pin, eproms only? has adapter for 32 pin?
+*           EP-1132 - 32 pin, eproms only?
+*           EP-1140 - 40 pin, eproms only?
+*       PLD-series:
 *           PLD-1100 - ndip plds/pals only?
-*           EP-1140 - 32 pin eproms only?
-*       286 based:
-*           BP-1148 - fixed 512k ram, uses a special BP-1148 socket instead of a tech adapter+socket module
-*           BP-1200 - fixed 512k ram, uses a TP-48 or TP-84 tech adapter, otherwise identical to above, same firmware
-*       286 based w/extra header for >84 (up to 240?) pin drivers, expandable ram:
-*           BP-1400 - uses a 30? pin SIMM for up to 8MB? of ram
-*       Unclear whether 286 or 486, all have extra button per programmer:
-*           BP-2100/84x4 - four BP-1?00s ganged together [1400?]
-*           BP-2200/240x2 - two BP-1?00s ganged together [1600?]
-*           BP-2200/240x4 - four BP-1?00s ganged together
-*           BP-2200/240x6 - six BP-1?00s ganged together
-*           BP-2500/240x4 - four BP-1?00s ganged together
-*           BP-2000, BP-2600M - ganged/bulk/autofeed programmers?
-*           Silicon Sculptor - custom firmware locked to Actel fpga/pld devices, may have a custom MB
+*           PLD-1128 - ndip plds/pals only?
+*       286 based w/512k ram, fixed: (1992ish)
+*           BP-1148 - fixed 512k ram, uses a special 'low cost' BP-1148 socket
+              instead of a tech adapter+socket module
+*           BP-1200 - fixed 512k ram, uses a TA-84 or TA-240 tech adapter plus
+              a socket module, otherwise identical to above, same firmware
+*       286 based w/240 pin tech adapter integrated as a "mezzanine board", expandable ram:
+*           BP-1400/240 - uses a 30 OR 72 pin SIMM (some programmers may have
+              the 30 pin SIMM socket populated) for up to 8MB? of ram
+*           BP-1400/84 - more or less a 1200/84 with expandable ram, very rare.
+*           Silicon Sculptor - custom firmware locked to Actel fpga/pld [1400?]
+              devices, may have a custom MB
 *           Silicon Sculptor 6X - as above but 6 programmers ganged together
-*           Silicon Sculptor II
 *       486 based:
-*           BP-1600 - 486DX2 based, uses a 72 pin SIMM for up to 16MB of ram (does NOT support 32MB SIMMs!)
+*           BP-1600 - 486DX4 100Mhz based, uses a 72 pin SIMM for up to 16MB of
+              ram (does NOT support 32MB SIMMs!), supports 1.5vdd devices
+*           Silicon Sculptor II - same as BP-1600 except it has the extra
+              button and different firmware and a different mezzanine
+              board/tech adapter; comes with a 72-pin SIMM installed
 *       probably 'universal platform':
 *           BP-2510
-*       486+USB 2nd gen 'universal platform':
-*           BP-1610 - 486DX2 based, uses a laptop SODIMM for up to 512MB? of ram?, has USB
-*           BP-1410 - 486DX2 based, uses a laptop SODIMM for up to 512MB? of ram?, has USB
+*       486+USB "6th Gen":
+*           BP-1410 - 486DX4 based, uses a laptop SODIMM for up to 512MB? of ram?, has USB
+*           BP-1610 - unclear what the difference to 1410 is
 *           BP-1710 - same as BP1610, but two programmers ganged together in a single case
-*           Silicon Sculptor III and IV?
+*           Silicon Sculptor III - 486DX4 100Mhz
+*       There exist "7th" "8th" and "9th" gen programmers as well.
+
+*       2000-series (ganged, manual programmers)
+*       Unclear whether 286 or 486, all have extra button per programmer:
+*           BP-2100/84x4 - four BP-1?00s ganged together [1400/84 based?]
+*           BP-2200/240x2 - two BP-1?00s ganged together [1400/240 based?]
+*           BP-2200/240x4 - four BP-1?00s ganged together
+*           BP-2200/240x6 - six BP-1?00s ganged together
+*           BP-2500/240x4 - four BP-1?00s ganged together [1600 based?]
+*           BP-2000, BP-2600M - ganged programmers?
+
 *
 ******************************************************************************
 *       TODO:
@@ -41,7 +57,7 @@
 *       8-pin pin driver boards
 *       tech adapter relays
 *       Parallel port interface
-*       Serial EEPROM (93c46) at U26 on BP1200 mainboard
+*       Serial EEPROM (93c46) at U38 on BP1200 mainboard
 *       Serial EEPROM (93c46) at (U1? U7? U12?) on TA-84 tech adapter
 *       Serial EEPROM (93c46a) at ? on SM48D socket adapter
 *       other socket adapters other than sm48d
@@ -51,24 +67,128 @@
 *       Links:
 *       http://www3.bpmmicro.com/web/helpandsupport.nsf/69f301ee4e15195486256fcf0062c2eb/8194a48179484c9f862573220065d38e!OpenDocument
 *       ftp://ftp.bpmmicro.com/Dnload/
+******************************************************************************
+*       Analog driver cards:
+        The BP-1200, 1400 and 1600 have up to 6 of these cards in them.
+        Each card can drive exactly 8 pins with analog (pwm-controlled?)
+        voltages. The BP-1200 is probably usable with as few as one of these
+        cards installed, but can only be used with 8-pin devices in that case!
+******************************************************************************
+*       Tech adapters for BP-1148 and BP-1200:
+*       Note: Regardless of tech adapter, only up to 48 pins are drivable with
+         analog (pseudo-dac-per-pin) voltages, the remainder are pulled high or
+         low by the tech adapter.
+*       TA-84: 84 pin tech adapter
+         Rev C: Small board which doesn't cover the whole front of the BP-1200.
+          no screen printing on the case, only identifiable by the pcb marking
+          this PCB can be populated with either 48 or 84 relays; if the former,
+          it is known as an STD48 pcb; the latter is presumably STD84 and may
+          have an otherwise unpopulated PGA FPGA or ASIC on it as well.
+         Rev E: Marked "CPCBTA84V", a larger board which covers the entire
+          front of the BP-1200 including the LEDs, but has its own 3 LEDs on
+          it (why not plastic light pipes?) controlled probably through the
+          93c46 bus. This board again has either 48 relays on it, or 84 relays
+          and an FPGA or ASIC on it.
+*        TA-240: 240 pin tech adapter, this is a full sized shield which
+          like the CPCBTA84V covers the entire front of the BP1200.
+          It likely has even more relays in it, and it provides the same
+          "three" connectors that the bp1400 and 1600 do natively, to allow
+          for 240 pins to be driven. It almost certainly has an FPGA or ASIC
+          on it as well, possibly several.
+******************************************************************************
+*       SM48D socket module:
+*       The SM48D socket module has two DIN 41612/IEC 60603-2 sockets on the
+          bottom, each of which has two rows of pins, with the middle "B" row
+          unpopulated. It contains six 74HCT164 Serial-in Parallel-out shift
+          registers, for 48 bits of serially drivable state, which is used to
+          drive the gates of transistors which act as a pull-down to GND for
+          each of the 48 pins.
+          There is also a relay, of unknown purpose.
+          There are several versions of the SM48D pcb which existed:
+          Rev B uses all through-hole components, and extra passive resistor arrays for every pin (1992)
+          Rev C uses all through-hole components (1992)
+          Rev E "CPCBS48D" uses all surface mount/soic components (1998)
+          For revision E, assuming IC1 is the upper leftmost IC, and IC7 is
+          the lower rightmost ic, from left to right then top to bottom
+          and ic4 being the 93c46;
+          The 74hct164s are chained in this order and drive the following pins:
+		  IC3: TODO: ADD ME
+		  IC2: "
+		  IC7: "
+		  IC5: "
+		  IC6: "
+		  IC1: "
+          
+*       Looking "through" the pcb from the top, the connectors are arranged
+          as such:
+(note: J3 may be the wrong label, it could be J5)
+
+           ___J3___                                             ___J4___ 
+   GND -- |A32  C32|                                           |A32  C32| -- GND
+   VCC -- |A31  C31|                                           |A31  C31| <> J3 A03
+J4 C30 <> |A30  C30|                           ?Relay control? |A30  C30| <> J3 A30
+   GND -- |A29  C29|                                           |A29  C29|
+Pin 01 <> |A28  C28|                                           |A28  C28| <> Pin 48
+Pin 02 <> |A27  C27|                                           |A27  C27| <> Pin 47
+Pin 03 <> |A26  C26|                                           |A26  C26| <> Pin 46
+Pin 04 <> |A25  C25|                                           |A25  C25| <> Pin 45
+Pin 05 <> |A24  C24|                                           |A24  C24| <> Pin 44
+Pin 06 <> |A23  C23| -- GND                             GND -- |A23  C23| <> Pin 43
+Pin 07 <> |A22  C22|                                           |A22  C22| <> Pin 42
+Pin 08 <> |A21  C21|                                           |A21  C21| <> Pin 41
+Pin 09 <> |A20  C20|                                           |A20  C20| <> Pin 40
+Pin 10 <> |A19  C19|                                           |A19  C19| <> Pin 39
+Pin 11 <> |A18  C18|                                           |A18  C18| <> Pin 38
+Pin 12 <> |A17  C17| -- GND                             GND -- |A17  C17| <> Pin 37
+Pin 13 <> |A16  C16|                                           |A16  C16| <> Pin 36
+Pin 14 <> |A15  C15|                                           |A15  C15| <> Pin 35
+Pin 15 <> |A14  C14|                                           |A14  C14| <> Pin 34
+Pin 16 <> |A13  C13|                                           |A13  C13| <> Pin 33
+Pin 17 <> |A12  C12|                                           |A12  C12| <> Pin 32
+Pin 18 <> |A11  C11| -- GND                             GND -- |A11  C11| <> Pin 31
+Pin 19 <> |A10  C10|                                           |A10  C10| <> Pin 30
+Pin 20 <> |A09  C09|                                           |A09  C09| <> Pin 29
+Pin 21 <> |A08  C08|                                           |A08  C08| <> Pin 28
+Pin 22 <> |A07  C07|                                     ?? <> |A07  C07| <> Pin 27
+Pin 23 <> |A06  C06|                                           |A06  C06| <> Pin 26
+Pin 24 <> |A05  C05|                                           |A05  C05| <> Pin 25
+          |A04  C04|                               93c46 CS -> |A04  C04| -- VCC
+J4 C31 <> |A03  C03|                              93c46 CLK -> |A03  C03|
+J4 C02 <> |A02  C02| <- '164 CP   93c46 DI AND '164 IC3 DSB -> |A02  C02| <> J3 A02
+   GND -- |A01  C01| <- '164 /MR                   93c46 DO <- |A01  C01| -- GND
+          ----------                                           ----------
+
 ******************************************************************************/
 
 /* Core includes */
 #include "emu.h"
 #include "cpu/i86/i286.h"
+#include "machine/eepromser.h"
 
 class bpmmicro_state : public driver_device
 {
 public:
 	bpmmicro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_eeprom_u38(*this, "eeprom_u38")
 	{
 	}
 
 	DECLARE_DRIVER_INIT(bp1200);
+	DECLARE_WRITE16_MEMBER(unknown_82200_w);
+	DECLARE_READ16_MEMBER(latch_84000_r);
+	DECLARE_WRITE16_MEMBER(latch_84002_w);
+	DECLARE_WRITE16_MEMBER(unknown_8400e_w);
+	DECLARE_WRITE16_MEMBER(unknown_84018_w);
+	DECLARE_WRITE16_MEMBER(unknown_8401a_w);
+	DECLARE_WRITE16_MEMBER(eeprom_8401c_w);
+	virtual void machine_start() override;
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<eeprom_serial_93cxx_device> m_eeprom_u38;
+	uint16_t m_shifter;
+	uint16_t m_latch;
 };
 
 /******************************************************************************
@@ -77,11 +197,81 @@ private:
 
 DRIVER_INIT_MEMBER(bpmmicro_state,bp1200)
 {
+	m_shifter = 0;
+	m_latch = 0;
+}
+
+/******************************************************************************
+ Machine Start/Reset
+******************************************************************************/
+
+void bpmmicro_state::machine_start()
+{
+	save_item(NAME(m_shifter));
+	save_item(NAME(m_latch));
 }
 
 /******************************************************************************
  Read/Write handlers
 ******************************************************************************/
+
+WRITE16_MEMBER(bpmmicro_state::unknown_82200_w)
+{
+	logerror("%s: unknown write to 0x82200 offset %08x mask (%08x) data %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
+}
+
+READ16_MEMBER(bpmmicro_state::latch_84000_r)
+{
+	uint16_t returnval = m_latch; // not sure this is correct, it could be that the 93c48 DO pin is connected directly to bit 7 here...
+	logerror("%08x:Read 0x84000 octal latch %08x (%08x), got %08x\n", machine().describe_context(), offset << 1, mem_mask, returnval);
+	return returnval;
+}
+
+WRITE16_MEMBER(bpmmicro_state::latch_84002_w)
+{
+	logerror("%s: write to 0x84002 octal latch clock? %08x mask (%08x) data %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
+	if (data) m_latch = m_shifter;
+}
+
+WRITE16_MEMBER(bpmmicro_state::unknown_8400e_w)
+{
+	logerror("%s: unknown write to 0x8400e offset %08x mask (%08x) data %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
+}
+
+WRITE16_MEMBER(bpmmicro_state::unknown_84018_w)
+{
+	logerror("%s: unknown write to 0x84018 offset %08x mask (%08x) data %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
+	if (data&1) // HACK
+	{
+		m_eeprom_u38->cs_write(CLEAR_LINE);
+		m_eeprom_u38->cs_write(ASSERT_LINE);
+	}
+}
+
+WRITE16_MEMBER(bpmmicro_state::unknown_8401a_w)
+{
+	logerror("%s: unknown write to 0x8401a offset %08x mask (%08x) data %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
+}
+
+WRITE16_MEMBER(bpmmicro_state::eeprom_8401c_w)
+{
+	logerror("%s:write eeprom %08x (%08x) %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
+	if (ACCESSING_BITS_0_7)
+	{
+		m_eeprom_u38->di_write(BIT(data, 0));
+		m_eeprom_u38->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
+		if (BIT(data,1)) // is this correct at all?
+		{
+			m_shifter <<= 1;
+			m_shifter |= m_eeprom_u38->do_read();
+		}
+		/* bits 2 thru 7 here also do something;
+		There is a 74HCT14 hex inverter schmitt trigger at u26
+		and it is possible these 6 bits feed the inputs of that chip.
+		These MIGHT be the CS lines for the 6 pin driver cards!
+		 */
+	}
+}
 
 
 /* todo (v1.24 rom)
@@ -139,15 +329,17 @@ read <- 00
 
 static ADDRESS_MAP_START(i286_mem, AS_PROGRAM, 16, bpmmicro_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM
-	// 82200 w
-	// 84000 r
-	// 8400e w
-	// 84018 w
-	// 8401a w - gets written with 3, then 2, then..
-	// 8401c w - bits 0 and 1 are serial data and clock respectively, either for serial over the parallel port, or they connect to one of the 93c46s (probably the one on the mainboard @ U26?)
-	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM // 512k ram
+	AM_RANGE(0x082200, 0x82201) AM_WRITE(unknown_82200_w)
+	AM_RANGE(0x084000, 0x84001) AM_READ(latch_84000_r) // GUESS: this is reading the octal latch
+	AM_RANGE(0x084002, 0x84003) AM_WRITE(latch_84002_w) // GUESS: this is clocking the CK pin on the octal latch from bit 0, dumping the contents of a serial in parallel out shifter into said latch
+	AM_RANGE(0x08400e, 0x8400f) AM_WRITE(unknown_8400e_w) 
+	AM_RANGE(0x084018, 0x84019) AM_WRITE(unknown_84018_w) 
+	AM_RANGE(0x08401a, 0x8401b) AM_WRITE(unknown_8401a_w)
+	AM_RANGE(0x08401c, 0x8401d) AM_WRITE(eeprom_8401c_w) 
+	AM_RANGE(0x0f0000, 0x0fffff) AM_ROM AM_REGION("bios", 0x10000)
+	//AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0) //?
+	AM_RANGE(0xfffff0, 0xffffff) AM_ROM AM_REGION("bios", 0x1fff0) //?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(i286_io, AS_IO, 16, bpmmicro_state)
@@ -170,6 +362,8 @@ static MACHINE_CONFIG_START( bpmmicro, bpmmicro_state )
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_32MHz/4) /* divider is guessed, cpu is an AMD N80L286-16/S part */
 	MCFG_CPU_PROGRAM_MAP(i286_mem)
 	MCFG_CPU_IO_MAP(i286_io)
+
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom_u38")
 MACHINE_CONFIG_END
 
 
@@ -220,4 +414,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE           INIT           COMPANY              FULLNAME      FLAGS */
-COMP( 1991, bp1200,     0,          0,      bpmmicro,   bpmmicro, bpmmicro_state, bp1200,      "BP Microsystems",   "BP-1200",    MACHINE_IS_SKELETON | MACHINE_NO_SOUND_HW )
+COMP( 1992, bp1200,     0,          0,      bpmmicro,   bpmmicro, bpmmicro_state, bp1200,      "BP Microsystems",   "BP-1200",    MACHINE_IS_SKELETON | MACHINE_NO_SOUND_HW )
