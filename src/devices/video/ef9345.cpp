@@ -229,16 +229,9 @@ void ef9345_device::set_busy_flag(int period)
 // draw a char in 40 char line mode
 void ef9345_device::draw_char_40(uint8_t *c, uint16_t x, uint16_t y)
 {
-	int scan_xsize,scan_ysize;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-
-	scan_xsize = m_screen->width() - (x * 8);
-	if ( scan_xsize > 8 )
-		scan_xsize = 8;
-
-	scan_ysize = m_screen->height() - (y * 10);
-	if ( scan_ysize > 10 )
-		scan_ysize = 10;
+	const int scan_xsize = std::min( m_screen->width() - (x * 8), 8);
+	const int scan_ysize = std::min( m_screen->height() - (y * 10), 10);
 
 	for(int i = 0; i < scan_ysize; i++)
 		for(int j = 0; j < scan_xsize; j++)
@@ -248,16 +241,9 @@ void ef9345_device::draw_char_40(uint8_t *c, uint16_t x, uint16_t y)
 // draw a char in 80 char line mode
 void ef9345_device::draw_char_80(uint8_t *c, uint16_t x, uint16_t y)
 {
-	int scan_xsize,scan_ysize;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-
-	scan_xsize = m_screen->width() - (x * 6);
-	if ( scan_xsize > 6 )
-		scan_xsize = 6;
-
-	scan_ysize = m_screen->height() - (y * 10);
-	if ( scan_ysize > 10 )
-		scan_ysize = 10;
+	const int scan_xsize = std::min( m_screen->width() - (x * 6), 6);
+	const int scan_ysize = std::min( m_screen->height() - (y * 10), 10);
 
 	for(int i = 0; i < scan_ysize; i++)
 		for(int j = 0; j < scan_xsize; j++)
