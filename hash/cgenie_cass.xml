@@ -162,6 +162,7 @@ distributor of the Colour Genie EG2000 computers.
 				<rom name="colourfrog_tcs.cas" size="8225" crc="0ddbf620" sha1="7bfff994d4b7c5785a1f5bd1289d0c9c86239da3" offset="0" />
 			</dataarea>
 		</part>
+	</software>
 
 	<software name="colkong" supported="yes">
 		<description>Colour Kong (32k)</description>
