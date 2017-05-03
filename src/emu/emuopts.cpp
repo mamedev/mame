@@ -1122,7 +1122,7 @@ void slot_option::set_bios(std::string &&text)
 core_options::entry::shared_ptr slot_option::setup_option_entry(const char *name)
 {
 	// this should only be called once
-	assert(!m_entry.lock());
+	assert(m_entry.expired());
 
 	// create the entry and return it
 	core_options::entry::shared_ptr entry = std::make_shared<slot_option_entry>(name, *this);
@@ -1176,7 +1176,7 @@ void image_option::specify(std::string &&value)
 core_options::entry::shared_ptr image_option::setup_option_entry(std::vector<std::string> &&names)
 {
 	// this should only be called once
-	assert(!m_entry.lock());
+	assert(m_entry.expired());
 
 	// create the entry and return it
 	core_options::entry::shared_ptr entry = std::make_shared<image_option_entry>(std::move(names), *this);
