@@ -781,6 +781,10 @@ endif
 ifdef WEBASSEMBLY
 PARAMS += --WEBASSEMBLY='$(WEBASSEMBLY)'
 endif
+
+ifdef NO_USE_LINENOISE
+PARAMS += --NO_USE_LINENOISE=1
+endif
 #-------------------------------------------------
 # All scripts
 #-------------------------------------------------
