@@ -659,8 +659,6 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 16, badlands_state )
 	AM_RANGE(0x400000, 0x401fff) AM_READWRITE8(bootleg_shared_r,bootleg_shared_w,0xffff)
 
 	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(badlandsb_unk_r ) // sound comms?
-	
-
 
 	AM_RANGE(0xfd0000, 0xfd1fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
 	//AM_RANGE(0xfe0000, 0xfe1fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
@@ -670,21 +668,25 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 16, badlands_state )
 	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("FE4000")
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("P1")
 	AM_RANGE(0xfe4006, 0xfe4007) AM_READ_PORT("P2")
-	AM_RANGE(0xfe4008, 0xfe4009) AM_WRITENOP 
-	AM_RANGE(0xfe400c, 0xfe400d) AM_WRITENOP 
+	AM_RANGE(0xfe4008, 0xfe4009) AM_WRITE(badlands_pf_bank_w) 
+	AM_RANGE(0xfe400c, 0xfe400d) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 
-	AM_RANGE(0xfec000, 0xfedfff) AM_WRITE(badlands_pf_bank_w)
-	AM_RANGE(0xfee000, 0xfeffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
 	AM_RANGE(0xffc000, 0xffc3ff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0xff00) AM_SHARE("palette")
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
 	AM_RANGE(0xfff000, 0xfff1ff) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0xfff200, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
+WRITE8_MEMBER(badlands_state::bootleg_main_irq_w)
+{
+	m_maincpu->set_input_line(2, HOLD_LINE);
+}
+
 static ADDRESS_MAP_START( bootleg_audio_map, AS_PROGRAM, 8, badlands_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("audiorom", 0) 
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("b_sharedram")
 	AM_RANGE(0x4000, 0xcfff) AM_ROM AM_REGION("audiorom", 0x4000)
+	AM_RANGE(0xd400, 0xd400) AM_WRITE(bootleg_main_irq_w) // correct?
 	AM_RANGE(0xd800, 0xd801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 ADDRESS_MAP_END
 
@@ -751,7 +753,7 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL_20MHz/12)    /* Divisor estimated */
 	MCFG_CPU_PROGRAM_MAP(bootleg_audio_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", badlands_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", badlands_state,  irq0_line_hold) // TODO: maybe triggered by main CPU instead of periodic timer
 
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
 	MCFG_MACHINE_RESET_OVERRIDE(badlands_state,badlandsb)

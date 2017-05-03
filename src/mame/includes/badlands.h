@@ -50,6 +50,7 @@ public:
 	DECLARE_WRITE16_MEMBER( badlands_pf_bank_w );
 	DECLARE_READ8_MEMBER(bootleg_shared_r);
 	DECLARE_WRITE8_MEMBER(bootleg_shared_w);
+	DECLARE_WRITE8_MEMBER(bootleg_main_irq_w);
 
 	static const atari_motion_objects_config s_mob_config;
 };
