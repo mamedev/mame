@@ -308,6 +308,8 @@ protected:
 	void eorb_im();
 	void eorb_ix();
 	void illegal();
+	void illega2();
+	void illega3();
 	void inc_ex();
 	void inc_ix();
 	void inca();

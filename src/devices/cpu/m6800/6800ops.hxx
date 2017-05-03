@@ -22,6 +22,20 @@ OP_HANDLER( illegal )
 	logerror("m6800: illegal opcode: address %04X, op %02X\n",PC-1,(int) M_RDOP_ARG(PC-1)&0xFF);
 }
 
+//OP_HANDLER( illega2 )
+OP_HANDLER( illega2 )
+{
+	logerror("m6800: illegal 2 bytes opcode: address %04X, op %02X\n",PC-1,(int) M_RDOP_ARG(PC-1)&0xFF);
+	PC++;
+}
+
+//OP_HANDLER( illega3 )
+OP_HANDLER( illega3 )
+{
+	logerror("m6800: illegal 3 bytes opcode: address %04X, op %02X\n",PC-1,(int) M_RDOP_ARG(PC-1)&0xFF);
+	PC += 2;
+}
+
 /* HD63701 only */
 //OP_HANDLER( trap )
 OP_HANDLER( trap )
