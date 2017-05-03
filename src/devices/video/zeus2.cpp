@@ -86,6 +86,7 @@ void zeus2_device::device_start()
 	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&zeus2_device::exit_handler2, this));
 
 	int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zeus2_device::int_timer_callback), this));
+
 	vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zeus2_device::display_irq), this));
 
 	//printf("%s\n", machine().system().name);
@@ -101,27 +102,40 @@ void zeus2_device::device_start()
 	}
 
 	/* save states */
-	save_pointer(NAME(waveram), WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 2);
-	save_pointer(NAME(m_frameColor.get()), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
-	save_pointer(NAME(m_frameDepth.get()), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
-	save_pointer(NAME(m_zeusbase), 0x80);
-	save_pointer(NAME(m_renderRegs), 0x50);
-	save_pointer(NAME(m_pal_table), 0x100);
-	save_item(NAME(zeus_fifo));
-	save_item(NAME(zeus_fifo_words));
+	save_item(NAME(m_atlantis));
+	save_item(NAME(m_zeusbase));
+	save_item(NAME(m_renderRegs));
+	// poly
 	save_item(NAME(zeus_cliprect.min_x));
 	save_item(NAME(zeus_cliprect.max_x));
 	save_item(NAME(zeus_cliprect.min_y));
 	save_item(NAME(zeus_cliprect.max_y));
+	save_item(NAME(m_palSize));
 	save_item(NAME(zeus_matrix));
 	save_item(NAME(zeus_trans));
 	save_item(NAME(zeus_light));
 	save_item(NAME(zeus_texbase));
 	save_item(NAME(zeus_quad_size));
+	save_item(NAME(m_useZOffset));
+	save_pointer(NAME(waveram), WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / 4);
+	save_pointer(NAME(m_frameColor.get()), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
+	save_pointer(NAME(m_frameDepth.get()), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
+	save_item(NAME(m_pal_table));
+	// m_ucode
+	save_item(NAME(m_curUCodeSrc));
+	save_item(NAME(m_curPalTableSrc));
+	save_item(NAME(m_texmodeReg));
+	// int_timer
+	// vblank_timer
+	// yoffs
+	// texel_width
+	// zbase
+	save_item(NAME(m_system));
+	save_item(NAME(zeus_fifo));
+	save_item(NAME(zeus_fifo_words));
 	save_item(NAME(m_fill_color));
 	save_item(NAME(m_fill_depth));
 	save_item(NAME(m_yScale));
-	save_item(NAME(m_system));
 }
 
 void zeus2_device::device_reset()

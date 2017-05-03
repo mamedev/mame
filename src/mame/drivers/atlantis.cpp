@@ -114,7 +114,6 @@ public:
 	DECLARE_DRIVER_INIT(mwskins);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<mips3_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
@@ -127,7 +126,6 @@ public:
 	required_device<nvram_device> m_rtc;
 	uint8_t m_rtc_data[0x8000];
 
-	uint32_t m_last_offset;
 	READ8_MEMBER(cmos_r);
 	WRITE8_MEMBER(cmos_w);
 	DECLARE_WRITE32_MEMBER(cmos_protect_w);
@@ -197,16 +195,14 @@ READ32_MEMBER(atlantis_state::board_ctrl_r)
 		// ???
 		data = 0x1;
 	case CTRL_STATUS:
-		if (m_last_offset != (newOffset | 0x40000))
-			if (LOG_IRQ)
-				logerror("%s:board_ctrl_r read from CTRL_STATUS offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
+		if (LOG_IRQ)
+			logerror("%s:board_ctrl_r read from CTRL_STATUS offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
 		break;
 	default:
 		if (LOG_IRQ)
 			logerror("%s:board_ctrl_r read from offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
 		break;
 	}
-	m_last_offset = newOffset | 0x40000;
 	return data;
 }
 
@@ -618,14 +614,6 @@ WRITE16_MEMBER(atlantis_state::a2d_data_w)
 }
 
 /*************************************
- *  Video refresh
- *************************************/
-uint32_t atlantis_state::screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
-
-/*************************************
 *  Machine start
 *************************************/
 void atlantis_state::machine_start()
@@ -636,8 +624,15 @@ void atlantis_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
 
 	// Save states
+	save_item(NAME(m_cmos_write_enabled));
+	save_item(NAME(m_serial_count));
+	save_item(NAME(m_status_leds));
+	save_item(NAME(m_user_io_state));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(board_ctrl));
+	save_item(NAME(m_port_data));
+	save_item(NAME(m_a2d_data));
+
 }
 
 
@@ -806,6 +801,7 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
 	MCFG_VRC4373_ADD(                 PCI_ID_NILE, ":maincpu")
+	MCFG_VRC4373_SET_RAM(0x00800000)
 	MCFG_PCI9050_ADD(                 PCI_ID_9050)
 	MCFG_PCI9050_SET_MAP(0, map0)
 	MCFG_PCI9050_SET_MAP(1, map1)
