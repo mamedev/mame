@@ -81,6 +81,8 @@ protected:
 	}
 
 	void update_cpu_clock(void);
+	void set_clock_scale_recursive(device_t &device, double clockscale);
+	bool is_device_subject_to_clock_changes(const device_t &device) const;
 };
 
 class sam6883_device : public device_t, public sam6883_friend_device
