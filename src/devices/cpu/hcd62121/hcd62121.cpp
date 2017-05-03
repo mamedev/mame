@@ -21,8 +21,22 @@ TODO:
 #include "hcd62121.h"
 
 
-/* From the battery check routine at 20:e874 it looks like
-   bit 3 of the flag register should be the Zero flag. */
+enum
+{
+	HCD62121_IP=1, HCD62121_SP, HCD62121_F, HCD62121_LAR,
+	HCD62121_CS, HCD62121_DS, HCD62121_SS, HCD62121_DSIZE,
+	/* 128 byte register file */
+	HCD62121_R00, HCD62121_R04, HCD62121_R08, HCD62121_R0C,
+	HCD62121_R10, HCD62121_R14, HCD62121_R18, HCD62121_R1C,
+	HCD62121_R20, HCD62121_R24, HCD62121_R28, HCD62121_R2C,
+	HCD62121_R30, HCD62121_R34, HCD62121_R38, HCD62121_R3C,
+	HCD62121_R40, HCD62121_R44, HCD62121_R48, HCD62121_R4C,
+	HCD62121_R50, HCD62121_R54, HCD62121_R58, HCD62121_R5C,
+	HCD62121_R60, HCD62121_R64, HCD62121_R68, HCD62121_R6C,
+	HCD62121_R70, HCD62121_R74, HCD62121_R78, HCD62121_R7C
+};
+
+
 constexpr u8 FLAG_Z = 0x08;
 constexpr u8 FLAG_C = 0x02;
 constexpr u8 FLAG_ZL = 0x04;
@@ -45,10 +59,14 @@ hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const ch
 	, m_sseg(0)
 	, m_f(0)
 	, m_lar(0)
+	, m_opt(0)
+	, m_port(0)
 	, m_program(nullptr)
 	, m_icount(0)
 	, m_kol_cb(*this)
 	, m_koh_cb(*this)
+	, m_port_cb(*this)
+	, m_opt_cb(*this)
 	, m_ki_cb(*this)
 	, m_in0_cb(*this)
 {
@@ -280,6 +298,8 @@ void hcd62121_cpu_device::device_start()
 
 	m_kol_cb.resolve_safe();
 	m_koh_cb.resolve_safe();
+	m_port_cb.resolve_safe();
+	m_opt_cb.resolve_safe();
 	m_ki_cb.resolve_safe(0);
 	m_in0_cb.resolve_safe(0);
 
@@ -295,6 +315,8 @@ void hcd62121_cpu_device::device_start()
 	save_item(NAME(m_reg));
 	save_item(NAME(m_temp1));
 	save_item(NAME(m_temp2));
+	save_item(NAME(m_opt));
+	save_item(NAME(m_port));
 
 	// Register state for debugger
 	state_add(STATE_GENPC,    "GENPC",    m_rtemp).callexport().formatstr("%8s");
@@ -489,6 +511,8 @@ void hcd62121_cpu_device::device_reset()
 	m_lar = 0;
 	m_f = 0;
 	m_dsize = 0;
+	m_opt = 0;
+	m_port = 0;
 
 	for (auto & elem : m_reg)
 	{
@@ -746,6 +770,45 @@ void hcd62121_cpu_device::execute_run()
 
 		switch (op)
 		{
+		case 0x00:      /* rorb/rolb r1,4 */
+		case 0x01:      /* rorw/rolw r1,4 */
+		case 0x02:      /* rorq/rolq r1,4 */
+		case 0x03:      /* rort/rolt r1,4 */
+			/* Nibble rotate */
+			{
+				int size = datasize(op);
+				u8 reg1 = read_op();
+				u8 d1 = 0, d2 = 0;
+
+				read_reg(size, reg1);
+
+				if (reg1 & 0x80)
+				{
+					// rotate right
+					d2 = (m_temp1[size-1] & 0x0f) << 4;
+					for (int i = 0; i < size; i++)
+					{
+						d1 = (m_temp1[i] & 0x0f) << 4;
+						m_temp1[i] = (m_temp1[i] >> 4) | d2;
+						d2 = d1;
+					}
+				}
+				else
+				{
+					// rotate left
+					d2 = (m_temp1[size-1] & 0xf0) >> 4;
+					for (int i = 0; i < size; i++)
+					{
+						d1 = (m_temp1[i] & 0xf0) >> 4;
+						m_temp1[i] = (m_temp1[i] << 4) | d2;
+						d2 = d1;
+					}
+				}
+
+				write_reg(size, reg1);
+			}
+			break;
+
 		case 0x04:      /* mskb r1,r2 */
 		case 0x05:      /* mskw r1,r2 */
 		case 0x06:      /* mskq r1,r2 */
@@ -761,11 +824,11 @@ void hcd62121_cpu_device::execute_run()
 			}
 			break;
 
-		case 0x08:      /* shb r1,4 */
-		case 0x09:      /* shw r1,4 */
-		case 0x0A:      /* shq r1,4 */
-		case 0x0B:      /* sht r1,4 */
-			/* Shift is a nibble shift! */
+		case 0x08:      /* shrb/shlb r1,4 */
+		case 0x09:      /* shrw/shlw r1,4 */
+		case 0x0A:      /* shrq/shlq r1,4 */
+		case 0x0B:      /* shrt/shlt r1,4 */
+			/* Nibble shift */
 			{
 				int size = datasize(op);
 				u8 reg1 = read_op();
@@ -773,19 +836,25 @@ void hcd62121_cpu_device::execute_run()
 
 				read_reg(size, reg1);
 
-				for (int i = 0; i < size; i++)
+				if (reg1 & 0x80)
 				{
-					if (reg1 & 0x80)
+					// shift right
+					for (int i = 0; i < size; i++)
 					{
 						d1 = (m_temp1[i] & 0x0f) << 4;
 						m_temp1[i] = (m_temp1[i] >> 4) | d2;
+						d2 = d1;
 					}
-					else
+				}
+				else
+				{
+					// shift left
+					for (int i = 0; i < size; i++)
 					{
 						d1 = (m_temp1[i] & 0xf0) >> 4;
 						m_temp1[i] = (m_temp1[i] << 4) | d2;
+						d2 = d1;
 					}
-					d2 = d1;
 				}
 
 				write_reg(size, reg1);
@@ -872,11 +941,11 @@ void hcd62121_cpu_device::execute_run()
 			}
 			break;
 
-		case 0x20:      /* shrb r1 */
-		case 0x21:      /* shrw r1 */
-		case 0x22:      /* shrq r1 */
-		case 0x23:      /* shrt r1 */
-			/* Shift is a single shift! */
+		case 0x20:      /* rorb/rolb r1 */
+		case 0x21:      /* rorw/rolw r1 */
+		case 0x22:      /* rorq/rolq r1 */
+		case 0x23:      /* rort/rolt r1 */
+			/* Single bit rotate */
 			{
 				int size = datasize(op);
 				u8 reg1 = read_op();
@@ -884,11 +953,27 @@ void hcd62121_cpu_device::execute_run()
 
 				read_reg(size, reg1);
 
-				for (int i = 0; i < size; i++)
+				if (reg1 & 0x80)
 				{
-					d1 = (m_temp1[i] & 0x01) << 7;
-					m_temp1[i] = (m_temp1[i] >> 1) | d2;
-					d2 = d1;
+					// rotate right
+					d2 = (m_temp1[size-1] & 0x01) << 7;
+					for (int i = 0; i < size; i++)
+					{
+						d1 = (m_temp1[i] & 0x01) << 7;
+						m_temp1[i] = (m_temp1[i] >> 1) | d2;
+						d2 = d1;
+					}
+				}
+				else
+				{
+					// rotate left
+					d2 = (m_temp1[size-1] & 0x80) >> 7;
+					for (int i = 0; i < size; i++)
+					{
+						d1 = (m_temp1[i] & 0x80) >> 7;
+						m_temp1[i] = (m_temp1[i] << 1) | d2;
+						d2 = d1;
+					}
 				}
 
 				write_reg(size, reg1);
@@ -912,11 +997,11 @@ void hcd62121_cpu_device::execute_run()
 			}
 			break;
 
-		case 0x28:      /* shlb r1 */
-		case 0x29:      /* shlw r1 */
-		case 0x2A:      /* shlq r1 */
-		case 0x2B:      /* shlt r1 */
-			/* Shift is a single shift! */
+		case 0x28:      /* shrb/shlb r1 */
+		case 0x29:      /* shrw/shlw r1 */
+		case 0x2A:      /* shrq/shlq r1 */
+		case 0x2B:      /* shrt/shlt r1 */
+			/* Single bit shift */
 			{
 				int size = datasize(op);
 				u8 reg1 = read_op();
@@ -924,11 +1009,25 @@ void hcd62121_cpu_device::execute_run()
 
 				read_reg(size, reg1);
 
-				for (int i = 0; i < size; i++)
+				if (reg1 & 0x80)
 				{
-					d1 = (m_temp1[i] & 0x80) >> 7;
-					m_temp1[i] = (m_temp1[i] << 1) | d2;
-					d2 = d1;
+					// shift right
+					for (int i = 0; i < size; i++)
+					{
+						d1 = (m_temp1[i] & 0x01) << 7;
+						m_temp1[i] = (m_temp1[i] >> 1) | d2;
+						d2 = d1;
+					}
+				}
+				else
+				{
+					// shift left
+					for (int i = 0; i < size; i++)
+					{
+						d1 = (m_temp1[i] & 0x80) >> 7;
+						m_temp1[i] = (m_temp1[i] << 1) | d2;
+						d2 = d1;
+					}
 				}
 
 				write_reg(size, reg1);
@@ -1202,8 +1301,8 @@ void hcd62121_cpu_device::execute_run()
 			}
 			break;
 
-		case 0xB1:      /* unk_B1 reg/i8 */
-		case 0xB3:      /* unk_B3 reg/i8 */
+		case 0xB1:      /* unk_B1 reg/i8 - PORTx control/direction? */
+		case 0xB3:      /* unk_B3 reg/i8 - timer/irq related? */
 			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
 			read_op();
 			break;
@@ -1224,7 +1323,7 @@ void hcd62121_cpu_device::execute_run()
 			m_kol_cb(read_op());
 			break;
 
-		case 0xB9:      /* unk_B9 reg/i8 */
+		case 0xB9:      /* unk_B9 reg/i8 - timer/irq related? */
 			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
 			read_op();
 			break;
@@ -1238,6 +1337,11 @@ void hcd62121_cpu_device::execute_run()
 				if (m_f & FLAG_CL)
 					m_ip = ( a1 << 8) | a2;
 			}
+			break;
+
+		case 0xBC:      /* unk_BC reg/i8 */
+			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
+			read_op();
 			break;
 
 		case 0xBF:      /* jmpncl? a16 */
@@ -1406,25 +1510,28 @@ void hcd62121_cpu_device::execute_run()
 
 		case 0xE0:      /* in0 reg */
 			{
+				logerror("%06x: in0 read\n", (m_cseg << 16) | m_ip);
 				u8 reg1 = read_op();
 
 				m_reg[reg1 & 0x7f] = m_in0_cb();
 			}
 			break;
 
-		case 0xE1:      /* unk_E1 reg/i8 (in?) */
-			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
-			read_op();
+		case 0xE1:      /* movb reg,OPT */
+			m_reg[read_op() & 0x7f] = m_opt;
 			break;
 
 		case 0xE2:      /* in kb, reg */
 			m_reg[read_op() & 0x7f] = m_ki_cb();
 			break;
 
+		case 0xE6:      /* movb reg,PORT */
+			m_reg[read_op() & 0x7f] = m_port;
+			break;
+
 		case 0xE3:      /* unk_e3 reg/i8 (in?) */
 		case 0xE4:      /* unk_e4 reg/i8 (in?) */
 		case 0xE5:      /* unk_e5 reg/i8 (in?) */
-		case 0xE6:      /* unk_e6 reg/i8 (in?) */
 		case 0xE7:      /* unk_e7 reg/i8 (in?) */
 			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
 			read_op();
@@ -1452,9 +1559,17 @@ void hcd62121_cpu_device::execute_run()
 			m_reg[read_op() & 0x7f] = m_sseg;
 			break;
 
-		case 0xF0:      /* unk_F0 reg/i8 (out?) */
+		case 0xF0:      /* movb OPT,reg */
+			m_opt = m_reg[read_op() & 0x7f];
+			m_opt_cb(m_opt);
+			break;
+
+		case 0xF2:      /* movb PORT,reg */
+			m_port = m_reg[read_op() & 0x7f];
+			m_port_cb(m_port);
+			break;
+
 		case 0xF1:      /* unk_F1 reg/i8 (out?) */
-		case 0xF2:      /* unk_F2 reg/i8 (out?) */
 		case 0xF3:      /* unk_F3 reg/i8 (out?) */
 		case 0xF4:      /* unk_F4 reg/i8 (out?) */
 		case 0xF5:      /* unk_F5 reg/i8 (out?) */
@@ -1464,9 +1579,9 @@ void hcd62121_cpu_device::execute_run()
 			read_op();
 			break;
 
-		case 0xFC:      /* unk_FC - disable interrupts?? */
+		case 0xFC:      /* unk_FC - disable interrupts/stop timer?? */
 		case 0xFD:      /* unk_FD */
-		case 0xFE:      /* unk_FE */
+		case 0xFE:      /* unk_FE - wait for/start timer */
 			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
 			break;
 

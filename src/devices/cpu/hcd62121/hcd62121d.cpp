@@ -25,11 +25,14 @@ enum
 	ARG_ILR,       /* indirect last address register access */
 	ARG_LAR,       /* last address register */
 	ARG_DSZ,       /* dsize register? */
+	ARG_OPT,       /* OPTx (output) pins */
+	ARG_PORT,      /* PORTx (output) pins */
 	ARG_TIM,       /* timing related register? */
 	ARG_KLO,       /* KO1 - KO8 output lines */
 	ARG_KHI,       /* KO9 - KO14(?) output lines */
 	ARG_KI,        /* K input lines */
-	ARG_4          /* for nibble shifts */
+	ARG_RS,        /* rotate/shift */
+	ARG_RS4        /* nibble rotate/shift */
 };
 
 struct hcd62121_dasm
@@ -43,12 +46,12 @@ struct hcd62121_dasm
 static const hcd62121_dasm hcd62121_ops[256] =
 {
 	/* 0x00 */
-	{ "un00?",   ARG_NONE,   ARG_NONE }, { "un01?",   ARG_NONE,   ARG_NONE },
-	{ "un02?",   ARG_NONE,   ARG_NONE }, { "un03?",   ARG_NONE,   ARG_NONE },
+	{ "ro?b",    ARG_REG,    ARG_RS4  }, { "ro?w",    ARG_REG,    ARG_RS4  },
+	{ "ro?q",    ARG_REG,    ARG_RS4  }, { "ro?t",    ARG_REG,    ARG_RS4  },
 	{ "mskb",    ARG_REGREG, ARG_NONE }, { "mskw",    ARG_REGREG, ARG_NONE },
 	{ "mskq",    ARG_REGREG, ARG_NONE }, { "mskt",    ARG_REGREG, ARG_NONE },
-	{ "sh?b",    ARG_REG,    ARG_4    }, { "sh?w",    ARG_REG,    ARG_4    },
-	{ "sh?q",    ARG_REG,    ARG_4    }, { "sh?t",    ARG_REG,    ARG_4    },
+	{ "sh?b",    ARG_REG,    ARG_RS4  }, { "sh?w",    ARG_REG,    ARG_RS4  },
+	{ "sh?q",    ARG_REG,    ARG_RS4  }, { "sh?t",    ARG_REG,    ARG_RS4  },
 	{ "tstb",    ARG_REGREG, ARG_NONE }, { "tstw",    ARG_REGREG, ARG_NONE },
 	{ "tstq",    ARG_REGREG, ARG_NONE }, { "tstt",    ARG_REGREG, ARG_NONE },
 
@@ -63,12 +66,12 @@ static const hcd62121_dasm hcd62121_ops[256] =
 	{ "imskq",   ARG_REGREG, ARG_NONE }, { "imskt",   ARG_REGREG, ARG_NONE },
 
 	/* 0x20 */
-	{ "shrb",    ARG_REG,    ARG_NONE }, { "shrw",    ARG_REG,    ARG_NONE },
-	{ "shrq",    ARG_REG,    ARG_NONE }, { "shrt",    ARG_REG,    ARG_NONE },
+	{ "ro?b",    ARG_REG,    ARG_RS   }, { "ro?w",    ARG_REG,    ARG_RS   },
+	{ "ro?q",    ARG_REG,    ARG_RS   }, { "ro?t",    ARG_REG,    ARG_RS   },
 	{ "orb",     ARG_REGREG, ARG_NONE }, { "orw",     ARG_REGREG, ARG_NONE },
 	{ "orq",     ARG_REGREG, ARG_NONE }, { "ort",     ARG_REGREG, ARG_NONE },
-	{ "shlb",    ARG_REG,    ARG_NONE }, { "shlw",    ARG_REG,    ARG_NONE },
-	{ "shlq",    ARG_REG,    ARG_NONE }, { "shlt",    ARG_REG,    ARG_NONE },
+	{ "sh?b",    ARG_REG,    ARG_RS   }, { "sh?w",    ARG_REG,    ARG_RS   },
+	{ "sh?q",    ARG_REG,    ARG_RS   }, { "sh?t",    ARG_REG,    ARG_RS   },
 	{ "andb",    ARG_REGREG, ARG_NONE }, { "andw",    ARG_REGREG, ARG_NONE },
 	{ "andq",    ARG_REGREG, ARG_NONE }, { "andt",    ARG_REGREG, ARG_NONE },
 
@@ -83,12 +86,12 @@ static const hcd62121_dasm hcd62121_ops[256] =
 	{ "addq",    ARG_REGREG, ARG_NONE }, { "addt",    ARG_REGREG, ARG_NONE },
 
 	/* 0x40 */
-	{ "shrb?",   ARG_IRG,    ARG_NONE }, { "shrw?",   ARG_IRG,    ARG_NONE },
-	{ "shrq?",   ARG_IRG,    ARG_NONE }, { "shrt?",   ARG_IRG,    ARG_NONE },
+	{ "ro?b",    ARG_IRG,    ARG_RS4  }, { "ro?w",    ARG_IRG,    ARG_RS4  },
+	{ "ro?q",    ARG_IRG,    ARG_RS4  }, { "ro?t",    ARG_IRG,    ARG_RS4  },
 	{ "mskb",    ARG_IRGREG, ARG_NONE }, { "mskw",    ARG_IRGREG, ARG_NONE },
 	{ "mskq",    ARG_IRGREG, ARG_NONE }, { "mskt",    ARG_IRGREG, ARG_NONE },
-	{ "shrb",    ARG_IRG,    ARG_NONE }, { "shrw",    ARG_IRG,    ARG_NONE },
-	{ "shrq",    ARG_IRG,    ARG_NONE }, { "shrt",    ARG_IRG,    ARG_NONE },
+	{ "sh?b",    ARG_IRG,    ARG_RS4  }, { "sh?w",    ARG_IRG,    ARG_RS4  },
+	{ "sh?q",    ARG_IRG,    ARG_RS4  }, { "sh?t",    ARG_IRG,    ARG_RS4  },
 	{ "tstb",    ARG_IRGREG, ARG_NONE }, { "tstw",    ARG_IRGREG, ARG_NONE },
 	{ "tstq",    ARG_IRGREG, ARG_NONE }, { "tstt",    ARG_IRGREG, ARG_NONE },
 
@@ -103,12 +106,12 @@ static const hcd62121_dasm hcd62121_ops[256] =
 	{ "imskq",   ARG_IRGREG, ARG_NONE }, { "imskt",   ARG_IRGREG, ARG_NONE },
 
 	/* 0x60 */
-	{ "shrb",    ARG_IRG,    ARG_NONE }, { "shrw",    ARG_IRG,    ARG_NONE },
-	{ "shrq",    ARG_IRG,    ARG_NONE }, { "shrt",    ARG_IRG,    ARG_NONE },
+	{ "ro?b",    ARG_IRG,    ARG_RS   }, { "ro?w",    ARG_IRG,    ARG_RS   },
+	{ "ro?q",    ARG_IRG,    ARG_RS   }, { "ro?t",    ARG_IRG,    ARG_RS   },
 	{ "orb",     ARG_IRGREG, ARG_NONE }, { "orw",     ARG_IRGREG, ARG_NONE },
 	{ "orq",     ARG_IRGREG, ARG_NONE }, { "ort",     ARG_IRGREG, ARG_NONE },
-	{ "shlb",    ARG_IRG,    ARG_NONE }, { "shlw",    ARG_IRG,    ARG_NONE },
-	{ "shlq",    ARG_IRG,    ARG_NONE }, { "shlt",    ARG_IRG,    ARG_NONE },
+	{ "sh?b",    ARG_IRG,    ARG_RS   }, { "sh?w",    ARG_IRG,    ARG_RS   },
+	{ "sh?q",    ARG_IRG,    ARG_RS   }, { "sh?t",    ARG_IRG,    ARG_RS   },
 	{ "andb",    ARG_IRGREG, ARG_NONE }, { "andw",    ARG_IRGREG, ARG_NONE },
 	{ "andq",    ARG_IRGREG, ARG_NONE }, { "andt",    ARG_IRGREG, ARG_NONE },
 
@@ -159,7 +162,7 @@ static const hcd62121_dasm hcd62121_ops[256] =
 	{ "out",     ARG_KLO,    ARG_REG  }, { "out",     ARG_KLO,    ARG_I8   },
 	{ "unB8?",   ARG_NONE,   ARG_NONE }, { "unB9?",   ARG_I8,     ARG_NONE },
 	{ "unBA?",   ARG_NONE,   ARG_NONE }, { "jmpcl?",  ARG_A16,    ARG_NONE },
-	{ "unBC?",   ARG_NONE,   ARG_NONE }, { "unBD?",   ARG_NONE,   ARG_NONE },
+	{ "unBC?",   ARG_I8,     ARG_NONE }, { "unBD?",   ARG_NONE,   ARG_NONE },
 	{ "unBE?",   ARG_NONE,   ARG_NONE }, { "jmpncl?", ARG_A16,    ARG_NONE },
 
 	/* 0xc0 */
@@ -180,21 +183,21 @@ static const hcd62121_dasm hcd62121_ops[256] =
 	{ "movb",    ARG_F,      ARG_REG  }, { "movb",    ARG_F,      ARG_I8   },
 	{ "unDA?",   ARG_NONE,   ARG_NONE }, { "unDb?",   ARG_NONE,   ARG_NONE },
 	{ "movb",    ARG_DS,     ARG_REG  }, { "movb",    ARG_DS,     ARG_I8   },
-	{ "movw",    ARG_LAR,    ARG_REG  }, { "movw?",   ARG_LAR,    ARG_I16  },
+	{ "movw",    ARG_LAR,    ARG_REG  }, { "movw?",   ARG_LAR,    ARG_I8   },
 
 	/* 0xe0 */
-	{ "in0",     ARG_REG,    ARG_NONE }, { "unE1?",   ARG_I8,     ARG_NONE },
+	{ "in0",     ARG_REG,    ARG_NONE }, { "movb",    ARG_REG,    ARG_OPT  },
 	{ "in",      ARG_REG,    ARG_KI   }, { "movb",    ARG_REG,    ARG_DSZ  },
-	{ "movb",    ARG_REG,    ARG_F    }, { "movb",    ARG_REG,    ARG_TIM  },
-	{ "unE6?",   ARG_I8,     ARG_NONE }, { "unE7?",   ARG_I8,     ARG_NONE },
+	{ "movb",    ARG_REG,    ARG_F    }, { "unE5?",   ARG_I8,     ARG_NONE },
+	{ "movb",    ARG_REG,    ARG_PORT }, { "unE7?",   ARG_I8,     ARG_NONE },
 	{ "movw",    ARG_REG,    ARG_LAR  }, { "movw?",   ARG_REG,    ARG_LAR  },
 	{ "movw",    ARG_REG,    ARG_PC   }, { "movw",    ARG_REG,    ARG_SP   },
 	{ "unEC?",   ARG_NONE,   ARG_NONE }, { "movb",    ARG_REG,    ARG_DS   },
 	{ "movb",    ARG_REG,    ARG_CS   }, { "movb",    ARG_REG,    ARG_SS   },
 
 	/* 0xf0 */
-	{ "unF0?",   ARG_I8,     ARG_NONE }, { "unF1?",   ARG_I8,     ARG_NONE },
-	{ "unF2?",   ARG_I8,     ARG_NONE }, { "unF3?",   ARG_I8,     ARG_NONE },
+	{ "movb",    ARG_OPT,    ARG_REG  }, { "unF1?",   ARG_I8,     ARG_NONE },
+	{ "movb",    ARG_PORT,   ARG_REG  }, { "unF3?",   ARG_I8,     ARG_NONE },
 	{ "unF4?",   ARG_I8,     ARG_NONE }, { "unF5?",   ARG_I8,     ARG_NONE },
 	{ "unF6?",   ARG_I8,     ARG_NONE }, { "unF7?",   ARG_I8,     ARG_NONE },
 	{ "unF8?",   ARG_NONE,   ARG_NONE }, { "unF9?",   ARG_NONE,   ARG_NONE },
@@ -216,9 +219,9 @@ CPU_DISASSEMBLE(hcd62121)
 
 	inst = &hcd62121_ops[op];
 
-	/* Special case for nibble shift instruction */
-	if (inst->arg2 == ARG_4)
-		util::stream_format(stream, "sh%c%c    ", (oprom[pos] & 0x80) ? 'l' : 'r', inst->str[3]);
+	/* Special cases for shift and rotate instructions */
+	if (inst->arg2 == ARG_RS || inst->arg2 == ARG_RS4)
+		util::stream_format(stream, "%c%c%c%c    ", inst->str[0], inst->str[1], (oprom[pos] & 0x80) ? 'r' : 'l', inst->str[3]);
 	else
 		util::stream_format(stream, "%-8s", inst->str);
 
@@ -336,6 +339,12 @@ CPU_DISASSEMBLE(hcd62121)
 	case ARG_DSZ:
 		util::stream_format(stream, "dsize");
 		break;
+	case ARG_OPT:
+		util::stream_format(stream, "OPT");
+		break;
+	case ARG_PORT:
+		util::stream_format(stream, "PORT");
+		break;
 	case ARG_TIM:
 		util::stream_format(stream, "TIM?");
 		break;
@@ -376,6 +385,10 @@ CPU_DISASSEMBLE(hcd62121)
 		util::stream_format(stream, ",0x%02x", oprom[pos++]);
 		break;
 	case ARG_I16:
+		util::stream_format(stream, ",0x%02x", oprom[pos+1]);
+		util::stream_format(stream, "%02x", oprom[pos]);
+		pos += 2;
+		break;
 	case ARG_A16:
 		util::stream_format(stream, ",0x%02x", oprom[pos++]);
 		util::stream_format(stream, "%02x", oprom[pos++]);
@@ -416,13 +429,19 @@ CPU_DISASSEMBLE(hcd62121)
 	case ARG_DSZ:
 		util::stream_format(stream, ",dsize");
 		break;
+	case ARG_OPT:
+		util::stream_format(stream, ",OPT");
+		break;
+	case ARG_PORT:
+		util::stream_format(stream, ",PORT");
+		break;
 	case ARG_TIM:
 		util::stream_format(stream, ",TIM?");
 		break;
 	case ARG_KI:
 		util::stream_format(stream, ",KI");
 		break;
-	case ARG_4:
+	case ARG_RS4:
 		util::stream_format(stream, ",4");
 		break;
 	default:
