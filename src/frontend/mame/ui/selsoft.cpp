@@ -715,8 +715,8 @@ void menu_select_software::inkey_select(const event *menu_event)
 				return;
 			}
 
-			std::string string_list = std::string(ui_swinfo->listname).append(":").append(ui_swinfo->shortname).append(":").append(ui_swinfo->part).append(":").append(ui_swinfo->instance);
-			machine().options().set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE);
+			machine().options().set_system_name(m_driver->name);
+			machine().options().set_value(OPTION_SOFTWARENAME, ui_swinfo->shortname, OPTION_PRIORITY_CMDLINE);
 			std::string snap_list = std::string(ui_swinfo->listname).append(PATH_SEPARATOR).append(ui_swinfo->shortname);
 			machine().options().set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE);
 			reselect_last::driver = drivlist.driver().name;
