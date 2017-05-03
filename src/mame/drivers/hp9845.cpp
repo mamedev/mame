@@ -24,10 +24,10 @@
 // - Beeper
 // - Correct character generator ROMs (a huge "thank you" to Ansgar Kueckes for the dumps!)
 // - 98775 light pen controller
+// - Display softkeys on 45C & 45T
 // What's not yet in:
 // - Better naming of tape drive image (it's now "magt1" and "magt2", should be "t15" and "t14")
 // - Better documentation of this file
-// - Display softkeys on 45C & 45T
 // - Better keyboard mapping
 // - German keyboard
 // What's wrong:
@@ -1256,23 +1256,6 @@ void hp9845b_state::update_graphic_bits(void)
 //  hp9845ct_state
 // ***************
 
-/*
-   For 9845C and 9845T we just add the light pen support via MAME's lightgun device.
-
-   Note that the LIGHTGUN device needs '-lightgun' and '-lightgun_device mouse' for light gun emulation if no real light gun device is installed.
- */
-static INPUT_PORTS_START(hp9845ct)
-	PORT_INCLUDE(hp9845_base)
-	PORT_START("LIGHTPENX")
-	PORT_BIT( 0x3ff, 0x000, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(20) PORT_MINMAX(0, VIDEO_TOT_HPIXELS - 1) PORT_CROSSHAIR(X, 1.0, 0.0, 0)
-
-	PORT_START("LIGHTPENY")
-	PORT_BIT( 0x3ff, 0x000, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(20) PORT_MINMAX(0, GVIDEO_VPIXELS - 1) PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
-
-	PORT_START("GKEY")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Gkey")
-INPUT_PORTS_END
-
 class hp9845ct_state : public hp9845_base_state
 {
 public:
@@ -1284,8 +1267,10 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	DECLARE_INPUT_CHANGED_MEMBER(softkey_changed);
 
 protected:
+	required_ioport m_io_softkeys;
 	required_ioport m_lightpen_x;
 	required_ioport m_lightpen_y;
 	required_ioport m_lightpen_sw;
@@ -1352,13 +1337,42 @@ protected:
 	bool m_gv_lp_int_256;
 	uint16_t m_gv_lxc;
 	uint16_t m_gv_lyc;
+	uint8_t m_gv_softkey;
 
 	static const uint16_t m_line_type[];
 	static const uint16_t m_area_fill[];
 };
 
+/*
+   For 9845C and 9845T we just add the light pen support via MAME's lightgun device.
+
+   Note that the LIGHTGUN device needs '-lightgun' and '-lightgun_device mouse' for light gun emulation if no real light gun device is installed.
+ */
+static INPUT_PORTS_START(hp9845ct)
+	PORT_INCLUDE(hp9845_base)
+	PORT_START("SOFTKEYS")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey0") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey1") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey2") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey3") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey4") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey5") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey6") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey7") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
+
+	PORT_START("LIGHTPENX")
+	PORT_BIT( 0x3ff, 0x000, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(20) PORT_MINMAX(0, VIDEO_TOT_HPIXELS - 1) PORT_CROSSHAIR(X, 1.0, 0.0, 0)
+
+	PORT_START("LIGHTPENY")
+	PORT_BIT( 0x3ff, 0x000, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(20) PORT_MINMAX(0, GVIDEO_VPIXELS - 1) PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
+
+	PORT_START("GKEY")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Gkey")
+INPUT_PORTS_END
+
 hp9845ct_state::hp9845ct_state(const machine_config &mconfig, device_type type, const char *tag)
 	: hp9845_base_state(mconfig , type , tag),
+      m_io_softkeys(*this, "SOFTKEYS"),
 	  m_lightpen_x(*this, "LIGHTPENX"),
 	  m_lightpen_y(*this, "LIGHTPENY"),
 	  m_lightpen_sw(*this, "GKEY")
@@ -1448,6 +1462,27 @@ WRITE_LINE_MEMBER(hp9845ct_state::vblank_w)
 	} else {
 		m_gv_lp_vblank = false;
 		update_gcursor();
+	}
+}
+
+INPUT_CHANGED_MEMBER(hp9845ct_state::softkey_changed)
+{
+	if (!m_gv_sk_status) {
+		uint8_t softkey_data = m_io_softkeys->read();
+		unsigned softkey;
+		for (softkey = 0; softkey < 8 && BIT(softkey_data , 7 - softkey); softkey++) {
+		}
+		LOG(("SK %02x => %u\n" , softkey_data , softkey));
+		if (softkey < 8) {
+			// softkey pressed
+			m_gv_softkey = softkey;
+			m_gv_sk_status = true;
+			update_graphic_bits();
+		}
+		for (softkey = 0; softkey < 8; softkey++) {
+			output().set_indexed_value("Softkey" , softkey , !BIT(softkey_data , 7 - softkey));
+		}
+
 	}
 }
 
@@ -1938,6 +1973,8 @@ protected:
 	uint8_t m_gv_cursor_color;
 	uint8_t m_gv_plane;
 	bool m_gv_plane_wrap;
+	bool m_gv_lp_int_latched;
+	bool m_gv_sk_int_latched;
 };
 
 hp9845c_state::hp9845c_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -2000,6 +2037,8 @@ void hp9845c_state::machine_reset()
 	m_gv_cursor_color = 7;
 	m_gv_plane = 0;
 	m_gv_plane_wrap = false;
+	m_gv_lp_int_latched = false;
+	m_gv_sk_int_latched = false;
 }
 
 READ16_MEMBER(hp9845c_state::graphic_r)
@@ -2007,14 +2046,23 @@ READ16_MEMBER(hp9845c_state::graphic_r)
 	uint16_t res = 0;
 
 	switch (offset) {
+	case 2:
+		// R6: data register with DMA TC
+		m_gv_dma_en = false;
+		// Intentional fall-through
+
 	case 0:
 		// R4: data register
 		if (m_gv_lp_en) {
 			res = lp_r4_r();
+		} else if (m_gv_sk_int_latched) {
+			res = m_gv_softkey;
+			m_gv_sk_status = false;
 		} else {
 			res = m_gv_data_r;
 		}
 		advance_gv_fsm(true , false);
+		update_graphic_bits();
 		break;
 
 	case 1:
@@ -2025,27 +2073,14 @@ READ16_MEMBER(hp9845c_state::graphic_r)
 		if (m_gv_dma_en) {
 			BIT_SET(res, 6);
 		}
-		if (m_gv_lp_status && m_gv_lp_int_en) {
+		if (m_gv_lp_int_latched) {
 			BIT_SET(res, 0);    // Lightpen service request
 		}
-		if (m_gv_sk_status) {
+		if (m_gv_sk_int_latched) {
 			BIT_SET(res, 1);    // Softkey service request
-			m_gv_sk_status = false;
 		}
+		// TODO: check! Should it be 10 instead?
 		BIT_SET(res, 11);   // ID
-
-		update_graphic_bits();
-		break;
-
-	case 2:
-		// R6: data register with DMA TC
-		m_gv_dma_en = false;
-		if (m_gv_lp_en) {
-			res = lp_r4_r();
-		} else {
-			res = m_gv_data_r;
-		}
-		advance_gv_fsm(true , false);
 		break;
 
 	case 3:
@@ -2084,6 +2119,7 @@ WRITE16_MEMBER(hp9845c_state::graphic_w)
 		}
 		advance_gv_fsm(false , false);
 		lp_r5_w(data);
+		update_graphic_bits();
 		break;
 
 	case 2:
@@ -2589,7 +2625,19 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 
 void hp9845c_state::update_graphic_bits(void)
 {
-	bool gv_ready = m_gv_lp_int_en && m_gv_lp_status;
+	bool lp_int = m_gv_lp_int_en && m_gv_lp_status;
+	bool sk_int = m_gv_sk_status && m_gv_sk_en;
+
+	if (lp_int && !m_gv_sk_int_latched) {
+		m_gv_lp_int_latched = true;
+	} else if (sk_int && !m_gv_lp_int_latched) {
+		m_gv_sk_int_latched = true;
+	} else if (!lp_int && !sk_int) {
+		m_gv_lp_int_latched = false;
+		m_gv_sk_int_latched = false;
+	}
+
+	bool gv_ready = m_gv_lp_int_latched || m_gv_sk_int_latched;
 
 	if (m_gv_gr_en && !gv_ready) {
 		gv_ready = m_gv_fsm_state == GV_STAT_WAIT_DS_0 ||
@@ -2603,6 +2651,14 @@ void hp9845c_state::update_graphic_bits(void)
 
 	bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
+#if 0
+	// DEBUG DEBUG DEBUG
+	static bool last_irq = false;
+	if (last_irq != irq) {
+		logerror("GV IRQ %d %d %d %d %d\n" , gv_ready , lp_int , m_gv_lp_int_latched , sk_int , m_gv_sk_int_latched);
+	}
+	last_irq = irq;
+#endif
 	irq_w(GVIDEO_PA , irq);
 
 	bool dmar = gv_ready && m_gv_dma_en;
@@ -2717,14 +2773,23 @@ READ16_MEMBER(hp9845t_state::graphic_r)
 	uint16_t res = 0;
 
 	switch (offset) {
+	case 2:
+		// R6: data register with DMA TC
+		m_gv_dma_en = false;
+		// Intentional fall-through
+
 	case 0:
 		// R4: data register
 		if (m_gv_lp_en) {
 			res = lp_r4_r();
+		} else if (m_gv_sk_en) {
+			res = m_gv_softkey;
+			m_gv_sk_status = false;
 		} else {
 			res = m_gv_data_r;
 		}
 		advance_gv_fsm(true , false);
+		update_graphic_bits();
 		break;
 
 	case 1:
@@ -2739,29 +2804,14 @@ READ16_MEMBER(hp9845t_state::graphic_r)
 			BIT_SET(res, 0);    // Lightpen service request
 		}
 		// TODO: gsr/
-		// TODO: fix sk status
 		if (m_gv_sk_status) {
-			BIT_SET(res, 1);    // Softkey service request
-			m_gv_sk_status = false;
+			BIT_SET(res, 1);	// Softkey service request
 		}
 		BIT_SET(res, 9);        // ID
 		BIT_SET(res, 11);       // ID
 		if (m_gv_stat) {
 			BIT_SET(res, 13);   // error indication
 		}
-
-		update_graphic_bits();
-		break;
-
-	case 2:
-		// R6: data register with DMA TC
-		m_gv_dma_en = false;
-		if (m_gv_lp_en) {
-			res = lp_r4_r();
-		} else {
-			res = m_gv_data_r;
-		}
-		advance_gv_fsm(true , false);
 		break;
 
 	case 3:
@@ -2795,7 +2845,7 @@ WRITE16_MEMBER(hp9845t_state::graphic_w)
 		m_gv_dma_en = BIT(data , 6) != 0;
 		m_gv_int_en = BIT(data , 7) != 0;
 		m_gv_gr_en = BIT(data , 8);       // enables graphics controller & vector generator command processing and IRQs
-		m_gv_sk_en = BIT(data , 9);       // enables reads on R4 to return SK keycode, also enables SK IRQs
+		m_gv_sk_en = (data & 0xb00) == 0x200;       // enables reads on R4 to return SK keycode, also enables SK IRQs
 		m_gv_opt_en = BIT(data , 11);     // not really used
 		m_gv_dsa_en = BIT(data , 12);     // for factory use only (function unknown)
 		m_gv_fsm_state = GV_STAT_RESET;     // command/reset state machine
@@ -3440,7 +3490,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 
 void hp9845t_state::update_graphic_bits(void)
 {
-	bool gv_ready = m_gv_lp_int_en && m_gv_lp_status;
+	bool gv_ready = (m_gv_lp_int_en && m_gv_lp_status) || (m_gv_sk_en && m_gv_sk_status);
 
 	if (m_gv_gr_en && !gv_ready) {
 		gv_ready = m_gv_fsm_state == GV_STAT_WAIT_DS_0 ||
@@ -3466,8 +3516,8 @@ void hp9845t_state::update_graphic_bits(void)
 #if 0
 	// DEBUG DEBUG DEBUG
 	static bool last_irq = false;
-	if (!last_irq && irq) {
-		logerror("GV IRQ %d %d %d\n" , gv_ready , m_gv_lp_int_en , m_gv_lp_status);
+	if (last_irq != irq) {
+		logerror("GV IRQ %d %d %d %d %d\n" , gv_ready , m_gv_lp_int_en , m_gv_lp_status , m_gv_sk_en , m_gv_sk_status);
 	}
 	last_irq = irq;
 #endif
