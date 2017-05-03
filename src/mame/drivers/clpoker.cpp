@@ -147,6 +147,24 @@ u32 clpoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
+
+static const gfx_layout gfx_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
+	8*64,
+};
+
+
+static GFXDECODE_START( clpoker )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_layout,   0x0, 1 )
+GFXDECODE_END
+
+
 static MACHINE_CONFIG_START( clpoker, clpoker_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 3) // Z0840004PSC, divider not verified
@@ -169,12 +187,15 @@ static MACHINE_CONFIG_START( clpoker, clpoker_state )
 	MCFG_SCREEN_REFRESH_RATE(60) // wrong
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))  // wrong
 	MCFG_SCREEN_SIZE(64*8, 32*8) // wrong
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1) // wrong
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1) // probably right
 	MCFG_SCREEN_UPDATE_DRIVER(clpoker_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HM86171
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", clpoker)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -190,10 +211,10 @@ ROM_START( clpoker )
 	ROM_LOAD( "5.u7", 0x00000, 0x10000, CRC(96b07104) SHA1(24ec1e44795add0db6215a7687ac2fd3b636980b) ) // 27512, 2nd half empty?
 
 	ROM_REGION(0x80000, "gfx1", 0)
-	ROM_LOAD( "1.u1", 0x00000, 0x20000, CRC(d1b5a3f1) SHA1(5a08be220b81d9502f1ed61966916384925ba569) ) // 27C010
-	ROM_LOAD( "2.u2", 0x20000, 0x20000, CRC(00abb6b2) SHA1(3123c2e18d987895cb1d3359bf2765343289037b) ) // 27C010
-	ROM_LOAD( "3.u3", 0x40000, 0x20000, CRC(fcccef5a) SHA1(a0bdba24a6a9ca8aa8b7fdfee10ace3cb17600b4) ) // 27C010
-	ROM_LOAD( "4.u4", 0x60000, 0x20000, CRC(be707d36) SHA1(b1cb9dc387a54d895cfaedfbc015598151ddab38) ) // 27C010
+	ROM_LOAD32_BYTE( "1.u1", 0x00000, 0x20000, CRC(d1b5a3f1) SHA1(5a08be220b81d9502f1ed61966916384925ba569) ) // 27C010
+	ROM_LOAD32_BYTE( "2.u2", 0x00001, 0x20000, CRC(00abb6b2) SHA1(3123c2e18d987895cb1d3359bf2765343289037b) ) // 27C010
+	ROM_LOAD32_BYTE( "3.u3", 0x00002, 0x20000, CRC(fcccef5a) SHA1(a0bdba24a6a9ca8aa8b7fdfee10ace3cb17600b4) ) // 27C010
+	ROM_LOAD32_BYTE( "4.u4", 0x00003, 0x20000, CRC(be707d36) SHA1(b1cb9dc387a54d895cfaedfbc015598151ddab38) ) // 27C010
 
 	ROM_REGION(0x1000, "pld", 0)
 	ROM_LOAD( "plsi1024-60lj.pl1", 0x00, 0x200,  NO_DUMP )
