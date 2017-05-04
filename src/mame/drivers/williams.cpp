@@ -3188,10 +3188,10 @@ GAME( 1980, defcmnd,    defender, defender,       defender, williams_state, defe
 GAME( 1981, defence,    defender, defender,       defender, williams_state, defender, ROT0,   "bootleg (Outer Limits)", "Defence Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, startrkd,   defender, defender,       defender, williams_state, defender, ROT0,   "bootleg", "Star Trek (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, mayday,     0,        defender,       mayday, williams_state,   mayday,   ROT0,   "Hoei", "Mayday (set 1)", MACHINE_SUPPORTS_SAVE ) // original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
-GAME( 1980, maydaya,    mayday,   defender,       mayday, williams_state,   mayday,   ROT0,   "Hoei", "Mayday (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, maydayb,    mayday,   defender,       mayday, williams_state,   mayday,   ROT0,   "Hoei", "Mayday (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, batlzone,   mayday,   defender,       mayday, williams_state,   mayday,   ROT0,   "bootleg (Video Game)", "Battle Zone (bootleg of Mayday)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mayday,     0,        defender,       mayday, williams_state,   mayday,   ROT0,   "Hoei", "Mayday (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // \  original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
+GAME( 1980, maydaya,    mayday,   defender,       mayday, williams_state,   mayday,   ROT0,   "Hoei", "Mayday (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) //  > these games have an unemulated protection chip of some sort which is hacked around in /machine/williams.cpp "mayday_protection_r" function
+GAME( 1980, maydayb,    mayday,   defender,       mayday, williams_state,   mayday,   ROT0,   "Hoei", "Mayday (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // /
+GAME( 1980, batlzone,   mayday,   defender,       mayday, williams_state,   mayday,   ROT0,   "bootleg (Video Game)", "Battle Zone (bootleg of Mayday)", MACHINE_SUPPORTS_SAVE )//    the bootleg may or may not use the same protection chip, or some hack around it.
 
 GAME( 1981, colony7,    0,        defender,       colony7, williams_state,  defender, ROT270, "Taito", "Colony 7 (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, colony7a,   colony7,  defender,       colony7, williams_state,  defender, ROT270, "Taito", "Colony 7 (set 2)", MACHINE_SUPPORTS_SAVE )
