@@ -1006,6 +1006,6 @@ GAME( 1992, moomesaaab, moomesa, moo,     moo,   driver_device, 0, ROT0, "Konami
 GAME( 1992, moomesabl,  moomesa, moobl,   moo,   driver_device, 0, ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // based on Version AA
 GAME( 1992, bucky,      0,       bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver EAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, buckyea,    bucky,   bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver EA)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyja,    bucky,   bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyjaa,   bucky,   bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, buckyuab,   bucky,   bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, buckyaab,   bucky,   bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver AAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
