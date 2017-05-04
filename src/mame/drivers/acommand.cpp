@@ -95,6 +95,7 @@ public:
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
 	DECLARE_WRITE16_MEMBER(output_7seg0_w);
 	DECLARE_WRITE16_MEMBER(output_7seg1_w);
+	DECLARE_WRITE16_MEMBER(output_lamps_w);
 	
 	DECLARE_READ16_MEMBER(ext_devices_0_r);
 	DECLARE_WRITE16_MEMBER(ext_devices_0_w);
@@ -160,8 +161,9 @@ void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			int h = ((spriteram16[offs+0] & 0xf0) >> 4);
 			int sy = (spriteram16[offs+4] & 0x0ff) - ((h+1)*0x10);
 /**/        int pri = spriteram16[offs+5];
-/**/        int flipy = ((spriteram16[offs+1] & 0x0200) >> 9);
-/**/        int flipx = ((spriteram16[offs+1] & 0x0100) >> 8);
+/**/        int flipy = ((spriteram16[offs+1] & 0x2000) >> 13);
+			// "this is the boss" uses flip x
+			int flipx = ((spriteram16[offs+1] & 0x1000) >> 12);
 
 			int xx,yy,x;
 			int delta = 16;
@@ -181,7 +183,7 @@ void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			yy = h;
 			do
 			{
-				x = sx;
+				x = flipx ? sx + w*16 : sx;
 				xx = w;
 				do
 				{
@@ -192,7 +194,10 @@ void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 							((x + 16) & 0x1ff) - 16,sy & 0x1ff,15);
 
 					code++;
-					x += delta;
+					if(flipx)
+						x -= delta;
+					else
+						x += delta;
 				} while (--xx >= 0);
 
 				sy += delta;
@@ -209,6 +214,7 @@ void acommand_state::video_start()
 
 	m_ac_vregs = std::make_unique<uint16_t[]>(0x80/2);
 
+	m_bg_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);
 }
 
@@ -272,6 +278,9 @@ void acommand_state::draw_led(bitmap_ind16 &bitmap, int x, int y,uint8_t value)
 
 uint32_t acommand_state::screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// reference has black pen background, as weird it might sound
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect,0,0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
@@ -384,7 +393,7 @@ WRITE16_MEMBER(acommand_state::output_7seg1_w)
 */
 READ16_MEMBER(acommand_state::ext_devices_0_r)
 {
-	return 0x111c | m_boss_door;
+	return 0xfffc | m_boss_door;
 }
 
 WRITE16_MEMBER(acommand_state::ext_devices_0_w)
@@ -402,7 +411,7 @@ WRITE16_MEMBER(acommand_state::ext_devices_0_w)
 */
 READ16_MEMBER(acommand_state::ext_devices_1_r)
 {	
-	return 0xff11;
+	return 0xffff;
 }
 
 WRITE16_MEMBER(acommand_state::ext_devices_1_w)
@@ -419,6 +428,14 @@ WRITE16_MEMBER(acommand_state::ext_devices_2_w)
 	m_ufo_lane[4] = (data >> 8) & 0x1f;
 }
 
+WRITE16_MEMBER(acommand_state::output_lamps_w)
+{
+	machine().bookkeeping().coin_counter_w(0, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, data & 0x80);
+
+	// --xx --xx lamps
+}
+
 static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16, acommand_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x082000, 0x082005) AM_WRITE(ac_bgscroll_w)
@@ -432,7 +449,7 @@ static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16, acommand_state )
 	AM_RANGE(0x0f9000, 0x0fffff) AM_RAM
 	
 	AM_RANGE(0x100000, 0x100001) AM_WRITE8(oki_bank_w,0x00ff)
-	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("IN0") AM_WRITENOP // lamps
+	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("IN0") AM_WRITE(output_lamps_w)
 	AM_RANGE(0x100014, 0x100017) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x100018, 0x10001b) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)        
 
