@@ -14,6 +14,7 @@ TODO:
 -Back tilemap paging is likely to be incorrect.
 -3D Artworks for the UFO's,Astronauts etc.
 -Merge to the Cisco Heat driver.
+-Use MAME layout instead of custom 7seg led drawing routine
 
 Notes:
 -The real HW is a redemption machine with two guns, similar to the "Cosmo Gang the Video"

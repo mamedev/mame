@@ -91,7 +91,7 @@ WRITE8_MEMBER(fidelmcs48_state::sc6_select_w)
 READ8_MEMBER(fidelmcs48_state::sc6_input_r)
 {
 	// P10-P15: multiplexed inputs low
-	return (~read_inputs(9) & 0xff) | 0xc0;
+	return (~read_inputs(9) & 0x3f) | 0xc0;
 }
 
 READ8_MEMBER(fidelmcs48_state::sc6_input6_r)
