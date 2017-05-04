@@ -2220,6 +2220,34 @@ ROM_START( gundcb79a )
 	ROM_LOAD("317-0415-jpn.pic", 0x00, 0x4000, CRC(e5490747) SHA1(91de42a562a265e4cfa1788e40985a5b9055a10a) )
 ROM_END
 
+// Quest of D Oukoku no Syugosya
+// note: all following CD/DVD discs for server PC, game image from CDV-10026D uploaded via network to satellite Chihiro units
+ROM_START( qofd3 )
+	CHIHIRO_BIOS
+
+	// "Quest of D Ver.3.02"
+	// DVD QOD 3.02
+	// CDV-10026D
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10026d", 0, SHA1(b079778f7837100a9b4fa2a536a4efc7817dd2d2) )	// DVD
+
+	// satellite Chihiro security PIC is missing
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD("317-xxxx-jpn.pic", 0x00, 0x4000, NO_DUMP )
+
+	// "Quest of D Ver. 3.0"
+	// CD QOD3 VERSION UPDATE
+	// CDP-10062
+	DISK_REGION("update")
+	DISK_IMAGE_READONLY( "cdp-10062", 0, SHA1(abe337cb8782155c4cb92895ba22454a175d479d) )	// CD
+
+	// "Quest of D Ver. 2.0"
+	// DVD QOD CHECK DISC
+	// CDV-10028
+	DISK_REGION("check")
+	DISK_IMAGE_READONLY( "cdv-10028", 0, SHA1(9f0f64cb4278cf51a42a21f880cda82b585c63f6) )	// DVD
+ROM_END
+
 ROM_START( gundcb83 )
 	CHIHIRO_BIOS
 
@@ -2350,6 +2378,7 @@ ROM_END
 /* 0005C */ GAME( 2004, questofd, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Quest of D (CDV-10005C)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0010  */ GAME( 2005, gundcb79, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0079 Card Builder (CDV-10010)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0024B */ GAME( 2006, gundcb79a,gundcb79, chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0079 Card Builder Ver.2.02 (CDV-10024B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0026D */ GAME( 2007, qofd3,    chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Quest of D Oukoku no Syugosya Ver. 3.02 (CDV-10026D)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0030  */ GAME( 2007, gundcb83, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0083 Card Builder (CDV-10030)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0031  */ GAME( 2007, gundcb83a,gundcb83, chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0083 Card Builder Check Disk (CDV-10031)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0035B */ GAME( 2007, qofdtbk,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Quest of D The Battle Kingdom (CDV-10035B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
