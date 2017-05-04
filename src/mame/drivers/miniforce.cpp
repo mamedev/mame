@@ -103,21 +103,15 @@
 #include "bus/vme/vme_mzr8300.h"
 #include "machine/clock.h"
 
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
+//#define LOG_GENERAL (1U <<  0)
+#define LOG_SETUP   (1U <<  1)
 
-#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+//#define VERBOSE (LOG_SETUP)
+//#define LOG_OUTPUT_FUNC printf
 
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+#include "logmacro.h"
 
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -184,7 +178,7 @@ MACHINE_CONFIG_START (miniforce, miniforce_state)
 	MCFG_VME_SLOT_ADD ("vme", 6, miniforce_vme_cards, nullptr)
 	MCFG_VME_SLOT_ADD ("vme", 7, miniforce_vme_cards, nullptr)
 	MCFG_VME_SLOT_ADD ("vme", 8, miniforce_vme_cards, nullptr)
-	MCFG_VME_SLOT_ADD ("vme", 9, miniforce_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 9, miniforce_vme_cards, "fcscsi")
 MACHINE_CONFIG_END
 
 ROM_START(miniforce)

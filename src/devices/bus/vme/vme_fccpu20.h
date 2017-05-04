@@ -46,6 +46,14 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
 
+	// VME access functions
+	DECLARE_READ32_MEMBER (vme_a32_r);
+	DECLARE_WRITE32_MEMBER (vme_a32_w);
+	DECLARE_READ32_MEMBER (vme_a24_r);
+	DECLARE_WRITE32_MEMBER (vme_a24_w);
+	DECLARE_READ32_MEMBER (vme_a16_r);
+	DECLARE_WRITE32_MEMBER (vme_a16_w);
+
 	// Below are duplicated declarations from src/mame/drivers/fccpu20.cpp
 	DECLARE_READ32_MEMBER (bootvect_r);
 	DECLARE_WRITE32_MEMBER (bootvect_w);
