@@ -10,14 +10,14 @@ Actually same HW as the Cisco Heat ones.
 
 TODO:
 -Understand what "devices" area needs to make this working.It's likely that the upper switches
-controls the UFO's and the lower switches the astronauts.
+ controls the UFO's and the lower switches the astronauts.
 -Back tilemap paging is likely to be incorrect.
 -3D Artworks for the UFO's,Astronauts etc.
 -Merge to the Cisco Heat driver.
 
 Notes:
 -The real HW is a redemption machine with two guns, similar to the "Cosmo Gang the Video"
-(Namco) bonus games.
+(Namco) redemption version.
 
 m68k irq table vectors
 lev 1 : 0x64 : 0000 04f0 - rte
@@ -72,7 +72,6 @@ public:
 		m_ac_bgvram(*this, "ac_bgvram"),
 		m_ac_txvram(*this, "ac_txvram"),
 		m_spriteram(*this, "spriteram"),
-		m_ac_devram(*this, "ac_devram"),
 		m_maincpu(*this, "maincpu"),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
@@ -82,20 +81,27 @@ public:
 	required_shared_ptr<uint16_t> m_ac_bgvram;
 	required_shared_ptr<uint16_t> m_ac_txvram;
 	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_ac_devram;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap;
 	std::unique_ptr<uint16_t[]> m_ac_vregs;
-	uint16_t m_led0;
-	uint16_t m_led1;
-	uint16_t m_ufo_sw1;
-	uint16_t m_ufo_sw2;
+	uint16_t m_7seg0;
+	uint16_t m_7seg1;
+	uint16_t m_ufo_lane[5];
+	uint8_t m_boss_door;
 	DECLARE_WRITE16_MEMBER(ac_bgvram_w);
 	DECLARE_WRITE16_MEMBER(ac_txvram_w);
 	DECLARE_WRITE16_MEMBER(ac_bgscroll_w);
 	DECLARE_WRITE16_MEMBER(ac_txscroll_w);
-	DECLARE_READ16_MEMBER(ac_devices_r);
-	DECLARE_WRITE16_MEMBER(ac_devices_w);
+	DECLARE_WRITE8_MEMBER(oki_bank_w);
+	DECLARE_WRITE16_MEMBER(output_7seg0_w);
+	DECLARE_WRITE16_MEMBER(output_7seg1_w);
+	
+	DECLARE_READ16_MEMBER(ext_devices_0_r);
+	DECLARE_WRITE16_MEMBER(ext_devices_0_w);
+	DECLARE_READ16_MEMBER(ext_devices_1_r);
+	DECLARE_WRITE16_MEMBER(ext_devices_1_w);
+	DECLARE_WRITE16_MEMBER(ext_devices_2_w);
+	
 	DECLARE_WRITE16_MEMBER(ac_unk2_w);
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILE_GET_INFO_MEMBER(ac_get_bg_tile_info);
@@ -271,13 +277,13 @@ uint32_t acommand_state::screen_update_acommand(screen_device &screen, bitmap_in
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	/*Order might be wrong,but these for sure are the led numbers tested*/
-	draw_led(bitmap,  0, 20, (m_led0 & 0x0f00) >> 8);
-	draw_led(bitmap,  6, 20, (m_led0 & 0x00f0) >> 4);
-	draw_led(bitmap, 12, 20, (m_led0 & 0x000f));
+	draw_led(bitmap,  0, 20, (m_7seg0 & 0x0f00) >> 8);
+	draw_led(bitmap,  6, 20, (m_7seg0 & 0x00f0) >> 4);
+	draw_led(bitmap, 12, 20, (m_7seg0 & 0x000f));
 
-	draw_led(bitmap, 256-18,20,(m_led0 & 0xf000) >> 12);
-	draw_led(bitmap, 256-12,20,(m_led1 & 0xf0) >> 4);
-	draw_led(bitmap, 256-6,20, (m_led1 & 0xf));
+	draw_led(bitmap, 256-18,20,(m_7seg0 & 0xf000) >> 12);
+	draw_led(bitmap, 256-12,20,(m_7seg1 & 0xf0) >> 4);
+	draw_led(bitmap, 256-6,20, (m_7seg1 & 0xf));
 	return 0;
 }
 
@@ -316,153 +322,101 @@ WRITE16_MEMBER(acommand_state::ac_txscroll_w)
 
 /******************************************************************************************/
 
-
-READ16_MEMBER(acommand_state::ac_devices_r)
-{
-	logerror("(PC=%06x) read at %04x\n",space.device().safe_pc(),offset*2);
-
-	switch(offset)
-	{
-		case 0x0008/2:
-			/*
-			    --x- ---- ---- ---- Ticket Dispenser - 2
-			    ---x ---- ---- ---- Ticket Dispenser - 1
-			    ---- -x-- ---- ---- Right Gun HIT
-			    ---- ---x ---- ---- Left Gun HIT
-			    ---- ---- --x- ---- Service Mode (Toggle)
-			    ---- ---- ---x ---- Service Coin
-			    ---- ---- ---- x--- COIN2
-			    ---- ---- ---- -x-- COIN1
-			    ---- ---- ---- --x- (Activate Test)
-			    ---- ---- ---- ---x (Advance through Tests)
-			*/
-			return ioport("IN0")->read();
-		case 0x0014/2:
-		case 0x0016/2:
-			return m_oki1->read(space,0);
-		case 0x0018/2:
-		case 0x001a/2:
-			return m_oki2->read(space,0);
-		case 0x0040/2:
-			/*
-			    "Upper switch / Under Switch"
-			    xx-x ---- xx-x xx-x
-			    -x-- ---- ---- ---- Catch Switch - 3
-			    --x- ---- ---- ---- Lower Switch - 3
-			    ---x ---- ---- ---- Upper Switch - 3
-			    ---- -x-- ---- ---- Catch Switch - 2
-			    ---- --x- ---- ---- Lower Switch - 2
-			    ---- ---x ---- ---- Upper Switch - 2
-			    ---- ---- -x-- ---- Catch Switch - 1
-			    ---- ---- --x- ---- Lower Switch - 1 (active high)
-			    ---- ---- ---x ---- Upper Switch - 1 (active low)
-			    ---- ---- ---- --xx Boss Door - Motor
-			*/
-		//22dc8
-		{
-			m_ufo_sw1 = m_ac_devram[offset] & 3;
-			if(m_ac_devram[offset] & 0x10)
-				m_ufo_sw1|= 0x10;
-			if(m_ac_devram[offset] & 0x40)
-				m_ufo_sw1|= 0x20;
-			if(m_ac_devram[offset] & 0x100)
-				m_ufo_sw1|=0x100;
-			if(m_ac_devram[offset] & 0x400)
-				m_ufo_sw1|=0x200;
-			if(m_ac_devram[offset] & 0x1000)
-				m_ufo_sw1|=0x1000;
-			if(m_ac_devram[offset] & 0x4000)
-				m_ufo_sw1|=0x2000;
-//          if(m_ac_devram[0x0048/2] & 0x0001)
-//              m_ufo_sw1|=0x0040;
-//          if(m_ac_devram[0x0048/2] & 0x0004)
-//              m_ufo_sw1|=0x0400;
-//          if(m_ac_devram[0x0048/2] & 0x0100)
-//              m_ufo_sw1|=0x4000;
-			return m_ufo_sw1;
-		}
-		case 0x0044/2:
-			/*
-			    ---- ---- --x- ---- Lower Switch - 5
-			    ---- ---- ---x ---- Upper Switch - 5
-			    ---- ---- ---- --x- Lower Switch - 4 (active high)
-			    ---- ---- ---- ---x Upper Switch - 4 (active low)
-			*/
-		{
-			m_ufo_sw2 = 0;
-			if(m_ac_devram[offset] & 0x01)
-				m_ufo_sw2|= 1;
-			if(m_ac_devram[offset] & 0x04)
-				m_ufo_sw2|= 2;
-			if(m_ac_devram[offset] & 0x10)
-				m_ufo_sw2|=0x10;
-			if(m_ac_devram[offset] & 0x40)
-				m_ufo_sw2|=0x20;
-			return m_ufo_sw2;
-		}
-		case 0x0048/2:
-			return m_ac_devram[offset];
-		case 0x005c/2:
-			/*
-			    xxxx xxxx ---- ---- DIPSW4
-			    ---- ---- xxxx xxxx DIPSW3
-			*/
-			return ioport("IN1")->read();
-	}
-	return m_ac_devram[offset];
-}
-
-WRITE16_MEMBER(acommand_state::ac_devices_w)
-{
-	COMBINE_DATA(&m_ac_devram[offset]);
-	switch(offset)
-	{
-		case 0x00/2:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_oki1->set_rom_bank(data & 0x3);
-				m_oki2->set_rom_bank((data & 0x30) >> 4);
-			}
-			break;
-		case 0x14/2:
-		case 0x16/2:
-			if(ACCESSING_BITS_0_7)
-			{
-				m_oki1->write(space,0,data);
-			}
-			break;
-		case 0x18/2:
-		case 0x1a/2:
-			if(ACCESSING_BITS_0_7)
-			{
-				m_oki2->write(space,0,data);
-			}
-			break;
-		case 0x1c/2:
-			/*IRQ mask?*/
-			break;
-		case 0x40/2:
-			break;
-		case 0x44/2:
-			break;
-		case 0x48/2:
-			break;
-		case 0x50/2:
-			m_led0 = m_ac_devram[offset];
-			//popmessage("%04x",m_led0);
-			break;
-		case 0x54/2:
-			m_led1 = m_ac_devram[offset];
-			//popmessage("%04x",m_led0);
-			break;
-	}
-}
-
 /*This is always zero ATM*/
 WRITE16_MEMBER(acommand_state::ac_unk2_w)
 {
 	if(data)
 		popmessage("UNK-2 enabled %04x",data);
+}
+
+/*************************************
+ *
+ * I/O
+ *
+ ************************************/
+
+WRITE8_MEMBER(acommand_state::oki_bank_w)
+{
+	m_oki1->set_rom_bank(data & 0x3);
+	m_oki2->set_rom_bank((data & 0x30) >> 4);
+}
+
+WRITE16_MEMBER(acommand_state::output_7seg0_w)
+{
+	COMBINE_DATA(&m_7seg0);
+}
+
+WRITE16_MEMBER(acommand_state::output_7seg1_w)
+{
+	COMBINE_DATA(&m_7seg1);
+}
+
+/*
+	"Upper switch / Under Switch"
+	xx-x ---- xx-x xx-x
+	-x-- ---- ---- ---- Catch Switch - 3
+	--x- ---- ---- ---- Lower Switch - 3
+	---x ---- ---- ---- Upper Switch - 3
+	---- -x-- ---- ---- Catch Switch - 2
+	---- --x- ---- ---- Lower Switch - 2
+	---- ---x ---- ---- Upper Switch - 2
+	---- ---- -x-- ---- Catch Switch - 1
+	---- ---- --x- ---- Lower Switch - 1 (active high)
+	---- ---- ---x ---- Upper Switch - 1 (active low)
+	---- ---- ---- --xx Boss Door - Motor
+	state of UFO lanes:
+	0x0
+	0x1
+	0x2
+	0x3
+	0x4
+	0x5 ufo lane limit switch
+	0x6
+	0x7 astronaut switch or jamming
+	0x8
+	0x9 ufo lane switch or motor
+	0xa astronaut switch or jamming
+	0xb ufo lane switch or motor
+	0xc ""
+	0xd ufo lane limit switch
+	0xe astronaut switch or jamming
+	0xf ""
+*/
+READ16_MEMBER(acommand_state::ext_devices_0_r)
+{
+	return 0x111c | m_boss_door;
+}
+
+WRITE16_MEMBER(acommand_state::ext_devices_0_w)
+{	
+	printf("%04x EXT 0\n",data);
+	m_boss_door = data & 3;
+	m_ufo_lane[0] = (data >> 8) & 0x1f;
+}
+
+/*
+	---- ---- --x- ---- Lower Switch - 5
+	---- ---- ---x ---- Upper Switch - 5
+	---- ---- ---- --x- Lower Switch - 4 (active high)
+	---- ---- ---- ---x Upper Switch - 4 (active low)
+*/
+READ16_MEMBER(acommand_state::ext_devices_1_r)
+{	
+	return 0xff11;
+}
+
+WRITE16_MEMBER(acommand_state::ext_devices_1_w)
+{
+	//printf("%04x EXT 1\n",data);
+	m_ufo_lane[1] = (data >> 0) & 0x1f;
+	m_ufo_lane[2] = (data >> 8) & 0x1f;
+}
+
+WRITE16_MEMBER(acommand_state::ext_devices_2_w)
+{
+	//printf("%04x EXT 2\n",data);
+	m_ufo_lane[3] = (data >> 0) & 0x1f;
+	m_ufo_lane[4] = (data >> 8) & 0x1f;
 }
 
 static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16, acommand_state )
@@ -476,7 +430,20 @@ static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16, acommand_state )
 	AM_RANGE(0x0f0000, 0x0f7fff) AM_RAM
 	AM_RANGE(0x0f8000, 0x0f8fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0f9000, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x1000ff) AM_READ(ac_devices_r) AM_WRITE(ac_devices_w) AM_SHARE("ac_devram")
+	
+	AM_RANGE(0x100000, 0x100001) AM_WRITE8(oki_bank_w,0x00ff)
+	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("IN0") AM_WRITENOP // lamps
+	AM_RANGE(0x100014, 0x100017) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x100018, 0x10001b) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)        
+
+	AM_RANGE(0x100040, 0x100041) AM_READWRITE(ext_devices_0_r,ext_devices_0_w)
+	AM_RANGE(0x100044, 0x100045) AM_READWRITE(ext_devices_1_r,ext_devices_1_w)
+	AM_RANGE(0x100048, 0x100049) AM_WRITE(ext_devices_2_w)
+	
+	AM_RANGE(0x100050, 0x100051) AM_WRITE(output_7seg0_w)
+	AM_RANGE(0x100054, 0x100055) AM_WRITE(output_7seg1_w)
+	AM_RANGE(0x10005c, 0x10005d) AM_READ_PORT("DSW")
+
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( acommand )
@@ -514,7 +481,7 @@ static INPUT_PORTS_START( acommand )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("IN1")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
