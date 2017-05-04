@@ -91,6 +91,34 @@ private:
 };
 
 
+// ======================> get_default_card_software_hook
+
+class get_default_card_software_hook
+{
+	// goofy "hook" to pass to device_slot_interface::get_default_card_software
+public:
+	get_default_card_software_hook(const std::string &path, std::function<bool(util::core_file &, std::string&)> &&get_hashfile_extrainfo);
+
+	// accesses the image file to be scrutinized by get_default_card_software(); is
+	// nullptr in the case of images loaded by software list
+	util::core_file::ptr &image_file() { return m_image_file;  }
+
+	// checks to see if image is of the specified "file type" (in practice, file extension)
+	bool is_filetype(const char *candidate_filetype) const { return !core_stricmp(m_file_type.c_str(), candidate_filetype); }
+
+	// extra info from hashfile
+	bool hashfile_extrainfo(std::string &extrainfo);
+
+private:
+	util::core_file::ptr                                    m_image_file;
+	std::string                                             m_file_type;
+	std::function<bool(util::core_file &, std::string&)>    m_get_hashfile_extrainfo;
+	bool                                                    m_called_get_hashfile_extrainfo;
+	bool                                                    m_has_hash_extrainfo;
+	std::string                                             m_hash_extrainfo;
+};
+
+
 // ======================> device_slot_interface
 
 class device_slot_interface : public device_interface
@@ -113,16 +141,19 @@ public:
 	bool has_selectable_options() const;
 	const char *default_option() const { return m_default_option; }
 	const std::unordered_map<std::string, std::unique_ptr<device_slot_option>> &option_list() const { return m_options; }
-	device_slot_option *option(const char *name) const { if (name) { auto search = m_options.find(name); if (search != m_options.end()) return search->second.get(); else return nullptr; } else return nullptr; }
-	virtual std::string get_default_card_software() { return std::string(); }
-	device_t *get_card_device();
+	device_slot_option *option(const char *name) const;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const { return std::string(); }
+	device_t *get_card_device() { return m_card_device; }
+	void set_card_device(device_t *dev) { m_card_device = dev; }
 
 private:
 	// internal state
-	static device_slot_option *static_option(device_t &device, const char *option);
 	std::unordered_map<std::string,std::unique_ptr<device_slot_option>> m_options;
 	const char *m_default_option;
 	bool m_fixed;
+	device_t *m_card_device;
+
+	static device_slot_option *static_option(device_t &device, const char *option);
 };
 
 // iterator

@@ -35,6 +35,7 @@ public:
 	int m_highcolorflag;
 	int m_flipscreen;
 	bitmap_rgb32 m_tmpbitmap;
+	emu_timer *m_blitter_timer;
 
 	DECLARE_WRITE8_MEMBER(hyhoo_blitter_w);
 	DECLARE_WRITE8_MEMBER(hyhoo_romsel_w);

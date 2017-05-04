@@ -128,7 +128,6 @@ Notes:
       Game                      Sticker      KEYCUS
       ---------------------------------------------
       Dancing Eyes              DC           C431
-      Don Bear Near
       Dunk Mania                DM           C410
       Kosodate Quiz My Angel 3  KQT          C443
       Prime Goal EX             PG           C411

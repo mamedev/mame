@@ -10,6 +10,7 @@
 
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/v60/v60.h"
+#include "machine/i8251.h"
 #include "machine/m1comm.h"
 #include "video/segaic24.h"
 
@@ -32,6 +33,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_m1audio(*this, "m1audio")
+		, m_m1uart(*this, "m1uart")
 		, m_m1comm(*this, "m1comm")
 		, m_dsbz80(*this, DSBZ80_TAG)
 		, m_tgp(*this, "tgp")
@@ -64,10 +66,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
-
-	// Sound
-	DECLARE_READ16_MEMBER(snd_68k_ready_r);
-	DECLARE_WRITE16_MEMBER(snd_latch_to_68k_w);
 
 	// TGP
 	DECLARE_READ16_MEMBER(fifoin_status_r);
@@ -193,6 +191,7 @@ private:
 	// Devices
 	required_device<v60_device> m_maincpu;          // V60
 	required_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
+	required_device<i8251_device> m_m1uart;
 	optional_device<m1comm_device> m_m1comm;        // Model 1 communication board
 	optional_device<dsbz80_device> m_dsbz80;        // Digital Sound Board
 	optional_device<mb86233_cpu_device> m_tgp;
@@ -206,8 +205,6 @@ private:
 
 	// Sound
 	int m_sound_irq;
-	uint8_t m_last_snd_cmd;
-	int m_snd_cmd_state;
 
 	// TGP FIFO
 	uint32_t  fifoout_pop();

@@ -90,7 +90,7 @@ bool n64_blender_t::alpha_reject(rdp_span_aux* userdata, const rdp_poly_state& o
 			return userdata->m_pixel_color.get_a() < userdata->m_blend_color.get_a();
 
 		case 3:
-			return userdata->m_pixel_color.get_a() < (rand() & 0xff);
+			return userdata->m_pixel_color.get_a() < (machine().rand() & 0xff);
 
 		default:
 			return false;

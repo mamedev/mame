@@ -76,10 +76,10 @@ enum
    /INT  6 |                 | 37 PB0
   RESET  7 |                 | 36 PA3
     PD0  8 |                 | 35 PA2
-    PD1  9 |     uPD552      | 34 PA1
-    PD2 10 |     uPD553      | 33 PA0
-    PD3 11 |     uPD650*     | 32 PI2
-    PE0 12 |                 | 31 PI1
+    PD1  9 |     uPD546      | 34 PA1
+    PD2 10 |     uPD552      | 33 PA0
+    PD3 11 |     uPD553      | 32 PI2
+    PE0 12 |     uPD650*     | 31 PI1
     PE1 13 |                 | 30 PI0
     PE2 14 |                 | 29 PH3
     PE3 15 |                 | 28 PH2
@@ -312,6 +312,13 @@ protected:
 };
 
 
+class upd546_cpu_device : public ucom4_cpu_device
+{
+public:
+	upd546_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
 class upd553_cpu_device : public ucom4_cpu_device
 {
 public:
@@ -345,6 +352,7 @@ public:
 
 
 
+extern const device_type NEC_D546;
 extern const device_type NEC_D553;
 extern const device_type NEC_D557L;
 extern const device_type NEC_D650;

@@ -34,7 +34,7 @@ ROM_END
 
 ROM_START( gc824 )
 	ROM_REGION(0x8000, GC48_ROM_REGION, 0)
-	ROM_LOAD( "3410868.bin",  0x000000, 0x008000, CRC(57f925fa) SHA1(4d3c0632711b7b31c8e0c5cfdd7ec1904f178336) )
+	ROM_LOAD( "3410868.bin",  0x000000, 0x008000, CRC(57f925fa) SHA1(4d3c0632711b7b31c8e0c5cfdd7ec1904f178336) ) /* Label: "341-0868 // (C)APPLE COMPUTER // INC. 1986-1991 // ALL RIGHTS // RESERVED    W5" */
 ROM_END
 
 //**************************************************************************

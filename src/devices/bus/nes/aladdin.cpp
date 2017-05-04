@@ -136,16 +136,16 @@ image_init_result nes_aladdin_slot_device::call_load()
 }
 
 
-std::string nes_aladdin_slot_device::get_default_card_software()
+std::string nes_aladdin_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string = "algn";
-		uint32_t len = m_file->size();
+		uint32_t len = hook.image_file()->size();
 		std::vector<uint8_t> rom(len);
 		uint8_t mapper;
 
-		m_file->read(&rom[0], len);
+		hook.image_file()->read(&rom[0], len);
 
 		mapper = (rom[6] & 0xf0) >> 4;
 		mapper |= rom[7] & 0xf0;
@@ -154,8 +154,6 @@ std::string nes_aladdin_slot_device::get_default_card_software()
 //          slot_string = "algn";
 		if (mapper == 232)
 			slot_string = "algq";
-
-		clear();
 
 		return std::string(slot_string);
 	}

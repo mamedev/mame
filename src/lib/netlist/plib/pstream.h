@@ -360,15 +360,15 @@ private:
 	postream &m_strm;
 };
 
-class putf8_fmt_writer : public pfmt_writer_t<>, public putf8_writer
+class putf8_fmt_writer : public pfmt_writer_t<putf8_fmt_writer>, public putf8_writer
 {
 public:
 
 	explicit putf8_fmt_writer(postream &strm);
 	virtual ~putf8_fmt_writer() override;
 
-protected:
-	virtual void vdowrite(const pstring &ls) const override;
+//protected:
+	void vdowrite(const pstring &ls) const;
 
 private:
 };

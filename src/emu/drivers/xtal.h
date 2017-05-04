@@ -121,7 +121,7 @@ enum
 	XTAL_10_738635MHz   = 10738635,     /* TMS9918 family (3x NTSC subcarrier) */
 	XTAL_10_816MHz      = 10816000,     /* Universal 1979-1980 (Cosmic Alien, etc) */
 	XTAL_11MHz          = 11000000,     /* Mario I8039 sound */
-	XTAL_11_0592MHz     = 11059200,     /* Lethal Justice, Ruleta RE-900, DEC VT220 */
+	XTAL_11_0592MHz     = 11059200,     /* Used with MCS-51 to generate common baud rates */
 	XTAL_11_2MHz        = 11200000,     /* New York, New York */
 	XTAL_11_289MHz      = 11289000,     /* Vanguard */
 	XTAL_11_4MHz        = 11400000,     /* HP 9845 */
@@ -233,9 +233,10 @@ enum
 	XTAL_49_152MHz      = 49152000,     /* Used on some Namco PCBs, Baraduke h/w, System 21, Super System 22  */
 	XTAL_50MHz          = 50000000,     /* Williams/Midway T/W/V-unit system */
 	XTAL_50_113MHz      = 50113000,     /* Namco NA-1 (14x NTSC subcarrier)*/
-	XTAL_50_3496MHz     = 50349600,     /* Sega System 18 (3200x NTSC line rate) */
+	XTAL_50_349MHz      = 50349000,     /* Sega System 18 (~3200x NTSC line rate) */
 	XTAL_52MHz          = 52000000,     /* Cojag */
 	XTAL_52_832MHz      = 52832000,     /* Wang PC TIG video controller */
+	XTAL_53_2034MHz     = 53203400,     /* Master System, Mega Drive PAL (~12x PAL subcarrier) */
 	XTAL_53_693175MHz   = 53693175,     /* PSX-based h/w, Sony ZN1-2-based (15x NTSC subcarrier) */
 	XTAL_54MHz          = 54000000,     /* Taito JC */
 	XTAL_55MHz          = 55000000,     /* Eolith Vega */

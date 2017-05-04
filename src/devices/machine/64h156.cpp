@@ -155,7 +155,7 @@ void c64h156_device::live_start()
 	cur_live.soe = m_soe;
 	cur_live.accl = m_accl;
 	cur_live.zero_counter = 0;
-	cur_live.cycles_until_random_flux = (rand() % 31) + 289;
+	cur_live.cycles_until_random_flux = (machine().rand() % 31) + 289;
 
 	checkpoint_live = cur_live;
 
@@ -402,7 +402,7 @@ int c64h156_device::get_next_bit(attotime &tm, const attotime &limit)
 			bit = 1;
 
 			cur_live.zero_counter = 0;
-			cur_live.cycles_until_random_flux = (rand() % 31) + 289;
+			cur_live.cycles_until_random_flux = (machine().rand() % 31) + 289;
 
 			get_next_edge(next);
 		}
@@ -410,7 +410,7 @@ int c64h156_device::get_next_bit(attotime &tm, const attotime &limit)
 
 	if (cur_live.zero_counter >= cur_live.cycles_until_random_flux) {
 		cur_live.zero_counter = 0;
-		cur_live.cycles_until_random_flux = (rand() % 367) + 33;
+		cur_live.cycles_until_random_flux = (machine().rand() % 367) + 33;
 
 		bit = 1;
 	}

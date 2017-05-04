@@ -85,11 +85,40 @@ MACHINE_CONFIG_END
 
 
 ROM_START(tokyocop)
-	ROM_REGION32_LE(0x20000, "maincpu", 0)  /* motherboard bios */
-	ROM_LOAD("tokyocop.pcbios", 0x000000, 0x10000, NO_DUMP )
+	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
+
+/* Dumper's note: The drive was ordered from Gaelco and they used a 250 GB drive that apparently used to have something
+else on it because when I ripped the entire drive and compressed it, the compressed image was 30 GB which is too much for me
+to upload. So I just ripped the partitions (it had 3) and the size was reasonable. This rip was burned into another drive and
+tested working on the real hardware. It uses the same hardware and bios as the kit version.*/
 
 	DISK_REGION( "disks" )
-	DISK_IMAGE( "tokyocop", 0, SHA1(a3cf011c8ef8ec80724c28e1534191b40ae8515d) )
+	DISK_IMAGE( "tokyocop", 0, SHA1(f3b60046da7094743822191473e05ee9cbc1af86) )
+ROM_END
+
+ROM_START(tokyocopk)
+	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
+
+	DISK_REGION( "disks" ) // Maxtor 2F040J0310613 VAM051JJ0
+	DISK_IMAGE( "tokyocopk", 0, SHA1(3805e41903719d8ed163f9879db65e71aba2e3e7) )
+ROM_END
+
+ROM_START(tokyocopi)
+	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_LOAD("tokyocopi.pcbios", 0x000000, 0x80000, NO_DUMP )
+
+	DISK_REGION( "disks" )
+	DISK_IMAGE( "tokyocopi", 0, SHA1(a3cf011c8ef8ec80724c28e1534191b40ae8515d) )
+ROM_END
+
+ROM_START(rriders)
+	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_LOAD("22-03.u10", 0x000000, 0x80000, CRC(0ccae12f) SHA1(a8878fa73d5a4f5e9b6e3f35994fddea08cd3c2d) )
+
+	DISK_REGION( "disks" ) // 250 MB compact flash card
+	DISK_IMAGE( "rriders", 0, SHA1(46e10517ee1b383e03c88cac67a54318c227e3e1) )
 ROM_END
 
 ROM_START(tuningrc)
@@ -101,5 +130,8 @@ ROM_START(tuningrc)
 ROM_END
 
 
-GAME( 2003, tokyocop,  0,   gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Tokyo Cop (Italy)", MACHINE_IS_SKELETON )
-GAME( 2005, tuningrc,  0,   gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Gaelco Championship Tuning Race", MACHINE_IS_SKELETON )
+GAME( 2003, tokyocop,  0,         gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Tokyo Cop (US, dedicated version)", MACHINE_IS_SKELETON )
+GAME( 2003, tokyocopk, tokyocop,  gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Tokyo Cop (US, kit version)", MACHINE_IS_SKELETON )
+GAME( 2003, tokyocopi, tokyocop,  gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Tokyo Cop (Italy)", MACHINE_IS_SKELETON )
+GAME( 2004, rriders,   0,         gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Ring Riders (Software version v2.2)", MACHINE_IS_SKELETON )
+GAME( 2005, tuningrc,  0,         gaelcopc, gaelcopc, driver_device, 0, ROT0, "Gaelco", "Gaelco Championship Tuning Race", MACHINE_IS_SKELETON )

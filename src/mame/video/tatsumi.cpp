@@ -493,7 +493,7 @@ static void draw_sprites(running_machine &machine, _BitmapClass &bitmap, const r
 		index = spriteram16[offs];
 
 //      if (spriteram16[offs+1]&0x7)
-//          color=rand()%0xff;
+//          color=machine().rand()%0xff;
 
 		/* End of sprite list marker */
 		if (index == 0xffff || spriteram16[offs + 4] == 0xffff) // todo

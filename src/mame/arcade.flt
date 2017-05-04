@@ -16,6 +16,7 @@
 8080bw.cpp
 88games.cpp
 a1supply.cpp
+acchi.cpp
 ace.cpp
 acefruit.cpp
 aces1.cpp
@@ -41,7 +42,6 @@ allied.cpp
 alpha68k.cpp
 alvg.cpp
 amaticmg.cpp
-amazonlf.cpp
 ambush.cpp
 amerihok.cpp
 ampoker2.cpp
@@ -680,7 +680,6 @@ maygay1b.cpp
 maygayep.cpp
 maygaysw.cpp
 maygayv1.cpp
-mayumi.cpp
 mazerbla.cpp
 mcatadv.cpp
 mcr.cpp
@@ -762,6 +761,7 @@ mrgame.cpp
 mrjong.cpp
 ms32.cpp
 msisaac.cpp
+mtouchxl.cpp
 mugsmash.cpp
 multfish.cpp
 multfish_boot.cpp
@@ -988,6 +988,7 @@ scobra.cpp
 scotrsht.cpp
 scramble.cpp
 scregg.cpp
+scyclone.cpp
 sderby.cpp
 seabattl.cpp
 sealy.cpp
@@ -1144,6 +1145,7 @@ suprloco.cpp
 suprnova.cpp
 suprridr.cpp
 suprslam.cpp
+supstarf.cpp
 surpratk.cpp
 system1.cpp
 system16.cpp
@@ -1254,6 +1256,7 @@ undrfire.cpp
 unico.cpp
 unkhorse.cpp
 upscope.cpp
+usbilliards.cpp
 usgames.cpp
 vamphalf.cpp
 vaportra.cpp

@@ -45,12 +45,8 @@ static int mycaslen;
 
 static int csw_cas_to_wav_size( const uint8_t *casdata, int caslen )
 {
-	uint32_t SampleRate;
-	uint32_t NumberOfPulses;
 	uint8_t  MajorRevision;
 	uint8_t  MinorRevision;
-	uint8_t  CompressionType;
-	uint8_t  Flags;
 	uint8_t  HeaderExtensionLength;
 	std::vector<uint8_t> gz_ptr;
 
@@ -83,18 +79,7 @@ static int csw_cas_to_wav_size( const uint8_t *casdata, int caslen )
 		goto cleanup;
 	}
 
-	SampleRate=get_leuint32(casdata+0x19);
-	LOG_FORMATS("Sample rate %u\n",SampleRate);
-
-	NumberOfPulses=get_leuint32(casdata+0x1d);
-	LOG_FORMATS("Number Of Pulses %u\n",NumberOfPulses);
-
-
-	CompressionType=casdata[0x21];
-	Flags=casdata[0x22];
 	HeaderExtensionLength=casdata[0x23];
-
-	LOG_FORMATS("CompressionType %u   Flast %u   HeaderExtensionLength %u\n",CompressionType,Flags,HeaderExtensionLength);
 
 	mycaslen=caslen;
 	//from here on down for now I am assuming it is compressed csw file.
@@ -180,7 +165,6 @@ static int csw_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 	int         bsize=0;
 	int     i;
 
-
 	LOG_FORMATS("Length %d\n",length);
 
 	SampleRate=get_leuint32(bytes+0x19);
@@ -193,17 +177,19 @@ static int csw_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 	Flags=bytes[0x22];
 	HeaderExtensionLength=bytes[0x23];
 
-	if ((Flags&0)==0)
-	{
-		Bit=-100;
-	}
-	else
-	{
-		Bit=100;
-	}
+	Bit = (Flags & 1) ? 100 : -100;
 
-	LOG_FORMATS("CompressionType %u   Flast %u   HeaderExtensionLength %u\n",CompressionType,Flags,HeaderExtensionLength);
+	LOG_FORMATS("CompressionType %u   Flags %u   HeaderExtensionLength %u\n",CompressionType,Flags,HeaderExtensionLength);
 
+	LOG_FORMATS("Encoder: ");
+	for (i = 0; i < 16; i++)
+		LOG_FORMATS("%c", bytes[0x24 + i]);
+	LOG_FORMATS("\n");
+
+	LOG_FORMATS("Header: ");
+	for (i = 0; i < HeaderExtensionLength; i++)
+		LOG_FORMATS("%c", bytes[0x34 + i]);
+	LOG_FORMATS("\n");
 
 	//from here on down for now I am assuming it is compressed csw file.
 	in_ptr = (uint8_t*) bytes+0x34+HeaderExtensionLength;
@@ -302,7 +288,7 @@ static cassette_image::error csw_cassette_load( cassette_image *cassette )
 	return cassette_legacy_construct( cassette, &csw_legacy_fill_wave );
 }
 
-static const struct CassetteFormat csw_cassette_format = {
+const struct CassetteFormat csw_cassette_format = {
 	"csw",
 	csw_cassette_identify,
 	csw_cassette_load,

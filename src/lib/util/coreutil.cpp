@@ -59,39 +59,6 @@ uint32_t bcd_2_dec(uint32_t a)
 
 
 /***************************************************************************
-    GREGORIAN CALENDAR HELPERS
-***************************************************************************/
-
-int gregorian_is_leap_year(int year)
-{
-	return !((year % 100) ? (year % 4) : (year % 400));
-}
-
-
-/* months are one counted */
-
-/**
- * @fn  int gregorian_days_in_month(int month, int year)
- *
- * @brief   Gregorian days in month.
- *
- * @param   month   The month.
- * @param   year    The year.
- *
- * @return  An int.
- */
-
-int gregorian_days_in_month(int month, int year)
-{
-	assert(month >= 1 && month <= 12);
-
-	int days[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
-	days[1] += gregorian_is_leap_year(year) ? 1 : 0;
-	return days[month-1];
-}
-
-
-/***************************************************************************
     MISC
 ***************************************************************************/
 

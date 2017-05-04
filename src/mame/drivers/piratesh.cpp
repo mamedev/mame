@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 /**************************************************************************
-	Pirate Ship
- 
+    Pirate Ship
+
  PWB(A)354460B
- 
+
  MC68HC00FN16
 
  054539  - 8-Channel ADPCM sound generator. Clock input 18.432MHz. Clock outputs 18.432/4 & 18.432/8
@@ -14,17 +14,17 @@
  056832  - Tilemap generator
  054156  - Tilemap generator
  053252  - CRTC
- 
+
 
  053250 config:
- 
+
  SELC (69)  GND
  SEL1 (83)  GND
  SEL0 (82)  GND
  MODE (68)  GND
- 
+
  TODO: Music stops if a coin is inserted. MAME or BTNAB?
- 
+
 **************************************************************************/
 
 #include "emu.h"
@@ -53,11 +53,11 @@ public:
 	m_k056832(*this, "k056832"),
 	m_k055673(*this, "k055673"),
 	m_k055555(*this, "k055555"),
-//	m_k053246(*this, "k053246"),
+//  m_k053246(*this, "k053246"),
 	m_k054539(*this, "k054539"),
 	m_spriteram(*this,"spriteram")
 	{ }
-	
+
 	required_device<cpu_device> m_maincpu;
 
 	required_device<k053250ps_device> m_k053250;
@@ -66,22 +66,22 @@ public:
 	required_device<k055673_device> m_k055673;
 	required_device<k055555_device> m_k055555;
 	required_device<k054539_device> m_k054539;
-//	required_device<k053247_device> m_k053246;
+//  required_device<k053247_device> m_k053246;
 
 	optional_shared_ptr<uint16_t> m_spriteram;
-	
+
 	int m_layer_colorbase[6];
 	int m_sprite_colorbase;
 	int m_lvc_colorbase;
-	
+
 	uint8_t m_int_enable;
 	uint8_t m_int_status;
 	uint8_t m_sound_ctrl;
 	uint8_t m_sound_nmi_clk;
 	uint16_t m_control;
-	
+
 	void update_interrupts();
-	
+
 	DECLARE_READ16_MEMBER(K056832_rom_r);
 	DECLARE_WRITE16_MEMBER(control1_w);
 	DECLARE_WRITE16_MEMBER(control2_w);
@@ -93,7 +93,7 @@ public:
 	DECLARE_WRITE16_MEMBER(k053247_martchmp_word_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(helm_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(battery_r);
-	
+
 	DECLARE_MACHINE_START(piratesh);
 	DECLARE_MACHINE_RESET(piratesh);
 	DECLARE_VIDEO_START(piratesh);
@@ -114,11 +114,11 @@ void piratesh_state::update_interrupts()
 
 /*
  Priority issues:
- 
+
  1. On title screen, stars should be behind the helm
  2. The Konami logo is a square transition
- 3. 
- 
+ 3.
+
 */
 
 K056832_CB_MEMBER(piratesh_state::piratesh_tile_callback)
@@ -127,9 +127,9 @@ K056832_CB_MEMBER(piratesh_state::piratesh_tile_callback)
 	// Code
 	// Color
 	// Flags
-//	if (*color != 0)
-//		printf("%x %x %x\n", layer, *code, *color >> 2);
-	
+//  if (*color != 0)
+//      printf("%x %x %x\n", layer, *code, *color >> 2);
+
 	*color = (m_layer_colorbase[layer] << 4) + ((*color >> 2));// & 0x0f);
 }
 
@@ -143,16 +143,16 @@ K055673_CB_MEMBER(piratesh_state::piratesh_sprite_callback)
 	// .... .... xxx. .... - Priority?
 	// .... ..x. .... .... - ?
 	// ..x. .... .... .... - ?
-	
+
 #if 0
 	int layerpri[4];
 	static const int pris[4] = { K55_PRIINP_0, K55_PRIINP_3, K55_PRIINP_6, K55_PRIINP_7 };
-	
+
 	for (uint32_t i = 0; i < 4; i++)
 	{
 		layerpri[i] = m_k055555->K055555_read_register(pris[i]);
 	}
-	
+
 	// TODO: THIS IS ALL WRONG
 	if (pri <= layerpri[0])
 		*priority_mask = 0;
@@ -165,12 +165,12 @@ K055673_CB_MEMBER(piratesh_state::piratesh_sprite_callback)
 #endif
 
 	*priority_mask = 0;
-	
+
 	// 0 - Sprites over everything
 	// f0 -
 	// f0 cc -
 	// f0 cc aa -
-	
+
 	// 1111 0000
 	// 1100 1100
 	// 1010 1010
@@ -189,7 +189,7 @@ VIDEO_START_MEMBER(piratesh_state, piratesh)
 	m_lvc_colorbase = 3;
 #if 0
 	konamigx_mixer_init(*m_screen, 0);
-	
+
 	m_k056832->set_layer_offs(0, -2+2-1, 0-1);
 	m_k056832->set_layer_offs(1,  0+2, 0);
 	m_k056832->set_layer_offs(2,  2+2, 0);
@@ -202,21 +202,21 @@ uint32_t piratesh_state::screen_update_piratesh(screen_device &screen, bitmap_rg
 {
 	bitmap.fill(0, cliprect);
 #if 1
-	
+
 	int layers[4], layerpri[4];
 	static const int pris[4] = { K55_PRIINP_0, K55_PRIINP_3, K55_PRIINP_6, K55_PRIINP_7 };
 	static const int enables[4] = { K55_INP_VRAM_A, K55_INP_VRAM_B, K55_INP_VRAM_C, K55_INP_VRAM_D };
-	
+
 	for (uint32_t i = 0; i < 4; i++)
 	{
 		layers[i] = i;
 		layerpri[i] = m_k055555->K055555_read_register(pris[i]);
 	}
-	
+
 	konami_sortlayers4(layers, layerpri);
-	
+
 	screen.priority().fill(0, cliprect);
-	
+
 	const uint32_t input_enables = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 
 	// TODO: FIX COLORBASES
@@ -229,10 +229,10 @@ uint32_t piratesh_state::screen_update_piratesh(screen_device &screen, bitmap_rg
 			m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[i], 0, 1 << i);
 		}
 	}
-	
+
 	if (input_enables & K55_INP_SUB2)
 		m_k055673->k053247_sprites_draw(bitmap, cliprect);
-	
+
 #if 0
 #define K55_INP_VRAM_A      0x01
 #define K55_INP_VRAM_B      0x02
@@ -243,7 +243,7 @@ uint32_t piratesh_state::screen_update_piratesh(screen_device &screen, bitmap_rg
 #define K55_INP_SUB2        0x40
 #define K55_INP_SUB3        0x80
 #endif
-	
+
 	//055555: 4 to reg 7 (A PRI 0)
 	//055555: 0 to reg 8 (A PRI 1)
 	//055555: 0 to reg 9 (A COLPRI)
@@ -254,7 +254,7 @@ uint32_t piratesh_state::screen_update_piratesh(screen_device &screen, bitmap_rg
 	//055555: 18 to reg e (D PRI)
 	//055555: 0 to reg 11 (SUB2 PRI)
 	//055555: 0 to reg 12 (SUB3 PRI)
-	
+
 	//055555: 0 to reg 17 (A PAL)
 	//055555: 2 to reg 18 (B PAL)
 	//055555: 4 to reg 19 (C PAL)
@@ -262,18 +262,18 @@ uint32_t piratesh_state::screen_update_piratesh(screen_device &screen, bitmap_rg
 	//055555: 3 to reg 1d (SUB2 PAL)
 	//055555: 1 to reg 1e (SUB3 PAL)
 
-	
+
 #else
 	// LAYER, FLAGS, PRIORITY
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, K056832_DRAW_FLAG_MIRROR, 1);
 
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 2);
-	
+
 	// TODO: Fix priority
 	m_k053250->draw(bitmap, cliprect, 0x20, 0, screen.priority(), 8);
-	
+
 	m_k055673->k053247_sprites_draw(bitmap, cliprect);
-	
+
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, K056832_DRAW_FLAG_MIRROR, 4);
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, K056832_DRAW_FLAG_MIRROR, 0);
 #endif
@@ -297,7 +297,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(piratesh_state::piratesh_interrupt)
 	if (scanline == 240)
 	{
 		m_k053250->vblank_w(1);
-		
+
 		if (m_int_enable & 2)
 		{
 			m_int_status |= 2;
@@ -308,7 +308,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(piratesh_state::piratesh_interrupt)
 	if (scanline == 0)
 	{
 		m_k053250->vblank_w(0);
-		
+
 		if (m_int_enable & 4)
 		{
 			m_int_status |= 4;
@@ -341,7 +341,7 @@ WRITE16_MEMBER(piratesh_state::control1_w)
 
 WRITE16_MEMBER(piratesh_state::control2_w)
 {
-	// .... .... ...x ....		- Unknown (always 1?)
+	// .... .... ...x ....      - Unknown (always 1?)
 	// .... .... ..x. ....      - Unknown
 	// .... .... .x.. ....      - Counter out
 	// .... .... x... ....      - Counter in
@@ -363,16 +363,16 @@ WRITE16_MEMBER(piratesh_state::control2_w)
 
 WRITE16_MEMBER(piratesh_state::control3_w)
 {
-	// .... .... .... ...x		- Watchdog? (051550?)
+	// .... .... .... ...x      - Watchdog? (051550?)
 	// .... .... .... ..x.      - 056832 ROM bank control
 	// .... .... ...x ....      - Ticket dispenser enable (active high)
 	// .... .... ..x. ....      - Hopper enable (active high)
 	// .... ...x .... ....      - Unknown (always 1?)
-	
+
 	if ((data & ~0x0133) || (~data & 0x100))
 		printf("CTRL1 W: %x %x %x\n", offset, data, mem_mask);
 
-//	printf("CTRL 1: %x\n", data & 0x0010);
+//  printf("CTRL 1: %x\n", data & 0x0010);
 	machine().device<ticket_dispenser_device>("ticket")->motor_w(data & 0x0010 ? 1 : 0);
 	machine().device<ticket_dispenser_device>("hopper")->motor_w(data & 0x0020 ? 1 : 0);
 
@@ -423,7 +423,7 @@ WRITE_LINE_MEMBER(piratesh_state::k054539_nmi_gen)
 			update_interrupts();
 		}
 	}
-	
+
 	m_sound_intck = state;
 }
 
@@ -432,10 +432,10 @@ CUSTOM_INPUT_MEMBER(piratesh_state::helm_r)
 	// Appears to be a quadrature encoder
 	uint8_t xa, xb;
 	uint16_t dx = ioport("HELM")->read();
-	
+
 	xa = ((dx + 1) & 7) <= 3;
 	xb = (dx & 7) <= 3;
-	
+
 	return (xb << 1) | xa;
 }
 
@@ -443,7 +443,7 @@ CUSTOM_INPUT_MEMBER(piratesh_state::battery_r)
 {
 	// .x MB3790 /ALARM1
 	// x. MB3790 /ALARM2
-	
+
 	return 0x3;
 }
 
@@ -571,11 +571,11 @@ MACHINE_RESET_MEMBER(piratesh_state,piratesh)
 	// soften chorus(chip 0 channel 0-3), boost voice(chip 0 channel 4-7)
 	for (i=0; i<=7; i++)
 	{
-	//	m_k054539->set_gain(i, 0.5);
+	//  m_k054539->set_gain(i, 0.5);
 	}
 
-//	// soften percussions(chip 1 channel 0-7)
-//	for (i=0; i<=7; i++) m_k054539_2->set_gain(i, 0.5);
+//  // soften percussions(chip 1 channel 0-7)
+//  for (i=0; i<=7; i++) m_k054539_2->set_gain(i, 0.5);
 
 }
 
@@ -671,8 +671,8 @@ ROM_START( piratesh )
 	ROM_LOAD( "360ua-a06.15t", 0x000000, 0x80000, CRC(6816a493) SHA1(4fc4cfbc164d84bbf8d75ccd78c9f40f3273d852) )
 	ROM_LOAD( "360ua-a07.17t", 0x080000, 0x80000, CRC(af7127c5) SHA1(b525f3c6b831e3354eba46016d414bedcb3ae8dc) )
 
-//	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-//	ROM_LOAD( "piratesh.nv", 0x0000, 0x080, CRC(28df2269) SHA1(3f071c97662745a199f96964e2e79f795bd5a391) )
+//  ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+//  ROM_LOAD( "piratesh.nv", 0x0000, 0x080, CRC(28df2269) SHA1(3f071c97662745a199f96964e2e79f795bd5a391) )
 ROM_END
 
 /*           ROM       parent    machine   inp       init */

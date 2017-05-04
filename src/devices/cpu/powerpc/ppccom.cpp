@@ -1552,7 +1552,7 @@ void ppc_device::ppccom_execute_tlbl()
 	vtlb_entry flags;
 	int entrynum;
 
-	/* determine entry number; we use rand() for associativity */
+	/* determine entry number; we use machine().rand() for associativity */
 	entrynum = ((address >> 12) & 0x1f) | (machine().rand() & 0x20) | (isitlb ? 0x40 : 0);
 
 	/* determine the flags */

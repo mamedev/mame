@@ -103,7 +103,7 @@ image_init_result ql_rom_cartridge_slot_t::call_load()
 //  get_default_card_software -
 //-------------------------------------------------
 
-std::string ql_rom_cartridge_slot_t::get_default_card_software()
+std::string ql_rom_cartridge_slot_t::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("standard");
 }

@@ -9,6 +9,7 @@ Real Mahjong Haihai Seichouhen     (c)1986 Visco
 CPU:    Z80
 Sound:  AY-3-8910
         M5205
+NVRAM:  NEC D449C
 OSC:    20.000MHz
 
 driver by Nicola Salmoria
@@ -21,9 +22,6 @@ TODO:
   deviously delayed to a later part of the game).
   In themj the checks are patched out, maybe it's a bootleg?
 
-- there probably is an area of NVRAM, because credits don't go away after
-  a reset.
-
 - some unknown reads and writes.
 
 - visible area uncertain.
@@ -32,6 +30,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "screen.h"
@@ -60,8 +59,8 @@ public:
 	int m_keyboard_cmd;
 	int m_gfxbank;
 
-	DECLARE_WRITE8_MEMBER(rmhaihai_videoram_w);
-	DECLARE_WRITE8_MEMBER(rmhaihai_colorram_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(colorram_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_READ8_MEMBER(samples_r);
@@ -81,13 +80,13 @@ public:
 
 
 
-WRITE8_MEMBER(rmhaihai_state::rmhaihai_videoram_w)
+WRITE8_MEMBER(rmhaihai_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(rmhaihai_state::rmhaihai_colorram_w)
+WRITE8_MEMBER(rmhaihai_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -119,7 +118,7 @@ uint32_t rmhaihai_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 
 
-
+// TODO: this device is shared with Speed Attack
 READ8_MEMBER(rmhaihai_state::keyboard_r)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1" };
@@ -128,6 +127,7 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 	switch(space.device().safe_pc())
 	{
 		/* read keyboard */
+		case 0x0280:
 		case 0x0aba:    // rmhaihai, rmhaisei
 		case 0x0b2a:    // rmhaihib
 		case 0x0ab4:    // rmhaijin
@@ -142,6 +142,7 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 			if (ioport("KEY1")->read() & 0x8000) return 0x80;   // coin
 			return 0;
 		}
+		case 0x02aa:
 		case 0x5c7b:    // rmhaihai, rmhaisei, rmhaijin
 		case 0x5950:    // rmhaihib
 		case 0x5bf3:    // themj, but the test is NOPed out!
@@ -225,9 +226,9 @@ MACHINE_RESET_MEMBER(rmhaihai_state,themj)
 
 static ADDRESS_MAP_START( rmhaihai_map, AS_PROGRAM, 8, rmhaihai_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xb83c, 0xb83c) AM_WRITENOP    // ??
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP    // ??
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
@@ -251,8 +252,8 @@ static ADDRESS_MAP_START( themj_map, AS_PROGRAM, 8, rmhaihai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -478,6 +479,8 @@ static MACHINE_CONFIG_START( rmhaihai, rmhaihai_state )
 	MCFG_CPU_IO_MAP(rmhaihai_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rmhaihai_state,  irq0_line_hold)
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -525,6 +528,8 @@ static MACHINE_CONFIG_DERIVED( themj, rmhaihai )
 	MCFG_MACHINE_START_OVERRIDE(rmhaihai_state,themj)
 	MCFG_MACHINE_RESET_OVERRIDE(rmhaihai_state,themj)
 
+	MCFG_DEVICE_REMOVE("nvram")
+
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", themj)
 	MCFG_PALETTE_MODIFY("palette")
@@ -546,6 +551,33 @@ ROM_START( rmhaihai )
 	ROM_LOAD( "s3-4.8g",      0x04000, 0x2000, CRC(f849e75c) SHA1(4636bcaa7cddb9bc012212098a25f3c57cfc6b51) )
 	ROM_CONTINUE(             0x02000, 0x2000 )
 	ROM_LOAD( "s3-2.6g",      0x08000, 0x2000, CRC(d614532b) SHA1(99911c679ff6f990ae493bfc0b71a2fff0ef1796) )
+	ROM_CONTINUE(             0x0c000, 0x2000 )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "s0-10.8a",     0x00000, 0x4000, CRC(797c63d1) SHA1(2ff9c3c61b28c34de97c0117b7eadb409d79df46) )
+	ROM_LOAD( "s0-9.7a",      0x04000, 0x4000, CRC(b2526747) SHA1(73d0a19a5bb83e8977e94a47abbb65f9c7788c78) )
+	ROM_LOAD( "s0-8.6a",      0x08000, 0x4000, CRC(146eaa31) SHA1(0e38aab52ff9bf0d42fea24caeee6ca90d63ace2) )
+	ROM_LOAD( "s1-7.5a",      0x0c000, 0x4000, CRC(be59e742) SHA1(19d253f72f760f6350f76b313cf8aca7e3f90e8d) )
+	ROM_LOAD( "s0-12.11a",    0x10000, 0x4000, CRC(e4229389) SHA1(b14d7855b66fe03c1485cb735cb20f59f19f248f) )
+	ROM_LOAD( "s1-11.10a",    0x14000, 0x4000, CRC(029ef909) SHA1(fd867b8e1ccd5b88f18409ff17939ec8420c6131) )
+	/* 0x18000-0x1ffff empty space filled by the init function */
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "s2.13b",       0x0000, 0x0100, CRC(911d32a5) SHA1(36f2b62009918862c13f3eda05a21403b4d9607f) )
+	ROM_LOAD( "s1.13a",       0x0100, 0x0100, CRC(e9be978a) SHA1(50c7ca7a7496cb6fe5e8ce0db693ccb82dbbb8c6) )
+	ROM_LOAD( "s3.13c",       0x0200, 0x0100, CRC(609775a6) SHA1(70a787aec0852e106216a4ca9891d36aef60b189) )
+
+	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples, read directly by the main CPU */
+	ROM_LOAD( "s0-1.5g",      0x00000, 0x8000, CRC(65e55b7e) SHA1(3852fb3b37eccdcddff05d8ef4a742fcb8b63473) )
+ROM_END
+
+ROM_START( rmhaihai2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "s2_6.11g",     0x00000, 0x2000, CRC(cb962e27) SHA1(ac51b76f9b9cdbfd4a42eace645343adb7a84ff8) )
+	ROM_CONTINUE(             0x06000, 0x2000 )
+	ROM_LOAD( "s2_4.8g",      0x04000, 0x2000, CRC(8eaa1869) SHA1(f5c928e63bbfc2d8035d730f8fdba29c21de38b6) )
+	ROM_CONTINUE(             0x02000, 0x2000 )
+	ROM_LOAD( "s2_2.6g",      0x08000, 0x2000, CRC(8df9a0f6) SHA1(15dfdf3a3b40161406b594c449ad1630dfb42061) )
 	ROM_CONTINUE(             0x0c000, 0x2000 )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
@@ -698,8 +730,9 @@ DRIVER_INIT_MEMBER(rmhaihai_state,rmhaihai)
 }
 
 
-GAME( 1985, rmhaihai, 0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, rmhaihib, rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rmhaijin, 0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rmhaisei, 0,        rmhaisei, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, themj,    0,        themj,    rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Visco", "The Mah-jong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rmhaihai,  0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, newer)", MACHINE_SUPPORTS_SAVE ) // writes Homedata in NVRAM
+GAME( 1985, rmhaihai2, rmhaihai, rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rmhaihib,  rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rmhaijin,  0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rmhaisei,  0,        rmhaisei, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, themj,     0,        themj,    rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Visco", "The Mah-jong (Japan)", MACHINE_SUPPORTS_SAVE )

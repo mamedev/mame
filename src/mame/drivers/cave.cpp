@@ -124,7 +124,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start)
 	update_irq_state();
 	cave_get_sprite_info(0);
 	m_agallet_vblank_irq = 1;
-	machine().scheduler().timer_set(attotime::from_usec(2000), timer_expired_delegate(FUNC(cave_state::cave_vblank_end),this));
+	m_vblank_end_timer->adjust(attotime::from_usec(2000));
 }
 TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start_left)
 {
@@ -1988,6 +1988,8 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(cave_state,cave)
 {
+	m_vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cave_state::cave_vblank_end), this));
+
 	save_item(NAME(m_soundbuf_len));
 	save_item(NAME(m_soundbuf_data));
 

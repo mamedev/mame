@@ -22,7 +22,7 @@ DRIVER_INIT_MEMBER(triplhnt_state,triplhnt)
 }
 
 
-void triplhnt_state::triplhnt_set_collision(int code)
+void triplhnt_state::set_collision(int code)
 {
 	m_hit_code = code;
 
@@ -30,7 +30,7 @@ void triplhnt_state::triplhnt_set_collision(int code)
 }
 
 
-void triplhnt_state::triplhnt_update_misc(address_space &space, int offset)
+void triplhnt_state::update_misc(address_space &space, int offset)
 {
 	uint8_t is_witch_hunt;
 	uint8_t bit = offset >> 1;
@@ -85,13 +85,13 @@ void triplhnt_state::triplhnt_update_misc(address_space &space, int offset)
 }
 
 
-WRITE8_MEMBER(triplhnt_state::triplhnt_misc_w)
+WRITE8_MEMBER(triplhnt_state::misc_w)
 {
-	triplhnt_update_misc(space, offset);
+	update_misc(space, offset);
 }
 
 
-READ8_MEMBER(triplhnt_state::triplhnt_cmos_r)
+READ8_MEMBER(triplhnt_state::cmos_r)
 {
 	m_cmos_latch = offset;
 
@@ -99,21 +99,21 @@ READ8_MEMBER(triplhnt_state::triplhnt_cmos_r)
 }
 
 
-READ8_MEMBER(triplhnt_state::triplhnt_input_port_4_r)
+READ8_MEMBER(triplhnt_state::input_port_4_r)
 {
 	m_watchdog->watchdog_reset();
 	return ioport("0C0B")->read();
 }
 
 
-READ8_MEMBER(triplhnt_state::triplhnt_misc_r)
+READ8_MEMBER(triplhnt_state::misc_r)
 {
-	triplhnt_update_misc(space, offset);
+	update_misc(space, offset);
 	return ioport("VBLANK")->read() | m_hit_code;
 }
 
 
-READ8_MEMBER(triplhnt_state::triplhnt_da_latch_r)
+READ8_MEMBER(triplhnt_state::da_latch_r)
 {
 	int cross_x = ioport("STICKX")->read();
 	int cross_y = ioport("STICKY")->read();
@@ -138,10 +138,10 @@ static ADDRESS_MAP_START( triplhnt_map, AS_PROGRAM, 8, triplhnt_state )
 	AM_RANGE(0x0c08, 0x0c08) AM_READ_PORT("0C08")
 	AM_RANGE(0x0c09, 0x0c09) AM_READ_PORT("0C09")
 	AM_RANGE(0x0c0a, 0x0c0a) AM_READ_PORT("0C0A")
-	AM_RANGE(0x0c0b, 0x0c0b) AM_READ(triplhnt_input_port_4_r)
-	AM_RANGE(0x0c10, 0x0c1f) AM_READ(triplhnt_da_latch_r)
-	AM_RANGE(0x0c20, 0x0c2f) AM_READ(triplhnt_cmos_r) AM_SHARE("nvram")
-	AM_RANGE(0x0c30, 0x0c3f) AM_READWRITE(triplhnt_misc_r, triplhnt_misc_w)
+	AM_RANGE(0x0c0b, 0x0c0b) AM_READ(input_port_4_r)
+	AM_RANGE(0x0c10, 0x0c1f) AM_READ(da_latch_r)
+	AM_RANGE(0x0c20, 0x0c2f) AM_READ(cmos_r) AM_SHARE("nvram")
+	AM_RANGE(0x0c30, 0x0c3f) AM_READWRITE(misc_r, misc_w)
 	AM_RANGE(0x0c40, 0x0c40) AM_READ_PORT("0C40")
 	AM_RANGE(0x0c48, 0x0c48) AM_READ_PORT("0C48")
 	AM_RANGE(0x7000, 0x7fff) AM_ROM /* program */
@@ -317,7 +317,7 @@ static MACHINE_CONFIG_START( triplhnt, triplhnt_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(triplhnt_state, screen_update_triplhnt)
+	MCFG_SCREEN_UPDATE_DRIVER(triplhnt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", triplhnt)
@@ -359,4 +359,4 @@ ROM_START( triplhnt )
 ROM_END
 
 
-GAME( 1977, triplhnt, 0, triplhnt, triplhnt, triplhnt_state, triplhnt, 0, "Atari", "Triple Hunt", MACHINE_REQUIRES_ARTWORK )
+GAME( 1977, triplhnt, 0, triplhnt, triplhnt, triplhnt_state, triplhnt, 0, "Atari", "Triple Hunt", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

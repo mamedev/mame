@@ -130,11 +130,11 @@ void xbox_state::hack_eeprom()
 
 void xbox_state::machine_start()
 {
-	ohci_game_controller_device *usb_device;
+	ohci_game_controller *usb_device;
 
 	xbox_base_state::machine_start();
 	xbox_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
-	usb_device = machine().device<ohci_game_controller_device>("ohci_gamepad");
+	usb_device = machine().device<ohci_game_controller>("ohci_gamepad");
 	if (usb_device != nullptr) {
 		usb_device->initialize(machine(), ohci_usb);
 		ohci_usb->usb_ohci_plug(3, usb_device); // connect to root hub port 3, chihiro needs to use 1 and 2
@@ -170,9 +170,9 @@ static MACHINE_CONFIG_DERIVED_CLASS(xbox, xbox_base, xbox_state)
 	MCFG_CPU_PROGRAM_MAP(xbox_map)
 	MCFG_CPU_IO_MAP(xbox_map_io)
 
-	MCFG_DEVICE_MODIFY("ide:0")
+	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")
 	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "hdd", true)
-	MCFG_DEVICE_MODIFY("ide:1")
+	MCFG_DEVICE_MODIFY(":pci:09.0:ide:1")
 	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "cdrom", true)
 
 	/* sound hardware */

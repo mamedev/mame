@@ -45,39 +45,41 @@ struct pdp1_reset_param_t
 #define IOT_NO_COMPLETION_PULSE -1
 
 
-#define AND 001
-#define IOR 002
-#define XOR 003
-#define XCT 004
-#define CALJDA 007
-#define LAC 010
-#define LIO 011
-#define DAC 012
-#define DAP 013
-#define DIP 014
-#define DIO 015
-#define DZM 016
-#define ADD 020
-#define SUB 021
-#define IDX 022
-#define ISP 023
-#define SAD 024
-#define SAS 025
-#define MUS_MUL 026
-#define DIS_DIV 027
-#define JMP 030
-#define JSP 031
-#define SKP 032
-#define SFT 033
-#define LAW 034
-#define IOT 035
-#define OPR 037
-
-
 class pdp1_device : public cpu_device
 					, public pdp1_reset_param_t
 {
 public:
+	enum opcode
+	{
+		AND = 001,
+		IOR = 002,
+		XOR = 003,
+		XCT = 004,
+		CALJDA = 007,
+		LAC = 010,
+		LIO = 011,
+		DAC = 012,
+		DAP = 013,
+		DIP = 014,
+		DIO = 015,
+		DZM = 016,
+		ADD = 020,
+		SUB = 021,
+		IDX = 022,
+		ISP = 023,
+		SAD = 024,
+		SAS = 025,
+		MUS_MUL = 026,
+		DIS_DIV = 027,
+		JMP = 030,
+		JSP = 031,
+		SKP = 032,
+		SFT = 033,
+		LAW = 034,
+		IOT = 035,
+		OPR = 037
+	};
+
 	// construction/destruction
 	pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

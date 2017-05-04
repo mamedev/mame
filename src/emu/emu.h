@@ -73,6 +73,7 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "dirom.h"
 #include "diexec.h"
 #include "opresolv.h"
+#include "dipalette.h"
 #include "digfx.h"
 #include "diimage.h"
 #include "dioutput.h"

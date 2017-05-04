@@ -23,8 +23,9 @@ rom 5 and 6 are prg roms
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "sound/ym2413.h"
 #include "screen.h"
-
+#include "speaker.h"
 
 
 
@@ -168,47 +169,48 @@ uint32_t fresh_state::screen_update_fresh(screen_device &screen, bitmap_ind16 &b
 static ADDRESS_MAP_START( fresh_map, AS_PROGRAM, 16, fresh_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
-	AM_RANGE(0xC00000, 0xC0ffff) AM_RAM_WRITE( fresh_bg_2_videoram_w ) AM_SHARE( "bg_videoram_2" )
-	AM_RANGE(0xC10000, 0xC1ffff) AM_RAM_WRITE( fresh_attr_2_videoram_w ) AM_SHARE( "attr_videoram_2" )
-	AM_RANGE(0xC20000, 0xC2ffff) AM_RAM_WRITE( fresh_bg_videoram_w ) AM_SHARE( "bg_videoram" )
-	AM_RANGE(0xC30000, 0xC3ffff) AM_RAM_WRITE( fresh_attr_videoram_w ) AM_SHARE( "attr_videoram" )
+	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM_WRITE(fresh_bg_2_videoram_w) AM_SHARE("bg_videoram_2")
+	AM_RANGE(0xc10000, 0xc1ffff) AM_RAM_WRITE(fresh_attr_2_videoram_w) AM_SHARE("attr_videoram_2")
+	AM_RANGE(0xc20000, 0xc2ffff) AM_RAM_WRITE(fresh_bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0xc30000, 0xc3ffff) AM_RAM_WRITE(fresh_attr_videoram_w) AM_SHARE("attr_videoram")
 
-//  AM_RANGE(0xC70000, 0xC70001) AM_RAM
-//  AM_RANGE(0xC70002, 0xC70003) AM_RAM
-	AM_RANGE(0xC71000, 0xC71001) AM_WRITE(c71000_write)
-//  AM_RANGE(0xC72000, 0xC72001) AM_RAM
-//  AM_RANGE(0xC72002, 0xC72003) AM_RAM
-//  AM_RANGE(0xC73000, 0xC73001) AM_RAM
-//  AM_RANGE(0xC73002, 0xC73003) AM_RAM
-	AM_RANGE(0xC74000, 0xC74001) AM_WRITE(c74000_write)
-	AM_RANGE(0xC75000, 0xC75001) AM_WRITE(c75000_write)
-	AM_RANGE(0xC76000, 0xC76001) AM_WRITE(c76000_write)
-//  AM_RANGE(0xC77000, 0xC77001) AM_RAM
-//  AM_RANGE(0xC77002, 0xC77003) AM_RAM
+//  AM_RANGE(0xc70000, 0xc70001) AM_RAM
+//  AM_RANGE(0xc70002, 0xc70003) AM_RAM
+	AM_RANGE(0xc71000, 0xc71001) AM_WRITE(c71000_write)
+//  AM_RANGE(0xc72000, 0xc72001) AM_RAM
+//  AM_RANGE(0xc72002, 0xc72003) AM_RAM
+//  AM_RANGE(0xc73000, 0xc73001) AM_RAM
+//  AM_RANGE(0xc73002, 0xc73003) AM_RAM
+	AM_RANGE(0xc74000, 0xc74001) AM_WRITE(c74000_write)
+	AM_RANGE(0xc75000, 0xc75001) AM_WRITE(c75000_write)
+	AM_RANGE(0xc76000, 0xc76001) AM_WRITE(c76000_write)
+//  AM_RANGE(0xc77000, 0xc77001) AM_RAM
+//  AM_RANGE(0xc77002, 0xc77003) AM_RAM
 
 
 	// written together
-	AM_RANGE(0xC40000, 0xC417ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xC50000, 0xC517ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xc40000, 0xc417ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc50000, 0xc517ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 
-//  AM_RANGE(0xD00000, 0xD00001) AM_RAM
-//  AM_RANGE(0xD10000, 0xD10001) AM_RAM
-	AM_RANGE(0xD30000, 0xD30001) AM_WRITE(d30000_write)
-	AM_RANGE(0xD40000, 0xD40001) AM_READ_PORT("IN0") //AM_WRITENOP // checks for 0x10
-//  AM_RANGE(0xD40002, 0xD40003) AM_WRITENOP
-	AM_RANGE(0xD70000, 0xD70001) AM_READ_PORT("IN1") // checks for 0x10, dead loop if fail
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE8("ymsnd", ym2413_device, register_port_w, 0x00ff)
+	AM_RANGE(0xd10000, 0xd10001) AM_DEVWRITE8("ymsnd", ym2413_device, data_port_w, 0x00ff)
 
-	AM_RANGE(0xE00000, 0xE00001) AM_READ_PORT("DSW0") //AM_WRITENOP
-	AM_RANGE(0xE20000, 0xE20001) AM_READ_PORT("DSW1") //AM_WRITENOP
-	AM_RANGE(0xE40000, 0xE40001) AM_READ_PORT("DSW2")
-	AM_RANGE(0xE60000, 0xE60001) AM_READ_PORT("DSW3")
-	AM_RANGE(0xE80000, 0xE80001) AM_READ_PORT("IN6")
-	AM_RANGE(0xEA0000, 0xEA0001) AM_READ_PORT("IN7")
-	AM_RANGE(0xEC0000, 0xEC0001) AM_READ_PORT("IN8")
-	AM_RANGE(0xEE0000, 0xEE0001) AM_READ_PORT("IN9")
+	AM_RANGE(0xd30000, 0xd30001) AM_WRITE(d30000_write)
+	AM_RANGE(0xd40000, 0xd40001) AM_READ_PORT("IN0") //AM_WRITENOP // checks for 0x10
+//  AM_RANGE(0xd40002, 0xd40003) AM_WRITENOP
+	AM_RANGE(0xd70000, 0xd70001) AM_READ_PORT("IN1") // checks for 0x10, dead loop if fail
+
+	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("DSW0") //AM_WRITENOP
+	AM_RANGE(0xe20000, 0xe20001) AM_READ_PORT("DSW1") //AM_WRITENOP
+	AM_RANGE(0xe40000, 0xe40001) AM_READ_PORT("DSW2")
+	AM_RANGE(0xe60000, 0xe60001) AM_READ_PORT("DSW3")
+	AM_RANGE(0xe80000, 0xe80001) AM_READ_PORT("IN6")
+	AM_RANGE(0xea0000, 0xea0001) AM_READ_PORT("IN7")
+	AM_RANGE(0xec0000, 0xec0001) AM_READ_PORT("IN8")
+	AM_RANGE(0xee0000, 0xee0001) AM_READ_PORT("IN9")
 
 
-	AM_RANGE(0xF00000, 0xF0FFFF) AM_RAM
+	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
 
 
 ADDRESS_MAP_END
@@ -609,6 +611,10 @@ static MACHINE_CONFIG_START( fresh, fresh_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fresh)
 
 	/* sound hw? */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM2413, 4000000) // actual clock and type unknown
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -628,4 +634,4 @@ ROM_END
 
 
 // title shows Fruit Fresh but on resetting you get text strings of 'Dream World V2.41SI 97. 1.28'
-GAME( 1996, fresh, 0, fresh, fresh, driver_device, 0, ROT0, "Chain Leisure", "Fruit Fresh (Italy)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1996, fresh, 0, fresh, fresh, driver_device, 0, ROT0, "Chain Leisure", "Fruit Fresh (Italy)", MACHINE_NOT_WORKING )

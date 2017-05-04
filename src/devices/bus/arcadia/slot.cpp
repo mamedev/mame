@@ -206,7 +206,7 @@ image_init_result arcadia_cart_slot_device::call_load()
  get default card software
  -------------------------------------------------*/
 
-std::string arcadia_cart_slot_device::get_default_card_software()
+std::string arcadia_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("std");
 }

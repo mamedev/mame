@@ -194,7 +194,7 @@ READ16_MEMBER( k053247_device::k055673_ps_rom_word_r )
 
 	romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
 	offset = ((offset & 4) >> 1);
-		
+
 	int finoffs = (romofs * 2) + (offset * 2) + magic;
 
 	return ROM[finoffs+2] | (ROM[finoffs]<<8);
@@ -928,6 +928,9 @@ k055673_device::k055673_device(const machine_config &mconfig, const char *tag, d
 
 void k055673_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	int gfx_index = 0;
 	uint32_t total;
 
@@ -1090,6 +1093,9 @@ k053247_device::k053247_device(const machine_config &mconfig, device_type type, 
 
 void k053247_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	uint32_t total;
 	static const gfx_layout spritelayout =
 	{

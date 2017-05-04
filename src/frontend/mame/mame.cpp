@@ -226,7 +226,14 @@ int mame_machine_manager::execute()
 			valid.set_verbose(false);
 			valid.check_shared_source(*system);
 		}
+
+		// reevaluate slot options until nothing changes
+		while (mame_options::reevaluate_slot_options(m_options))
+		{
+		}
+
 #if defined(__LIBRETRO__)
+
 		retro_global_config= global_alloc(machine_config(*system, m_options));
 
 	        retro_global_machine=global_alloc(running_machine(*retro_global_config, *this));

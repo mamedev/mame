@@ -1832,7 +1832,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 			m_maincpu->pulse_start_clear();    /* pulse Start Clear line */
 			m_maincpu->set_state_int(PDP1_PC, m_maincpu->state_int(PDP1_TA));
 			m_maincpu->set_state_int(PDP1_MA, m_maincpu->state_int(PDP1_PC));
-			m_maincpu->set_state_int(PDP1_IR, LAC); /* this instruction is actually executed */
+			m_maincpu->set_state_int(PDP1_IR, pdp1_device::LAC); /* this instruction is actually executed */
 
 			m_maincpu->set_state_int(PDP1_MB, (signed)m_maincpu->space(AS_PROGRAM).read_dword(PDP1_MA<<2));
 			m_maincpu->set_state_int(PDP1_AC, m_maincpu->state_int(PDP1_MB));
@@ -1843,7 +1843,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 			m_maincpu->set_state_int(PDP1_PC, m_maincpu->state_int(PDP1_TA));
 			m_maincpu->set_state_int(PDP1_MA, m_maincpu->state_int(PDP1_PC));
 			m_maincpu->set_state_int(PDP1_AC, m_maincpu->state_int(PDP1_TW));
-			m_maincpu->set_state_int(PDP1_IR, DAC); /* this instruction is actually executed */
+			m_maincpu->set_state_int(PDP1_IR, pdp1_device::DAC); /* this instruction is actually executed */
 
 			m_maincpu->set_state_int(PDP1_MB, m_maincpu->state_int(PDP1_AC));
 			m_maincpu->space(AS_PROGRAM).write_dword(m_maincpu->state_int(PDP1_MA)<<2, m_maincpu->state_int(PDP1_MB));

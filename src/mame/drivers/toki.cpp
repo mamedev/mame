@@ -71,7 +71,7 @@ Notes:
            8 - 8kx8 EPROM (i.e. 27C64)
      BK1/BK2 - 512kx8 DIP40 mask ROM
    OBJ1/OBJ2 - 512kx8 DIP40 mask ROM
-      82S129 - Philips 82S129 1k-bit (256x4) Biploar PROM at location J3
+      82S129 - Philips 82S129 1k-bit (256x4) Bipolar PROM at location J3
       82S135 - Philips 82S135 2k-bit (256x8) Bipolar PROM at location B6
       LA4460 - Sanyo LA4460 12W Power AMP
    SEI0100BU - Custom chip marked 'SEI0100BU YM3931' (SDIP64)
@@ -615,6 +615,10 @@ ROM_START( toki )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 
@@ -657,6 +661,10 @@ ROM_START( tokip )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9 1-M",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) ) //
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 ROM_START( tokia )
@@ -686,6 +694,10 @@ ROM_START( tokia )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 ROM_START( tokiua )
@@ -715,6 +727,10 @@ ROM_START( tokiua )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 
@@ -745,6 +761,10 @@ ROM_START( tokiu )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 ROM_START( juju )
@@ -774,6 +794,10 @@ ROM_START( juju )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 ROM_START( jujuba )

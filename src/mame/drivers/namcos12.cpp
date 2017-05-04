@@ -1423,7 +1423,7 @@ WRITE16_MEMBER(namcos12_state::tektagt_protection_2_w)
 	switch (offset)
 	{
 	case 0:
-		// Writes are 0 or rand(), only used as a "start prot value write" trigger
+		// Writes are 0 or machine().rand(), only used as a "start prot value write" trigger
 		m_ttt_cnt = 0;
 		break;
 	case 1:

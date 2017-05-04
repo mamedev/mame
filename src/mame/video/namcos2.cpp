@@ -7,14 +7,11 @@
 #include "includes/namcos2.h"
 #include "includes/namcoic.h"
 
-static void
-TilemapCB( running_machine &machine, uint16_t code, int *tile, int *mask )
-//void namcos2_shared_state::tilemap_cb(uint16_t code, int *tile, int *mask)
+void namcos2_state::TilemapCB(uint16_t code, int *tile, int *mask)
 {
 	*mask = code;
 
-	namcos2_shared_state *state = machine.driver_data<namcos2_shared_state>();
-	switch( state->m_gametype )
+	switch( m_gametype )
 	{
 	case NAMCOS2_FINAL_LAP_2:
 	case NAMCOS2_FINAL_LAP_3:
@@ -401,7 +398,7 @@ void namcos2_state::draw_sprite_init()
 
 void namcos2_state::video_start()
 {
-	namco_tilemap_init(2, memregion("gfx4")->base(), TilemapCB);
+	c123_tilemap_init(2, memregion("gfx4")->base(), namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	m_tilemap_roz = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_state::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8,8,256,256);
 	m_tilemap_roz->set_transparent_pen(0xff);
 	draw_sprite_init();
@@ -433,7 +430,7 @@ uint32_t namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	{
 		if( (pri&1)==0 )
 		{
-			namco_tilemap_draw( screen, bitmap, clip, pri/2 );
+			c123_tilemap_draw( screen, bitmap, clip, pri/2 );
 
 			if( ((m_gfx_ctrl & 0x7000) >> 12)==pri/2 )
 			{
@@ -449,7 +446,7 @@ uint32_t namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 void namcos2_state::video_start_finallap()
 {
-	namco_tilemap_init(2,memregion("gfx4")->base(),TilemapCB);
+	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	draw_sprite_init();
 }
 
@@ -466,7 +463,7 @@ uint32_t namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind
 	{
 		if( (pri&1)==0 )
 		{
-			namco_tilemap_draw( screen, bitmap, clip, pri/2 );
+			c123_tilemap_draw( screen, bitmap, clip, pri/2 );
 		}
 		m_c45_road->draw(bitmap,clip,pri);
 		draw_sprites(screen,bitmap,clip,pri,m_gfx_ctrl );
@@ -478,7 +475,7 @@ uint32_t namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind
 
 void namcos2_state::video_start_luckywld()
 {
-	namco_tilemap_init(2,memregion("gfx4")->base(),TilemapCB);
+	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	c355_obj_init( 0, 0x0, namcos2_shared_state::c355_obj_code2tile_delegate() );
 	if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
 	{
@@ -499,7 +496,7 @@ uint32_t namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind
 	{
 		if( (pri&1)==0 )
 		{
-			namco_tilemap_draw( screen, bitmap, clip, pri/2 );
+			c123_tilemap_draw( screen, bitmap, clip, pri/2 );
 		}
 		m_c45_road->draw(bitmap,clip,pri);
 		if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
@@ -515,7 +512,7 @@ uint32_t namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind
 
 void namcos2_state::video_start_sgunner()
 {
-	namco_tilemap_init(2,memregion("gfx4")->base(),TilemapCB);
+	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	c355_obj_init( 0, 0x0, namcos2_shared_state::c355_obj_code2tile_delegate() );
 }
 
@@ -530,7 +527,7 @@ uint32_t namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind1
 
 	for( pri=0; pri<8; pri++ )
 	{
-		namco_tilemap_draw( screen, bitmap, clip, pri );
+		c123_tilemap_draw( screen, bitmap, clip, pri );
 		c355_obj_draw(screen, bitmap, clip, pri );
 	}
 	return 0;
@@ -541,7 +538,7 @@ uint32_t namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind1
 
 void namcos2_state::video_start_metlhawk()
 {
-	namco_tilemap_init(2,memregion("gfx4")->base(),TilemapCB);
+	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	c169_roz_init(1, "gfx5");
 }
 
@@ -558,7 +555,7 @@ uint32_t namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind
 	{
 		if( (pri&1)==0 )
 		{
-			namco_tilemap_draw( screen, bitmap, clip, pri/2 );
+			c123_tilemap_draw( screen, bitmap, clip, pri/2 );
 		}
 		c169_roz_draw(screen, bitmap, clip, pri);
 		draw_sprites_metalhawk(screen,bitmap,clip,pri );

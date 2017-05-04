@@ -20,6 +20,7 @@
 #include <thread>
 #include <mutex>
 #include <algorithm>
+#include <utility>
 
 // ----------------------------------------------------------------------------------------
 // timed queue
@@ -54,22 +55,11 @@ namespace netlist
 	{
 		constexpr pqentry_t() noexcept : m_exec_time(), m_object(nullptr) { }
 		constexpr pqentry_t(const Time &t, const Element &o) noexcept : m_exec_time(t), m_object(o) { }
-		constexpr pqentry_t(const pqentry_t &e) noexcept : m_exec_time(e.m_exec_time), m_object(e.m_object) { }
-		pqentry_t(pqentry_t &&e) noexcept { swap(e); }
 		~pqentry_t() = default;
-
-		pqentry_t& operator=(pqentry_t && other) noexcept
-		{
-			swap(other);
-			return *this;
-		}
-
-		pqentry_t& operator=(const pqentry_t &other) noexcept
-		{
-			pqentry_t t(other);
-			swap(t);
-			return *this;
-		}
+		constexpr pqentry_t(const pqentry_t &e) noexcept = default;
+		constexpr pqentry_t(pqentry_t &&e) = default;
+		pqentry_t& operator=(pqentry_t && other) noexcept = default;
+		pqentry_t& operator=(const pqentry_t &other) noexcept = default;
 
 		void swap(pqentry_t &other) noexcept
 		{
@@ -120,10 +110,10 @@ namespace netlist
 		{
 			/* Lock */
 			tqlock lck(m_lock);
-			T * i = m_end;
+			T * i(m_end);
 			for (; QueueOp::less(*(i - 1), e); --i)
 			{
-				*(i) = *(i-1);
+				*(i) = std::move(*(i-1));
 				m_prof_sortmove.inc();
 			}
 			*i = std::move(e);
@@ -139,12 +129,12 @@ namespace netlist
 		{
 			/* Lock */
 			tqlock lck(m_lock);
-			for (T * i = m_end - 1; i > &m_list[0]; i--)
+			for (T * i = m_end - 1; i > &m_list[0]; --i)
 			{
 				if (QueueOp::equal(*i, elem))
 				{
-					m_end--;
-					for (;i < m_end; i++)
+					--m_end;
+					for (;i < m_end; ++i)
 						*i = std::move(*(i+1));
 					return;
 				}
@@ -155,7 +145,7 @@ namespace netlist
 		{
 			/* Lock */
 			tqlock lck(m_lock);
-			for (T * i = m_end - 1; i > &m_list[0]; i--)
+			for (T * i = m_end - 1; i > &m_list[0]; --i)
 			{
 				if (QueueOp::equal(*i, elem)) // partial equal!
 				{
@@ -163,12 +153,12 @@ namespace netlist
 					while (QueueOp::less(*(i-1), *i))
 					{
 						std::swap(*(i-1), *i);
-						i--;
+						--i;
 					}
 					while (i < m_end && QueueOp::less(*i, *(i+1)))
 					{
 						std::swap(*(i+1), *i);
-						i++;
+						++i;
 					}
 					return;
 				}
@@ -189,9 +179,9 @@ namespace netlist
 
 		// save state support & mame disasm
 
-		constexpr const T *listptr() const { return &m_list[1]; }
+		constexpr const T *listptr() const noexcept { return &m_list[1]; }
 		constexpr std::size_t size() const noexcept { return static_cast<std::size_t>(m_end - &m_list[1]); }
-		constexpr const T & operator[](const std::size_t index) const { return m_list[ 1 + index]; }
+		constexpr const T & operator[](const std::size_t index) const noexcept { return m_list[ 1 + index]; }
 	private:
 	#if HAS_OPENMP && USE_OPENMP
 		using tqmutex = pspin_mutex<true>;
@@ -217,7 +207,7 @@ namespace netlist
 
 		struct compare
 		{
-			bool operator()(const T &a, const T &b) { return QueueOp::less(b,a); }
+			constexpr bool operator()(const T &a, const T &b) const { return QueueOp::less(b,a); }
 		};
 
 		explicit timed_queue(const std::size_t list_size)

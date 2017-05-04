@@ -122,8 +122,12 @@
 #include "cpu/mb86235/mb86235.h"
 #include "cpu/sharc/sharc.h"
 #include "cpu/z80/z80.h"
+#include "machine/clock.h"
+#include "machine/cxd1095.h"
 #include "machine/eepromser.h"
+#include "machine/msm6253.h"
 #include "machine/nvram.h"
+#include "machine/315_5296.h"
 #include "sound/2612intf.h"
 #include "video/segaic24.h"
 #include "speaker.h"
@@ -406,6 +410,8 @@ MACHINE_RESET_MEMBER(model2_state,model2_common)
 	m_timers[3] = machine().device<timer_device>("timer3");
 	for (i=0; i<4; i++)
 		m_timers[i]->reset();
+
+	m_uart->write_cts(0);
 }
 
 MACHINE_RESET_MEMBER(model2_state,model2o)
@@ -1230,59 +1236,37 @@ WRITE32_MEMBER(model2_state::model2_irq_w)
 /* TODO: rewrite this part. It's a 8251-compatible chip */
 READ32_MEMBER(model2_state::model2_serial_r)
 {
-	if ((offset == 0) && (mem_mask == 0xffff0000))
+	if (offset == 0)
 	{
-		return 0x00070000;  // TxRdy RxRdy (zeroguna also needs bit 4 set)
+		u32 result = 0;
+		if (ACCESSING_BITS_0_7 && (offset == 0))
+			result |= m_uart->data_r(space, 0);
+		if (ACCESSING_BITS_16_23 && (offset == 0))
+			result |= m_uart->status_r(space, 0) << 16;
+		return result;
 	}
 
 	return 0xffffffff;
 }
 
 
-WRITE32_MEMBER(model2_state::model2o_serial_w)
-{
-	if(mem_mask == 0xffff0000)
-	{
-		//m_soundack++;
-	}
-	if (mem_mask == 0x0000ffff)
-	{
-		if (!m_m1audio->ready_r(space, 0))
-		{
-			space.device().execute().spin_until_time(attotime::from_usec(40));
-		}
-
-		m_m1audio->write_fifo(data & 0xff);
-
-		// give the 68k time to notice
-		space.device().execute().spin_until_time(attotime::from_usec(40));
-	}
-}
-
 WRITE32_MEMBER(model2_state::model2_serial_w)
 {
 	if (ACCESSING_BITS_0_7 && (offset == 0))
 	{
-		if (m_dsbz80 != nullptr)
+		m_uart->data_w(space, 0, data & 0xff);
+
+		if (m_scsp.found())
 		{
-			m_dsbz80->latch_w(space, 0, data&0xff);
+			m_scsp->midi_in(space, 0, data&0xff, 0);
+
+			// give the 68k time to notice
+			space.device().execute().spin_until_time(attotime::from_usec(40));
 		}
-
-		// for Manx TT DX
-		if (m_m1audio != nullptr)
-		{
-			if (!m_m1audio->ready_r(space, 0))
-			{
-				space.device().execute().spin_until_time(attotime::from_usec(40));
-			}
-
-			m_m1audio->write_fifo(data & 0xff);
-		}
-
-		m_scsp->midi_in(space, 0, data&0xff, 0);
-
-		// give the 68k time to notice
-		space.device().execute().spin_until_time(attotime::from_usec(40));
+	}
+	if (ACCESSING_BITS_16_23 && (offset == 0))
+	{
+		m_uart->control_w(space, 0, (data >> 16) & 0xff);
 	}
 }
 
@@ -1575,7 +1559,7 @@ static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
 	AM_RANGE(0x00980004, 0x00980007) AM_READ(model2o_fifoctrl_r)
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w)
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2o_serial_w)
+	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w)
 
 	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_SHARE("textureram0")   // texture RAM 0
 	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_SHARE("textureram1")   // texture RAM 1
@@ -1590,7 +1574,7 @@ static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01c00100, 0x01c0010f) AM_READ8(virtuacop_lightgun_r,0x00ff00ff)
 	AM_RANGE(0x01c00110, 0x01c00113) AM_READ8(virtuacop_lightgun_offscreen_r,0x00ff00ff)
 	AM_RANGE(0x01c00200, 0x01c002ff) AM_RAM AM_SHARE("backup2")
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2o_serial_w )
+	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w)
 
 	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
@@ -1615,7 +1599,7 @@ static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w)
 	AM_RANGE(0x00980014, 0x00980017) AM_READ(copro_status_r)
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w )
+	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w)
 
 	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_SHARE("textureram0")   // texture RAM 0
 	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_SHARE("textureram1")   // texture RAM 1
@@ -1630,7 +1614,7 @@ static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ(hotd_lightgun_r)
 	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE(analog_2b_w )
 	AM_RANGE(0x01c00040, 0x01c00043) AM_WRITENOP
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w )
+	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w)
 
 	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
@@ -1652,7 +1636,7 @@ static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00980014, 0x00980017) AM_READ(copro_status_r)
 	//AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_sharc_ctl1_w )
 
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w )
+	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w)
 
 	AM_RANGE(0x11000000, 0x110fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
 	AM_RANGE(0x11100000, 0x111fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
@@ -1671,7 +1655,7 @@ static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ(hotd_lightgun_r)
 	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE(analog_2b_w )
 	AM_RANGE(0x01c00040, 0x01c00043) AM_WRITENOP
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w )
+	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w)
 
 	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
@@ -1687,7 +1671,7 @@ static ADDRESS_MAP_START( model2c_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w )
 	AM_RANGE(0x00980014, 0x00980017) AM_READ(copro_status_r)
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w )
+	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE(model2_serial_r, model2_serial_w)
 
 	AM_RANGE(0x11000000, 0x111fffff) AM_RAM AM_SHARE("textureram0") // texture RAM 0 (2b/2c)
 	AM_RANGE(0x11200000, 0x113fffff) AM_RAM AM_SHARE("textureram1") // texture RAM 1 (2b/2c)
@@ -2428,6 +2412,14 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
 	MCFG_SEGAM1AUDIO_ADD("m1audio")
+	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
+
+	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("m1audio", segam1audio_device, write_txd))
+
+	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
@@ -2482,11 +2474,21 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
+	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
+
+	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( manxttdx, model2a ) /* Includes a Model 1 Sound board for additional sounds - Deluxe version only */
 	MCFG_SEGAM1AUDIO_ADD("m1audio")
+	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
+
+	MCFG_DEVICE_MODIFY("uart")
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("m1audio", segam1audio_device, write_txd))
 MACHINE_CONFIG_END
 
 uint16_t model2_state::crypt_read_callback(uint32_t addr)
@@ -2505,7 +2507,12 @@ static MACHINE_CONFIG_DERIVED( model2a_0229, model2a )
 //  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-READ8_MEMBER(model2_state::driveio_port_r)
+READ8_MEMBER(model2_state::driveio_portg_r)
+{
+	return m_driveio_comm_data;
+}
+
+READ8_MEMBER(model2_state::driveio_porth_r)
 {
 	return m_driveio_comm_data;
 }
@@ -2516,13 +2523,6 @@ WRITE8_MEMBER(model2_state::driveio_port_w)
 //  popmessage("%02x",data);
 }
 
-READ8_MEMBER(model2_state::driveio_port_str_r)
-{
-	static const char sega_str[4] = { 'S', 'E', 'G', 'A' };
-
-	return sega_str[offset];
-}
-
 static ADDRESS_MAP_START( drive_map, AS_PROGRAM, 8, model2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
@@ -2531,11 +2531,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( drive_io_map, AS_IO, 8, model2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP //watchdog
-	AM_RANGE(0x23, 0x23) AM_WRITE(driveio_port_w)
-	AM_RANGE(0x26, 0x27) AM_READ(driveio_port_r)
-	AM_RANGE(0x28, 0x2b) AM_READ(driveio_port_str_r)
-	AM_RANGE(0x40, 0x4f) AM_WRITENOP //Oki M6253
-	AM_RANGE(0x80, 0x83) AM_NOP //r/w it during irq
+	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("driveio1", sega_315_5296_device, read, write)
+	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("driveio2", sega_315_5296_device, read, write)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("driveadc", msm6253_device, d7_r, address_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( srallyc, model2a )
@@ -2544,6 +2542,15 @@ static MACHINE_CONFIG_DERIVED( srallyc, model2a )
 	MCFG_CPU_PROGRAM_MAP(drive_map)
 	MCFG_CPU_IO_MAP(drive_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", model2_state,  irq0_line_hold)
+
+	MCFG_DEVICE_ADD("driveio1", SEGA_315_5296, 0) // unknown clock
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(model2_state, driveio_port_w))
+	MCFG_315_5296_IN_PORTG_CB(READ8(model2_state, driveio_portg_r))
+	MCFG_315_5296_IN_PORTH_CB(READ8(model2_state, driveio_porth_r))
+
+	MCFG_DEVICE_ADD("driveio2", SEGA_315_5296, 0) // unknown clock
+
+	MCFG_DEVICE_ADD("driveadc", MSM6253, 0)
 MACHINE_CONFIG_END
 
 /* 2B-CRX */
@@ -2599,6 +2606,12 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
+	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
+
+	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
@@ -2611,6 +2624,25 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( model2b_0229, model2b )
 	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
 //  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
+MACHINE_CONFIG_END
+
+
+static ADDRESS_MAP_START( rchase2_iocpu_map, AS_PROGRAM, 8, model2_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rchase2_ioport_map, AS_IO, 8, model2_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE("ioexp", cxd1095_device, read, write)
+ADDRESS_MAP_END
+
+static MACHINE_CONFIG_DERIVED( rchase2, model2b )
+	MCFG_CPU_ADD("iocpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(rchase2_iocpu_map)
+	MCFG_CPU_IO_MAP(rchase2_ioport_map)
+
+	MCFG_DEVICE_ADD("ioexp", CXD1095, 0)
 MACHINE_CONFIG_END
 
 
@@ -2664,6 +2696,12 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
+	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
+
+	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
 
@@ -2671,6 +2709,9 @@ static MACHINE_CONFIG_DERIVED( stcc, model2c )
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_DEVICE_MODIFY("uart")
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( model2c_5881, model2c )
@@ -4659,14 +4700,14 @@ ROM_START( rchase2 ) /* Rail Chase 2 Revision A, Model 2B. Sega game ID# 833-118
 	ROM_LOAD32_WORD("epr-18075a.14", 0x100002, 0x080000, CRC(b82672e4) SHA1(519fdb5a978b6e82989b9841c6b59819f0d417cb) )
 
 	ROM_REGION32_LE( 0x2000000, "user1", 0 ) // Data
-	ROM_LOAD32_WORD("mpr-18037.11",    0x0000000, 0x200000, CRC(dea8f896) SHA1(8eb45e46bd14a2ffbdaac47d381a1ea9b9a03ca2) )
-	ROM_LOAD32_WORD("mpr-18038.12",    0x0000002, 0x200000, CRC(441f7709) SHA1(cbfa687839b6cad6a5ace45b44b95c45e4cfab0d) )
-	ROM_LOAD32_WORD("mpr-18039.9",     0x0800000, 0x200000, CRC(b98c6f06) SHA1(dd1ff9c682778de1c6c09e7a5cbc95a8149488c4) )
-	ROM_LOAD32_WORD("mpr-18040.10",    0x0800002, 0x200000, CRC(0d872667) SHA1(33e56486ec6b953341552b6bc21dc66f6f8aaf74) )
-	ROM_LOAD32_WORD("mpr-18041.7",     0x1000000, 0x200000, CRC(e511ab0a) SHA1(c6ea14b3bdefdc59603bd2fc152ac0421fae4d6f) )
-	ROM_LOAD32_WORD("mpr-18042.8",     0x1000002, 0x200000, CRC(e9a04159) SHA1(0204ba86af2707bc9e277cac68dd9ef759189c23) )
-	ROM_LOAD32_WORD("mpr-18043.5",     0x1800000, 0x200000, CRC(ff84dfd6) SHA1(82833bf4cb1f367aea5fec6cffb7023cbbd3c8cb) )
-	ROM_LOAD32_WORD("mpr-18044.6",     0x1800002, 0x200000, CRC(ab9b406d) SHA1(62e95ceea6f71eedbebae59e188aac03e6129e62) )
+	ROM_LOAD32_WORD("mpr-18037.11",  0x000000, 0x200000, CRC(dea8f896) SHA1(8eb45e46bd14a2ffbdaac47d381a1ea9b9a03ca2) )
+	ROM_LOAD32_WORD("mpr-18038.12",  0x000002, 0x200000, CRC(441f7709) SHA1(cbfa687839b6cad6a5ace45b44b95c45e4cfab0d) )
+	ROM_LOAD32_WORD("mpr-18039.9",   0x400000, 0x200000, CRC(b98c6f06) SHA1(dd1ff9c682778de1c6c09e7a5cbc95a8149488c4) )
+	ROM_LOAD32_WORD("mpr-18040.10",  0x400002, 0x200000, CRC(0d872667) SHA1(33e56486ec6b953341552b6bc21dc66f6f8aaf74) )
+	ROM_LOAD32_WORD("mpr-18041.7",   0x800000, 0x200000, CRC(e511ab0a) SHA1(c6ea14b3bdefdc59603bd2fc152ac0421fae4d6f) )
+	ROM_LOAD32_WORD("mpr-18042.8",   0x800002, 0x200000, CRC(e9a04159) SHA1(0204ba86af2707bc9e277cac68dd9ef759189c23) )
+	ROM_LOAD32_WORD("mpr-18043.5",   0xc00000, 0x200000, CRC(ff84dfd6) SHA1(82833bf4cb1f367aea5fec6cffb7023cbbd3c8cb) )
+	ROM_LOAD32_WORD("mpr-18044.6",   0xc00002, 0x200000, CRC(ab9b406d) SHA1(62e95ceea6f71eedbebae59e188aac03e6129e62) )
 
 	ROM_REGION( 0x800000, "user5", ROMREGION_ERASEFF ) // Coprocessor Data ROM
 	/* empty?? */
@@ -6147,7 +6188,7 @@ GAME( 1997, zerogunj,  zerogun, model2b_5881, model2,  model2_state,  zerogun, R
 GAME( 1998, dynamcopb,dynamcop, model2b_5881, model2,  model2_state,  genprot, ROT0, "Sega",   "Dynamite Cop (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dyndeka2b,dynamcop, model2b_5881, model2,  model2_state,  genprot, ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkids,         0, model2b_5881, model2,  model2_state,  pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2B, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, rchase2,         0, model2b,      rchase2, model2_state,  rchase2, ROT0, "Sega",   "Rail Chase 2 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, rchase2,         0, rchase2,      rchase2, model2_state,  rchase2, ROT0, "Sega",   "Rail Chase 2 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
 GAME( 1996, skisuprg,        0, model2c,      model2,  driver_device, 0,       ROT0, "Sega",   "Sega Ski Super G", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )

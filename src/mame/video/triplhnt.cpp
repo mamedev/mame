@@ -23,6 +23,16 @@ void triplhnt_state::video_start()
 	m_screen->register_screen_bitmap(m_helper);
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(triplhnt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+
+	m_hit_timer = timer_alloc(TIMER_HIT);
+
+	save_item(NAME(m_cmos));
+	save_item(NAME(m_da_latch));
+	save_item(NAME(m_misc_flags));
+	save_item(NAME(m_cmos_latch));
+	save_item(NAME(m_hit_code));
+	save_item(NAME(m_sprite_zoom));
+	save_item(NAME(m_sprite_bank));
 }
 
 
@@ -31,7 +41,7 @@ void triplhnt_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 	case TIMER_HIT:
-		triplhnt_set_collision(param);
+		set_collision(param);
 		break;
 	default:
 		assert_always(false, "Unknown id in triplhnt_state::device_timer");
@@ -41,12 +51,10 @@ void triplhnt_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
 	int hit_line = 999;
 	int hit_code = 999;
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		rectangle rect;
 
@@ -107,11 +115,11 @@ void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 
 	if (hit_line != 999 && hit_code != 999)
-		timer_set(m_screen->time_until_pos(hit_line), TIMER_HIT, hit_code);
+		m_hit_timer->adjust(m_screen->time_until_pos(hit_line), hit_code);
 }
 
 
-uint32_t triplhnt_state::screen_update_triplhnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t triplhnt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->mark_all_dirty();
 

@@ -184,7 +184,7 @@ void cesblit_device::do_blit()
 #endif
 
 	sx &= 0x1ff;
-	sw &= 0x1ff;	// can be 0: draw nothing (see e.g. fade-in effect in galgame3/diamond derby)
+	sw &= 0x1ff;    // can be 0: draw nothing (see e.g. fade-in effect in galgame3/diamond derby)
 
 	sy &= 0x1ff;
 	sh &= 0x1ff;

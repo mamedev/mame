@@ -72,7 +72,7 @@ namespace netlist
 		m_RV.set(NL_FCONST(1.0) / R_LOW, 0.0, 0.0);
 		m_inc = netlist_time::from_double(1.0 / m_FREQ());
 		if (m_FREQ() < 24000 || m_FREQ() > 56000)
-		log().warning(MW_1_FREQUENCY_OUTSIDE_OF_SPECS_1, m_FREQ());
+			log().warning(MW_1_FREQUENCY_OUTSIDE_OF_SPECS_1, m_FREQ());
 
 		m_shift = 0x1ffff;
 		m_is_timestep = m_RV.m_P.net().solver()->is_timestep();
@@ -82,7 +82,7 @@ namespace netlist
 	{
 		m_inc = netlist_time::from_double(1.0 / m_FREQ());
 		if (m_FREQ() < 24000 || m_FREQ() > 56000)
-		log().warning(MW_1_FREQUENCY_OUTSIDE_OF_SPECS_1, m_FREQ());
+			log().warning(MW_1_FREQUENCY_OUTSIDE_OF_SPECS_1, m_FREQ());
 	}
 
 	NETLIB_UPDATE(MM5837_dip)

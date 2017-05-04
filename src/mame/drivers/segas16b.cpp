@@ -3638,7 +3638,9 @@ static MACHINE_CONFIG_START( system16b, segas16b_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system16b_mc8123, system16b )
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_REPLACE("soundcpu", MC8123, MASTER_CLOCK_10MHz/2)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
@@ -3987,7 +3989,7 @@ ROM_START( aliensyn7 )
 	ROM_LOAD( "epr-10725.a9",  0x20000, 0x8000, CRC(6a50e08f) SHA1(d34b2ccadb8b07d5ad99cab5c5b5b79642c65574) )
 	ROM_LOAD( "epr-10726.a10", 0x30000, 0x8000, CRC(d50b7736) SHA1(b1f8e3b0cf2ffee5382098100cfabe21b383cd51) )
 
-	ROM_REGION( 0x2000, "mc8123", 0 ) // MC8123 key
+	ROM_REGION( 0x2000, "soundcpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "317-00xx.key",  0x0000, 0x2000, CRC(76b370cd) SHA1(996a4a24dec085caf93cbe614d3b0888379c91dd) )
 ROM_END
 
@@ -4279,7 +4281,7 @@ ROM_START( altbeast4 )
 	ROM_LOAD( "opr-11672.a11", 0x10000, 0x20000, CRC(bbd7f460) SHA1(bbc5c2219cb3a827d84062b19affd9780da2a3cf) )
 	ROM_LOAD( "opr-11673.a12", 0x30000, 0x20000, CRC(400c4a36) SHA1(de4bdfa91734410e0a7f6a16bf8336db172f458a) )
 
-	ROM_REGION( 0x2000, "mc8123", 0 ) // MC8123 key
+	ROM_REGION( 0x2000, "soundcpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "317-0066.key",  0x0000, 0x2000, CRC(ed85a054) SHA1(dcc84ec077a8a489f45abfd2bf4a9ba377da28a5) )
 ROM_END
 
@@ -4395,7 +4397,7 @@ ROM_START( altbeast2 )
 	ROM_LOAD( "opr-11672.a11", 0x10000, 0x20000, CRC(bbd7f460) SHA1(bbc5c2219cb3a827d84062b19affd9780da2a3cf) )
 	ROM_LOAD( "opr-11673.a12", 0x30000, 0x20000, CRC(400c4a36) SHA1(de4bdfa91734410e0a7f6a16bf8336db172f458a) )
 
-	ROM_REGION( 0x2000, "mc8123", 0 ) // MC8123 key
+	ROM_REGION( 0x2000, "soundcpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "317-0066.key",  0x0000, 0x2000, CRC(ed85a054) SHA1(dcc84ec077a8a489f45abfd2bf4a9ba377da28a5) )
 ROM_END
 
@@ -7055,7 +7057,7 @@ ROM_START( cencourt )
 	ROM_LOAD( "epr-a-10.a10", 0x30000, 0x08000, CRC(10263746) SHA1(1f981fb185c6a9795208ecdcfba36cf892a99ed5) ) // == epr-11860.a10
 	ROM_LOAD( "epr-a-11.a11", 0x40000, 0x08000, CRC(38b54a71) SHA1(68ec4ef5b115844214ff2213be1ce6678904fbd2) ) // == epr-11861.a11
 
-	ROM_REGION( 0x2000, "mc8123", 0 ) // MC8123 key
+	ROM_REGION( 0x2000, "soundcpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "mc-8123b_center_court.key",  0x0000, 0x2000, CRC(2be5c90b) SHA1(e98d989237f2b001950b876efdb21c1507162830) ) // No official 317-xxxx number
 ROM_END
 
@@ -7487,7 +7489,7 @@ ROM_START( shinobi4 )
 	ROM_LOAD( "epr-11377.a10", 0x00000, 0x08000, CRC(0fb6af34) SHA1(ae9da18bd2db317ed96c5f642f90cc1eba60ba99) ) // MC8123B (317-0054) encrypted version of epr-11361.a10 above
 	ROM_LOAD( "epr-11362.a11", 0x10000, 0x20000, CRC(256af749) SHA1(041bd007ea7708c6d69f07865828b9bd17a139f5) )
 
-	ROM_REGION( 0x2000, "mc8123", 0 ) // MC8123 key
+	ROM_REGION( 0x2000, "soundcpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "317-0054.key",  0x0000, 0x2000, CRC(39fd4535) SHA1(93bbb139d2d5acc6a1e338d92077e79a5e880b2e) )
 ROM_END
 
@@ -7525,7 +7527,7 @@ ROM_START( shinobi3 )
 	ROM_LOAD( "epr-11288.a8", 0x10000, 0x8000, CRC(c8df8460) SHA1(0aeb41a493df155edb5f600f53ec43b798927dff) )
 	ROM_LOAD( "epr-11289.a9", 0x20000, 0x8000, CRC(e5a4cf30) SHA1(d1982da7a550c11ab2253f5d64ac6ab847da0a04) )
 
-	ROM_REGION( 0x2000, "mc8123", 0 ) // MC8123 key
+	ROM_REGION( 0x2000, "soundcpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "317-0054.key",  0x0000, 0x2000, CRC(39fd4535) SHA1(93bbb139d2d5acc6a1e338d92077e79a5e880b2e) )
 ROM_END
 
@@ -8631,7 +8633,7 @@ DRIVER_INIT_MEMBER(segas16b_state,aceattac_5358)
 DRIVER_INIT_MEMBER(segas16b_state,aliensyn7_5358_small)
 {
 	DRIVER_INIT_CALL(generic_5358_small);
-	mc8123_decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, memregion("mc8123")->base(), 0x8000);
+	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
 
@@ -8650,7 +8652,7 @@ DRIVER_INIT_MEMBER(segas16b_state,altbeas5_5521)
 DRIVER_INIT_MEMBER(segas16b_state,altbeas4_5521)
 {
 	DRIVER_INIT_CALL(generic_5521);
-	mc8123_decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, memregion("mc8123")->base(), 0x8000);
+	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,ddux_5704)
@@ -8699,7 +8701,7 @@ DRIVER_INIT_MEMBER(segas16b_state,passshtj_5358)
 DRIVER_INIT_MEMBER(segas16b_state,cencourt_5358)
 {
 	DRIVER_INIT_CALL(passshtj_5358);
-	mc8123_decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, memregion("mc8123")->base(), 0x8000);
+	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
@@ -8724,13 +8726,13 @@ DRIVER_INIT_MEMBER(segas16b_state,defense_5358_small)
 DRIVER_INIT_MEMBER(segas16b_state,shinobi4_5521)
 {
 	DRIVER_INIT_CALL(generic_5521);
-	mc8123_decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, memregion("mc8123")->base(), 0x8000);
+	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,shinobi3_5358)
 {
 	DRIVER_INIT_CALL(generic_5358);
-	mc8123_decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, memregion("mc8123")->base(), 0x8000);
+	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,sjryuko_5358_small)

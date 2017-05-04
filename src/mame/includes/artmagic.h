@@ -61,6 +61,7 @@ public:
 	uint16_t m_blitter_data[8];
 	uint8_t m_blitter_page;
 	attotime m_blitter_busy_until;
+	emu_timer * m_irq_off_timer;
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(ultennis_hack_r);
 	DECLARE_WRITE16_MEMBER(protection_bit_w);

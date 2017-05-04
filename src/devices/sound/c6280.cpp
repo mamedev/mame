@@ -28,7 +28,7 @@
       game will reset the index prior to playback so this isn't an issue.
 
     - While the noise emulation is complete, the data for the pseudo-random
-      bitstream is calculated by machine.rand() and is not a representation of what
+      bitstream is calculated by machine().rand() and is not a representation of what
       the actual hardware does.
 
     For some background on Hudson Soft's C62 chipset:

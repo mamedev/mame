@@ -137,7 +137,7 @@ image_init_result nes_datach_slot_device::call_load()
 }
 
 
-std::string nes_datach_slot_device::get_default_card_software()
+std::string nes_datach_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	// any way to detect the game with X24C01?
 	return software_get_default_slot("datach_rom");

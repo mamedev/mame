@@ -943,7 +943,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER( cdi_state::quizard_mcu_p1_r )
 {
-	return rand();
+	return machine().rand();
 }
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, cdi_state )

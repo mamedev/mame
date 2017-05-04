@@ -145,9 +145,9 @@ void h8_device::set_current_dma(h8_dma_state *state)
 	if(!state)
 		logerror("DMA done\n");
 	else
-		logerror("New current dma s=%x d=%x is=%d id=%d count=%x m=%d\n",
+		logerror("New current dma s=%x d=%x is=%d id=%d count=%x m=%d autoreq=%d\n",
 					state->source, state->dest, state->incs, state->incd,
-					state->count, state->mode_16 ? 16 : 8);
+					state->count, state->mode_16 ? 16 : 8, state->autoreq);
 
 }
 
@@ -620,7 +620,7 @@ void h8_device::prefetch_done()
 	if(requested_state != -1) {
 		inst_state = requested_state;
 		requested_state = -1;
-	} else if(current_dma)
+	} else if(current_dma && !current_dma->suspended)
 		inst_state = STATE_DMA;
 	else if(current_dtc)
 		inst_state = STATE_DTC;

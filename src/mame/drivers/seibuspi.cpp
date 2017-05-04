@@ -581,6 +581,34 @@ Raiden Fighters Jet    (All Mask ROMs stamped 'RAIDEN-FJET')
 
 
 
+Mahjong Adapter Layout
+----------------------
+
+(C)SXX2C MAHJANG IF SEIBU KAIHATSU INC.
+|------------|  |---------------------------------------------|  |------------|
+|            |--|                  J A M M A                  |--|            |
+|   E  E                                                               E  E   |
+|   X  X                                                               X  X   |
+|   C  C     74LS393   16.9344MHz    jumpers        74LS174  74LS174   C  C   |
+|   N  N                                                               N  N   |
+|   4  3     74LS393       *                        74LS174  74LS174   2  1   |
+|                                                                             |
+|   74LS138   74LS04       **           ***         74LS174  74LS174          |
+|                                                                             |
+|   74LS161   SN7406            resistor package     ****    74LS148          |
+|                                                                             |
+|          |---|                   5 6 P M J                    |---|         |
+|----------|   |------------------------------------------------|   |---------|
+Notes:
+*     : Unpopulated location for ULN2003
+**    : Unpopulated location for 16V8-25 GAL
+***   : Unpopulated location for 74LS161
+****  : Unpopulated location for 74LS148
+
+This board is used by E Jong High School to encode the mahjong inputs onto the
+SPI motherboard's JAMMA connector.
+
+
 There were some single PCBs made that run just one game. These are shown below.
 
 
@@ -3984,7 +4012,7 @@ GAME( 1995, viprp1ot,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1, 
 GAME( 1995, viprp1oj,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1o,  ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, viprp1hk,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1,   ROT270, "Seibu Kaihatsu (Metrotainment license)", "Viper Phase 1 (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* "=HONG KONG=" seems part of title */
 
-GAME( 1996, ejanhs,     0,        ejanhs,  spi_ejanhs,  seibuspi_state, ejanhs,   ROT0,   "Seibu Kaihatsu",                         "E-Jan High School (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, ejanhs,     0,        ejanhs,  spi_ejanhs,  seibuspi_state, ejanhs,   ROT0,   "Seibu Kaihatsu",                         "E Jong High School (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1996, rdft,       0,        spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, rdftj,      rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

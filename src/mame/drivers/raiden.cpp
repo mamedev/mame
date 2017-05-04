@@ -451,6 +451,10 @@ ROM_START( raiden ) /* from a board with 2 daughter cards, no official board #s?
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
+	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( raidena )
@@ -484,6 +488,10 @@ ROM_START( raidena )
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
+	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( raident )
@@ -517,6 +525,10 @@ ROM_START( raident )
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
+	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( raidenu )
@@ -550,6 +562,10 @@ ROM_START( raidenu )
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
+	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( raidenk ) /* Same board as above. Not sure why the sound CPU would be decrypted */
@@ -583,6 +599,10 @@ ROM_START( raidenk ) /* Same board as above. Not sure why the sound CPU would be
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
+	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( raidenkb ) /* Korean bootleg board. ROMs for main, sub, audiocpu, chars and oki match raidenk, while object and tile ROMs are differently split */
@@ -626,6 +646,9 @@ ROM_START( raidenkb ) /* Korean bootleg board. ROMs for main, sub, audiocpu, cha
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.h7", 0x0000, 0x0200, NO_DUMP )
 ROM_END
 
 ROM_START( raidenb )/* Different hardware, Main & Sub CPU code not encrypted. */
@@ -696,6 +719,10 @@ ROM_START( raidenua )/* Different hardware, Main, Sub & sound CPU code not encry
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x00000, 0x10000, CRC(2051263e) SHA1(dff96caa11adf619360d88704e3af8427ddfe524) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "prom.n2", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "prom.u3", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
 

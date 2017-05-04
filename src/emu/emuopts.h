@@ -195,6 +195,54 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class slot_option
+{
+public:
+	slot_option(const char *default_value = nullptr);
+	slot_option(const slot_option &that) = default;
+	slot_option(slot_option &&that) = default;
+
+	const slot_option &operator=(const slot_option &that)
+	{
+		m_specified = that.m_specified;
+		m_specified_value = that.m_specified_value;
+		m_specified_bios = that.m_specified_bios;
+		m_default_card_software = that.m_default_card_software;
+		m_default_value = that.m_default_value;
+		return *this;
+	}
+
+	const slot_option &operator=(slot_option &&that)
+	{
+		m_specified = that.m_specified;
+		m_specified_value = std::move(that.m_specified_value);
+		m_specified_bios = std::move(that.m_specified_bios);
+		m_default_card_software = std::move(that.m_default_card_software);
+		m_default_value = std::move(that.m_default_value);
+		return *this;
+	}
+
+	// accessors
+	const std::string &value() const;
+	std::string specified_value() const;
+	const std::string &bios() const { return m_specified_bios; }
+	const std::string &default_card_software() const { return m_default_card_software; }
+	bool specified() const { return m_specified; }
+
+	// seters
+	void specify(std::string &&text);
+	void set_bios(std::string &&text);
+	void set_default_card_software(std::string &&s) { m_default_card_software = std::move(s); }
+
+private:
+	bool            m_specified;
+	std::string     m_specified_value;
+	std::string     m_specified_bios;
+	std::string     m_default_card_software;
+	std::string     m_default_value;
+};
+
+
 class emu_options : public core_options
 {
 public:
@@ -384,21 +432,31 @@ public:
 	short http_port() const { return int_value(OPTION_HTTP_PORT); }
 	const char *http_root() const { return value(OPTION_HTTP_ROOT); }
 
-	std::string main_value(const char *option) const;
-	std::string sub_value(const char *name, const char *subname) const;
+	// slots and devices - the values for these are stored outside of the core_options
+	// structure
+	std::map<std::string, slot_option> &slot_options() { return m_slot_options; }
+	const std::map<std::string, slot_option> &slot_options() const { return m_slot_options; }
+	std::map<std::string, std::string> &image_options() { return m_image_options; }
+	const std::map<std::string, std::string> &image_options() const { return m_image_options; }
 
 protected:
 	virtual void value_changed(const std::string &name, const std::string &value) override;
+	virtual override_get_value_result override_get_value(const char *name, std::string &value) const override;
+	virtual bool override_set_value(const char *name, const std::string &value) override;
 
 private:
 	static const options_entry s_option_entries[];
 
-	// cached options
-	int m_coin_impulse;
-	bool m_joystick_contradictory;
-	bool m_sleep;
-	bool m_refresh_speed;
-	ui_option m_ui;
+	// slots and devices
+	std::map<std::string, slot_option>  m_slot_options;
+	std::map<std::string, std::string>  m_image_options;
+
+	// cached options, for scenarios where parsing core_options is too slow
+	int                                 m_coin_impulse;
+	bool                                m_joystick_contradictory;
+	bool                                m_sleep;
+	bool                                m_refresh_speed;
+	ui_option                           m_ui;
 };
 
 #endif  // MAME_EMU_EMUOPTS_H

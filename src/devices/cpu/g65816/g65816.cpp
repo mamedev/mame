@@ -135,7 +135,7 @@ _5a22_device::_5a22_device(const machine_config &mconfig, const char *tag, devic
 }
 
 
-void g65816_device::g65816i_set_execution_mode(uint mode)
+void g65816_device::g65816i_set_execution_mode(unsigned mode)
 {
 	assert(mode < 5);
 	switch (mode)
@@ -196,21 +196,21 @@ const g65816_device::execute_func g65816_device::s_g65816_execute[5] =
 
 #define ADDRESS_65816(A) ((A)&0x00ffffff)
 
-uint g65816_device::g65816i_read_8_normal(uint address)
+unsigned g65816_device::g65816i_read_8_normal(unsigned address)
 {
 	address = ADDRESS_65816(address);
 	CLOCKS -= (bus_5A22_cycle_burst(address));
 	return g65816_read_8(address);
 }
 
-uint g65816_device::g65816i_read_8_immediate(uint address)
+unsigned g65816_device::g65816i_read_8_immediate(unsigned address)
 {
 	address = ADDRESS_65816(address);
 	CLOCKS -= (bus_5A22_cycle_burst(address));
 	return g65816_read_8_immediate(address);
 }
 
-uint g65816_device::g65816i_read_8_direct(uint address)
+unsigned g65816_device::g65816i_read_8_direct(unsigned address)
 {
 	if (FLAG_E)
 	{
@@ -226,7 +226,7 @@ uint g65816_device::g65816i_read_8_direct(uint address)
 	return g65816_read_8(address);
 }
 
-uint g65816_device::g65816i_read_8_vector(uint address)
+unsigned g65816_device::g65816i_read_8_vector(unsigned address)
 {
 	if (!READ_VECTOR.isnull())
 		return READ_VECTOR(*m_program, address, 0xff);
@@ -234,14 +234,14 @@ uint g65816_device::g65816i_read_8_vector(uint address)
 		return g65816i_read_8_normal(address);
 }
 
-void g65816_device::g65816i_write_8_normal(uint address, uint value)
+void g65816_device::g65816i_write_8_normal(unsigned address, unsigned value)
 {
 	address = ADDRESS_65816(address);
 	CLOCKS -= (bus_5A22_cycle_burst(address));
 	g65816_write_8(address, MAKE_UINT_8(value));
 }
 
-void g65816_device::g65816i_write_8_direct(uint address, uint value)
+void g65816_device::g65816i_write_8_direct(unsigned address, unsigned value)
 {
 	if (FLAG_E)
 	{
@@ -257,57 +257,57 @@ void g65816_device::g65816i_write_8_direct(uint address, uint value)
 	g65816_write_8(address, MAKE_UINT_8(value));
 }
 
-uint g65816_device::g65816i_read_16_normal(uint address)
+unsigned g65816_device::g65816i_read_16_normal(unsigned address)
 {
 	return   g65816i_read_8_normal(address) |
 			(g65816i_read_8_normal(address+1)<<8);
 }
 
-uint g65816_device::g65816i_read_16_immediate(uint address)
+unsigned g65816_device::g65816i_read_16_immediate(unsigned address)
 {
 	return   g65816i_read_8_immediate(address) |
 			(g65816i_read_8_immediate(address+1)<<8);
 }
 
-uint g65816_device::g65816i_read_16_direct(uint address)
+unsigned g65816_device::g65816i_read_16_direct(unsigned address)
 {
 	return   g65816i_read_8_direct(address) |
 			(g65816i_read_8_direct(address+1)<<8);
 }
 
-uint g65816_device::g65816i_read_16_vector(uint address)
+unsigned g65816_device::g65816i_read_16_vector(unsigned address)
 {
 	return   g65816i_read_8_vector(address) |
 			(g65816i_read_8_vector(address+1)<<8);
 }
 
-void g65816_device::g65816i_write_16_normal(uint address, uint value)
+void g65816_device::g65816i_write_16_normal(unsigned address, unsigned value)
 {
 	g65816i_write_8_normal(address, value&0xff);
 	g65816i_write_8_normal(address+1, value>>8);
 }
 
-void g65816_device::g65816i_write_16_direct(uint address, uint value)
+void g65816_device::g65816i_write_16_direct(unsigned address, unsigned value)
 {
 	g65816i_write_8_direct(address, value&0xff);
 	g65816i_write_8_direct(address+1, value>>8);
 }
 
-uint g65816_device::g65816i_read_24_normal(uint address)
+unsigned g65816_device::g65816i_read_24_normal(unsigned address)
 {
 	return   g65816i_read_8_normal(address)       |
 			(g65816i_read_8_normal(address+1)<<8) |
 			(g65816i_read_8_normal(address+2)<<16);
 }
 
-uint g65816_device::g65816i_read_24_immediate(uint address)
+unsigned g65816_device::g65816i_read_24_immediate(unsigned address)
 {
 	return   g65816i_read_8_immediate(address)       |
 			(g65816i_read_8_immediate(address+1)<<8) |
 			(g65816i_read_8_immediate(address+2)<<16);
 }
 
-uint g65816_device::g65816i_read_24_direct(uint address)
+unsigned g65816_device::g65816i_read_24_direct(unsigned address)
 {
 	return   g65816i_read_8_direct(address)         |
 			(g65816i_read_8_direct(address+1)<<8) |
@@ -319,7 +319,7 @@ uint g65816_device::g65816i_read_24_direct(uint address)
 /* ================================= STACK ================================ */
 /* ======================================================================== */
 
-void g65816_device::g65816i_push_8(uint value)
+void g65816_device::g65816i_push_8(unsigned value)
 {
 	g65816i_write_8_normal(REGISTER_S, value);
 	if (FLAG_E)
@@ -332,7 +332,7 @@ void g65816_device::g65816i_push_8(uint value)
 	}
 }
 
-uint g65816_device::g65816i_pull_8()
+unsigned g65816_device::g65816i_pull_8()
 {
 	if (FLAG_E)
 	{
@@ -345,28 +345,28 @@ uint g65816_device::g65816i_pull_8()
 	return g65816i_read_8_normal(REGISTER_S);
 }
 
-void g65816_device::g65816i_push_16(uint value)
+void g65816_device::g65816i_push_16(unsigned value)
 {
 	g65816i_push_8(value>>8);
 	g65816i_push_8(value&0xff);
 }
 
-uint g65816_device::g65816i_pull_16()
+unsigned g65816_device::g65816i_pull_16()
 {
-	uint res = g65816i_pull_8();
+	unsigned res = g65816i_pull_8();
 	return res | (g65816i_pull_8() << 8);
 }
 
-void g65816_device::g65816i_push_24(uint value)
+void g65816_device::g65816i_push_24(unsigned value)
 {
 	g65816i_push_8(value>>16);
 	g65816i_push_8((value>>8)&0xff);
 	g65816i_push_8(value&0xff);
 }
 
-uint g65816_device::g65816i_pull_24()
+unsigned g65816_device::g65816i_pull_24()
 {
-	uint res = g65816i_pull_8();
+	unsigned res = g65816i_pull_8();
 	res |= g65816i_pull_8() << 8;
 	return ((res + 1) & 0xffff) | (g65816i_pull_8() << 16);
 }
@@ -376,24 +376,24 @@ uint g65816_device::g65816i_pull_24()
 /* ============================ PROGRAM COUNTER =========================== */
 /* ======================================================================== */
 
-void g65816_device::g65816i_jump_16(uint address)
+void g65816_device::g65816i_jump_16(unsigned address)
 {
 	REGISTER_PC = MAKE_UINT_16(address);
 	g65816i_jumping(REGISTER_PC);
 }
 
-void g65816_device::g65816i_jump_24(uint address)
+void g65816_device::g65816i_jump_24(unsigned address)
 {
 	REGISTER_PB = address&0xff0000;
 	REGISTER_PC = MAKE_UINT_16(address);
 	g65816i_jumping(REGISTER_PC);
 }
 
-void g65816_device::g65816i_branch_8(uint offset)
+void g65816_device::g65816i_branch_8(unsigned offset)
 {
 	if (FLAG_E)
 	{
-		uint old_pc = REGISTER_PC;
+		unsigned old_pc = REGISTER_PC;
 		REGISTER_PC = MAKE_UINT_16(REGISTER_PC + MAKE_INT_8(offset));
 		if((REGISTER_PC^old_pc)&0xff00)
 			CLK(1);
@@ -405,7 +405,7 @@ void g65816_device::g65816i_branch_8(uint offset)
 	g65816i_branching(REGISTER_PC);
 }
 
-void g65816_device::g65816i_branch_16(uint offset)
+void g65816_device::g65816i_branch_16(unsigned offset)
 {
 	REGISTER_PC = MAKE_UINT_16(REGISTER_PC + offset);
 	g65816i_branching(REGISTER_PC);
@@ -416,7 +416,7 @@ void g65816_device::g65816i_branch_16(uint offset)
 /* ============================ STATUS REGISTER =========================== */
 /* ======================================================================== */
 
-void g65816_device::g65816i_set_flag_mx(uint value)
+void g65816_device::g65816i_set_flag_mx(unsigned value)
 {
 	if (FLAG_M)
 	{
@@ -455,7 +455,7 @@ void g65816_device::g65816i_set_flag_mx(uint value)
 	g65816i_set_execution_mode((FLAG_M>>4) | (FLAG_X>>4));
 }
 
-void g65816_device::g65816i_set_flag_e(uint value)
+void g65816_device::g65816i_set_flag_e(unsigned value)
 {
 	if (FLAG_E)
 	{
@@ -488,7 +488,7 @@ void g65816_device::g65816i_set_flag_e(uint value)
 	}
 }
 
-void g65816_device::g65816i_set_flag_i(uint value)
+void g65816_device::g65816i_set_flag_i(unsigned value)
 {
 	value &= FLAGPOS_I;
 	if(!FLAG_I || value)
@@ -500,7 +500,7 @@ void g65816_device::g65816i_set_flag_i(uint value)
 }
 
 /* Get the Processor Status Register */
-uint g65816_device::g65816i_get_reg_p()
+unsigned g65816_device::g65816i_get_reg_p()
 {
 	return  (FLAG_N&0x80)       |
 			((FLAG_V>>1)&0x40)  |
@@ -512,7 +512,7 @@ uint g65816_device::g65816i_get_reg_p()
 			((FLAG_C>>8)&1);
 }
 
-void g65816_device::g65816i_set_reg_p(uint value)
+void g65816_device::g65816i_set_reg_p(unsigned value)
 {
 	if (FLAG_E)
 	{
@@ -540,7 +540,7 @@ void g65816_device::g65816i_set_reg_p(uint value)
 /* =============================== INTERRUPTS ============================= */
 /* ======================================================================== */
 
-void g65816_device::g65816i_interrupt_hardware(uint vector)
+void g65816_device::g65816i_interrupt_hardware(unsigned vector)
 {
 	if (FLAG_E)
 	{
@@ -567,7 +567,7 @@ void g65816_device::g65816i_interrupt_hardware(uint vector)
 	}
 }
 
-void g65816_device::g65816i_interrupt_software(uint vector)
+void g65816_device::g65816i_interrupt_software(unsigned vector)
 {
 	if (FLAG_E)
 	{
@@ -627,27 +627,27 @@ void g65816_device::g65816i_check_maskable_interrupt()
 }
 
 
-uint g65816_device::EA_IMM8()  {REGISTER_PC += 1; return REGISTER_PB | MAKE_UINT_16(REGISTER_PC-1);}
-uint g65816_device::EA_IMM16() {REGISTER_PC += 2; return REGISTER_PB | MAKE_UINT_16(REGISTER_PC-2);}
-uint g65816_device::EA_IMM24() {REGISTER_PC += 3; return REGISTER_PB | MAKE_UINT_16(REGISTER_PC-3);}
-uint g65816_device::EA_D()     {if(MAKE_UINT_8(REGISTER_D)) CLK(1); return MAKE_UINT_16(REGISTER_D + g65816i_read_8_immediate(EA_IMM8()));}
-uint g65816_device::EA_A()     {return REGISTER_DB | g65816i_read_16_immediate(EA_IMM16());}
-uint g65816_device::EA_AL()    {return g65816i_read_24_immediate(EA_IMM24());}
-uint g65816_device::EA_DX()    {return MAKE_UINT_16(REGISTER_D + g65816i_read_8_immediate(EA_IMM8()) + REGISTER_X);}
-uint g65816_device::EA_DY()    {return MAKE_UINT_16(REGISTER_D + g65816i_read_8_immediate(EA_IMM8()) + REGISTER_Y);}
-uint g65816_device::EA_AX()    {uint tmp = EA_A(); if((tmp^(tmp+REGISTER_X))&0xff00) CLK(1); return tmp + REGISTER_X;}
-uint g65816_device::EA_ALX()   {return EA_AL() + REGISTER_X;}
-uint g65816_device::EA_AY()    {uint tmp = EA_A(); if((tmp^(tmp+REGISTER_X))&0xff00) CLK(1); return tmp + REGISTER_Y;}
-uint g65816_device::EA_DI()    {return REGISTER_DB | g65816i_read_16_direct(EA_D());}
-uint g65816_device::EA_DLI()   {return g65816i_read_24_direct(EA_D());}
-uint g65816_device::EA_AI()    {return g65816i_read_16_normal(g65816i_read_16_immediate(EA_IMM16()));}
-uint g65816_device::EA_ALI()   {return g65816i_read_24_normal(EA_A());}
-uint g65816_device::EA_DXI()   {return REGISTER_DB | g65816i_read_16_direct(EA_DX());}
-uint g65816_device::EA_DIY()   {uint tmp = REGISTER_DB | g65816i_read_16_direct(EA_D()); if((tmp^(tmp+REGISTER_X))&0xff00) CLK(1); return tmp + REGISTER_Y;}
-uint g65816_device::EA_DLIY()  {return g65816i_read_24_direct(EA_D()) + REGISTER_Y;}
-uint g65816_device::EA_AXI()   {return g65816i_read_16_normal(MAKE_UINT_16(g65816i_read_16_immediate(EA_IMM16()) + REGISTER_X));}
-uint g65816_device::EA_S()     {return MAKE_UINT_16(REGISTER_S + g65816i_read_8_immediate(EA_IMM8()));}
-uint g65816_device::EA_SIY()   {return MAKE_UINT_16(g65816i_read_16_normal(REGISTER_S + g65816i_read_8_immediate(EA_IMM8())) + REGISTER_Y) | REGISTER_DB;}
+unsigned g65816_device::EA_IMM8()  {REGISTER_PC += 1; return REGISTER_PB | MAKE_UINT_16(REGISTER_PC-1);}
+unsigned g65816_device::EA_IMM16() {REGISTER_PC += 2; return REGISTER_PB | MAKE_UINT_16(REGISTER_PC-2);}
+unsigned g65816_device::EA_IMM24() {REGISTER_PC += 3; return REGISTER_PB | MAKE_UINT_16(REGISTER_PC-3);}
+unsigned g65816_device::EA_D()     {if(MAKE_UINT_8(REGISTER_D)) CLK(1); return MAKE_UINT_16(REGISTER_D + g65816i_read_8_immediate(EA_IMM8()));}
+unsigned g65816_device::EA_A()     {return REGISTER_DB | g65816i_read_16_immediate(EA_IMM16());}
+unsigned g65816_device::EA_AL()    {return g65816i_read_24_immediate(EA_IMM24());}
+unsigned g65816_device::EA_DX()    {return MAKE_UINT_16(REGISTER_D + g65816i_read_8_immediate(EA_IMM8()) + REGISTER_X);}
+unsigned g65816_device::EA_DY()    {return MAKE_UINT_16(REGISTER_D + g65816i_read_8_immediate(EA_IMM8()) + REGISTER_Y);}
+unsigned g65816_device::EA_AX()    {unsigned tmp = EA_A(); if((tmp^(tmp+REGISTER_X))&0xff00) CLK(1); return tmp + REGISTER_X;}
+unsigned g65816_device::EA_ALX()   {return EA_AL() + REGISTER_X;}
+unsigned g65816_device::EA_AY()    {unsigned tmp = EA_A(); if((tmp^(tmp+REGISTER_X))&0xff00) CLK(1); return tmp + REGISTER_Y;}
+unsigned g65816_device::EA_DI()    {return REGISTER_DB | g65816i_read_16_direct(EA_D());}
+unsigned g65816_device::EA_DLI()   {return g65816i_read_24_direct(EA_D());}
+unsigned g65816_device::EA_AI()    {return g65816i_read_16_normal(g65816i_read_16_immediate(EA_IMM16()));}
+unsigned g65816_device::EA_ALI()   {return g65816i_read_24_normal(EA_A());}
+unsigned g65816_device::EA_DXI()   {return REGISTER_DB | g65816i_read_16_direct(EA_DX());}
+unsigned g65816_device::EA_DIY()   {unsigned tmp = REGISTER_DB | g65816i_read_16_direct(EA_D()); if((tmp^(tmp+REGISTER_X))&0xff00) CLK(1); return tmp + REGISTER_Y;}
+unsigned g65816_device::EA_DLIY()  {return g65816i_read_24_direct(EA_D()) + REGISTER_Y;}
+unsigned g65816_device::EA_AXI()   {return g65816i_read_16_normal(MAKE_UINT_16(g65816i_read_16_immediate(EA_IMM16()) + REGISTER_X));}
+unsigned g65816_device::EA_S()     {return MAKE_UINT_16(REGISTER_S + g65816i_read_8_immediate(EA_IMM8()));}
+unsigned g65816_device::EA_SIY()   {return MAKE_UINT_16(g65816i_read_16_normal(REGISTER_S + g65816i_read_8_immediate(EA_IMM8())) + REGISTER_Y) | REGISTER_DB;}
 
 
 
@@ -984,7 +984,7 @@ void g65816_device::set_read_vector_callback(read8_delegate read_vector)
 SNES specific, used to handle master cycles, based off byuu's BSNES code
 */
 
-int g65816_device::bus_5A22_cycle_burst(uint addr)
+int g65816_device::bus_5A22_cycle_burst(unsigned addr)
 {
 	if(m_cpu_type == CPU_TYPE_G65816)
 		return 0;

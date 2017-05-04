@@ -183,9 +183,9 @@ READ8_MEMBER(a1bus_cassette_device::cassette_r)
 		   because it can cause tape header bits on real cassette
 		   images to be misread as data bits.) */
 		if (m_cassette->input() > 0.0)
-			return m_rom[0xc100 + (offset & ~1)];
+			return m_rom[(offset & ~1)];
 		else
-			return m_rom[0xc100 + offset];
+			return m_rom[offset];
 	}
 }
 

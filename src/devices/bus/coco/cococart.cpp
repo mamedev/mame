@@ -240,7 +240,7 @@ void cococart_slot_device::twiddle_line_if_q(coco_cartridge_line &line)
 
 //-------------------------------------------------
 //  twiddle_q_lines - hack to support twiddling the
-//	Q line
+//  Q line
 //-------------------------------------------------
 
 void cococart_slot_device::twiddle_q_lines()
@@ -368,7 +368,7 @@ image_init_result cococart_slot_device::call_load()
 //  get_default_card_software
 //-------------------------------------------------
 
-std::string cococart_slot_device::get_default_card_software()
+std::string cococart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("pak");
 }

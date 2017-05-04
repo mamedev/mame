@@ -28,6 +28,7 @@
 #include "emu.h"
 #include "includes/amiga.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/amigafdc.h"
 #include "speaker.h"
@@ -39,7 +40,8 @@ public:
 	upscope_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag),
 	m_prev_cia1_porta(0xff),
-	m_parallel_data(0xff)
+	m_parallel_data(0xff),
+	m_ppi(*this, "ppi")
 	{ }
 
 	uint8_t m_nvram[0x100];
@@ -53,10 +55,16 @@ public:
 	DECLARE_READ8_MEMBER(upscope_cia_1_porta_r);
 	DECLARE_WRITE8_MEMBER(upscope_cia_1_porta_w);
 
+	DECLARE_WRITE8_MEMBER(lamps_w);
+	DECLARE_WRITE8_MEMBER(coin_counter_w);
+
 	DECLARE_DRIVER_INIT(upscope);
 
 protected:
 	virtual void machine_reset() override;
+
+private:
+	required_device<i8255_device> m_ppi;
 };
 
 
@@ -132,34 +140,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 		/* if SEL == 1 && BUSY == 1, we write data to internal registers */
 		else if ((data & 5) == 5)
 		{
-			switch (m_nvram_address_latch)
-			{
-				case 0x01:
-					/* lamps:
-					    01 = Enemy Right
-					    02 = Enemy Left
-					    04 = Torpedo 1
-					    08 = Torpedo 2
-					    10 = Torpedo 3
-					    20 = Torpedo 4
-					    40 = Sight
-					    80 = Bubble Light
-					*/
-					break;
-
-				case 0x02:
-					/* coin counter */
-					machine().bookkeeping().coin_counter_w(0, data & 1);
-					break;
-
-				case 0x03:
-					/* Written $98 at startup and nothing afterwards */
-					break;
-
-				default:
-					logerror("Internal register (%d) = %02X\n", m_nvram_address_latch, m_parallel_data);
-					break;
-			}
+			m_ppi->write(space, m_nvram_address_latch & 0x03, m_parallel_data);
 		}
 
 		/* if SEL == 0 && BUSY == 1, we write data to NVRAM */
@@ -183,7 +164,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 		if (data & 4)
 		{
 			if (LOG_IO) logerror("Internal register (%d) read\n", m_nvram_address_latch);
-			m_nvram_data_latch = (m_nvram_address_latch == 0) ? ioport("IO0")->read() : 0xff;
+			m_nvram_data_latch = m_ppi->read(space, m_nvram_address_latch & 0x03);
 		}
 
 		/* if SEL == 0, we read NVRAM */
@@ -198,6 +179,22 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 	m_prev_cia1_porta = data;
 }
 
+WRITE8_MEMBER( upscope_state::lamps_w )
+{
+	// 7-------  bubble light
+	// -6------  sight
+	// --5-----  torpedo 4
+	// ---4----  torpedo 3
+	// ----3---  torpedo 2
+	// -----2--  torpedo 1
+	// ------1-  enemy left
+	// -------0  enemy right
+}
+
+WRITE8_MEMBER( upscope_state::coin_counter_w )
+{
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+}
 
 
 /*************************************
@@ -307,6 +304,12 @@ static MACHINE_CONFIG_START( upscope, upscope_state )
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
 	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
+
+	// i/o extension
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IO0"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(upscope_state, lamps_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(upscope_state, coin_counter_w))
 MACHINE_CONFIG_END
 
 

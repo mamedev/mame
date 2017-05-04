@@ -72,6 +72,8 @@ public:
 // address_map_entry is a linked list element describing one address range in a map
 class address_map_entry
 {
+	friend class address_map;
+
 public:
 	// construction/destruction
 	address_map_entry(device_t &device, address_map &map, offs_t start, offs_t end);
@@ -183,7 +185,7 @@ public:
 
 private:
 	// helper functions
-	bool unitmask_is_appropriate(u8 width, u64 unitmask, const char *string);
+	bool unitmask_is_appropriate(u8 width, u64 unitmask, const char *string) const;
 };
 
 // ======================> address_map

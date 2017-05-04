@@ -55,6 +55,7 @@ public:
 	required_device<pic8259_device> m_upd71059c;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
+	emu_timer *m_spritebuffer_timer;
 	uint16_t m_sound_status;
 	uint32_t m_raster_irq_position;
 	uint16_t m_videocontrol;

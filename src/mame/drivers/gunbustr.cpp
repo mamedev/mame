@@ -36,7 +36,7 @@
 
     Todo:
 
-        FLIPX support in taitoic.c is not quite correct - the Taito logo is wrong,
+        FLIPX support in the video chips is not quite correct - the Taito logo is wrong,
         and the floor in the Doom levels has horizontal scrolling where it shouldn't.
 
         No networked machine support
@@ -69,7 +69,7 @@ void gunbustr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 INTERRUPT_GEN_MEMBER(gunbustr_state::gunbustr_interrupt)
 {
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), TIMER_GUNBUSTR_INTERRUPT5);
+	m_interrupt5_timer->adjust(m_maincpu->cycles_to_attotime(200000-500));
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
@@ -140,7 +140,7 @@ READ32_MEMBER(gunbustr_state::gunbustr_gun_r)
 WRITE32_MEMBER(gunbustr_state::gunbustr_gun_w)
 {
 	/* 10000 cycle delay is arbitrary */
-	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_GUNBUSTR_INTERRUPT5);
+	m_interrupt5_timer->adjust(m_maincpu->cycles_to_attotime(10000));
 }
 
 
@@ -428,6 +428,8 @@ DRIVER_INIT_MEMBER(gunbustr_state,gunbustr)
 {
 	/* Speedup handler */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32_delegate(FUNC(gunbustr_state::main_cycle_r),this));
+
+	m_interrupt5_timer = timer_alloc(TIMER_GUNBUSTR_INTERRUPT5);
 }
 
 DRIVER_INIT_MEMBER(gunbustr_state,gunbustrj)

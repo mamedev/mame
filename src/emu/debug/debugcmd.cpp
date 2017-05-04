@@ -2931,8 +2931,7 @@ void debugger_commands::execute_symlist(int ref, const std::vector<std::string> 
 	symbol_table *symtable;
 	int symnum, count = 0;
 
-
-	if (!params[0].empty())
+	if (!params.empty())
 	{
 		/* validate parameters */
 		if (!validate_cpu_parameter(params[0].c_str(), cpu))

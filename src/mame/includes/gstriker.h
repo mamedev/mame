@@ -47,14 +47,15 @@ public:
 	required_shared_ptr<uint16_t> m_mixerregs1;
 	required_shared_ptr<uint16_t> m_mixerregs2;
 
-	uint16_t m_dmmy_8f_ret;
+	uint8_t m_dmmy_8f_ret;
 	int m_pending_command;
 	int m_gametype;
 	uint16_t m_mcu_data;
 	uint16_t m_prot_reg[2];
 
 	// common
-	DECLARE_READ16_MEMBER(dmmy_8f);
+	DECLARE_READ8_MEMBER(dmmy_8f);
+	DECLARE_WRITE8_MEMBER(unknown_output_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(sh_pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);

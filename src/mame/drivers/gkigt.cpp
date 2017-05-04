@@ -109,12 +109,12 @@ public:
 
 	DECLARE_READ32_MEMBER(igt_gk_28010008_r)
 	{
-		return rand();  // don't quite understand this one
+		return machine().rand();  // don't quite understand this one
 	};
 
 	DECLARE_READ32_MEMBER(igt_gk_28030000_r)
 	{
-		return rand();
+		return machine().rand();
 	};
 
 	DECLARE_READ32_MEMBER(uart_status_r);

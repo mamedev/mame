@@ -333,7 +333,7 @@ void msm5205_device::device_clock_changed()
 	int prescaler = get_prescaler();
 	if (prescaler != 0)
 	{
-		attotime period = attotime::from_hz(clock()) * prescaler;
+		attotime period = clocks_to_attotime(prescaler);
 		m_timer->adjust(period, 0, period);
 	}
 	else
