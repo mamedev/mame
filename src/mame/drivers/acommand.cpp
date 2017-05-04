@@ -14,7 +14,6 @@ TODO:
 -Back tilemap paging is likely to be incorrect.
 -3D Artworks for the UFO's,Astronauts etc.
 -Merge to the Cisco Heat driver.
--Use MAME layout instead of custom 7seg led drawing routine
 
 Notes:
 -The real HW is a redemption machine with two guns, similar to the "Cosmo Gang the Video"
@@ -64,6 +63,8 @@ JALCF1   BIN     1,048,576  02-07-99  1:11a JALCF1.BIN
 #include "screen.h"
 #include "speaker.h"
 
+#include "acommand.lh"
+
 
 class acommand_state : public driver_device
 {
@@ -112,7 +113,6 @@ public:
 	uint32_t screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(acommand_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask);
-	void draw_led(bitmap_ind16 &bitmap, int x, int y,uint8_t value);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki1;
 	required_device<okim6295_device> m_oki2;
@@ -220,63 +220,6 @@ void acommand_state::video_start()
 }
 
 
-#define LED_ON      0x01c00
-#define LED_OFF     0x00000
-/*
-     a
-    ---
-f   | | b
-    -g-
-e   | | c
-    ---
-     d
-a & 1
-b & 2
-c & 4
-d & 8
-e & 10
-f & 20
-g & 40
-7f
-*/
-/*                                    0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f*/
-static const uint8_t led_fill[0x10] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x00,0x00,0x00,0x00,0x00,0x00};
-
-void acommand_state::draw_led(bitmap_ind16 &bitmap, int x, int y,uint8_t value)
-{
-	bitmap.plot_box(x, y, 6, 10, 0x00000000);
-
-	/*a*/
-	bitmap.pix16(y+0, x+1) = ((led_fill[value] & 0x0001) ? LED_ON : LED_OFF);
-	bitmap.pix16(y+0, x+2) = ((led_fill[value] & 0x0001) ? LED_ON : LED_OFF);
-	bitmap.pix16(y+0, x+3) = ((led_fill[value] & 0x0001) ? LED_ON : LED_OFF);
-	/*b*/
-	bitmap.pix16(y+1, x+4) = ((led_fill[value] & 0x0002) ? LED_ON : LED_OFF);
-	bitmap.pix16(y+2, x+4) = ((led_fill[value] & 0x0002) ? LED_ON : LED_OFF);
-	bitmap.pix16(y+3, x+4) = ((led_fill[value] & 0x0002) ? LED_ON : LED_OFF);
-	/*c*/
-	bitmap.pix16(y+5, x+4) = ((led_fill[value] & 0x0004) ? LED_ON : LED_OFF);
-	bitmap.pix16(y+6, x+4) = ((led_fill[value] & 0x0004) ? LED_ON : LED_OFF);
-	bitmap.pix16(y+7, x+4) = ((led_fill[value] & 0x0004) ? LED_ON : LED_OFF);
-	/*d*/
-	bitmap.pix16(y+8, x+1) = ((led_fill[value] & 0x0008) ? LED_ON : LED_OFF);
-	bitmap.pix16(y+8, x+2) = ((led_fill[value] & 0x0008) ? LED_ON : LED_OFF);
-	bitmap.pix16(y+8, x+3) = ((led_fill[value] & 0x0008) ? LED_ON : LED_OFF);
-	/*e*/
-	bitmap.pix16(y+5, x+0) = ((led_fill[value] & 0x0010) ? LED_ON : LED_OFF);
-	bitmap.pix16(y+6, x+0) = ((led_fill[value] & 0x0010) ? LED_ON : LED_OFF);
-	bitmap.pix16(y+7, x+0) = ((led_fill[value] & 0x0010) ? LED_ON : LED_OFF);
-	/*f*/
-	bitmap.pix16(y+1, x+0) = ((led_fill[value] & 0x0020) ? LED_ON : LED_OFF);
-	bitmap.pix16(y+2, x+0) = ((led_fill[value] & 0x0020) ? LED_ON : LED_OFF);
-	bitmap.pix16(y+3, x+0) = ((led_fill[value] & 0x0020) ? LED_ON : LED_OFF);
-	/*g*/
-	bitmap.pix16(y+4, x+1) = ((led_fill[value] & 0x0040) ? LED_ON : LED_OFF);
-	bitmap.pix16(y+4, x+2) = ((led_fill[value] & 0x0040) ? LED_ON : LED_OFF);
-	bitmap.pix16(y+4, x+3) = ((led_fill[value] & 0x0040) ? LED_ON : LED_OFF);
-}
-
-
 uint32_t acommand_state::screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// reference has black pen background, as weird it might sound
@@ -286,14 +229,6 @@ uint32_t acommand_state::screen_update_acommand(screen_device &screen, bitmap_in
 	draw_sprites(bitmap,cliprect,0,0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
-	/*Order might be wrong,but these for sure are the led numbers tested*/
-	draw_led(bitmap,  0, 20, (m_7seg0 & 0x0f00) >> 8);
-	draw_led(bitmap,  6, 20, (m_7seg0 & 0x00f0) >> 4);
-	draw_led(bitmap, 12, 20, (m_7seg0 & 0x000f));
-
-	draw_led(bitmap, 256-18,20,(m_7seg0 & 0xf000) >> 12);
-	draw_led(bitmap, 256-12,20,(m_7seg1 & 0xf0) >> 4);
-	draw_led(bitmap, 256-6,20, (m_7seg1 & 0xf));
 	return 0;
 }
 
@@ -351,14 +286,28 @@ WRITE8_MEMBER(acommand_state::oki_bank_w)
 	m_oki2->set_rom_bank((data & 0x30) >> 4);
 }
 
+
+/*                                    0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f*/
+static const uint8_t led_fill[0x10] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x00,0x00,0x00,0x00,0x00,0x00};
+
 WRITE16_MEMBER(acommand_state::output_7seg0_w)
 {
 	COMBINE_DATA(&m_7seg0);
+
+	// nybble 0,1,2: left 7segs, nybble 3: right 7seg 1st digit
+	for (int i = 0; i < 4; i++)
+		output().set_digit_value(i, led_fill[m_7seg0 >> (i*4) & 0xf]);
 }
 
 WRITE16_MEMBER(acommand_state::output_7seg1_w)
 {
 	COMBINE_DATA(&m_7seg1);
+
+	// nybble 0,1: right 7seg 2nd,3rd digit
+	for (int i = 0; i < 2; i++)
+		output().set_digit_value(i+4, led_fill[m_7seg1 >> (i*4) & 0xf]);
+	
+	// other: ?
 }
 
 /*
@@ -661,4 +610,4 @@ ROM_START( acommand )
 	ROM_LOAD( "jalmr17.bin",   0x080000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) )
 ROM_END
 
-GAME( 1994, acommand,  0,       acommand,  acommand, driver_device,  0, ROT0, "Jaleco", "Alien Command" , MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAMEL( 1994, acommand,  0,       acommand,  acommand, driver_device,  0, ROT0, "Jaleco", "Alien Command" , MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_acommand )
