@@ -1254,7 +1254,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchind
 			throw CHDERR_METADATA_NOT_FOUND;
 
 		// read the metadata
-		output.assign(metaentry.length + 1, '\0');
+		output.assign(metaentry.length, '\0');
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, &output[0], metaentry.length);
 		return CHDERR_NONE;
 	}
