@@ -652,7 +652,6 @@ WRITE8_MEMBER(badlands_state::bootleg_shared_w)
 	m_b_sharedram[offset] = data;
 }
 
-
 static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 16, badlands_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
@@ -660,7 +659,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 16, badlands_state )
 	AM_RANGE(0x400000, 0x401fff) AM_READWRITE8(bootleg_shared_r,bootleg_shared_w,0xffff)
 
 	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(badlandsb_unk_r ) // sound comms?
-
+	
 	AM_RANGE(0xfd0000, 0xfd1fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
 	//AM_RANGE(0xfe0000, 0xfe1fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xfe2000, 0xfe3fff) AM_WRITE(video_int_ack_w)
@@ -744,6 +743,16 @@ MACHINE_RESET_MEMBER(badlands_state,badlandsb)
 //  memcpy(m_bank_base, &m_bank_source_data[0x0000], 0x1000);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(badlands_state::bootleg_sound_scanline)
+{
+	int scanline = param;
+	//address_space &space = m_audiocpu->space(AS_PROGRAM);
+	
+	// 32V
+	if ((scanline % 64) == 0 && scanline < 240)
+		m_audiocpu->set_input_line(0, HOLD_LINE);
+}
+
 static MACHINE_CONFIG_START( badlandsb, badlands_state )
 
 	/* basic machine hardware */
@@ -751,9 +760,9 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", badlands_state,  irq1_line_hold) //vblank_int)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_20MHz/12)    /* Divisor estimated */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_20MHz/12)    /* Divisor estimated */
 	MCFG_CPU_PROGRAM_MAP(bootleg_audio_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", badlands_state,  irq0_line_hold) // TODO: maybe triggered by main CPU instead of periodic timer
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", badlands_state, bootleg_sound_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
 	MCFG_MACHINE_RESET_OVERRIDE(badlands_state,badlandsb)
