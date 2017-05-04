@@ -835,7 +835,7 @@ ROM_START( buckyea ) /* Version EA */
 	ROM_LOAD( "bucky.nv", 0x0000, 0x080, CRC(6a5986f3) SHA1(3efddeed261b09031c582e12318f00c2cbb214ea) )
 ROM_END
 
-ROM_START( buckyja ) /* Version JA */
+ROM_START( buckyjaa ) /* Version JA */
 	ROM_REGION( 0x240000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD16_BYTE( "173_ja_a01.05", 0x000000, 0x040000, CRC(0a32bde7) SHA1(17b7654fd69eb1b82e2949ef324ce599113360aa) )   /* JAA */
