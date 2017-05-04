@@ -838,8 +838,8 @@ ROM_END
 ROM_START( buckyja ) /* Version JA */
 	ROM_REGION( 0x240000, "maincpu", 0 )
 	/* main program */
-    ROM_LOAD16_BYTE( "173_ja_a01.05", 0x000000, 0x040000, CRC(0a32bde7) SHA1(17b7654fd69eb1b82e2949ef324ce599113360aa) )
-	ROM_LOAD16_BYTE( "173_ja_a02.06", 0x000001, 0x040000, CRC(3e6f3955) SHA1(09ca39da8bdb37cb5517fe59cff5467c0623c380) )
+	ROM_LOAD16_BYTE( "173_ja_a01.05", 0x000000, 0x040000, CRC(0a32bde7) SHA1(17b7654fd69eb1b82e2949ef324ce599113360aa) )   /* JAA */
+	ROM_LOAD16_BYTE( "173_ja_a02.06", 0x000001, 0x040000, CRC(3e6f3955) SHA1(09ca39da8bdb37cb5517fe59cff5467c0623c380) )   /* JAA */
 	
 	/* data */
 	ROM_LOAD16_BYTE( "173a03.t5", 0x200000, 0x20000, CRC(cd724026) SHA1(525445499604b713da4d8bc0a88e428654ceab95) )
@@ -1006,6 +1006,6 @@ GAME( 1992, moomesaaab, moomesa, moo,     moo,   driver_device, 0, ROT0, "Konami
 GAME( 1992, moomesabl,  moomesa, moobl,   moo,   driver_device, 0, ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // based on Version AA
 GAME( 1992, bucky,      0,       bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver EAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, buckyea,    bucky,   bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver EA)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyja,    bucky,   bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver JA)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyja,    bucky,   bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, buckyuab,   bucky,   bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, buckyaab,   bucky,   bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver AAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
