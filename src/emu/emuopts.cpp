@@ -1079,7 +1079,7 @@ void slot_option::specify(std::string &&text)
 void slot_option::set_default_card_software(std::string &&s)
 {
 	// record the old value; we may need to trigger an update
-	std::string old_value = value();
+	const std::string old_value = value();
 
 	// update the default card software
 	m_default_card_software = std::move(s);
