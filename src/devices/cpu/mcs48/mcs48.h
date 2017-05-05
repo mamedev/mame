@@ -56,30 +56,6 @@ enum
 };
 
 
-/* special I/O space ports */
-enum
-{
-	MCS48_PORT_P0   = 0x100,    /* Not used */
-	MCS48_PORT_P1   = 0x101,
-	MCS48_PORT_P2   = 0x102,
-	MCS48_PORT_T0   = 0x110,
-	MCS48_PORT_T1   = 0x111,
-	MCS48_PORT_BUS  = 0x120,
-	MCS48_PORT_PROG = 0x121     /* PROG line to 8243 expander */
-};
-
-
-/* 8243 expander operations */
-enum
-{
-	MCS48_EXPANDER_OP_READ = 0,
-	MCS48_EXPANDER_OP_WRITE = 1,
-	MCS48_EXPANDER_OP_OR = 2,
-	MCS48_EXPANDER_OP_AND = 3
-};
-
-
-
 /***************************************************************************
     MACROS
 ***************************************************************************/
@@ -89,6 +65,41 @@ enum
 
 #define MCS48_ALE_CLOCK(_clock) \
 	attotime::from_hz(_clock/(3*5))
+
+
+#define MCFG_MCS48_PORT_P1_IN_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_port_in_cb(*device, 0, DEVCB_##_devcb);
+#define MCFG_MCS48_PORT_P1_OUT_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_port_out_cb(*device, 0, DEVCB_##_devcb);
+
+#define MCFG_MCS48_PORT_P2_IN_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_port_in_cb(*device, 1, DEVCB_##_devcb);
+#define MCFG_MCS48_PORT_P2_OUT_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_port_out_cb(*device, 1, DEVCB_##_devcb);
+
+#define MCFG_MCS48_PORT_T0_IN_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_test_in_cb(*device, 0, DEVCB_##_devcb);
+#define MCFG_MCS48_PORT_T0_CLK_DEVICE(_tag) \
+	mcs48_cpu_device::set_t0_clk_cb(*device, clock_update_delegate(FUNC(device_t::set_unscaled_clock), _tag, (device_t *)nullptr));
+#define MCFG_MCS48_PORT_T0_CLK_CUSTOM(_class, _func) \
+	mcs48_cpu_device::set_t0_clk_cb(*device, clock_update_delegate(&_class::_func, #_class "::" _func, owner));
+
+#define MCFG_MCS48_PORT_T1_IN_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_test_in_cb(*device, 1, DEVCB_##_devcb);
+
+#define MCFG_MCS48_PORT_BUS_IN_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_bus_in_cb(*device, DEVCB_##_devcb);
+#define MCFG_MCS48_PORT_BUS_OUT_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_bus_out_cb(*device, DEVCB_##_devcb);
+
+// PROG line to 8243 expander
+#define MCFG_MCS48_PORT_PROG_OUT_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_prog_out_cb(*device, DEVCB_##_devcb);
+
+
+/***************************************************************************
+    TYPES
+***************************************************************************/
 
 /* Official Intel MCS-48 parts */
 extern const device_type I8021;            /* 1k internal ROM,      64 bytes internal RAM */
@@ -120,12 +131,34 @@ extern const device_type M58715;           /* 8049 clone */
 class mcs48_cpu_device : public cpu_device
 {
 public:
+	// 8243 expander operations
+	enum expander_op
+	{
+		EXPANDER_OP_READ = 0,
+		EXPANDER_OP_WRITE = 1,
+		EXPANDER_OP_OR = 2,
+		EXPANDER_OP_AND = 3
+	};
+
 	// construction/destruction
 	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int rom_size, int ram_size, uint8_t feature_mask = 0);
+
+	// static configuration
+	template<class Object> static devcb_base &set_port_in_cb(device_t &device, int n, Object &&obj) { return downcast<mcs48_cpu_device &>(device).m_port_in_cb[n].set_callback(std::forward<Object>(obj)); }
+	template<class Object> static devcb_base &set_port_out_cb(device_t &device, int n, Object &&obj) { return downcast<mcs48_cpu_device &>(device).m_port_out_cb[n].set_callback(std::forward<Object>(obj)); }
+	template<class Object> static devcb_base &set_bus_in_cb(device_t &device, Object &&obj) { return downcast<mcs48_cpu_device &>(device).m_bus_in_cb.set_callback(std::forward<Object>(obj)); }
+	template<class Object> static devcb_base &set_bus_out_cb(device_t &device, Object &&obj) { return downcast<mcs48_cpu_device &>(device).m_bus_out_cb.set_callback(std::forward<Object>(obj)); }
+	template<class Object> static devcb_base &set_test_in_cb(device_t &device, int n, Object &&obj) { return downcast<mcs48_cpu_device &>(device).m_test_in_cb[n].set_callback(std::forward<Object>(obj)); }
+	static void set_t0_clk_cb(device_t &device, clock_update_delegate &&func) { downcast<mcs48_cpu_device &>(device).m_t0_clk_func = std::move(func); }
+	template<class Object> static devcb_base &set_prog_out_cb(device_t &device, Object &&obj) { return downcast<mcs48_cpu_device &>(device).m_prog_out_cb.set_callback(std::forward<Object>(obj)); }
+
+	DECLARE_READ8_MEMBER(p1_r);
+	DECLARE_READ8_MEMBER(p2_r);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_config_complete() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
@@ -158,6 +191,15 @@ protected:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
+
+	devcb_read8   m_port_in_cb[2];
+	devcb_write8  m_port_out_cb[2];
+	devcb_read8   m_bus_in_cb;
+	devcb_write8  m_bus_out_cb;
+
+	devcb_read_line m_test_in_cb[2];
+	clock_update_delegate m_t0_clk_func;
+	devcb_write_line m_prog_out_cb;
 
 	uint16_t      m_prevpc;             /* 16-bit previous program counter */
 	uint16_t      m_pc;                 /* 16-bit program counter */
@@ -215,7 +257,7 @@ protected:
 	void execute_call(uint16_t address);
 	void execute_jcc(uint8_t result);
 	uint8_t p2_mask();
-	void expander_operation(uint8_t operation, uint8_t port);
+	void expander_operation(expander_op operation, uint8_t port);
 	int check_irqs();
 	void burn_cycles(int count);
 

@@ -819,13 +819,13 @@ WRITE8_MEMBER(pcw_state::mcu_printer_p2_w)
 }
 
 // Paper sensor
-READ8_MEMBER(pcw_state::mcu_printer_t1_r)
+READ_LINE_MEMBER(pcw_state::mcu_printer_t1_r)
 {
 	return 1;
 }
 
 // Print head location (0 if at left margin, otherwise 1)
-READ8_MEMBER(pcw_state::mcu_printer_t0_r)
+READ_LINE_MEMBER(pcw_state::mcu_printer_t0_r)
 {
 	if(m_printer_headpos == 0)
 		return 0;
@@ -920,12 +920,12 @@ READ8_MEMBER(pcw_state::mcu_kb_data_r)
 	return 0xff;
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_t1_r)
+READ_LINE_MEMBER(pcw_state::mcu_kb_t1_r)
 {
 	return 1;
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_t0_r)
+READ_LINE_MEMBER(pcw_state::mcu_kb_t0_r)
 {
 	return 0;
 }
@@ -975,22 +975,6 @@ static ADDRESS_MAP_START(pcw9512_io, AS_IO, 8, pcw_state )
 	AM_RANGE(0x0f7, 0x0f7) AM_WRITE(                                pcw_vdu_video_control_register_w)
 	AM_RANGE(0x0f8, 0x0f8) AM_READWRITE(pcw_system_status_r,        pcw_system_control_w)
 	AM_RANGE(0x0fc, 0x0fd) AM_READWRITE(pcw9512_parallel_r,         pcw9512_parallel_w)
-ADDRESS_MAP_END
-
-/* i8041 MCU */
-static ADDRESS_MAP_START(pcw_printer_io, AS_IO, 8, pcw_state )
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mcu_printer_p2_r,mcu_printer_p2_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mcu_printer_p1_r, mcu_printer_p1_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(mcu_printer_t1_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(mcu_printer_t0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(pcw_keyboard_io, AS_IO, 8, pcw_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mcu_kb_scan_r,mcu_kb_scan_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mcu_kb_scan_high_r,mcu_kb_scan_high_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(mcu_kb_t1_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(mcu_kb_t0_r)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(mcu_kb_data_r)
 ADDRESS_MAP_END
 
 
@@ -1263,10 +1247,21 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 	MCFG_CPU_IO_MAP(pcw_io)
 
 	MCFG_CPU_ADD("printer_mcu", I8041, 11000000)  // 11MHz
-	MCFG_CPU_IO_MAP(pcw_printer_io)
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(pcw_state, mcu_printer_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pcw_state, mcu_printer_p2_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(pcw_state, mcu_printer_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pcw_state, mcu_printer_p1_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pcw_state, mcu_printer_t1_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(pcw_state, mcu_printer_t0_r))
 
 	MCFG_CPU_ADD("keyboard_mcu", I8048, 5000000) // 5MHz
-	MCFG_CPU_IO_MAP(pcw_keyboard_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(pcw_state, mcu_kb_scan_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pcw_state, mcu_kb_scan_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(pcw_state, mcu_kb_scan_high_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pcw_state, mcu_kb_scan_high_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pcw_state, mcu_kb_t1_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(pcw_state, mcu_kb_t0_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pcw_state, mcu_kb_data_r))
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(50))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")

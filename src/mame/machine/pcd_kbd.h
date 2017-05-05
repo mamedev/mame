@@ -22,7 +22,7 @@ public:
 	DECLARE_READ8_MEMBER( bus_r );
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_WRITE8_MEMBER( p1_w );
-	DECLARE_READ8_MEMBER( t0_r );
+	DECLARE_READ_LINE_MEMBER( t0_r );
 	DECLARE_WRITE_LINE_MEMBER( t0_w );
 private:
 	required_ioport_array<17> m_rows;

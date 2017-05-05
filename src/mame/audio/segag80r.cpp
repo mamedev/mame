@@ -673,23 +673,6 @@ static const char *const monsterb_sample_names[] =
 
 /*************************************
  *
- *  N7751 memory maps
- *
- *************************************/
-
-static ADDRESS_MAP_START( monsterb_7751_portmap, AS_IO, 8, segag80r_state )
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ(n7751_t1_r)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
-	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_WRITE(n7751_p2_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("audio_8243", i8243_device, i8243_prog_w)
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -703,7 +686,12 @@ MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", N7751, 6000000)
-	MCFG_CPU_IO_MAP(monsterb_7751_portmap)
+	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(segag80r_state, n7751_command_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(segag80r_state, n7751_rom_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(segag80r_state, n7751_p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("audio_8243", i8243_device, prog_w))
 
 	MCFG_I8243_ADD("audio_8243", NOOP, WRITE8(segag80r_state,n7751_rom_control_w))
 
@@ -847,16 +835,9 @@ WRITE8_MEMBER(segag80r_state::n7751_p2_w)
 {
 	i8243_device *device = machine().device<i8243_device>("audio_8243");
 	/* write to P2; low 4 bits go to 8243 */
-	device->i8243_p2_w(space, offset, data & 0x0f);
+	device->p2_w(space, offset, data & 0x0f);
 
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */
 	m_n7751_busy = data >> 7;
-}
-
-
-READ8_MEMBER(segag80r_state::n7751_t1_r)
-{
-	/* T1 - labelled as "TEST", connected to ground */
-	return 0;
 }

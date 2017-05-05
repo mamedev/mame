@@ -113,7 +113,7 @@ public:
 	/*----------- defined in audio/carnival.c -----------*/
 	DECLARE_WRITE8_MEMBER( carnival_audio_1_w );
 	DECLARE_WRITE8_MEMBER( carnival_audio_2_w );
-	DECLARE_READ8_MEMBER( carnival_music_port_t1_r );
+	DECLARE_READ_LINE_MEMBER( carnival_music_port_t1_r );
 	DECLARE_WRITE8_MEMBER( carnival_music_port_1_w );
 	DECLARE_WRITE8_MEMBER( carnival_music_port_2_w );
 	void carnival_psg_latch(address_space &space);

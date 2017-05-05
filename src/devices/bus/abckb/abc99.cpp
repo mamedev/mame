@@ -133,10 +133,6 @@ static ADDRESS_MAP_START( abc99_z2_io, AS_IO, 8, abc99_device )
 	AM_RANGE(0x3d, 0x3d) AM_READ_PORT("X13") AM_WRITENOP
 	AM_RANGE(0x3e, 0x3e) AM_READ_PORT("X14") AM_WRITENOP
 	AM_RANGE(0x3f, 0x3f) AM_READ_PORT("X15") AM_WRITENOP
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(z2_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(z2_p2_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(z2_t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(z2_t1_r)
 ADDRESS_MAP_END
 
 
@@ -150,18 +146,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( abc99_z5_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( abc99_z5_io, AS_IO, 8, abc99_device )
-/*  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(z5_p1_r)
-    AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(z5_p2_w)
-    AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_WRITENOP // Z2 CLK
-    AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(z5_t1_r)*/
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( abc99 )
 //-------------------------------------------------
 
@@ -170,11 +154,18 @@ static MACHINE_CONFIG_FRAGMENT( abc99 )
 	MCFG_CPU_ADD(I8035_Z2_TAG, I8035, XTAL_6MHz/3) // from Z5 T0 output
 	MCFG_CPU_PROGRAM_MAP(abc99_z2_mem)
 	MCFG_CPU_IO_MAP(abc99_z2_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(abc99_device, z2_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(abc99_device, z2_p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(abc99_device, z2_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(abc99_device, z2_t1_r))
 
 	// mouse CPU
 	MCFG_CPU_ADD(I8035_Z5_TAG, I8035, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(abc99_z5_mem)
-	MCFG_CPU_IO_MAP(abc99_z5_io)
+	//MCFG_MCS48_PORT_P1_IN_CB(READ8(abc99_device, z5_p1_r))
+	//MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(abc99_device, z5_p2_w))
+	//MCFG_MCS48_PORT_T0_CLK_CUSTOM() // Z2 CLK
+	//MCFG_MCS48_PORT_T1_IN_CB(READ8(abc99_device, z5_t1_r))
 	MCFG_DEVICE_DISABLE() // HACK fix for broken serial I/O
 
 	// sound hardware
@@ -676,7 +667,7 @@ READ8_MEMBER( abc99_device::z2_p2_r )
 //  z2_t0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc99_device::z2_t0_r )
+READ_LINE_MEMBER( abc99_device::z2_t0_r )
 {
 	return 1; // 0=mouse connected, 1=no mouse
 }
@@ -686,7 +677,7 @@ READ8_MEMBER( abc99_device::z2_t0_r )
 //  z2_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc99_device::z2_t1_r )
+READ_LINE_MEMBER( abc99_device::z2_t1_r )
 {
 	return m_t1_z2;
 }

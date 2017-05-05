@@ -100,12 +100,12 @@ void speech_sound_device::device_start()
 
 
 
-READ8_MEMBER( speech_sound_device::t0_r )
+READ_LINE_MEMBER( speech_sound_device::t0_r )
 {
 	return m_t0;
 }
 
-READ8_MEMBER( speech_sound_device::t1_r )
+READ_LINE_MEMBER( speech_sound_device::t1_r )
 {
 	return m_drq;
 }
@@ -204,10 +204,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( speech_portmap, AS_IO, 8, speech_sound_device )
 	AM_RANGE(0x00, 0xff) AM_DEVREAD("segaspeech", speech_sound_device, rom_r)
 	AM_RANGE(0x00, 0xff) AM_DEVWRITE("speech", sp0250_device, write)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVREADWRITE("segaspeech", speech_sound_device, p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE("segaspeech", speech_sound_device, p2_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVREAD("segaspeech", speech_sound_device, t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_DEVREAD("segaspeech", speech_sound_device, t1_r)
 ADDRESS_MAP_END
 
 
@@ -223,6 +219,11 @@ MACHINE_CONFIG_FRAGMENT( sega_speech_board )
 	MCFG_CPU_ADD("audiocpu", I8035, SPEECH_MASTER_CLOCK)        /* divide by 15 in CPU */
 	MCFG_CPU_PROGRAM_MAP(speech_map)
 	MCFG_CPU_IO_MAP(speech_portmap)
+	MCFG_MCS48_PORT_P1_IN_CB(DEVREAD8("segaspeech", speech_sound_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("segaspeech", speech_sound_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(DEVWRITE8("segaspeech", speech_sound_device, p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("segaspeech", speech_sound_device, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("segaspeech", speech_sound_device, t1_r))
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("segaspeech", SEGASPEECH, 0)
@@ -488,7 +489,7 @@ WRITE8_MEMBER( usb_sound_device::p2_w )
 }
 
 
-READ8_MEMBER( usb_sound_device::t1_r )
+READ_LINE_MEMBER( usb_sound_device::t1_r )
 {
 	/* T1 returns 1 based on the value of the T1 clock; the exact */
 	/* pattern is determined by one or more jumpers on the board. */
@@ -852,9 +853,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( usb_portmap, AS_IO, 8, usb_sound_device )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(workram_r, workram_w) AM_SHARE("workram")
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
 ADDRESS_MAP_END
 
 
@@ -870,6 +868,10 @@ MACHINE_CONFIG_FRAGMENT( segausb )
 	MCFG_CPU_ADD("ourcpu", I8035, USB_MASTER_CLOCK)     /* divide by 15 in CPU */
 	MCFG_CPU_PROGRAM_MAP(usb_map)
 	MCFG_CPU_IO_MAP(usb_portmap)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(usb_sound_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(usb_sound_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(usb_sound_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(usb_sound_device, t1_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("usb_timer", usb_sound_device, increment_t1_clock_timer_cb, attotime::from_hz(USB_2MHZ_CLOCK / 256))
 MACHINE_CONFIG_END

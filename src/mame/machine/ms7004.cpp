@@ -51,13 +51,6 @@ static ADDRESS_MAP_START( ms7004_map, AS_PROGRAM, 8, ms7004_device )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ms7004_iomap, AS_IO, 8, ms7004_device )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w)
-ADDRESS_MAP_END
-
 //-------------------------------------------------
 //  MACHINE_CONFIG
 //-------------------------------------------------
@@ -65,7 +58,10 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_FRAGMENT( ms7004 )
 	MCFG_CPU_ADD(MS7004_CPU_TAG, I8035, XTAL_4_608MHz)
 	MCFG_CPU_PROGRAM_MAP(ms7004_map)
-	MCFG_CPU_IO_MAP(ms7004_iomap)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ms7004_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ms7004_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ms7004_device, t1_r))
+	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("i8243", i8243_device, prog_w))
 
 	MCFG_I8243_ADD("i8243", NOOP, WRITE8(ms7004_device, i8243_port_w))
 
@@ -443,7 +439,7 @@ WRITE8_MEMBER( ms7004_device::p2_w )
 	DBG_LOG(2,0,( "p2_w %02x = col %d\n", data, data&15));
 
 	m_p2 = data;
-	m_i8243->i8243_p2_w(space, offset, data);
+	m_i8243->p2_w(space, offset, data);
 }
 
 
@@ -476,7 +472,7 @@ WRITE8_MEMBER( ms7004_device::i8243_port_w )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ms7004_device::t1_r )
+READ_LINE_MEMBER( ms7004_device::t1_r )
 {
 	if (!BIT(m_p1,4))
 		return m_keylatch;

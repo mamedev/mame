@@ -382,12 +382,6 @@ READ8_MEMBER(josvolly_state::mcu2_p2_r)
 	return 0x7fU & ioport("DSW2")->read();
 }
 
-READ8_MEMBER(josvolly_state::mcu2_test_r)
-{
-	// TEST0 and TEST1 are driven by P20 and P21 on the other MCU
-	return BIT(m_mcu1_p2, offset);
-}
-
 WRITE8_MEMBER(josvolly_state::cpu2_nmi_enable_w)
 {
 	m_cpu2_nmi_enable = true;
@@ -534,17 +528,6 @@ static ADDRESS_MAP_START( josvolly_cpu2_io_map, AS_IO, 8, josvolly_state )
 
 	AM_RANGE(0x81, 0x81) AM_WRITE(cpu2_nmi_enable_w);
 	AM_RANGE(0xC1, 0xC1) AM_WRITE(cpu2_irq_clear_w);
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( josvolly_mcu1_io_map, AS_IO, 8, josvolly_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mcu1_p1_r, mcu1_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mcu1_p2_r, mcu1_p2_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( josvolly_mcu2_io_map, AS_IO, 8, josvolly_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mcu2_p1_r, mcu2_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mcu2_p2_r, mcu2_p2_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T1) AM_READ(mcu2_test_r)
 ADDRESS_MAP_END
 
 
@@ -863,10 +846,19 @@ static MACHINE_CONFIG_START( josvolly, josvolly_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", josvolly_state, irq0_line_assert)
 
 	MCFG_DEVICE_ADD("mcu1", I8741, 18000000/2) /* ? */
-	MCFG_CPU_IO_MAP(josvolly_mcu1_io_map)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(josvolly_state, mcu1_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(josvolly_state, mcu1_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(josvolly_state, mcu1_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(josvolly_state, mcu1_p2_w))
 
 	MCFG_DEVICE_ADD("mcu2", I8741, 12000000/2) /* ? */
-	MCFG_CPU_IO_MAP(josvolly_mcu2_io_map)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(josvolly_state, mcu2_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(josvolly_state, mcu2_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(josvolly_state, mcu2_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(josvolly_state, mcu2_p2_w))
+	// TEST0 and TEST1 are driven by P20 and P21 on the other MCU
+	MCFG_MCS48_PORT_T0_IN_CB(DEVREAD8("mcu1", i8741_device, p2_r)) MCFG_DEVCB_RSHIFT(0)
+	MCFG_MCS48_PORT_T1_IN_CB(DEVREAD8("mcu1", i8741_device, p2_r)) MCFG_DEVCB_RSHIFT(1)
 
 	MCFG_DEVICE_ADD("aa_007", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))   // 1PL
