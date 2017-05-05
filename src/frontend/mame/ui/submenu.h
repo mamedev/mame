@@ -48,7 +48,7 @@ public:
 		option_type type;
 		const char  *description;
 		const char  *name;
-		core_options::entry *entry;
+		core_options::entry::shared_ptr entry;
 		core_options *options;
 		std::vector<std::string> value;
 	};

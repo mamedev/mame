@@ -195,32 +195,16 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+struct game_driver;
+class device_slot_interface;
+class emu_options;
+
 class slot_option
 {
 public:
-	slot_option(const char *default_value = nullptr);
-	slot_option(const slot_option &that) = default;
+	slot_option(emu_options &host, const char *default_value);
+	slot_option(const slot_option &that) = delete;
 	slot_option(slot_option &&that) = default;
-
-	const slot_option &operator=(const slot_option &that)
-	{
-		m_specified = that.m_specified;
-		m_specified_value = that.m_specified_value;
-		m_specified_bios = that.m_specified_bios;
-		m_default_card_software = that.m_default_card_software;
-		m_default_value = that.m_default_value;
-		return *this;
-	}
-
-	const slot_option &operator=(slot_option &&that)
-	{
-		m_specified = that.m_specified;
-		m_specified_value = std::move(that.m_specified_value);
-		m_specified_bios = std::move(that.m_specified_bios);
-		m_default_card_software = std::move(that.m_default_card_software);
-		m_default_value = std::move(that.m_default_value);
-		return *this;
-	}
 
 	// accessors
 	const std::string &value() const;
@@ -228,23 +212,60 @@ public:
 	const std::string &bios() const { return m_specified_bios; }
 	const std::string &default_card_software() const { return m_default_card_software; }
 	bool specified() const { return m_specified; }
+	core_options::entry::shared_ptr option_entry() const { return m_entry.lock(); }
 
 	// seters
 	void specify(std::string &&text);
 	void set_bios(std::string &&text);
-	void set_default_card_software(std::string &&s) { m_default_card_software = std::move(s); }
+	void set_default_card_software(std::string &&s);
+
+	// instantiates an option entry (don't call outside of emuopts.cpp)
+	core_options::entry::shared_ptr setup_option_entry(const char *name);
 
 private:
-	bool            m_specified;
-	std::string     m_specified_value;
-	std::string     m_specified_bios;
-	std::string     m_default_card_software;
-	std::string     m_default_value;
+	void possibly_changed(const std::string &old_value);
+
+	emu_options &                   m_host;
+	bool                            m_specified;
+	std::string                     m_specified_value;
+	std::string                     m_specified_bios;
+	std::string                     m_default_card_software;
+	std::string                     m_default_value;
+	core_options::entry::weak_ptr   m_entry;
+};
+
+
+class image_option
+{
+public:
+	image_option(emu_options &host, const std::string &cannonical_instance_name);
+	image_option(const image_option &that) = delete;
+	image_option(image_option &&that) = default;
+
+	// accessors
+	const std::string &cannonical_instance_name() const { return m_cannonical_instance_name; }
+	const std::string &value() const { return m_value; }
+	core_options::entry::shared_ptr option_entry() const { return m_entry.lock(); }
+
+	// mutators
+	void specify(const std::string &value);
+	void specify(std::string &&value);
+
+	// instantiates an option entry (don't call outside of emuopts.cpp)
+	core_options::entry::shared_ptr setup_option_entry(std::vector<std::string> &&names);
+
+private:
+	emu_options &                   m_host;
+	std::string                     m_cannonical_instance_name;
+	std::string                     m_value;
+	core_options::entry::weak_ptr   m_entry;
 };
 
 
 class emu_options : public core_options
 {
+	friend class slot_option;
+	friend class image_option;
 public:
 	enum ui_option
 	{
@@ -253,11 +274,16 @@ public:
 	};
 
 	// construction/destruction
-	emu_options();
+	emu_options(bool general_only = false);
+	~emu_options();
+
+	// mutation
+	void set_system_name(const std::string &new_system_name);
+	void set_software(const std::string &new_software);
 
 	// core options
-	const char *system_name() const { return value(OPTION_SYSTEMNAME); }
-	const char *software_name() const { return value(OPTION_SOFTWARENAME); }
+	const game_driver *system() const { return m_system; }
+	const char *system_name() const;
 
 	// core configuration options
 	bool read_config() const { return bool_value(OPTION_READCONFIG); }
@@ -427,36 +453,51 @@ public:
 
 	const char *language() const { return value(OPTION_LANGUAGE); }
 
-	// Web server specific optopns
+	// Web server specific options
 	bool  http() const { return bool_value(OPTION_HTTP); }
 	short http_port() const { return int_value(OPTION_HTTP_PORT); }
 	const char *http_root() const { return value(OPTION_HTTP_ROOT); }
 
 	// slots and devices - the values for these are stored outside of the core_options
 	// structure
-	std::map<std::string, slot_option> &slot_options() { return m_slot_options; }
-	const std::map<std::string, slot_option> &slot_options() const { return m_slot_options; }
-	std::map<std::string, std::string> &image_options() { return m_image_options; }
-	const std::map<std::string, std::string> &image_options() const { return m_image_options; }
-
-protected:
-	virtual void value_changed(const std::string &name, const std::string &value) override;
-	virtual override_get_value_result override_get_value(const char *name, std::string &value) const override;
-	virtual bool override_set_value(const char *name, const std::string &value) override;
+	const ::slot_option &slot_option(const std::string &device_name) const;
+	::slot_option &slot_option(const std::string &device_name);
+	bool has_slot_option(const std::string &device_name) const;
+	const ::image_option &image_option(const std::string &device_name) const;
+	::image_option &image_option(const std::string &device_name);
 
 private:
-	static const options_entry s_option_entries[];
+	struct software_options
+	{
+		std::unordered_map<std::string, std::string>    slot;
+		std::unordered_map<std::string, std::string>    image;
+	};
+
+	// slot/image/softlist calculus
+	software_options evaluate_initial_softlist_options(const std::string &software_identifier);
+	void update_slot_and_image_options();
+	bool add_and_remove_slot_options();
+	bool add_and_remove_image_options();
+	void reevaluate_default_card_software();
+	std::string get_default_card_software(device_slot_interface &slot);
+
+	// static list of options entries
+	static const options_entry                          s_option_entries[];
+
+	// the current driver
+	const game_driver *                                 m_system;
 
 	// slots and devices
-	std::map<std::string, slot_option>  m_slot_options;
-	std::map<std::string, std::string>  m_image_options;
+	std::unordered_map<std::string, ::slot_option>      m_slot_options;
+	std::unordered_map<std::string, ::image_option>     m_image_options_cannonical;
+	std::unordered_map<std::string, ::image_option *>   m_image_options;
 
 	// cached options, for scenarios where parsing core_options is too slow
-	int                                 m_coin_impulse;
-	bool                                m_joystick_contradictory;
-	bool                                m_sleep;
-	bool                                m_refresh_speed;
-	ui_option                           m_ui;
+	int                                                 m_coin_impulse;
+	bool                                                m_joystick_contradictory;
+	bool                                                m_sleep;
+	bool                                                m_refresh_speed;
+	ui_option                                           m_ui;
 };
 
 #endif  // MAME_EMU_EMUOPTS_H

@@ -163,9 +163,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("%s", output.str().c_str());
 
 		osd_printf_warning("Setting value to default %s\n",m_default_size);
-		std::string error;
-		mconfig().options().set_value(OPTION_RAMSIZE, m_default_size, OPTION_PRIORITY_CMDLINE, error);
-		assert(error.empty());
+		mconfig().options().set_value(OPTION_RAMSIZE, m_default_size, OPTION_PRIORITY_CMDLINE);
 	}
 }
 
