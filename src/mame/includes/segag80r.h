@@ -158,6 +158,7 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	emu_timer *m_vblank_latch_clear_timer;
 };
 
 
