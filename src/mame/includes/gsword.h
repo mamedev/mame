@@ -121,7 +121,6 @@ public:
 	DECLARE_READ8_MEMBER(mcu1_p2_r);
 	DECLARE_READ8_MEMBER(mcu2_p1_r);
 	DECLARE_READ8_MEMBER(mcu2_p2_r);
-	DECLARE_READ8_MEMBER(mcu2_test_r);
 
 	DECLARE_WRITE8_MEMBER(cpu2_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(cpu2_irq_clear_w);

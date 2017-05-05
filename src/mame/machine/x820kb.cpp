@@ -81,25 +81,17 @@ const tiny_rom_entry *xerox_820_keyboard_t::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( kb_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( xerox_820_keyboard_io, AS_IO, 8, xerox_820_keyboard_t )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(kb_p1_r, kb_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(kb_p2_r) AM_WRITENOP
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(kb_t0_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T1) AM_READ(kb_t1_r)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(kb_bus_w)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( xerox_820_keyboard )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( xerox_820_keyboard )
 	MCFG_CPU_ADD(I8748_TAG, I8048, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(xerox_820_keyboard_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(xerox_820_keyboard_t, kb_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(xerox_820_keyboard_t, kb_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(xerox_820_keyboard_t, kb_p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(xerox_820_keyboard_t, kb_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(xerox_820_keyboard_t, kb_t1_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(xerox_820_keyboard_t, kb_bus_w))
 MACHINE_CONFIG_END
 
 
@@ -347,7 +339,7 @@ READ8_MEMBER( xerox_820_keyboard_t::kb_p2_r )
 //  kb_t0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( xerox_820_keyboard_t::kb_t0_r )
+READ_LINE_MEMBER( xerox_820_keyboard_t::kb_t0_r )
 {
 	uint8_t data = 1;
 
@@ -365,7 +357,7 @@ READ8_MEMBER( xerox_820_keyboard_t::kb_t0_r )
 //  kb_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( xerox_820_keyboard_t::kb_t1_r )
+READ_LINE_MEMBER( xerox_820_keyboard_t::kb_t1_r )
 {
 	return 1; // ??? if 0, toggle P17
 }

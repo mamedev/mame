@@ -56,17 +56,13 @@ public:
 	uint8_t m_pkr_io_ram[0x100];
 	uint16_t m_video_ram[0x0400];
 	uint8_t m_color_ram[0x0400];
-	DECLARE_WRITE8_MEMBER(t0_w);
-	DECLARE_WRITE8_MEMBER(t1_w);
-	DECLARE_WRITE8_MEMBER(p0_w);
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_WRITE8_MEMBER(p2_w);
-	DECLARE_WRITE8_MEMBER(prog_w);
+	DECLARE_WRITE_LINE_MEMBER(prog_w);
 	DECLARE_WRITE8_MEMBER(bus_w);
 	DECLARE_WRITE8_MEMBER(drw80pkr_io_w);
-	DECLARE_READ8_MEMBER(t0_r);
-	DECLARE_READ8_MEMBER(t1_r);
-	DECLARE_READ8_MEMBER(p0_r);
+	DECLARE_READ_LINE_MEMBER(t0_r);
+	DECLARE_READ_LINE_MEMBER(t1_r);
 	DECLARE_READ8_MEMBER(p1_r);
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_READ8_MEMBER(bus_r);
@@ -95,21 +91,6 @@ void drw80pkr_state::machine_start()
 * Write Handlers *
 ******************/
 
-WRITE8_MEMBER(drw80pkr_state::t0_w)
-{
-	m_t0 = data;
-}
-
-WRITE8_MEMBER(drw80pkr_state::t1_w)
-{
-	m_t1 = data;
-}
-
-WRITE8_MEMBER(drw80pkr_state::p0_w)
-{
-	m_p0 = data;
-}
-
 WRITE8_MEMBER(drw80pkr_state::p1_w)
 {
 	m_p1 = data;
@@ -120,9 +101,9 @@ WRITE8_MEMBER(drw80pkr_state::p2_w)
 	m_p2 = data;
 }
 
-WRITE8_MEMBER(drw80pkr_state::prog_w)
+WRITE_LINE_MEMBER(drw80pkr_state::prog_w)
 {
-	m_prog = data;
+	m_prog = state;
 
 	// Bankswitch Program Memory
 	if (m_prog == 0x01)
@@ -216,19 +197,14 @@ WRITE8_MEMBER(drw80pkr_state::drw80pkr_io_w)
 * Read Handlers *
 ****************/
 
-READ8_MEMBER(drw80pkr_state::t0_r)
+READ_LINE_MEMBER(drw80pkr_state::t0_r)
 {
 	return m_t0;
 }
 
-READ8_MEMBER(drw80pkr_state::t1_r)
+READ_LINE_MEMBER(drw80pkr_state::t1_r)
 {
 	return m_t1;
-}
-
-READ8_MEMBER(drw80pkr_state::p0_r)
-{
-	return m_p0;
 }
 
 READ8_MEMBER(drw80pkr_state::p1_r)
@@ -428,13 +404,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drw80pkr_io_map, AS_IO, 8, drw80pkr_state )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(drw80pkr_io_r, drw80pkr_io_w)
-	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0) AM_READWRITE(t0_r, t0_w)
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READWRITE(t1_r, t1_w)
-	AM_RANGE(MCS48_PORT_P0,   MCS48_PORT_P0) AM_READWRITE(p0_r, p0_w)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_RAM_WRITE(prog_w)
-	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READWRITE(bus_r, bus_w)
 ADDRESS_MAP_END
 
 /*************************
@@ -474,6 +443,15 @@ static MACHINE_CONFIG_START( drw80pkr, drw80pkr_state )
 	MCFG_CPU_ADD("maincpu", I8039, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(drw80pkr_map)
 	MCFG_CPU_IO_MAP(drw80pkr_io_map)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(drw80pkr_state, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(drw80pkr_state, t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(drw80pkr_state, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(drw80pkr_state, p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(drw80pkr_state, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(drw80pkr_state, p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(drw80pkr_state, prog_w))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(drw80pkr_state, bus_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(drw80pkr_state, bus_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", drw80pkr_state,  irq0_line_hold)
 
 

@@ -52,25 +52,17 @@ const tiny_rom_entry *compis_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( compis_keyboard_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( compis_keyboard_io, AS_IO, 8, compis_keyboard_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READWRITE(bus_r, bus_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(p1_r) AM_WRITENOP
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(p2_r) AM_WRITENOP
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_NOP
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_NOP
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( compis_keyboard )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( compis_keyboard )
 	MCFG_CPU_ADD(I8748_TAG, I8748, 2016000) // XTAL_4_032MHz/2 ???
-	MCFG_CPU_IO_MAP(compis_keyboard_io)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(compis_keyboard_device, bus_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(compis_keyboard_device, bus_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(compis_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(compis_keyboard_device, p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(NOOP) // ???
+	MCFG_MCS48_PORT_T1_IN_CB(NOOP) // ???
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

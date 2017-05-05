@@ -243,14 +243,6 @@ static ADDRESS_MAP_START( spacefb_main_io_map, AS_IO, 8, spacefb_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spacefb_audio_io_map, AS_IO, 8, spacefb_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(audio_p2_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(audio_t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(audio_t1_r)
-ADDRESS_MAP_END
-
-
 
 /*************************************
  *
@@ -345,7 +337,10 @@ static MACHINE_CONFIG_START( spacefb, spacefb_state )
 
 	MCFG_CPU_ADD("audiocpu", I8035, SPACEFB_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(spacefb_audio_map)
-	MCFG_CPU_IO_MAP(spacefb_audio_io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(spacefb_state, audio_p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(spacefb_state, audio_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(spacefb_state, audio_t1_r))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(180))
 

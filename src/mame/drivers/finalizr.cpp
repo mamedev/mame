@@ -77,7 +77,7 @@ WRITE8_MEMBER(finalizr_state::i8039_irqen_w)
 		m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
-READ8_MEMBER(finalizr_state::i8039_T1_r)
+READ_LINE_MEMBER(finalizr_state::i8039_T1_r)
 {
 	/*  I suspect the clock-out from the I8039 T0 line should be connected
 	    here (See the i8039_T0_w handler below).
@@ -138,10 +138,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, finalizr_state )
 	AM_RANGE(0x00, 0xff)                   AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_WRITE(i8039_T0_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(i8039_T1_r)
 ADDRESS_MAP_END
 
 
@@ -274,6 +270,10 @@ static MACHINE_CONFIG_START( finalizr, finalizr_state )
 	MCFG_CPU_ADD("audiocpu", I8039,XTAL_18_432MHz/2) /* 9.216MHz clkin ?? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(finalizr_state, i8039_irqen_w))
+	//MCFG_MCS48_PORT_T0_CLK_CUSTOM(finalizr_state, i8039_T0_w)
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(finalizr_state, i8039_T1_r))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

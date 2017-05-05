@@ -114,7 +114,6 @@ public:
 	DECLARE_WRITE8_MEMBER(spaceod_sound_w);
 	DECLARE_READ8_MEMBER(n7751_rom_r);
 	DECLARE_READ8_MEMBER(n7751_command_r);
-	DECLARE_READ8_MEMBER(n7751_t1_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_WRITE8_MEMBER(usb_ram_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_soundport_w);

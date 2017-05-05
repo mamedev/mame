@@ -41,8 +41,8 @@ public:
 	DECLARE_WRITE8_MEMBER( p1_w );
 	DECLARE_READ8_MEMBER( p2_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( t0_r );
-	DECLARE_READ8_MEMBER( t1_r );
+	DECLARE_READ_LINE_MEMBER( t0_r );
+	DECLARE_READ_LINE_MEMBER( t1_r );
 
 protected:
 	// device-level overrides

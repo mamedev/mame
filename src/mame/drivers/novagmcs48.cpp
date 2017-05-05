@@ -105,21 +105,6 @@ MACHINE_RESET_MEMBER(novagmcs48_state, octo)
 
 
 /******************************************************************************
-    Address Maps
-******************************************************************************/
-
-// Presto/Octo
-
-static ADDRESS_MAP_START( presto_io, AS_IO, 8, novagmcs48_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(presto_input_r) AM_WRITENOP
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(presto_control_w)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(presto_mux_w)
-ADDRESS_MAP_END
-
-
-
-/******************************************************************************
     Input Ports
 ******************************************************************************/
 
@@ -157,11 +142,15 @@ INPUT_CHANGED_MEMBER(novagmcs48_state::octo_cpu_freq)
     Machine Drivers
 ******************************************************************************/
 
+// Presto/Octo
+
 static MACHINE_CONFIG_START( presto, novagmcs48_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8049, 6000000) // LC circuit, measured
-	MCFG_CPU_IO_MAP(presto_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(novagmcs48_state, presto_input_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(novagmcs48_state, presto_control_w))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(novagmcs48_state, presto_mux_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_novag_presto)

@@ -403,8 +403,6 @@ WRITE8_MEMBER(monzagp_state::port2_w)
 
 static ADDRESS_MAP_START( monzagp_io, AS_IO, 8, monzagp_state )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(port_r, port_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(port1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(port2_r, port2_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( monzagp )
@@ -489,6 +487,9 @@ static MACHINE_CONFIG_START( monzagp, monzagp_state )
 	MCFG_CPU_ADD("maincpu", I8035, 12000000/4) /* 400KHz ??? - Main board Crystal is 12MHz */
 	MCFG_CPU_PROGRAM_MAP(monzagp_map)
 	MCFG_CPU_IO_MAP(monzagp_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(monzagp_state, port1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(monzagp_state, port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(monzagp_state, port2_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", monzagp_state, irq0_line_hold)
 
 	/* video hardware */

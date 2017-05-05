@@ -167,7 +167,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ipc_port1_w );
 	DECLARE_WRITE8_MEMBER( ipc_port2_w );
 	DECLARE_READ8_MEMBER( ipc_port2_r );
-	DECLARE_READ8_MEMBER( ipc_t1_r );
+	DECLARE_READ_LINE_MEMBER( ipc_t1_r );
 	DECLARE_READ8_MEMBER( ipc_bus_r );
 	DECLARE_WRITE_LINE_MEMBER( ql_baudx4_w );
 	DECLARE_WRITE_LINE_MEMBER( ql_comdata_w );
@@ -440,7 +440,7 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 //  ipc_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ql_state::ipc_t1_r )
+READ_LINE_MEMBER( ql_state::ipc_t1_r )
 {
 	return m_baudx4;
 }
@@ -503,10 +503,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ipc_io, AS_IO, 8, ql_state )
 	AM_RANGE(0x00, 0x7f) AM_WRITE(ipc_w)
 	AM_RANGE(0x27, 0x28) AM_READNOP // IPC reads these to set P0 (bus) to Hi-Z mode
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(ipc_port1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(ipc_port2_r, ipc_port2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(ipc_t1_r)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(ipc_bus_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -899,6 +895,11 @@ static MACHINE_CONFIG_START( ql, ql_state )
 
 	MCFG_CPU_ADD(I8749_TAG, I8749, X4)
 	MCFG_CPU_IO_MAP(ipc_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ql_state, ipc_port1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(ql_state, ipc_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ql_state, ipc_port2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ql_state, ipc_t1_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(ql_state, ipc_bus_r))
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
