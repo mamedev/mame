@@ -29,6 +29,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
+	void postload(void);
 	void set_cpu_tag(const char *tag);
 	static void set_type(const int type) {m_type = type;}
 	void set_fbmem(const int fbmem) {m_fbmem = fbmem;}

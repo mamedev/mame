@@ -100,6 +100,7 @@ public:
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	void set_irq_info(const char *tag, const int irq_num);
+	void postload(void);
 
 	DECLARE_READ32_MEMBER (reg_r);
 	DECLARE_WRITE32_MEMBER(reg_w);
