@@ -20,8 +20,8 @@ const device_type ITEAGLE_FPGA = device_creator<iteagle_fpga_device>;
 MACHINE_CONFIG_FRAGMENT(iteagle_fpga)
 	MCFG_NVRAM_ADD_0FILL("eagle2_rtc")
 	// RS232 serial ports
-	//MCFG_SCC85C30_ADD(AM85C30_TAG, XTAL_7_3728MHz, XTAL_1_8432MHz, 0, XTAL_1_8432MHz, 0)
-	MCFG_SCC85C30_ADD(AM85C30_TAG, XTAL_1_8432MHz, XTAL_1_8432MHz, 0, XTAL_1_8432MHz, 0)
+	// The console terminal (com1) operates at 38400 baud
+	MCFG_SCC85C30_ADD(AM85C30_TAG, XTAL_7_3728MHz, XTAL_7_3728MHz, 0, XTAL_7_3728MHz, 0)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(iteagle_fpga_device, serial_interrupt))
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(COM2_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(COM1_TAG, rs232_port_device, write_txd))
@@ -241,6 +241,10 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 			break;
 		case 0x0c/4: //
 			result = 0;
+			// Need to eat some CPU cycles otherwise the CPU times out waiting for tx uart buffer empty
+			if (ACCESSING_BITS_0_15) {
+				m_cpu->eat_cycles(40);
+			}
 			if (ACCESSING_BITS_0_7) {
 				result |= m_scc1->cb_r(space, offset) << 0;
 				if (LOG_SERIAL) m_serial0_1.read_control(1);

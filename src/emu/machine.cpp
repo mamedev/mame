@@ -1314,6 +1314,11 @@ static running_machine * jsmess_machine;
 
 void js_main_loop()
 {
+	if (jsmess_machine->paused()) {
+		jsmess_machine->video().frame_update();
+		return;
+	}
+
 	device_scheduler * scheduler;
 	scheduler = &(jsmess_machine->scheduler());
 	attotime stoptime(scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60)));

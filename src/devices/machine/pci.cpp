@@ -102,6 +102,9 @@ void pci_device::device_start()
 	expansion_rom = nullptr;
 	expansion_rom_size = 0;
 	expansion_rom_base = 0;
+
+	save_item(NAME(intr_line));
+	save_item(NAME(intr_pin));
 }
 
 void pci_device::device_reset()

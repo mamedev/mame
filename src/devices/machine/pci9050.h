@@ -60,6 +60,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	void postload(void);
+
 private:
 	DECLARE_ADDRESS_MAP(map, 32);
 	DECLARE_ADDRESS_MAP(empty, 32);

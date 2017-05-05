@@ -1639,7 +1639,7 @@ INPUT_PORTS_END
 
 epr-17740  - Japan   STVB1.10J0950131  95/01/31 v1.10  - Found on a early board dated 02/1995
 epr-17740a - Japan   STVB1.11J0950220  95/02/20 v1.11
-epr-17951a - Japan   STVB1.13J0950425  95/04/25 v1.13
+epr-17951a - Japan   STVB1.13J0950425  95/04/25 v1.13 - There's also a 100% identical mask ROM version: mpr-17951a
 epr-17952a - USA     STVB1.13U0950425  95/04/25 v1.13
 epr-17953a - Taiwan  STVB1.13T0950425  95/04/25 v1.13
 epr-17954a - Europe  STVB1.13E0950425  95/04/25 v1.13

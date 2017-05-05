@@ -95,6 +95,11 @@ void ide_pci_device::device_start()
 
 	intr_pin = 0x1;
 	intr_line = 0xe;
+
+	// Save states
+	save_item(NAME(pci_bar));
+	save_item(NAME(m_config_data));
+
 }
 
 void ide_pci_device::device_reset()

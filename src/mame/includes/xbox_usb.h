@@ -314,7 +314,7 @@ struct usb_device_string
 	int size;
 };
 
-struct usb_device_interface_alternate
+struct usb_device_interfac_alternate
 {
 	uint8_t *position;
 	int size;
@@ -322,11 +322,11 @@ struct usb_device_interface_alternate
 	std::forward_list<USBStandardEndpointDescriptor> endpoint_descriptors;
 };
 
-struct usb_device_interface
+struct usb_device_interfac
 {
 	uint8_t *position;
 	int size;
-	std::forward_list<usb_device_interface_alternate *> alternate_settings;
+	std::forward_list<usb_device_interfac_alternate *> alternate_settings;
 	int selected_alternate;
 };
 
@@ -335,17 +335,17 @@ struct usb_device_configuration
 	USBStandardConfigurationDescriptor configuration_descriptor;
 	uint8_t *position;
 	int size;
-	std::forward_list<usb_device_interface *> interfaces;
+	std::forward_list<usb_device_interfac *> interfaces;
 };
 
-class ohci_function_device; // forward declaration
+class ohci_function; // forward declaration
 
 class ohci_usb_controller
 {
 public:
 	ohci_usb_controller();
 	~ohci_usb_controller() {}
-	void usb_ohci_plug(int port, ohci_function_device *function);
+	void usb_ohci_plug(int port, ohci_function *function);
 	void usb_ohci_device_address_changed(int old_address, int new_address);
 	void set_cpu(cpu_device *cpu) { m_maincpu = cpu; }
 	void set_timer(emu_timer *timer) { ohcist.timer = timer; }
@@ -371,13 +371,13 @@ private:
 	struct {
 		uint32_t hc_regs[256];
 		struct {
-			ohci_function_device *function;
+			ohci_function *function;
 			int address;
 			int delay;
 		} ports[4 + 1];
 		struct
 		{
-			ohci_function_device *function;
+			ohci_function *function;
 			int port;
 		} address[256];
 		emu_timer *timer;
@@ -395,9 +395,9 @@ private:
 	} ohcist;
 };
 
-class ohci_function_device {
+class ohci_function {
 public:
-	ohci_function_device();
+	ohci_function();
 	virtual void initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager);
 	virtual void execute_reset();
 	virtual void execute_connect() {};
@@ -448,16 +448,16 @@ protected:
 	std::forward_list<usb_device_configuration *> configurations;
 	std::forward_list<usb_device_string *> device_strings;
 	usb_device_configuration *latest_configuration;
-	usb_device_interface_alternate *latest_alternate;
+	usb_device_interfac_alternate *latest_alternate;
 	usb_device_configuration *selected_configuration;
 };
 
 extern const device_type OHCI_GAME_CONTROLLER;
 
-class ohci_game_controller_device : public device_t, public ohci_function_device
+class ohci_game_controller : public device_t, public ohci_function
 {
 public:
-	ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ohci_game_controller(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager) override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size) override;

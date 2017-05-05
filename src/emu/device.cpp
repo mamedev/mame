@@ -217,15 +217,13 @@ std::string device_t::parameter(const char *tag) const
 
 void device_t::static_set_clock(device_t &device, u32 clock)
 {
+	device.m_configured_clock = clock;
+
 	// derive the clock from our owner if requested
 	if ((clock & 0xff000000) == 0xff000000)
-	{
-		assert(device.m_owner != nullptr);
-		clock = device.m_owner->m_configured_clock * ((clock >> 12) & 0xfff) / ((clock >> 0) & 0xfff);
-	}
-
-	device.m_clock = device.m_unscaled_clock = device.m_configured_clock = clock;
-	device.m_attoseconds_per_clock = (clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock);
+		device.calculate_derived_clock();
+	else
+		device.set_unscaled_clock(clock);
 }
 
 
@@ -297,10 +295,21 @@ void device_t::reset()
 
 void device_t::set_unscaled_clock(u32 clock)
 {
+	// do nothing if no actual change
+	if (clock == m_unscaled_clock)
+		return;
+
 	m_unscaled_clock = clock;
 	m_clock = m_unscaled_clock * m_clock_scale;
 	m_attoseconds_per_clock = (m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(m_clock);
-	notify_clock_changed();
+
+	// recalculate all derived clocks
+	for (device_t &child : subdevices())
+		child.calculate_derived_clock();
+
+	// if the device has already started, make sure it knows about the new clock
+	if (m_started)
+		notify_clock_changed();
 }
 
 
@@ -311,10 +320,36 @@ void device_t::set_unscaled_clock(u32 clock)
 
 void device_t::set_clock_scale(double clockscale)
 {
+	// do nothing if no actual change
+	if (clockscale == m_clock_scale)
+		return;
+
 	m_clock_scale = clockscale;
 	m_clock = m_unscaled_clock * m_clock_scale;
 	m_attoseconds_per_clock = (m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(m_clock);
-	notify_clock_changed();
+
+	// recalculate all derived clocks
+	for (device_t &child : subdevices())
+		child.calculate_derived_clock();
+
+	// if the device has already started, make sure it knows about the new clock
+	if (m_started)
+		notify_clock_changed();
+}
+
+
+//-------------------------------------------------
+//  calculate_derived_clock - derive the device's
+//  clock from its owner, if so configured
+//-------------------------------------------------
+
+void device_t::calculate_derived_clock()
+{
+	if ((m_configured_clock & 0xff000000) == 0xff000000)
+	{
+		assert(m_owner != nullptr);
+		set_unscaled_clock(m_owner->m_clock * ((m_configured_clock >> 12) & 0xfff) / ((m_configured_clock >> 0) & 0xfff));
+	}
 }
 
 
@@ -325,7 +360,9 @@ void device_t::set_clock_scale(double clockscale)
 
 attotime device_t::clocks_to_attotime(u64 numclocks) const
 {
-	if (numclocks < m_clock)
+	if (m_clock == 0)
+		return attotime::never;
+	else if (numclocks < m_clock)
 		return attotime(0, numclocks * m_attoseconds_per_clock);
 	else
 	{
@@ -343,7 +380,10 @@ attotime device_t::clocks_to_attotime(u64 numclocks) const
 
 u64 device_t::attotime_to_clocks(const attotime &duration) const
 {
-	return mulu_32x32(duration.seconds(), m_clock) + u64(duration.attoseconds()) / u64(m_attoseconds_per_clock);
+	if (m_clock == 0)
+		return 0;
+	else
+		return mulu_32x32(duration.seconds(), m_clock) + u64(duration.attoseconds()) / u64(m_attoseconds_per_clock);
 }
 
 

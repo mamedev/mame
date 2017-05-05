@@ -227,11 +227,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(joust2_pia_3_cb1_w);
 };
 
-/*----------- defined in video/williams.c -----------*/
+/*----------- defined in video/williams.cpp -----------*/
 
 #define WILLIAMS_BLITTER_NONE       0       /* no blitter */
-#define WILLIAMS_BLITTER_SC01       1       /* SC-01 blitter */
-#define WILLIAMS_BLITTER_SC02       2       /* SC-02 "fixed" blitter */
+#define WILLIAMS_BLITTER_SC1        1       /* Special Chip 1 blitter */
+#define WILLIAMS_BLITTER_SC2        2       /* Special Chip 2 "bugfixed" blitter */
 
 #define WILLIAMS_TILEMAP_MYSTICM    0       /* IC79 is a 74LS85 comparator */
 #define WILLIAMS_TILEMAP_TSHOOT     1       /* IC79 is a 74LS157 selector jumpered to be enabled */

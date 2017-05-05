@@ -1039,8 +1039,9 @@ static MACHINE_CONFIG_FRAGMENT( common_sound )
 	MCFG_CPU_ADD("audiocpu", I8085A, XTAL_6_144MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_I8085A_CLK_OUT_DEVICE("audio8155")
 
-	MCFG_DEVICE_ADD("audio8155", I8155, XTAL_6_144MHz/2)
+	MCFG_DEVICE_ADD("audio8155", I8155, 0)
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(equites_state, equites_8155_porta_w))
 	MCFG_I8155_OUT_PORTB_CB(WRITE8(equites_state, equites_8155_portb_w))
 	MCFG_I8155_OUT_PORTC_CB(WRITE8(equites_state, equites_8155_portc_w))
