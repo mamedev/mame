@@ -654,8 +654,7 @@ ROM_START( tm3keval ) /* FREEPLAY ONLY / NOT FOR RELEASE / FOR EVALUATION ONLY *
 	ROM_LOAD16_BYTE( "u40_touchmaster_10-21-97_7086.u40", 0x400001, 0x100000, CRC(e3ae6fa6) SHA1(02c98f59553f4343f0dd855794364ad95aa81063) ) /* U40  TOUCHMASTER 10-21-97 7086 (date and checksum hand written) */
 
 	ROM_REGION( 0x100000, "oki", 0 ) // Samples
-	ROM_LOAD( "touchmaster_u8_1.0.u8", 0x40000, 0x040000, CRC(f39ad4cf) SHA1(9bcb9a5dd3636d6541eeb3e737c7253ab0ed4e8d) ) /* Labeled TOUCHMASTER U8 1.0 (pink label) */
-	ROM_CONTINUE(                      0xc0000, 0x040000 )
+	ROM_LOAD( "tm3k_sound.u8", 0x00000, 0x100000, CRC(d0ae33c1) SHA1(a079def9a086a091fcc4493a44fec756d2470415) ) /* Labeled TOUCHMASTER U8 5.0 (green label) */
 ROM_END
 
 /***************************************************************************
