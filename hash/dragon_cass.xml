@@ -3309,13 +3309,13 @@
 		<description>Duplidisk 2</description>
 		<year>1986</year>
 		<publisher>Quickbeam</publisher>
-		<part name="cass2" interface="dragon_cass">
+		<part name="cass1" interface="dragon_cass">
 			<feature name="part_id" value="Side A: Super DOS, Cumana DOS and Dragon DOS"/>
 			<dataarea name="cass" size="39817">
 				<rom name="duplidisk2_a.cas" size="39817" crc="84cbad5b" sha1="04e1bddce0a2385afc2097da3d76b266e49c6cd7" offset="0" />
 			</dataarea>
 		</part>
-		<part name="cass1" interface="dragon_cass">
+		<part name="cass2" interface="dragon_cass">
 			<feature name="part_id" value="Side B: Delta DOS"/>
 			<dataarea name="cass" size="38941">
 				<rom name="duplidisk2_b.cas" size="38941" crc="8c8589f7" sha1="6e2a906adeeb4ec867eb1e476e6290dab57d447c" offset="0" />
@@ -3335,7 +3335,7 @@
 	</software>
 
 	<software name="eddiestead">
-		<description>Eddie Steady Go</description>
+		<description>Eddie Steady Go!</description>
 		<year>1985</year>
 		<publisher>Incentive</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -5075,7 +5075,7 @@
 	</software>
 
 	<software name="intptradr">
-		<description>Interplanetary Trader</description>
+		<description>Inter-Planetary Trader</description>
 		<year>1983</year>
 		<publisher>Bamby Software</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -5700,7 +5700,7 @@
 	</software>
 
 	<software name="lionheart">
-		<description>Lionheart</description>
+		<description>Lion Heart</description>
 		<year>1983</year>
 		<publisher>Peaksoft</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -6123,7 +6123,7 @@
 	<software name="mathscse">
 		<description>Maths CSE Revision</description>
 		<year>1983</year>
-		<publisher>Micro-De-Bug Consultancy</publisher>
+		<publisher>Micro De-Bug Consultancy</publisher>
 		<part name="cass1" interface="dragon_cass">
 			<dataarea name="cass" size="12410">
 				<rom name="Maths CSE Revision (1983)(Micro-De-Bug Consultancy)[!].cas" size="12410" crc="8343fe00" sha1="d81377139512d390c0f5162fc715bcf4c312b78c" offset="0" />
@@ -6132,7 +6132,7 @@
 	</software>
 
 	<software name="mathlev1">
-		<description>Maths Level 1</description>
+		<description>Maths Level 1 (Age 4-6)</description>
 		<year>1983</year>
 		<publisher>Ampalsoft</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -6144,7 +6144,7 @@
 	</software>
 
 	<software name="mathlev2">
-		<description>Maths Level 2</description>
+		<description>Maths Level 2 (Age 6-7)</description>
 		<year>198?</year>
 		<publisher>Ampalsoft</publisher>
 		<part name="cass1" interface="dragon_cass">
@@ -7996,8 +7996,9 @@
 
 	<software name="schoolmaze">
 		<description>School Maze</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Dragon Data</publisher>
+		<info name="serial" value="A0529" />
 		<part name="cass1" interface="dragon_cass">
 			<dataarea name="cass" size="12454">
 				<rom name="school maze (198x)(dragon data ltd)[u].cas" size="12454" crc="e7611fc1" sha1="b3023384cc0623e32fdafd61a4e71d0ddbbb3f81" offset="0" />
@@ -8815,7 +8816,7 @@
 	<software name="splimprov">
 		<description>Spelling Improver</description>
 		<year>1985</year>
-		<publisher>Micro-De-Bug Consultancy</publisher>
+		<publisher>Micro De-Bug Consultancy</publisher>
 		<part name="cass1" interface="dragon_cass">
 			<dataarea name="cass" size="15507">
 				<rom name="Spelling Improver (1985)(Micro-De-Bug Consultancy)[!].cas" size="15507" crc="0ac83455" sha1="38959da99bdf2d152107b21812369d65db710f91" offset="0" />
@@ -8826,7 +8827,7 @@
 	<software name="spltutor">
 		<description>Spelling Tutor</description>
 		<year>1983</year>
-		<publisher>Micro-De-Bug Consultancy</publisher>
+		<publisher>Micro De-Bug Consultancy</publisher>
 		<part name="cass1" interface="dragon_cass">
 			<dataarea name="cass" size="15507">
 				<rom name="Spelling Tutor (1983)(Micro-De-Bug Consultancy)[!].cas" size="15507" crc="0ac83455" sha1="38959da99bdf2d152107b21812369d65db710f91" offset="0" />
