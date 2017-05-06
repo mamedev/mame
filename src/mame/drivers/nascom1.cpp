@@ -705,8 +705,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( nascom2, nascom1, nascom2_state )
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(nascom2_state, socket2_load)
 
-	MCFG_SOFTWARE_LIST_ADD("socket_list", "nascom_socket")
-
 	// nasbus expansion bus
 	MCFG_NASBUS_ADD(NASBUS_TAG)
 	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(nascom2_state, ram_disable_w))
@@ -714,6 +712,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( nascom2, nascom1, nascom2_state )
 	MCFG_NASBUS_SLOT_ADD("nasbus2", nasbus_slot_cards, nullptr)
 	MCFG_NASBUS_SLOT_ADD("nasbus3", nasbus_slot_cards, nullptr)
 	MCFG_NASBUS_SLOT_ADD("nasbus4", nasbus_slot_cards, nullptr)
+
+	// software
+	MCFG_SOFTWARE_LIST_ADD("socket_list", "nascom_socket")
+	MCFG_SOFTWARE_LIST_ADD("floppy_list", "nascom_flop")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( nascom2c, nascom2, nascom2_state )
