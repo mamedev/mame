@@ -444,6 +444,20 @@ void sm510_base_device::op_dta()
 	m_acc = m_div >> 11 & 0xf;
 }
 
+void sm510_base_device::op_clklo()
+{
+	// CLKLO*: select 8kHz instruction clock (*unknown mnemonic)
+	m_clk_div = 4;
+	notify_clock_changed();
+}
+
+void sm510_base_device::op_clkhi()
+{
+	// CLKHI*: select 16kHz instruction clock (*unknown mnemonic)
+	m_clk_div = 2;
+	notify_clock_changed();
+}
+
 void sm510_base_device::op_illegal()
 {
 	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_prev_pc);

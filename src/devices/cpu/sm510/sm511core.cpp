@@ -59,6 +59,21 @@ sm512_device::sm512_device(const machine_config &mconfig, const char *tag, devic
 
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void sm511_device::device_reset()
+{
+	sm510_base_device::device_reset();
+
+	m_melody_rd &= ~1;
+	m_clk_div = 4; // 8kHz
+	notify_clock_changed();
+}
+
+
+
+//-------------------------------------------------
 //  melody controller
 //-------------------------------------------------
 
@@ -179,7 +194,7 @@ void sm511_device::execute_one()
 			switch (m_op)
 			{
 		case 0x00: op_rot(); break;
-		case 0x01: op_dta(); break; // guessed
+		case 0x01: op_dta(); break;
 		case 0x02: op_sbm(); break;
 		case 0x03: op_atpl(); break;
 		case 0x08: op_add(); break;
@@ -204,7 +219,7 @@ void sm511_device::execute_one()
 		case 0x62: op_wr(); break;
 		case 0x63: op_ws(); break;
 		case 0x64: op_incb(); break;
-		case 0x65: op_dr(); break; // guessed
+		case 0x65: op_dr(); break;
 		case 0x66: op_rc(); break;
 		case 0x67: op_sc(); break;
 		case 0x6c: op_decb(); break;
@@ -223,6 +238,8 @@ void sm511_device::execute_one()
 		case 0x33: op_atfc(); break;
 		case 0x34: op_bdc(); break;
 		case 0x35: op_atbp(); break;
+		case 0x36: op_clkhi(); break;
+		case 0x37: op_clklo(); break;
 
 		default: op_illegal(); break;
 			}

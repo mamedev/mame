@@ -1775,7 +1775,6 @@ static MACHINE_CONFIG_START( vbrc, fidelz80_state )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_CPU_ADD("mcu", I8041, XTAL_5MHz)
-	MCFG_MCS48_PORT_P1_IN_CB(CONSTANT(0)) // ???
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(fidelz80_state, vbrc_mcu_p1_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(fidelz80_state, vbrc_mcu_p2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(DEVWRITE8("i8243", i8243_device, p2_w))

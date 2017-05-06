@@ -142,8 +142,6 @@ INPUT_CHANGED_MEMBER(novagmcs48_state::octo_cpu_freq)
     Machine Drivers
 ******************************************************************************/
 
-// Presto/Octo
-
 static MACHINE_CONFIG_START( presto, novagmcs48_state )
 
 	/* basic machine hardware */

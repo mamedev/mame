@@ -134,8 +134,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 2 - 1) / 2; } // default 2 cycles per machine cycle
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * 2); } // "
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + m_clk_div - 1) / m_clk_div; } // default 2 cycles per machine cycle
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * m_clk_div); } // "
 	virtual u32 execute_min_cycles() const override { return 1; }
 	virtual u32 execute_max_cycles() const override { return 2; }
 	virtual u32 execute_input_lines() const override { return 1; }
@@ -177,6 +177,7 @@ protected:
 	u8 m_r, m_r_out;
 	bool m_k_active;
 	bool m_halt;
+	int m_clk_div;
 
 	// lcd driver
 	optional_shared_ptr<u8> m_lcd_ram_a, m_lcd_ram_b, m_lcd_ram_c;
@@ -295,6 +296,8 @@ protected:
 	virtual void op_idiv();
 	virtual void op_dr();
 	virtual void op_dta();
+	virtual void op_clklo();
+	virtual void op_clkhi();
 
 	void op_illegal();
 };
@@ -323,6 +326,9 @@ public:
 	sm511_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
+	virtual void device_post_load() override { notify_clock_changed(); }
+	virtual void device_reset() override;
+
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
