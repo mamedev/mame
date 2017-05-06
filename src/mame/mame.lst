@@ -35487,6 +35487,7 @@ spacegunu                       // C57 (c) 1990 Taito America Corporation (US)
 ainferno                        // C45 (c) 1990 Taito America Corporation (US)
 ainfernoj                       // C45 (c) 1990 Taito Corporation (Japan)
 topland                         // B62 (c) 1988 Taito Corporation Japan (World)
+toplandj						// B62 (c) 1988 Taito Corporation (Japan)	
 
 @source:taitogn.cpp
 chaoshea                        // 1998.10 Chaos Heat (V2.09O)
