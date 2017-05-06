@@ -215,7 +215,7 @@ public:
 	core_options::entry::shared_ptr option_entry() const { return m_entry.lock(); }
 
 	// seters
-	void specify(std::string &&text);
+	void specify(std::string &&text, bool peg_priority = true);
 	void set_bios(std::string &&text);
 	void set_default_card_software(std::string &&s);
 
@@ -248,8 +248,8 @@ public:
 	core_options::entry::shared_ptr option_entry() const { return m_entry.lock(); }
 
 	// mutators
-	void specify(const std::string &value);
-	void specify(std::string &&value);
+	void specify(const std::string &value, bool peg_priority = true);
+	void specify(std::string &&value, bool peg_priority = true);
 
 	// instantiates an option entry (don't call outside of emuopts.cpp)
 	core_options::entry::shared_ptr setup_option_entry(std::vector<std::string> &&names);
