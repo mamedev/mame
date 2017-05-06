@@ -117,6 +117,7 @@ public:
 		const std::string &name() const { return m_names[0]; }
 		virtual const char *value() const;
 		int priority() const { return m_priority;  }
+		void set_priority(int priority) { m_priority = priority; }
 		option_type type() const { return m_type; }
 		const char *description() const { return m_description; }
 		virtual const std::string &default_value() const;
