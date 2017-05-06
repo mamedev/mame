@@ -52,7 +52,7 @@
 
 // Debugging
 #define VERBOSE 0
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 #define BIT_MASK(n) (1U << (n))
 
@@ -1472,7 +1472,7 @@ INPUT_CHANGED_MEMBER(hp9845ct_state::softkey_changed)
 		unsigned softkey;
 		for (softkey = 0; softkey < 8 && BIT(softkey_data , 7 - softkey); softkey++) {
 		}
-		LOG(("SK %02x => %u\n" , softkey_data , softkey));
+		LOG("SK %02x => %u\n" , softkey_data , softkey);
 		if (softkey < 8) {
 			// softkey pressed
 			m_gv_softkey = softkey;
@@ -1679,8 +1679,8 @@ void hp9845ct_state::lp_r4_w(uint16_t data)
 			m_gv_lp_threshold = BIT(data, 3);
 			m_gv_lp_interlace = !BIT(data, 4);
 			m_gv_lp_vbint = BIT(data, 5);
-			LOG(("LP Y cursor y = %d, threshold = %d, interlace = %d, vbint = %d\n",
-				 m_gv_lp_cursor_y, m_gv_lp_threshold, m_gv_lp_interlace, m_gv_lp_vbint));
+			LOG("LP Y cursor y = %d, threshold = %d, interlace = %d, vbint = %d\n",
+				 m_gv_lp_cursor_y, m_gv_lp_threshold, m_gv_lp_interlace, m_gv_lp_vbint);
 			m_gv_lp_reg_cnt--;
 			break;
 
@@ -1688,7 +1688,7 @@ void hp9845ct_state::lp_r4_w(uint16_t data)
 			// LP X cursor + cursor type
 			m_gv_lp_cursor_x = ((data >> 6) & 0x3ff) + 1;
 			m_gv_lp_cursor_fs = !BIT(data, 0);
-			LOG(("LP X cursor x = %d, fs = %d\n", m_gv_lp_cursor_x, m_gv_lp_cursor_fs));
+			LOG("LP X cursor x = %d, fs = %d\n", m_gv_lp_cursor_x, m_gv_lp_cursor_fs);
 			m_gv_lp_reg_cnt--;
 			break;
 
@@ -1886,7 +1886,7 @@ void hp9845ct_state::compute_lp_data(void)
 	m_gv_next_lp_scanline[ 2 ] = ylo;
 
 	m_gv_lp_hit_lt192 = yhi < 192;
-	LOG(("LP data %d %d %d %d (%u;%d) (%u;%u) %u %u %u %04x %04x %04x\n" , m_gv_lp_selftest , m_gv_lp_interlace , m_gv_lp_sw , m_gv_lp_hit_lt192 , m_gv_lp_cursor_x , yc , m_gv_lp_x , m_gv_lp_y , yhi , xleft , ylo , m_gv_next_lp_data[ 0 ] , m_gv_next_lp_data[ 1 ] , m_gv_next_lp_data[ 2 ]));
+	LOG("LP data %d %d %d %d (%u;%d) (%u;%u) %u %u %u %04x %04x %04x\n" , m_gv_lp_selftest , m_gv_lp_interlace , m_gv_lp_sw , m_gv_lp_hit_lt192 , m_gv_lp_cursor_x , yc , m_gv_lp_x , m_gv_lp_y , yhi , xleft , ylo , m_gv_next_lp_data[ 0 ] , m_gv_next_lp_data[ 1 ] , m_gv_next_lp_data[ 2 ]);
 }
 
 void hp9845ct_state::lp_scanline_update(unsigned video_scanline)
@@ -1896,7 +1896,7 @@ void hp9845ct_state::lp_scanline_update(unsigned video_scanline)
 	}
 
 	if (video_scanline == 256 && !m_gv_lp_status && m_gv_lp_hit_lt192) {
-		LOG(("Hit < 192 @%d\n" , m_screen->vpos()));
+		LOG("Hit < 192 @%d\n" , m_screen->vpos());
 		m_gv_lp_status = true;
 		m_gv_lp_int_256 = true;
 		update_graphic_bits();
@@ -2088,14 +2088,14 @@ READ16_MEMBER(hp9845c_state::graphic_r)
 		break;
 	}
 
-	LOG(("rd gv R%u = %04x\n", 4 + offset , res));
+	LOG("rd gv R%u = %04x\n", 4 + offset , res);
 
 	return res;
 }
 
 WRITE16_MEMBER(hp9845c_state::graphic_w)
 {
-	LOG(("wr gv R%u = %04x\n", 4 + offset , data));
+	LOG("wr gv R%u = %04x\n", 4 + offset , data);
 
 	switch (offset) {
 	case 0:
@@ -2411,15 +2411,15 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 			if (m_gv_cmd == 0x1) {
 				// read words command
 				check_io_counter_restore();
-				LOG(("read words, last = %x\n", m_gv_last_cmd));
+				LOG("read words, last = %x\n", m_gv_last_cmd);
 				m_gv_fsm_state = GV_STAT_WAIT_MEM_0;    // -> read stream
 				m_gv_last_cmd = m_gv_cmd;
 			} else if (ds) {
 				if ((m_gv_cmd == 0x0) || (m_gv_cmd == 0x2)) {
 					// write words & clear/set words commands
 					check_io_counter_restore();
-					if (m_gv_cmd == 0x2) LOG(("clear/set words, last = %x\n", m_gv_last_cmd));
-					else LOG(("write words, last = %x\n", m_gv_last_cmd));
+					if (m_gv_cmd == 0x2) LOG("clear/set words, last = %x\n", m_gv_last_cmd);
+					else LOG("write words, last = %x\n", m_gv_last_cmd);
 					m_gv_fsm_state = GV_STAT_WAIT_TRIG_1;   // -> write stream
 				} else {
 					// any other command
@@ -2437,21 +2437,21 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 				switch (m_gv_cmd) {
 				case 0x8:   // load X I/O address
 					m_gv_word_x_position = ~m_gv_data_w & 0x3f;     // 0..34
-					LOG(("load X I/O adress = %04x\n", m_gv_word_x_position));
+					LOG("load X I/O adress = %04x\n", m_gv_word_x_position);
 					m_gv_io_counter = get_gv_mem_addr(m_gv_word_x_position , m_gv_word_y_position);
 					m_gv_plane = 0;
 					m_gv_plane_wrap = false;
 					break;
 				case 0x9:   // load Y I/O address
 					m_gv_word_y_position = ~m_gv_data_w & 0x1ff;    // 0..454
-					LOG(("load Y I/O adress = %04x\n", m_gv_word_y_position));
+					LOG("load Y I/O adress = %04x\n", m_gv_word_y_position);
 					m_gv_io_counter = get_gv_mem_addr(m_gv_word_x_position , m_gv_word_y_position);
 					m_gv_plane = 0;
 					m_gv_plane_wrap = false;
 					break;
 				case 0xa:   // load memory control
 					m_gv_memory_control = m_gv_data_w & 0x7f;
-					LOG(("load memory control = %04x\n", m_gv_memory_control));
+					LOG("load memory control = %04x\n", m_gv_memory_control);
 					break;
 				case 0xb:   // set line type/area fill
 					m_gv_line_type_area_fill =  m_gv_data_w & 0x1ff;
@@ -2459,15 +2459,15 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 						m_gv_line_type_mask = m_line_type[ m_gv_line_type_area_fill & 0x7 ];
 						m_gv_repeat_count = 0;
 					}
-					LOG(("set line type = %04x\n", m_gv_line_type_area_fill));
+					LOG("set line type = %04x\n", m_gv_line_type_area_fill);
 					break;
 				case 0xc:   // load color mask
 					m_gv_music_memory = m_gv_data_w & 0x1ff;
-					LOG(("load color mask = %04x\n", m_gv_music_memory));
+					LOG("load color mask = %04x\n", m_gv_music_memory);
 					break;
 				case 0xd:   // load end points
 					m_gv_ypt = ~m_gv_data_w & 0x1ff;
-					LOG(("load end points y = %d\n", m_gv_ypt));
+					LOG("load end points y = %d\n", m_gv_ypt);
 					break;
 				case 0xe:   // Y cursor position & color
 					m_gv_lyc = m_gv_data_w;
@@ -2495,7 +2495,7 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 			if (time_mem_av.is_zero()) {
 				// Read a word from graphic memory
 				m_gv_data_r = m_graphic_mem[ m_gv_plane ][ m_gv_io_counter ];
-				LOG(("read words @%04x = %04x, plane #%d\n" , m_gv_io_counter , m_gv_data_r, m_gv_plane + 1));
+				LOG("read words @%04x = %04x, plane #%d\n" , m_gv_io_counter , m_gv_data_r, m_gv_plane + 1);
 				advance_io_counter();
 				m_gv_fsm_state = GV_STAT_WAIT_DS_1;     // -> proceed with read stream
 			} else {
@@ -2534,10 +2534,10 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 					m_gv_xpt = ~m_gv_data_w & 0x3ff;
 					if (BIT(m_gv_data_w, 10)) {
 						// draw vector
-						LOG(("load end points x = %d (draw)\n", m_gv_xpt));
+						LOG("load end points x = %d (draw)\n", m_gv_xpt);
 						m_gv_fsm_state = GV_STAT_WAIT_MEM_2;    // -> proceed with draw vector
 					} else {
-						LOG(("load end points x = %d (move)\n", m_gv_xpt));
+						LOG("load end points x = %d (move)\n", m_gv_xpt);
 						m_gv_last_xpt = m_gv_xpt;
 						m_gv_last_ypt = m_gv_ypt;
 						m_gv_fsm_state = GV_STAT_WAIT_DS_0;     // -> proceed with next word pair
@@ -2561,7 +2561,7 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 			time_mem_av = time_to_gv_mem_availability();
 			if (time_mem_av.is_zero()) {
 				// Write a full word to graphic memory
-				LOG(("write words @%04x = %04x, plane #%d\n" , m_gv_io_counter , m_gv_data_w, m_gv_plane + 1));
+				LOG("write words @%04x = %04x, plane #%d\n" , m_gv_io_counter , m_gv_data_w, m_gv_plane + 1);
 				if ((m_gv_cmd == 0x0) || BIT(m_gv_memory_control, m_gv_plane)) {
 					m_graphic_mem[ m_gv_plane ][ m_gv_io_counter ] = m_gv_data_w;
 				}
@@ -2598,7 +2598,7 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 					draw_line(x0 , y0 , x1 , y1);
 				} else {
 					// fill area with pattern
-					LOG(("area fill (%d,%d) -> (%d,%d) pattern=%04x\n", m_gv_last_xpt, m_gv_last_ypt, m_gv_xpt, m_gv_ypt, m_gv_line_type_area_fill));
+					LOG("area fill (%d,%d) -> (%d,%d) pattern=%04x\n", m_gv_last_xpt, m_gv_last_ypt, m_gv_xpt, m_gv_ypt, m_gv_line_type_area_fill);
 
 					pattern_fill(m_gv_xpt , m_gv_ypt , m_gv_last_xpt , m_gv_last_ypt , m_gv_line_type_area_fill & 0xf);
 				}
@@ -2651,14 +2651,6 @@ void hp9845c_state::update_graphic_bits(void)
 
 	bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
-#if 0
-	// DEBUG DEBUG DEBUG
-	static bool last_irq = false;
-	if (last_irq != irq) {
-		logerror("GV IRQ %d %d %d %d %d\n" , gv_ready , lp_int , m_gv_lp_int_latched , sk_int , m_gv_sk_int_latched);
-	}
-	last_irq = irq;
-#endif
 	irq_w(GVIDEO_PA , irq);
 
 	bool dmar = gv_ready && m_gv_dma_en;
@@ -2673,16 +2665,6 @@ void hp9845c_state::update_gcursor(void)
 	m_gv_cursor_fs = BIT(m_gv_lxc, 0);
 	m_gv_cursor_gc = BIT(m_gv_lxc, 1);
 	m_gv_cursor_x = (m_gv_lxc >> 6) & 0x3ff;
-
-#if 0
-	// DEBUG DEBUG DEBUG
-	static uint16_t last_lxc , last_lyc;
-	if (last_lxc != m_gv_lxc || last_lyc != m_gv_lyc) {
-		logerror("Cursor position = (%d,%d), fs = %d, gc = %d, col = %u, %04x %04x\n", m_gv_cursor_x, m_gv_cursor_y, m_gv_cursor_fs, m_gv_cursor_gc, m_gv_cursor_color, m_gv_lxc , m_gv_lyc);
-		last_lxc = m_gv_lxc;
-		last_lyc = m_gv_lyc;
-	}
-#endif
 }
 
 // ***************
@@ -2819,14 +2801,14 @@ READ16_MEMBER(hp9845t_state::graphic_r)
 		break;
 	}
 
-	LOG(("rd gv R%u = %04x\n", 4 + offset , res));
+	LOG("rd gv R%u = %04x\n", 4 + offset , res);
 
 	return res;
 }
 
 WRITE16_MEMBER(hp9845t_state::graphic_w)
 {
-	LOG(("wr gv R%u = %04x\n", 4 + offset , data));
+	LOG("wr gv R%u = %04x\n", 4 + offset , data);
 
 	switch (offset) {
 	case 0:
@@ -3165,7 +3147,7 @@ void hp9845t_state::draw_full_arc(int x0 , int y0 , int dx , int dy , int draw_c
 	// radius
 	int radius = sqrt(dx * dx + dy * dy);
 
-	LOG(("midpoint = (%d,%d) radius = %d ctrl = %d count = %d\n", x0, y0, radius, m_gv_memory_control, draw_counter));
+	LOG("midpoint = (%d,%d) radius = %d ctrl = %d count = %d\n", x0, y0, radius, m_gv_memory_control, draw_counter);
 
 	/* quadrants:
 	 *
@@ -3211,7 +3193,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 				if (m_gv_last_cmd != m_gv_cmd) {
 					m_gv_io_counter = get_gv_mem_addr(m_gv_word_x_position , m_gv_word_y_position);
 				}
-				LOG(("read words, last = %x\n", m_gv_last_cmd));
+				LOG("read words, last = %x\n", m_gv_last_cmd);
 				m_gv_fsm_state = GV_STAT_WAIT_MEM_0;    // -> read stream
 				m_gv_last_cmd = m_gv_cmd;
 			} else if (m_gv_cmd == 0xd) {
@@ -3224,7 +3206,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 					if (m_gv_last_cmd != m_gv_cmd) {
 						m_gv_io_counter = get_gv_mem_addr(m_gv_word_x_position , m_gv_word_y_position);
 					}
-					LOG(("write words\n"));
+					LOG("write words\n");
 					m_gv_fsm_state = GV_STAT_WAIT_TRIG_1;   // -> write stream
 				} else {
 					// any other command
@@ -3241,17 +3223,17 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 			switch (m_gv_cmd) {
 			case 0x1:   // load end points
 				m_gv_ypt = m_gv_data_w & 0x3ff;
-				LOG(("load end points y = %d\n", m_gv_ypt));
+				LOG("load end points y = %d\n", m_gv_ypt);
 				break;
 			case 0x3:   // load arc
 				m_gv_arc_parm = 0;
 				m_gv_arc[ m_gv_arc_parm ] = m_gv_data_w;
-				LOG(("load arc parm%d = %04x\n", m_gv_arc_parm, m_gv_arc[m_gv_arc_parm]));
+				LOG("load arc parm%d = %04x\n", m_gv_arc_parm, m_gv_arc[m_gv_arc_parm]);
 				m_gv_arc_parm++;
 				break;
 			case 0x5:   // load scan
 				m_gv_scan_start_x = m_gv_data_w & 0x3ff;    // 0..559
-				LOG(("load scan x = %d\n", m_gv_scan_start_x));
+				LOG("load scan x = %d\n", m_gv_scan_start_x);
 				break;
 			case 0x6:   // set line type/area fill
 				m_gv_line_type_area_fill = m_gv_data_w & 0x1ff;
@@ -3259,20 +3241,20 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 					m_gv_line_type_mask = m_line_type[ m_gv_line_type_area_fill & 0x7 ];
 					m_gv_repeat_count = 0;
 				}
-				LOG(("set line type = %04x\n", m_gv_line_type_area_fill));
+				LOG("set line type = %04x\n", m_gv_line_type_area_fill);
 				break;
 			case 0x7:   // load X/Y I/O address
 				m_gv_word_y_position = m_gv_data_w & 0x1ff; // 0..454
-				LOG(("load X/Y I/O adress y = %04x\n", m_gv_word_y_position));
+				LOG("load X/Y I/O adress y = %04x\n", m_gv_word_y_position);
 				break;
 			case 0xa:   // load memory control
 				// A single bit is saved (InvBit)
 				m_gv_memory_control = (m_gv_data_w & 0x9) == 9 || (m_gv_data_w & 0x12) == 0x12 || (m_gv_data_w & 0x24) == 0x24;
-				LOG(("load memory control = %04x\n", m_gv_memory_control));
+				LOG("load memory control = %04x\n", m_gv_memory_control);
 				break;
 			case 0xb:   // video on/off - enable graphics video output (1=on 2=off)
 				m_graphic_sel = BIT(m_gv_data_w, 0);
-				LOG(("video on/off parm = %d\n", m_gv_data_w & 0x3));
+				LOG("video on/off parm = %d\n", m_gv_data_w & 0x3);
 				break;
 			case 0xc:   // load color mask (no effect, just for compatibility with 9845c), takes a single word as parameter
 				break;
@@ -3283,7 +3265,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 				m_gv_lxc = m_gv_data_w;
 				break;
 			default:
-				LOG(("unknown 98780A command = %d, parm = 0x%04x\n", m_gv_cmd, m_gv_data_w));
+				LOG("unknown 98780A command = %d, parm = 0x%04x\n", m_gv_cmd, m_gv_data_w);
 			}
 			if ((m_gv_cmd == 0x1) || (m_gv_cmd == 0x3) || (m_gv_cmd == 0x5) || (m_gv_cmd == 0x7)) {
 				m_gv_fsm_state = GV_STAT_WAIT_DS_2;     // -> get second data word
@@ -3299,7 +3281,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 			if (time_mem_av.is_zero()) {
 				// Read a word from graphic memory
 				m_gv_data_r = m_graphic_mem[ m_gv_io_counter ];
-				LOG(("read words @%04x = %04x\n" , m_gv_io_counter , m_gv_data_r));
+				LOG("read words @%04x = %04x\n" , m_gv_io_counter , m_gv_data_r);
 				m_gv_io_counter = (m_gv_io_counter + 1) & GVIDEO_ADDR_MASK;
 				m_gv_fsm_state = GV_STAT_WAIT_DS_1;     // -> proceed with read stream
 			} else {
@@ -3344,10 +3326,10 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 				}
 				if (BIT(m_gv_data_w, 11)) {
 					// draw vector
-					LOG(("load end points x = %d, rb = %d (draw)\n", m_gv_xpt, m_gv_rb_control));
+					LOG("load end points x = %d, rb = %d (draw)\n", m_gv_xpt, m_gv_rb_control);
 					m_gv_fsm_state = GV_STAT_WAIT_MEM_2;    // -> proceed with draw vector
 				} else {
-					LOG(("load end points x = %d, rb = %d (move)\n", m_gv_xpt, m_gv_rb_control));
+					LOG("load end points x = %d, rb = %d (move)\n", m_gv_xpt, m_gv_rb_control);
 					m_gv_last_xpt = m_gv_xpt;
 					m_gv_last_ypt = m_gv_ypt;
 					m_gv_fsm_state = GV_STAT_WAIT_DS_0;     // -> proceed with next word pair
@@ -3357,7 +3339,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 			case 0x3:
 				// load arc
 				m_gv_arc[ m_gv_arc_parm ] = m_gv_data_w;
-				LOG(("load arc parm%d = %04x\n", m_gv_arc_parm, m_gv_arc[m_gv_arc_parm]));
+				LOG("load arc parm%d = %04x\n", m_gv_arc_parm, m_gv_arc[m_gv_arc_parm]);
 				m_gv_arc_parm++;
 				if (m_gv_arc_parm < 4) {
 					m_gv_fsm_state = GV_STAT_WAIT_DS_2;     // -> proceed with next word
@@ -3369,7 +3351,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 			case 0x5:
 				// load scan
 				m_gv_scan_start_y = m_gv_data_w & 0x3ff;    // 0..454
-				LOG(("load scan y = %d\n", m_gv_scan_start_y));
+				LOG("load scan y = %d\n", m_gv_scan_start_y);
 				m_gv_fsm_state = GV_STAT_WAIT_DS_0;
 				break;
 
@@ -3378,7 +3360,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 				m_gv_word_x_position = (m_gv_data_w & 0x3f0) >> 4;  // 0..34
 				m_gv_increment_to_next_row = BIT(m_gv_data_w, 11);
 				m_gv_io_counter = get_gv_mem_addr(m_gv_word_x_position , m_gv_word_y_position);
-				LOG(("load X/Y I/O adress x = %04x increment = %d\n", m_gv_word_x_position, m_gv_increment_to_next_row));
+				LOG("load X/Y I/O adress x = %04x increment = %d\n", m_gv_word_x_position, m_gv_increment_to_next_row);
 				m_gv_fsm_state = GV_STAT_WAIT_DS_0;
 				break;
 
@@ -3394,7 +3376,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 			time_mem_av = time_to_gv_mem_availability();
 			if (time_mem_av.is_zero()) {
 				// Write a full word to graphic memory
-				LOG(("write words @%04x = %04x\n" , m_gv_io_counter , m_gv_data_w));
+				LOG("write words @%04x = %04x\n" , m_gv_io_counter , m_gv_data_w);
 				m_graphic_mem[ m_gv_io_counter ] = m_gv_data_w;
 				if (!m_gv_increment_to_next_row || (m_gv_word_x_position < 34)) {
 					m_gv_io_counter = (m_gv_io_counter + 1) & GVIDEO_ADDR_MASK;
@@ -3413,12 +3395,12 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 				if (m_gv_cmd == 0xd) {
 					// fast clear/set command
 					if (m_gv_memory_control) {
-						LOG(("fast clear/set (set)\n"));
+						LOG("fast clear/set (set)\n");
 						for (auto& el : m_graphic_mem) {
 							el = 0xffff;
 						}
 					} else {
-						LOG(("fast clear/set (clear)\n"));
+						LOG("fast clear/set (clear)\n");
 						for (auto& el : m_graphic_mem) {
 							el = 0;
 						}
@@ -3431,7 +3413,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 						// m_gv_arc[1] is the delta last load endpoint x coordinate minus the midpoint x coordinate
 						// m_gv_arc[2] is the (probably) the start count (?), actually ignored
 						// m_gv_arc[3] is the total horizontal + vertical count for the 4 quadrants counter-clockwise, starting at the last load endpoint (equals 4 times radius for full circles)
-						LOG(("arc draw\n"));
+						LOG("arc draw\n");
 
 						// midpoint
 						int dx = BIT(m_gv_arc[ 1 ] , 15) ? (int)m_gv_arc[ 1 ] - 65536 : m_gv_arc[ 1 ] & 0x7ff;
@@ -3446,7 +3428,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 						unsigned y0;
 						unsigned y1;
 
-						LOG(("line draw (%d,%d)->(%d,%d)\n", m_gv_last_xpt, m_gv_last_ypt, m_gv_xpt, m_gv_ypt));
+						LOG("line draw (%d,%d)->(%d,%d)\n", m_gv_last_xpt, m_gv_last_ypt, m_gv_xpt, m_gv_ypt);
 
 						// vector generator uses normalization
 						if (m_gv_xpt > m_gv_last_xpt) {
@@ -3463,7 +3445,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 						draw_line(x0 , y0 , x1 , y1);
 					} else {
 						// fill area with pattern
-						LOG(("area fill (%d,%d) -> (%d,%d) pattern=%04x\n", m_gv_last_xpt, m_gv_last_ypt, m_gv_xpt, m_gv_ypt, m_gv_line_type_area_fill));
+						LOG("area fill (%d,%d) -> (%d,%d) pattern=%04x\n", m_gv_last_xpt, m_gv_last_ypt, m_gv_xpt, m_gv_ypt, m_gv_line_type_area_fill);
 
 						pattern_fill(m_gv_xpt , m_gv_ypt , m_gv_last_xpt , m_gv_last_ypt , 15 - (m_gv_line_type_area_fill & 0xf));
 					}
@@ -3513,15 +3495,6 @@ void hp9845t_state::update_graphic_bits(void)
 
 	bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
-#if 0
-	// DEBUG DEBUG DEBUG
-	static bool last_irq = false;
-	if (last_irq != irq) {
-		logerror("GV IRQ %d %d %d %d %d\n" , gv_ready , m_gv_lp_int_en , m_gv_lp_status , m_gv_sk_en , m_gv_sk_status);
-	}
-	last_irq = irq;
-#endif
-
 	irq_w(GVIDEO_PA , irq);
 
 	bool dmar = gv_ready && m_gv_dma_en;
@@ -3535,15 +3508,6 @@ void hp9845t_state::update_gcursor(void)
 	m_gv_cursor_gc = !BIT(m_gv_lyc , 1);
 	m_gv_cursor_y = (~m_gv_lyc >> 7) & 0x1ff;
 	m_gv_cursor_x = (m_gv_lxc >> 6) & 0x3ff;
-#if 0
-	// DEBUG DEBUG DEBUG
-	static uint16_t last_lxc , last_lyc;
-	if (last_lxc != m_gv_lxc || last_lyc != m_gv_lyc) {
-		logerror("Cursor position = (%d,%d), fs = %d, gc = %d, %04x %04x\n", m_gv_cursor_x, m_gv_cursor_y, m_gv_cursor_fs, m_gv_cursor_gc, m_gv_lxc , m_gv_lyc);
-		last_lxc = m_gv_lxc;
-		last_lyc = m_gv_lyc;
-	}
-#endif
 }
 
 const uint8_t hp9845t_state::m_back_arrow_shape[] = {
