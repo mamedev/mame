@@ -105,51 +105,51 @@ public:
 	virtual int get_fixed_bank_type(void) { return 0; }
 
 	void rom_alloc(uint32_t size) { m_rom.resize(size/sizeof(uint16_t)); }
-	uint16_t* get_rom_base()  { return &m_rom[0]; }
+	uint16_t* get_rom_base()  { return m_rom.size() > 0 ? &m_rom[0] : nullptr; }
 	uint32_t get_rom_size() { return m_rom.size() * sizeof(uint16_t); }
 	uint16_t* get_region_rom_base()  { if (m_region_rom.found()) return &m_region_rom->as_u16(0); return nullptr; }
 	uint32_t get_region_rom_size() { if (m_region_rom.found()) return m_region_rom->bytes(); return 0; }
 
 	void fixed_alloc(uint32_t size) { m_fixed.resize(size); }
-	uint8_t* get_fixed_base() { return &m_fixed[0]; }
+	uint8_t* get_fixed_base() { return m_fixed.size() > 0 ? &m_fixed[0] : nullptr; }
 	uint32_t get_fixed_size() { return m_fixed.size(); }
 	uint8_t* get_region_fixed_base()  { if (m_region_fixed.found()) return m_region_fixed->base(); return nullptr; }
 	uint32_t get_region_fixed_size() { if (m_region_fixed.found()) return m_region_fixed->bytes(); return 0; }
 
 	void audio_alloc(uint32_t size) { m_audio.resize(size); }
-	uint8_t* get_audio_base() { return &m_audio[0]; }
+	uint8_t* get_audio_base() { return m_audio.size() > 0 ? &m_audio[0] : nullptr; }
 	uint32_t get_audio_size() { return m_audio.size(); }
 	uint8_t* get_region_audio_base()  { if (m_region_audio.found()) return m_region_audio->base(); return nullptr; }
 	uint32_t get_region_audio_size() { if (m_region_audio.found()) return m_region_audio->bytes(); return 0; }
 
 	void audiocrypt_alloc(uint32_t size) { m_audiocrypt.resize(size); }
-	uint8_t* get_audiocrypt_base() { if (m_audiocrypt.size() == 0) return nullptr; else  return &m_audiocrypt[0]; }
+	uint8_t* get_audiocrypt_base() { return m_audiocrypt.size() > 0 ? &m_audiocrypt[0] : nullptr; }
 	uint32_t get_audiocrypt_size() { return m_audiocrypt.size(); }
 	uint8_t* get_region_audiocrypt_base()  { if (m_region_audiocrypt.found()) return m_region_audiocrypt->base(); return nullptr; }
 	uint32_t get_region_audiocrypt_size() { if (m_region_audiocrypt.found()) return m_region_audiocrypt->bytes(); return 0; }
 
 	// TODO: review sprite code later!!
 	void sprites_alloc(uint32_t size) { m_sprites.resize(size); }
-	uint8_t* get_sprites_base() { return &m_sprites[0]; }
+	uint8_t* get_sprites_base() { return m_sprites.size() > 0 ? &m_sprites[0] : nullptr; }
 	uint32_t get_sprites_size() { return m_sprites.size(); }
 	uint8_t* get_region_sprites_base()  { if (m_region_spr.found()) return m_region_spr->base(); return nullptr; }
 	uint32_t get_region_sprites_size() { if (m_region_spr.found()) return m_region_spr->bytes(); return 0; }
 
 	void ym_alloc(uint32_t size) { m_ym.resize(size); }
-	uint8_t* get_ym_base() { return &m_ym[0]; }
+	uint8_t* get_ym_base() { return m_ym.size() > 0 ? &m_ym[0] : nullptr; }
 	uint32_t get_ym_size() { return m_ym.size(); }
 	uint8_t* get_region_ym_base()  { if (m_region_ym.found()) return m_region_ym->base(); return nullptr; }
 	uint32_t get_region_ym_size() { if (m_region_ym.found()) return m_region_ym->bytes(); return 0; }
 
 	void ymdelta_alloc(uint32_t size) { m_ymdelta.resize(size); }
-	uint8_t* get_ymdelta_base() { return &m_ymdelta[0]; }
+	uint8_t* get_ymdelta_base() { return m_ymdelta.size() > 0 ? &m_ymdelta[0] : nullptr; }
 	uint32_t get_ymdelta_size() { return m_ymdelta.size(); }
 	uint8_t* get_region_ymdelta_base()  { if (m_region_ymd.found()) return m_region_ymd->base(); return nullptr; }
 	uint32_t get_region_ymdelta_size() { if (m_region_ymd.found()) return m_region_ymd->bytes(); return 0; }
 
 	// this is only used to setup optimized sprites when loading on multi-slot drivers from softlist
 	// therefore, we do not need a separate region accessor!
-	uint8_t* get_sprites_opt_base() { return &m_sprites_opt[0]; }
+	uint8_t* get_sprites_opt_base() { return m_sprites_opt.size() > 0 ? &m_sprites_opt[0] : nullptr; }
 	uint32_t get_sprites_opt_size() { return m_sprites_opt.size(); }
 	void optimize_sprites(uint8_t* region_sprites, uint32_t region_sprites_size);
 
@@ -207,7 +207,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	DECLARE_READ16_MEMBER(rom_r);

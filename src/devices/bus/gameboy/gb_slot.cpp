@@ -440,7 +440,7 @@ void base_gb_cart_slot_device::setup_ram(uint8_t banks)
 
 
 // This fails to catch Mani 4-in-1 carts... even when they match this, then they have MBC1/3 in the internal header instead of MMM01...
-bool base_gb_cart_slot_device::get_mmm01_candidate(uint8_t *ROM, uint32_t len)
+bool base_gb_cart_slot_device::get_mmm01_candidate(const uint8_t *ROM, uint32_t len)
 {
 	if (len < 0x8147)
 		return false;
@@ -463,7 +463,7 @@ bool base_gb_cart_slot_device::get_mmm01_candidate(uint8_t *ROM, uint32_t len)
 		return false;
 }
 
-int base_gb_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
+int base_gb_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 {
 	int type = GB_MBC_NONE;
 
@@ -579,16 +579,16 @@ int base_gb_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
  get default card software
  -------------------------------------------------*/
 
-std::string base_gb_cart_slot_device::get_default_card_software()
+std::string base_gb_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t len = m_file->size(), offset = 0;
+		uint32_t len = hook.image_file()->size(), offset = 0;
 		std::vector<uint8_t> rom(len);
 		int type;
 
-		m_file->read(&rom[0], len);
+		hook.image_file()->read(&rom[0], len);
 
 		if ((len % 0x4000) == 512)
 			offset = 512;
@@ -600,7 +600,6 @@ std::string base_gb_cart_slot_device::get_default_card_software()
 		slot_string = gb_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		return std::string(slot_string);
 	}
@@ -609,9 +608,9 @@ std::string base_gb_cart_slot_device::get_default_card_software()
 }
 
 
-std::string megaduck_cart_slot_device::get_default_card_software()
+std::string megaduck_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 		return std::string("rom");
 
 	return software_get_default_slot("rom");

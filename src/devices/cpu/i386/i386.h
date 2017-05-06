@@ -5,8 +5,13 @@
 #ifndef __I386INTF_H__
 #define __I386INTF_H__
 
+// SoftFloat 2 lacks an include guard
+#ifndef softfloat_h
+#define softfloat_h 1
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
+#endif
+
 #include "debug/debugcpu.h"
 #include "divtlb.h"
 

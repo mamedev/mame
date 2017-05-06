@@ -10,7 +10,6 @@
 #define _SM510_H_
 
 
-
 // I/O ports setup
 
 // 4-bit K input port (pull-down)
@@ -47,6 +46,16 @@
 // LCD bs output: same as above, but only up to 2 bits used
 #define MCFG_SM510_WRITE_SEGBS_CB(_devcb) \
 	devcb = &sm510_base_device::set_write_segbs_callback(*device, DEVCB_##_devcb);
+
+// LCD output lazy combination
+#define MCFG_SM510_WRITE_SEGS_CB(_devcb) \
+	MCFG_SM510_WRITE_SEGA_CB(_devcb) \
+	MCFG_SM510_WRITE_SEGB_CB(_devcb) \
+	MCFG_SM510_WRITE_SEGC_CB(_devcb) \
+	MCFG_SM510_WRITE_SEGBS_CB(_devcb)
+
+// ACL input pin
+#define SM510_INPUT_LINE_ACL INPUT_LINE_RESET
 
 enum
 {
@@ -125,8 +134,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 2 - 1) / 2; } // default 2 cycles per machine cycle
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * 2); } // "
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + m_clk_div - 1) / m_clk_div; } // default 2 cycles per machine cycle
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * m_clk_div); } // "
 	virtual u32 execute_min_cycles() const override { return 1; }
 	virtual u32 execute_max_cycles() const override { return 2; }
 	virtual u32 execute_input_lines() const override { return 1; }
@@ -165,9 +174,10 @@ protected:
 	u8 m_c;
 	bool m_skip;
 	u8 m_w;
-	u8 m_r;
+	u8 m_r, m_r_out;
 	bool m_k_active;
 	bool m_halt;
+	int m_clk_div;
 
 	// lcd driver
 	optional_shared_ptr<u8> m_lcd_ram_a, m_lcd_ram_b, m_lcd_ram_c;
@@ -190,8 +200,8 @@ protected:
 	u8 m_melody_duty_index;
 	u8 m_melody_address;
 
-	void clock_melody();
-	void init_melody();
+	virtual void clock_melody() { }
+	virtual void init_melody() { }
 
 	// interrupt/divider
 	emu_timer *m_div_timer;
@@ -286,6 +296,8 @@ protected:
 	virtual void op_idiv();
 	virtual void op_dr();
 	virtual void op_dta();
+	virtual void op_clklo();
+	virtual void op_clkhi();
 
 	void op_illegal();
 };
@@ -302,6 +314,8 @@ protected:
 	virtual void get_opcode_param() override;
 
 	virtual void update_w_latch() override { m_write_s(0, m_w, 0xff); } // W is connected directly to S
+
+	virtual void clock_melody() override;
 };
 
 
@@ -312,9 +326,15 @@ public:
 	sm511_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
+	virtual void device_post_load() override { notify_clock_changed(); }
+	virtual void device_reset() override;
+
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
+
+	virtual void clock_melody() override;
+	virtual void init_melody() override;
 };
 
 class sm512_device : public sm511_device

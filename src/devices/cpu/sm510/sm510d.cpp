@@ -25,7 +25,7 @@ enum e_mnemonics
 	mTB, mTC, mTAM, mTMI, mTA0, mTABL, mTIS, mTAL, mTF1, mTF4,
 	mRM, mSM,
 	mPRE, mSME, mRME, mTMEL,
-	mSKIP, mCEND, mIDIV, mDR, mDTA,
+	mSKIP, mCEND, mIDIV, mDR, mDTA, mCLKLO, mCLKHI,
 
 	// SM500-specific
 	mCOMCB, mRTN, mRTNS, mSSR, mTR, mTRS,
@@ -52,7 +52,7 @@ static const char *const s_mnemonics[] =
 	"TB", "TC", "TAM", "TMI", "TA0", "TABL", "TIS", "TAL", "TF1", "TF4",
 	"RM", "SM",
 	"PRE", "SME", "RME", "TMEL",
-	"SKIP", "CEND", "IDIV", "DR", "DTA",
+	"SKIP", "CEND", "IDIV", "DR", "DTA", "CLKLO", "CLKHI",
 
 	//
 	"COMCB", "RTN", "RTNS", "SSR", "TR", "TRS",
@@ -80,7 +80,7 @@ static const u8 s_bits[] =
 	0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
 	2, 2,
 	8, 0, 0, 0,
-	0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0,
 
 	//
 	0, 0, 0, 4, 6, 6,
@@ -110,7 +110,7 @@ static const u32 s_flags[] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0,
 	0, 0, 0, 0,
-	0, _OVER, 0, 0, 0,
+	0, _OVER, 0, 0, 0, 0, 0,
 
 	//
 	0, _OUT, _OUT, 0, 0, _OVER,
@@ -253,7 +253,7 @@ static const u8 sm511_mnemonic[0x100] =
 
 static const u8 sm511_extended[0x10] =
 {
-	mRME,  mSME,  mTMEL, mATFC, mBDC,  mATBP, 0,     0,     0,     0,     0,     0,     0,     0,     0,     0      // 60 3
+	mRME,  mSME,  mTMEL, mATFC, mBDC,  mATBP, mCLKHI,mCLKLO,0,     0,     0,     0,     0,     0,     0,     0      // 60 3
 };
 
 CPU_DISASSEMBLE(sm511)

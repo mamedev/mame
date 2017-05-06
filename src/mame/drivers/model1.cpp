@@ -633,6 +633,7 @@ Notes:
 #include "emu.h"
 #include "includes/model1.h"
 
+#include "machine/clock.h"
 #include "machine/nvram.h"
 #include "speaker.h"
 
@@ -735,6 +736,7 @@ IRQ_CALLBACK_MEMBER(model1_state::irq_callback)
 void model1_state::irq_init()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_m1uart->write_cts(0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
@@ -748,8 +750,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 	else if(scanline == 384/2)
 	{
 		irq_raise(m_sound_irq);
-
-		m_m1audio->check_fifo_irq();
 
 		if (m_m1comm != nullptr)
 			m_m1comm->check_vint_irq();
@@ -850,47 +850,6 @@ WRITE16_MEMBER(model1_state::mr2_w)
 		logerror("MW 10[r10], %f (%x)\n", *(float *)(m_mr2+0x1f10/2), space.device().safe_pc());
 }
 
-READ16_MEMBER(model1_state::snd_68k_ready_r)
-{
-	if (m_m1audio->ready_r(space, 0) == 0)
-	{
-		space.device().execute().spin_until_time(attotime::from_usec(40));
-		return 0;
-	}
-
-	return 0xff;
-}
-
-WRITE16_MEMBER(model1_state::snd_latch_to_68k_w)
-{
-	m_m1audio->write_fifo(data);
-
-	if (data == 0xae)
-	{
-		m_snd_cmd_state = 0;
-	}
-
-	if (m_dsbz80 != nullptr)
-	{
-//      printf("%d: %02x (last %02x)\n", m_snd_cmd_state, data, m_last_snd_cmd);
-		// HACK: on h/w, who filters out commands the DSB shouldn't see?  Need a wiring diagram.
-		if ((m_snd_cmd_state == 2) && (m_last_snd_cmd == 0x50))
-		{
-			m_dsbz80->latch_w(space, 0, data);
-		}
-		else    // keep in sync but send a "don't care"
-		{
-			m_dsbz80->latch_w(space, 0, 0x70);
-		}
-	}
-
-	m_last_snd_cmd = data;
-	m_snd_cmd_state++;
-
-	// give the 68k time to reply
-	space.device().execute().spin_until_time(attotime::from_usec(40));
-}
-
 static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")
@@ -923,8 +882,8 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 
 	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
-	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
+	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("m1uart", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xc40002, 0xc40003) AM_DEVREADWRITE8("m1uart", i8251_device, status_r, control_w, 0x00ff)
 
 	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(model1_tgp_copro_adr_r, model1_tgp_copro_adr_w)
 	AM_RANGE(0xd20000, 0xd20003) AM_WRITE(model1_tgp_copro_ram_w )
@@ -975,8 +934,8 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 
 	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
-	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
+	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("m1uart", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xc40002, 0xc40003) AM_DEVREADWRITE8("m1uart", i8251_device, status_r, control_w, 0x00ff)
 
 	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(model1_tgp_vr_adr_r, model1_tgp_vr_adr_w)
 	AM_RANGE(0xd20000, 0xd20003) AM_WRITE(model1_vr_tgp_ram_w )
@@ -1154,11 +1113,11 @@ INPUT_PORTS_END
 	ROM_LOAD("opr14747.bin",   0x0a0000,  0x20000, CRC(a4ad5e19) SHA1(7d7ec300eeb9a8de1590011e37108688c092f329) ) \
 	ROM_LOAD("opr14748.bin",   0x0c0000,  0x20000, CRC(4a532cb8) SHA1(23280ebbcd6b2bc8a8e643a2d07a58d6598301b8) ) \
 \
-	ROM_REGION32_LE( 0x2000, "315_5571", 0) \
-	ROM_LOAD("315-5571.bin", 0, 0x2000, CRC(1233db2a) SHA1(06760409d40f3d9117fd3e7c7ab62dfd70aa2a4d) ) \
+	/*ROM_REGION32_LE( 0x2000, "315_5571", 0)*/ \
+	/*ROM_LOAD("315-5571.bin", 0, 0x2000, CRC(1233db2a) SHA1(06760409d40f3d9117fd3e7c7ab62dfd70aa2a4d) )*/ \
 \
-	ROM_REGION32_LE( 0x2000, "315_5572", 0) \
-	ROM_LOAD("315-5572.bin", 0, 0x2000, CRC(0a534a3b) SHA1(b8c988bc414b3ad3cd036ba5a64b5ee04a4758b4) )
+	/*ROM_REGION32_LE( 0x2000, "315_5572", 0)*/ \
+	/*ROM_LOAD("315-5572.bin", 0, 0x2000, CRC(0a534a3b) SHA1(b8c988bc414b3ad3cd036ba5a64b5ee04a4758b4) )*/
 
 ROM_START( vf )
 	MODEL1_CPU_BOARD
@@ -1252,7 +1211,7 @@ ROM_START( vr )
 
 	ROM_REGION( 0x2000, "tgp", 0 ) /* TGP program rom */
 	// The real internal TGP rom
-	ROM_LOAD("315-5573.bin", 0, 0x2000, CRC(ec913af2) SHA1(a18bf6c9d7b35f8b9e513a7d279f13a30b32a961) )
+	/*ROM_LOAD("315-5573.bin", 0, 0x2000, CRC(ec913af2) SHA1(a18bf6c9d7b35f8b9e513a7d279f13a30b32a961) )*/
 
 	// this is the Daytona TGP program with some modifications needed for Virtua Racing
 	// Kept here for now to avoid instantly breaking the game until the tgp is up to it
@@ -1316,7 +1275,7 @@ ROM_START( vformula )
 
 	ROM_REGION( 0x2000, "tgp", 0 ) /* TGP program rom */
 	// The real internal TGP rom
-	ROM_LOAD("315-5573.bin", 0, 0x2000, CRC(ec913af2) SHA1(a18bf6c9d7b35f8b9e513a7d279f13a30b32a961) )
+	/*ROM_LOAD("315-5573.bin", 0, 0x2000, CRC(ec913af2) SHA1(a18bf6c9d7b35f8b9e513a7d279f13a30b32a961) )*/
 
 	// this is the Daytona TGP program with some modifications needed for Virtua Racing
 	// Kept here for now to avoid instantly breaking the game until the tgp is up to it
@@ -1666,6 +1625,14 @@ static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
 	MCFG_SEGAM1AUDIO_ADD("m1audio")
+	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_rxd))
+
+	MCFG_DEVICE_ADD("m1uart", I8251, 8000000) // uPD71051C, clock unknown
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("m1audio", segam1audio_device, write_txd))
+
+	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("m1uart", i8251_device, write_rxc))
 
 	MCFG_M1COMM_ADD("m1comm")
 MACHINE_CONFIG_END
@@ -1675,6 +1642,11 @@ static MACHINE_CONFIG_DERIVED(swa, model1)
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "dleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "dright", 1.0)
+
+	// Apparently m1audio has to filter out commands the DSB shouldn't see
+	MCFG_DEVICE_MODIFY("m1audio")
+	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_rxd))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( model1_vr, model1_state )
@@ -1710,6 +1682,14 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
 	MCFG_SEGAM1AUDIO_ADD("m1audio")
+	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_rxd))
+
+	MCFG_DEVICE_ADD("m1uart", I8251, 8000000) // uPD71051C, clock unknown
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("m1audio", segam1audio_device, write_txd))
+
+	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("m1uart", i8251_device, write_rxc))
 
 	MCFG_M1COMM_ADD("m1comm")
 MACHINE_CONFIG_END

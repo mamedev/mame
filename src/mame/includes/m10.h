@@ -75,6 +75,7 @@ public:
 
 	/* misc */
 	int                 m_last;
+	emu_timer *m_interrupt_timer;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

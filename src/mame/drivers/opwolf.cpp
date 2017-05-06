@@ -246,7 +246,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * all reference to TAITO and "Operation Wolf" have been changed or "blanked"
       * "(c) 1988 BEAR CORPORATION KOREA" / "ALL RIGHTS RESERVED"
       * ROM check test "noped" (code at 0x00bb72)
-  - Notes on bootleg c-chip (similar to what is in machine/opwolf.c) :
+  - Notes on bootleg c-chip (similar to what is in machine/opwolf.cpp) :
       * always Engish language (thus the Dip Switch change to "Unused")
       * round 4 in "demo mode" instead of round 5
       * "service" button doesn't add credits (it works in the "test mode" though)
@@ -439,6 +439,8 @@ ADDRESS_MAP_END
 
 void opwolf_state::machine_start()
 {
+	m_opwolf_timer = timer_alloc(TIMER_OPWOLF);
+
 	save_item(NAME(m_sprite_ctrl));
 	save_item(NAME(m_sprites_flipscreen));
 

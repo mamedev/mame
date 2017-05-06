@@ -93,6 +93,7 @@ public:
 	std::unique_ptr<uint16_t[]> m_f3_pf_data;
 	std::unique_ptr<uint16_t[]> m_f3_pivot_ram;
 
+	emu_timer *m_interrupt3_timer;
 	uint32_t m_coin_word[2];
 	int m_f3_game;
 	tilemap_t *m_pf1_tilemap;
@@ -307,7 +308,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info8);
 	TILE_GET_INFO_MEMBER(get_tile_info_vram);
 	TILE_GET_INFO_MEMBER(get_tile_info_pixel);
-	DECLARE_MACHINE_START(f3);
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(f3);
 	DECLARE_VIDEO_START(f3);
 	uint32_t screen_update_f3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

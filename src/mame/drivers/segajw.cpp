@@ -370,14 +370,14 @@ static MACHINE_CONFIG_START( segajw, segajw_state )
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
-	MCFG_DEVICE_ADD("io1a", SEGA_315_5296, 8000000) // unknown clock
+	MCFG_DEVICE_ADD("io1a", SEGA_315_5296, 0) // unknown clock
 	MCFG_315_5296_OUT_PORTA_CB(WRITE8(segajw_state, coin_counter_w))
 	MCFG_315_5296_OUT_PORTB_CB(WRITE8(segajw_state, lamps1_w))
 	MCFG_315_5296_OUT_PORTC_CB(WRITE8(segajw_state, lamps2_w))
 	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segajw_state, hopper_w))
 	MCFG_315_5296_IN_PORTF_CB(READ8(segajw_state, coin_counter_r))
 
-	MCFG_DEVICE_ADD("io1c", SEGA_315_5296, 8000000) // unknown clock
+	MCFG_DEVICE_ADD("io1c", SEGA_315_5296, 0) // unknown clock
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("IN0"))
 	MCFG_315_5296_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_315_5296_IN_PORTC_CB(IOPORT("IN2"))

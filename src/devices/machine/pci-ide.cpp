@@ -10,7 +10,8 @@ ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, d
 	m_ide(*this, "ide"),
 	m_ide2(*this, "ide2"),
 	m_irq_num(-1),
-	m_irq_handler(*this)
+	m_irq_handler(*this),
+	m_legacy_top(0x000)
 {
 }
 
@@ -74,13 +75,13 @@ void ide_pci_device::device_start()
 	pci_device::device_start();
 
 	add_map(8,    M_IO,  FUNC(ide_pci_device::chan1_data_command_map));
-	bank_infos[0].adr = 0x1f0;
+	bank_infos[0].adr = (m_legacy_top << 20) | 0x1f0;
 	add_map(4,    M_IO,  FUNC(ide_pci_device::chan1_control_map));
-	bank_infos[1].adr = 0x3f4;
+	bank_infos[1].adr = (m_legacy_top << 20) | 0x3f4;
 	add_map(8,    M_IO,  FUNC(ide_pci_device::chan2_data_command_map));
-	bank_infos[2].adr = 0x170;
+	bank_infos[2].adr = (m_legacy_top << 20) | 0x170;
 	add_map(4,    M_IO,  FUNC(ide_pci_device::chan2_control_map));
-	bank_infos[3].adr = 0x374;
+	bank_infos[3].adr = (m_legacy_top << 20) | 0x374;
 	add_map(16,   M_IO,  FUNC(ide_pci_device::bus_master_map));
 	bank_infos[4].adr = 0xf00;
 
@@ -95,6 +96,11 @@ void ide_pci_device::device_start()
 
 	intr_pin = 0x1;
 	intr_line = 0xe;
+
+	// Save states
+	save_item(NAME(pci_bar));
+	save_item(NAME(m_config_data));
+
 }
 
 void ide_pci_device::device_reset()
@@ -166,16 +172,12 @@ WRITE8_MEMBER(ide_pci_device::prog_if_w)
 		// Map Primary IDE Channel
 		if (pclass & 0x1) {
 			// PCI Mode
-			// Enabling BAR 4 in legacy mode
-			bank_infos[4].flags &= ~M_DISABLED;
 			pci_device::address_base_w(space, 0, pci_bar[0]);
 			pci_device::address_base_w(space, 1, pci_bar[1]);
 		} else {
 			// Legacy Mode
-			// Disabling BAR 4 in legacy mode
-			bank_infos[4].flags |= M_DISABLED;
-			pci_device::address_base_w(space, 0, 0x1f0);
-			pci_device::address_base_w(space, 1, 0x3f4);
+			pci_device::address_base_w(space, 0, (m_legacy_top << 20) | 0x1f0);
+			pci_device::address_base_w(space, 1, (m_legacy_top << 20) | 0x3f4);
 		}
 		// Map Primary IDE Channel
 		if (pclass & 0x4) {
@@ -185,8 +187,8 @@ WRITE8_MEMBER(ide_pci_device::prog_if_w)
 		}
 		else {
 			// Legacy Mode
-			pci_device::address_base_w(space, 2, 0x170);
-			pci_device::address_base_w(space, 3, 0x374);
+			pci_device::address_base_w(space, 2, (m_legacy_top << 20) | 0x170);
+			pci_device::address_base_w(space, 3, (m_legacy_top << 20) | 0x374);
 		}
 	}
 	if (1)
@@ -218,19 +220,17 @@ WRITE32_MEMBER(ide_pci_device::address_base_w)
 		// Bits 0 (primary) and 2 (secondary) control if the mapping is legacy or BAR
 		switch (offset) {
 		case 0: case 1:
-			if ((pclass & 0x1) == 1)
+			if (pclass & 0x1)
 				pci_device::address_base_w(space, offset, data);
 			break;
 		case 2: case 3:
-			if ((pclass & 0x4) == 1)
+			if (pclass & 0x4)
 				pci_device::address_base_w(space, offset, data);
 			break;
 		default:
+			// Only the first 4 bars are controlled by pif
 			pci_device::address_base_w(space, offset, data);
-			// Not sure what to do for the bus master ide BAR in legacy mode
-			// prog_if_w will disable register in legacy mode
-			if ((pclass & 0x5) == 0)
-				logerror("Mapping bar[%i] in legacy mode\n", offset);
 		}
+		logerror("Mapping bar[%i] = %08x\n", offset, data);
 	}
 }

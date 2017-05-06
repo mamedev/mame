@@ -56,8 +56,8 @@ public:
 	template<class _Object> static devcb_base &set_keyboard_data_callback(device_t &device, _Object object) { return downcast<at_keyboard_controller_device &>(device).m_keyboard_data_cb.set_callback(object); }
 
 	// internal 8042 interface
-	DECLARE_READ8_MEMBER( t0_r );
-	DECLARE_READ8_MEMBER( t1_r );
+	DECLARE_READ_LINE_MEMBER( t0_r );
+	DECLARE_READ_LINE_MEMBER( t1_r );
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_READ8_MEMBER( p2_r );
 	DECLARE_WRITE8_MEMBER( p2_w );

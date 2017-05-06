@@ -319,12 +319,22 @@ std::string machine_info::game_info_string()
 std::string machine_info::mandatory_images()
 {
 	std::ostringstream buf;
+	bool is_first = true;
 
 	// make sure that any required image has a mounted file
 	for (device_image_interface &image : image_interface_iterator(m_machine.root_device()))
 	{
-		if (image.must_be_loaded() && m_machine.options().image_options().count(image.instance_name()) == 0)
-			buf << "\"" << image.instance_name() << "\", ";
+		if (image.must_be_loaded())
+		{
+			if (m_machine.options().image_option(image.instance_name()).value().empty())
+			{
+				if (is_first)
+					is_first = false;
+				else
+					buf << ", ";
+				buf << "\"" << image.instance_name() << "\"";
+			}
+		}
 	}
 	return buf.str();
 }

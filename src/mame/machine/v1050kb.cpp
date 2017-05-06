@@ -51,16 +51,6 @@ const tiny_rom_entry *v1050_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( kb_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( v1050_keyboard_io, AS_IO, 8, v1050_keyboard_device )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(kb_p1_r, kb_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(kb_p2_w)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
 //  DISCRETE_SOUND_START( v1050kb )
 //-------------------------------------------------
 
@@ -84,7 +74,9 @@ DISCRETE_SOUND_END
 
 static MACHINE_CONFIG_FRAGMENT( v1050_keyboard )
 	MCFG_CPU_ADD(I8049_TAG, I8049, XTAL_4_608MHz)
-	MCFG_CPU_IO_MAP(v1050_keyboard_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(v1050_keyboard_device, kb_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(v1050_keyboard_device, kb_p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(v1050_keyboard_device, kb_p2_w))
 	MCFG_DEVICE_DISABLE() // TODO
 
 	// discrete sound

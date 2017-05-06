@@ -165,9 +165,9 @@ K05324X_CB_MEMBER(tmnt_state::lgtnfght_sprite_callback)
 K05324X_CB_MEMBER(tmnt_state::blswhstl_sprite_callback)
 {
 #if 0
-if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x20)) *color = rand();
-if (machine().input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = rand();
-if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = rand();
+if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x20)) *color = machine().rand();
+if (machine().input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = machine().rand();
+if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = machine().rand();
 #endif
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])

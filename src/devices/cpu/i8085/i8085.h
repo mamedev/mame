@@ -32,21 +32,27 @@ enum
 #define I8085_STATUS_MEMR   0x80
 
 
-/* STATUS changed callback */
+// STATUS changed callback
 #define MCFG_I8085A_STATUS(_devcb) \
 	devcb = &i8085a_cpu_device::set_out_status_func(*device, DEVCB_##_devcb);
 
-/* INTE changed callback */
+// INTE changed callback
 #define MCFG_I8085A_INTE(_devcb) \
 	devcb = &i8085a_cpu_device::set_out_inte_func(*device, DEVCB_##_devcb);
 
-/* SID changed callback (8085A only) */
+// SID changed callback (8085A only)
 #define MCFG_I8085A_SID(_devcb) \
 	devcb = &i8085a_cpu_device::set_in_sid_func(*device, DEVCB_##_devcb);
 
-/* SOD changed callback (8085A only) */
+// SOD changed callback (8085A only)
 #define MCFG_I8085A_SOD(_devcb) \
 	devcb = &i8085a_cpu_device::set_out_sod_func(*device, DEVCB_##_devcb);
+
+// CLK rate callback (8085A only)
+#define MCFG_I8085A_CLK_OUT_DEVICE(_tag) \
+	i8085a_cpu_device::static_set_clk_out(*device, clock_update_delegate(FUNC(device_t::set_unscaled_clock), _tag, (device_t *)nullptr));
+#define MCFG_I8085A_CLK_OUT_CUSTOM(_class, _func) \
+	i8085a_cpu_device::static_set_clk_out(*device, clock_update_delegate(&_class::_func, #_class "::" _func, owner));
 
 
 class i8085a_cpu_device :  public cpu_device
@@ -61,9 +67,12 @@ public:
 	template<class _Object> static devcb_base &set_out_inte_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_out_inte_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_in_sid_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_in_sid_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_sod_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_out_sod_func.set_callback(object); }
+	static void static_set_clk_out(device_t &device, clock_update_delegate &&clk_out) { downcast<i8085a_cpu_device &>(device).m_clk_out_func = std::move(clk_out); }
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete() override;
+	virtual void device_clock_changed() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -98,6 +107,7 @@ private:
 	devcb_write_line   m_out_inte_func;
 	devcb_read_line    m_in_sid_func;
 	devcb_write_line   m_out_sod_func;
+	clock_update_delegate m_clk_out_func;
 
 	int                 m_cputype;        /* 0 8080, 1 8085A */
 	PAIR                m_PC,m_SP,m_AF,m_BC,m_DE,m_HL,m_WZ;

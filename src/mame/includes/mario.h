@@ -114,8 +114,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mario_flip_w);
 	DECLARE_READ8_MEMBER(mario_sh_p1_r);
 	DECLARE_READ8_MEMBER(mario_sh_p2_r);
-	DECLARE_READ8_MEMBER(mario_sh_t0_r);
-	DECLARE_READ8_MEMBER(mario_sh_t1_r);
+	DECLARE_READ_LINE_MEMBER(mario_sh_t0_r);
+	DECLARE_READ_LINE_MEMBER(mario_sh_t1_r);
 	DECLARE_READ8_MEMBER(mario_sh_tune_r);
 	DECLARE_WRITE8_MEMBER(mario_sh_p1_w);
 	DECLARE_WRITE8_MEMBER(mario_sh_p2_w);

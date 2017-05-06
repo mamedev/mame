@@ -1202,7 +1202,7 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 
 							if (!flipx) current_xpos = (xpos+xpos2+((xx*16*xinc)>>16));
 							else current_xpos = (xpos+xpos2-((xx*16*xinc)>>16));
-							//current_xpos +=  rand()&0x3ff;
+							//current_xpos +=  machine().rand()&0x3ff;
 							current_xpos += gscrollx;
 							current_xpos += 1;
 							current_xpos &=0x3ff;

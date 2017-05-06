@@ -37,6 +37,20 @@ device_palette_interface::device_palette_interface(const machine_config &mconfig
 
 
 //-------------------------------------------------
+//  interface_validity_check - validation for a
+//  device after the configuration has been
+//  constructed
+//-------------------------------------------------
+
+void device_palette_interface::interface_validity_check(validity_checker &valid) const
+{
+	// this info must be available before the device has started
+	if (palette_entries() == 0)
+		osd_printf_error("Palette has no entries specified\n");
+}
+
+
+//-------------------------------------------------
 //  interface_pre_start - work to be done prior to
 //  actually starting a device
 //-------------------------------------------------
@@ -48,28 +62,25 @@ void device_palette_interface::interface_pre_start()
 	m_format = (screen != nullptr) ? screen->format() : BITMAP_FORMAT_INVALID;
 
 	// allocate the palette
-	int numentries = palette_entries();
-	if (numentries > 0)
+	u32 numentries = palette_entries();
+	allocate_palette(numentries);
+	allocate_color_tables();
+	allocate_shadow_tables();
+
+	// allocate indirection tables
+	int indirect_colors = palette_indirect_entries();
+	if (indirect_colors > 0)
 	{
-		allocate_palette(numentries);
-		allocate_color_tables();
-		allocate_shadow_tables();
-
-		// allocate indirection tables
-		int indirect_colors = palette_indirect_entries();
-		if (indirect_colors > 0)
+		m_indirect_colors.resize(indirect_colors);
+		for (int color = 0; color < indirect_colors; color++)
 		{
-			m_indirect_colors.resize(indirect_colors);
-			for (int color = 0; color < indirect_colors; color++)
-			{
-				// alpha = 0 ensures change is detected the first time set_indirect_color() is called
-				m_indirect_colors[color] = rgb_t::transparent();
-			}
-
-			m_indirect_pens.resize(numentries);
-			for (int pen = 0; pen < numentries; pen++)
-				m_indirect_pens[pen] = pen % indirect_colors;
+			// alpha = 0 ensures change is detected the first time set_indirect_color() is called
+			m_indirect_colors[color] = rgb_t::transparent();
 		}
+
+		m_indirect_pens.resize(numentries);
+		for (int pen = 0; pen < numentries; pen++)
+			m_indirect_pens[pen] = pen % indirect_colors;
 	}
 }
 
@@ -328,8 +339,10 @@ void device_palette_interface::set_shadow_dRGB32(int mode, int dr, int dg, int d
 //  palette object itself
 //-------------------------------------------------
 
-void device_palette_interface::allocate_palette(int numentries)
+void device_palette_interface::allocate_palette(u32 numentries)
 {
+	assert(numentries > 0);
+
 	// determine the number of groups we need
 	int numgroups = 1;
 	if (palette_shadows_enabled())

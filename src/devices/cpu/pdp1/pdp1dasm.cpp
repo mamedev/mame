@@ -31,31 +31,31 @@ CPU_DISASSEMBLE(pdp1)
 	ib = (md >> 12) & 1;               /* */
 	switch (md >> 13)
 	{
-	case AND:
+	case pdp1_device::AND:
 		ea ();
 		util::stream_format(stream, "AND (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
-	case IOR:
+	case pdp1_device::IOR:
 		ea ();
 		util::stream_format(stream, "IOR (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
-	case XOR:
+	case pdp1_device::XOR:
 		ea ();
 		util::stream_format(stream, "XOR (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
-	case XCT:
+	case pdp1_device::XCT:
 		ea ();
 		util::stream_format(stream, "XCT (0%06o)", y);
 		IN;
 		//etime = 5;
 		break;
-	case CALJDA:
+	case pdp1_device::CALJDA:
 		{
 			if (ib == 1)
 				util::stream_format(stream, "JDA 0%06o  ", y);
@@ -64,109 +64,109 @@ CPU_DISASSEMBLE(pdp1)
 			//etime = 10;
 			break;
 		}
-	case LAC:
+	case pdp1_device::LAC:
 		ea ();
 		util::stream_format(stream, "LAC (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
-	case LIO:
+	case pdp1_device::LIO:
 		ea ();
 		util::stream_format(stream, "LIO (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
-	case DAC:
+	case pdp1_device::DAC:
 		ea ();
 		util::stream_format(stream, "DAC 0%06o  ", y);
 		IN;
 		//etime = 10;
 		break;
-	case DAP:
+	case pdp1_device::DAP:
 		ea ();
 		util::stream_format(stream, "DAP 0%06o  ", y);
 		IN;
 		//etime = 10;
 		break;
-	case DIP:
+	case pdp1_device::DIP:
 		ea ();
 		util::stream_format(stream, "DIP 0%06o  ", y);
 		IN;
 		//etime = 10;
 		break;
-	case DIO:
+	case pdp1_device::DIO:
 		ea ();
 		util::stream_format(stream, "DIO 0%06o  ", y);
 		IN;
 		//etime = 10;
 		break;
-	case DZM:
+	case pdp1_device::DZM:
 		ea ();
 		util::stream_format(stream, "DZM 0%06o  ", y);
 		IN;
 		//etime = 10;
 		break;
-	case ADD:
+	case pdp1_device::ADD:
 		ea ();
 		util::stream_format(stream, "ADD (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
-	case SUB:
+	case pdp1_device::SUB:
 		ea ();
 		util::stream_format(stream, "SUB (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
-	case IDX:
+	case pdp1_device::IDX:
 		ea ();
 		util::stream_format(stream, "IDX (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
-	case ISP:
+	case pdp1_device::ISP:
 		ea ();
 		util::stream_format(stream, "ISP (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
-	case SAD:
+	case pdp1_device::SAD:
 		ea ();
 		util::stream_format(stream, "SAD (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
-	case SAS:
+	case pdp1_device::SAS:
 		ea ();
 		util::stream_format(stream, "SAS (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
-	case MUS_MUL:
+	case pdp1_device::MUS_MUL:
 		ea ();
 		util::stream_format(stream, "MUS (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
-	case DIS_DIV:
+	case pdp1_device::DIS_DIV:
 		ea ();
 		util::stream_format(stream, "DIS (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
-	case JMP:
+	case pdp1_device::JMP:
 		ea ();
 		util::stream_format(stream, "JMP 0%06o  ", y);
 		IN;
 		//etime = 5;
 		break;
-	case JSP:
+	case pdp1_device::JSP:
 		ea ();
 		util::stream_format(stream, "JSP 0%06o  ", y);
 		IN;
 		//etime = 5;
 		break;
-	case SKP:
+	case pdp1_device::SKP:
 		{
 			if ((y & 0100) == 0100)
 				util::stream_format(stream, "SZA ");
@@ -186,7 +186,7 @@ CPU_DISASSEMBLE(pdp1)
 			//etime = 5;
 			break;
 		}
-	case SFT:
+	case pdp1_device::SFT:
 		{
 			int nshift = 0;
 			int mask = md & 0777;
@@ -253,16 +253,16 @@ CPU_DISASSEMBLE(pdp1)
 			}
 			break;
 		}
-	case LAW:
+	case pdp1_device::LAW:
 		util::stream_format(stream, "LAW 0%06o", y);
 		IN;
 		//etime = 5;
 		break;
-	case IOT:
+	case pdp1_device::IOT:
 		util::stream_format(stream, "IOT 0%06o", md);
 		//etime = 10;
 		break;
-	case OPR:
+	case pdp1_device::OPR:
 		{
 			if ((y & 04000) == 04000)
 				util::stream_format(stream, "CLI ");

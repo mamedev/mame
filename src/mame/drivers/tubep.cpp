@@ -891,8 +891,6 @@ static MACHINE_CONFIG_START( tubep, tubep_state )
 	MCFG_PALETTE_ADD("palette", 32 + 256*64)
 
 	MCFG_PALETTE_INIT_OWNER(tubep_state,tubep)
-	MCFG_VIDEO_START_OVERRIDE(tubep_state,tubep)
-	MCFG_VIDEO_RESET_OVERRIDE(tubep_state,tubep)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -955,8 +953,6 @@ static MACHINE_CONFIG_START( rjammer, tubep_state )
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(tubep_state,rjammer)
-	MCFG_VIDEO_START_OVERRIDE(tubep_state,tubep)
-	MCFG_VIDEO_RESET_OVERRIDE(tubep_state,tubep)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

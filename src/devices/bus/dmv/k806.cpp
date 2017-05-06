@@ -19,15 +19,11 @@ ROM_START( dmv_k806 )
 	ROM_LOAD( "dmv_mouse_8741a.bin", 0x0000, 0x0400, CRC(2163737a) SHA1(b82c14dba6c25cb1f60cf623989ca8c0c1ee4cc3))
 ROM_END
 
-static ADDRESS_MAP_START( k806_io, AS_IO, 8, dmv_k806_device )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(port1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(port2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(portt1_r)
-ADDRESS_MAP_END
-
 static MACHINE_CONFIG_FRAGMENT( dmv_k806 )
 	MCFG_CPU_ADD("mcu", I8741, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(k806_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(dmv_k806_device, port1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dmv_k806_device, port2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(dmv_k806_device, portt1_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", dmv_k806_device, mouse_timer, attotime::from_hz(1000))
 MACHINE_CONFIG_END
@@ -174,7 +170,7 @@ READ8_MEMBER( dmv_k806_device::port1_r )
 	return data;
 }
 
-READ8_MEMBER( dmv_k806_device::portt1_r )
+READ_LINE_MEMBER( dmv_k806_device::portt1_r )
 {
 	return BIT(m_jumpers->read(), 7) ? 0 : 1;
 }

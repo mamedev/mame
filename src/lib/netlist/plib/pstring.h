@@ -34,10 +34,12 @@ public:
 
 	pstring_const_iterator() noexcept : p() { }
 	explicit constexpr pstring_const_iterator(const typename string_type::const_iterator &x) noexcept : p(x) { }
+#if !defined(_MSC_VER) || !defined(_ITERATOR_DEBUG_LEVEL) || (0 == _ITERATOR_DEBUG_LEVEL) // debug iterators are broken
 	pstring_const_iterator(const pstring_const_iterator &rhs) noexcept = default;
 	pstring_const_iterator(pstring_const_iterator &&rhs) noexcept = default;
 	pstring_const_iterator &operator=(const pstring_const_iterator &rhs) noexcept = default;
 	pstring_const_iterator &operator=(pstring_const_iterator &&rhs) noexcept = default;
+#endif
 
 	pstring_const_iterator& operator++() noexcept { p += static_cast<difference_type>(traits_type::codelen(&(*p))); return *this; }
 	pstring_const_iterator operator++(int) noexcept { pstring_const_iterator tmp(*this); operator++(); return tmp; }
@@ -62,18 +64,18 @@ public:
 
 	typedef typename traits_type::mem_t mem_t;
 	typedef typename traits_type::code_t code_t;
-	typedef std::size_t 	size_type;
-    typedef std::ptrdiff_t difference_type;
-    typedef typename traits_type::string_type string_type;
+	typedef std::size_t     size_type;
+	typedef std::ptrdiff_t difference_type;
+	typedef typename traits_type::string_type string_type;
 
 	class ref_value_type final
 	{
 	public:
-    	ref_value_type() = delete;
-    	ref_value_type(const ref_value_type &) = delete;
-    	ref_value_type(ref_value_type &&) = delete;
-    	ref_value_type &operator=(const ref_value_type &) = delete;
-    	ref_value_type &operator=(ref_value_type &&) = delete;
+		ref_value_type() = delete;
+		ref_value_type(const ref_value_type &) = delete;
+		ref_value_type(ref_value_type &&) = delete;
+		ref_value_type &operator=(const ref_value_type &) = delete;
+		ref_value_type &operator=(ref_value_type &&) = delete;
 		operator code_t() const noexcept { return traits_type::code(&m); }
 	private:
 		const mem_t m;
@@ -166,8 +168,8 @@ public:
 	const_iterator cend() const { return const_iterator(m_str.end()); }
 
 	// C string conversion helpers
-	const mem_t *c_str() const  { 	return static_cast<const mem_t *>(m_str.c_str()); }
-	const mem_t *data() const  { 	return c_str(); }
+	const mem_t *c_str() const  {   return static_cast<const mem_t *>(m_str.c_str()); }
+	const mem_t *data() const  {    return c_str(); }
 
 	size_type length() const { return traits_type::len(m_str); }
 	size_type size() const { return traits_type::len(m_str); }
@@ -369,7 +371,7 @@ struct putf16_traits
 		while (i != p.end())
 		{
 			// FIXME: check that size is equal
-	        uint16_t c = static_cast<uint16_t>(*i++);
+			uint16_t c = static_cast<uint16_t>(*i++);
 			if (!((c & 0xd800) == 0xd800))
 				ret++;
 		}
@@ -377,8 +379,8 @@ struct putf16_traits
 	}
 	static std::size_t codelen(const mem_t *p)
 	{
-        uint16_t c = static_cast<uint16_t>(*p);
-        return ((c & 0xd800) == 0xd800) ? 2 : 1;
+		uint16_t c = static_cast<uint16_t>(*p);
+		return ((c & 0xd800) == 0xd800) ? 2 : 1;
 	}
 	static std::size_t codelen(const code_t c)
 	{
@@ -389,28 +391,28 @@ struct putf16_traits
 	}
 	static code_t code(const mem_t *p)
 	{
-        uint32_t c = static_cast<uint32_t>(*p++);
-        if ((c & 0xd800) == 0xd800)
-        {
-        	c = (c - 0xd800) << 10;
-            c += static_cast<uint32_t>(*p) - 0xdc00 + 0x10000;
-        }
-        return static_cast<code_t>(c);
+		uint32_t c = static_cast<uint32_t>(*p++);
+		if ((c & 0xd800) == 0xd800)
+		{
+			c = (c - 0xd800) << 10;
+			c += static_cast<uint32_t>(*p) - 0xdc00 + 0x10000;
+		}
+		return static_cast<code_t>(c);
 	}
 	static void encode(code_t c, string_type &s)
 	{
 		uint32_t cu = static_cast<uint32_t>(c);
-        if (c > 0xffff)
-        { //make a surrogate pair
-        	uint32_t t = ((cu - 0x10000) >> 10) + 0xd800;
-        	cu = (cu & 0x3ff) + 0xdc00;
-        	s += static_cast<mem_t>(t);
-            s += static_cast<mem_t>(cu);
-        }
-        else
-        {
-            s += static_cast<mem_t>(cu);
-        }
+		if (c > 0xffff)
+		{ //make a surrogate pair
+			uint32_t t = ((cu - 0x10000) >> 10) + 0xd800;
+			cu = (cu & 0x3ff) + 0xdc00;
+			s += static_cast<mem_t>(t);
+			s += static_cast<mem_t>(cu);
+		}
+		else
+		{
+			s += static_cast<mem_t>(cu);
+		}
 	}
 	static const mem_t *nthcode(const mem_t *p, const std::size_t n)
 	{
@@ -435,7 +437,7 @@ struct pwchar_traits
 			while (i != p.end())
 			{
 				// FIXME: check that size is equal
-		        uint32_t c = static_cast<uint32_t>(*i++);
+				uint32_t c = static_cast<uint32_t>(*i++);
 				if (!((c & 0xd800) == 0xd800))
 					ret++;
 			}
@@ -449,8 +451,8 @@ struct pwchar_traits
 	{
 		if (sizeof(wchar_t) == 2)
 		{
-	        uint16_t c = static_cast<uint16_t>(*p);
-	        return ((c & 0xd800) == 0xd800) ? 2 : 1;
+			uint16_t c = static_cast<uint16_t>(*p);
+			return ((c & 0xd800) == 0xd800) ? 2 : 1;
 		}
 		else
 			return 1;
@@ -468,13 +470,13 @@ struct pwchar_traits
 	{
 		if (sizeof(wchar_t) == 2)
 		{
-	        uint32_t c = static_cast<uint32_t>(*p++);
-	        if ((c & 0xd800) == 0xd800)
-	        {
-	        	c = (c - 0xd800) << 10;
-	            c += static_cast<uint32_t>(*p) - 0xdc00 + 0x10000;
-	        }
-	        return static_cast<code_t>(c);
+			uint32_t c = static_cast<uint32_t>(*p++);
+			if ((c & 0xd800) == 0xd800)
+			{
+				c = (c - 0xd800) << 10;
+				c += static_cast<uint32_t>(*p) - 0xdc00 + 0x10000;
+			}
+			return static_cast<code_t>(c);
 		}
 		else
 			return static_cast<code_t>(*p);

@@ -190,7 +190,10 @@ WRITE8_MEMBER( sega_315_5296_device::write )
 			for (int i = 0; i < 8; i++)
 			{
 				if ((m_dir ^ data) & (1 << i))
+				{
+					logerror("Port %c configured for output\n", 'A' + i);
 					(*m_out_port_cb[i])((offs_t)i, (data & 1 << i) ? m_output_latch[i] : 0);
+				}
 			}
 
 			m_dir = data;

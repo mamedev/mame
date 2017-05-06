@@ -513,21 +513,21 @@ bool device_image_interface::load_software_region(const char *tag, optional_shar
 // to be loaded
 // ****************************************************************************
 
-void device_image_interface::run_hash(void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *),
+void device_image_interface::run_hash(util::core_file &file, void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *),
 	util::hash_collection &hashes, const char *types)
 {
 	u32 size;
 	std::vector<u8> buf;
 
 	hashes.reset();
-	size = (u32) length();
+	size = (u32) file.size();
 
 	buf.resize(size);
 	memset(&buf[0], 0, size);
 
 	// read the file
-	fseek(0, SEEK_SET);
-	fread(&buf[0], size);
+	file.seek(0, SEEK_SET);
+	file.read(&buf[0], size);
 
 	if (partialhash)
 		partialhash(hashes, &buf[0], size, types);
@@ -535,7 +535,7 @@ void device_image_interface::run_hash(void (*partialhash)(util::hash_collection 
 		hashes.compute(&buf[0], size, types);
 
 	// cleanup
-	fseek(0, SEEK_SET);
+	file.seek(0, SEEK_SET);
 }
 
 
@@ -560,10 +560,23 @@ void device_image_interface::image_checkhash()
 		// retrieve the partial hash func
 		partialhash = get_partial_hash();
 
-		run_hash(partialhash, m_hash, util::hash_collection::HASH_TYPES_ALL);
+		run_hash(*m_file, partialhash, m_hash, util::hash_collection::HASH_TYPES_ALL);
 	}
 	return;
 }
+
+
+util::hash_collection device_image_interface::calculate_hash_on_file(util::core_file &file) const
+{
+	// retrieve the partial hash func
+	device_image_partialhash_func partialhash = get_partial_hash();
+
+	// and calculate the hash
+	util::hash_collection hash;
+	run_hash(file, partialhash, hash, util::hash_collection::HASH_TYPES_ALL);
+	return hash;
+}
+
 
 u32 device_image_interface::crc()
 {
@@ -984,7 +997,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 //  load_internal - core image loading
 //-------------------------------------------------
 
-image_init_result device_image_interface::load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load)
+image_init_result device_image_interface::load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args)
 {
 	// first unload the image
 	unload();
@@ -1032,10 +1045,6 @@ image_init_result device_image_interface::load_internal(const std::string &path,
 	// success!
 
 done:
-	if (just_load) {
-		if (m_err) clear();
-		return m_err ? image_init_result::FAIL : image_init_result::PASS;
-	}
 	if (m_err!=0) {
 		if (!init_phase())
 		{
@@ -1063,7 +1072,7 @@ image_init_result device_image_interface::load(const std::string &path)
 		return image_init_result::PASS;
 	}
 
-	return load_internal(path, false, 0, nullptr, false);
+	return load_internal(path, false, 0, nullptr);
 }
 
 
@@ -1073,6 +1082,13 @@ image_init_result device_image_interface::load(const std::string &path)
 
 image_init_result device_image_interface::load_software(const std::string &software_identifier)
 {
+	// Is this a software part that forces a reset and we're at runtime?  If so, get this loaded through reset_and_load
+	if (is_reset_on_load() && !init_phase())
+	{
+		reset_and_load(software_identifier);
+		return image_init_result::PASS;
+	}
+
 	// Prepare to load
 	unload();
 	clear_error();
@@ -1125,36 +1141,6 @@ image_init_result device_image_interface::load_software(const std::string &softw
 		return image_init_result::FAIL;
 
 	return image_init_result::PASS;
-}
-
-
-//-------------------------------------------------
-//  open_image_file - opening plain image file
-//
-//  This is called by implementations of get_default_card_software() so that they can
-//	interogate the file.  Implementations of get_default_card_software() are then
-//	responsible for closing out the resulting image file
-//
-//	If this sounds gross, its because it is gross.  get_default_card_software() needs to die
-//-------------------------------------------------
-
-bool device_image_interface::open_image_file(emu_options &options)
-{
-	if (options.image_options().count(instance_name()) > 0)
-	{
-		const std::string &path = options.image_options()[instance_name()];
-
-		// Try to load with load_internal()
-		//
-		// Take note that this code path is executed when an image is loaded by a
-		// software list.  Under such circumstances, load_internal() is expected
-		// to fail.  This is by "design"; implementations of get_default_card_software()
-		// typically invoke open_image_file() and if the result is false, branch on a
-		// code path oriented for software lists
-		if (load_internal(path, false, 0, nullptr, true) == image_init_result::PASS)
-			return true;
-	}
-	return false;
 }
 
 
@@ -1224,14 +1210,14 @@ image_init_result device_image_interface::create(const std::string &path, const 
 		}
 		cnt++;
 	}
-	return load_internal(path, true, format_index, create_args, false);
+	return load_internal(path, true, format_index, create_args);
 }
 
 
 //-------------------------------------------------
-//	reset_and_load - called internally when we try
-//	to load an is_reset_on_load() item; will reset
-//	the emulation and record this image to be loaded
+//  reset_and_load - called internally when we try
+//  to load an is_reset_on_load() item; will reset
+//  the emulation and record this image to be loaded
 //-------------------------------------------------
 
 void device_image_interface::reset_and_load(const std::string &path)
@@ -1240,7 +1226,7 @@ void device_image_interface::reset_and_load(const std::string &path)
 	device().machine().schedule_hard_reset();
 
 	// and record the new load
-	device().machine().options().image_options()[instance_name()] = path;
+	device().machine().options().image_option(instance_name()).specify(path);
 }
 
 
@@ -1324,9 +1310,10 @@ void device_image_interface::update_names()
 	if (brief_name == nullptr)
 		brief_name = device_brieftypename(image_type());
 
+	m_cannonical_instance_name = string_format("%s%d", inst_name, index + 1);
 	if (count > 1)
 	{
-		m_instance_name = string_format("%s%d", inst_name, index + 1);
+		m_instance_name = m_cannonical_instance_name;
 		m_brief_instance_name = string_format("%s%d", brief_name, index + 1);
 	}
 	else
@@ -1431,13 +1418,6 @@ bool device_image_interface::load_software_part(const std::string &identifier)
 		return false;
 	}
 
-	// Is this a software part that forces a reset and we're at runtime?  If so, get this loaded through reset_and_load
-	if (is_reset_on_load() && !init_phase())
-	{
-		reset_and_load(identifier);
-		return true;
-	}
-
 	// Load the software part
 	const char *swname = m_software_part_ptr->info().shortname().c_str();
 	const rom_entry *start_entry = m_software_part_ptr->romdata().data();
@@ -1484,11 +1464,11 @@ std::string device_image_interface::software_get_default_slot(const char *defaul
 {
 	std::string result;
 
-	auto iter = device().mconfig().options().image_options().find(instance_name());
-	if (iter != device().mconfig().options().image_options().end() && !iter->second.empty())
+	const std::string &image_name(device().mconfig().options().image_option(instance_name()).value());
+	if (!image_name.empty())
 	{
 		result.assign(default_card_slot);
-		const software_part *swpart = find_software_item(iter->second, true);
+		const software_part *swpart = find_software_item(image_name, true);
 		if (swpart != nullptr)
 		{
 			const char *slot = swpart->feature("slot");

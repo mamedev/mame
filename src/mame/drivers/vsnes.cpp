@@ -261,7 +261,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( vsnes_state::vsnes_bootleg_z80_latch_r )
 {
-	return 0x00;// rand();
+	return 0x00;
 }
 
 static ADDRESS_MAP_START( vsnes_bootleg_z80_map, AS_PROGRAM, 8, vsnes_state )

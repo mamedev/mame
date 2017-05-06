@@ -36,6 +36,8 @@
          D - SPG243 - Wall-E
          D - SPG243 - Chintendo / KenSingTon / Siatronics / Jungle Soft Vii
  Partial D - SPG200 - V-Tech V-Smile
+        ND - unknown - Zone 40
+         D - SPG243 - Zone 60
          D - SPG243 - Wireless 60
         ND - unknown - Wireless Air 60
         ND - Likely many more
@@ -69,6 +71,9 @@ Detailed list of bugs:
 -- The "EEPROM TEST" option in the diagnostic menu (accessible by holding 1+2 or A+B during startup) freezes when selected
 -- The "MOTOR" option in the diagnostic menu does nothing when selected
 -- The input for the gyroscopic sensor tests in the "KEYBOARD + G-SENSOR" sub-menu goes haywire
+- Zone 60 / Wireless 60:
+-- Auto Racing / Auto X, Dragon, Yummy, some other games: some sprites are inverted or opaque where they should be transparent
+-- Basketball: emulator crashes when starting the game due to an unimplemented instruction
 
 
 *******************************************************************************/
@@ -1308,6 +1313,13 @@ ROM_START( walle )
 	//ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, CRC(6bc90b16) SHA1(184d72de059057aae7800da510fcf05ed1da9ec9))
 ROM_END
 
+ROM_START( zone60 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+
+	ROM_REGION( 0x4000000, "bios", 0 )
+	ROM_LOAD( "zone60.bin", 0x0000, 0x4000000, CRC(4cb637d1) SHA1(1f97cbdb4299ac0fbafc2a3aa592066cb0727066))
+ROM_END
+
 ROM_START( wirels60 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 
@@ -1321,4 +1333,5 @@ CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile,   vii_state, vsmile,
 CONS( 2005, vsmilef,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (France)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2007, vii,      0,        0,        vii,      vii,      vii_state, vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",               MACHINE_NO_SOUND )
 CONS( 2008, walle,    vii,      0,        batman,   walle,    vii_state, walle,    "JAKKS Pacific Inc",                                 "Wall-E",            MACHINE_NO_SOUND )
+CONS( 2010, zone60,   0,        0,        wirels60, wirels60, vii_state, wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 60",           MACHINE_NO_SOUND )
 CONS( 2010, wirels60, 0,        0,        wirels60, wirels60, vii_state, wirels60, "Jungle Soft / Kids Station Toys Inc",               "Wireless 60",       MACHINE_NO_SOUND )

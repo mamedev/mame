@@ -100,25 +100,18 @@ const tiny_rom_entry *ibm_3270pc_122_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( kb_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( ibm_pc_at_84_keyboard_io, AS_IO, 8, ibm_pc_at_84_keyboard_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READNOP AM_WRITE(bus_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( ibm_pc_at_84_keyboard )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( ibm_pc_at_84_keyboard )
 	MCFG_CPU_ADD(I8048_TAG, I8048, 5364000)
-	MCFG_CPU_IO_MAP(ibm_pc_at_84_keyboard_io)
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(ibm_pc_at_84_keyboard_device, bus_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(ibm_pc_at_84_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ibm_pc_at_84_keyboard_device, p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(ibm_pc_at_84_keyboard_device, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ibm_pc_at_84_keyboard_device, p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(ibm_pc_at_84_keyboard_device, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ibm_pc_at_84_keyboard_device, t1_r))
 MACHINE_CONFIG_END
 
 
@@ -553,7 +546,7 @@ WRITE8_MEMBER( ibm_pc_at_84_keyboard_device::p2_w )
 //  t0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ibm_pc_at_84_keyboard_device::t0_r )
+READ_LINE_MEMBER( ibm_pc_at_84_keyboard_device::t0_r )
 {
 	return !data_signal();
 }
@@ -563,7 +556,7 @@ READ8_MEMBER( ibm_pc_at_84_keyboard_device::t0_r )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ibm_pc_at_84_keyboard_device::t1_r )
+READ_LINE_MEMBER( ibm_pc_at_84_keyboard_device::t1_r )
 {
 	return key_depressed();
 }

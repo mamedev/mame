@@ -201,7 +201,7 @@ READ32_MEMBER(juicebox_state::s3c44b0_gpio_port_r)
 		}
 		break;
 	}
-//  data = ((rand() & 0xFF) << 24) | ((rand() & 0xFF) << 16) | ((rand() & 0xFF) << 8) | ((rand() & 0xFF) << 0);
+//  data = ((machine().rand() & 0xFF) << 24) | ((machine().rand() & 0xFF) << 16) | ((machine().rand() & 0xFF) << 8) | ((machine().rand() & 0xFF) << 0);
 	return data;
 }
 

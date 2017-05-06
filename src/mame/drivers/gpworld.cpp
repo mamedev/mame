@@ -70,6 +70,7 @@ public:
 	uint8_t m_ldp_read_latch;
 	uint8_t m_ldp_write_latch;
 	uint8_t m_brake_gas;
+	emu_timer *m_irq_stop_timer;
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<uint8_t> m_sprite_ram;
 	required_shared_ptr<uint8_t> m_palette_ram;
@@ -82,11 +83,11 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_write);
 	DECLARE_DRIVER_INIT(gpworld);
 	virtual void machine_start() override;
-	uint32_t screen_update_gpworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_callback_gpworld);
-	void gpworld_draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_callback);
+	void draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	inline void draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip);
-	void gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -104,7 +105,7 @@ protected:
 
 
 /* VIDEO GOODS */
-void gpworld_state::gpworld_draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cliprect)
+void gpworld_state::draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
 	uint8_t characterX, characterY;
 
@@ -133,7 +134,7 @@ void gpworld_state::draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,in
 		bitmap.pix32(y, x) = m_palette->pen(color);
 }
 
-void gpworld_state::gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void gpworld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const int SPR_Y_TOP     = 0;
 	const int SPR_Y_BOTTOM  = 1;
@@ -243,12 +244,12 @@ void gpworld_state::gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &
 }
 
 
-uint32_t gpworld_state::screen_update_gpworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gpworld_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
-	gpworld_draw_tiles(bitmap, cliprect);
-	gpworld_draw_sprites(bitmap, cliprect);
+	draw_tiles(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	return 0;
 }
@@ -256,6 +257,7 @@ uint32_t gpworld_state::screen_update_gpworld(screen_device &screen, bitmap_rgb3
 
 void gpworld_state::machine_start()
 {
+	m_irq_stop_timer = timer_alloc(TIMER_IRQ_STOP);
 }
 
 
@@ -455,7 +457,7 @@ void gpworld_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-INTERRUPT_GEN_MEMBER(gpworld_state::vblank_callback_gpworld)
+INTERRUPT_GEN_MEMBER(gpworld_state::vblank_callback)
 {
 	/* Do an NMI if the enabled bit is set */
 	if (m_nmi_enable)
@@ -467,7 +469,7 @@ INTERRUPT_GEN_MEMBER(gpworld_state::vblank_callback_gpworld)
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */
 	device.execute().set_input_line(0, ASSERT_LINE);
-	timer_set(attotime::from_usec(100), TIMER_IRQ_STOP);
+	m_irq_stop_timer->adjust(attotime::from_usec(100));
 }
 
 static const gfx_layout gpworld_tile_layout =
@@ -492,11 +494,11 @@ static MACHINE_CONFIG_START( gpworld, gpworld_state )
 	MCFG_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mainmem)
 	MCFG_CPU_IO_MAP(mainport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gpworld_state,  vblank_callback_gpworld)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gpworld_state,  vblank_callback)
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_DRIVER(512, 256, gpworld_state, screen_update_gpworld)
+	MCFG_LASERDISC_OVERLAY_DRIVER(512, 256, gpworld_state, screen_update)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 
 	/* video hardware */

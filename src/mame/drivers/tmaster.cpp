@@ -538,6 +538,23 @@ ROM_START( tm2kb )
 	ROM_CONTINUE(              0xc0000, 0x040000 )
 ROM_END
 
+ROM_START( tm2kspeval ) /* NOT FOR RELEASE / FOR EVALUATION - still requires credits - Defaults to Spanish but English can be selected */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "tm2k_spain_4.xx3.u51", 0x000000, 0x080000, CRC(ba51f4dd) SHA1(bcdf6acbe6546a562e74178d4f9cdb0e167baee2) ) /* Ver: 4.XX3 Spanish 6-26-97 - Evaluation Only */
+	ROM_LOAD16_BYTE( "tm2k_spain_4.xx3.u52", 0x000001, 0x080000, CRC(6ca86264) SHA1(2fb04b8d4bd0a51653ca80e1af7fedab5aebb9dd) ) /* Ver: 4.XX3 Spanish 6-26-97 - Evaluation Only */
+
+	ROM_REGION( 0x400000, "blitter", ROMREGION_ERASE )  // Blitter gfx
+	ROM_LOAD16_BYTE( "tm2k_graphic.u38", 0x100000, 0x080000, CRC(22bb6cc5) SHA1(fc6cfd4e1e6e1455d648a7b63f2c8e37cdfe86d6) ) /* All 4 graphic roms marked as Rev 4.X */
+	ROM_LOAD16_BYTE( "tm2k_graphic.u36", 0x100001, 0x080000, CRC(7f0840ac) SHA1(1c3af419d571579a3f2c561617d55914d28ef22b) )
+	ROM_LOAD16_BYTE( "tm2k_graphic.u39", 0x300000, 0x080000, CRC(059e1bd8) SHA1(7451c1cfa0d090b0566e353738a1ffba732a8ad2) )
+	ROM_LOAD16_BYTE( "tm2k_graphic.u37", 0x300001, 0x080000, CRC(4cf65950) SHA1(74d49166da19ecc4b8fc1e8e3f01361dfb645eea) )
+	/* Sockets U40 & U41 not populated with earlier Touchmaster 2000 sets */
+
+	ROM_REGION( 0x100000, "oki", 0 ) // Samples
+	ROM_LOAD( "tm2k_sound.u8", 0x40000, 0x040000, CRC(f39ad4cf) SHA1(9bcb9a5dd3636d6541eeb3e737c7253ab0ed4e8d) ) /* Marked as Rev 1.0 */
+	ROM_CONTINUE(              0xc0000, 0x040000 )
+ROM_END
+
 /***************************************************************************
 
 Touchmaster 3000
@@ -589,6 +606,23 @@ ROM_START( tm3k )
 	ROM_LOAD( "tm3k_sound.u8", 0x00000, 0x100000, CRC(d0ae33c1) SHA1(a079def9a086a091fcc4493a44fec756d2470415) ) /* Labeled TOUCHMASTER U8 5.0 (green label) */
 ROM_END
 
+ROM_START( tm3ksp ) /* Defaults to Spanish but can also be played in English */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "tm3k_v5.02_spain.u51", 0x000000, 0x100000, CRC(e5d1d465) SHA1(30ecf32c146a611a257d97bd6789b46ce2695024) ) /* TOUCHMASTER U51 SPAIN 5.02 (Spanish 11-25-97) (yellow label) */
+	ROM_LOAD16_BYTE( "tm3k_v5.02_spain.u52", 0x000001, 0x100000, CRC(21c5fb8b) SHA1(5575925d6dc7548f5ccb04876d8c15b24601e3c0) ) /* TOUCHMASTER U52 SPAIN 5.02 (Spanish 11-25-97) (yellow label) */
+
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
+	ROM_LOAD16_BYTE( "tm3k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Labeled TOUCHMASTER U38 STANDARD 5.0 (pink label) */
+	ROM_LOAD16_BYTE( "tm3k_graphic.u36", 0x000001, 0x100000, CRC(7bde520d) SHA1(77750b689e2f0d47804042456e54bbd9c28deeac) ) /* Labeled TOUCHMASTER U36 STANDARD 5.0 (pink label) */
+	ROM_LOAD16_BYTE( "tm3k_graphic.u39", 0x200000, 0x100000, CRC(206b56a6) SHA1(09e5e05bffd0a09abd24d668e2c59b56f2c79134) ) /* Labeled TOUCHMASTER U39 STANDARD 5.0 (pink label) */
+	ROM_LOAD16_BYTE( "tm3k_graphic.u37", 0x200001, 0x100000, CRC(18f50eb3) SHA1(a7c9d3b24b5fd110380ec87d9200d55cad473efc) ) /* Labeled TOUCHMASTER U37 STANDARD 5.0 (pink label) */
+	ROM_LOAD16_BYTE( "tm3k_graphic.u41", 0x400000, 0x100000, CRC(c35c0536) SHA1(a29fd88e8f3e124f6e84012c3573616f6447eeaa) ) /* Labeled TOUCHMASTER U41 STANDARD 5.0 (pink label) */
+	ROM_LOAD16_BYTE( "tm3k_graphic.u40", 0x400001, 0x100000, CRC(353df7ca) SHA1(d6c5d5449af6b6a3acee219778583904c5b554b4) ) /* Labeled TOUCHMASTER U40 STANDARD 5.0 (pink label) */
+
+	ROM_REGION( 0x100000, "oki", 0 ) // Samples
+	ROM_LOAD( "tm3k_sound.u8", 0x00000, 0x100000, CRC(d0ae33c1) SHA1(a079def9a086a091fcc4493a44fec756d2470415) ) /* Labeled TOUCHMASTER U8 5.0 (green label) */
+ROM_END
+
 ROM_START( tm3ka )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm3k_v5.01.u51", 0x000000, 0x100000, CRC(c9522279) SHA1(e613b791f831271722f05b7e96c35519fa9fc174) ) /* TOUCHMASTER 3000 U51 DOMESTIC 5.01 (Standard 11-4-97) (yellow label) */
@@ -601,6 +635,23 @@ ROM_START( tm3ka )
 	ROM_LOAD16_BYTE( "tm3k_graphic.u37", 0x200001, 0x100000, CRC(18f50eb3) SHA1(a7c9d3b24b5fd110380ec87d9200d55cad473efc) ) /* Labeled TOUCHMASTER U37 STANDARD 5.0 (pink label) */
 	ROM_LOAD16_BYTE( "tm3k_graphic.u41", 0x400000, 0x100000, CRC(c35c0536) SHA1(a29fd88e8f3e124f6e84012c3573616f6447eeaa) ) /* Labeled TOUCHMASTER U41 STANDARD 5.0 (pink label) */
 	ROM_LOAD16_BYTE( "tm3k_graphic.u40", 0x400001, 0x100000, CRC(353df7ca) SHA1(d6c5d5449af6b6a3acee219778583904c5b554b4) ) /* Labeled TOUCHMASTER U40 STANDARD 5.0 (pink label) */
+
+	ROM_REGION( 0x100000, "oki", 0 ) // Samples
+	ROM_LOAD( "tm3k_sound.u8", 0x00000, 0x100000, CRC(d0ae33c1) SHA1(a079def9a086a091fcc4493a44fec756d2470415) ) /* Labeled TOUCHMASTER U8 5.0 (green label) */
+ROM_END
+
+ROM_START( tm3keval ) /* FREEPLAY ONLY / NOT FOR RELEASE / FOR EVALUATION ONLY */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "u51_touchmaster_10-21-97_a903.u51", 0x000000, 0x100000, CRC(4ddf94aa) SHA1(733134f835a30db48e6edb7eef95dc7a8f680955) ) /* U51  TOUCHMASTER 10-21-97 A903 (Standard AMOA 10-21-97) */
+	ROM_LOAD16_BYTE( "u52_touchmaster_10-21-97_dab0.u52", 0x000001, 0x100000, CRC(a1e1eb81) SHA1(d2e116872ff41cce9f6c228ac0ce7a3250f21054) ) /* U51  TOUCHMASTER 10-21-97 DAB0 (Standard AMOA 10-21-97) */
+
+	ROM_REGION( 0x600000, "blitter", 0 )    // Blitter gfx
+	ROM_LOAD16_BYTE( "u38_touchmaster_10-21-97_0067.u38", 0x000000, 0x100000, CRC(cc2af2b0) SHA1(64de224599e038b98ffedd965ac83b077298097f) ) /* U38  TOUCHMASTER 10-21-97 0067 (date and checksum hand written) */
+	ROM_LOAD16_BYTE( "u36_touchmaster_10-21-97_ba57.u36", 0x000001, 0x100000, CRC(73e99b1c) SHA1(812d6958a8746cc8f5cba125486e1f72740a0840) ) /* U36  TOUCHMASTER 10-21-97 BA57 (date and checksum hand written) */
+	ROM_LOAD16_BYTE( "u39_touchmaster_10-21-97_4a76.u39", 0x200000, 0x100000, CRC(af92cf87) SHA1(cb6baf8b3afe1e61e440be69a90d5c001eb7b388) ) /* U39  TOUCHMASTER 10-21-97 4A76 (date and checksum hand written) */
+	ROM_LOAD16_BYTE( "u37_touchmaster_10-21-97_40F6.u37", 0x200001, 0x100000, CRC(b5e69eca) SHA1(c548e33a049d17381c9755499940ffc459c0cb48) ) /* U37  TOUCHMASTER 10-21-97 40F6 (date and checksum hand written) */
+	ROM_LOAD16_BYTE( "u41_touchmaster_10-21-97_f986.u41", 0x400000, 0x100000, CRC(97bc5e19) SHA1(9a9786ec2a9a7b7008d9e2e8624df8301f737dbc) ) /* U41  TOUCHMASTER 10-21-97 F986 (date and checksum hand written) */
+	ROM_LOAD16_BYTE( "u40_touchmaster_10-21-97_7086.u40", 0x400001, 0x100000, CRC(e3ae6fa6) SHA1(02c98f59553f4343f0dd855794364ad95aa81063) ) /* U40  TOUCHMASTER 10-21-97 7086 (date and checksum hand written) */
 
 	ROM_REGION( 0x100000, "oki", 0 ) // Samples
 	ROM_LOAD( "tm3k_sound.u8", 0x00000, 0x100000, CRC(d0ae33c1) SHA1(a079def9a086a091fcc4493a44fec756d2470415) ) /* Labeled TOUCHMASTER U8 5.0 (green label) */
@@ -1084,28 +1135,31 @@ ROM_START( tm8k902 )
 	ROM_LOAD( "tm8k_sound.u8", 0x00000, 0x100000, CRC(c6070a60) SHA1(2dc20bf2217a36374b5a691133ad43f53dbe29ca) ) /* Mask rom labeled 5341-16513-03 U8 SOUND */
 ROM_END
 
-GAME( 1996, tm,       0,        tm,       tm,       driver_device, 0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v3.00 Euro)",               0 )
-GAME( 1996, tmdo,     tm,       tm,       tm,       driver_device, 0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v2.2-01 Standard)",         0 )
-GAME( 1996, tm2k,     0,        tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 Plus (v4.63 Standard)", 0 )
-GAME( 1996, tm2ka,    tm2k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.02 Standard)",      0 )
-GAME( 1996, tm2kb,    tm2k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.00 Standard)",      0 )
-GAME( 1997, tm3k,     0,        tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.02 Standard)",      0 )
-GAME( 1997, tm3ka,    tm3k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.01 Standard)",      0 )
-GAME( 1998, tm4k,     0,        tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.03 Standard)",      0 )
-GAME( 1998, tm4knj,   tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.03 New Jersey)",    0 )
-GAME( 1998, tm4ka,    tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 Standard)",      0 )
-GAME( 1998, tm4kca,   tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 California)",    0 )
-GAME( 1998, tm4kb,    tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.01 Standard)",      0 )
-GAME( 1998, tm4kmn,   tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.01 Minnesota)",     0 )
-GAME( 1998, tm5k,     0,        tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 Standard)",      0 )
-GAME( 1998, tm5kca,   tm5k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 California)",    0 )
-GAME( 1998, tm5kmn,   tm5k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 Minnesota)",     0 )
-GAME( 1998, tm5ka,    tm5k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.01 Standard)",      0 )
-GAME( 1999, tm7k,     0,        tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.04 Standard)",      0 )
-GAME( 1999, tm7knj,   tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.05 New Jersey)",    0 )
-GAME( 1999, tm7kmn,   tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.04 Minnesota)",     0 )
-GAME( 1999, tm7ka,    tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.00 Standard)",      0 )
-GAME( 1999, tm7kmna,  tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.00 Minnesota)",     0 )
-GAME( 1999, tm7keval, tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.1X Evaluation)",    0 )
-GAME( 2000, tm8k,     0,        tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 8000 (v9.04 Standard)",      0 )
-GAME( 2000, tm8k902,  tm8k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 8000 (v9.02 Standard)",      0 )
+GAME( 1996, tm,         0,        tm,       tm,       driver_device, 0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v3.00 Euro)",                          0 )
+GAME( 1996, tmdo,       tm,       tm,       tm,       driver_device, 0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v2.2-01 Standard)",                    0 )
+GAME( 1996, tm2k,       0,        tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 Plus (v4.63 Standard)",            0 )
+GAME( 1996, tm2ka,      tm2k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.02 Standard)",                 0 )
+GAME( 1996, tm2kb,      tm2k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.00 Standard)",                 0 )
+GAME( 1996, tm2kspeval, tm2k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.XX3 Spanish Evaluation)",      0 )
+GAME( 1997, tm3k,       0,        tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.02 Standard)",                 0 )
+GAME( 1997, tm3ksp,     tm3k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.02 Spanish)",                  0 )
+GAME( 1997, tm3ka,      tm3k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.01 Standard)",                 0 )
+GAME( 1997, tm3keval,   tm3k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.XX Standard AMOA Evaluation)", 0 )
+GAME( 1998, tm4k,       0,        tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.03 Standard)",                 0 )
+GAME( 1998, tm4knj,     tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.03 New Jersey)",               0 )
+GAME( 1998, tm4ka,      tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 Standard)",                 0 )
+GAME( 1998, tm4kca,     tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 California)",               0 )
+GAME( 1998, tm4kb,      tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.01 Standard)",                 0 )
+GAME( 1998, tm4kmn,     tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.01 Minnesota)",                0 )
+GAME( 1998, tm5k,       0,        tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 Standard)",                 0 )
+GAME( 1998, tm5kca,     tm5k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 California)",               0 )
+GAME( 1998, tm5kmn,     tm5k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 Minnesota)",                0 )
+GAME( 1998, tm5ka,      tm5k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.01 Standard)",                 0 )
+GAME( 1999, tm7k,       0,        tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.04 Standard)",                 0 )
+GAME( 1999, tm7knj,     tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.05 New Jersey)",               0 )
+GAME( 1999, tm7kmn,     tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.04 Minnesota)",                0 )
+GAME( 1999, tm7ka,      tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.00 Standard)",                 0 )
+GAME( 1999, tm7kmna,    tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.00 Minnesota)",                0 )
+GAME( 1999, tm7keval,   tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.1X ASI Standard Evaluation)",  0 )
+GAME( 2000, tm8k,       0,        tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 8000 (v9.04 Standard)",                 0 )
+GAME( 2000, tm8k902,    tm8k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 8000 (v9.02 Standard)",                 0 )

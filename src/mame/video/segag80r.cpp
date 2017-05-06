@@ -39,7 +39,7 @@ void segag80r_state::vblank_latch_set()
 	/* set a timer to mimic the 555 timer that drives the EDGINT signal */
 	/* the 555 is run in monostable mode with R=56000 and C=1000pF */
 	m_vblank_latch = 1;
-	timer_set(PERIOD_OF_555_MONOSTABLE(CAP_P(1000), RES_K(56)), TIMER_VBLANK_LATCH_CLEAR);
+	m_vblank_latch_clear_timer->adjust(PERIOD_OF_555_MONOSTABLE(CAP_P(1000), RES_K(56)));
 
 	/* latch the current flip state at the same time */
 	m_video_flip = m_video_control & 1;

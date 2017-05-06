@@ -17,14 +17,6 @@
 
 const device_type AT_KEYBOARD_CONTROLLER = device_creator<at_keyboard_controller_device>;
 
-// i/o map for the 8042
-static ADDRESS_MAP_START( at_keybc_io, AS_IO, 8, at_keyboard_controller_device)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ( p1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
-ADDRESS_MAP_END
-
 static INPUT_PORTS_START( at_keybc )
 	PORT_START("DSW")
 	PORT_BIT(     0xbf, 0xbf, IPT_UNUSED )
@@ -36,7 +28,11 @@ INPUT_PORTS_END
 // machine fragment
 static MACHINE_CONFIG_FRAGMENT( at_keybc )
 	MCFG_CPU_ADD("at_keybc", I8042, DERIVED_CLOCK(1,1))
-	MCFG_CPU_IO_MAP(at_keybc_io)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(at_keyboard_controller_device, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(at_keyboard_controller_device, t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(at_keyboard_controller_device, p1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(at_keyboard_controller_device, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(at_keyboard_controller_device, p2_w))
 MACHINE_CONFIG_END
 
 // rom definition for the 8042 internal rom
@@ -134,12 +130,12 @@ void at_keyboard_controller_device::device_reset()
 //  INTERNAL 8042 READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( at_keyboard_controller_device::t0_r )
+READ_LINE_MEMBER( at_keyboard_controller_device::t0_r )
 {
 	return m_clock_signal;
 }
 
-READ8_MEMBER( at_keyboard_controller_device::t1_r )
+READ_LINE_MEMBER( at_keyboard_controller_device::t1_r )
 {
 	return m_data_signal;
 }

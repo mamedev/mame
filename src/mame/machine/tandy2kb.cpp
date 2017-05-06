@@ -48,23 +48,14 @@ const tiny_rom_entry *tandy2k_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( kb_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( tandy2k_keyboard_io, AS_IO, 8, tandy2k_keyboard_device )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kb_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(kb_p2_w)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(kb_p1_r)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( tandy2k_keyboard )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( tandy2k_keyboard )
 	MCFG_CPU_ADD(I8048_TAG, I8048, 1000000) // ?
-	MCFG_CPU_IO_MAP(tandy2k_keyboard_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(tandy2k_keyboard_device, kb_p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(tandy2k_keyboard_device, kb_p2_w))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(tandy2k_keyboard_device, kb_p1_r))
 	MCFG_DEVICE_DISABLE() // TODO
 MACHINE_CONFIG_END
 

@@ -71,6 +71,8 @@ const atari_motion_objects_config blstroid_state::s_mob_config =
 
 VIDEO_START_MEMBER(blstroid_state,blstroid)
 {
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+	m_irq_on_timer = timer_alloc(TIMER_IRQ_ON);
 }
 
 
@@ -123,8 +125,8 @@ void blstroid_state::scanline_update(screen_device &screen, int scanline)
 			attotime period_on  = screen.time_until_pos(vpos + 7, width * 0.9);
 			attotime period_off = screen.time_until_pos(vpos + 8, width * 0.9);
 
-			timer_set(period_on, TIMER_IRQ_ON);
-			timer_set(period_off, TIMER_IRQ_OFF);
+			m_irq_on_timer->adjust(period_on);
+			m_irq_off_timer->adjust(period_off);
 		}
 }
 

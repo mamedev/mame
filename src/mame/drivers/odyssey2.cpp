@@ -52,7 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER(p1_write);
 	DECLARE_READ8_MEMBER(p2_read);
 	DECLARE_WRITE8_MEMBER(p2_write);
-	DECLARE_READ8_MEMBER(t1_read);
+	DECLARE_READ_LINE_MEMBER(t1_read);
 	DECLARE_DRIVER_INIT(odyssey2);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -111,23 +111,12 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( odyssey2_io , AS_IO, 8, odyssey2_state )
-	AM_RANGE(0x00,           0xff)           AM_READWRITE(io_read, io_write)
-	AM_RANGE(MCS48_PORT_P1,  MCS48_PORT_P1)  AM_READWRITE(p1_read, p1_write)
-	AM_RANGE(MCS48_PORT_P2,  MCS48_PORT_P2)  AM_READWRITE(p2_read, p2_write)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READWRITE(bus_read, bus_write)
-	AM_RANGE(MCS48_PORT_T0,  MCS48_PORT_T0)  AM_DEVREAD("cartslot", o2_cart_slot_device, t0_read)
-	AM_RANGE(MCS48_PORT_T1,  MCS48_PORT_T1)  AM_READ(t1_read)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(io_read, io_write)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( g7400_io , AS_IO, 8, g7400_state )
-	AM_RANGE(0x00,            0xff)            AM_READWRITE(io_read, io_write)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_READWRITE(p1_read, p1_write)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2)   AM_READWRITE(p2_read, p2_write)
-	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS)  AM_READWRITE(bus_read, bus_write)
-	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0)   AM_DEVREAD("cartslot", o2_cart_slot_device, t0_read)
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ(t1_read)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w);
+	AM_RANGE(0x00, 0xff) AM_READWRITE(io_read, io_write)
 ADDRESS_MAP_END
 
 
@@ -471,7 +460,7 @@ uint32_t odyssey2_state::screen_update_odyssey2(screen_device &screen, bitmap_in
 }
 
 
-READ8_MEMBER(odyssey2_state::t1_read)
+READ_LINE_MEMBER(odyssey2_state::t1_read)
 {
 	if ( m_i8244->vblank() || m_i8244->hblank() )
 	{
@@ -543,7 +532,7 @@ WRITE8_MEMBER(odyssey2_state::p2_write)
 WRITE8_MEMBER(g7400_state::p2_write)
 {
 	m_p2 = data;
-	m_i8243->i8243_p2_w( space, 0, m_p2 & 0x0f );
+	m_i8243->p2_w( space, 0, m_p2 & 0x0f );
 }
 
 
@@ -673,6 +662,14 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 	MCFG_CPU_ADD("maincpu", I8048, ( ( XTAL_7_15909MHz * 3 ) / 4 ) )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
 	MCFG_CPU_IO_MAP(odyssey2_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(odyssey2_state, p1_read))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(odyssey2_state, p1_write))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(odyssey2_state, p2_read))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(odyssey2_state, p2_write))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(odyssey2_state, bus_read))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(odyssey2_state, bus_write))
+	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("cartslot", o2_cart_slot_device, t0_read))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(odyssey2_state, t1_read))
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -725,6 +722,15 @@ static MACHINE_CONFIG_START( g7400, g7400_state )
 	MCFG_CPU_ADD("maincpu", I8048, XTAL_5_911MHz )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
 	MCFG_CPU_IO_MAP(g7400_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(g7400_state, p1_read))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(g7400_state, p1_write))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(g7400_state, p2_read))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(g7400_state, p2_write))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(g7400_state, bus_read))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(g7400_state, bus_write))
+	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("cartslot", o2_cart_slot_device, t0_read))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(g7400_state, t1_read))
+	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("i8243", i8243_device, prog_w))
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -757,6 +763,15 @@ static MACHINE_CONFIG_START( odyssey3, g7400_state )
 	MCFG_CPU_ADD("maincpu", I8048, XTAL_5_911MHz )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
 	MCFG_CPU_IO_MAP(g7400_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(g7400_state, p1_read))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(g7400_state, p1_write))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(g7400_state, p2_read))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(g7400_state, p2_write))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(g7400_state, bus_read))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(g7400_state, bus_write))
+	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("cartslot", o2_cart_slot_device, t0_read))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(g7400_state, t1_read))
+	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("i8243", i8243_device, prog_w))
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */

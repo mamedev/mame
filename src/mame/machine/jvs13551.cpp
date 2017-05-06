@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "jvs13551.h"
 
+#include "cpu/tlcs90/tlcs90.h"
+
 const device_type SEGA_837_13551 = device_creator<sega_837_13551>;
 
 WRITE_LINE_MEMBER(sega_837_13551::jvs13551_coin_1_w)
@@ -23,17 +25,21 @@ static INPUT_PORTS_START(sega_837_13551_coins)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, sega_837_13551, jvs13551_coin_2_w)
 INPUT_PORTS_END
 
+MACHINE_CONFIG_FRAGMENT(sega_837_13551)
+	MCFG_CPU_ADD("iomcu", TMP90PH44, 10000000) // unknown clock
+MACHINE_CONFIG_END
+
 ROM_START( jvs13551 )
 	// TMP90PH44N firmwares
-	ROM_REGION( 0x8000, "jvs13551", ROMREGION_ERASE )
+	ROM_REGION( 0x4000, "iomcu", ROMREGION_ERASE )
 	// Sega 838-13683-93
-	ROM_LOAD( "sp5001.bin",   0x0000, 0x8000, CRC(2f17e21a) SHA1(ac227ef3ca52ef17321bd60e435dba147645d8b8))
+	ROM_LOAD( "sp5001.bin",   0x0000, 0x4000, CRC(3456c8cc) SHA1(f3b66ab1d2eab32e97b46077e3ed2ab5b2982325))
 	// Sega 838-13683-93 Rev.B
-	ROM_LOAD( "sp5001-b.bin", 0x0000, 0x8000, CRC(121693cd) SHA1(c9834aca671aff5e283ac708788c2a0f4a5bdecc))
+	ROM_LOAD( "sp5001-b.bin", 0x0000, 0x4000, CRC(28b5fb84) SHA1(8784024548d24b6a43057f06de1d53ce3a34eb12))
 	// Sega 838-13683-02
-	ROM_LOAD( "sp5002-a.bin", 0x0000, 0x8000, CRC(a088df8c) SHA1(8237e9b18b8367d3f5b99b8f29c528a55c2e0fbf))
+	ROM_LOAD( "sp5002-a.bin", 0x0000, 0x4000, CRC(72983a0f) SHA1(aa13276347bc643ef93e81e9ab7c905deb16c415))
 	// Sega 837-13551-92 0007 Type1
-	ROM_LOAD( "315-6215.bin", 0x0000, 0x8000, CRC(d7c97e40) SHA1(b1ae8db332f869c4fdbbae15967baeca0bc7f57d))
+	ROM_LOAD( "315-6215.bin", 0x0000, 0x4000, CRC(98202738) SHA1(8c4dc85438298e31e25f69542804a78ff0e20962))
 ROM_END
 
 const tiny_rom_entry *sega_837_13551::device_rom_region() const
@@ -45,6 +51,11 @@ void sega_837_13551::static_set_port_tag(device_t &device, int port, const char 
 {
 	sega_837_13551 &ctrl = downcast<sega_837_13551 &>(device);
 	ctrl.port_tag[port] = tag;
+}
+
+machine_config_constructor sega_837_13551::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME(sega_837_13551);
 }
 
 ioport_constructor sega_837_13551::device_input_ports() const

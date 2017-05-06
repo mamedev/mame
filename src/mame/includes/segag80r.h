@@ -114,7 +114,6 @@ public:
 	DECLARE_WRITE8_MEMBER(spaceod_sound_w);
 	DECLARE_READ8_MEMBER(n7751_rom_r);
 	DECLARE_READ8_MEMBER(n7751_command_r);
-	DECLARE_READ8_MEMBER(n7751_t1_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_WRITE8_MEMBER(usb_ram_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_soundport_w);
@@ -158,6 +157,7 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	emu_timer *m_vblank_latch_clear_timer;
 };
 
 

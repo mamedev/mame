@@ -155,18 +155,6 @@ static ADDRESS_MAP_START(ioc_io_map , AS_IO , 8 , imds2_state)
 	AM_RANGE(0xf0 , 0xf8) AM_DEVREADWRITE("iocdma" , i8257_device , read , write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pio_io_map , AS_IO , 8 , imds2_state)
-	AM_RANGE(MCS48_PORT_P1 , MCS48_PORT_P1) AM_READWRITE(imds2_pio_port_p1_r , imds2_pio_port_p1_w)
-	AM_RANGE(MCS48_PORT_P2 , MCS48_PORT_P2) AM_READWRITE(imds2_pio_port_p2_r , imds2_pio_port_p2_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(kb_io_map , AS_IO , 8 , imds2_state)
-	AM_RANGE(MCS48_PORT_P1 , MCS48_PORT_P1) AM_WRITE(imds2_kb_port_p1_w)
-	AM_RANGE(MCS48_PORT_P2 , MCS48_PORT_P2) AM_READ(imds2_kb_port_p2_r)
-	AM_RANGE(MCS48_PORT_T0 , MCS48_PORT_T0) AM_READ(imds2_kb_port_t0_r)
-	AM_RANGE(MCS48_PORT_T1 , MCS48_PORT_T1) AM_READ(imds2_kb_port_t1_r)
-ADDRESS_MAP_END
-
 imds2_state::imds2_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig , type , tag),
 	m_ipccpu(*this , "ipccpu"),
@@ -366,14 +354,14 @@ WRITE8_MEMBER(imds2_state::imds2_kb_port_p1_w)
 	m_kb_p1 = data;
 }
 
-READ8_MEMBER(imds2_state::imds2_kb_port_t0_r)
+READ_LINE_MEMBER(imds2_state::imds2_kb_port_t0_r)
 {
 	// T0 tied low
 	// It appears to be some kind of strapping option on kb hw
 	return 0;
 }
 
-READ8_MEMBER(imds2_state::imds2_kb_port_t1_r)
+READ_LINE_MEMBER(imds2_state::imds2_kb_port_t1_r)
 {
 	// T1 tied low
 	// It appears to be some kind of strapping option on kb hw
@@ -869,11 +857,17 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_SLOT_FIXED(true)
 
 		MCFG_CPU_ADD("iocpio" , I8041 , IOC_XTAL_Y3)
-		MCFG_CPU_IO_MAP(pio_io_map)
+		MCFG_MCS48_PORT_P1_IN_CB(READ8(imds2_state, imds2_pio_port_p1_r))
+		MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(imds2_state, imds2_pio_port_p1_w))
+		MCFG_MCS48_PORT_P2_IN_CB(READ8(imds2_state, imds2_pio_port_p2_r))
+		MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(imds2_state, imds2_pio_port_p2_w))
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
 		MCFG_CPU_ADD("kbcpu", I8741, XTAL_3_579545MHz)         /* 3.579545 MHz */
-		MCFG_CPU_IO_MAP(kb_io_map)
+		MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(imds2_state, imds2_kb_port_p1_w))
+		MCFG_MCS48_PORT_P2_IN_CB(READ8(imds2_state, imds2_kb_port_p2_r))
+		MCFG_MCS48_PORT_T0_IN_CB(READLINE(imds2_state, imds2_kb_port_t0_r))
+		MCFG_MCS48_PORT_T1_IN_CB(READLINE(imds2_state, imds2_kb_port_t1_r))
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
 		MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")

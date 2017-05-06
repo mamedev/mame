@@ -307,7 +307,9 @@ protected:
 	void eorb_ex();
 	void eorb_im();
 	void eorb_ix();
-	void illegal();
+	void illegl1();
+	void illegl2();
+	void illegl3();
 	void inc_ex();
 	void inc_ix();
 	void inca();

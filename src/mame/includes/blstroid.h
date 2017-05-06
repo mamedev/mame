@@ -41,6 +41,9 @@ public:
 	DECLARE_VIDEO_START(blstroid);
 	uint32_t screen_update_blstroid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	emu_timer *m_irq_off_timer;
+	emu_timer *m_irq_on_timer;
+
 	static const atari_motion_objects_config s_mob_config;
 
 protected:

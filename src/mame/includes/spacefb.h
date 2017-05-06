@@ -58,8 +58,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port_1_w);
 	DECLARE_WRITE8_MEMBER(port_2_w);
 	DECLARE_READ8_MEMBER(audio_p2_r);
-	DECLARE_READ8_MEMBER(audio_t0_r);
-	DECLARE_READ8_MEMBER(audio_t1_r);
+	DECLARE_READ_LINE_MEMBER(audio_t0_r);
+	DECLARE_READ_LINE_MEMBER(audio_t1_r);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

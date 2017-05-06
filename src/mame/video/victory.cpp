@@ -48,6 +48,7 @@ void victory_state::video_start()
 	m_video_control = 0;
 	memset(&m_micro, 0, sizeof(m_micro));
 	m_micro.timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_bgcoll_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(victory_state::bgcoll_irq_callback), this));
 
 	/* register for state saving */
 	save_item(NAME(m_paletteram));
@@ -1117,7 +1118,7 @@ uint32_t victory_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			int bpix = bg[(x + m_scrollx) & 255];
 			scanline[x] = bpix | (fpix << 3);
 			if (fpix && (bpix & bgcollmask) && count++ < 128)
-				machine().scheduler().timer_set(screen.time_until_pos(y, x), timer_expired_delegate(FUNC(victory_state::bgcoll_irq_callback),this), x | (y << 8));
+				m_bgcoll_irq_timer->adjust(screen.time_until_pos(y, x), x | (y << 8));
 		}
 	}
 

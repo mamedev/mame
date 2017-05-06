@@ -85,6 +85,7 @@ public:
 	DECLARE_WRITE8_MEMBER(aerfboot_soundlatch_w);
 	DECLARE_READ8_MEMBER(pending_command_r);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
+	DECLARE_WRITE8_MEMBER(aerofgt_unknown_output_w);
 	DECLARE_WRITE8_MEMBER(aerofgt_sh_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(aerfboot_okim6295_banking_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg1videoram_w);

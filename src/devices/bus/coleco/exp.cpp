@@ -101,11 +101,11 @@ image_init_result colecovision_cartridge_slot_device::call_load()
 //  get_default_card_software -
 //-------------------------------------------------
 
-std::string colecovision_cartridge_slot_device::get_default_card_software()
+std::string colecovision_cartridge_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
-		uint32_t length = m_file->size();
+		uint32_t length = hook.image_file()->size();
 		if (length == 0x100000 || length == 0x200000)
 			return software_get_default_slot("xin1");
 	}

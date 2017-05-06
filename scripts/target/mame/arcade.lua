@@ -407,6 +407,7 @@ MACHINES["CXD1095"] = true
 --MACHINES["DM9334"] = true
 MACHINES["DP8390"] = true
 MACHINES["DS1204"] = true
+MACHINES["DS1205"] = true
 MACHINES["DS1302"] = true
 --MACHINES["DS1315"] = true
 --MACHINES["DS1386"] = true
@@ -499,6 +500,7 @@ MACHINES["MPU401"] = true
 MACHINES["MSM5832"] = true
 MACHINES["MSM58321"] = true
 MACHINES["MSM6242"] = true
+MACHINES["MSM6253"] = true
 --MACHINES["NCR5380"] = true
 --MACHINES["NCR5380N"] = true
 --MACHINES["NCR5390"] = true
@@ -600,6 +602,7 @@ MACHINES["GENPC"] = true
 MACHINES["GEN_LATCH"] = true
 MACHINES["WATCHDOG"] = true
 MACHINES["INPUT_MERGER"] = true
+MACHINES["K054321"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -2928,6 +2931,7 @@ files {
 
 createMAMEProjects(_target, _subtarget, "nmk")
 files {
+	MAME_DIR .. "src/mame/drivers/acchi.cpp",
 	MAME_DIR .. "src/mame/drivers/acommand.cpp",
 	MAME_DIR .. "src/mame/drivers/cultures.cpp",
 	MAME_DIR .. "src/mame/drivers/ddealer.cpp",
@@ -3107,7 +3111,6 @@ files {
 	MAME_DIR .. "src/mame/includes/drmicro.h",
 	MAME_DIR .. "src/mame/video/drmicro.cpp",
 	MAME_DIR .. "src/mame/drivers/jantotsu.cpp",
-	MAME_DIR .. "src/mame/drivers/mayumi.cpp",
 	MAME_DIR .. "src/mame/drivers/mermaid.cpp",
 	MAME_DIR .. "src/mame/includes/mermaid.h",
 	MAME_DIR .. "src/mame/video/mermaid.cpp",
@@ -3733,6 +3736,7 @@ files {
 	MAME_DIR .. "src/mame/includes/rollrace.h",
 	MAME_DIR .. "src/mame/video/rollrace.cpp",
 	MAME_DIR .. "src/mame/drivers/sbowling.cpp",
+	MAME_DIR .. "src/mame/drivers/scyclone.cpp",
 	MAME_DIR .. "src/mame/drivers/slapshot.cpp",
 	MAME_DIR .. "src/mame/includes/slapshot.h",
 	MAME_DIR .. "src/mame/video/slapshot.cpp",
@@ -4124,6 +4128,8 @@ files {
 
 createMAMEProjects(_target, _subtarget, "vsystem")
 files {
+	MAME_DIR .. "src/mame/machine/vs9209.cpp",
+	MAME_DIR .. "src/mame/machine/vs9209.h",
 	MAME_DIR .. "src/mame/video/vsystem_gga.cpp",
 	MAME_DIR .. "src/mame/video/vsystem_gga.h",
 	MAME_DIR .. "src/mame/video/vsystem_spr.cpp",
@@ -4305,6 +4311,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/st_mp100.cpp",
 	MAME_DIR .. "src/mame/drivers/st_mp200.cpp",
 	MAME_DIR .. "src/mame/drivers/stargame.cpp",
+	MAME_DIR .. "src/mame/drivers/supstarf.cpp",
 	MAME_DIR .. "src/mame/drivers/taito.cpp",
 	MAME_DIR .. "src/mame/drivers/techno.cpp",
 	MAME_DIR .. "src/mame/drivers/vd.cpp",
@@ -4694,6 +4701,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ice_tbd.cpp",
 	MAME_DIR .. "src/mame/drivers/umipoker.cpp",
 	MAME_DIR .. "src/mame/drivers/unkhorse.cpp",
+	MAME_DIR .. "src/mame/drivers/usbilliards.cpp",
 	MAME_DIR .. "src/mame/drivers/usgames.cpp",
 	MAME_DIR .. "src/mame/includes/usgames.h",
 	MAME_DIR .. "src/mame/video/usgames.cpp",

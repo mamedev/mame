@@ -564,7 +564,7 @@ ADDRESS_MAP_END
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( cb_buttons )
+INPUT_PORTS_START( novag_cb_buttons )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
@@ -646,7 +646,7 @@ static INPUT_PORTS_START( cb_buttons )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( cb_magnets )
+INPUT_PORTS_START( novag_cb_magnets )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
@@ -730,7 +730,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( supercon )
-	PORT_INCLUDE( cb_buttons )
+	PORT_INCLUDE( novag_cb_buttons )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("New Game")
@@ -767,7 +767,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( cforte )
-	PORT_INCLUDE( cb_buttons )
+	PORT_INCLUDE( novag_cb_buttons )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("New Game")
@@ -856,12 +856,12 @@ INPUT_CHANGED_MEMBER(novag6502_state::sexpert_cpu_freq)
 }
 
 static INPUT_PORTS_START( sexpert )
-	PORT_INCLUDE( cb_magnets )
+	PORT_INCLUDE( novag_cb_magnets )
 	PORT_INCLUDE( sexy_shared )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sforte )
-	PORT_INCLUDE( cb_buttons )
+	PORT_INCLUDE( novag_cb_buttons )
 	PORT_INCLUDE( sexy_shared )
 INPUT_PORTS_END
 

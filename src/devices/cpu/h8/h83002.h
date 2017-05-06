@@ -16,22 +16,37 @@
 
 #include "h8h.h"
 #include "h8_adc.h"
+#include "h8_dma.h"
 #include "h8_port.h"
 #include "h8_intc.h"
 #include "h8_timer16.h"
 #include "h8_sci.h"
 #include "h8_watchdog.h"
 
+#define MCFG_H83002_TEND0_CALLBACK(_devcb) \
+	devcb = &h83002_device::set_tend0_callback(*device, DEVCB_##_devcb);
+#define MCFG_H83002_TEND1_CALLBACK(_devcb) \
+	devcb = &h83002_device::set_tend1_callback(*device, DEVCB_##_devcb);
+
 class h83002_device : public h8h_device {
 public:
 	h83002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template<class _Object> static devcb_base &set_tend0_callback(device_t &device, _Object object) { return downcast<h83002_device&>(device).tend0_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_tend1_callback(device_t &device, _Object object) { return downcast<h83002_device&>(device).tend1_cb.set_callback(object); }
+
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);
+
+	DECLARE_READ8_MEMBER(rtmcsr_r);
+	DECLARE_WRITE8_MEMBER(rtmcsr_w);
 
 protected:
 	required_device<h8h_intc_device> intc;
 	required_device<h8_adc_device> adc;
+	optional_device<h8_dma_device> dma;
+	optional_device<h8_dma_channel_device> dma0;
+	optional_device<h8_dma_channel_device> dma1;
 	required_device<h8_port_device> port4;
 	required_device<h8_port_device> port6;
 	required_device<h8_port_device> port7;
@@ -50,6 +65,9 @@ protected:
 	required_device<h8_watchdog_device> watchdog;
 
 	uint8_t syscr;
+	uint8_t rtmcsr;
+
+	devcb_write_line tend0_cb, tend1_cb;
 
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;

@@ -49,7 +49,7 @@ RST not only resets the chip on its rising edge but grabs a byte of mode state d
     9bit DAC is composed of 5bit Physical and 3bitPWM.
 
   todo:
-    Noise Generator circuit without 'machine.rand()' function.
+    Noise Generator circuit without 'machine().rand()' function.
 
 ----------- command format (Analytical result) ----------
 

@@ -66,7 +66,7 @@ public:
 	virtual const char *file_extensions() const override { return "nes,bin"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	virtual DECLARE_READ8_MEMBER(read);
 	void write_prg_bank(uint8_t bank) { if (m_cart) m_cart->write_prg_bank(bank); }

@@ -40,6 +40,16 @@ void ad1848_device::device_start()
 	m_timer = timer_alloc(0, nullptr);
 	m_irq_cb.resolve_safe();
 	m_drq_cb.resolve_safe();
+	save_item(NAME(m_regs.idx));
+	save_item(NAME(m_addr));
+	save_item(NAME(m_stat));
+	save_item(NAME(m_sam_cnt));
+	save_item(NAME(m_samples));
+	save_item(NAME(m_count));
+	save_item(NAME(m_play));
+	save_item(NAME(m_mce));
+	save_item(NAME(m_trd));
+	save_item(NAME(m_irq));
 }
 
 void ad1848_device::device_reset()
@@ -50,6 +60,7 @@ void ad1848_device::device_reset()
 	m_sam_cnt = 0;
 	m_samples = 0;
 	m_play = false;
+	m_irq = false;
 }
 
 READ8_MEMBER(ad1848_device::read)
@@ -61,7 +72,7 @@ READ8_MEMBER(ad1848_device::read)
 		case 1:
 			return m_regs.idx[m_addr];
 		case 2:
-			return m_stat;
+			return m_stat | (m_irq ? 1 : 0);
 		case 3:
 			break; // capture
 	}
@@ -105,6 +116,7 @@ WRITE8_MEMBER(ad1848_device::write)
 			break;
 		case 2:
 			m_irq_cb(CLEAR_LINE);
+			m_irq = false;
 			if(m_regs.iface & 1)
 				m_play = true;
 			break;
@@ -183,6 +195,7 @@ void ad1848_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			if(m_trd)
 				m_play = false;
 			m_irq_cb(ASSERT_LINE);
+			m_irq = true;
 		}
 		m_count = (m_regs.ubase << 8) | m_regs.lbase;
 	}

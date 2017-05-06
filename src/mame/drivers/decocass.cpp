@@ -135,11 +135,6 @@ static ADDRESS_MAP_START( decocass_sound_map, AS_PROGRAM, 8, decocass_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( decocass_mcu_portmap, AS_IO, 8, decocass_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(i8041_p1_r, i8041_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(i8041_p2_r, i8041_p2_w)
-ADDRESS_MAP_END
-
 static INPUT_PORTS_START( decocass )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICK_RIGHT )
@@ -789,7 +784,10 @@ static MACHINE_CONFIG_START( decocass, decocass_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audionmi", decocass_state, decocass_audio_nmi_gen, "screen", 0, 8)
 
 	MCFG_CPU_ADD("mcu", I8041, HCLK)
-	MCFG_CPU_IO_MAP(decocass_mcu_portmap)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(decocass_state, i8041_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(decocass_state, i8041_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(decocass_state, i8041_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(decocass_state, i8041_p2_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4200))              /* interleave CPUs */
 

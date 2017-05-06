@@ -37,11 +37,13 @@ image_manager::image_manager(running_machine &machine)
 		if (!image.user_loadable())
 			continue;
 
+		// find the image option in image_options()
+		const std::string &startup_image(machine.options().image_option(image.instance_name()).value());
+
 		// is an image specified for this image?
-		if (machine.options().image_options().count(image.instance_name()) > 0)
+		if (!startup_image.empty())
 		{
 			// we do have a startup image specified - load it
-			const std::string &startup_image = machine.options().image_options()[image.instance_name()];
 			image_init_result result = image_init_result::FAIL;
 
 			// try as a softlist
@@ -174,24 +176,28 @@ int image_manager::write_config(emu_options &options, const char *filename, cons
 
 void image_manager::options_extract()
 {
-	/* only extract the device options if we've added them
-	   no need to assert in case they are missing */
+	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
-		int index = 0;
-
-		for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+		// only perform this activity for devices where is_reset_on_load() is false; for devices
+		// where this is true, manipulation of this value is done in reset_and_load()
+		if (!image.is_reset_on_load())
 		{
-			const char *filename = image.filename();
+			// we have to assemble the image option differently for software lists and for normal images
+			std::string image_opt;
+			if (image.exists())
+			{
+				if (image.loaded_through_softlist())
+					image_opt = util::string_format("%s:%s:%s", image.software_list_name(), image.full_software_name(), image.brief_instance_name());
+				else
+					image_opt = image.filename();
+			}
 
-			/* and set the option */
-			std::string error;
-			machine().options().set_value(image.instance_name().c_str(), filename ? filename : "", OPTION_PRIORITY_CMDLINE, error);
-
-			index++;
+			// and set the option
+			machine().options().image_option(image.instance_name()).specify(std::move(image_opt));
 		}
 	}
 
-	/* write the config, if appropriate */
+	// write the config, if appropriate
 	if (machine().options().write_config())
 		write_config(machine().options(), nullptr, &machine().system());
 }
