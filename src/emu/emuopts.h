@@ -284,6 +284,7 @@ public:
 	// core options
 	const game_driver *system() const { return m_system; }
 	const char *system_name() const;
+	const std::string &attempted_system_name() const { return m_attempted_system_name; }
 
 	// core configuration options
 	bool read_config() const { return bool_value(OPTION_READCONFIG); }
@@ -498,6 +499,9 @@ private:
 	bool                                                m_sleep;
 	bool                                                m_refresh_speed;
 	ui_option                                           m_ui;
+
+	// special option; the system name we tried to specify
+	std::string											m_attempted_system_name;
 };
 
 #endif  // MAME_EMU_EMUOPTS_H
