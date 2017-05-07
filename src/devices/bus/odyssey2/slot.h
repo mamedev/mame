@@ -37,7 +37,7 @@ public:
 	virtual void write_bank(int bank) {}
 
 	virtual DECLARE_WRITE8_MEMBER(io_write) {}
-	virtual DECLARE_READ8_MEMBER(t0_read) { return 0; }
+	virtual DECLARE_READ_LINE_MEMBER(t0_read) { return 0; }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -88,12 +88,12 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom04);
-	virtual DECLARE_READ8_MEMBER(read_rom0c);
-	virtual DECLARE_WRITE8_MEMBER(io_write);
-	virtual DECLARE_READ8_MEMBER(t0_read) { if (m_cart) return m_cart->t0_read(space, offset); else return 0; }
+	DECLARE_READ8_MEMBER(read_rom04);
+	DECLARE_READ8_MEMBER(read_rom0c);
+	DECLARE_WRITE8_MEMBER(io_write);
+	DECLARE_READ_LINE_MEMBER(t0_read) { if (m_cart) return m_cart->t0_read(); else return 0; }
 
-	virtual void write_bank(int bank)   { if (m_cart) m_cart->write_bank(bank); }
+	void write_bank(int bank)   { if (m_cart) m_cart->write_bank(bank); }
 
 protected:
 

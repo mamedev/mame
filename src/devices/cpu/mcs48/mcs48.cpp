@@ -128,17 +128,16 @@
 #define ram_r(a)        m_data->read_byte(a)
 #define ram_w(a,V)      m_data->write_byte(a, V)
 
-/* ports are mapped to AS_IO */
+/* ports are mapped to AS_IO and callbacks */
 #define ext_r(a)        m_io->read_byte(a)
 #define ext_w(a,V)      m_io->write_byte(a, V)
-#define port_r(a)       m_io->read_byte(MCS48_PORT_P0 + a)
-#define port_w(a,V)     m_io->write_byte(MCS48_PORT_P0 + a, V)
-#define test_r(a)       m_io->read_byte(MCS48_PORT_T0 + a)
-#define test_w(a,V)     m_io->write_byte(MCS48_PORT_T0 + a, V)
-#define bus_r()         m_io->read_byte(MCS48_PORT_BUS)
-#define bus_w(V)        m_io->write_byte(MCS48_PORT_BUS, V)
-#define ea_r()          m_io->read_byte(MCS48_PORT_EA)
-#define prog_w(V)       m_io->write_byte(MCS48_PORT_PROG, V)
+#define port_r(a)       m_port_in_cb[a-1]()
+#define port_w(a,V)     m_port_out_cb[a-1](V)
+#define test_r(a)       m_test_in_cb[a]()
+#define test_w(a,V)     m_test_out_cb[a](V)
+#define bus_r()         m_bus_in_cb()
+#define bus_w(V)        m_bus_out_cb(V)
+#define prog_w(V)       m_prog_out_cb(V)
 
 /* r0-r7 map to memory via the regptr */
 #define R0              m_regptr[0]
@@ -209,7 +208,14 @@ mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type ty
 		, ( ( rom_size == 1024 ) ? ADDRESS_MAP_NAME(program_10bit) : ( ( rom_size == 2048 ) ? ADDRESS_MAP_NAME(program_11bit) : ( ( rom_size == 4096 ) ? ADDRESS_MAP_NAME(program_12bit) : nullptr ) ) ))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, ( ( ram_size == 64 ) ? 6 : ( ( ram_size == 128 ) ? 7 : 8 ) ), 0
 		, ( ( ram_size == 64 ) ? ADDRESS_MAP_NAME(data_6bit) : ( ( ram_size == 128 ) ? ADDRESS_MAP_NAME(data_7bit) : ADDRESS_MAP_NAME(data_8bit) ) ))
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 9, 0)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
+	, m_port_in_cb{{*this}, {*this}}
+	, m_port_out_cb{{*this}, {*this}}
+	, m_bus_in_cb(*this)
+	, m_bus_out_cb(*this)
+	, m_test_in_cb{{*this}, {*this}}
+	, m_t0_clk_func()
+	, m_prog_out_cb(*this)
 	, m_psw(0)
 	, m_feature_mask(feature_mask)
 	, m_int_rom_size(rom_size)
@@ -516,16 +522,16 @@ uint8_t mcs48_cpu_device::p2_mask()
     the 8243 expander chip
 -------------------------------------------------*/
 
-void mcs48_cpu_device::expander_operation(uint8_t operation, uint8_t port)
+void mcs48_cpu_device::expander_operation(expander_op operation, uint8_t port)
 {
 	/* put opcode/data on low 4 bits of P2 */
-	port_w(2, m_p2 = (m_p2 & 0xf0) | (operation << 2) | (port & 3));
+	port_w(2, m_p2 = (m_p2 & 0xf0) | (uint8_t(operation) << 2) | (port & 3));
 
 	/* generate high-to-low transition on PROG line */
 	prog_w(0);
 
 	/* put data on low 4 bits of P2 */
-	if (operation != 0)
+	if (operation != EXPANDER_OP_READ)
 		port_w(2, m_p2 = (m_p2 & 0xf0) | (m_a & 0x0f));
 	else
 		m_a = port_r(2) | 0x0f;
@@ -591,10 +597,10 @@ OPHANDLER( anl_a_n )        { m_a &= argument_fetch(); return 2; }
 OPHANDLER( anl_bus_n )      { bus_w(bus_r() & argument_fetch()); return 2; }
 OPHANDLER( anl_p1_n )       { port_w(1, m_p1 &= argument_fetch()); return 2; }
 OPHANDLER( anl_p2_n )       { port_w(2, m_p2 &= argument_fetch() | ~p2_mask()); return 2; }
-OPHANDLER( anld_p4_a )      { expander_operation(MCS48_EXPANDER_OP_AND, 4); return 2; }
-OPHANDLER( anld_p5_a )      { expander_operation(MCS48_EXPANDER_OP_AND, 5); return 2; }
-OPHANDLER( anld_p6_a )      { expander_operation(MCS48_EXPANDER_OP_AND, 6); return 2; }
-OPHANDLER( anld_p7_a )      { expander_operation(MCS48_EXPANDER_OP_AND, 7); return 2; }
+OPHANDLER( anld_p4_a )      { expander_operation(EXPANDER_OP_AND, 4); return 2; }
+OPHANDLER( anld_p5_a )      { expander_operation(EXPANDER_OP_AND, 5); return 2; }
+OPHANDLER( anld_p6_a )      { expander_operation(EXPANDER_OP_AND, 6); return 2; }
+OPHANDLER( anld_p7_a )      { expander_operation(EXPANDER_OP_AND, 7); return 2; }
 
 OPHANDLER( call_0 )         { execute_call(argument_fetch() | 0x000); return 2; }
 OPHANDLER( call_1 )         { execute_call(argument_fetch() | 0x100); return 2; }
@@ -661,7 +667,10 @@ OPHANDLER( en_dma )         { m_dma_enabled = true; port_w(2, m_p2); return 1; }
 OPHANDLER( en_flags )       { m_flags_enabled = true; port_w(2, m_p2); return 1; }
 OPHANDLER( ent0_clk )
 {
-	logerror("MCS-48 PC:%04X - Unimplemented opcode = %02x\n", m_pc - 1, program_r(m_pc - 1));
+	if (!m_t0_clk_func.isnull())
+		m_t0_clk_func(clock() / 3);
+	else
+		logerror("T0 clock enabled\n");
 	return 1;
 }
 
@@ -765,14 +774,14 @@ OPHANDLER( mov_xr1_a )      { ram_w(R1, m_a); return 1; }
 OPHANDLER( mov_xr0_n )      { ram_w(R0, argument_fetch()); return 2; }
 OPHANDLER( mov_xr1_n )      { ram_w(R1, argument_fetch()); return 2; }
 
-OPHANDLER( movd_a_p4 )      { expander_operation(MCS48_EXPANDER_OP_READ, 4); return 2; }
-OPHANDLER( movd_a_p5 )      { expander_operation(MCS48_EXPANDER_OP_READ, 5); return 2; }
-OPHANDLER( movd_a_p6 )      { expander_operation(MCS48_EXPANDER_OP_READ, 6); return 2; }
-OPHANDLER( movd_a_p7 )      { expander_operation(MCS48_EXPANDER_OP_READ, 7); return 2; }
-OPHANDLER( movd_p4_a )      { expander_operation(MCS48_EXPANDER_OP_WRITE, 4); return 2; }
-OPHANDLER( movd_p5_a )      { expander_operation(MCS48_EXPANDER_OP_WRITE, 5); return 2; }
-OPHANDLER( movd_p6_a )      { expander_operation(MCS48_EXPANDER_OP_WRITE, 6); return 2; }
-OPHANDLER( movd_p7_a )      { expander_operation(MCS48_EXPANDER_OP_WRITE, 7); return 2; }
+OPHANDLER( movd_a_p4 )      { expander_operation(EXPANDER_OP_READ, 4); return 2; }
+OPHANDLER( movd_a_p5 )      { expander_operation(EXPANDER_OP_READ, 5); return 2; }
+OPHANDLER( movd_a_p6 )      { expander_operation(EXPANDER_OP_READ, 6); return 2; }
+OPHANDLER( movd_a_p7 )      { expander_operation(EXPANDER_OP_READ, 7); return 2; }
+OPHANDLER( movd_p4_a )      { expander_operation(EXPANDER_OP_WRITE, 4); return 2; }
+OPHANDLER( movd_p5_a )      { expander_operation(EXPANDER_OP_WRITE, 5); return 2; }
+OPHANDLER( movd_p6_a )      { expander_operation(EXPANDER_OP_WRITE, 6); return 2; }
+OPHANDLER( movd_p7_a )      { expander_operation(EXPANDER_OP_WRITE, 7); return 2; }
 
 OPHANDLER( movp_a_xa )      { m_a = program_r((m_pc & 0xf00) | m_a); return 2; }
 OPHANDLER( movp3_a_xa )     { m_a = program_r(0x300 | m_a); return 2; }
@@ -799,10 +808,10 @@ OPHANDLER( orl_a_n )        { m_a |= argument_fetch(); return 2; }
 OPHANDLER( orl_bus_n )      { bus_w(bus_r() | argument_fetch()); return 2; }
 OPHANDLER( orl_p1_n )       { port_w(1, m_p1 |= argument_fetch()); return 2; }
 OPHANDLER( orl_p2_n )       { port_w(2, m_p2 |= argument_fetch() & p2_mask()); return 2; }
-OPHANDLER( orld_p4_a )      { expander_operation(MCS48_EXPANDER_OP_OR, 4); return 2; }
-OPHANDLER( orld_p5_a )      { expander_operation(MCS48_EXPANDER_OP_OR, 5); return 2; }
-OPHANDLER( orld_p6_a )      { expander_operation(MCS48_EXPANDER_OP_OR, 6); return 2; }
-OPHANDLER( orld_p7_a )      { expander_operation(MCS48_EXPANDER_OP_OR, 7); return 2; }
+OPHANDLER( orld_p4_a )      { expander_operation(EXPANDER_OP_OR, 4); return 2; }
+OPHANDLER( orld_p5_a )      { expander_operation(EXPANDER_OP_OR, 5); return 2; }
+OPHANDLER( orld_p6_a )      { expander_operation(EXPANDER_OP_OR, 6); return 2; }
+OPHANDLER( orld_p7_a )      { expander_operation(EXPANDER_OP_OR, 7); return 2; }
 
 OPHANDLER( outl_bus_a )     { bus_w(m_a); return 2; }
 OPHANDLER( outl_p1_a )      { port_w(1, m_p1 = m_a); return 2; }
@@ -940,6 +949,13 @@ const mcs48_cpu_device::mcs48_ophandler mcs48_cpu_device::s_opcode_table[256]=
     INITIALIZATION/RESET
 ***************************************************************************/
 
+void mcs48_cpu_device::device_config_complete()
+{
+	m_t0_clk_func.bind_relative_to(*owner());
+	if (!m_t0_clk_func.isnull())
+		m_t0_clk_func(clock() / 3);
+}
+
 /*-------------------------------------------------
     mcs48_init - generic MCS-48 initialization
 -------------------------------------------------*/
@@ -966,6 +982,17 @@ void mcs48_cpu_device::device_start()
 	m_direct = &m_program->direct();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
+
+	// resolve callbacks
+	for (auto &cb : m_port_in_cb)
+		cb.resolve_safe(0xff);
+	for (auto &cb : m_port_out_cb)
+		cb.resolve_safe();
+	m_bus_in_cb.resolve_safe(0xff);
+	m_bus_out_cb.resolve_safe();
+	for (auto &cb : m_test_in_cb)
+		cb.resolve_safe(0);
+	m_prog_out_cb.resolve_safe();
 
 	/* set up the state table */
 	{
@@ -1046,6 +1073,8 @@ void mcs48_cpu_device::device_reset()
 	m_sts = 0;
 	m_flags_enabled = false;
 	m_dma_enabled = false;
+	if (!m_t0_clk_func.isnull())
+		m_t0_clk_func(0);
 
 	/* confirmed from interrupt logic description */
 	m_irq_in_progress = false;
@@ -1241,6 +1270,16 @@ WRITE8_MEMBER( upi41_cpu_device::upi41_master_w )
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upi41_cpu_device::master_callback), this), (offset << 8) | data);
 }
 
+
+READ8_MEMBER(mcs48_cpu_device::p1_r)
+{
+	return m_p1;
+}
+
+READ8_MEMBER(mcs48_cpu_device::p2_r)
+{
+	return m_p2;
+}
 
 
 /***************************************************************************

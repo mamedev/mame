@@ -26,16 +26,13 @@ static ADDRESS_MAP_START( pcd_keyboard_map, AS_PROGRAM, 8, pcd_keyboard_device )
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcd_keyboard_io, AS_IO, 8, pcd_keyboard_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(bus_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
-ADDRESS_MAP_END
-
 static MACHINE_CONFIG_FRAGMENT( pcd_keyboard )
 	MCFG_CPU_ADD("mcu", I8035, 5760000*2) // FIXME: the mc2661 baud rate calculation
 	MCFG_CPU_PROGRAM_MAP(pcd_keyboard_map)
-	MCFG_CPU_IO_MAP(pcd_keyboard_io)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pcd_keyboard_device, bus_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(pcd_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pcd_keyboard_device, p1_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(pcd_keyboard_device, t0_r))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -258,7 +255,7 @@ WRITE8_MEMBER( pcd_keyboard_device::p1_w )
 	m_out_tx_handler(BIT(data, 5));
 }
 
-READ8_MEMBER( pcd_keyboard_device::t0_r )
+READ_LINE_MEMBER( pcd_keyboard_device::t0_r )
 {
 	return m_t0;
 }

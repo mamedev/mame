@@ -517,6 +517,7 @@ protected:
 private:
 	// internal helpers
 	device_t *subdevice_slow(const char *tag) const;
+	void calculate_derived_clock();
 
 	// private state; accessor use required
 	running_machine *       m_machine;

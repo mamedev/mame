@@ -377,24 +377,16 @@ const tiny_rom_entry *victor_9000_keyboard_t::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( kb_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( victor9k_keyboard_io, AS_IO, 8, victor_9000_keyboard_t )
-	// P0 is unconnected on pcb
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(kb_p1_r, kb_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(kb_p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(kb_t1_r)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( victor9k_keyboard )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( victor9k_keyboard )
 	MCFG_CPU_ADD(I8021_TAG, I8021, XTAL_3_579545MHz)
-	MCFG_CPU_IO_MAP(victor9k_keyboard_io)
+	// P0 is unconnected on pcb
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(victor_9000_keyboard_t, kb_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(victor_9000_keyboard_t, kb_p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(victor_9000_keyboard_t, kb_p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(victor_9000_keyboard_t, kb_t1_r))
 MACHINE_CONFIG_END
 
 
@@ -680,7 +672,7 @@ WRITE8_MEMBER( victor_9000_keyboard_t::kb_p2_w )
 //  kb_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( victor_9000_keyboard_t::kb_t1_r )
+READ_LINE_MEMBER( victor_9000_keyboard_t::kb_t1_r )
 {
 	return m_kback;
 }

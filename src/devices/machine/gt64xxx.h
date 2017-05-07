@@ -14,7 +14,7 @@
 
 // Supports R4600/4650/4700/R5000 CPUs
 #define MCFG_GT64010_ADD(_tag,  _cpu_tag, _clock, _irq_num) \
-	MCFG_PCI_HOST_ADD(_tag, GT64XXX, 0x014611ab, 0x03, 0x00000000) \
+	MCFG_PCI_HOST_ADD(_tag, GT64XXX, 0x11ab0146, 0x03, 0x00000000) \
 	downcast<gt64xxx_device *>(device)->set_cpu_tag(_cpu_tag); \
 	downcast<gt64xxx_device *>(device)->set_clock(_clock); \
 	downcast<gt64xxx_device *>(device)->set_irq_num(_irq_num);
@@ -36,7 +36,7 @@
 	downcast<gt64xxx_device *>(device)->set_irq_info(_irq_num);
 
 #define MCFG_GT64XXX_SET_CS(_cs_num, _map) \
-	downcast<gt64xxx_device *>(device)->set_cs_map(_cs_num, ADDRESS_MAP_NAME(_map), #_map, owner);
+	downcast<gt64xxx_device *>(device)->set_map(_cs_num, address_map_delegate(ADDRESS_MAP_NAME(_map), #_map), owner);
 
 /*************************************
  *
@@ -166,36 +166,26 @@
 #define GINT_TARABORT_SHIFT (19)
 #define GINT_RETRYCTR_SHIFT (20)
 
-
 /*************************************
  *  Structures
  *************************************/
-struct galileo_timer
-{
-	emu_timer *     timer;
-	uint32_t          count;
-	uint8_t           active;
-};
-
-struct galileo_addr_map
-{
-	uint32_t low_addr;
-	uint32_t high_addr;
-	address_space* space;
-	galileo_addr_map() : low_addr(0xffffffff), high_addr(0x0) {}
-};
-
-struct galileo_device_map
-{
-	bool enable;
-	const char *name;
-	device_t *device;
-	address_map_constructor map;
-	galileo_device_map() : enable(false), device(nullptr) {}
-};
-
 class gt64xxx_device : public pci_host_device {
 public:
+	struct galileo_timer
+	{
+		emu_timer *     timer;
+		uint32_t          count;
+		uint8_t           active;
+	};
+
+	struct galileo_addr_map
+	{
+		uint32_t low_addr;
+		uint32_t high_addr;
+		address_space* space;
+		galileo_addr_map() : low_addr(0xffffffff), high_addr(0x0) {}
+	};
+
 	gt64xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void reset_all_mappings() override;
@@ -243,8 +233,8 @@ public:
 	// Enums
 	enum proc_addr_bank {ADDR_RAS1_0, ADDR_RAS3_2, ADDR_CS2_0, ADDR_CS3_BCS, ADDR_PCI_IO, ADDR_PCI_MEM0, ADDR_PCI_MEM1, ADDR_NUM};
 
-	void set_cs_map(int id, address_map_constructor map, const char *name, device_t *device);
-
+	void set_map(int id, const address_map_delegate &map, device_t *device);
+	void postload(void);
 protected:
 	address_space *m_cpu_space;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
@@ -272,6 +262,7 @@ private:
 	optional_memory_region m_updateRegion;
 
 	DECLARE_ADDRESS_MAP(cpu_map, 32);
+	DECLARE_ADDRESS_MAP(empty, 32);
 
 	void map_cpu_space();
 
@@ -290,16 +281,8 @@ private:
 	std::vector<uint32_t> m_ram[4];
 
 	// Chip Select
-	galileo_device_map m_cs_map[4];
-
-	template<int id> void map_trampoline(::address_map &map) {
-		m_cs_map[id].map(map);
-	}
-	template <typename T> void install_cs_map(offs_t addrstart, offs_t addrend, void (T::*map)(::address_map &map), const char *name) {
-		//address_map_delegate delegate(map, name, static_cast<T *>(this));
-		address_map_delegate delegate(map, name, static_cast<T *>(this));
-		m_cpu_space->install_device_delegate(addrstart, addrend, *this, delegate);
-	}
+	device_t *m_cs_devices[4];
+	address_map_delegate m_cs_maps[4];
 
 	void update_irqs();
 

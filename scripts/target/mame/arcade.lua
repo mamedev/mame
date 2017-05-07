@@ -3111,7 +3111,6 @@ files {
 	MAME_DIR .. "src/mame/includes/drmicro.h",
 	MAME_DIR .. "src/mame/video/drmicro.cpp",
 	MAME_DIR .. "src/mame/drivers/jantotsu.cpp",
-	MAME_DIR .. "src/mame/drivers/mayumi.cpp",
 	MAME_DIR .. "src/mame/drivers/mermaid.cpp",
 	MAME_DIR .. "src/mame/includes/mermaid.h",
 	MAME_DIR .. "src/mame/video/mermaid.cpp",

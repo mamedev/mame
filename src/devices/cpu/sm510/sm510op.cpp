@@ -58,22 +58,8 @@ inline u8 sm510_base_device::bitmask(u16 param)
 void sm510_base_device::op_lb()
 {
 	// LB x: load BM/BL with 4-bit immediate value (partial)
-
-	// SM510 WIP..
-	// bm and bl(low) are probably ok!
 	m_bm = (m_bm & 4) | (m_op & 3);
-	m_bl = (m_op >> 2 & 3);
-
-	// bl(high) is still unclear, official doc is confusing
-	u8 hi = 0;
-	switch (m_bl)
-	{
-		case 0: hi = 0; break;
-		case 1: hi = 3; break;
-		case 2: hi = 3; break;
-		case 3: hi = 3; break;
-	}
-	m_bl |= (hi << 2 & 0xc);
+	m_bl = (m_op >> 2 & 3) | ((m_op & 0xc) ? 0xc : 0);
 }
 
 void sm510_base_device::op_lbl()
@@ -263,11 +249,7 @@ void sm510_base_device::op_atfc()
 void sm510_base_device::op_atr()
 {
 	// ATR: output ACC to R
-	if (m_r != (m_acc & 3))
-	{
-		m_r = m_acc & 3;
-		m_write_r(0, m_r, 0xff);
-	}
+	m_r = m_acc;
 }
 
 
@@ -460,6 +442,20 @@ void sm510_base_device::op_dta()
 {
 	// DTA: transfer divider low 4 bits to ACC
 	m_acc = m_div >> 11 & 0xf;
+}
+
+void sm510_base_device::op_clklo()
+{
+	// CLKLO*: select 8kHz instruction clock (*unknown mnemonic)
+	m_clk_div = 4;
+	notify_clock_changed();
+}
+
+void sm510_base_device::op_clkhi()
+{
+	// CLKHI*: select 16kHz instruction clock (*unknown mnemonic)
+	m_clk_div = 2;
+	notify_clock_changed();
 }
 
 void sm510_base_device::op_illegal()

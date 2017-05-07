@@ -988,6 +988,7 @@ TIMER_CALLBACK_MEMBER(mac128_state::kbd_clock)
 		{
 			m_kbd_receive = FALSE;
 			/* Process the command received from mac */
+			//printf("Mac sent %02x\n", m_kbd_shift_reg & 0xff);
 			keyboard_receive(m_kbd_shift_reg & 0xff);
 		}
 		else
@@ -1010,6 +1011,7 @@ void mac128_state::kbd_shift_out(int data)
 
 WRITE_LINE_MEMBER(mac128_state::mac_via_out_cb2)
 {
+	//printf("CB2 = %d, kbd_comm = %d\n", state, m_kbd_comm);
 	if (m_kbd_comm == FALSE && state == 0)
 	{
 		/* Mac pulls CB2 down to initiate communication */

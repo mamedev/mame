@@ -573,8 +573,8 @@ public:
 	void vbrc_prepare_display();
 	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
 	DECLARE_WRITE8_MEMBER(vbrc_mcu_p1_w);
-	DECLARE_READ8_MEMBER(vbrc_mcu_t0_r);
-	DECLARE_READ8_MEMBER(vbrc_mcu_t1_r);
+	DECLARE_READ_LINE_MEMBER(vbrc_mcu_t0_r);
+	DECLARE_READ_LINE_MEMBER(vbrc_mcu_t1_r);
 	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
 	DECLARE_WRITE8_MEMBER(vbrc_ioexp_port_w);
 
@@ -1068,16 +1068,16 @@ READ8_MEMBER(fidelz80_state::vbrc_mcu_p2_r)
 {
 	// P20-P23: I8243 P2
 	// P24-P27: multiplexed inputs (active low)
-	return (m_i8243->i8243_p2_r(space, offset) & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
+	return (m_i8243->p2_r(space, offset) & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
 }
 
-READ8_MEMBER(fidelz80_state::vbrc_mcu_t0_r)
+READ_LINE_MEMBER(fidelz80_state::vbrc_mcu_t0_r)
 {
 	// T0: card scanner?
 	return 0;
 }
 
-READ8_MEMBER(fidelz80_state::vbrc_mcu_t1_r)
+READ_LINE_MEMBER(fidelz80_state::vbrc_mcu_t1_r)
 {
 	// T1: ? (locks up on const 0 or 1)
 	return machine().rand() & 1;
@@ -1225,15 +1225,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vbrc_main_io, AS_IO, 8, fidelz80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x01)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("mcu", i8041_device, upi41_master_r, upi41_master_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( vbrc_mcu_map, AS_IO, 8, fidelz80_state )
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(vbrc_mcu_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(vbrc_mcu_p2_r) AM_DEVWRITE("i8243", i8243_device, i8243_p2_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(vbrc_mcu_t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(vbrc_mcu_t1_r)
 ADDRESS_MAP_END
 
 
@@ -1784,7 +1775,12 @@ static MACHINE_CONFIG_START( vbrc, fidelz80_state )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_CPU_ADD("mcu", I8041, XTAL_5MHz)
-	MCFG_CPU_IO_MAP(vbrc_mcu_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(fidelz80_state, vbrc_mcu_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(fidelz80_state, vbrc_mcu_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(DEVWRITE8("i8243", i8243_device, p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("i8243", i8243_device, prog_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(fidelz80_state, vbrc_mcu_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(fidelz80_state, vbrc_mcu_t1_r))
 
 	MCFG_I8243_ADD("i8243", NOOP, WRITE8(fidelz80_state, vbrc_ioexp_port_w))
 

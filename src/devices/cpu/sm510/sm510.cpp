@@ -23,14 +23,17 @@
   - KB1013VK1-2/KB1013VK4-2 manual
 
   TODO:
+  - finish SM500 emulation
   - proper support for LFSR program counter in debugger
   - callback for lcd screen as MAME bitmap (when needed)
   - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
-  - LB/SBM is correct?
+  - wake up after CEND doesn't work right
+  - SM510 buzzer control divider bit is mask-programmable?
   - SM511 undocumented/guessed opcodes:
     * $01 is guessed as DIV to ACC transfer, unknown which bits
     * $5d is certainly CEND
     * $65 is certainly divider reset, but not sure if it behaves same as on SM510
+    * $6036 and $6037 may be instruction timing? (16kHz and 8kHz), mnemonics unknown
 
 */
 
@@ -68,6 +71,38 @@ void sm510_base_device::device_start()
 	m_write_segbs.resolve_safe();
 	m_write_segc.resolve_safe();
 
+	// init/zerofill
+	memset(m_stack, 0, sizeof(m_stack));
+	m_pc = 0;
+	m_prev_pc = 0;
+	m_op = 0;
+	m_prev_op = 0;
+	m_param = 0;
+	m_acc = 0;
+	m_bl = 0;
+	m_bm = 0;
+	m_sbm = false;
+	m_c = 0;
+	m_skip = false;
+	m_w = 0;
+	m_r = 0;
+	m_r_out = 0;
+	m_div = 0;
+	m_1s = false;
+	m_k_active = false;
+	m_l = 0;
+	m_x = 0;
+	m_y = 0;
+	m_bp = false;
+	m_bc = false;
+	m_halt = false;
+	m_melody_rd = 0;
+	m_melody_step_count = 0;
+	m_melody_duty_count = 0;
+	m_melody_duty_index = 0;
+	m_melody_address = 0;
+	m_clk_div = 2; // 16kHz
+
 	// register for savestates
 	save_item(NAME(m_stack));
 	save_item(NAME(m_pc));
@@ -78,10 +113,12 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_acc));
 	save_item(NAME(m_bl));
 	save_item(NAME(m_bm));
+	save_item(NAME(m_sbm));
 	save_item(NAME(m_c));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_w));
 	save_item(NAME(m_r));
+	save_item(NAME(m_r_out));
 	save_item(NAME(m_div));
 	save_item(NAME(m_1s));
 	save_item(NAME(m_k_active));
@@ -96,6 +133,7 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_melody_duty_count));
 	save_item(NAME(m_melody_duty_index));
 	save_item(NAME(m_melody_address));
+	save_item(NAME(m_clk_div));
 
 	// register state for debugger
 	state_add(SM510_PC,  "PC",  m_pc).formatstr("%04X");
@@ -138,9 +176,8 @@ void sm510_base_device::device_reset()
 	m_bc = false;
 	m_y = 0;
 
-	m_r = 0;
+	m_r = m_r_out = 0;
 	m_write_r(0, 0, 0xff);
-	m_melody_rd &= ~1;
 }
 
 
@@ -186,82 +223,6 @@ void sm510_base_device::init_lcd_driver()
 	// note: in reality, this timer runs at high frequency off the main divider, strobing one segment at a time
 	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sm510_base_device::lcd_timer_cb), this));
 	m_lcd_timer->adjust(attotime::from_ticks(0x200, unscaled_clock())); // 64hz default
-}
-
-
-
-//-------------------------------------------------
-//  melody controller
-//-------------------------------------------------
-
-void sm510_base_device::clock_melody()
-{
-	if (!m_melody_rom)
-		return;
-
-	// tone cycle table (SM511/SM512 datasheet fig.5)
-	// cmd 0 = cmd, 1 = stop, > 13 = illegal(unknown)
-	static const u8 lut_tone_cycles[4*16] =
-	{
-		0, 0, 7, 8, 8, 9, 9, 10,11,11,12,13,14,14, 7*2, 8*2,
-		0, 0, 8, 8, 9, 9, 10,11,11,12,13,13,14,15, 8*2, 8*2,
-		0, 0, 8, 8, 9, 9, 10,10,11,12,12,13,14,15, 8*2, 8*2,
-		0, 0, 8, 9, 9, 10,10,11,11,12,13,14,14,15, 8*2, 9*2
-	};
-
-	u8 cmd = m_melody_rom[m_melody_address] & 0x3f;
-	u8 out = 0;
-
-	// clock duty cycle if tone is active
-	if ((cmd & 0xf) > 1)
-	{
-		out = m_melody_duty_index & m_melody_rd & 1;
-		m_melody_duty_count++;
-		int index = m_melody_duty_index << 4 | (cmd & 0xf);
-		int shift = ~cmd >> 4 & 1; // OCT
-
-		if (m_melody_duty_count >= (lut_tone_cycles[index] << shift))
-		{
-			m_melody_duty_count = 0;
-			m_melody_duty_index = (m_melody_duty_index + 1) & 3;
-		}
-	}
-	else if ((cmd & 0xf) == 1)
-	{
-		// rest tell signal
-		m_melody_rd |= 2;
-	}
-
-	// clock time base on F8(d7)
-	if ((m_div & 0x7f) == 0)
-	{
-		u8 mask = (cmd & 0x20) ? 0x1f : 0x0f;
-		m_melody_step_count = (m_melody_step_count + 1) & mask;
-
-		if (m_melody_step_count == 0)
-			m_melody_address++;
-	}
-
-	// output to R pin
-	if (out != m_r)
-	{
-		m_write_r(0, out, 0xff);
-		m_r = out;
-	}
-}
-
-void sm510_base_device::init_melody()
-{
-	if (!m_melody_rom)
-		return;
-
-	// verify melody rom
-	for (int i = 0; i < 0x100; i++)
-	{
-		u8 data = m_melody_rom[i];
-		if (data & 0xc0 || (data & 0x0f) > 13)
-			logerror("%s unknown melody ROM data $%02X at $%02X\n", tag(), data, i);
-	}
 }
 
 

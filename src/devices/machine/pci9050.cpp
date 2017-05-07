@@ -72,6 +72,25 @@ void pci9050_device::device_start()
 
 	m_user_input_handler.resolve();
 	m_user_output_handler.resolve();
+	// Save states
+	save_item(NAME(m_lasrr));
+	save_item(NAME(m_lasba));
+	save_item(NAME(m_lasbrd));
+	save_item(NAME(m_csbase));
+	save_item(NAME(m_eromrr));
+	save_item(NAME(m_eromba));
+	save_item(NAME(m_erombrd));
+	save_item(NAME(m_intcsr));
+	save_item(NAME(m_cntrl));
+	machine().save().register_postload(save_prepost_delegate(FUNC(pci9050_device::postload), this));
+
+}
+
+void pci9050_device::postload(void)
+{
+	remap_rom();
+	for (int id = 0; id < 4; id++)
+		remap_local(id);
 }
 
 void pci9050_device::device_reset()

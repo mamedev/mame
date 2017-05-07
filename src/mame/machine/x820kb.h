@@ -48,8 +48,8 @@ public:
 	DECLARE_READ8_MEMBER( kb_p1_r );
 	DECLARE_WRITE8_MEMBER( kb_p1_w );
 	DECLARE_READ8_MEMBER( kb_p2_r );
-	DECLARE_READ8_MEMBER( kb_t0_r );
-	DECLARE_READ8_MEMBER( kb_t1_r );
+	DECLARE_READ_LINE_MEMBER( kb_t0_r );
+	DECLARE_READ_LINE_MEMBER( kb_t1_r );
 	DECLARE_WRITE8_MEMBER( kb_bus_w );
 
 protected:

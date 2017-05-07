@@ -184,7 +184,7 @@ WRITE8_MEMBER( vicdual_state::carnival_music_port_2_w )
 }
 
 
-READ8_MEMBER( vicdual_state::carnival_music_port_t1_r )
+READ_LINE_MEMBER( vicdual_state::carnival_music_port_t1_r )
 {
 	// T1: comms from audio port 2 d3
 	return ~m_port2State >> 3 & 1;
@@ -195,19 +195,15 @@ static ADDRESS_MAP_START( mboard_map, AS_PROGRAM, 8, vicdual_state )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mboard_io_map, AS_IO, 8, vicdual_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(carnival_music_port_1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(carnival_music_port_2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(carnival_music_port_t1_r)
-ADDRESS_MAP_END
-
 
 MACHINE_CONFIG_FRAGMENT( carnival_audio )
 
 	/* music board */
 	MCFG_CPU_ADD("audiocpu", I8039, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(mboard_map)
-	MCFG_CPU_IO_MAP(mboard_io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(vicdual_state, carnival_music_port_1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(vicdual_state, carnival_music_port_2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(vicdual_state, carnival_music_port_t1_r))
 
 	MCFG_SOUND_ADD("psg", AY8912, XTAL_3_579545MHz/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

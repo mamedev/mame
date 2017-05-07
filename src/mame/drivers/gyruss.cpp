@@ -234,8 +234,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu2_io_map, AS_IO, 8, gyruss_state )
 	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(gyruss_dac_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(gyruss_irq_clear_w)
 ADDRESS_MAP_END
 
 
@@ -481,6 +479,8 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 	MCFG_CPU_ADD("audio2", I8039, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(audio_cpu2_map)
 	MCFG_CPU_IO_MAP(audio_cpu2_io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(gyruss_state, gyruss_dac_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(gyruss_state, gyruss_irq_clear_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

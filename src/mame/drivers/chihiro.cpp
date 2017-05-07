@@ -398,8 +398,6 @@ extern const device_type JVS_MASTER;
 class jvs_master : public jvs_host
 {
 public:
-	//friend class mie_device;
-
 	// construction/destruction
 	jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	int get_sense_line();
@@ -452,7 +450,7 @@ int jvs_master::received_packet(uint8_t *buffer)
 
 extern const device_type OHCI_HLEAN2131QC;
 
-class ohci_hlean2131qc_device : public device_t, public ohci_function_device
+class ohci_hlean2131qc_device : public device_t, public ohci_function
 {
 public:
 	ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -499,7 +497,7 @@ const device_type OHCI_HLEAN2131QC = device_creator<ohci_hlean2131qc_device>;
 
 extern const device_type OHCI_HLEAN2131SC;
 
-class ohci_hlean2131sc_device : public device_t, public ohci_function_device
+class ohci_hlean2131sc_device : public device_t, public ohci_function
 {
 public:
 	ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -786,7 +784,7 @@ const uint8_t ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0
 
 ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, OHCI_HLEAN2131QC, "OHCI Hlean2131qc", tag, owner, clock, "ohci_hlean2131qc", __FILE__),
-	ohci_function_device()
+	ohci_function()
 {
 	maximum_send = 0;
 	region = nullptr;
@@ -798,7 +796,7 @@ ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, 
 
 void ohci_hlean2131qc_device::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
 {
-	ohci_function_device::initialize(machine, usb_bus_manager);
+	ohci_function::initialize(machine, usb_bus_manager);
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
@@ -1104,7 +1102,7 @@ const uint8_t ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0
 
 ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, OHCI_HLEAN2131SC, "OHCI Hlean2131sc", tag, owner, clock, "ohci_hlean2131sc", __FILE__),
-	ohci_function_device()
+	ohci_function()
 {
 	region = nullptr;
 	midi_rs232 = 0;
@@ -1119,7 +1117,7 @@ void ohci_hlean2131sc_device::set_region_base(uint8_t *data)
 
 void ohci_hlean2131sc_device::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
 {
-	ohci_function_device::initialize(machine, usb_bus_manager);
+	ohci_function::initialize(machine, usb_bus_manager);
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
@@ -1762,9 +1760,9 @@ static MACHINE_CONFIG_DERIVED_CLASS(chihiro_base, xbox_base, chihiro_state)
 	MCFG_CPU_IO_MAP(chihiro_map_io)
 
 	//MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ide_baseboard, nullptr, "bb", true)
-	MCFG_DEVICE_MODIFY("ide:0")
+	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")
 	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, nullptr, true)
-	MCFG_DEVICE_MODIFY("ide:1")
+	MCFG_DEVICE_MODIFY(":pci:09.0:ide:1")
 	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, "bb", true)
 
 	// next lines are temporary
@@ -2185,7 +2183,7 @@ ROM_START( ccfboxa )
 	ROM_LOAD("317-0567-exp.pic", 0x00, 0x4000, CRC(cd1d2b2d) SHA1(78203ee0339f76eb76da08d7de43e7e44e4b7d32) )
 ROM_END
 
-/* CDV-1xxxx (Sega network DVD-ROM games) */
+/* CDV-1xxxx (Sega network CD-ROM and DVD-ROM games) */
 
 ROM_START( questofd )
 	CHIHIRO_BIOS
@@ -2222,6 +2220,34 @@ ROM_START( gundcb79a )
 	ROM_LOAD("317-0415-jpn.pic", 0x00, 0x4000, CRC(e5490747) SHA1(91de42a562a265e4cfa1788e40985a5b9055a10a) )
 ROM_END
 
+// Quest of D Oukoku no Syugosya
+// note: all following CD/DVD discs for server PC, game image from CDV-10026D uploaded via network to satellite Chihiro units
+ROM_START( qofd3 )
+	CHIHIRO_BIOS
+
+	// "Quest of D Ver.3.02"
+	// DVD QOD 3.02
+	// CDV-10026D
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10026d", 0, SHA1(b079778f7837100a9b4fa2a536a4efc7817dd2d2) )	// DVD
+
+	// satellite Chihiro security PIC is missing
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD("317-xxxx-jpn.pic", 0x00, 0x4000, NO_DUMP )
+
+	// "Quest of D Ver. 3.0"
+	// CD QOD3 VERSION UPDATE
+	// CDP-10062
+	DISK_REGION("update")
+	DISK_IMAGE_READONLY( "cdp-10062", 0, SHA1(abe337cb8782155c4cb92895ba22454a175d479d) )	// CD
+
+	// "Quest of D Ver. 2.0"
+	// DVD QOD CHECK DISC
+	// CDV-10028
+	DISK_REGION("check")
+	DISK_IMAGE_READONLY( "cdv-10028", 0, SHA1(9f0f64cb4278cf51a42a21f880cda82b585c63f6) )	// DVD
+ROM_END
+
 ROM_START( gundcb83 )
 	CHIHIRO_BIOS
 
@@ -2244,6 +2270,36 @@ ROM_START( gundcb83a )
 	//PIC16C621A (317-0484-JPN)
 	//(sticker 253-5508-0484J)
 	ROM_LOAD("317-0484-jpn.pic", 0x00, 0x4000, CRC(308995bb) SHA1(9459ca99bfb5c3cf227821739e7008ae9bd6e710) )
+ROM_END
+
+// Quest of D The Battle Kingdom
+// note: all following CD/DVD discs for server PC, game image from CDV-10035B uploaded via network to satellite Chihiro units
+ROM_START( qofdtbk )
+	CHIHIRO_BIOS
+
+	// "Quest of D The Battle Kingdom"
+	// DVD QOD VS
+	// CDV-10035B
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10035b", 0, SHA1(710776b88e7403193c1e0889bbd2d15fc8a92880) )	// DVD
+
+	// satellite Chihiro security PIC
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A 317-0506-JPN
+	//(sticker 253-5508-0506J)
+	ROM_LOAD("317-0506-jpn.pic", 0x00, 0x4000, CRC(e105c6c8) SHA1(63e17b330a2f7d30bf0c263b163469f7f8e6a495) )
+
+	// "Quest of D The Battle Kingdom"
+	// CD QOD VS VERSION UPDATE
+	// CDP-10078
+	DISK_REGION("update")
+	DISK_IMAGE_READONLY( "cdp-10078", 0, SHA1(f7dde6a95c8b9087f984f92248c22a3b148ef645) )	// CD
+
+	// "Quest of D The Battle Kingdom"
+	// CD QOD SERVICE END
+	// CDP-10136
+	DISK_REGION("serv_end")
+	DISK_IMAGE_READONLY( "cdp-10136", 0, SHA1(3bfb6258bf9c08e1c8056183d02fe8aa3b65db49) )	// CD
 ROM_END
 
 ROM_START( gundcb83b )
@@ -2318,10 +2374,12 @@ ROM_END
 // 0024     GAME( 2009, ccfboxo,  ccfboxa,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (GDX-0024)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0024A */ GAME( 2009, ccfboxa,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (4.01) (GDX-0024A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 
-/* CDV-1xxxx (Sega network DVD-ROM games) */
+/* CDV-1xxxx (Sega network CD-ROM and DVD-ROM games) */
 /* 0005C */ GAME( 2004, questofd, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Quest of D (CDV-10005C)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0010  */ GAME( 2005, gundcb79, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0079 Card Builder (CDV-10010)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0024B */ GAME( 2006, gundcb79a,gundcb79, chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0079 Card Builder Ver.2.02 (CDV-10024B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0026D */ GAME( 2007, qofd3,    chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Quest of D Oukoku no Syugosya Ver. 3.02 (CDV-10026D)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0030  */ GAME( 2007, gundcb83, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0083 Card Builder (CDV-10030)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0031  */ GAME( 2007, gundcb83a,gundcb83, chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0083 Card Builder Check Disk (CDV-10031)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0035B */ GAME( 2007, qofdtbk,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Quest of D The Battle Kingdom (CDV-10035B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0037B */ GAME( 2008, gundcb83b,gundcb83, chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0083 Card Builder Ver.2.10 (CDV-10037B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

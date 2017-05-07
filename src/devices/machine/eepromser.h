@@ -20,6 +20,13 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
+// optional enable for streaming reads
+#define MCFG_EEPROM_SERIAL_ENABLE_STREAMING() \
+	eeprom_serial_base_device::static_enable_streaming(*device);
+// optional enable for output on falling clock
+#define MCFG_EEPROM_SERIAL_ENABLE_OUTPUT_ON_FALLING_CLOCK() \
+	eeprom_serial_base_device::static_enable_output_on_falling_clock(*device);
+
 // standard 93CX6 class of 16-bit EEPROMs
 #define MCFG_EEPROM_SERIAL_93C06_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_93C06_16BIT, 0)
@@ -61,13 +68,25 @@
 #define MCFG_EEPROM_SERIAL_MSM16911_16BIT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_MSM16911_16BIT, 0)
 
+// Seiko S-29X90 class of 16-bit EEPROMs. They always use 13 address bits, despite needing only 6-8.
+// The output is updated on the falling edge of the clock. Streaming is enabled
+#define MCFG_EEPROM_SERIAL_S29190_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_S29190_16BIT, 0) \
+	MCFG_EEPROM_SERIAL_ENABLE_OUTPUT_ON_FALLING_CLOCK() \
+	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+#define MCFG_EEPROM_SERIAL_S29290_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_S29290_16BIT, 0) \
+	MCFG_EEPROM_SERIAL_ENABLE_OUTPUT_ON_FALLING_CLOCK() \
+	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+#define MCFG_EEPROM_SERIAL_S29390_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_S29390_16BIT, 0) \
+	MCFG_EEPROM_SERIAL_ENABLE_OUTPUT_ON_FALLING_CLOCK() \
+	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+
 // X24c44 16 bit ram/eeprom combo
 #define MCFG_EEPROM_SERIAL_X24C44_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, EEPROM_SERIAL_X24C44_16BIT, 0)
 
-// optional enable for streaming reads
-#define MCFG_EEPROM_SERIAL_ENABLE_STREAMING() \
-	eeprom_serial_base_device::static_enable_streaming(*device);
 // pass-throughs to the base class for setting default data
 #define MCFG_EEPROM_SERIAL_DATA MCFG_EEPROM_DATA
 #define MCFG_EEPROM_SERIAL_DEFAULT_VALUE MCFG_EEPROM_DEFAULT_VALUE
@@ -91,6 +110,7 @@ public:
 	// inline configuration helpers
 	static void static_set_address_bits(device_t &device, int addrbits);
 	static void static_enable_streaming(device_t &device);
+	static void static_enable_output_on_falling_clock(device_t &device);
 
 protected:
 	// device-level overrides
@@ -152,22 +172,23 @@ protected:
 
 
 	// configuration state
-	uint8_t           m_command_address_bits;     // number of address bits in a command
+	uint8_t         m_command_address_bits;     // number of address bits in a command
 	bool            m_streaming_enabled;        // true if streaming is enabled
+	bool            m_output_on_falling_clock_enabled;  // true if the output pin is updated on the falling edge of the clock
 
 	// runtime state
 	eeprom_state    m_state;                    // current internal state
-	uint8_t           m_cs_state;                 // state of the CS line
+	uint8_t         m_cs_state;                 // state of the CS line
 	attotime        m_last_cs_rising_edge_time; // time of the last CS rising edge
-	uint8_t           m_oe_state;                 // state of the OE line
-	uint8_t           m_clk_state;                // state of the CLK line
-	uint8_t           m_di_state;                 // state of the DI line
+	uint8_t         m_oe_state;                 // state of the OE line
+	uint8_t         m_clk_state;                // state of the CLK line
+	uint8_t         m_di_state;                 // state of the DI line
 	bool            m_locked;                   // are we locked against writes?
-	uint32_t          m_bits_accum;               // number of bits accumulated
-	uint32_t          m_command_address_accum;    // accumulator of command+address bits
+	uint32_t        m_bits_accum;               // number of bits accumulated
+	uint32_t        m_command_address_accum;    // accumulator of command+address bits
 	eeprom_command  m_command;                  // current command
-	uint32_t          m_address;                  // current address extracted from command
-	uint32_t          m_shift_register;           // holds data coming in/going out
+	uint32_t        m_address;                  // current address extracted from command
+	uint32_t        m_shift_register;           // holds data coming in/going out
 };
 
 
@@ -289,6 +310,12 @@ DECLARE_SERIAL_EEPROM_DEVICE(er5911, er5911, ER5911, 8)
 DECLARE_SERIAL_EEPROM_DEVICE(er5911, er5911, ER5911, 16)
 DECLARE_SERIAL_EEPROM_DEVICE(er5911, msm16911, MSM16911, 8)
 DECLARE_SERIAL_EEPROM_DEVICE(er5911, msm16911, MSM16911, 16)
+
+// Seiko S-29X90 class of 16-bit EEPROMs. They always use 13 address bits, despite needing only 6-8.
+// The output is updated on the falling edge of the clock. Streaming is enabled
+DECLARE_SERIAL_EEPROM_DEVICE(93cxx, s29190, S29190, 16)
+DECLARE_SERIAL_EEPROM_DEVICE(93cxx, s29290, S29290, 16)
+DECLARE_SERIAL_EEPROM_DEVICE(93cxx, s29390, S29390, 16)
 
 // X24c44 8 bit 32byte ram/eeprom combo
 DECLARE_SERIAL_EEPROM_DEVICE(x24c44, x24c44, X24C44, 16)

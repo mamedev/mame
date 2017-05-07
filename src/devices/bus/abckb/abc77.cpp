@@ -101,10 +101,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc77_io, AS_IO, 8, abc77_device )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_WRITE(j3_w)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ_PORT("DSW")
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(p1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_WRITE(prog_w)
 ADDRESS_MAP_END
 
 
@@ -136,6 +132,10 @@ static MACHINE_CONFIG_FRAGMENT( abc77 )
 	MCFG_CPU_ADD(I8035_TAG, I8035, XTAL_4_608MHz)
 	MCFG_CPU_PROGRAM_MAP(abc77_map)
 	MCFG_CPU_IO_MAP(abc77_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(abc77_device, p1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(abc77_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(abc77_device, t1_r))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(abc77_device, prog_w))
 
 	// watchdog
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -592,7 +592,7 @@ WRITE8_MEMBER( abc77_device::p2_w )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc77_device::t1_r )
+READ_LINE_MEMBER( abc77_device::t1_r )
 {
 	return m_clock;
 }
@@ -602,9 +602,9 @@ READ8_MEMBER( abc77_device::t1_r )
 //  prog_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc77_device::prog_w )
+WRITE_LINE_MEMBER( abc77_device::prog_w )
 {
-	m_stb = BIT(data, 0);
+	m_stb = state;
 }
 
 

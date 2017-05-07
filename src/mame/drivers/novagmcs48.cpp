@@ -105,21 +105,6 @@ MACHINE_RESET_MEMBER(novagmcs48_state, octo)
 
 
 /******************************************************************************
-    Address Maps
-******************************************************************************/
-
-// Presto/Octo
-
-static ADDRESS_MAP_START( presto_map, AS_IO, 8, novagmcs48_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(presto_input_r) AM_WRITENOP
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(presto_control_w)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(presto_mux_w)
-ADDRESS_MAP_END
-
-
-
-/******************************************************************************
     Input Ports
 ******************************************************************************/
 
@@ -127,14 +112,14 @@ static INPUT_PORTS_START( presto )
 	PORT_INCLUDE( novag_cb_buttons )
 
 	PORT_START("IN.8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Black/White") // Octo calls it "Change Color"
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Verify / Pawn")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Set Up / Rook")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Knight")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Set Level / Bishop")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Queen")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Take Back / King")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Go")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Black/White") // Octo calls it "Change Color"
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Verify / Pawn")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Set Up / Rook")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Knight")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Set Level / Bishop")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Queen")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Take Back / King")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Go")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( octo )
@@ -161,7 +146,9 @@ static MACHINE_CONFIG_START( presto, novagmcs48_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8049, 6000000) // LC circuit, measured
-	MCFG_CPU_IO_MAP(presto_map)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(novagmcs48_state, presto_input_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(novagmcs48_state, presto_control_w))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(novagmcs48_state, presto_mux_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_novag_presto)

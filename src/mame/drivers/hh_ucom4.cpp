@@ -15,9 +15,9 @@
 
   FIP = fluorescent indicator panel
   g = number of grids
-  A = revision of the VFD
-  M = custom display
-  20 = unique display part number
+  r = revision of the VFD
+  c = custom display
+  s = unique display part number
 
 
   known chips:

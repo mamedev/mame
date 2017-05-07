@@ -1238,16 +1238,14 @@ WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
 	}
 	else
 	{
-		if (m_adb_timer_ticks > 1)
+		m_adb_command <<= 1;
+		if (state)
 		{
-			if (state)
-			{
-				m_adb_command |= 1;
-			}
-			else
-			{
-				m_adb_command &= ~1;
-			}
+			m_adb_command |= 1;
+		}
+		else
+		{
+			m_adb_command &= ~1;
 		}
 	}
 }
@@ -2025,7 +2023,7 @@ void mac_state::machine_reset()
 }
 
 WRITE_LINE_MEMBER(mac_state::cuda_reset_w)
-{
+{	
 	if ((state == ASSERT_LINE) && (m_model < MODEL_MAC_POWERMAC_6100))
 	{
 		set_memory_overlay(0);

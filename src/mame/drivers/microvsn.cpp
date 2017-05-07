@@ -54,7 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i8021_p0_write);
 	DECLARE_WRITE8_MEMBER(i8021_p1_write);
 	DECLARE_WRITE8_MEMBER(i8021_p2_write);
-	DECLARE_READ8_MEMBER(i8021_t1_read);
+	DECLARE_READ_LINE_MEMBER(i8021_t1_read);
 	DECLARE_READ8_MEMBER(i8021_bus_read);
 
 	// TMS1100 interface
@@ -388,7 +388,7 @@ WRITE8_MEMBER( microvision_state::i8021_p2_write )
 }
 
 
-READ8_MEMBER( microvision_state::i8021_t1_read )
+READ_LINE_MEMBER( microvision_state::i8021_t1_read )
 {
 	return m_t1;
 }
@@ -634,17 +634,17 @@ INPUT_PORTS_END
 
 static ADDRESS_MAP_START( microvision_8021_io, AS_IO, 8, microvision_state )
 	AM_RANGE( 0x00, 0xFF ) AM_WRITE( i8021_p0_write )
-	AM_RANGE( MCS48_PORT_P0, MCS48_PORT_P0 ) AM_WRITE( i8021_p0_write )
-	AM_RANGE( MCS48_PORT_P1, MCS48_PORT_P1 ) AM_WRITE( i8021_p1_write )
-	AM_RANGE( MCS48_PORT_P2, MCS48_PORT_P2 ) AM_WRITE( i8021_p2_write )
-	AM_RANGE( MCS48_PORT_T1, MCS48_PORT_T1 ) AM_READ( i8021_t1_read )
-	AM_RANGE( MCS48_PORT_BUS, MCS48_PORT_BUS ) AM_READ( i8021_bus_read )
 ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_START( microvision, microvision_state )
 	MCFG_CPU_ADD("maincpu1", I8021, 2000000)    // approximately
-	MCFG_CPU_IO_MAP( microvision_8021_io )
+	MCFG_CPU_IO_MAP(microvision_8021_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(microvision_state, i8021_p1_write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(microvision_state, i8021_p2_write))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(microvision_state, i8021_t1_read))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(microvision_state, i8021_bus_read))
+
 	MCFG_CPU_ADD("maincpu2", TMS1100, 500000)   // most games seem to be running at approximately this speed
 	MCFG_TMS1XXX_OUTPUT_PLA( microvision_output_pla_0 )
 	MCFG_TMS1XXX_READ_K_CB( READ8( microvision_state, tms1100_read_k ) )

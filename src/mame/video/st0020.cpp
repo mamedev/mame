@@ -1,13 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia,David Haywood
-/* ST0020 - Seta Zooming Sprites + Blitter
+/************************************************************************************************************
 
-  (gdfs also has a tilemap, I don't know if this chip supplies that)
+  ST0020 - Seta Zooming Sprites + 4 Tilemaps + Blitter
 
- The ST0032 seems very similar, used by the newer Jockey Club II boards
+  ST0032 seems very similar, used by the newer Jockey Club II boards
 
-*/
+  The tilemaps are used by jclub2, while gdfs uses its own tilemap.
 
+  To do:
+
+  - fix visible area in jclub2 under non-wide monitor setting.
+
+************************************************************************************************************/
 
 #include "emu.h"
 #include "st0020.h"
@@ -15,309 +20,538 @@
 
 const device_type ST0020_SPRITES = device_creator<st0020_device>;
 
-st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ST0020_SPRITES, "Seta ST0020 Sprites", tag, owner, clock, "st0020", __FILE__)
-	, device_gfx_interface(mconfig, *this)
+
+#define ST0020_ST0032_BYTESWAP_DATA \
+	if (m_is_st0032) data = ((data & 0x00ff)<<8) | ((data & 0xff00)>>8);
+#define ST0020_ST0032_BYTESWAP_MEM_MASK \
+	if (m_is_st0032) mem_mask = ((mem_mask & 0x00ff)<<8) | ((mem_mask & 0xff00)>>8);
+
+
+st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ST0020_SPRITES, "Seta ST0020 Sprites", tag, owner, clock, "st0020", __FILE__),
+	device_gfx_interface(mconfig, *this)
 {
 	m_is_st0032 = 0;
 	m_is_jclub2 = 0;
 }
 
-void st0020_device::set_is_st0032(device_t &device, int is_st0032)
+
+void st0020_device::static_set_is_st0032(device_t &device, int is_st0032)
 {
-	st0020_device &dev = downcast<st0020_device &>(device);
-	dev.m_is_st0032 = is_st0032;
+	downcast<st0020_device &>(device).m_is_st0032 = is_st0032;
 }
 
-void st0020_device::set_is_jclub2o(device_t &device, int is_st0032)
+void st0020_device::static_set_is_jclub2(device_t &device, int is_jclub2)
 {
-	st0020_device &dev = downcast<st0020_device &>(device);
-	dev.m_is_jclub2 = is_st0032;
+	downcast<st0020_device &>(device).m_is_jclub2 = is_jclub2;
 }
 
 
-
-static const gfx_layout layout_16x8x8_2 =
+void st0020_device::device_reset()
 {
-	16,8,
-	0x400000/(16*8),
-	8,
-	{   STEP8(0,1)      },
-	{   STEP16(0,8)     },
-	{   STEP8(0,16*8)   },
-	16*8*8
-};
-
-
+	m_gfxram_bank = 0;
+}
 
 void st0020_device::device_start()
 {
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
-	memory_region* rgn = memregion(tag());
+	// ROM region
+	memory_region *rgn = memregion(tag());
+	m_rom_ptr  = rgn ? rgn->base()  : nullptr;
+	m_rom_size = rgn ? rgn->bytes() : 0;
 
-	if (rgn)
+	// Allocate RAM
+	m_gfxram	=	make_unique_clear<uint16_t[]>(4 * 0x100000/2);
+	m_spriteram	=	make_unique_clear<uint16_t[]>(0x80000/2);
+	m_regs		=	make_unique_clear<uint16_t[]>(0x100/2);
+
+	// Gfx element
+	const int granularity = 16;
+	const gfx_layout layout_16x8x8 =
 	{
-		m_rom_ptr = rgn->base();
-		m_rom_size = rgn->bytes();
-	}
-	else
+		16,8,
+		0x400000/(16*8),
+		8,
+		{ STEP8(0,1)    },
+		{ STEP16(0,8)   },
+		{ STEP8(0,16*8) },
+		16*8*8
+	};
+	set_gfx(0, std::make_unique<gfx_element>(palette(), layout_16x8x8,  (uint8_t *)m_gfxram.get(), 0, palette().entries() / granularity, 0));
+	gfx(0)->set_granularity(granularity); /* 256 colour sprites with palette selectable on 64 colour boundaries */
+
+	// Tilemaps
+	m_tmap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info_0), this), TILEMAP_SCAN_ROWS,16,8, 0x40,0x40*2);
+	m_tmap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info_1), this), TILEMAP_SCAN_ROWS,16,8, 0x40,0x40*2);
+	m_tmap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info_2), this), TILEMAP_SCAN_ROWS,16,8, 0x40,0x40*2);
+	m_tmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info_3), this), TILEMAP_SCAN_ROWS,16,8, 0x40,0x40*2);
+	for (int i = 0; i < 4; ++i)
 	{
-		m_rom_ptr = nullptr;
-		m_rom_size = 0;
+		m_tmap[i]->set_transparent_pen(0);
+//		m_tmap[i]->set_scrolldy(-0x301, 0);
 	}
 
-	m_st0020_gfxram = make_unique_clear<uint16_t[]>(4 * 0x100000 / 2);
-	m_st0020_spriteram = make_unique_clear<uint16_t[]>(0x80000 / 2);
-	m_st0020_blitram = make_unique_clear<uint16_t[]>(0x100 / 2);
-
-	set_gfx(0, std::make_unique<gfx_element>(palette(), layout_16x8x8_2, (uint8_t *)m_st0020_gfxram.get(), 0, palette().entries() / 64, 0));
-
-	gfx(0)->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
-
-	save_pointer(NAME(m_st0020_gfxram.get()), 4 * 0x100000/2);
-	save_pointer(NAME(m_st0020_spriteram.get()), 0x80000/2);
-	save_pointer(NAME(m_st0020_blitram.get()), 0x100/2);
-	save_item(NAME(m_st0020_gfxram_bank));
+	// Save state
+	save_pointer(NAME(m_gfxram.get()),		4 * 0x100000/2);
+	save_pointer(NAME(m_spriteram.get()),	0x80000/2);
+	save_pointer(NAME(m_regs.get()),		0x100/2);
+	save_item(NAME(m_gfxram_bank));
 }
 
-void st0020_device::device_reset()
-{
-	m_st0020_gfxram_bank = 0;
-}
 
-
-READ16_MEMBER(st0020_device::st0020_gfxram_r)
+// Gfx ram
+READ16_MEMBER(st0020_device::gfxram_r)
 {
-	uint16_t data;
 	ST0020_ST0032_BYTESWAP_MEM_MASK
 
-	data = m_st0020_gfxram[offset + m_st0020_gfxram_bank * 0x100000/2];
+	uint16_t data = m_gfxram[offset + m_gfxram_bank * 0x100000/2];
 
 	ST0020_ST0032_BYTESWAP_DATA
 	return data;
 }
 
-WRITE16_MEMBER(st0020_device::st0020_gfxram_w)
+WRITE16_MEMBER(st0020_device::gfxram_w)
 {
 	ST0020_ST0032_BYTESWAP_MEM_MASK
 	ST0020_ST0032_BYTESWAP_DATA
 
-	offset += m_st0020_gfxram_bank * 0x100000/2;
-	COMBINE_DATA(&m_st0020_gfxram[offset]);
+	offset += m_gfxram_bank * 0x100000/2;
+	COMBINE_DATA(&m_gfxram[offset]);
 	gfx(0)->mark_dirty(offset / (16*8/2));
 }
 
-READ16_MEMBER(st0020_device::st0020_sprram_r)
+WRITE16_MEMBER(st0020_device::gfxram_bank_w)
 {
-	uint16_t data;
+	data = COMBINE_DATA(&m_regs[offset]);
 
-	data = m_st0020_spriteram[offset];
+	if (data & ~0x43)
+		logerror("%s: Unknown gfxram_bank bit written %04X\n", machine().describe_context(), data);
 
-	return data;
+	if (ACCESSING_BITS_0_7)
+		m_gfxram_bank = data & 3;
 }
 
-WRITE16_MEMBER(st0020_device::st0020_sprram_w)
+
+// Tilemaps
+int st0020_device::tmap_offset(int i)
 {
-	COMBINE_DATA(&m_st0020_spriteram[offset]);
+	return m_is_st0032	?	(m_regs[i * 16/2 + 0x28/2] & 0x007c) * 0x1000/2	:
+							(m_regs[i *  8/2         ] & 0x7c00) * 0x10/2	;
 }
 
-READ16_MEMBER(st0020_device::st0020_blit_r)
+int st0020_device::tmap_priority(int i)
 {
-	switch (offset)
+	return m_is_st0032	?	(m_regs[i * 16/2 + 0x24/2] & 0x0fc0) >> 6	:
+							(m_regs[i *  8/2 + 0x04/2] & 0x0fc0) >> 6	;
+}
+
+int st0020_device::tmap_is_enabled(int i)
+{
+	// jclub2 uses 0x19/0x00 for used/unused tilemaps
+	return m_is_st0032	?	m_regs[i * 16/2 + 0x24/2] & 0x0001	:
+							m_regs[i *  8/2 + 0x04/2] & 0x0001	;
+}
+
+/***************************************************************************
+
+    Tile format
+
+    Offset:     Bits:                   Value:
+
+        0.w                             Tile Code
+
+        2.w     fedc ba-- ---- ----
+                ---- --9- ---- ----     0/1 = 256/64-Color Granularity *
+                ---- ---8 7654 3210     Color
+
+    * ST-0032 only?
+      ST-0020 uses a tilemap flag to switch between 32/128-color granularity
+
+***************************************************************************/
+
+inline void st0020_device::get_tile_info_i(int i, tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
+{
+	int offset = tmap_offset(i) + ((tile_index % 0x40) + (tile_index / 0x80) * 0x40) * 2;
+	uint16_t tile	=	m_spriteram[offset + 0] + ((tile_index / 0x40) & 1);
+	uint16_t color	=	m_spriteram[offset + 1];
+
+	if (m_is_st0032)	color = (color & 0x1ff) * ((color & 0x200) ? 4 : 16);
+	else				color = color * ((m_regs[i * 4 + 3] & 0x0100) ? 2 : 8);
+
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+}
+
+TILE_GET_INFO_MEMBER(st0020_device::get_tile_info_0)	{ get_tile_info_i(0, tilemap, tileinfo, tile_index); }
+TILE_GET_INFO_MEMBER(st0020_device::get_tile_info_1)	{ get_tile_info_i(1, tilemap, tileinfo, tile_index); }
+TILE_GET_INFO_MEMBER(st0020_device::get_tile_info_2)	{ get_tile_info_i(2, tilemap, tileinfo, tile_index); }
+TILE_GET_INFO_MEMBER(st0020_device::get_tile_info_3)	{ get_tile_info_i(3, tilemap, tileinfo, tile_index); }
+
+
+// Sprite RAM
+READ16_MEMBER(st0020_device::sprram_r)
+{
+	return m_spriteram[offset];
+}
+
+WRITE16_MEMBER(st0020_device::sprram_w)
+{
+	COMBINE_DATA(&m_spriteram[offset]);
+
+	for (int i = 0; i < 4; ++i)
+	{
+		int tmap_offs = tmap_offset(i);
+		if ((offset >= tmap_offs) && (offset < tmap_offs + 0x4000/2))
+		{
+			int tile_index = (offset - tmap_offs) / 2;
+			tile_index = (tile_index % 0x40) + ((tile_index / 0x40) * 0x80);
+			m_tmap[i]->mark_tile_dirty(tile_index);
+			m_tmap[i]->mark_tile_dirty(tile_index + 0x40);
+			// the same offset can be used by multiple tilemaps, so do not break the loop here
+		}
+	}
+}
+
+// Blitter
+WRITE16_MEMBER(st0020_device::do_blit_w)
+{
+	uint32_t src  =   (m_regs[0xc0/2] + (m_regs[0xc2/2] << 16)) << 1;
+	uint32_t dst  =   (m_regs[0xc4/2] + (m_regs[0xc6/2] << 16)) << 4;
+	uint32_t len  =   (m_regs[0xc8/2]) << 4;
+
+	if ( m_rom_ptr && (src+len <= m_rom_size) && (dst+len <= 4 * 0x100000) )
+	{
+		memcpy( &m_gfxram[dst/2], &m_rom_ptr[src], len );
+
+		if (len % (16*8))   len = len / (16*8) + 1;
+		else                len = len / (16*8);
+
+		dst /= 16*8;
+		while (len--)
+		{
+			gfx(0)->mark_dirty(dst);
+			dst++;
+		}
+	}
+	else
+	{
+		logerror("%s: Blit out of range: src %x, dst %x, len %x\n", machine().describe_context(), src, dst, len);
+	}
+}
+
+// Blitter / Tilemaps / CRTC registers
+
+/***************************************************************************
+
+    Tilemap Registers (8 bytes each for ST-0020, 16 bytes for ST-0032):
+
+    Offset:     Bits:                   Value:
+
+        0.w     f--- ---- ---- ----
+                -edc ba-- ---- ----     Tile RAM offset / 4000 (ST-0032: low bits of offset 8)
+                ---- --98 7654 3210     X scroll
+
+        2.w     fedc ba-- ---- ----
+                ---- --98 7654 3210     Y scroll
+
+        4.w     fedc ---- ---- ----
+                ---- ba98 76-- ----     (jclub2o:        switches seemingly at random between 0 and 3f)
+                ---- ---- --54 3210     (jclub2o/jclub2: 19 for tilemaps to display / 0 for unused ones)
+
+        6.w     fe-- ---- ---- ----
+                --d- ---- ---- ----     (jclub2o: usually on for used tilemaps, but it's not enable: see test mode)
+                ---c ba9- ---- ----
+                ---- ---8 ---- ----     0/1 = Color granularity 128/32 (ST-0020 only?)
+                ---- ---- 7654 3210
+
+   Note: gdfs, which does not use the ST-0020 tilemaps, keeps all these registers to 0
+
+***************************************************************************/
+
+WRITE16_MEMBER(st0020_device::tmap_st0020_w)
+{
+	uint16_t old = m_regs[offset];
+	data = COMBINE_DATA(&m_regs[offset]);
+
+	int i   = offset / (8/2);
+	int reg = offset % (8/2);
+
+	switch (reg)
 	{
 		case 0x00/2:
-			// blitter status? (bit C, bit A)
+			if ((old ^ data) & 0x7c00)
+				m_tmap[i]->mark_all_dirty();
+			m_tmap[i]->set_scrollx(0, data);
+			break;
+		case 0x02/2:
+			m_tmap[i]->set_scrolly(0, data + m_regs[0x7a/2] + 1);	// fixme update when writing offset
+			break;
+		case 0x04/2:
+			// Priority/Enable?
+			break;
+		case 0x06/2:
+			// Color Granularity + ?
+			if ((old ^ data) & 0x0100)
+				m_tmap[i]->mark_all_dirty();
+			break;
+	}
+}
+
+WRITE16_MEMBER(st0020_device::tmap_st0032_w)
+{
+	uint16_t old = m_regs[offset];
+	data = COMBINE_DATA(&m_regs[offset]);
+
+	int i   = (offset - 0x20/2) / (16/2);
+	int reg = (offset - 0x20/2) % (16/2);
+
+	switch (reg)
+	{
+		case 0x00/2:
+			m_tmap[i]->set_scrollx(0, data);
+			break;
+		case 0x02/2:
+			m_tmap[i]->set_scrolly(0, data + m_regs[0x78/2] - 1);	// fixme update when writing offset
+			break;
+		case 0x08/2:
+			if ((old ^ data) & 0x007c)
+				m_tmap[i]->mark_all_dirty();
+			break;
+	}
+}
+
+
+READ16_MEMBER(st0020_device::regs_r)
+{
+	if (m_is_st0032)
+	{
+		// bits 0, 1, 2
+		// jclub2v200: waits for bit 0 == 0 (vblank?) before writing sprite ram
+		if (offset == 0x0c/2)
+			return 0;
+	}
+	else
+	{
+		// bits A, B, C
+		// gdfs: waits for bit A == 0 (vblank?) before flipping reg 0x86 between 8/9 (double buffering?)
+		//       tests bit C before changing reg 0x86 and then doing a blit
+		if (offset == 0x00/2)
 			return 0;
 	}
 
-	logerror("CPU #0 PC: %06X - Blit reg read: %02X\n",space.device().safe_pc(),offset*2);
+	logerror("%s: Reg read: %02X\n", machine().describe_context(), offset*2);
 	return 0;
 }
 
-READ16_MEMBER(st0020_device::st0020_blitram_r)
+
+WRITE16_MEMBER(st0020_device::regs_st0020_w)
 {
-	uint16_t data;
-	data = st0020_blit_r(space, offset, mem_mask);
-	return data;
-}
+	if (offset < 0x20/2)
+	{
+		tmap_st0020_w(space, offset, data, mem_mask);
+		return;
+	}
 
-WRITE16_MEMBER(st0020_device::st0020_blit_w)
-{
-	uint16_t *st0020_blitram = m_st0020_blitram.get();
-
-	COMBINE_DATA(&st0020_blitram[offset]);
-
+	data = COMBINE_DATA(&m_regs[offset]);
 	switch (offset)
 	{
+		// crtc
+//		                jclub2v203:
+//		case 0x20/2:	// 0000
+//		case 0x22/2:	// 0000
+//		case 0x62/2:	// 004C (normal monitor), 0050 (wide monitor)
+//		case 0x64/2:	// 01AC (normal monitor), 01E0 (wide monitor)
+//		case 0x7c/2:	// 0301 (normal monitor), 0302 (wide monitor)
+//		case 0x84/2:	// 0082 (normal monitor), 0081 (wide monitor)
+
+//                      gdfs:
+//		case 0x20/2:	// 000C
+//		case 0x22/2:	// 03F0
+//		case 0x68/2:	// 0000 (normal), 0298 (flip screen)
+//		case 0x6a/2:	// 0000 (normal), 0298 (flip screen)
+//		case 0x84/2:	// 0002 (normal), 001A (flip screen) <- mask 0018 might be flip_xy
+
+//		case 0x86/2:	double buffering?
+
 		case 0x8a/2:
-		{
-			if (data & ~0x43)
-				logerror("CPU #0 PC: %06X - Unknown st0020_gfxram_bank bit written %04X\n",space.device().safe_pc(),data);
+			gfxram_bank_w(space, offset, data, mem_mask);
+			break;
 
-			if (ACCESSING_BITS_0_7)
-				m_st0020_gfxram_bank = data & 3;
-		}
-		break;
-
-		case 0xc0/2:
+		// blitter
+		case 0xc0/2:	// source address
 		case 0xc2/2:
-		case 0xc4/2:
+		case 0xc4/2:	// destination address
 		case 0xc6/2:
-		case 0xc8/2:
-		break;
+		case 0xc8/2:	// length
+			break;
 
-		case 0xca/2:
-		{
-			uint32_t src  =   (st0020_blitram[0xc0/2] + (st0020_blitram[0xc2/2] << 16)) << 1;
-			uint32_t dst  =   (st0020_blitram[0xc4/2] + (st0020_blitram[0xc6/2] << 16)) << 4;
-			uint32_t len  =   (st0020_blitram[0xc8/2]) << 4;
-
-			if (!m_rom_ptr)
-			{
-				logerror("CPU #0 PC: %06X - Blit out of range: src %x, dst %x, len %x\n",space.device().safe_pc(),src,dst,len);
-				return;
-			}
-
-			size_t size = m_rom_size;
-
-			if ( (src+len <= size) && (dst+len <= 4 * 0x100000) )
-			{
-				memcpy( &m_st0020_gfxram[dst/2], &m_rom_ptr[src], len );
-
-				if (len % (16*8))   len = len / (16*8) + 1;
-				else                len = len / (16*8);
-
-				dst /= 16*8;
-				while (len--)
-				{
-					gfx(0)->mark_dirty(dst);
-					dst++;
-				}
-			}
-			else
-			{
-				logerror("CPU #0 PC: %06X - Blit out of range: src %x, dst %x, len %x\n",space.device().safe_pc(),src,dst,len);
-			}
-		}
-		break;
+		case 0xca/2:	// start
+			do_blit_w(space, offset, data, mem_mask);
+			break;
 
 		default:
-			logerror("CPU #0 PC: %06X - Blit reg written: %02X <- %04X\n",space.device().safe_pc(),offset*2,data);
+			logerror("%s: Reg written: %02X <- %04X\n", machine().describe_context(), offset*2, data);
 	}
 }
 
-WRITE16_MEMBER(st0020_device::st0020_blitram_w)
+WRITE16_MEMBER(st0020_device::regs_st0032_w)
 {
-	st0020_blit_w(space, offset, data, mem_mask);
+	if (offset >= 0x20/2 && offset < 0x60/2)
+	{
+		tmap_st0032_w(space, offset, data, mem_mask);
+		return;
+	}
+
+	data = COMBINE_DATA(&m_regs[offset]);
+	switch (offset)
+	{
+		// crtc
+//		                jclub2v200:
+//		case 0x62/2:	// 004C (normal monitor), 0050 (wide monitor)
+//		case 0x64/2:	// 01AC (normal monitor), 01E0 (wide monitor)
+
+//		case 0x82/2:	double buffering?
+
+		case 0x86/2:
+			gfxram_bank_w(space, offset, data, mem_mask);
+			break;
+
+		// blitter
+		case 0xc0/2:	// source address
+		case 0xc2/2:
+		case 0xc4/2:	// destination address
+		case 0xc6/2:
+		case 0xc8/2:	// length
+			break;
+
+		case 0xca/2:	// start
+			do_blit_w(space, offset, data, mem_mask);
+			break;
+
+		default:
+			logerror("%s: Reg written: %02X <- %04X\n", machine().describe_context(), offset*2, data);
+	}
 }
 
+WRITE16_MEMBER(st0020_device::regs_w)
+{
+	if (m_is_st0032)
+		regs_st0032_w(space, offset, data, mem_mask);
+	else
+		regs_st0020_w(space, offset, data, mem_mask);
+}
 
+/***************************************************************************
 
-/*
     Sprites RAM is 0x80000 bytes long. The first 0x2000? bytes hold a list
     of sprites to display (the list can be made shorter using an end-of-list
     marker).
 
-    Each entry in the list (16 bytes) is a multi-sprite (e.g it tells the
-    hardware to display several single-sprites).
+    Each entry in the list uses 8 bytes (padded to 16 for the ST-0032) and is
+    a multi-sprite: it tells the hardware to display several single-sprites.
 
-    The list looks like this:
+    The list of multi-sprites looks like this:
 
     Offset:     Bits:                   Value:
 
-        0.h     fedc ba-- ---- ----
+        0.w     fedc ba-- ---- ----
                 ---- --98 7654 3210     X displacement
 
-        2.h     fedc ba-- ---- ----
+        2.w     fedc ba-- ---- ----
                 ---- --98 7654 3210     Y displacement
 
-        4.h     f--- ---- ---- ----     List end
-                -edc ba98 7654 3210     Offset of the single-sprite(s) data
+        4.w     f--- ---- ---- ----     List end
+                -edc ba98 7654 3210     Offset of the single-sprite(s) data (16-byte units)
 
-        0.h                             Number of single-sprites (how many bits?)
+        6.w                             Number of single-sprites (how many bits?)
 
-    A single-sprite is:
+    A single-sprite uses 16 bytes:
 
     Offset:     Bits:                   Value:
 
-        0.h                             Code
+        0.w                             Code
 
-        2.h     f--- ---- ---- ----     Flip X
+        2.w     f--- ---- ---- ----     Flip X
                 -e-- ---- ---- ----     Flip Y
+                --dc b--- ---- ----
                 ---- -a-- ---- ----     0 = 256 color steps, 1 = 64 color steps
                 ---- --98 7654 3210     Color code
 
-        4.h     fedc ba-- ---- ----
+        4.w     fedc ba-- ---- ----
                 ---- --98 7654 3210     X displacement
 
-        6.h     fedc ba-- ---- ----
+        6.w     fedc ba-- ---- ----
                 ---- --98 7654 3210     Y displacement
 
-        8.h     fedc ba98 ---- ----     Y Size
-                ---- ---- 7654 3210     X Size
+        8.w     fedc ba98 ---- ----     Zoomed Y Size - 1
+                ---- ---- 7654 3210     Zoomed X Size - 1
 
-        A.h     fedc ba98 ---- ----
+        A.w     fedc ba98 ---- ----
                 ---- ---- 7654 ----     Priority
                 ---- ---- ---- 32--     Y Tiles (1,2,4,8)
                 ---- ---- ---- --10     X Tiles (1,2,4,8)
 
-        C.h                             Unused
+        C.w                             Unused
 
-        E.h                             Unused
+        E.w                             Unused
 
-*/
-void st0020_device::st0020_draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
+***************************************************************************/
+
+void st0020_device::draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
-	/* Sprites list */
-	uint16_t *spriteram16_2 = m_st0020_spriteram.get();
-	uint16_t *s1  =   spriteram16_2;
-	uint16_t *end1    =   spriteram16_2 + 0x02000/2;
+	// Sprites list
+	uint16_t *spriteram = m_spriteram.get();
+
+	uint16_t *s1	=	spriteram;
+	uint16_t *end1	=	spriteram + 0x02000/2;
 
 	priority <<= 4;
 
-	for ( ; s1 < end1; s1+=8/2 )
+	const int s1_inc = m_is_st0032 ? 16/2 : 8/2;
+
+	for ( ; s1 < end1; s1+=s1_inc )
 	{
 		int attr, code, color, num, sprite, zoom, size;
 		int sx, x, xoffs, flipx, xnum, xstart, xend, xinc, xdim, xscale;
 		int sy, y, yoffs, flipy, ynum, ystart, yend, yinc, ydim, yscale;
 
-		if (!m_is_st0032)
+		if (m_is_st0032)
 		{
-			xoffs   =       s1[ 0 ];
-			yoffs   =       s1[ 1 ];
-			sprite  =       s1[ 2 ];
-			num     =       s1[ 3 ] % 0x101; // how many?
+			num		=	s1[ 0 ];
+			sprite	=	s1[ 1 ];
+			xoffs	=	s1[ 2 ];
+			yoffs	=	s1[ 3 ];
+
+			// List end
+			if (num & 0x8000)
+				break;
 		}
 		else
 		{
-			// these seem to be swapped around on the st0032
-			xoffs   =       s1[ 2 ];
-			yoffs   =       s1[ 3 ];
-			sprite  =       s1[ 1 ];
-			num     =       s1[ 0 ] % 0x101; // how many?
+			xoffs	=	s1[ 0 ];
+			yoffs	=	s1[ 1 ];
+			sprite	=	s1[ 2 ];
+			num		=	s1[ 3 ];
 
+			// List end
+			if (sprite & 0x8000)
+				break;
 		}
 
-
-
-		/* Last sprite */
-		if (sprite & 0x8000) break;
+		num = num % 0x101; // how many?
 
 		int s2 = 0;
 		int spritebase = (sprite & 0x7fff) * 16/2;
 
 		for( ; num > 0; num--,s2+=16/2 )
 		{
-			code    =   spriteram16_2[(spritebase + s2 + 0 )&0x3ffff];
-			attr    =   spriteram16_2[(spritebase + s2 + 1 )&0x3ffff];
-			sx      =   spriteram16_2[(spritebase + s2 + 2 )&0x3ffff];
-			sy      =   spriteram16_2[(spritebase + s2 + 3 )&0x3ffff];
-			zoom    =   spriteram16_2[(spritebase + s2 + 4 )&0x3ffff];
-			size    =   spriteram16_2[(spritebase + s2 + 5 )&0x3ffff];
-
-
+			code    =   spriteram[(spritebase + s2 + 0 ) & 0x3ffff];
+			attr    =   spriteram[(spritebase + s2 + 1 ) & 0x3ffff];
+			sx      =   spriteram[(spritebase + s2 + 2 ) & 0x3ffff];
+			sy      =   spriteram[(spritebase + s2 + 3 ) & 0x3ffff];
+			zoom    =   spriteram[(spritebase + s2 + 4 ) & 0x3ffff];
+			size    =   spriteram[(spritebase + s2 + 5 ) & 0x3ffff];
 
 			if (priority != (size & 0xf0))
 				break;
@@ -325,20 +559,12 @@ void st0020_device::st0020_draw_zooming_sprites(bitmap_ind16 &bitmap, const rect
 			flipx   =   (attr & 0x8000);
 			flipy   =   (attr & 0x4000);
 
-/*
-            if ((ssv_scroll[0x74/2] & 0x1000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
-            {
-                if (flipx == 0) flipx = 1; else flipx = 0;
-            }
-            if ((ssv_scroll[0x74/2] & 0x4000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
-            {
-                if (flipy == 0) flipy = 1; else flipy = 0;
-            }
-*/
+			if (m_is_st0032)
+				color = (attr & 0x200) ? (attr & 0x1ff) : (attr & 0x1ff) * 4;
+			else
+				color = (attr & 0x400) ? (attr & 0x3ff) : (attr & 0x3ff) * 4;
 
-			color   =   (attr & 0x0400) ? attr : attr * 4;
-
-			/* Single-sprite tile size */
+			// Single-sprite tile size
 			xnum = 1 << ((size >> 0) & 3);
 			ynum = 1 << ((size >> 2) & 3);
 
@@ -350,21 +576,22 @@ void st0020_device::st0020_draw_zooming_sprites(bitmap_ind16 &bitmap, const rect
 			if (flipy)  { ystart = ynum-1;  yend = -1;    yinc = -1; }
 			else        { ystart = 0;       yend = ynum;  yinc = +1; }
 
-			/* Apply global offsets */
+			// Apply global offsets
 			sx  +=  xoffs;
 			sy  +=  yoffs;
 
-			/* Sign extend the position */
+			// Sign extend the position
 			sx  =   (sx & 0x1ff) - (sx & 0x200);
 			sy  =   (sy & 0x1ff) - (sy & 0x200);
 
+			// Y is inverted
 			sy  =   -sy;
 
 			// otherwise everything is off-screen
 			if (m_is_jclub2)
 				sy += 0x100;
 
-			/* Use fixed point values (16.16), for accuracy */
+			// Use fixed point values (16.16), for accuracy
 			sx <<= 16;
 			sy <<= 16;
 
@@ -379,42 +606,72 @@ void st0020_device::st0020_draw_zooming_sprites(bitmap_ind16 &bitmap, const rect
 			if (xscale & 0xffff)    xscale += (1<<16) / 16;
 			if (yscale & 0xffff)    yscale += (1<<16) / 8;
 
-			/* Draw the tiles */
+			// Draw the tiles
 
 			for (x = xstart; x != xend; x += xinc)
 			{
 				for (y = ystart; y != yend; y += yinc)
 				{
-					gfx(0)->zoom_transpen(bitmap,cliprect,
-									code++,
-									color,
-									flipx, flipy,
-									(sx + x * xdim) / 0x10000, (sy + y * ydim) / 0x10000,
-									xscale, yscale, 0
+					gfx(0)->zoom_transpen(bitmap, cliprect,
+							code++,
+							color * 4,
+							flipx, flipy,
+							(sx + x * xdim) / 0x10000, (sy + y * ydim) / 0x10000,
+							xscale, yscale, 0
 					);
 				}
 			}
-
-
-#if 0 /* doesn't compile in a device context (can't use ui_draw_text? */
-			if (machine().input().code_pressed(KEYCODE_Z))    /* Display some info on each sprite */
-			{
-				char buf[10];
-				sprintf(buf, "%X",size);
-				ui_draw_text(&machine().render().ui_container(), buf, sx / 0x10000, sy / 0x10000);
-			}
-#endif
-		}   /* single-sprites */
-
-
-
-	}   /* sprites list */
+		}   // single-sprites
+	}   // sprites list
 }
 
 
-
-void st0020_device::st0020_draw_all(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void st0020_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool update_visible_area)
 {
-	for (int pri = 0; pri <= 0xf; pri++)
-		st0020_draw_zooming_sprites(bitmap, cliprect, pri);
+	int layers_ctrl = -1;
+
+#ifdef MAME_DEBUG
+	if (machine().input().code_pressed(KEYCODE_Z))
+	{
+		int mask = 0;
+		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 1;
+		if (machine().input().code_pressed(KEYCODE_W))  mask |= 2;
+		if (machine().input().code_pressed(KEYCODE_E))  mask |= 4;
+		if (machine().input().code_pressed(KEYCODE_R))  mask |= 8;
+		if (machine().input().code_pressed(KEYCODE_A))  mask |= 16;
+		if (mask != 0) layers_ctrl &= mask;
+	}
+#endif
+
+	// crtc
+	if (update_visible_area)
+	{
+		int x0 = m_regs[0x62/2];
+		int x1 = m_regs[0x64/2];
+		int y0 = m_regs[m_is_st0032 ? 0x72/2 : 0x74/2];
+		int y1 = m_regs[m_is_st0032 ? 0x74/2 : 0x76/2];
+		if ((x1 > x0) && (y1 > y0))
+			screen.set_visible_area(0, (x1 - x0) - 1, y0, y1 - 1);
+	}
+
+	// tilemaps
+	for (int pri = 0x3f; pri >= 0; --pri)
+		for (int i = 0; i < 4; ++i)
+			if (	(layers_ctrl & (1 << i))
+					&& (tmap_priority(i) == pri)
+					&& tmap_is_enabled(i)			)
+				m_tmap[i]->draw(screen, bitmap, cliprect, 0, 0);
+
+	// sprites
+	if (layers_ctrl & 16)
+		for (int pri = 0; pri <= 0xf; ++pri)
+			draw_zooming_sprites(bitmap, cliprect, pri);
+
+#ifdef MAME_DEBUG
+#if 0
+	popmessage("1: %04x,%04x (%04x %04x) 2: %04x,%04x (%04x %04x)",
+			m_regs[0x08/2], m_regs[0x0a/2], m_regs[0x0c/2], m_regs[0x0e/2],
+			m_regs[0x10/2], m_regs[0x12/2], m_regs[0x14/2], m_regs[0x16/2] );
+#endif
+#endif
 }

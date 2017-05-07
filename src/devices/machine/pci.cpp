@@ -102,6 +102,15 @@ void pci_device::device_start()
 	expansion_rom = nullptr;
 	expansion_rom_size = 0;
 	expansion_rom_base = 0;
+
+	for (int i = 0; i < ARRAY_LENGTH(bank_infos); i++) {
+		save_item(NAME(bank_infos[i].adr), i);
+	}
+	save_item(NAME(command));
+	save_item(NAME(command_mask));
+	save_item(NAME(status));
+	save_item(NAME(intr_line));
+	save_item(NAME(intr_pin));
 }
 
 void pci_device::device_reset()
@@ -833,6 +842,9 @@ void pci_host_device::device_start()
 	io_window_start = io_window_end = io_offset = 0;
 
 	reset_all_mappings();
+
+	save_item(NAME(config_address));
+
 }
 
 void pci_host_device::device_reset()
