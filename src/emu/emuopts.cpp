@@ -292,7 +292,7 @@ namespace
 	protected:
 		virtual void internal_set_value(std::string &&newvalue) override
 		{
-			m_host.specify(std::move(newvalue));
+			m_host.specify(std::move(newvalue), false);
 		}
 
 	private:
@@ -318,7 +318,7 @@ namespace
 	protected:
 		virtual void internal_set_value(std::string &&newvalue) override
 		{
-			m_host.specify(std::move(newvalue));
+			m_host.specify(std::move(newvalue), false);
 		}
 
 	private:
@@ -374,6 +374,19 @@ namespace
 			result.push_back(image.brief_instance_name() + "1");
 		}
 		return result;
+	}
+
+
+	//-------------------------------------------------
+	//  conditionally_peg_priority
+	//-------------------------------------------------
+
+	void conditionally_peg_priority(core_options::entry::weak_ptr &entry, bool peg_priority)
+	{
+		// if the [image|slot] entry was specified outside of the context of the options sytem, we need
+		// to peg the priority of any associated core_options::entry at the maximum priority
+		if (peg_priority && !entry.expired())
+			entry.lock()->set_priority(OPTION_PRIORITY_MAXIMUM);
 	}
 }
 
@@ -1046,7 +1059,7 @@ std::string slot_option::specified_value() const
 //  slot_option::specify
 //-------------------------------------------------
 
-void slot_option::specify(std::string &&text)
+void slot_option::specify(std::string &&text, bool peg_priority)
 {
 	// record the old value; we may need to trigger an update
 	const std::string old_value = value();
@@ -1066,6 +1079,8 @@ void slot_option::specify(std::string &&text)
 		m_specified_value = std::move(text);
 		m_specified_bios = "";
 	}
+
+	conditionally_peg_priority(m_entry, peg_priority);
 
 	// we may have changed
 	possibly_changed(old_value);
@@ -1150,22 +1165,24 @@ image_option::image_option(emu_options &host, const std::string &cannonical_inst
 //  image_option::specify
 //-------------------------------------------------
 
-void image_option::specify(const std::string &value)
+void image_option::specify(const std::string &value, bool peg_priority)
 {
 	if (value != m_value)
 	{
 		m_value = value;
 		m_host.reevaluate_default_card_software();
 	}
+	conditionally_peg_priority(m_entry, peg_priority);
 }
 
-void image_option::specify(std::string &&value)
+void image_option::specify(std::string &&value, bool peg_priority)
 {
 	if (value != m_value)
 	{
 		m_value = std::move(value);
 		m_host.reevaluate_default_card_software();
 	}
+	conditionally_peg_priority(m_entry, peg_priority);
 }
 
 
