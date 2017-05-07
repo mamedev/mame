@@ -102,7 +102,7 @@ NETLIB_UPDATE(solver)
 	if (nthreads > 1 && t_cnt > 1)
 	{
 		plib::omp::set_num_threads(nthreads);
-		plib::omp::for_static(0, t_cnt, [this, solv](int i) { ATTR_UNUSED const netlist_time ts = this->m_mat_solvers[solv[i]]->solve(); });
+		plib::omp::for_static(0, t_cnt, [this, &solv](int i) { ATTR_UNUSED const netlist_time ts = this->m_mat_solvers[solv[i]]->solve(); });
 	}
 	else
 		for (auto & solver : m_mat_solvers)
