@@ -44,6 +44,26 @@ const char *const core_options::s_option_unadorned[MAX_UNADORNED_OPTIONS] =
 };
 
 
+//**************************************************************************
+//  UTILITY
+//**************************************************************************
+
+namespace
+{
+	void trim_spaces_and_quotes(std::string &data)
+	{
+		// trim any whitespace
+		strtrimspace(data);
+
+		// trim quotes
+		if (data.find_first_of('"') == 0 && data.find_last_of('"') == data.length() - 1)
+		{
+			data.erase(0, 1);
+			data.erase(data.length() - 1, 1);
+		}
+	}
+};
+
 
 //**************************************************************************
 //  CORE OPTIONS ENTRY
@@ -352,6 +372,15 @@ bool core_options::parse_command_line(std::vector<std::string> &args, int priori
 		const char *curarg = args[arg].c_str();
 		bool is_unadorned = (curarg[0] != '-');
 		const char *optionname = is_unadorned ? core_options::unadorned(unadorned_index++) : &curarg[1];
+
+		// special case - collect unadorned arguments after commands into a special place
+		if (is_unadorned && !m_command.empty())
+		{
+			trim_spaces_and_quotes(args[arg]);
+			m_command_arguments.push_back(std::move(args[arg]));
+			args[arg].clear();
+			continue;
+		}
 
 		// find our entry; if not found, continue
 		auto curentry = m_entrymap.find(optionname);
@@ -832,15 +861,7 @@ void core_options::copyfrom(const core_options &src)
 
 bool core_options::validate_and_set_data(core_options::entry &curentry, std::string &&data, int priority, std::string &error_string)
 {
-	// trim any whitespace
-	strtrimspace(data);
-
-	// trim quotes
-	if (data.find_first_of('"') == 0 && data.find_last_of('"') == data.length() - 1)
-	{
-		data.erase(0, 1);
-		data.erase(data.length() - 1, 1);
-	}
+	trim_spaces_and_quotes(data);
 
 	// let derived classes override how we set this data
 	if (override_set_value(curentry.name(), data))

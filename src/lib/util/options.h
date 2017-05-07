@@ -129,6 +129,7 @@ public:
 	// getters
 	entry *first() const { return m_entrylist.first(); }
 	const std::string &command() const { return m_command; }
+	const std::vector<std::string> &command_arguments() const { assert(!m_command.empty()); return m_command_arguments; }
 	entry *get_entry(const char *name) const;
 
 	// range iterators
@@ -201,6 +202,7 @@ private:
 	simple_list<entry>      m_entrylist;            // head of list of entries
 	std::unordered_map<std::string,entry *>       m_entrymap;             // map for fast lookup
 	std::string             m_command;              // command found
+	std::vector<std::string>	m_command_arguments;	// command arguments
 	static const char *const s_option_unadorned[];  // array of unadorned option "names"
 };
 
