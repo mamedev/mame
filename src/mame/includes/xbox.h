@@ -20,8 +20,8 @@ public:
 		nvidia_nv2a(nullptr),
 		debug_irq_active(false),
 		debug_irq_number(0),
-		debugc_bios(nullptr),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		debugc_bios(nullptr) { }
 
 	DECLARE_READ8_MEMBER(superio_read);
 	DECLARE_WRITE8_MEMBER(superio_write);
