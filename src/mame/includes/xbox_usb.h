@@ -398,10 +398,11 @@ private:
 class ohci_function {
 public:
 	ohci_function();
-	virtual void initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager);
+	virtual void initialize(running_machine &machine);
 	virtual void execute_reset();
 	virtual void execute_connect() {};
 	virtual void execute_disconnect() {};
+	void set_bus_manager(ohci_usb_controller *usb_bus_manager);
 	int execute_transfer(int endpoint, int pid, uint8_t *buffer, int size);
 protected:
 	virtual int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) { return -1; };
@@ -458,7 +459,7 @@ class ohci_game_controller : public device_t, public ohci_function
 {
 public:
 	ohci_game_controller(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager) override;
+	void initialize(running_machine &machine) override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
 

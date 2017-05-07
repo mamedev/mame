@@ -375,6 +375,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 #include "emu.h"
 #include "includes/xbox.h"
+#include "includes/xbox_pci.h"
 
 #include "cpu/i386/i386.h"
 #include "machine/idehd.h"
@@ -454,7 +455,7 @@ class ohci_hlean2131qc_device : public device_t, public ohci_function
 {
 public:
 	ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager) override;
+	void initialize(running_machine &machine) override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
 	void set_region_base(uint8_t *data);
@@ -501,7 +502,7 @@ class ohci_hlean2131sc_device : public device_t, public ohci_function
 {
 public:
 	ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager) override;
+	void initialize(running_machine &machine) override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
 	void set_region_base(uint8_t *data);
@@ -794,9 +795,9 @@ ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, 
 	jvs.master = nullptr;
 }
 
-void ohci_hlean2131qc_device::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
+void ohci_hlean2131qc_device::initialize(running_machine &machine)
 {
-	ohci_function::initialize(machine, usb_bus_manager);
+	ohci_function::initialize(machine);
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
@@ -1115,9 +1116,9 @@ void ohci_hlean2131sc_device::set_region_base(uint8_t *data)
 	region = data;
 }
 
-void ohci_hlean2131sc_device::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
+void ohci_hlean2131sc_device::initialize(running_machine &machine)
 {
-	ohci_function::initialize(machine, usb_bus_manager);
+	ohci_function::initialize(machine);
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
@@ -1739,13 +1740,13 @@ void chihiro_state::machine_start()
 		}
 	hack_counter = 0;
 	usb_device1 = machine().device<ohci_hlean2131qc_device>("ohci_hlean2131qc");
-	usb_device1->initialize(machine(), ohci_usb);
+	usb_device1->initialize(machine());
 	usb_device1->set_region_base(memregion(":others")->base()); // temporary
-	ohci_usb->usb_ohci_plug(1, usb_device1); // connect
+	machine().device<mcpx_ohci_device>(":pci:02.0")->plug_usb_device(1, usb_device1); // connect
 	usb_device2 = machine().device<ohci_hlean2131sc_device>("ohci_hlean2131sc");
-	usb_device2->initialize(machine(), ohci_usb);
+	usb_device2->initialize(machine());
 	usb_device2->set_region_base(memregion(":others")->base() + 0x2080); // temporary
-	ohci_usb->usb_ohci_plug(2, usb_device2); // connect
+	machine().device<mcpx_ohci_device>(":pci:02.0")->plug_usb_device(2, usb_device2); // connect
 	// savestates
 	save_item(NAME(hack_counter));
 }
