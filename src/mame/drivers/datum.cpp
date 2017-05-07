@@ -177,7 +177,7 @@ WRITE8_MEMBER( datum_state::pb_w )
 }
 
 
-static MACHINE_CONFIG_START( datum, datum_state )
+static MACHINE_CONFIG_START( datum )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6802, XTAL_4MHz) // internally divided to 1 MHz
 	MCFG_CPU_PROGRAM_MAP(datum_mem)
@@ -207,5 +207,5 @@ ROM_START( datum )
 	ROM_LOAD( "datum.bin", 0x0000, 0x0800, BAD_DUMP CRC(6fb11628) SHA1(8a77a846b62eee0d12848da76e16b4c66ef445d8) )
 ROM_END
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS          INIT    COMPANY         FULLNAME   FLAGS */
-COMP( 1982, datum,   0,      0,       datum,      datum,  driver_device,   0,   "Gammatron",     "Datum", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS        INIT  COMPANY       FULLNAME   FLAGS
+COMP( 1982, datum,   0,      0,       datum,      datum,  datum_state, 0,    "Gammatron",  "Datum",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

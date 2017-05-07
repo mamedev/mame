@@ -9,8 +9,10 @@
 
 *********************************************************************/
 
-#ifndef __BML3BUS_MP1802__
-#define __BML3BUS_MP1802__
+#ifndef MAME_BUS_BML3_BML3MP1802_H
+#define MAME_BUS_BML3_BML3MP1802_H
+
+#pragma once
 
 #include "bml3bus.h"
 #include "imagedev/flopdrv.h"
@@ -42,7 +44,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_device<mb8866_t> m_fdc;
+	required_device<mb8866_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
@@ -53,5 +55,6 @@ private:
 
 // device type definition
 extern const device_type BML3BUS_MP1802;
+DECLARE_DEVICE_TYPE(BML3BUS_MP1802, bml3bus_mp1802_device)
 
-#endif /* __BML3BUS_MP1802__ */
+#endif // MAME_BUS_BML3_BML3MP1802_H

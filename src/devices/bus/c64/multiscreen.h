@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_MULTISCREEN_H
+#define MAME_BUS_C64_MULTISCREEN_H
 
-#ifndef __MULTISCREEN__
-#define __MULTISCREEN__
+#pragma once
 
 
 #include "cpu/m6800/m6800.h"
@@ -50,7 +50,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_MULTISCREEN;
+DECLARE_DEVICE_TYPE(C64_MULTISCREEN, c64_multiscreen_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_MULTISCREEN_H

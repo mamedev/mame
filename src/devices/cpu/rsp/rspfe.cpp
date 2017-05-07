@@ -10,7 +10,10 @@
 
 #include "emu.h"
 #include "rspfe.h"
+
 #include "rsp.h"
+#include "rspdefs.h"
+
 
 //**************************************************************************
 //  RSP FRONTEND

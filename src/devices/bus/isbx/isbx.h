@@ -31,10 +31,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ISBX_ISBX_SLOT_H
+#define MAME_BUS_ISBX_ISBX_SLOT_H
 
-#ifndef __ISBX_SLOT__
-#define __ISBX_SLOT__
+#pragma once
 
 
 
@@ -73,9 +73,6 @@ class isbx_slot_device;
 class device_isbx_card_interface : public device_slot_card_interface
 {
 public:
-	// construction/destruction
-	device_isbx_card_interface(const machine_config &mconfig, device_t &device);
-
 	virtual uint8_t mcs0_r(address_space &space, offs_t offset) { return 0xff; }
 	virtual void mcs0_w(address_space &space, offs_t offset, uint8_t data) { }
 	virtual uint8_t mcs1_r(address_space &space, offs_t offset) { return 0xff; }
@@ -90,6 +87,9 @@ public:
 	virtual void mclk_w(int state) { }
 
 protected:
+	// construction/destruction
+	device_isbx_card_interface(const machine_config &mconfig, device_t &device);
+
 	isbx_slot_device *m_slot;
 };
 
@@ -103,10 +103,10 @@ public:
 	// construction/destruction
 	isbx_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _mintr0> void set_mintr0_callback(_mintr0 mintr0) { m_write_mintr0.set_callback(mintr0); }
-	template<class _mintr1> void set_mintr1_callback(_mintr1 mintr1) { m_write_mintr1.set_callback(mintr1); }
-	template<class _mdrqt> void set_mdrqt_callback(_mdrqt mdrqt) { m_write_mdrqt.set_callback(mdrqt); }
-	template<class _mwait> void set_mwait_callback(_mwait mwait) { m_write_mwait.set_callback(mwait); }
+	template <class Object> void set_mintr0_callback(Object &&cb) { m_write_mintr0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_mintr1_callback(Object &&cb) { m_write_mintr1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_mdrqt_callback(Object &&cb) { m_write_mdrqt.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_mwait_callback(Object &&cb) { m_write_mwait.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	DECLARE_READ8_MEMBER( mcs0_r ) { return m_card ? m_card->mcs0_r(space, offset) : 0xff; }
@@ -144,11 +144,10 @@ protected:
 
 
 // device type definition
-extern const device_type ISBX_SLOT;
+DECLARE_DEVICE_TYPE(ISBX_SLOT, isbx_slot_device)
 
 
 SLOT_INTERFACE_EXTERN( isbx_cards );
 
 
-
-#endif
+#endif // MAME_BUS_ISBX_ISBX_SLOT_H

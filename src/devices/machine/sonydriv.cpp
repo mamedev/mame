@@ -33,8 +33,9 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "machine/applefdc.h"
 #include "sonydriv.h"
+
+#include "machine/applefdc.h"
 #include "formats/ap_dsk35.h"
 #include "imagedev/flopdrv.h"
 
@@ -525,14 +526,14 @@ void sony_set_speed(int speed)
 }
 
 // device type definition
-const device_type FLOPPY_SONY = device_creator<sonydriv_floppy_image_device>;
+DEFINE_DEVICE_TYPE(FLOPPY_SONY, sonydriv_floppy_image_device, "floppy_sonny", "Floppy Disk [Sony]")
 
 //-------------------------------------------------
 //  sonydriv_floppy_image_device - constructor
 //-------------------------------------------------
 
 sonydriv_floppy_image_device::sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: legacy_floppy_image_device(mconfig, FLOPPY_SONY, "Floppy Disk [Sony]", tag, owner, clock, "floppy_sonny", __FILE__)
+	: legacy_floppy_image_device(mconfig, FLOPPY_SONY, tag, owner, clock)
 {
 }
 

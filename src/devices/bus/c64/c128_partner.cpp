@@ -37,14 +37,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C128_PARTNER = device_creator<partner128_t>;
+DEFINE_DEVICE_TYPE(C128_PARTNER, c128_partner_cartridge_device, "c128_partner", "PARTNER 128 cartridge")
 
 
 //-------------------------------------------------
 //  INPUT_PORTS( c128_partner )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( partner128_t::nmi_w )
+WRITE_LINE_MEMBER( c128_partner_cartridge_device::nmi_w )
 {
 	if (state)
 	{
@@ -54,7 +54,7 @@ WRITE_LINE_MEMBER( partner128_t::nmi_w )
 
 static INPUT_PORTS_START( c128_partner )
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Menu") PORT_CODE(KEYCODE_END) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, partner128_t, nmi_w)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Menu") PORT_CODE(KEYCODE_END) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, c128_partner_cartridge_device, nmi_w)
 INPUT_PORTS_END
 
 
@@ -62,7 +62,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor partner128_t::device_input_ports() const
+ioport_constructor c128_partner_cartridge_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( c128_partner );
 }
@@ -74,13 +74,12 @@ ioport_constructor partner128_t::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  partner128_t - constructor
+//  c128_partner_cartridge_device - constructor
 //-------------------------------------------------
 
-partner128_t::partner128_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C128_PARTNER, "PARTNER 128", tag, owner, clock, "c128_partner", __FILE__),
+c128_partner_cartridge_device::c128_partner_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C128_PARTNER, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
-	//device_vcs_control_port_interface(mconfig, *this),
 	m_ram(*this, "ram"), t_joyb2(nullptr),
 	m_ram_a12_a7(0),
 	m_ls74_cd(0),
@@ -95,7 +94,7 @@ partner128_t::partner128_t(const machine_config &mconfig, const char *tag, devic
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void partner128_t::device_start()
+void c128_partner_cartridge_device::device_start()
 {
 	// allocate memory
 	m_ram.allocate(0x2000);
@@ -117,7 +116,7 @@ void partner128_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void partner128_t::device_reset()
+void c128_partner_cartridge_device::device_reset()
 {
 	m_ram_a12_a7 = 0;
 
@@ -133,7 +132,7 @@ void partner128_t::device_reset()
 //  device_timer -
 //-------------------------------------------------
 
-void partner128_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void c128_partner_cartridge_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (m_ls74_cd)
 	{
@@ -148,7 +147,7 @@ void partner128_t::device_timer(emu_timer &timer, device_timer_id id, int param,
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t partner128_t::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c128_partner_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
@@ -186,7 +185,7 @@ uint8_t partner128_t::c64_cd_r(address_space &space, offs_t offset, uint8_t data
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void partner128_t::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c128_partner_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{
@@ -236,7 +235,7 @@ void partner128_t::c64_cd_w(address_space &space, offs_t offset, uint8_t data, i
 //  vcs_joy_w - joystick write
 //-------------------------------------------------
 
-void partner128_t::vcs_joy_w(uint8_t data)
+void c128_partner_cartridge_device::vcs_joy_w(uint8_t data)
 {
 	int joyb2 = BIT(data, 2);
 

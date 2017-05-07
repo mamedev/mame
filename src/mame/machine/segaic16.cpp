@@ -27,10 +27,10 @@
 //**************************************************************************
 
 // device type definition
-const device_type SEGA_315_5195_MEM_MAPPER = device_creator<sega_315_5195_mapper_device>;
-const device_type SEGA_315_5248_MULTIPLIER = device_creator<sega_315_5248_multiplier_device>;
-const device_type SEGA_315_5249_DIVIDER = device_creator<sega_315_5249_divider_device>;
-const device_type SEGA_315_5250_COMPARE_TIMER = device_creator<sega_315_5250_compare_timer_device>;
+DEFINE_DEVICE_TYPE(SEGA_315_5195_MEM_MAPPER,    sega_315_5195_mapper_device,        "sega_315_5195", "Sega 315-5195 Memory Mapper")
+DEFINE_DEVICE_TYPE(SEGA_315_5248_MULTIPLIER,    sega_315_5248_multiplier_device,    "sega_315_5248", "Sega 315-5248 Multiplier")
+DEFINE_DEVICE_TYPE(SEGA_315_5249_DIVIDER,       sega_315_5249_divider_device,       "sega_315_5249", "Sega 315-5249 Divider")
+DEFINE_DEVICE_TYPE(SEGA_315_5250_COMPARE_TIMER, sega_315_5250_compare_timer_device, "sega_315_5250", "Sega 315-5250 Compare/Timer")
 
 
 
@@ -199,7 +199,7 @@ WRITE16_MEMBER( sega_16bit_common_base::philko_paletteram_w )
 //-------------------------------------------------
 
 sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, "Sega 315-5195 Memory Mapper", tag, owner, clock, "sega_315_5195", __FILE__)
+	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, tag, owner, clock)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_cpuregion(*this, finder_base::DUMMY_TAG)
 	, m_space(nullptr)
@@ -739,7 +739,7 @@ void sega_315_5195_mapper_device::decrypt_bank::update()
 //-------------------------------------------------
 
 sega_315_5248_multiplier_device::sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, "Sega 315-5248 Multiplier", tag, owner, clock, "sega_315_5248", __FILE__)
+	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, tag, owner, clock)
 {
 }
 
@@ -807,7 +807,7 @@ void sega_315_5248_multiplier_device::device_reset()
 //-------------------------------------------------
 
 sega_315_5249_divider_device::sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEGA_315_5249_DIVIDER, "Sega 315-5249 Divider", tag, owner, clock, "sega_315_5249", __FILE__)
+	: device_t(mconfig, SEGA_315_5249_DIVIDER, tag, owner, clock)
 {
 }
 
@@ -952,7 +952,7 @@ void sega_315_5249_divider_device::execute(int mode)
 //-------------------------------------------------
 
 sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEGA_315_5250_COMPARE_TIMER, "Sega 315-5250 Compare/Timer", tag, owner, clock, "sega_315_5250", __FILE__)
+	: device_t(mconfig, SEGA_315_5250_COMPARE_TIMER, tag, owner, clock)
 {
 }
 

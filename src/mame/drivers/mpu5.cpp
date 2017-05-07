@@ -235,7 +235,7 @@ public:
 protected:
 
 	// devices
-	required_device<m68340cpu_device> m_maincpu;
+	required_device<m68340_cpu_device> m_maincpu;
 	virtual void machine_start() override;
 };
 
@@ -541,7 +541,7 @@ void mpu5_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START( mpu5, mpu5_state )
+MACHINE_CONFIG_START( mpu5 )
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)    // ?
 	MCFG_CPU_PROGRAM_MAP(mpu5_map)
 

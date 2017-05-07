@@ -41,7 +41,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMV_K210 = device_creator<dmv_k210_device>;
+DEFINE_DEVICE_TYPE(DMV_K210, dmv_k210_device, "dmv_k210", "K210 Centronics")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -52,13 +52,14 @@ const device_type DMV_K210 = device_creator<dmv_k210_device>;
 //-------------------------------------------------
 
 dmv_k210_device::dmv_k210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, DMV_K210, "K210 Centronics", tag, owner, clock, "dmv_k210", __FILE__),
-		device_dmvslot_interface( mconfig, *this ),
-		m_ppi(*this, "ppi8255"),
-		m_centronics(*this, "centronics"),
-		m_cent_data_in(*this, "cent_data_in"),
-		m_cent_data_out(*this, "cent_data_out"), m_bus(nullptr), m_clk1_timer(nullptr), m_portb(0), m_portc(0)
-	{
+	: device_t(mconfig, DMV_K210, tag, owner, clock)
+	, device_dmvslot_interface(mconfig, *this)
+	, m_ppi(*this, "ppi8255")
+	, m_centronics(*this, "centronics")
+	, m_cent_data_in(*this, "cent_data_in")
+	, m_cent_data_out(*this, "cent_data_out")
+	, m_bus(nullptr), m_clk1_timer(nullptr), m_portb(0), m_portc(0)
+{
 }
 
 //-------------------------------------------------

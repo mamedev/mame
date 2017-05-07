@@ -210,10 +210,10 @@
 #include "sound/sn76496.h"
 
 #include "bus/ti99x/genboard.h"
-#include "bus/ti99x/joyport.h"
-#include "bus/ti99x/colorbus.h"
 
-#include "bus/ti99_peb/peribox.h"
+#include "bus/ti99/colorbus/colorbus.h"
+#include "bus/ti99/joyport/joyport.h"
+#include "bus/ti99/peb/peribox.h"
 
 #include "speaker.h"
 
@@ -235,8 +235,10 @@ public:
 		m_keyboard(*this, GKEYBOARD_TAG),
 		m_mapper(*this, GMAPPER_TAG),
 		m_peribox(*this, PERIBOX_TAG),
-		m_joyport(*this,JOYPORT_TAG),
-		m_colorbus(*this, COLORBUS_TAG) { }
+		m_joyport(*this, JOYPORT_TAG),
+		m_colorbus(*this, COLORBUS_TAG)
+	{
+	}
 
 	// CRU (Communication Register Unit) handling
 	DECLARE_READ8_MEMBER(cruread);
@@ -264,8 +266,8 @@ public:
 	required_device<geneve_keyboard_device> m_keyboard;
 	required_device<geneve_mapper_device>   m_mapper;
 	required_device<peribox_device>         m_peribox;
-	required_device<joyport_device>         m_joyport;
-	required_device<colorbus_device>        m_colorbus;
+	required_device<ti99_joyport_device>    m_joyport;
+	required_device<ti99_colorbus_device>   m_colorbus;
 
 	DECLARE_WRITE_LINE_MEMBER( inta );
 	DECLARE_WRITE_LINE_MEMBER( intb );
@@ -452,7 +454,7 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 
 	switch (offset & 0x03)
 	{
-	case TMS9901_CB_INT7:
+	case tms9901_device::CB_INT7:
 		//
 		// Read pins INT3*-INT7* of Geneve's 9901.
 		// bit 1: INTA status
@@ -466,7 +468,7 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 		answer |= m_joyport->read_port()<<3;
 		break;
 
-	case TMS9901_INT8_INT15:
+	case tms9901_device::INT8_INT15:
 		// Read pins int8_t*-INT15* of Geneve 9901.
 		//
 		// bit 0: keyboard interrupt
@@ -485,11 +487,11 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 		if (TRACE_LINES) logerror("INT15-8 = %02x\n", answer);
 		break;
 
-	case TMS9901_P0_P7:
+	case tms9901_device::P0_P7:
 		// Read pins P0-P7 of TMS9901. All pins are configured as outputs, so nothing here.
 		break;
 
-	case TMS9901_P8_P15:
+	case tms9901_device::P8_P15:
 		// Read pins P8-P15 of TMS 9901.
 		// bit 4: mouse left button
 		// video wait is an output; no input possible here
@@ -682,7 +684,7 @@ void geneve_state::machine_reset()
 	m_joyport->write_port(0x01);    // select Joystick 1
 }
 
-static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
+static MACHINE_CONFIG_START( geneve_60hz )
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, memmap, crumap)
@@ -764,5 +766,5 @@ ROM_START(geneve)
 	ROM_LOAD_OPTIONAL("gnmbt100.bin", 0x8000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs GenMod */
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT    INIT       COMPANY     FULLNAME */
-COMP( 1987,geneve,   0,     0,      geneve_60hz,  geneve, geneve_state,  geneve,        "Myarc",    "Geneve 9640" , MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE      INPUT   STATE         INIT    COMPANY  FULLNAME       FLAGS
+COMP( 1987, geneve, 0,      0,      geneve_60hz, geneve, geneve_state, geneve, "Myarc", "Geneve 9640", MACHINE_SUPPORTS_SAVE)

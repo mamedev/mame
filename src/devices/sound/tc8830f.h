@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_SOUND_TC8830F_H
+#define MAME_SOUND_TC8830F_H
 
-#ifndef __TC8830F_H__
-#define __TC8830F_H__
+#pragma once
 
 
 //**************************************************************************
@@ -37,8 +37,6 @@ public:
 	void reset();
 	void write_p(uint8_t data);
 
-	sound_stream *m_stream;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -48,6 +46,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	sound_stream *m_stream;
+
 	bool m_playing;
 	uint32_t m_address;
 	uint32_t m_stop_address;
@@ -65,6 +65,6 @@ private:
 
 
 // device type definition
-extern const device_type TC8830F;
+DECLARE_DEVICE_TYPE(TC8830F, tc8830f_device)
 
-#endif /* __TC8830F_H__ */
+#endif // MAME_SOUND_TC8830F_H

@@ -38,10 +38,10 @@
     xxxx xxxx    ROM access address [15:8]
  */
 
-const device_type K053250PS = device_creator<k053250ps_device>;
+DEFINE_DEVICE_TYPE(K053250PS, k053250ps_device, "k053250ps", "K053250PS LVC")
 
 k053250ps_device::k053250ps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K053250PS, "K053250PS LVC", tag, owner, clock, "k053250ps", __FILE__),
+	: device_t(mconfig, K053250PS, tag, owner, clock),
 		device_gfx_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_dmairq_cb(*this),

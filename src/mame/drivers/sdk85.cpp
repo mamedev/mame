@@ -124,7 +124,7 @@ READ8_MEMBER( sdk85_state::kbd_r )
 	return data;
 }
 
-static MACHINE_CONFIG_START( sdk85, sdk85_state )
+static MACHINE_CONFIG_START( sdk85 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(sdk85_mem)
@@ -154,5 +154,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1977, sdk85,  0,       0,      sdk85,     sdk85, driver_device,     0,  "Intel",   "SDK-85", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY    FULLNAME  FLAGS */
+COMP( 1977, sdk85,  0,       0,      sdk85,     sdk85, sdk85_state,  0,    "Intel",   "SDK-85", MACHINE_NO_SOUND_HW)

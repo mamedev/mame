@@ -25,10 +25,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_QL_ROM_H
+#define MAME_BUS_QL_ROM_H
 
-#ifndef __QL_ROM_CARTRIDGE_SLOT__
-#define __QL_ROM_CARTRIDGE_SLOT__
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -49,15 +49,14 @@
 
 // ======================> device_ql_rom_cartridge_card_interface
 
-class ql_rom_cartridge_slot_t;
+class ql_rom_cartridge_slot_device;
 
 class device_ql_rom_cartridge_card_interface : public device_slot_card_interface
 {
-	friend class ql_rom_cartridge_slot_t;
+	friend class ql_rom_cartridge_slot_device;
 
 public:
 	// construction/destruction
-	device_ql_rom_cartridge_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_ql_rom_cartridge_card_interface();
 
 	virtual void romoeh_w(int state) { m_romoeh = state; }
@@ -65,7 +64,9 @@ public:
 	virtual void write(address_space &space, offs_t offset, uint8_t data) { }
 
 protected:
-	ql_rom_cartridge_slot_t *m_slot;
+	device_ql_rom_cartridge_card_interface(const machine_config &mconfig, device_t &device);
+
+	ql_rom_cartridge_slot_device *m_slot;
 
 	optional_shared_ptr<uint8_t> m_rom;
 
@@ -73,15 +74,15 @@ protected:
 };
 
 
-// ======================> ql_rom_cartridge_slot_t
+// ======================> ql_rom_cartridge_slot_device
 
-class ql_rom_cartridge_slot_t : public device_t,
+class ql_rom_cartridge_slot_device : public device_t,
 								public device_slot_interface,
 								public device_image_interface
 {
 public:
 	// construction/destruction
-	ql_rom_cartridge_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ql_rom_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// computer interface
 	uint8_t read(address_space &space, offs_t offset, uint8_t data) { if (m_card) data = m_card->read(space, offset, data); return data; }
@@ -114,10 +115,8 @@ protected:
 
 
 // device type definition
-extern const device_type QL_ROM_CARTRIDGE_SLOT;
+DECLARE_DEVICE_TYPE(QL_ROM_CARTRIDGE_SLOT, ql_rom_cartridge_slot_device)
 
 SLOT_INTERFACE_EXTERN( ql_rom_cartridge_cards );
 
-
-
-#endif
+#endif // MAME_BUS_QL_ROM_H

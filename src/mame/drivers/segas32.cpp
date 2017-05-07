@@ -547,29 +547,29 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "radr.lh"
 
 
-const device_type SEGA_S32_PCB = device_creator<segas32_state>;
+DEFINE_DEVICE_TYPE(SEGA_S32_PCB, segas32_state, "segas32_pcb", "Sega System 32 PCB")
 
 segas32_state::segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: segas32_state(mconfig, SEGA_S32_PCB, "Sega System 32 PCB", tag, owner, clock, "segas32_pcb", __FILE__)
+	: segas32_state(mconfig, SEGA_S32_PCB, tag, owner, clock)
 {
 }
 
-segas32_state::segas32_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_z80_shared_ram(*this,"z80_shared_ram"),
-		m_system32_workram(*this,"workram"),
-		m_system32_videoram(*this,"videoram", 0),
-		m_system32_spriteram(*this,"spriteram", 0),
-		m_system32_paletteram(*this,"paletteram.%u", 0, uint8_t(0)),
-		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
-		m_multipcm(*this, "sega"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_irq_timer_0(*this, "v60_irq0"),
-		m_irq_timer_1(*this, "v60_irq1"),
-		m_s32comm(*this, "s32comm")
+segas32_state::segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
+	m_z80_shared_ram(*this,"z80_shared_ram"),
+	m_system32_workram(*this,"workram"),
+	m_system32_videoram(*this,"videoram", 0),
+	m_system32_spriteram(*this,"spriteram", 0),
+	m_system32_paletteram(*this,"paletteram.%u", 0, uint8_t(0)),
+	m_maincpu(*this, "maincpu"),
+	m_soundcpu(*this, "soundcpu"),
+	m_multipcm(*this, "sega"),
+	m_gfxdecode(*this, "gfxdecode"),
+	m_screen(*this, "screen"),
+	m_palette(*this, "palette"),
+	m_irq_timer_0(*this, "v60_irq0"),
+	m_irq_timer_1(*this, "v60_irq1"),
+	m_s32comm(*this, "s32comm")
 {
 }
 
@@ -2342,10 +2342,10 @@ static MACHINE_CONFIG_FRAGMENT( system32 )
 	MCFG_S32COMM_ADD("s32comm")
 MACHINE_CONFIG_END
 
-const device_type SEGA_S32_REGULAR_DEVICE = device_creator<segas32_regular_state>;
+DEFINE_DEVICE_TYPE(SEGA_S32_REGULAR_DEVICE, segas32_regular_state, "segas32_pcb_regular", "Sega System 32 regular PCB")
 
 segas32_regular_state::segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_REGULAR_DEVICE, "Sega System 32 regular PCB", tag, owner, clock, "sega32_pcb_regular", __FILE__)
+	: segas32_state(mconfig, SEGA_S32_REGULAR_DEVICE, tag, owner, clock)
 {
 }
 
@@ -2377,10 +2377,10 @@ static MACHINE_CONFIG_FRAGMENT( system32_analog )
 	MCFG_MSM6253_IN3_ANALOG_PORT("ANALOG4")
 MACHINE_CONFIG_END
 
-const device_type SEGA_S32_ANALOG_DEVICE = device_creator<segas32_analog_state>;
+DEFINE_DEVICE_TYPE(SEGA_S32_ANALOG_DEVICE, segas32_analog_state, "segas32_pcb_analog", "Sega System 32 analog PCB")
 
 segas32_analog_state::segas32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_ANALOG_DEVICE, "Sega System 32 analog PCB", tag, owner, clock, "sega32_pcb_analog", __FILE__)
+	: segas32_state(mconfig, SEGA_S32_ANALOG_DEVICE, tag, owner, clock)
 {
 }
 
@@ -2406,11 +2406,11 @@ static MACHINE_CONFIG_FRAGMENT( system32_trackball )
 	MCFG_DEVICE_PROGRAM_MAP(system32_trackball_map)
 MACHINE_CONFIG_END
 
-const device_type SEGA_S32_TRACKBALL_DEVICE = device_creator<segas32_trackball_state>;
+DEFINE_DEVICE_TYPE(SEGA_S32_TRACKBALL_DEVICE, segas32_trackball_state, "segas32_pcb_trackball", "Sega System 32 trackball PCB")
 
 segas32_trackball_state::segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_TRACKBALL_DEVICE, "Sega System 32 trackball PCB", tag, owner, clock, "sega32_pcb_trackball", __FILE__),
-		m_track_ports(*this, {"TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3"})
+	: segas32_state(mconfig, SEGA_S32_TRACKBALL_DEVICE, tag, owner, clock)
+	, m_track_ports(*this, {"TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3"})
 {
 }
 
@@ -2441,10 +2441,10 @@ static MACHINE_CONFIG_FRAGMENT( system32_4player )
 	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA3"))
 MACHINE_CONFIG_END
 
-const device_type SEGA_S32_4PLAYER_DEVICE = device_creator<segas32_4player_state>;
+DEFINE_DEVICE_TYPE(SEGA_S32_4PLAYER_DEVICE, segas32_4player_state, "segas32_pcb_4player", "Sega System 32 4-player/fighting PCB")
 
 segas32_4player_state::segas32_4player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_4PLAYER_DEVICE, "Sega System 32 4 player/fighting PCB", tag, owner, clock, "sega32_pcb_4player", __FILE__)
+	: segas32_state(mconfig, SEGA_S32_4PLAYER_DEVICE, tag, owner, clock)
 {
 }
 
@@ -2477,10 +2477,10 @@ static MACHINE_CONFIG_FRAGMENT( system32_v25 )
 	MCFG_V25_CONFIG(ga2_v25_opcode_table)
 MACHINE_CONFIG_END
 
-const device_type SEGA_S32_V25_DEVICE = device_creator<segas32_v25_state>;
+DEFINE_DEVICE_TYPE(SEGA_S32_V25_DEVICE, segas32_v25_state, "segas32_pcb_v25", "Sega System 32 V25 PCB")
 
 segas32_v25_state::segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_V25_DEVICE, "Sega System 32 V25 PCB", tag, owner, clock, "sega32_pcb_v25", __FILE__)
+	: segas32_state(mconfig, SEGA_S32_V25_DEVICE, tag, owner, clock)
 {
 }
 
@@ -2507,10 +2507,10 @@ static MACHINE_CONFIG_FRAGMENT( system32_upd7725 )
 	// See HLE of this dsp in /src/mame/machine/segas32.cpp : arescue_dsp_r and arescue_dsp_w
 MACHINE_CONFIG_END
 
-const device_type SEGA_S32_UPD7725_DEVICE = device_creator<segas32_upd7725_state>;
+DEFINE_DEVICE_TYPE(SEGA_S32_UPD7725_DEVICE, segas32_upd7725_state, "segas32_pcb_upd7725", "Sega System 32 uPD7725 PCB")
 
 segas32_upd7725_state::segas32_upd7725_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_UPD7725_DEVICE, "Sega System 32 UPD7725 PCB", tag, owner, clock, "sega32_pcb_upd7725", __FILE__)
+	: segas32_state(mconfig, SEGA_S32_UPD7725_DEVICE, tag, owner, clock)
 {
 }
 
@@ -2555,10 +2555,10 @@ static MACHINE_CONFIG_FRAGMENT( system32_cd )
 	MCFG_CXD1095_IN_PORTD_CB(CONSTANT(0xff))
 MACHINE_CONFIG_END
 
-const device_type SEGA_S32_CD_DEVICE = device_creator<segas32_cd_state>;
+DEFINE_DEVICE_TYPE(SEGA_S32_CD_DEVICE, segas32_cd_state, "segas32_pcb_cd", "Sega System 32 CD PCB")
 
 segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_CD_DEVICE, "Sega System 32 CD PCB", tag, owner, clock, "sega32_pcb_cd", __FILE__)
+	: segas32_state(mconfig, SEGA_S32_CD_DEVICE, tag, owner, clock)
 {
 }
 
@@ -2643,10 +2643,10 @@ static MACHINE_CONFIG_FRAGMENT( multi32 )
 MACHINE_CONFIG_END
 
 
-const device_type SEGA_MULTI32_DEVICE = device_creator<sega_multi32_state>;
+DEFINE_DEVICE_TYPE(SEGA_MULTI32_DEVICE, sega_multi32_state, "segas32_pcb_multi", "Sega Multi 32")
 
 sega_multi32_state::sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_MULTI32_DEVICE, "Sega Multi 32 PCB", tag, owner, clock, "sega32_pcb_multi", __FILE__)
+	: segas32_state(mconfig, SEGA_MULTI32_DEVICE, tag, owner, clock)
 {
 }
 
@@ -2692,11 +2692,11 @@ WRITE8_MEMBER(sega_multi32_analog_state::analog_bank_w)
 	m_analog_bank = data & 1;
 }
 
-const device_type SEGA_MULTI32_ANALOG_DEVICE = device_creator<sega_multi32_analog_state>;
+DEFINE_DEVICE_TYPE(SEGA_MULTI32_ANALOG_DEVICE, sega_multi32_analog_state, "segas32_pcb_multi_analog", "Sega Multi 32 analog PCB")
 
 sega_multi32_analog_state::sega_multi32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_MULTI32_ANALOG_DEVICE, "Sega Multi 32 analog PCB", tag, owner, clock, "sega32_pcb_multi_analog", __FILE__),
-		m_analog_ports(*this, {"ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4", "ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8"})
+	: segas32_state(mconfig, SEGA_MULTI32_ANALOG_DEVICE, tag, owner, clock)
+	, m_analog_ports(*this, "ANALOG%u", 1)
 {
 }
 
@@ -2725,10 +2725,10 @@ static MACHINE_CONFIG_FRAGMENT( multi32_6player )
 	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA3"))
 MACHINE_CONFIG_END
 
-const device_type SEGA_MULTI32_6PLAYER_DEVICE = device_creator<sega_multi32_6player_state>;
+DEFINE_DEVICE_TYPE(SEGA_MULTI32_6PLAYER_DEVICE, sega_multi32_6player_state, "segas32_pcb_multi_6player", "Sega Multi 32 6-player PCB")
 
 sega_multi32_6player_state::sega_multi32_6player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_MULTI32_6PLAYER_DEVICE, "Sega Multi 32 6 player PCB", tag, owner, clock, "sega32_pcb_multi_6player", __FILE__)
+	: segas32_state(mconfig, SEGA_MULTI32_6PLAYER_DEVICE, tag, owner, clock)
 {
 }
 
@@ -2742,9 +2742,9 @@ class segas32_new_state : public driver_device
 {
 public:
 	segas32_new_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_mainpcb(*this, "mainpcb"),
-	m_slavepcb(*this, "slavepcb")
+		: driver_device(mconfig, type, tag)
+		, m_mainpcb(*this, "mainpcb")
+		, m_slavepcb(*this, "slavepcb")
 	{ }
 
 	required_device<segas32_state> m_mainpcb;
@@ -2785,51 +2785,51 @@ public:
 
 
 
-static MACHINE_CONFIG_START( sega_system32, segas32_new_state )
+static MACHINE_CONFIG_START( sega_system32 )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_REGULAR_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_system32_analog, segas32_new_state )
+static MACHINE_CONFIG_START( sega_system32_analog )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_ANALOG_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_system32_track, segas32_new_state )
+static MACHINE_CONFIG_START( sega_system32_track )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_TRACKBALL_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_system32_4p, segas32_new_state )
+static MACHINE_CONFIG_START( sega_system32_4p )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_4PLAYER_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_system32_cd, segas32_new_state )
+static MACHINE_CONFIG_START( sega_system32_cd )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_CD_DEVICE, 0)
 MACHINE_CONFIG_END
 
 // for f1en where there is a sub-board containing shared ram sitting underneath the ROM board bridging 2 PCBs (not a network link)
-static MACHINE_CONFIG_START( sega_system32_dual_direct, segas32_new_state )
+static MACHINE_CONFIG_START( sega_system32_dual_direct )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_ANALOG_DEVICE, 0)
 	MCFG_DEVICE_ADD("slavepcb", SEGA_S32_ANALOG_DEVICE, 0)
 MACHINE_CONFIG_END
 
 // air rescue is like f1en above but also has the 837-8341 DSP daughterboard on the mainpcb side only
-static MACHINE_CONFIG_START( sega_system32_dual_direct_upd7725, segas32_new_state )
+static MACHINE_CONFIG_START( sega_system32_dual_direct_upd7725 )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_UPD7725_DEVICE, 0)
 	MCFG_DEVICE_ADD("slavepcb", SEGA_S32_ANALOG_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_system32_v25, segas32_new_state )
+static MACHINE_CONFIG_START( sega_system32_v25 )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_V25_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_multi32, segas32_new_state )
+static MACHINE_CONFIG_START( sega_multi32 )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_multi32_analog, segas32_new_state )
+static MACHINE_CONFIG_START( sega_multi32_analog )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_ANALOG_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_multi32_6p, segas32_new_state )
+static MACHINE_CONFIG_START( sega_multi32_6p )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_6PLAYER_DEVICE, 0)
 MACHINE_CONFIG_END
 

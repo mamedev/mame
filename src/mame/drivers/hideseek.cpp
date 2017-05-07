@@ -96,7 +96,7 @@ PALETTE_INIT_MEMBER(hideseek_state, hideseek)
 
 
 
-static MACHINE_CONFIG_START( hideseek, hideseek_state )
+static MACHINE_CONFIG_START( hideseek )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, 7372800 * 4 )

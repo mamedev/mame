@@ -272,7 +272,7 @@ GFX:                Custom 145     ( 80 pin PQFP)
 */
 #include "emu.h"
 #include "includes/namconb1.h"
-#include "includes/namcoic.h"
+#include "machine/namcoic.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/namcomcu.h"
@@ -1064,7 +1064,7 @@ MACHINE_RESET_MEMBER(namconb1_state, namconb)
 
 /***************************************************************/
 
-static MACHINE_CONFIG_START( namconb1, namconb1_state )
+static MACHINE_CONFIG_START( namconb1 )
 	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(namconb1_am)
 
@@ -1106,7 +1106,7 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( namconb2, namconb1_state )
+static MACHINE_CONFIG_START( namconb2 )
 	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(namconb2_am)
 

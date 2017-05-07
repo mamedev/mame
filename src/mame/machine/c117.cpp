@@ -31,7 +31,7 @@ static MACHINE_CONFIG_FRAGMENT( namco_c117 )
 MACHINE_CONFIG_END
 
 
-const device_type NAMCO_C117 = device_creator<namco_c117_device>;
+DEFINE_DEVICE_TYPE(NAMCO_C117, namco_c117_device, "namco_c117", "Namco C117 MMU")
 
 
 //-------------------------------------------------
@@ -39,7 +39,7 @@ const device_type NAMCO_C117 = device_creator<namco_c117_device>;
 //-------------------------------------------------
 
 namco_c117_device::namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_C117, "Namco C117 MMU", tag, owner, clock, "namco_c117", __FILE__),
+	: device_t(mconfig, NAMCO_C117, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_subres_cb(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 23),

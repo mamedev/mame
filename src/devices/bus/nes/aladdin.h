@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __NES_ALADDIN_H
-#define __NES_ALADDIN_H
+#ifndef MAME_BUS_NES_ALADDIN_H
+#define MAME_BUS_NES_ALADDIN_H
+
+#pragma once
 
 #include "nxrom.h"
 #include "softlist_dev.h"
@@ -19,7 +21,6 @@ class aladdin_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	aladdin_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~aladdin_cart_interface();
 
 	// reading and writing
@@ -30,6 +31,8 @@ public:
 	virtual void write_prg(uint32_t offset, uint8_t data) { }
 
 protected:
+	aladdin_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -38,10 +41,13 @@ protected:
 
 // ======================> nes_aladdin_slot_device
 
+class nes_aladdin_device;
+
 class nes_aladdin_slot_device : public device_t,
 								public device_image_interface,
 								public device_slot_interface
 {
+	friend class nes_aladdin_device;
 public:
 	// construction/destruction
 	nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -69,11 +75,12 @@ public:
 	virtual DECLARE_READ8_MEMBER(read);
 	void write_prg(uint32_t offset, uint8_t data) { if (m_cart) m_cart->write_prg(offset, data); }
 
+protected:
 	aladdin_cart_interface*      m_cart;
 };
 
 // device type definition
-extern const device_type NES_ALADDIN_SLOT;
+DECLARE_DEVICE_TYPE(NES_ALADDIN_SLOT, nes_aladdin_slot_device)
 
 
 #define MCFG_ALADDIN_MINICART_ADD(_tag, _slot_intf) \
@@ -94,7 +101,6 @@ class nes_algn_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_algn_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	nes_algn_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
@@ -103,6 +109,8 @@ public:
 	virtual void write_prg(uint32_t offset, uint8_t data) override;
 
 protected:
+	nes_algn_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -129,8 +137,8 @@ protected:
 };
 
 // device type definition
-extern const device_type NES_ALGN_ROM;
-extern const device_type NES_ALGQ_ROM;
+DECLARE_DEVICE_TYPE(NES_ALGN_ROM, nes_algn_rom_device)
+DECLARE_DEVICE_TYPE(NES_ALGQ_ROM, nes_algq_rom_device)
 
 
 //-----------------------------------------------
@@ -147,8 +155,6 @@ public:
 	// construction/destruction
 	nes_aladdin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_READ8_MEMBER(read_h) override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
@@ -156,11 +162,14 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	required_device<nes_aladdin_slot_device> m_subslot;
 };
 
 
 // device type definition
-extern const device_type NES_ALADDIN;
+DECLARE_DEVICE_TYPE(NES_ALADDIN, nes_aladdin_device)
 
-#endif
+#endif // MAME_BUS_NES_ALADDIN_H

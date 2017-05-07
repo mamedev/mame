@@ -43,7 +43,7 @@ static DEVICE_INPUT_DEFAULTS_START(vga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x00)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( pcmda, genpc_state )
+static MACHINE_CONFIG_START( pcmda )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 4772720)
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
@@ -151,9 +151,9 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1987,    pc,         ibm5150,    0,      pccga,      0,     driver_device,       0,          "<generic>",  "PC (CGA)" , 0)
-COMP(  1987,    pcega,      ibm5150,    0,      pcega,      0,     driver_device,       0,          "<generic>",  "PC (EGA)" , 0)
-COMP ( 1987,    pcmda,      ibm5150,    0,      pcmda,      0,     driver_device,       0,          "<generic>",  "PC (MDA)" , 0)
-COMP ( 1987,    pcherc,     ibm5150,    0,      pcherc,     0,     driver_device,       0,          "<generic>",  "PC (Hercules)" , 0)
-COMP ( 1987,    pcvga,      ibm5150,    0,      pcvga,      0,     driver_device,       0,          "<generic>",  "PC (VGA)" , 0)
+//     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT  STATE        INIT        COMPANY       FULLNAME
+COMP(  1987,    pc,         ibm5150,    0,      pccga,      0,     genpc_state, 0,          "<generic>",  "PC (CGA)",      0 )
+COMP(  1987,    pcega,      ibm5150,    0,      pcega,      0,     genpc_state, 0,          "<generic>",  "PC (EGA)",      0 )
+COMP ( 1987,    pcmda,      ibm5150,    0,      pcmda,      0,     genpc_state, 0,          "<generic>",  "PC (MDA)",      0 )
+COMP ( 1987,    pcherc,     ibm5150,    0,      pcherc,     0,     genpc_state, 0,          "<generic>",  "PC (Hercules)", 0 )
+COMP ( 1987,    pcvga,      ibm5150,    0,      pcvga,      0,     genpc_state, 0,          "<generic>",  "PC (VGA)",      0 )

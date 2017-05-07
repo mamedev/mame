@@ -758,7 +758,7 @@ void px8_state::machine_reset()
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( px8, px8_state )
+static MACHINE_CONFIG_START( px8 )
 	/* main cpu (uPD70008) */
 	MCFG_CPU_ADD(UPD70008_TAG, Z80, XTAL_CR1 / 4) /* 2.45 MHz */
 	MCFG_CPU_PROGRAM_MAP(px8_mem)
@@ -841,5 +841,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME    FLAGS */
-COMP( 1984, px8,    0,      0,      px8,    px8, driver_device, 0,      "Epson",    "PX-8",     MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE      INIT    COMPANY     FULLNAME    FLAGS */
+COMP( 1984, px8,    0,      0,      px8,    px8,   px8_state, 0,      "Epson",    "PX-8",     MACHINE_NOT_WORKING )

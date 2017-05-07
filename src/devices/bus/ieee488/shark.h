@@ -8,10 +8,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_IEEE488_SHARK_H
+#define MAME_BUS_IEEE488_SHARK_H
 
-#ifndef __SHARK__
-#define __SHARK__
+#pragma once
 
 #include "ieee488.h"
 
@@ -45,8 +45,6 @@ private:
 
 
 // device type definition
-extern const device_type SHARK;
+DECLARE_DEVICE_TYPE(MSHARK, mshark_device)
 
-
-
-#endif
+#endif // MAME_BUS_IEEE488_SHARK_H

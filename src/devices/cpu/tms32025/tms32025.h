@@ -17,10 +17,10 @@
 	*                                                                          *
 	\***************************************************************************/
 
-#pragma once
+#ifndef MAME_TMS32025_TMS32025_H
+#define MAME_TMS32025_TMS32025_H
 
-#ifndef __TMS32025_H__
-#define __TMS32025_H__
+#pragma once
 
 
 #define MCFG_TMS32025_BIO_IN_CB(_devcb) \
@@ -82,7 +82,6 @@ class tms32025_device : public cpu_device
 public:
 	// construction/destruction
 	tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms32025_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor map);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base & set_bio_in_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_bio_in.set_callback(object); }
@@ -106,6 +105,8 @@ public:
 	DECLARE_WRITE16_MEMBER(greg_w);
 
 protected:
+	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -118,7 +119,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ) ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : (spacenum == AS_IO) ? &m_io_config : (spacenum == AS_DATA) ? &m_data_config : nullptr; }
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -376,7 +377,6 @@ protected:
 	void zals();
 	inline int process_IRQs();
 	inline void process_timer(int clocks);
-
 };
 
 
@@ -394,8 +394,7 @@ protected:
 };
 
 
-extern const device_type TMS32025;
-extern const device_type TMS32026;
+DECLARE_DEVICE_TYPE(TMS32025, tms32025_device)
+DECLARE_DEVICE_TYPE(TMS32026, tms32026_device)
 
-
-#endif  /* __TMS32025_H__ */
+#endif // MAME_TMS32025_TMS32025_H

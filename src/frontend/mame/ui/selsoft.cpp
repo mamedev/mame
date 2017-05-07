@@ -518,7 +518,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 void menu_select_software::build_software_list()
 {
 	// add start empty item
-	m_swinfo.emplace_back(m_driver->name, m_driver->description, "", "", "", 0, "", m_driver, "", "", "", 1, "", "", "", true);
+	m_swinfo.emplace_back(m_driver->name, m_driver->type.fullname(), "", "", "", 0, "", m_driver, "", "", "", 1, "", "", "", true);
 
 	machine_config config(*m_driver, machine().options());
 
@@ -1497,7 +1497,7 @@ void menu_select_software::make_topbox_text(std::string &line0, std::string &lin
 	// determine the text for the header
 	int vis_item = !m_search.empty() ? visible_items : (m_has_empty_start ? visible_items - 1 : visible_items);
 	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d software packages )"), emulator_info::get_appname(), bare_build_version, vis_item, m_swinfo.size() - 1);
-	line1 = string_format(_("Driver: \"%1$s\" software list "), m_driver->description);
+	line1 = string_format(_("Driver: \"%1$s\" software list "), m_driver->type.fullname());
 
 	std::string filtered;
 	if (sw_filters::actual == UI_SW_REGION && m_filter.region.ui.size() != 0)
@@ -1518,7 +1518,7 @@ void menu_select_software::make_topbox_text(std::string &line0, std::string &lin
 std::string menu_select_software::make_driver_description(game_driver const &driver) const
 {
 	// first line is game description
-	return string_format(_("%1$-.100s"), driver.description);
+	return string_format(_("%1$-.100s"), driver.type.fullname());
 }
 
 

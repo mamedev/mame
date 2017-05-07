@@ -9,10 +9,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_RSP_RSP_H
+#define MAME_CPU_RSP_RSP_H
 
-#ifndef __RSP_H__
-#define __RSP_H__
+#pragma once
 
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
@@ -65,32 +65,6 @@ enum
 	RSP_V24, RSP_V25, RSP_V26, RSP_V27, RSP_V28, RSP_V29, RSP_V30, RSP_V31
 };
 
-/***************************************************************************
-    HELPER MACROS
-***************************************************************************/
-
-#define REG_LO          32
-#define REG_HI          33
-
-#define RSREG           ((op >> 21) & 31)
-#define RTREG           ((op >> 16) & 31)
-#define RDREG           ((op >> 11) & 31)
-#define SHIFT           ((op >> 6) & 31)
-
-#define FRREG           ((op >> 21) & 31)
-#define FTREG           ((op >> 16) & 31)
-#define FSREG           ((op >> 11) & 31)
-#define FDREG           ((op >> 6) & 31)
-
-#define IS_SINGLE(o)    (((o) & (1 << 21)) == 0)
-#define IS_DOUBLE(o)    (((o) & (1 << 21)) != 0)
-#define IS_FLOAT(o)     (((o) & (1 << 23)) == 0)
-#define IS_INTEGRAL(o)  (((o) & (1 << 23)) != 0)
-
-#define SIMMVAL         ((int16_t)op)
-#define UIMMVAL         ((uint16_t)op)
-#define LIMMVAL         (op & 0x03ffffff)
-
 #define RSP_STATUS_HALT          0x0001
 #define RSP_STATUS_BROKE         0x0002
 #define RSP_STATUS_DMABUSY       0x0004
@@ -139,11 +113,11 @@ public:
 	rsp_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	void resolve_cb();
-	template<class _Object> static devcb_base &static_set_dp_reg_r_callback(device_t &device, _Object object) { return downcast<rsp_device &>(device).m_dp_reg_r_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_dp_reg_w_callback(device_t &device, _Object object) { return downcast<rsp_device &>(device).m_dp_reg_w_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_sp_reg_r_callback(device_t &device, _Object object) { return downcast<rsp_device &>(device).m_sp_reg_r_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_sp_reg_w_callback(device_t &device, _Object object) { return downcast<rsp_device &>(device).m_sp_reg_w_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_status_callback(device_t &device, _Object object) { return downcast<rsp_device &>(device).m_sp_set_status_func.set_callback(object); }
+	template <class Object> static devcb_base &static_set_dp_reg_r_callback(device_t &device, Object &&cb) { return downcast<rsp_device &>(device).m_dp_reg_r_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_dp_reg_w_callback(device_t &device, Object &&cb) { return downcast<rsp_device &>(device).m_dp_reg_w_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_sp_reg_r_callback(device_t &device, Object &&cb) { return downcast<rsp_device &>(device).m_sp_reg_r_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_sp_reg_w_callback(device_t &device, Object &&cb) { return downcast<rsp_device &>(device).m_sp_reg_w_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_status_callback(device_t &device, Object &&cb) { return downcast<rsp_device &>(device).m_sp_set_status_func.set_callback(std::forward<Object>(cb)); }
 
 	void rspdrc_flush_drc_cache();
 	void rspdrc_set_options(uint32_t options);
@@ -323,9 +297,9 @@ private:
 };
 
 
-extern const device_type RSP;
+DECLARE_DEVICE_TYPE(RSP, rsp_device)
 
 extern offs_t rsp_dasm_one(std::ostream &stream, offs_t pc, uint32_t op);
 
 
-#endif /* __RSP_H__ */
+#endif // MAME_CPU_RSP_RSP_H

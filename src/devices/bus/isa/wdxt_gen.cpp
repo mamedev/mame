@@ -62,7 +62,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISA8_WDXT_GEN = device_creator<wdxt_gen_device>;
+DEFINE_DEVICE_TYPE(ISA8_WDXT_GEN, wdxt_gen_device, "wdxt_gen", "Western Digital WDXT-GEN (Amstrad PC1512/1640)")
 
 
 //-------------------------------------------------
@@ -193,11 +193,11 @@ machine_config_constructor wdxt_gen_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 wdxt_gen_device::wdxt_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ISA8_WDXT_GEN, "Western Digital WDXT-GEN (Amstrad PC1512/1640)", tag, owner, clock, "wdxt_gen", __FILE__),
-		device_isa8_card_interface(mconfig, *this),
-		m_maincpu(*this, WD1015_TAG),
-		m_host(*this, WD11C00_17_TAG),
-		m_hdc(*this, WD2010A_TAG)
+	: device_t(mconfig, ISA8_WDXT_GEN, tag, owner, clock)
+	, device_isa8_card_interface(mconfig, *this)
+	, m_maincpu(*this, WD1015_TAG)
+	, m_host(*this, WD11C00_17_TAG)
+	, m_hdc(*this, WD2010A_TAG)
 {
 }
 

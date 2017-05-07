@@ -358,7 +358,7 @@ void bwing_state::bwing_postload()
 }
 
 
-static MACHINE_CONFIG_START( bwing, bwing_state )
+static MACHINE_CONFIG_START( bwing )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)

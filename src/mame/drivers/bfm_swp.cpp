@@ -130,7 +130,7 @@ public:
 protected:
 
 	// devices
-	required_device<m68340cpu_device> m_maincpu;
+	required_device<m68340_cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
 };
@@ -198,7 +198,7 @@ void bfm_swp_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( bfm_swp, bfm_swp_state )
+static MACHINE_CONFIG_START( bfm_swp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
@@ -301,7 +301,7 @@ ROM_END
 
 
 
-GAME( 199?, c3_rtime        , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "Radio Times (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
-GAME( 199?, c3_telly        , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "Telly Addicts (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
-GAME( 199?, c3_totp         , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "Top of the Pops (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )
-GAME( 199?, c3_ppays        , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "The Phrase That Pays (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_rtime        , 0         , bfm_swp, bfm_swp, bfm_swp_state, 0, ROT0, "BFM", "Radio Times (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_telly        , 0         , bfm_swp, bfm_swp, bfm_swp_state, 0, ROT0, "BFM", "Telly Addicts (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_totp         , 0         , bfm_swp, bfm_swp, bfm_swp_state, 0, ROT0, "BFM", "Top of the Pops (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_ppays        , 0         , bfm_swp, bfm_swp, bfm_swp_state, 0, ROT0, "BFM", "The Phrase That Pays (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )

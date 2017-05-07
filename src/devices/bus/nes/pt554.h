@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __NES_PT554_H
-#define __NES_PT554_H
+#ifndef MAME_BUS_NES_PT554_H
+#define MAME_BUS_NES_PT554_H
+
+#pragma once
 
 #include "nxrom.h"
 
@@ -23,9 +25,7 @@ private:
 };
 
 
-
-
 // device type definition
-extern const device_type NES_BANDAI_PT554;
+DECLARE_DEVICE_TYPE(NES_BANDAI_PT554, nes_bandai_pt554_device)
 
-#endif
+#endif // MAME_BUS_NES_PT554_H

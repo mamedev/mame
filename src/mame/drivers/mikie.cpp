@@ -254,7 +254,7 @@ INTERRUPT_GEN_MEMBER(mikie_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( mikie, mikie_state )
+static MACHINE_CONFIG_START( mikie )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, OSC/12)
@@ -382,6 +382,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, mikie,   0,     mikie, mikie, driver_device, 0, ROT270, "Konami", "Mikie", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mikiej,  mikie, mikie, mikie, driver_device, 0, ROT270, "Konami", "Shinnyuushain Tooru-kun", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mikiehs, mikie, mikie, mikie, driver_device, 0, ROT270, "Konami", "Mikie (High School Graffiti)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikie,   0,     mikie, mikie, mikie_state, 0, ROT270, "Konami", "Mikie",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikiej,  mikie, mikie, mikie, mikie_state, 0, ROT270, "Konami", "Shinnyuushain Tooru-kun",      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikiehs, mikie, mikie, mikie, mikie_state, 0, ROT270, "Konami", "Mikie (High School Graffiti)", MACHINE_SUPPORTS_SAVE )

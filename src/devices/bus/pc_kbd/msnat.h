@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef __KB_MSNAT_H__
-#define __KB_MSNAT_H__
+#ifndef MAME_BUS_PC_KB_MSNAT_H
+#define MAME_BUS_PC_KB_MSNAT_H
+
+#pragma once
 
 #include "pc_kbdc.h"
 
@@ -21,8 +23,6 @@ class pc_kbd_microsoft_natural_device : public device_t,
 public:
 	// construction/destruction
 	pc_kbd_microsoft_natural_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	required_device<cpu_device> m_cpu;
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -40,26 +40,14 @@ public:
 	DECLARE_WRITE8_MEMBER(p3_write);
 
 protected:
-	required_ioport m_p2_0;
-	required_ioport m_p2_1;
-	required_ioport m_p2_2;
-	required_ioport m_p2_3;
-	required_ioport m_p2_4;
-	required_ioport m_p2_5;
-	required_ioport m_p2_6;
-	required_ioport m_p2_7;
-	required_ioport m_p1_0;
-	required_ioport m_p1_1;
-	required_ioport m_p1_2;
-	required_ioport m_p1_3;
-	required_ioport m_p1_4;
-	required_ioport m_p1_5;
-	required_ioport m_p1_6;
-	required_ioport m_p1_7;
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	required_device<cpu_device> m_cpu;
+
+	required_ioport_array<8> m_p2_r;
+	required_ioport_array<8> m_p1_r;
 
 	uint8_t   m_p0;
 	uint8_t   m_p1;
@@ -71,4 +59,4 @@ protected:
 // device type definition
 extern const device_type PC_KBD_MICROSOFT_NATURAL;
 
-#endif  /* __KB_MSNAT_H__ */
+#endif // MAME_BUS_PC_KB_MSNAT_H

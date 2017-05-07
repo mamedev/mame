@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_VIDEO_K053936_H
+#define MAME_VIDEO_K053936_H
+
 #pragma once
-#ifndef __K053936_H__
-#define __K053936_H__
 
 
 void K053936_0_zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,uint32_t priority, int glfgreat_hack);
@@ -51,7 +52,7 @@ private:
 	int       m_wrap, m_xoff, m_yoff;
 };
 
-extern const device_type K053936;
+DECLARE_DEVICE_TYPE(K053936, k053936_device)
 
 #define MCFG_K053936_WRAP(_wrap) \
 	k053936_device::set_wrap(*device, _wrap);
@@ -59,4 +60,4 @@ extern const device_type K053936;
 #define MCFG_K053936_OFFSETS(_xoffs, _yoffs) \
 	k053936_device::set_offsets(*device, _xoffs, _yoffs);
 
-#endif
+#endif // MAME_VIDEO_K053936_H

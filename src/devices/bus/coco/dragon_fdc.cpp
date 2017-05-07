@@ -91,11 +91,10 @@ namespace
 {
 	class dragon_fdc_device_base : public coco_family_fdc_device_base
 	{
-	public:
-		// construction/destruction
-		dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	protected:
+		// construction/destruction
+		dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 		// device-level overrides
 		virtual DECLARE_READ8_MEMBER(read) override;
 		virtual DECLARE_WRITE8_MEMBER(write) override;
@@ -104,13 +103,13 @@ namespace
 
 	private:
 		// device references
-		required_device<wd2797_t>                   m_wd2797;
+		required_device<wd2797_device>              m_wd2797;
 		required_device_array<floppy_connector, 4>  m_floppies;
 
 		// methods
 		void dskreg_w(uint8_t data);
 	};
-};
+}
 
 /***************************************************************************
     LOCAL VARIABLES
@@ -144,8 +143,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 //  dragon_fdc_device_base - constructor
 //-------------------------------------------------
-dragon_fdc_device_base::dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: coco_family_fdc_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
+dragon_fdc_device_base::dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: coco_family_fdc_device_base(mconfig, type, tag, owner, clock)
 	, m_wd2797(*this, WD2797_TAG)
 	, m_floppies(*this, WD2797_TAG ":%u", 0)
 {
@@ -288,7 +287,7 @@ namespace
 	public:
 		// construction/destruction
 		dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: dragon_fdc_device_base(mconfig, DRAGON_FDC, "Dragon FDC", tag, owner, clock, "dragon_fdc", __FILE__)
+			: dragon_fdc_device_base(mconfig, DRAGON_FDC, tag, owner, clock)
 		{
 		}
 
@@ -299,9 +298,9 @@ namespace
 			return ROM_NAME(dragon_fdc);
 		}
 	};
-};
+}
 
-const device_type DRAGON_FDC = device_creator<dragon_fdc_device>;
+DEFINE_DEVICE_TYPE(DRAGON_FDC, dragon_fdc_device, "dragon_fdc", "Dragon FDC")
 
 
 //**************************************************************************
@@ -320,7 +319,7 @@ namespace
 	public:
 		// construction/destruction
 		sdtandy_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: dragon_fdc_device_base(mconfig, SDTANDY_FDC, "SDTANDY FDC", tag, owner, clock, "sdtandy_fdc", __FILE__)
+			: dragon_fdc_device_base(mconfig, SDTANDY_FDC, tag, owner, clock)
 		{
 		}
 
@@ -331,6 +330,6 @@ namespace
 			return ROM_NAME(sdtandy_fdc);
 		}
 	};
-};
+}
 
-const device_type SDTANDY_FDC = device_creator<sdtandy_fdc_device>;
+DEFINE_DEVICE_TYPE(SDTANDY_FDC, sdtandy_fdc_device, "sdtandy_fdc", "SDTANDY FDC")

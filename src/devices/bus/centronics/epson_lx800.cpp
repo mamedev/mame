@@ -25,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EPSON_LX800 = device_creator<epson_lx800_t>;
+DEFINE_DEVICE_TYPE(EPSON_LX800, epson_lx800_device, "lx800", "Epson LX-800")
 
 
 //-------------------------------------------------
@@ -42,7 +42,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *epson_lx800_t::device_rom_region() const
+const tiny_rom_entry *epson_lx800_device::device_rom_region() const
 {
 	return ROM_NAME( lx800 );
 }
@@ -52,7 +52,7 @@ const tiny_rom_entry *epson_lx800_t::device_rom_region() const
 //  ADDRESS_MAP( lx800_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( lx800_mem, AS_PROGRAM, 8, epson_lx800_t )
+static ADDRESS_MAP_START( lx800_mem, AS_PROGRAM, 8, epson_lx800_device )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* 32k firmware */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* 8k external RAM */
 	AM_RANGE(0xa000, 0xbfff) AM_NOP /* not used */
@@ -70,17 +70,17 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx800 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
 	MCFG_CPU_PROGRAM_MAP(lx800_mem)
-	MCFG_UPD7810_PORTA_READ_CB(READ8(epson_lx800_t, porta_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(epson_lx800_t, porta_w))
+	MCFG_UPD7810_PORTA_READ_CB(READ8(epson_lx800_device, porta_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(epson_lx800_device, porta_w))
 	MCFG_UPD7810_PORTB_READ_CB(IOPORT("DIPSW1"))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(epson_lx800_t, portc_r))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(epson_lx800_t, portc_w))
-	MCFG_UPD7810_AN0(READLINE(epson_lx800_t, an0_r))
-	MCFG_UPD7810_AN1(READLINE(epson_lx800_t, an1_r))
-	MCFG_UPD7810_AN2(READLINE(epson_lx800_t, an2_r))
-	MCFG_UPD7810_AN3(READLINE(epson_lx800_t, an3_r))
-	MCFG_UPD7810_AN4(READLINE(epson_lx800_t, an4_r))
-	MCFG_UPD7810_AN5(READLINE(epson_lx800_t, an5_r))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(epson_lx800_device, portc_r))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(epson_lx800_device, portc_w))
+	MCFG_UPD7810_AN0(READLINE(epson_lx800_device, an0_r))
+	MCFG_UPD7810_AN1(READLINE(epson_lx800_device, an1_r))
+	MCFG_UPD7810_AN2(READLINE(epson_lx800_device, an2_r))
+	MCFG_UPD7810_AN3(READLINE(epson_lx800_device, an3_r))
+	MCFG_UPD7810_AN4(READLINE(epson_lx800_device, an4_r))
+	MCFG_UPD7810_AN5(READLINE(epson_lx800_device, an5_r))
 
 	MCFG_DEFAULT_LAYOUT(layout_lx800)
 
@@ -91,10 +91,10 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx800 )
 
 	/* gate array */
 	MCFG_DEVICE_ADD("ic3b", E05A03, 0)
-	MCFG_E05A03_PE_LP_CALLBACK(WRITELINE(epson_lx800_t, paperempty_led_w))
-	MCFG_E05A03_RESO_CALLBACK(WRITELINE(epson_lx800_t, reset_w))
-	MCFG_E05A03_PE_CALLBACK(WRITELINE(epson_lx800_t, centronics_pe_w))
-	MCFG_E05A03_DATA_CALLBACK(READ8(epson_lx800_t, centronics_data_r))
+	MCFG_E05A03_PE_LP_CALLBACK(WRITELINE(epson_lx800_device, paperempty_led_w))
+	MCFG_E05A03_RESO_CALLBACK(WRITELINE(epson_lx800_device, reset_w))
+	MCFG_E05A03_PE_CALLBACK(WRITELINE(epson_lx800_device, centronics_pe_w))
+	MCFG_E05A03_DATA_CALLBACK(READ8(epson_lx800_device, centronics_data_r))
 MACHINE_CONFIG_END
 
 
@@ -103,7 +103,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor epson_lx800_t::device_mconfig_additions() const
+machine_config_constructor epson_lx800_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( epson_lx800 );
 }
@@ -179,7 +179,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor epson_lx800_t::device_input_ports() const
+ioport_constructor epson_lx800_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( epson_lx800 );
 }
@@ -191,19 +191,19 @@ ioport_constructor epson_lx800_t::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  epson_lx800_t - constructor
+//  epson_lx800_device - constructor
 //-------------------------------------------------
 
-epson_lx800_t::epson_lx800_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, EPSON_LX800, "Epson LX-800", tag, owner, clock, "lx800", __FILE__),
+epson_lx800_device::epson_lx800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, EPSON_LX800, tag, owner, clock),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
 	m_beep(*this, "beeper")
 {
 }
 
-epson_lx800_t::epson_lx800_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+epson_lx800_device::epson_lx800_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
 	m_beep(*this, "beeper")
@@ -215,7 +215,7 @@ epson_lx800_t::epson_lx800_t(const machine_config &mconfig, device_type type, co
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void epson_lx800_t::device_start()
+void epson_lx800_device::device_start()
 {
 }
 
@@ -224,7 +224,7 @@ void epson_lx800_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void epson_lx800_t::device_reset()
+void epson_lx800_device::device_reset()
 {
 	m_beep->set_state(0);
 }
@@ -243,7 +243,7 @@ void epson_lx800_t::device_reset()
  * PA6             not used
  * PA7  R   P/S    P/S signal from the optional interface
  */
-READ8_MEMBER( epson_lx800_t::porta_r )
+READ8_MEMBER( epson_lx800_device::porta_r )
 {
 	uint8_t result = 0;
 
@@ -258,7 +258,7 @@ READ8_MEMBER( epson_lx800_t::porta_r )
 	return result;
 }
 
-WRITE8_MEMBER( epson_lx800_t::porta_w )
+WRITE8_MEMBER( epson_lx800_device::porta_w )
 {
 	logerror("%s: lx800_porta_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> carriage: %d, paper feed: %d\n", BIT(data, 0), BIT(data, 2));
@@ -273,7 +273,7 @@ WRITE8_MEMBER( epson_lx800_t::porta_w )
  * PC6   W  FIRE       drive pulse width signal
  * PC7   W  BUZZER     buzzer signal
  */
-READ8_MEMBER( epson_lx800_t::portc_r )
+READ8_MEMBER( epson_lx800_device::portc_r )
 {
 	uint8_t result = 0;
 
@@ -284,7 +284,7 @@ READ8_MEMBER( epson_lx800_t::portc_r )
 	return result;
 }
 
-WRITE8_MEMBER( epson_lx800_t::portc_w )
+WRITE8_MEMBER( epson_lx800_device::portc_w )
 {
 	logerror("%s: lx800_portc_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
@@ -293,32 +293,32 @@ WRITE8_MEMBER( epson_lx800_t::portc_w )
 	m_beep->set_state(!BIT(data, 7));
 }
 
-READ_LINE_MEMBER( epson_lx800_t::an0_r )
+READ_LINE_MEMBER( epson_lx800_device::an0_r )
 {
 	return BIT(ioport("DIPSW2")->read(), 0);
 }
 
-READ_LINE_MEMBER( epson_lx800_t::an1_r )
+READ_LINE_MEMBER( epson_lx800_device::an1_r )
 {
 	return BIT(ioport("DIPSW2")->read(), 1);
 }
 
-READ_LINE_MEMBER( epson_lx800_t::an2_r )
+READ_LINE_MEMBER( epson_lx800_device::an2_r )
 {
 	return BIT(ioport("DIPSW2")->read(), 2);
 }
 
-READ_LINE_MEMBER( epson_lx800_t::an3_r )
+READ_LINE_MEMBER( epson_lx800_device::an3_r )
 {
 	return BIT(ioport("DIPSW2")->read(), 3); // can also read an external line AUTO_FEED_XT
 }
 
-READ_LINE_MEMBER( epson_lx800_t::an4_r )
+READ_LINE_MEMBER( epson_lx800_device::an4_r )
 {
 	return 0; // Printer select line (0=always selected)
 }
 
-READ_LINE_MEMBER( epson_lx800_t::an5_r )
+READ_LINE_MEMBER( epson_lx800_device::an5_r )
 {
 	return 1; // Monitors 24v line, should return 4.08 volts
 }
@@ -328,24 +328,24 @@ READ_LINE_MEMBER( epson_lx800_t::an5_r )
     GATE ARRAY
 ***************************************************************************/
 
-READ8_MEMBER( epson_lx800_t::centronics_data_r )
+READ8_MEMBER( epson_lx800_device::centronics_data_r )
 {
 	logerror("centronics: data read\n");
 	return 0x55;
 }
 
-WRITE_LINE_MEMBER( epson_lx800_t::centronics_pe_w )
+WRITE_LINE_MEMBER( epson_lx800_device::centronics_pe_w )
 {
 	logerror("centronics: pe = %d\n", state);
 }
 
-WRITE_LINE_MEMBER( epson_lx800_t::paperempty_led_w )
+WRITE_LINE_MEMBER( epson_lx800_device::paperempty_led_w )
 {
 	logerror("setting paperout led: %d\n", state);
 	machine().output().set_value("paperout_led", state);
 }
 
-WRITE_LINE_MEMBER( epson_lx800_t::reset_w )
+WRITE_LINE_MEMBER( epson_lx800_device::reset_w )
 {
 	logerror("cpu reset");
 	m_maincpu->reset();

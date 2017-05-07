@@ -2568,7 +2568,7 @@ WRITE_LINE_MEMBER(calomega_state::write_acia_clock)
 *                Machine Drivers                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( sys903, calomega_state )
+static MACHINE_CONFIG_START( sys903 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* confirmed */
 	MCFG_CPU_PROGRAM_MAP(sys903_map)

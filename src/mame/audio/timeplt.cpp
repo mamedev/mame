@@ -22,12 +22,12 @@
 #define MASTER_CLOCK         XTAL_14_31818MHz
 
 
-const device_type TIMEPLT_AUDIO = device_creator<timeplt_audio_device>;
+DEFINE_DEVICE_TYPE(TIMEPLT_AUDIO, timeplt_audio_device, "timplt_audio", "Time Pilot Audio")
 
 timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TIMEPLT_AUDIO, "Time Pilot Audio", tag, owner, clock, "timeplt_audio", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_last_irq_state(0)
+	: device_t(mconfig, TIMEPLT_AUDIO, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_last_irq_state(0)
 {
 }
 
@@ -100,7 +100,7 @@ void timeplt_audio_device::filter_w( device_t *device, int data )
 	if (data & 2)
 		C +=  47000;    /*  47000pF = 0.047uF */
 
-	dynamic_cast<filter_rc_device*>(device)->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 5100, 0, CAP_P(C));
+	downcast<filter_rc_device*>(device)->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 5100, 0, CAP_P(C));
 }
 
 

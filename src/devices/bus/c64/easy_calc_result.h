@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_EASY_CALC_RESULT_H
+#define MAME_BUS_C64_EASY_CALC_RESULT_H
 
-#ifndef __EASY_CALC_RESULT__
-#define __EASY_CALC_RESULT__
+#pragma once
 
 
 #include "exp.h"
@@ -44,7 +44,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_EASY_CALC_RESULT;
+DECLARE_DEVICE_TYPE(C64_EASY_CALC_RESULT, c64_easy_calc_result_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_EASY_CALC_RESULT_H

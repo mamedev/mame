@@ -8,10 +8,10 @@
 
 ****************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_UPD7725_UPD7725_H
+#define MAME_CPU_UPD7725_UPD7725_H
 
-#ifndef __UPD7725_H__
-#define __UPD7725_H__
+#pragma once
 
 //**************************************************************************
 //  ENUMERATIONS
@@ -27,10 +27,6 @@ enum
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-class necdsp_device;
-class upd7725_device;
-class upd96050_device;
 
 
 #define MCFG_NECDSP_IN_INT_CB(_devcb) \
@@ -71,28 +67,26 @@ class upd96050_device;
 
 class necdsp_device : public cpu_device
 {
-protected:
-	// construction/destruction
-	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits, const char *name, const char *shortname, const char *source);
-
 public:
-
-	template<class _Object> static devcb_base &set_in_int_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_in_int_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_in_si_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_in_si_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_in_sck_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_in_sck_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_in_sien_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_in_sien_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_in_soen_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_in_soen_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_in_dack_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_in_dack_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_p0_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_p0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_p1_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_p1_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_out_so_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_so_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_out_sorq_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_sorq_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_out_drq_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_drq_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_in_int_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_in_int_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_in_si_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_in_si_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_in_sck_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_in_sck_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_in_sien_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_in_sien_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_in_soen_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_in_soen_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_in_dack_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_in_dack_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_p0_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_out_p0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_p1_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_out_p1_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_out_so_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_out_so_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_out_sorq_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_out_sorq_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_out_drq_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_out_drq_cb.set_callback(std::forward<Object>(cb)); }
 
 	uint8_t snesdsp_read(bool mode);
 	void snesdsp_write(bool mode, uint8_t data);
 
 protected:
+	// construction/destruction
+	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -234,6 +228,8 @@ public:
 // device type definition
 extern const device_type UPD7725;
 extern const device_type UPD96050;
+DECLARE_DEVICE_TYPE(UPD7725,  upd7725_device)
+DECLARE_DEVICE_TYPE(UPD96050, upd96050_device)
 
 //**************************************************************************
 //  ENUMERATIONS
@@ -265,4 +261,4 @@ enum
 	UPD7725_SOACK
 };
 
-#endif /* __UPD7725_H__ */
+#endif // MAME_CPU_UPD7725_UPD7725_H

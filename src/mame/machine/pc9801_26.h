@@ -6,11 +6,11 @@ Template for skeleton device
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_PC9801_26_H
+#define MAME_MACHINE_PC9801_26_H
 
 #pragma once
 
-#ifndef __PC9801_26DEV_H__
-#define __PC9801_26DEV_H__
 
 #include "machine/pic8259.h"
 #include "sound/2203intf.h"
@@ -38,8 +38,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9801_26_w);
 	DECLARE_WRITE_LINE_MEMBER(pc9801_sound_irq);
 
-//  required_device<cpu_device>  m_maincpu;
-	required_device<ym2203_device>  m_opn;
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -48,13 +46,15 @@ protected:
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
 private:
-	uint8_t m_joy_sel;
+//  required_device<cpu_device>  m_maincpu;
+	required_device<ym2203_device>  m_opn;
 
+	uint8_t m_joy_sel;
 };
 
 
 // device type definition
-extern const device_type PC9801_26;
+DECLARE_DEVICE_TYPE(PC9801_26, pc9801_26_device)
 
 
 
@@ -64,4 +64,4 @@ extern const device_type PC9801_26;
 
 
 
-#endif
+#endif // MAME_MACHINE_PC9801_26_H

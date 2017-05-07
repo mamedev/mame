@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_PROF80MMU_H
+#define MAME_MACHINE_PROF80MMU_H
 
-#ifndef __PROF80_MMU__
-#define __PROF80_MMU__
+#pragma once
 
 
 
@@ -30,8 +30,7 @@
 
 // ======================> prof80_mmu_device
 
-class prof80_mmu_device : public device_t,
-							public device_memory_interface
+class prof80_mmu_device : public device_t, public device_memory_interface
 {
 public:
 	prof80_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -60,8 +59,8 @@ private:
 
 
 // device type definition
-extern const device_type PROF80_MMU;
+DECLARE_DEVICE_TYPE(PROF80_MMU, prof80_mmu_device)
 
 
 
-#endif
+#endif // MAME_MACHINE_PROF80MMU_H

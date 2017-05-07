@@ -47,7 +47,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_VIZASTAR = device_creator<c64_vizastar_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_VIZASTAR, c64_vizastar_cartridge_device, "c64_vizastar", "VizaStar 64 XL4")
 
 
 
@@ -60,7 +60,7 @@ const device_type C64_VIZASTAR = device_creator<c64_vizastar_cartridge_device>;
 //-------------------------------------------------
 
 c64_vizastar_cartridge_device::c64_vizastar_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_VIZASTAR, "VizaStar 64 XL4", tag, owner, clock, "c64_vizastar", __FILE__),
+	device_t(mconfig, C64_VIZASTAR, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {
 }

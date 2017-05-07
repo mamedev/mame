@@ -407,7 +407,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( ch2001, cxgz80_state )
+static MACHINE_CONFIG_START( ch2001 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
@@ -445,5 +445,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     INIT                      COMPANY, FULLNAME, FLAGS */
-CONS( 1984, ch2001,    0,        0,      ch2001,   ch2001,   driver_device,   0,       "CXG", "Chess 2001", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     STATE          INIT  COMPANY  FULLNAME       FLAGS */
+CONS( 1984, ch2001,    0,        0,      ch2001,   ch2001,   cxgz80_state,  0,    "CXG",   "Chess 2001",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

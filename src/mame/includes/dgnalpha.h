@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_INCLUDES_DGNALPHA_H
+#define MAME_INCLUDES_DGNALPHA_H
 
-#ifndef __DGNALPHA__
-#define __DGNALPHA__
+#pragma once
 
 
 #include "includes/dragon.h"
@@ -52,14 +52,6 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(dragon_formats);
 
-	required_device<pia6821_device> m_pia_2;
-	required_device<ay8912_device> m_ay8912;
-	required_device<wd2797_t> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-
 
 	/* pia2 */
 	DECLARE_WRITE8_MEMBER( pia2_pa_w );
@@ -86,6 +78,14 @@ protected:
 	virtual DECLARE_READ8_MEMBER( ff20_read ) override;
 	virtual DECLARE_WRITE8_MEMBER( ff20_write ) override;
 
+	required_device<pia6821_device> m_pia_2;
+	required_device<ay8912_device> m_ay8912;
+	required_device<wd2797_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+
 private:
 	uint8_t m_just_reset;
 
@@ -94,4 +94,4 @@ private:
 	void modem_w(offs_t offset, uint8_t data);
 };
 
-#endif /* __DGNALPHA__ */
+#endif // MAME_INCLUDES_DGNALPHA_H

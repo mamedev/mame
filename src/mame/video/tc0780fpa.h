@@ -1,9 +1,10 @@
 // license:LGPL-2.1+
 // copyright-holders:Ville Linde, Angelo Salese, hap
 
+#ifndef MAME_VIDEO_TC0780FPA_H
+#define MAME_VIDEO_TC0780FPA_H
+
 #pragma once
-#ifndef __TC0780FPA_H__
-#define __TC0780FPA_H__
 
 #include "video/poly.h"
 
@@ -21,7 +22,6 @@ class tc0780fpa_renderer : public poly_manager<float, tc0780fpa_polydata, 6, 100
 {
 public:
 	tc0780fpa_renderer(device_t &parent, screen_device &screen, const uint8_t *texture_ram);
-	~tc0780fpa_renderer() {}
 
 	void render_solid_scan(int32_t scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid);
 	void render_shade_scan(int32_t scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid);
@@ -46,7 +46,6 @@ class tc0780fpa_device : public device_t, public device_video_interface
 {
 public:
 	tc0780fpa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~tc0780fpa_device() {}
 
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -75,6 +74,6 @@ private:
 	int m_texbase_y;
 };
 
-extern const device_type TC0780FPA;
+DECLARE_DEVICE_TYPE(TC0780FPA, tc0780fpa_device)
 
-#endif
+#endif // MAME_VIDEO_TC0780FPA_H

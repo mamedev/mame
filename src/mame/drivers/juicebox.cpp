@@ -301,7 +301,7 @@ DRIVER_INIT_MEMBER(juicebox_state,juicebox)
 	// do nothing
 }
 
-static MACHINE_CONFIG_START( juicebox, juicebox_state )
+static MACHINE_CONFIG_START( juicebox )
 	MCFG_CPU_ADD("maincpu", ARM7, 66000000)
 	MCFG_CPU_PROGRAM_MAP(juicebox_map)
 

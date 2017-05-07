@@ -45,13 +45,11 @@ private:
 	sound_stream    *m_sh_channel;
 };
 
-extern const device_type PV1000;
-
-const device_type PV1000 = device_creator<pv1000_sound_device>;
+DEFINE_DEVICE_TYPE(PV1000, pv1000_sound_device, "pv1000_sound", "NEC D65010G031")
 
 pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-				: device_t(mconfig, PV1000, "NEC D65010G031", tag, owner, clock, "pv1000_sound", __FILE__),
-					device_sound_interface(mconfig, *this)
+	: device_t(mconfig, PV1000, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 {
 }
 
@@ -434,7 +432,7 @@ static GFXDECODE_START( pv1000 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( pv1000, pv1000_state )
+static MACHINE_CONFIG_START( pv1000 )
 
 	MCFG_CPU_ADD( "maincpu", Z80, 17897725/5 )
 	MCFG_CPU_PROGRAM_MAP( pv1000 )
@@ -471,5 +469,5 @@ ROM_START( pv1000 )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT    COMPANY   FULLNAME    FLAGS */
-CONS( 1983, pv1000,  0,      0,      pv1000,  pv1000, driver_device,   0,   "Casio",  "PV-1000",  MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE           INIT  COMPANY   FULLNAME    FLAGS */
+CONS( 1983, pv1000,  0,      0,      pv1000,  pv1000, pv1000_state,   0,    "Casio",  "PV-1000",  MACHINE_SUPPORTS_SAVE )

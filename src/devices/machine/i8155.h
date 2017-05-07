@@ -30,10 +30,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_I8155_H
+#define MAME_MACHINE_I8155_H
 
-#ifndef __I8155__
-#define __I8155__
+#pragma once
 
 
 
@@ -76,13 +76,13 @@ public:
 	// construction/destruction
 	i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_in_pa_callback(device_t &device, _Object object)  { return downcast<i8155_device &>(device).m_in_pa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pb_callback(device_t &device, _Object object)  { return downcast<i8155_device &>(device).m_in_pb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pc_callback(device_t &device, _Object object)  { return downcast<i8155_device &>(device).m_in_pc_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<i8155_device &>(device).m_out_pa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<i8155_device &>(device).m_out_pb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pc_callback(device_t &device, _Object object) { return downcast<i8155_device &>(device).m_out_pc_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_to_callback(device_t &device, _Object object) { return downcast<i8155_device &>(device).m_out_to_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_in_pa_callback(device_t &device, Object &&cb)  { return downcast<i8155_device &>(device).m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_pb_callback(device_t &device, Object &&cb)  { return downcast<i8155_device &>(device).m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_pc_callback(device_t &device, Object &&cb)  { return downcast<i8155_device &>(device).m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_pa_callback(device_t &device, Object &&cb) { return downcast<i8155_device &>(device).m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_pb_callback(device_t &device, Object &&cb) { return downcast<i8155_device &>(device).m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_pc_callback(device_t &device, Object &&cb) { return downcast<i8155_device &>(device).m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_to_callback(device_t &device, Object &&cb) { return downcast<i8155_device &>(device).m_out_to_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
@@ -100,7 +100,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 
 	inline uint8_t get_timer_mode();
 	inline void timer_output();
@@ -145,7 +145,7 @@ private:
 
 
 // device type definition
-extern const device_type I8155;
+DECLARE_DEVICE_TYPE(I8155, i8155_device)
 extern const device_type I8156;
 
 

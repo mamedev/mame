@@ -230,8 +230,8 @@ public: // HACK FOR MC6845
 	optional_device<mc146818_device> m_rtc;
 	optional_device<bbc_fdc_slot_device> m_fdc;
 	optional_device<i8271_device> m_i8271;
-	optional_device<wd1770_t> m_wd1770;
-	optional_device<wd1772_t> m_wd1772;
+	optional_device<wd1770_device> m_wd1770;
+	optional_device<wd1772_device> m_wd1772;
 	optional_device<generic_slot_device> m_exp1;
 	optional_device<generic_slot_device> m_exp2;
 	optional_device<generic_slot_device> m_exp3;

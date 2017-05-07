@@ -574,7 +574,7 @@ static SLOT_INTERFACE_START( sun_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( sun3_80, sun3x_state )
+static MACHINE_CONFIG_START( sun3_80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_80_mem)
@@ -621,7 +621,7 @@ static MACHINE_CONFIG_START( sun3_80, sun3x_state )
 	MCFG_SCREEN_REFRESH_RATE(72)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun3_460, sun3x_state )
+static MACHINE_CONFIG_START( sun3_460 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_460_mem)
@@ -690,6 +690,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY         FULLNAME       FLAGS */
-COMP( 198?, sun3_80,   0,       0,   sun3_80,   sun3x, driver_device,     0,  "Sun Microsystems", "Sun 3/80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Hydra
-COMP( 198?, sun3_460,  0,       0,   sun3_460,  sun3x, driver_device,     0,  "Sun Microsystems", "Sun 3/460/470/480", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Pegasus
+//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT  STATE        INIT  COMPANY             FULLNAME             FLAGS
+COMP( 198?, sun3_80,  0,      0,      sun3_80,   sun3x, sun3x_state, 0,    "Sun Microsystems", "Sun 3/80",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Hydra
+COMP( 198?, sun3_460, 0,      0,      sun3_460,  sun3x, sun3x_state, 0,    "Sun Microsystems", "Sun 3/460/470/480", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Pegasus

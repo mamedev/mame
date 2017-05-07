@@ -330,7 +330,7 @@ INTERRUPT_GEN_MEMBER(tankbust_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( tankbust, tankbust_state )
+static MACHINE_CONFIG_START( tankbust )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2)    /* Verified on PCB */
@@ -420,4 +420,4 @@ ROM_START( tankbust )
 ROM_END
 
 
-GAME( 1985, tankbust,    0,       tankbust, tankbust, driver_device,  0, ROT90, "Valadon Automation", "Tank Busters", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tankbust,    0,       tankbust, tankbust, tankbust_state,  0, ROT90, "Valadon Automation", "Tank Busters", MACHINE_SUPPORTS_SAVE )

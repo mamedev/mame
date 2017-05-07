@@ -159,7 +159,7 @@ OSC3: 48.384MHz
 
 #include "emu.h"
 #include "includes/namcofl.h"
-#include "includes/namcoic.h"
+#include "machine/namcoic.h"
 
 #include "cpu/i960/i960.h"
 #include "sound/c352.h"
@@ -577,7 +577,7 @@ MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 }
 
 
-static MACHINE_CONFIG_START( namcofl, namcofl_state )
+static MACHINE_CONFIG_START( namcofl )
 	MCFG_CPU_ADD("maincpu", I960, 20000000) // i80960KA-20 == 20 MHz part
 	MCFG_CPU_PROGRAM_MAP(namcofl_mem)
 

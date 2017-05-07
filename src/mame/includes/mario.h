@@ -82,10 +82,10 @@ public:
 #if OLD_SOUND
 	optional_device<discrete_device> m_discrete;
 #else
-	optional_device<netlist_mame_logic_input_t> m_audio_snd0;
-	optional_device<netlist_mame_logic_input_t> m_audio_snd1;
-	optional_device<netlist_mame_logic_input_t> m_audio_snd7;
-	optional_device<netlist_mame_int_input_t> m_audio_dac;
+	optional_device<netlist_mame_logic_input_device> m_audio_snd0;
+	optional_device<netlist_mame_logic_input_device> m_audio_snd1;
+	optional_device<netlist_mame_logic_input_device> m_audio_snd7;
+	optional_device<netlist_mame_int_input_device> m_audio_dac;
 #endif
 
 	/* memory pointers */

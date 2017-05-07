@@ -253,7 +253,7 @@ void dday_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( dday, dday_state )
+static MACHINE_CONFIG_START( dday )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)     /* 2 MHz ? */

@@ -371,7 +371,7 @@ PALETTE_INIT_MEMBER(bingoman_state, bingoman)
 {
 }
 
-static MACHINE_CONFIG_START( bingoman, bingoman_state )
+static MACHINE_CONFIG_START( bingoman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83002, XTAL_20MHz) /* TODO: correct CPU type */
@@ -465,5 +465,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT  ROT    COMPANY          FULLNAME                    FLAGS   */
-GAME( 1993, bingoman,  0,        bingoman,  bingoman, driver_device,  0,    ROT0, "HP Automaten",  "Bingo Mania (P03-P07-P14)", MACHINE_IS_SKELETON )
-GAME( 1993, bingomana, bingoman, bingoman,  bingoman, driver_device,  0,    ROT0, "HP Automaten",  "Bingo Mania (A03)",         MACHINE_IS_SKELETON )
+GAME( 1993, bingoman,  0,        bingoman,  bingoman, bingoman_state, 0,    ROT0, "HP Automaten",  "Bingo Mania (P03-P07-P14)", MACHINE_IS_SKELETON )
+GAME( 1993, bingomana, bingoman, bingoman,  bingoman, bingoman_state, 0,    ROT0, "HP Automaten",  "Bingo Mania (A03)",         MACHINE_IS_SKELETON )

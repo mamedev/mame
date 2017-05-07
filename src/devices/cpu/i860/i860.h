@@ -10,39 +10,15 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_I860_I860_H
+#define MAME_CPU_I860_I860_H
 
-#ifndef __I860_H__
-#define __I860_H__
+#pragma once
 
 
 /***************************************************************************
     REGISTER ENUMERATION
 ***************************************************************************/
-
-enum
-{
-	I860_PC = 1,
-
-	I860_FIR,
-	I860_PSR,
-	I860_DIRBASE,
-	I860_DB,
-	I860_FSR,
-	I860_EPSR,
-
-	I860_R0,  I860_R1,  I860_R2,  I860_R3,  I860_R4,  I860_R5,  I860_R6,  I860_R7,  I860_R8,  I860_R9,
-	I860_R10, I860_R11, I860_R12, I860_R13, I860_R14, I860_R15, I860_R16, I860_R17, I860_R18, I860_R19,
-	I860_R20, I860_R21, I860_R22, I860_R23, I860_R24, I860_R25, I860_R26, I860_R27, I860_R28, I860_R29,
-	I860_R30, I860_R31,
-
-	I860_F0,  I860_F1,  I860_F2,  I860_F3,  I860_F4,  I860_F5,  I860_F6,  I860_F7,  I860_F8,  I860_F9,
-	I860_F10, I860_F11, I860_F12, I860_F13, I860_F14, I860_F15, I860_F16, I860_F17, I860_F18, I860_F19,
-	I860_F20, I860_F21, I860_F22, I860_F23, I860_F24, I860_F25, I860_F26, I860_F27, I860_F28, I860_F29,
-	I860_F30, I860_F31
-
-};
-
 
 class i860_cpu_device : public cpu_device
 {
@@ -62,6 +38,30 @@ public:
 	void reset_i860();
 
 protected:
+	enum
+	{
+		I860_PC = 1,
+
+		I860_FIR,
+		I860_PSR,
+		I860_DIRBASE,
+		I860_DB,
+		I860_FSR,
+		I860_EPSR,
+
+		I860_R0,  I860_R1,  I860_R2,  I860_R3,  I860_R4,  I860_R5,  I860_R6,  I860_R7,  I860_R8,  I860_R9,
+		I860_R10, I860_R11, I860_R12, I860_R13, I860_R14, I860_R15, I860_R16, I860_R17, I860_R18, I860_R19,
+		I860_R20, I860_R21, I860_R22, I860_R23, I860_R24, I860_R25, I860_R26, I860_R27, I860_R28, I860_R29,
+		I860_R30, I860_R31,
+
+		I860_F0,  I860_F1,  I860_F2,  I860_F3,  I860_F4,  I860_F5,  I860_F6,  I860_F7,  I860_F8,  I860_F9,
+		I860_F10, I860_F11, I860_F12, I860_F13, I860_F14, I860_F15, I860_F16, I860_F17, I860_F18, I860_F19,
+		I860_F20, I860_F21, I860_F22, I860_F23, I860_F24, I860_F25, I860_F26, I860_F27, I860_F28, I860_F29,
+		I860_F30, I860_F31
+
+	};
+
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -307,7 +307,6 @@ enum {
 };
 
 
-extern const device_type I860;
+DECLARE_DEVICE_TYPE(I860, i860_cpu_device)
 
-
-#endif /* __I860_H__ */
+#endif // MAME_CPU_I860_I860_H

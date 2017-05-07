@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_COMX35_FD_H
+#define MAME_BUS_COMX35_FD_H
 
-#ifndef __COMX_FD__
-#define __COMX_FD__
+#pragma once
 
 #include "exp.h"
 #include "formats/comx35_dsk.h"
@@ -50,7 +50,7 @@ protected:
 
 private:
 	// internal state
-	required_device<wd1770_t> m_fdc;
+	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_memory_region m_rom;
@@ -63,7 +63,7 @@ private:
 
 
 // device type definition
-extern const device_type COMX_FD;
+DECLARE_DEVICE_TYPE(COMX_FD, comx_fd_device)
 
 
-#endif
+#endif // MAME_BUS_COMX35_FD_H

@@ -379,7 +379,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 }
 
 /* Machine Drivers */
-static MACHINE_CONFIG_START( pv2000, pv2000_state )
+static MACHINE_CONFIG_START( pv2000 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2) // 3.579545 MHz
@@ -426,5 +426,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT     INIT COMPANY   FULLNAME    FLAGS
-CONS( 1983, pv2000,  0,      0,      pv2000,  pv2000, driver_device,   0,   "Casio",  "PV-2000",  MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE           INIT COMPANY   FULLNAME    FLAGS
+CONS( 1983, pv2000,  0,      0,      pv2000,  pv2000, pv2000_state,   0,   "Casio",  "PV-2000",  MACHINE_NOT_WORKING )

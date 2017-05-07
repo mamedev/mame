@@ -59,7 +59,7 @@
 
 #define LOG_SAM     0
 
-const device_type SAM6883 = device_creator<sam6883_device>;
+DEFINE_DEVICE_TYPE(SAM6883, sam6883_device, "sam6883", "MC6883 SAM")
 
 
 
@@ -72,7 +72,7 @@ const device_type SAM6883 = device_creator<sam6883_device>;
 //-------------------------------------------------
 
 sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SAM6883, "SAM6883", tag, owner, clock, "sam6883", __FILE__),
+	: device_t(mconfig, SAM6883, tag, owner, clock),
 		m_cpu_tag(nullptr),
 		m_cpu_space_ref(AS_PROGRAM),
 		m_read_res(*this),

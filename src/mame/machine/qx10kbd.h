@@ -3,7 +3,11 @@
 #ifndef MAME_MACHINE_QX10KBD_H
 #define MAME_MACHINE_QX10KBD_H
 
-#include "bus/rs232/keyboard.h"
+#pragma once
+
+#include "bus/rs232/rs232.h"
+#include "machine/keyboard.h"
+
 
 class qx10_keyboard_device : public buffered_rs232_device<16U>, protected device_matrix_keyboard_interface<16U>
 {
@@ -20,6 +24,6 @@ private:
 	virtual void received_byte(uint8_t data) override;
 };
 
-extern const device_type QX10_KEYBOARD;
+DECLARE_DEVICE_TYPE(QX10_KEYBOARD, qx10_keyboard_device)
 
 #endif // MAME_MACHINE_QX10KBD_H

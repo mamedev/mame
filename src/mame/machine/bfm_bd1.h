@@ -1,21 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_MACHINE_BFM_BD1_H
+#define MAME_MACHINE_BFM_BD1_H
+
 #pragma once
-#ifndef BFM_BD1_H
-#define BFM_BD1_H
+
 
 #define MCFG_BFMBD1_ADD(_tag,_val) \
 		MCFG_DEVICE_ADD(_tag, BFM_BD1,60)\
 		MCFG_BD1_PORT(_val)
 #define MCFG_BD1_PORT(_val) \
-	bfm_bd1_t::static_set_value(*device, _val);
+	bfm_bd1_device::static_set_value(*device, _val);
 #define MCFG_BFMBD1_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
-class bfm_bd1_t : public device_t
+class bfm_bd1_device : public device_t
 {
 public:
-	bfm_bd1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bfm_bd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
 	static void static_set_value(device_t &device, int val);
@@ -65,5 +67,6 @@ protected:
 
 };
 
-extern const device_type BFM_BD1;
-#endif
+DECLARE_DEVICE_TYPE(BFM_BD1, bfm_bd1_device)
+
+#endif // MAME_MACHINE_BFM_BD1_H

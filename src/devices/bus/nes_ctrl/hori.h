@@ -6,13 +6,13 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_NES_CTRL_HORI_H
+#define MAME_BUS_NES_CTRL_HORI_H
+
 #pragma once
 
-#ifndef __NES_HORI__
-#define __NES_HORI__
-
-
 #include "ctrl.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -31,7 +31,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override {}
+	virtual void device_start() override { }
 
 	virtual uint8_t read_exp(offs_t offset) override;
 	virtual void write(uint8_t data) override;
@@ -55,7 +55,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override {}
+	virtual void device_start() override { }
 
 	virtual uint8_t read_exp(offs_t offset) override;
 	virtual void write(uint8_t data) override;
@@ -70,8 +70,8 @@ private:
 
 
 // device type definition
-extern const device_type NES_HORITWIN;
-extern const device_type NES_HORI4P;
+DECLARE_DEVICE_TYPE(NES_HORITWIN, nes_horitwin_device)
+DECLARE_DEVICE_TYPE(NES_HORI4P,   nes_hori4p_device)
 
 
-#endif
+#endif // MAME_BUS_NES_CTRL_HORI_H

@@ -11,18 +11,20 @@
 
 *****************************************************************************/
 
-#ifndef __DMUX__
-#define __DMUX__
+#ifndef MAME_BUS_TI99X_DATAMUX_H
+#define MAME_BUS_TI99X_DATAMUX_H
+
+#pragma once
 
 #include "ti99defs.h"
 #include "machine/tmc0430.h"
 #include "gromport.h"
-#include "bus/ti99_peb/peribox.h"
+#include "bus/ti99/peb/peribox.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "machine/ram.h"
 
-extern const device_type DATAMUX;
+DECLARE_DEVICE_TYPE(TI99_DATAMUX, ti99_datamux_device)
 
 /*
     Main class
@@ -41,9 +43,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( gromclk_in );
 
-	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &static_set_ready_callback(device_t &device, Object &&cb)
 	{
-		return downcast<ti99_datamux_device &>(device).m_ready.set_callback(object);
+		return downcast<ti99_datamux_device &>(device).m_ready.set_callback(std::forward<Object>(cb));
 	}
 
 protected:
@@ -65,7 +67,7 @@ private:
 	required_device<peribox_device> m_peb;
 
 	// Link to the cartridge port (aka GROM port)
-	required_device<gromport_device> m_gromport;
+	required_device<ti99_gromport_device> m_gromport;
 
 	// Memory expansion (internal, 16 bit)
 	required_device<ram_device> m_ram16b;
@@ -137,4 +139,4 @@ private:
 #define MCFG_DMUX_READY_HANDLER( _intcallb ) \
 	devcb = &ti99_datamux_device::static_set_ready_callback( *device, DEVCB_##_intcallb );
 
-#endif
+#endif // MAME_BUS_TI99X_DATAMUX_H

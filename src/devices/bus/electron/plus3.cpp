@@ -24,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ELECTRON_PLUS3 = device_creator<electron_plus3_device>;
+DEFINE_DEVICE_TYPE(ELECTRON_PLUS3, electron_plus3_device, "electron_plus3", "Acorn Plus 3 Disc Expansion")
 
 
 //-------------------------------------------------
@@ -102,12 +102,12 @@ const tiny_rom_entry *electron_plus3_device::device_rom_region() const
 //-------------------------------------------------
 
 electron_plus3_device::electron_plus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELECTRON_PLUS3, "Acorn Plus 3 Disc Expansion", tag, owner, clock, "electron_plus3", __FILE__),
-		device_electron_expansion_interface(mconfig, *this),
-		m_exp_rom(*this, "exp_rom"),
-		m_fdc(*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1")
+	: device_t(mconfig, ELECTRON_PLUS3, tag, owner, clock)
+	, device_electron_expansion_interface(mconfig, *this)
+	, m_exp_rom(*this, "exp_rom")
+	, m_fdc(*this, "fdc")
+	, m_floppy0(*this, "fdc:0")
+	, m_floppy1(*this, "fdc:1")
 {
 }
 
@@ -121,7 +121,7 @@ void electron_plus3_device::device_start()
 	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
 
 	space.install_readwrite_handler(0xfcc0, 0xfcc0, READ8_DELEGATE(electron_plus3_device, wd1770_status_r), WRITE8_DELEGATE(electron_plus3_device, wd1770_status_w));
-	space.install_readwrite_handler(0xfcc4, 0xfcc7, READ8_DEVICE_DELEGATE(m_fdc, wd1770_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_t, write));
+	space.install_readwrite_handler(0xfcc4, 0xfcc7, READ8_DEVICE_DELEGATE(m_fdc, wd1770_device, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_device, write));
 }
 
 //-------------------------------------------------

@@ -8,13 +8,14 @@
 
 #include "emu.h"
 #include "mface2.h"
+
 SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_MFACE2 = device_creator<cpc_multiface2_device>;
+DEFINE_DEVICE_TYPE(CPC_MFACE2, cpc_multiface2_device, "cpc_mface2", "Multiface II")
 
 // device machine config
 static MACHINE_CONFIG_FRAGMENT( cpc_mface2 )
@@ -311,8 +312,9 @@ ioport_constructor cpc_multiface2_device::device_input_ports() const
 //**************************************************************************
 
 cpc_multiface2_device::cpc_multiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CPC_MFACE2, "Multiface II", tag, owner, clock, "cpc_mf2", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr), m_multiface_ram(nullptr), m_multiface_flags(0), m_romdis(0)
+	device_t(mconfig, CPC_MFACE2, tag, owner, clock),
+	device_cpc_expansion_card_interface(mconfig, *this),
+	m_slot(nullptr), m_multiface_ram(nullptr), m_multiface_flags(0), m_romdis(0)
 {
 }
 

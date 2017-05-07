@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PRINTER_INTERFACE = device_creator<printer_interface_device>;
+DEFINE_DEVICE_TYPE(VTECH_PRINTER_INTERFACE, vtech_printer_interface_device, "vtech_printer", "Laser/VZ Printer Interface")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -26,11 +26,11 @@ const device_type PRINTER_INTERFACE = device_creator<printer_interface_device>;
 
 static MACHINE_CONFIG_FRAGMENT( printer_interface )
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(printer_interface_device, busy_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(vtech_printer_interface_device, busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("latch", "centronics")
 MACHINE_CONFIG_END
 
-machine_config_constructor printer_interface_device::device_mconfig_additions() const
+machine_config_constructor vtech_printer_interface_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( printer_interface );
 }
@@ -41,12 +41,12 @@ machine_config_constructor printer_interface_device::device_mconfig_additions() 
 //**************************************************************************
 
 //-------------------------------------------------
-//  printer_interface_device - constructor
+//  vtech_printer_interface_device - constructor
 //-------------------------------------------------
 
-printer_interface_device::printer_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PRINTER_INTERFACE, "Laser/VZ Printer Interface", tag, owner, clock, "printer", __FILE__),
-	device_ioexp_interface(mconfig, *this),
+vtech_printer_interface_device::vtech_printer_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VTECH_PRINTER_INTERFACE, tag, owner, clock),
+	device_vtech_ioexp_interface(mconfig, *this),
 	m_centronics(*this, "centronics"),
 	m_latch(*this, "latch"),
 	m_centronics_busy(0)
@@ -57,7 +57,7 @@ printer_interface_device::printer_interface_device(const machine_config &mconfig
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void printer_interface_device::device_start()
+void vtech_printer_interface_device::device_start()
 {
 }
 
@@ -65,11 +65,11 @@ void printer_interface_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void printer_interface_device::device_reset()
+void vtech_printer_interface_device::device_reset()
 {
-	m_slot->m_io->install_read_handler(0x00, 0x00, read8_delegate(FUNC(printer_interface_device::busy_r), this));
-	m_slot->m_io->install_write_handler(0x0d, 0x0d, write8_delegate(FUNC(printer_interface_device::strobe_w), this));
-	m_slot->m_io->install_write_handler(0x0e, 0x0e, write8_delegate(FUNC(output_latch_device::write), m_latch.target()));
+	io_space().install_read_handler(0x00, 0x00, read8_delegate(FUNC(vtech_printer_interface_device::busy_r), this));
+	io_space().install_write_handler(0x0d, 0x0d, write8_delegate(FUNC(vtech_printer_interface_device::strobe_w), this));
+	io_space().install_write_handler(0x0e, 0x0e, write8_delegate(FUNC(output_latch_device::write), m_latch.target()));
 }
 
 
@@ -77,17 +77,17 @@ void printer_interface_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( printer_interface_device::busy_w )
+WRITE_LINE_MEMBER( vtech_printer_interface_device::busy_w )
 {
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( printer_interface_device::busy_r )
+READ8_MEMBER( vtech_printer_interface_device::busy_r )
 {
 	return 0xfe | m_centronics_busy;
 }
 
-WRITE8_MEMBER( printer_interface_device::strobe_w )
+WRITE8_MEMBER( vtech_printer_interface_device::strobe_w )
 {
 	m_centronics->write_strobe(1);
 	m_centronics->write_strobe(0);

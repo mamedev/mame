@@ -12,7 +12,113 @@
 #define LOG_NILE_TARGET     (0)
 #define PRINTF_SERIAL       (0)
 
-const device_type VRC5074      = device_creator<vrc5074_device>;
+/* NILE 4 registers 0x000-0x0ff */
+#define NREG_SDRAM0         (0x000/4)
+#define NREG_SDRAM1         (0x008/4)
+#define NREG_DCS2           (0x010/4)   /* SIO misc */
+#define NREG_DCS3           (0x018/4)   /* ADC */
+#define NREG_DCS4           (0x020/4)   /* CMOS */
+#define NREG_DCS5           (0x028/4)   /* SIO */
+#define NREG_DCS6           (0x030/4)   /* IOASIC */
+#define NREG_DCS7           (0x038/4)   /* ethernet */
+#define NREG_DCS8           (0x040/4)
+#define NREG_PCIW0          (0x060/4)
+#define NREG_PCIW1          (0x068/4)
+#define NREG_INTCS          (0x070/4)
+#define NREG_BOOTCS         (0x078/4)
+#define NREG_CPUSTAT        (0x080/4)
+#define NREG_INTCTRL        (0x088/4)
+#define NREG_INTSTAT0       (0x090/4)
+#define NREG_INTSTAT1       (0x098/4)
+#define NREG_INTCLR         (0x0A0/4)
+#define NREG_INTPPES        (0x0A8/4)
+#define NREG_PCIERR         (0x0B8/4)
+#define NREG_MEMCTRL        (0x0C0/4)
+#define NREG_ACSTIME        (0x0C8/4)
+#define NREG_CHKERR         (0x0D0/4)
+#define NREG_PCICTRL        (0x0E0/4)
+#define NREG_PCIARB         (0x0E8/4)
+#define NREG_PCIINIT0       (0x0F0/4)
+#define NREG_PCIINIT1       (0x0F8/4)
+
+/* NILE 4 registers 0x100-0x1ff */
+#define NREG_LCNFG          (0x100/4)
+#define NREG_LCST2          (0x110/4)
+#define NREG_LCST3          (0x118/4)
+#define NREG_LCST4          (0x120/4)
+#define NREG_LCST5          (0x128/4)
+#define NREG_LCST6          (0x130/4)
+#define NREG_LCST7          (0x138/4)
+#define NREG_LCST8          (0x140/4)
+#define NREG_DCSFN          (0x150/4)
+#define NREG_DCSIO          (0x158/4)
+#define NREG_BCST           (0x178/4)
+#define NREG_DMACTRL0       (0x180/4)
+#define NREG_DMASRCA0       (0x188/4)
+#define NREG_DMADESA0       (0x190/4)
+#define NREG_DMACTRL1       (0x198/4)
+#define NREG_DMASRCA1       (0x1A0/4)
+#define NREG_DMADESA1       (0x1A8/4)
+#define NREG_T0CTRL         (0x1C0/4)
+#define NREG_T0CNTR         (0x1C8/4)
+#define NREG_T1CTRL         (0x1D0/4)
+#define NREG_T1CNTR         (0x1D8/4)
+#define NREG_T2CTRL         (0x1E0/4)
+#define NREG_T2CNTR         (0x1E8/4)
+#define NREG_T3CTRL         (0x1F0/4)
+#define NREG_T3CNTR         (0x1F8/4)
+
+/* NILE 4 registers 0x300-0x3ff */
+#define NREG_UARTRBR        (0x00/4)
+#define NREG_UARTTHR        (0x00/4)
+#define NREG_UARTIER        (0x08/4)
+#define NREG_UARTDLL        (0x00/4)
+#define NREG_UARTDLM        (0x08/4)
+#define NREG_UARTIIR        (0x10/4)
+#define NREG_UARTFCR        (0x10/4)
+#define NREG_UARTLCR        (0x18/4)
+#define NREG_UARTMCR        (0x20/4)
+#define NREG_UARTLSR        (0x28/4)
+#define NREG_UARTMSR        (0x30/4)
+#define NREG_UARTSCR        (0x38/4)
+
+/* NILE 4 interrupts */
+#define NINT_CPCE           (0)
+#define NINT_CNTD           (1)
+#define NINT_MCE            (2)
+#define NINT_DMA            (3)
+#define NINT_UART           (4)
+#define NINT_WDOG           (5)
+#define NINT_GPT            (6)
+#define NINT_LBRTD          (7)
+#define NINT_INTA           (8)
+#define NINT_INTB           (9)
+#define NINT_INTC           (10)
+#define NINT_INTD           (11)
+#define NINT_INTE           (12)
+#define NINT_RESV           (13)
+#define NINT_PCIS           (14)
+#define NINT_PCIE           (15)
+
+#define TIMER_PERIOD        attotime::from_hz(SYSTEM_CLOCK)
+
+#define PCI_BUS_CLOCK        33000000
+// Number of dma words to transfer at a time, real hardware bursts 8
+#define DMA_BURST_SIZE       128
+#define DMA_TIMER_PERIOD     attotime::from_hz(PCI_BUS_CLOCK / 32)
+
+#define DMA_BUSY                0x80000000
+#define DMA_INTEN               0x40000000
+#define DMA_INTVLD              0x20000000
+#define DMA_GO                  0x10000000
+#define DMA_SUS                 0x08000000
+#define DMA_DSTINC              0x04000000
+#define DMA_SRCINC              0x02000000
+#define DMA_RST                 0x01000000
+#define DMA_BLK_SIZE            0x000fffff
+
+
+DEFINE_DEVICE_TYPE(VRC5074, vrc5074_device, "vrc5074", "NEC VRC5074 System Controller")
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, vrc5074_device)
 	AM_RANGE(0x00000018, 0x00000027) AM_READWRITE(sdram_addr_r, sdram_addr_w)
@@ -34,7 +140,7 @@ DEVICE_ADDRESS_MAP_START(target1_map, 32, vrc5074_device)
 ADDRESS_MAP_END
 
 vrc5074_device::vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, VRC5074, "NEC VRC5074 System Controller", tag, owner, clock, "vrc5074", __FILE__),
+	: pci_host_device(mconfig, VRC5074, tag, owner, clock),
 		m_cpu_space(nullptr), m_cpu(nullptr), cpu_tag(nullptr),
 		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
 		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32),

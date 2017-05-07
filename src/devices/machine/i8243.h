@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_I8243_H
+#define MAME_MACHINE_I8243_H
 
-#ifndef __I8243_H__
-#define __I8243_H__
+#pragma once
 
 
 
@@ -41,8 +41,8 @@ public:
 	i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_handler(device_t &device, _Object object) { return downcast<i8243_device &>(device).m_readhandler.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_handler(device_t &device, _Object object) { return downcast<i8243_device &>(device).m_writehandler.set_callback(object); }
+	template <class Object> static devcb_base &set_read_handler(device_t &device, Object &&cb) { return downcast<i8243_device &>(device).m_readhandler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_handler(device_t &device, Object &&cb) { return downcast<i8243_device &>(device).m_writehandler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_WRITE8_MEMBER(p2_w);
@@ -70,6 +70,6 @@ private:
 
 
 // device type definition
-extern const device_type I8243;
+DECLARE_DEVICE_TYPE(I8243, i8243_device)
 
-#endif  /* __I8243_H__ */
+#endif /* __I8243_H__ */

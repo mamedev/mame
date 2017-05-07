@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_KB = device_creator<adam_keyboard_device>;
+DEFINE_DEVICE_TYPE(ADAM_KB, adam_keyboard_device, "adam_kb", "Adam keyboard")
 
 
 //-------------------------------------------------
@@ -224,7 +224,7 @@ ioport_constructor adam_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 adam_keyboard_device::adam_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ADAM_KB, "Adam keyboard", tag, owner, clock, "adam_kb", __FILE__),
+	device_t(mconfig, ADAM_KB, tag, owner, clock),
 	device_adamnet_card_interface(mconfig, *this),
 	m_maincpu(*this, M6801_TAG),
 	m_y(*this, "Y%u", 0),

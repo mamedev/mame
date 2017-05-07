@@ -39,11 +39,11 @@ enum
 static const int div_tab[4] = { 1, 4, 8, 16 };
 
 
-const device_type MC68HC11 = device_creator<mc68hc11_cpu_device>;
+DEFINE_DEVICE_TYPE(MC68HC11, mc68hc11_cpu_device, "mc68hc11", "MC68HC11")
 
 
 mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, MC68HC11, "MC68HC11", tag, owner, clock, "mc68hc11", __FILE__)
+	: cpu_device(mconfig, MC68HC11, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0 )
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
 	/* defaults it to the HC11M0 version for now (I might strip this down on a later date) */

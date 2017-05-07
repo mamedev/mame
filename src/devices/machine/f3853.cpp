@@ -25,13 +25,6 @@
 #include "emu.h"
 #include "f3853.h"
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-#define INTERRUPT_VECTOR(external) ( external ? m_low | ( m_high << 8 ) | 0x80 \
-: ( m_low | ( m_high << 8 ) ) & ~0x80 )
-
 
 
 /***************************************************************************
@@ -43,14 +36,14 @@
 //**************************************************************************
 
 // device type definition
-const device_type F3853 = device_creator<f3853_device>;
+DEFINE_DEVICE_TYPE(F3853, f3853_device, "f3853_device", "F3853")
 
 //-------------------------------------------------
 //  f3853_device - constructor
 //-------------------------------------------------
 
 f3853_device::f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, F3853, "F3853", tag, owner, clock, "f3853", __FILE__)
+	: device_t(mconfig, F3853, tag, owner, clock)
 {
 }
 
@@ -113,9 +106,9 @@ void f3853_device::set_interrupt_request_line()
 		return;
 
 	if (m_external_enable && !m_priority_line)
-		m_interrupt_req_cb(INTERRUPT_VECTOR(true), true);
+		m_interrupt_req_cb(external_interrupt_vector(), true);
 	else if (m_timer_enable && !m_priority_line && m_request_flipflop)
-		m_interrupt_req_cb(INTERRUPT_VECTOR(false), true);
+		m_interrupt_req_cb(timer_interrupt_vector(), true);
 	else
 		m_interrupt_req_cb(0, false);
 }

@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "bus/isa/isa_cards.h"
 #include "bus/lpci/pci.h"
 #include "bus/lpci/i82371ab.h"
 #include "bus/lpci/i82371sb.h"
@@ -44,7 +45,7 @@ static ADDRESS_MAP_START( at586_io, AS_IO, 32, at586_state )
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( at586, at586_state )
+static MACHINE_CONFIG_START( at586 )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
 	MCFG_CPU_PROGRAM_MAP(at586_map)
 	MCFG_CPU_IO_MAP(at586_io)
@@ -69,7 +70,7 @@ static MACHINE_CONFIG_START( at586, at586_state )
 	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( at586x3, at586_state )
+static MACHINE_CONFIG_START( at586x3 )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
 	MCFG_CPU_PROGRAM_MAP(at586_map)
 	MCFG_CPU_IO_MAP(at586_io)
@@ -129,6 +130,6 @@ ROM_START( ficvt503 )
 	ROMX_LOAD("115gk140.awd", 0x20000, 0x20000, CRC(65e88956) SHA1(f94bb0732e00b5b0f18f4e349db24a289f8379c5), ROM_BIOS(5))
 ROM_END
 
-COMP ( 1990, at586,    ibm5170, 0,       at586,     0, driver_device,   0,  "<generic>",  "PC/AT 586 (PIIX4)", MACHINE_NOT_WORKING )
-COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   0, driver_device,   0,  "<generic>",  "PC/AT 586 (PIIX3)", MACHINE_NOT_WORKING )
-COMP ( 1997, ficvt503, ibm5170, 0,       at586,     0, driver_device,   0,  "FIC", "VT-503",                   MACHINE_NOT_WORKING )
+COMP ( 1990, at586,    ibm5170, 0,       at586,     0, at586_state,   0,  "<generic>",  "PC/AT 586 (PIIX4)", MACHINE_NOT_WORKING )
+COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   0, at586_state,   0,  "<generic>",  "PC/AT 586 (PIIX3)", MACHINE_NOT_WORKING )
+COMP ( 1997, ficvt503, ibm5170, 0,       at586,     0, at586_state,   0,  "FIC",        "VT-503",            MACHINE_NOT_WORKING )

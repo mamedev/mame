@@ -89,7 +89,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_PCXPORTER = device_creator<a2bus_pcxporter_device>;
+DEFINE_DEVICE_TYPE(A2BUS_PCXPORTER, a2bus_pcxporter_device, "a2pcxport", "Applied Engineering PC Transporter")
 
 static ADDRESS_MAP_START( pc_map, AS_PROGRAM, 16, a2bus_pcxporter_device )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -183,8 +183,8 @@ machine_config_constructor a2bus_pcxporter_device::device_mconfig_additions() co
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_v30(*this, "v30"),
 	m_pic8259(*this, "pic8259"),
@@ -197,15 +197,7 @@ a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, de
 }
 
 a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_PCXPORTER, "Applied Engineering PC Transporter", tag, owner, clock, "a2pcxport", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_v30(*this, "v30"),
-	m_pic8259(*this, "pic8259"),
-	m_dma8237(*this, "dma8237"),
-	m_pit8253(*this, "pit8253"),
-	m_speaker(*this, "speaker"),
-	m_isabus(*this, "isa"),
-	m_pc_kbdc(*this, "pc_kbdc")
+	a2bus_pcxporter_device(mconfig, A2BUS_PCXPORTER, tag, owner, clock)
 {
 }
 

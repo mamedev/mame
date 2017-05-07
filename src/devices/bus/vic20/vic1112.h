@@ -8,10 +8,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VIC20_VIC1112_H
+#define MAME_BUS_VIC20_VIC1112_H
 
-#ifndef __VIC1112__
-#define __VIC1112__
+#pragma once
 
 #include "exp.h"
 #include "bus/ieee488/ieee488.h"
@@ -64,8 +64,6 @@ private:
 
 
 // device type definition
-extern const device_type VIC1112;
+DECLARE_DEVICE_TYPE(VIC1112, vic1112_device)
 
-
-
-#endif
+#endif // MAME_BUS_VIC20_VIC1112_H

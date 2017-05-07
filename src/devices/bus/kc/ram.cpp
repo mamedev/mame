@@ -27,12 +27,12 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type KC_M011 = device_creator<kc_m011_device>;
-const device_type KC_M022 = device_creator<kc_m022_device>;
-const device_type KC_M032 = device_creator<kc_m032_device>;
-const device_type KC_M034 = device_creator<kc_m034_device>;
-const device_type KC_M035 = device_creator<kc_m035_device>;
-const device_type KC_M036 = device_creator<kc_m036_device>;
+DEFINE_DEVICE_TYPE(KC_M011, kc_m011_device, "kc_m011", "M011 64KB RAM")
+DEFINE_DEVICE_TYPE(KC_M022, kc_m022_device, "kc_m022", "M022 16KB RAM")
+DEFINE_DEVICE_TYPE(KC_M032, kc_m032_device, "kc_m032", "M032 256KB segmented RAM")
+DEFINE_DEVICE_TYPE(KC_M034, kc_m034_device, "kc_m034", "M034 512KB segmented RAM")
+DEFINE_DEVICE_TYPE(KC_M035, kc_m035_device, "kc_m035", "M035 1MB segmented RAM")
+DEFINE_DEVICE_TYPE(KC_M036, kc_m036_device, "kc_m036", "M036 128KB segmented RAM")
 
 //**************************************************************************
 //  M011 64KB RAM
@@ -43,14 +43,14 @@ const device_type KC_M036 = device_creator<kc_m036_device>;
 //-------------------------------------------------
 
 kc_m011_device::kc_m011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, KC_M011, "M011 64KB RAM", tag, owner, clock, "kc_m011", __FILE__),
-		device_kcexp_interface( mconfig, *this ), m_slot(nullptr), m_mei(0), m_ram(nullptr), m_enabled(0), m_write_enabled(0), m_base(0), m_segment(0)
-	{
+	: kc_m011_device(mconfig, KC_M011, tag, owner, clock)
+{
 }
 
-kc_m011_device::kc_m011_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_kcexp_interface( mconfig, *this ), m_slot(nullptr), m_mei(0), m_ram(nullptr), m_enabled(0), m_write_enabled(0), m_base(0), m_segment(0)
+kc_m011_device::kc_m011_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_kcexp_interface(mconfig, *this)
+	, m_slot(nullptr), m_mei(0), m_ram(nullptr), m_enabled(0), m_write_enabled(0), m_base(0), m_segment(0)
 {
 }
 
@@ -148,7 +148,7 @@ WRITE_LINE_MEMBER( kc_m011_device::mei_w )
 //-------------------------------------------------
 
 kc_m022_device::kc_m022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: kc_m011_device(mconfig, KC_M022, "M022 16KB RAM", tag, owner, clock, "kc_m022", __FILE__)
+	: kc_m011_device(mconfig, KC_M022, tag, owner, clock)
 {
 }
 
@@ -193,7 +193,7 @@ void kc_m022_device::write(offs_t offset, uint8_t data)
 //-------------------------------------------------
 
 kc_m032_device::kc_m032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: kc_m011_device(mconfig, KC_M032, "M032 256KB segmented RAM", tag, owner, clock, "kc_m032", __FILE__)
+	: kc_m011_device(mconfig, KC_M032, tag, owner, clock)
 {
 }
 
@@ -262,7 +262,7 @@ void kc_m032_device::write(offs_t offset, uint8_t data)
 //-------------------------------------------------
 
 kc_m034_device::kc_m034_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: kc_m011_device(mconfig, KC_M034, "M034 512KB segmented RAM", tag, owner, clock, "kc_m034", __FILE__)
+	: kc_m011_device(mconfig, KC_M034, tag, owner, clock)
 {
 }
 
@@ -331,7 +331,7 @@ void kc_m034_device::write(offs_t offset, uint8_t data)
 //-------------------------------------------------
 
 kc_m035_device::kc_m035_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: kc_m011_device(mconfig, KC_M035, "M035 1MB segmented RAM", tag, owner, clock, "kc_m035", __FILE__)
+	: kc_m011_device(mconfig, KC_M035, tag, owner, clock)
 {
 }
 
@@ -389,7 +389,7 @@ void kc_m035_device::write(offs_t offset, uint8_t data)
 //-------------------------------------------------
 
 kc_m036_device::kc_m036_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: kc_m011_device(mconfig, KC_M036, "M036 128KB segmented RAM", tag, owner, clock, "kc_m036", __FILE__)
+	: kc_m011_device(mconfig, KC_M036, tag, owner, clock)
 {
 }
 

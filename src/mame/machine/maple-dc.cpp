@@ -5,7 +5,7 @@
 #include "maple-dc.h"
 #include "mie.h"
 
-const device_type MAPLE_DC = device_creator<maple_dc_device>;
+DEFINE_DEVICE_TYPE(MAPLE_DC, maple_dc_device, "maple_dc", "Dreamcast Maple Bus")
 
 DEVICE_ADDRESS_MAP_START(amap, 32, maple_dc_device)
 	AM_RANGE(0x04, 0x07) AM_READWRITE(sb_mdstar_r, sb_mdstar_w)
@@ -29,7 +29,7 @@ void maple_dc_device::static_set_irq_cb(device_t &device, void (*irq_cb)(running
 }
 
 maple_dc_device::maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MAPLE_DC, "Dreamcast Maple Bus", tag, owner, clock, "maple_dc", __FILE__)
+	: device_t(mconfig, MAPLE_DC, tag, owner, clock)
 {
 	// Do not move that in device_start or there will be a race
 	// condition with the maple devices call to register_port.

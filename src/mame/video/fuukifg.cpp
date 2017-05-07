@@ -7,10 +7,10 @@
 #include "fuukifg.h"
 #include "screen.h"
 
-const device_type FUUKI_VIDEO = device_creator<fuukivid_device>;
+DEFINE_DEVICE_TYPE(FUUKI_VIDEO, fuukivid_device, "fuukivid", "Fuuki Video")
 
 fuukivid_device::fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, FUUKI_VIDEO, "Fuuki Video", tag, owner, clock, "fuukivid", __FILE__)
+	: device_t(mconfig, FUUKI_VIDEO, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {

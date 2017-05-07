@@ -84,7 +84,7 @@ static INPUT_PORTS_START( globalvr )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( globalvr, globalvr_state )
+static MACHINE_CONFIG_START( globalvr )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 100000000)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(globalvr_map)
@@ -146,15 +146,15 @@ ROM_START( nfsug )
 ROM_END
 
 
-/* OS/Global VR specific Setup Installers */
-GAME( 2002, hyperv2,   0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Hyper V2 (Global VR) Install - 06/12/02", MACHINE_IS_SKELETON )
-GAME( 2001, hyperv2a,  0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Hyper V2 (Global VR) Install - 09/30/01", MACHINE_IS_SKELETON )
-GAME( 2001, gvrxpsys,  0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Global VR XP OS Install - 09/30/01", MACHINE_IS_SKELETON )
-GAME( 2002, gvrxpsup,  0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Global VR XP OS Update/Install - 06/11/02", MACHINE_IS_SKELETON )
+// OS/Global VR specific Setup Installers
+GAME( 2002, hyperv2,   0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Hyper V2 (Global VR) Install - 06/12/02",   MACHINE_IS_SKELETON )
+GAME( 2001, hyperv2a,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Hyper V2 (Global VR) Install - 09/30/01",   MACHINE_IS_SKELETON )
+GAME( 2001, gvrxpsys,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Global VR XP OS Install - 09/30/01",        MACHINE_IS_SKELETON )
+GAME( 2002, gvrxpsup,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Global VR XP OS Update/Install - 06/11/02", MACHINE_IS_SKELETON )
 
-/* Game Installer CDs */
-GAME( 2000, bhead2k,   0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Beach Head 2000 Install - 05/27/03", MACHINE_IS_SKELETON )
-GAME( 2000, bhead2ka,  0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Beach Head 2000 Install - 09/16/01", MACHINE_IS_SKELETON )
-GAME( 2002, bhead2k2,  0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Beach Head 2002 Install - 05/27/03", MACHINE_IS_SKELETON )
-GAME( 2003, bhead2k3,  0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Beach Head 2003 Desert War Install - 05/27/03", MACHINE_IS_SKELETON )
-GAME( 2005, nfsug,     0, globalvr, globalvr, driver_device, 0, ROT0, "Global VR", "Need For Speed: Underground Install (2 Discs) (v1.1)", MACHINE_IS_SKELETON )
+// Game Installer CDs
+GAME( 2000, bhead2k,   0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Beach Head 2000 Install - 05/27/03",                   MACHINE_IS_SKELETON )
+GAME( 2000, bhead2ka,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Beach Head 2000 Install - 09/16/01",                   MACHINE_IS_SKELETON )
+GAME( 2002, bhead2k2,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Beach Head 2002 Install - 05/27/03",                   MACHINE_IS_SKELETON )
+GAME( 2003, bhead2k3,  0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Beach Head 2003 Desert War Install - 05/27/03",        MACHINE_IS_SKELETON )
+GAME( 2005, nfsug,     0, globalvr, globalvr, globalvr_state, 0, ROT0, "Global VR", "Need For Speed: Underground Install (2 Discs) (v1.1)", MACHINE_IS_SKELETON )

@@ -18,8 +18,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type A590 = device_creator<a590_device>;
-const device_type A2091 = device_creator<a2091_device>;
+DEFINE_DEVICE_TYPE(A590,  a590_device,  "a590",  "CBM A590 HD Controller")
+DEFINE_DEVICE_TYPE(A2091, a2091_device, "a2091", "CBM A2091 HD Controller")
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -192,9 +192,8 @@ const tiny_rom_entry *dmac_hdc_device::device_rom_region() const
 //  dmac_hdc_device - constructor
 //-------------------------------------------------
 
-dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type, const char *tag,
-	device_t *owner, uint32_t clock, const char *name, const char *shortname) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_int6(false),
 	m_dmac(*this, "dmac"),
 	m_wdc(*this, "wd33c93")
@@ -202,7 +201,7 @@ dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type
 }
 
 a590_device::a590_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dmac_hdc_device(mconfig, A590, tag, owner, clock, "CBM A590 HD Controller", "a590"),
+	dmac_hdc_device(mconfig, A590, tag, owner, clock),
 	device_exp_card_interface(mconfig, *this),
 	m_dips(*this, "dips"),
 	m_jp1(*this, "jp1"),
@@ -212,7 +211,7 @@ a590_device::a590_device(const machine_config &mconfig, const char *tag, device_
 }
 
 a2091_device::a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dmac_hdc_device(mconfig, A2091, tag, owner, clock, "CBM A2091 HD Controller", "a2091"),
+	dmac_hdc_device(mconfig, A2091, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_jp1(*this, "jp1"),
 	m_jp2(*this, "jp2"),

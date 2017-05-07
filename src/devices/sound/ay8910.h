@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
-#pragma once
+#ifndef MAME_SOUND_AY8910_H
+#define MAME_SOUND_AY8910_H
 
-#ifndef __AY8910_H__
-#define __AY8910_H__
+#pragma once
 
 
 /*
@@ -67,9 +67,6 @@ OKI M5255, Winbond WF19054, JFC 95101, File KC89C72, Toshiba T7766A : difference
 #define YM2149_PIN26_LOW            (0x10)
 
 
-#define AY8910_NUM_CHANNELS 3
-
-
 #define MCFG_AY8910_OUTPUT_TYPE(_flag) \
 	ay8910_device::set_flags(*device, _flag);
 
@@ -101,17 +98,15 @@ public:
 
 	// construction/destruction
 	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner,
-					uint32_t clock, psg_type_t psg_type, int streams, int ioports, const char *shortname, const char *source);
 
 	// static configuration helpers
 	static void set_flags(device_t &device, int flags) { downcast<ay8910_device &>(device).m_flags = flags; }
 	static void set_psg_type(device_t &device, psg_type_t psg_type) { downcast<ay8910_device &>(device).set_type(psg_type); }
 	static void set_resistors_load(device_t &device, int res_load0, int res_load1, int res_load2) { downcast<ay8910_device &>(device).m_res_load[0] = res_load0; downcast<ay8910_device &>(device).m_res_load[1] = res_load1; downcast<ay8910_device &>(device).m_res_load[2] = res_load2; }
-	template<class _Object> static devcb_base &set_port_a_read_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_a_read_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_port_b_read_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_b_read_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_port_a_write_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_a_write_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_port_b_write_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_b_write_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_port_a_read_callback(device_t &device, Object &&cb) { return downcast<ay8910_device &>(device).m_port_a_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port_b_read_callback(device_t &device, Object &&cb) { return downcast<ay8910_device &>(device).m_port_b_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port_a_write_callback(device_t &device, Object &&cb) { return downcast<ay8910_device &>(device).m_port_a_write_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port_b_write_callback(device_t &device, Object &&cb) { return downcast<ay8910_device &>(device).m_port_b_write_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( address_w );
@@ -148,11 +143,16 @@ public:
 		double m_Kn[32];
 	};
 
+	// internal interface for PSG component of YM device
+	// FIXME: these should be private, but vector06 accesses them directly
 	void ay8910_write_ym(int addr, uint8_t data);
 	uint8_t ay8910_read_ym();
 	void ay8910_reset_ym();
 
 protected:
+	ay8910_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner,
+					uint32_t clock, psg_type_t psg_type, int streams, int ioports);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -161,7 +161,15 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
+	// trampolines for callbacks from fm.cpp
+	static void psg_set_clock(device_t *device, int clock) { downcast<ay8910_device *>(device)->ay_set_clock(clock); }
+	static void psg_write(device_t *device, int address, int data) { downcast<ay8910_device *>(device)->ay8910_write_ym(address, data); }
+	static int psg_read(device_t *device) { return downcast<ay8910_device *>(device)->ay8910_read_ym(); }
+	static void psg_reset(device_t *device) { downcast<ay8910_device *>(device)->ay8910_reset_ym(); }
+
 private:
+	static constexpr unsigned NUM_CHANNELS = 3;
+
 	// internal helpers
 	void set_type(psg_type_t psg_type);
 	inline uint16_t mix_3D();
@@ -179,8 +187,8 @@ private:
 	int32_t m_register_latch;
 	uint8_t m_regs[16];
 	int32_t m_last_enable;
-	int32_t m_count[AY8910_NUM_CHANNELS];
-	uint8_t m_output[AY8910_NUM_CHANNELS];
+	int32_t m_count[NUM_CHANNELS];
+	uint8_t m_output[NUM_CHANNELS];
 	uint8_t m_prescale_noise;
 	int32_t m_count_noise;
 	int32_t m_count_env;
@@ -192,11 +200,11 @@ private:
 	/* init parameters ... */
 	int m_step;
 	int m_zero_is_off;
-	uint8_t m_vol_enabled[AY8910_NUM_CHANNELS];
+	uint8_t m_vol_enabled[NUM_CHANNELS];
 	const ay_ym_param *m_par;
 	const ay_ym_param *m_par_env;
-	int32_t m_vol_table[AY8910_NUM_CHANNELS][16];
-	int32_t m_env_table[AY8910_NUM_CHANNELS][32];
+	int32_t m_vol_table[NUM_CHANNELS][16];
+	int32_t m_env_table[NUM_CHANNELS][32];
 	int32_t m_vol3d_table[8*32*32*32];
 	int m_flags;          /* Flags */
 	int m_res_load[3];    /* Load on channel in ohms */
@@ -206,7 +214,7 @@ private:
 	devcb_write8 m_port_b_write_cb;
 };
 
-extern const device_type AY8910;
+DECLARE_DEVICE_TYPE(AY8910, ay8910_device)
 
 class ay8912_device : public ay8910_device
 {
@@ -214,7 +222,7 @@ public:
 	ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type AY8912;
+DECLARE_DEVICE_TYPE(AY8912, ay8912_device)
 
 class ay8913_device : public ay8910_device
 {
@@ -222,7 +230,7 @@ public:
 	ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type AY8913;
+DECLARE_DEVICE_TYPE(AY8913, ay8913_device)
 
 class ay8914_device : public ay8910_device
 {
@@ -234,7 +242,7 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 };
 
-extern const device_type AY8914;
+DECLARE_DEVICE_TYPE(AY8914, ay8914_device)
 
 class ay8930_device : public ay8910_device
 {
@@ -242,7 +250,7 @@ public:
 	ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type AY8930;
+DECLARE_DEVICE_TYPE(AY8930, ay8930_device)
 
 class ym2149_device : public ay8910_device
 {
@@ -250,7 +258,7 @@ public:
 	ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type YM2149;
+DECLARE_DEVICE_TYPE(YM2149, ym2149_device)
 
 class ym3439_device : public ay8910_device
 {
@@ -258,7 +266,7 @@ public:
 	ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type YM3439;
+DECLARE_DEVICE_TYPE(YM3439, ym3439_device)
 
 class ymz284_device : public ay8910_device
 {
@@ -266,7 +274,7 @@ public:
 	ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type YMZ284;
+DECLARE_DEVICE_TYPE(YMZ284, ymz284_device)
 
 class ymz294_device : public ay8910_device
 {
@@ -274,7 +282,7 @@ public:
 	ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type YMZ294;
+DECLARE_DEVICE_TYPE(YMZ294, ymz294_device)
 
 
-#endif /* __AY8910_H__ */
+#endif // MAME_DEVICES_SOUND_AY8910_H

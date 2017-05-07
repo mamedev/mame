@@ -23,8 +23,8 @@
 // - Speed is all wrong
 
 
-const device_type MIE = device_creator<mie_device>;
-const device_type MIE_JVS = device_creator<mie_jvs_device>;
+DEFINE_DEVICE_TYPE(MIE,     mie_device,     "mie",     "Sega 315-6146 MIE")
+DEFINE_DEVICE_TYPE(MIE_JVS, mie_jvs_device, "mie_jvs", "JVS (MIE)")
 
 static ADDRESS_MAP_START( mie_map, AS_PROGRAM, 8, mie_device)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
@@ -88,12 +88,12 @@ machine_config_constructor mie_device::device_mconfig_additions() const
 }
 
 mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: jvs_host(mconfig, MIE_JVS, "JVS (MIE)", tag, owner, clock, "mie_jvs", __FILE__)
+	: jvs_host(mconfig, MIE_JVS, tag, owner, clock)
 {
 }
 
 mie_device::mie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: maple_device(mconfig, MIE, "Sega 315-6146 MIE", tag, owner, clock, "mie", __FILE__)
+	: maple_device(mconfig, MIE, tag, owner, clock)
 {
 	memset(gpio_name, 0, sizeof(gpio_name));
 	jvs_name = nullptr;

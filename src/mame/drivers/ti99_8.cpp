@@ -183,9 +183,9 @@ Known Issues (MZ, 2010-11-07)
 
 #include "bus/ti99x/998board.h"
 #include "bus/ti99x/gromport.h"
-#include "bus/ti99x/joyport.h"
 
-#include "bus/ti99_peb/peribox.h"
+#include "bus/ti99/joyport/joyport.h"
+#include "bus/ti99/peb/peribox.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -221,7 +221,9 @@ public:
 		m_peribox(*this, PERIBOX_TAG),
 		m_mainboard(*this, MAINBOARD8_TAG),
 		m_joyport(*this, JOYPORT_TAG),
-		m_cassette(*this, "cassette") { };
+		m_cassette(*this, "cassette")
+	{
+	}
 
 	// Machine management
 	DECLARE_MACHINE_START(ti99_8);
@@ -273,10 +275,10 @@ private:
 	// Connected devices
 	required_device<tms9995_device>     m_cpu;
 	required_device<tms9901_device>     m_tms9901;
-	required_device<gromport_device>    m_gromport;
+	required_device<ti99_gromport_device> m_gromport;
 	required_device<peribox_device>     m_peribox;
 	required_device<mainboard8_device>  m_mainboard;
-	required_device<joyport_device>     m_joyport;
+	required_device<ti99_joyport_device> m_joyport;
 	required_device<cassette_image_device> m_cassette;
 };
 
@@ -449,7 +451,7 @@ READ8_MEMBER( ti99_8_state::read_by_9901 )
 	uint8_t joyst;
 	switch (offset & 0x03)
 	{
-	case TMS9901_CB_INT7:
+	case tms9901_device::CB_INT7:
 		// Read pins INT3*-INT7* of TI99's 9901.
 		//
 		// bit 1: INT1 status
@@ -475,7 +477,7 @@ READ8_MEMBER( ti99_8_state::read_by_9901 )
 
 		break;
 
-	case TMS9901_INT8_INT15:
+	case tms9901_device::INT8_INT15:
 		// Read pins int8_t*-INT15* of TI99's 9901.
 		//
 		// bit 0-2: keyboard status bits 2 to 4
@@ -497,11 +499,11 @@ READ8_MEMBER( ti99_8_state::read_by_9901 )
 		answer = (answer >> 2) & 0x07;
 		break;
 
-	case TMS9901_P0_P7:
+	case tms9901_device::P0_P7:
 		// Read pins P0-P7 of TI99's 9901. None here.
 		break;
 
-	case TMS9901_P8_P15:
+	case tms9901_device::P8_P15:
 		// Read pins P8-P15 of TI99's 9901. (TI-99/8)
 		//
 		// bit 26: high
@@ -712,7 +714,7 @@ MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
 	m_int2 = CLEAR_LINE;
 }
 
-static MACHINE_CONFIG_START( ti99_8, ti99_8_state )
+static MACHINE_CONFIG_START( ti99_8 )
 	// basic machine hardware */
 	// TMS9995-MP9537 CPU @ 10.7 MHz
 	// MP9537 mask: This variant of the TMS9995 does not contain on-chip RAM
@@ -740,7 +742,7 @@ static MACHINE_CONFIG_START( ti99_8, ti99_8_state )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_8_state, tms9901_interrupt) )
 
 	// Mainboard with custom chips
-	MCFG_DEVICE_ADD(MAINBOARD8_TAG, MAINBOARD8, 0)
+	MCFG_DEVICE_ADD(MAINBOARD8_TAG, TI99_MAINBOARD8, 0)
 	MCFG_MAINBOARD8_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready))
 	MCFG_MAINBOARD8_RESET_CALLBACK(WRITELINE(ti99_8_state, console_reset))
 	MCFG_MAINBOARD8_HOLD_CALLBACK(WRITELINE(ti99_8_state, cpu_hold))
@@ -912,6 +914,6 @@ ROM_END
 
 #define rom_ti99_8e rom_ti99_8
 
-/*      YEAR    NAME        PARENT  COMPAT  MACHINE     INPUT   INIT      COMPANY                 FULLNAME */
-COMP(   1983,   ti99_8,     0,      0,  ti99_8_60hz,ti99_8, driver_device,  0,      "Texas Instruments",    "TI-99/8 Computer (US)" , MACHINE_SUPPORTS_SAVE )
-COMP(   1983,   ti99_8e,    ti99_8, 0,  ti99_8_50hz,ti99_8, driver_device,  0,      "Texas Instruments",    "TI-99/8 Computer (Europe)" ,  MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE      INPUT   STATE         INIT  COMPANY              FULLNAME                     FLAGS
+COMP( 1983, ti99_8,  0,      0,      ti99_8_60hz, ti99_8, ti99_8_state, 0,    "Texas Instruments", "TI-99/8 Computer (US)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, ti99_8e, ti99_8, 0,      ti99_8_50hz, ti99_8, ti99_8_state, 0,    "Texas Instruments", "TI-99/8 Computer (Europe)", MACHINE_SUPPORTS_SAVE )

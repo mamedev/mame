@@ -86,7 +86,7 @@ static GFXDECODE_START( unistar )
 	GFXDECODE_ENTRY( "chargen", 0x0000, unistar_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( unistar, unistar_state )
+static MACHINE_CONFIG_START( unistar )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(unistar_mem)
@@ -119,5 +119,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT        COMPANY            FULLNAME              FLAGS */
-COMP( 198?, unistar, 0,      0,       unistar,   unistar, driver_device, 0,  "Callan Data Systems", "Unistar 200 Terminal", MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY                FULLNAME                FLAGS
+COMP( 198?, unistar, 0,      0,       unistar,   unistar, unistar_state, 0,    "Callan Data Systems", "Unistar 200 Terminal", MACHINE_IS_SKELETON )

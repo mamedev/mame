@@ -124,7 +124,7 @@ const tiny_rom_entry *spc1000_fdd_exp_device::device_rom_region() const
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SPC1000_FDD_EXP = device_creator<spc1000_fdd_exp_device>;
+DEFINE_DEVICE_TYPE(SPC1000_FDD_EXP, spc1000_fdd_exp_device, "spc1000_fdd_exp", "SPC1000 FDD expansion")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -134,13 +134,14 @@ const device_type SPC1000_FDD_EXP = device_creator<spc1000_fdd_exp_device>;
 //  spc1000_fdd_exp_device - constructor
 //-------------------------------------------------
 
-spc1000_fdd_exp_device::spc1000_fdd_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, SPC1000_FDD_EXP, "SPC1000 FDD expansion", tag, owner, clock, "spc1000_fdd_exp", __FILE__),
-		device_spc1000_card_interface(mconfig, *this),
-		m_cpu(*this, "fdccpu"),
-		m_fdc(*this, "upd765"),
-		m_pio(*this, "d8255_master"), m_fd0(nullptr), m_fd1(nullptr), m_timer_tc(nullptr), m_i8255_0_pc(0), m_i8255_1_pc(0), m_i8255_portb(0)
-	{
+spc1000_fdd_exp_device::spc1000_fdd_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SPC1000_FDD_EXP, tag, owner, clock),
+	device_spc1000_card_interface(mconfig, *this),
+	m_cpu(*this, "fdccpu"),
+	m_fdc(*this, "upd765"),
+	m_pio(*this, "d8255_master"),
+	m_fd0(nullptr), m_fd1(nullptr), m_timer_tc(nullptr), m_i8255_0_pc(0), m_i8255_1_pc(0), m_i8255_portb(0)
+{
 }
 
 

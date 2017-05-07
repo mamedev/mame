@@ -260,7 +260,7 @@ void finalizr_state::machine_reset()
 	m_irq_enable = 0;
 }
 
-static MACHINE_CONFIG_START( finalizr, finalizr_state )
+static MACHINE_CONFIG_START( finalizr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL_18_432MHz/6) /* ??? */
@@ -363,5 +363,5 @@ ROM_END
 
 
 
-GAME( 1985, finalizr,  0,        finalizr, finalizr,  driver_device, 0, ROT90, "Konami", "Finalizer - Super Transformation", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, finalizrb, finalizr, finalizr, finalizrb, driver_device, 0, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, finalizr,  0,        finalizr, finalizr,  finalizr_state, 0, ROT90, "Konami",  "Finalizer - Super Transformation",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, finalizrb, finalizr, finalizr, finalizrb, finalizr_state, 0, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( mu100_iomap, AS_IO, 16, mu100_state )
 	AM_RANGE(h8_device::ADC_7,   h8_device::ADC_7)   AM_READ(adc7_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mu100, mu100_state )
+static MACHINE_CONFIG_START( mu100 )
 	MCFG_CPU_ADD( "maincpu", H8S2655, XTAL_16MHz )
 	MCFG_CPU_PROGRAM_MAP( mu100_map )
 	MCFG_CPU_IO_MAP( mu100_iomap )
@@ -455,9 +455,6 @@ static MACHINE_CONFIG_START( mu100, mu100_state )
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 	MCFG_DEVICE_MODIFY("maincpu:sci0")
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":mdout", midi_port_device, write_txd))
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED_CLASS( mu100r, mu100, mu100r_state )
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -500,5 +497,5 @@ ROM_START( mu100r )
 	ROM_LOAD( "mu100-font.bin", 0x0000, 0x1000, BAD_DUMP CRC(a7d6c1d6) SHA1(9f0398d678bdf607cb34d83ee535f3b7fcc97c41) )
 ROM_END
 
-CONS( 1997, mu100,  0,     0, mu100,  mu100, driver_device, 0, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
-CONS( 1997, mu100r, mu100, 0, mu100r, mu100, driver_device, 0, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )
+CONS( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  0, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
+CONS( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, 0, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )

@@ -139,7 +139,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type LUXOR_55_10828 = device_creator<luxor_55_10828_device>;
+DEFINE_DEVICE_TYPE(LUXOR_55_10828, luxor_55_10828_device, "lux10828", "Luxor 55 10828")
 
 
 //-------------------------------------------------
@@ -405,7 +405,7 @@ ioport_constructor luxor_55_10828_device::device_input_ports() const
 //-------------------------------------------------
 
 luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, LUXOR_55_10828, "Luxor 55 10828", tag, owner, clock, "lux10828", __FILE__),
+	: device_t(mconfig, LUXOR_55_10828, tag, owner, clock),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
 		m_pio(*this, Z80PIO_TAG),

@@ -63,10 +63,10 @@ static uint16_t parity(uint16_t x)
  *
  *************************************/
 
-const device_type ATARI_136094_0072 = device_creator<atari_136094_0072_device>;
+DEFINE_DEVICE_TYPE(ATARI_136094_0072, atari_136094_0072_device, "136094_0072", "Atari 136094-0072 XGA")
 
 atari_136094_0072_device::atari_136094_0072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: atari_xga_device(mconfig, ATARI_136094_0072, tag, owner, clock, "Atari 136094-0072 XGA", "136094_0072")
+	: atari_xga_device(mconfig, ATARI_136094_0072, tag, owner, clock)
 {
 }
 
@@ -283,10 +283,10 @@ READ32_MEMBER(atari_136094_0072_device::read)
  *
  *************************************/
 
-const device_type ATARI_136095_0072 = device_creator<atari_136095_0072_device>;
+DEFINE_DEVICE_TYPE(ATARI_136095_0072, atari_136095_0072_device, "136095_0072", "Atari 136095-0072 XGA")
 
 atari_136095_0072_device::atari_136095_0072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: atari_xga_device(mconfig, ATARI_136095_0072, tag, owner, clock, "Atari 136095-0072 XGA", "136095_0072")
+	: atari_xga_device(mconfig, ATARI_136095_0072, tag, owner, clock)
 {
 }
 

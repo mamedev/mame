@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_IDECTRL_H
+#define MAME_MACHINE_IDECTRL_H
 
-#ifndef __IDECTRL_H__
-#define __IDECTRL_H__
+#pragma once
 
 #include "ataintf.h"
 
@@ -20,46 +20,50 @@
 ***************************************************************************/
 
 #define MCFG_IDE_CONTROLLER_ADD(_tag, _slot_intf, _master, _slave, _fixed) \
-	MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER, 0) \
-	MCFG_DEVICE_MODIFY(_tag ":0") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag ":1") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag)
+		MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER, 0) \
+		MCFG_DEVICE_MODIFY(_tag ":0") \
+		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
+		MCFG_DEVICE_MODIFY(_tag ":1") \
+		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
+		MCFG_DEVICE_MODIFY(_tag)
 
 class ide_controller_device : public ata_interface_device
 {
 public:
 	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual DECLARE_READ16_MEMBER(read_cs0) override;
 	virtual DECLARE_READ16_MEMBER(read_cs1) override;
 	virtual DECLARE_WRITE16_MEMBER(write_cs0) override;
 	virtual DECLARE_WRITE16_MEMBER(write_cs1) override;
+
+protected:
+	ide_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type IDE_CONTROLLER;
+DECLARE_DEVICE_TYPE(IDE_CONTROLLER, ide_controller_device)
 
 
 #define MCFG_IDE_CONTROLLER_32_ADD(_tag, _slot_intf, _master, _slave, _fixed) \
-	MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER_32, 0) \
-	MCFG_DEVICE_MODIFY(_tag ":0") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag ":1") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag)
+		MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER_32, 0) \
+		MCFG_DEVICE_MODIFY(_tag ":0") \
+		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
+		MCFG_DEVICE_MODIFY(_tag ":1") \
+		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
+		MCFG_DEVICE_MODIFY(_tag)
 
 class ide_controller_32_device : public ide_controller_device
 {
 public:
 	ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	ide_controller_32_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual DECLARE_READ32_MEMBER(read_cs0);
 	virtual DECLARE_READ32_MEMBER(read_cs1);
 	virtual DECLARE_WRITE32_MEMBER(write_cs0);
 	virtual DECLARE_WRITE32_MEMBER(write_cs1);
+
+protected:
+	ide_controller_32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 private:
 	using ide_controller_device::read_cs0;
@@ -68,25 +72,25 @@ private:
 	using ide_controller_device::write_cs1;
 };
 
-extern const device_type IDE_CONTROLLER_32;
+DECLARE_DEVICE_TYPE(IDE_CONTROLLER_32, ide_controller_32_device)
 
 
 #define MCFG_BUS_MASTER_IDE_CONTROLLER_ADD(_tag, _slot_intf, _master, _slave, _fixed) \
-	MCFG_DEVICE_ADD(_tag, BUS_MASTER_IDE_CONTROLLER, 0) \
-	MCFG_DEVICE_MODIFY(_tag ":0") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag ":1") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag)
+		MCFG_DEVICE_ADD(_tag, BUS_MASTER_IDE_CONTROLLER, 0) \
+		MCFG_DEVICE_MODIFY(_tag ":0") \
+		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
+		MCFG_DEVICE_MODIFY(_tag ":1") \
+		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
+		MCFG_DEVICE_MODIFY(_tag)
 
 #define MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(bmcpu, bmspace) \
-	bus_master_ide_controller_device::set_bus_master_space(*device, bmcpu, bmspace);
+		bus_master_ide_controller_device::set_bus_master_space(*device, bmcpu, bmspace);
 
 class bus_master_ide_controller_device : public ide_controller_32_device
 {
 public:
 	bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	static void set_bus_master_space(device_t &device, const char *bmcpu, uint32_t bmspace) {bus_master_ide_controller_device &ide = downcast<bus_master_ide_controller_device &>(device); ide.m_bmcpu = bmcpu; ide.m_bmspace = bmspace; }
+	static void set_bus_master_space(device_t &device, const char *bmcpu, uint32_t bmspace) { bus_master_ide_controller_device &ide = downcast<bus_master_ide_controller_device &>(device); ide.m_bmcpu = bmcpu; ide.m_bmspace = bmspace; }
 
 	DECLARE_READ32_MEMBER( bmdma_r );
 	DECLARE_WRITE32_MEMBER( bmdma_w );
@@ -116,6 +120,6 @@ private:
 	int m_dmarq;
 };
 
-extern const device_type BUS_MASTER_IDE_CONTROLLER;
+DECLARE_DEVICE_TYPE(BUS_MASTER_IDE_CONTROLLER, bus_master_ide_controller_device)
 
-#endif  /* __IDECTRL_H__ */
+#endif // MAME_MACHINE_IDECTRL_H

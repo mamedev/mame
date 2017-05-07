@@ -6,7 +6,7 @@
 #include "k053936.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 // Localized K053936/ROZ+
@@ -227,10 +227,10 @@ void K053936_set_offset(int chip, int xoffs, int yoffs)
 /*                                                                         */
 /***************************************************************************/
 
-const device_type K053936 = device_creator<k053936_device>;
+DEFINE_DEVICE_TYPE(K053936, k053936_device, "k053936", "K053936 Video Controller")
 
 k053936_device::k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K053936, "K053936 Video Controller", tag, owner, clock, "k053936", __FILE__),
+	: device_t(mconfig, K053936, tag, owner, clock),
 	m_ctrl(nullptr),
 	m_linectrl(nullptr),
 	m_wrap(0),

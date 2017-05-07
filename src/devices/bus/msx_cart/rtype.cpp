@@ -3,11 +3,11 @@
 #include "emu.h"
 #include "rtype.h"
 
-const device_type MSX_CART_RTYPE = device_creator<msx_cart_rtype>;
+DEFINE_DEVICE_TYPE(MSX_CART_RTYPE, msx_cart_rtype_device, "msx_cart_rtype", "MSX Cartridge - R-Type")
 
 
-msx_cart_rtype::msx_cart_rtype(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_RTYPE, "MSX Cartridge - R-Type", tag, owner, clock, "msx_cart_rtype", __FILE__)
+msx_cart_rtype_device::msx_cart_rtype_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSX_CART_RTYPE, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_selected_bank(0)
 {
@@ -18,15 +18,15 @@ msx_cart_rtype::msx_cart_rtype(const machine_config &mconfig, const char *tag, d
 }
 
 
-void msx_cart_rtype::device_start()
+void msx_cart_rtype_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_rtype::restore_banks), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_rtype_device::restore_banks), this));
 }
 
 
-void msx_cart_rtype::restore_banks()
+void msx_cart_rtype_device::restore_banks()
 {
 	m_bank_base[0] = get_rom_base() + 15 * 0x4000;
 	if (m_selected_bank & 0x10)
@@ -37,13 +37,13 @@ void msx_cart_rtype::restore_banks()
 }
 
 
-void msx_cart_rtype::device_reset()
+void msx_cart_rtype_device::device_reset()
 {
 	m_selected_bank = 15;
 }
 
 
-void msx_cart_rtype::initialize_cartridge()
+void msx_cart_rtype_device::initialize_cartridge()
 {
 	if ( get_rom_size() != 0x80000 && get_rom_size() != 0x60000 )
 	{
@@ -54,7 +54,7 @@ void msx_cart_rtype::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_rtype::read_cart)
+READ8_MEMBER(msx_cart_rtype_device::read_cart)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -64,7 +64,7 @@ READ8_MEMBER(msx_cart_rtype::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_rtype::write_cart)
+WRITE8_MEMBER(msx_cart_rtype_device::write_cart)
 {
 	if (offset >= 0x7000 && offset < 0x8000)
 	{

@@ -215,7 +215,7 @@ PALETTE_INIT_MEMBER(poolshrk_state, poolshrk)
 }
 
 
-static MACHINE_CONFIG_START( poolshrk, poolshrk_state )
+static MACHINE_CONFIG_START( poolshrk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 8) /* ? */

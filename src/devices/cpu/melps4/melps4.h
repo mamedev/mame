@@ -6,9 +6,10 @@
 
 */
 
-#ifndef _MELPS4_H_
-#define _MELPS4_H_
+#ifndef MAME_CPU_MELPS4_MELPS4_H
+#define MAME_CPU_MELPS4_MELPS4_H
 
+#pragma once
 
 
 // I/O ports setup
@@ -99,46 +100,23 @@ enum
 class melps4_cpu_device : public cpu_device
 {
 public:
-	// construction/destruction
-	melps4_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, uint8_t sm_page, uint8_t int_page, const char *shortname, const char *source)
-		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-		, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
-		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
-		, m_prgwidth(prgwidth)
-		, m_datawidth(datawidth)
-		, m_d_pins(d_pins)
-		, m_sm_page(sm_page)
-		, m_int_page(int_page)
-		, m_xami_mask(0xf)
-		, m_sp_mask(0x7<<4)
-		, m_ba_op(0x01)
-		, m_stack_levels(3)
-		, m_read_k(*this)
-		, m_read_d(*this)
-		, m_read_s(*this)
-		, m_read_f(*this)
-		, m_write_d(*this)
-		, m_write_s(*this)
-		, m_write_f(*this)
-		, m_write_g(*this)
-		, m_write_u(*this)
-		, m_write_t(*this)
-	{ }
-
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_k_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_k.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_d_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_d.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_s_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_s.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_f_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_f.set_callback(object); }
+	template <class Object> static devcb_base &set_read_k_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_read_k.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_d_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_read_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_s_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_read_s.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_f_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_read_f.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_d.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_s_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_s.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_f_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_f.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_g_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_g.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_u_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_u.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_t_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_t.set_callback(object); }
+	template <class Object> static devcb_base &set_write_d_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_write_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_s_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_write_s.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_f_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_write_f.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_g_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_write_g.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_u_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_write_u.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_t_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_write_t.set_callback(std::forward<Object>(cb)); }
 
 protected:
+	// construction/destruction
+	melps4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, uint8_t sm_page, uint8_t int_page);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -361,5 +339,4 @@ protected:
 };
 
 
-
-#endif /* _MELPS4_H_ */
+#endif // MAME_CPU_MELPS4_MELPS4_H

@@ -15,14 +15,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type QIMI = device_creator<qimi_t>;
+DEFINE_DEVICE_TYPE(QIMI, qimi_device, "qimi", "QL Internal Mouse Interface")
 
 
 //-------------------------------------------------
 //  INPUT_CHANGED_MEMBER( mouse_x_changed )
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( qimi_t::mouse_x_changed )
+INPUT_CHANGED_MEMBER( qimi_device::mouse_x_changed )
 {
 	if (newval > oldval)
 	{
@@ -46,7 +46,7 @@ INPUT_CHANGED_MEMBER( qimi_t::mouse_x_changed )
 //  INPUT_CHANGED_MEMBER( mouse_y_changed )
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( qimi_t::mouse_y_changed )
+INPUT_CHANGED_MEMBER( qimi_device::mouse_y_changed )
 {
 	if (newval < oldval)
 	{
@@ -72,10 +72,10 @@ INPUT_CHANGED_MEMBER( qimi_t::mouse_y_changed )
 
 INPUT_PORTS_START( qimi )
 	PORT_START("mouse_x")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, qimi_t, mouse_x_changed, 0)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, qimi_device, mouse_x_changed, 0)
 
 	PORT_START("mouse_y")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, qimi_t, mouse_y_changed, 0)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_CHANGED_MEMBER(DEVICE_SELF, qimi_device, mouse_y_changed, 0)
 
 	PORT_START("mouse_buttons")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2)
@@ -88,7 +88,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor qimi_t::device_input_ports() const
+ioport_constructor qimi_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( qimi );
 }
@@ -100,11 +100,11 @@ ioport_constructor qimi_t::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  qimi_t - constructor
+//  qimi_device - constructor
 //-------------------------------------------------
 
-qimi_t::qimi_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, QIMI, "QL Internal Mouse Interface", tag, owner, clock, "qimi", __FILE__),
+qimi_device::qimi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, QIMI, tag, owner, clock),
 	m_write_extint(*this),
 	m_buttons(*this, "mouse_buttons"),
 	m_status(0),
@@ -117,7 +117,7 @@ qimi_t::qimi_t(const machine_config &mconfig, const char *tag, device_t *owner, 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void qimi_t::device_start()
+void qimi_device::device_start()
 {
 	// resolve callbacks
 	m_write_extint.resolve_safe();
@@ -128,7 +128,7 @@ void qimi_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void qimi_t::device_reset()
+void qimi_device::device_reset()
 {
 	m_status = 0;
 	m_extint_en = false;
@@ -139,7 +139,7 @@ void qimi_t::device_reset()
 //  read -
 //-------------------------------------------------
 
-uint8_t qimi_t::read(address_space &space, offs_t offset, uint8_t data)
+uint8_t qimi_device::read(address_space &space, offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -169,7 +169,7 @@ uint8_t qimi_t::read(address_space &space, offs_t offset, uint8_t data)
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( qimi_t::write )
+WRITE8_MEMBER( qimi_device::write )
 {
 	// write to 0x1bfbe resets int status
 	if (offset == 0x1bfbe)

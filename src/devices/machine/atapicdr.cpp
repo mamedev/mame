@@ -8,21 +8,21 @@
 #define T10MMC_GET_EVENT_STATUS_NOTIFICATION 0x4a
 
 // device type definition
-const device_type ATAPI_CDROM = device_creator<atapi_cdrom_device>;
-const device_type ATAPI_FIXED_CDROM = device_creator<atapi_fixed_cdrom_device>;
+DEFINE_DEVICE_TYPE(ATAPI_CDROM,       atapi_cdrom_device,       "cdrom",       "ATAPI CD-ROM")
+DEFINE_DEVICE_TYPE(ATAPI_FIXED_CDROM, atapi_fixed_cdrom_device, "cdrom_fixed", "ATAPI fixed CD-ROM")
 
 atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	atapi_hle_device(mconfig, ATAPI_CDROM, "ATAPI CDROM", tag, owner, clock, "cdrom", __FILE__)
+	atapi_cdrom_device(mconfig, ATAPI_CDROM, tag, owner, clock)
 {
 }
 
-atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	atapi_hle_device(mconfig, type, name, tag, owner, clock, shortname, source)
+atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	atapi_hle_device(mconfig, type, tag, owner, clock)
 {
 }
 
 atapi_fixed_cdrom_device::atapi_fixed_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	atapi_cdrom_device(mconfig, ATAPI_FIXED_CDROM, "ATAPI fixed CDROM", tag, owner, clock, "cdrom_fixed", __FILE__)
+	atapi_cdrom_device(mconfig, ATAPI_FIXED_CDROM, tag, owner, clock)
 {
 }
 

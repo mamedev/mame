@@ -317,7 +317,7 @@ void mole_state::machine_reset()
 	m_tile_bank = 0;
 }
 
-static MACHINE_CONFIG_START( mole, mole_state )
+static MACHINE_CONFIG_START( mole )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 4000000) // ???
@@ -372,4 +372,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mole, 0, mole, mole, driver_device, 0, ROT0, "Yachiyo Electronics, Ltd.", "Mole Attack", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mole, 0, mole, mole, mole_state, 0, ROT0, "Yachiyo Electronics, Ltd.", "Mole Attack", MACHINE_SUPPORTS_SAVE )

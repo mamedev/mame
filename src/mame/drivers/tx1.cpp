@@ -606,7 +606,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tx1, tx1_state )
+static MACHINE_CONFIG_START( tx1 )
 	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_CPU_PROGRAM_MAP(tx1_main)
 
@@ -669,7 +669,7 @@ static MACHINE_CONFIG_START( tx1, tx1_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( buggyboy, tx1_state )
+static MACHINE_CONFIG_START( buggyboy )
 	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_CPU_PROGRAM_MAP(buggyboy_main)
 
@@ -733,7 +733,7 @@ static MACHINE_CONFIG_START( buggyboy, tx1_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( buggybjr, tx1_state )
+static MACHINE_CONFIG_START( buggybjr )
 	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_CPU_PROGRAM_MAP(buggybjr_main)
 
@@ -1243,8 +1243,8 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1983, tx1,        0,        tx1,      tx1, driver_device,      0,     ROT0, "Tatsumi (Atari/Namco/Taito license)", "TX-1 (World)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1983, tx1jb,      tx1,      tx1,      tx1j, driver_device,     0,     ROT0, "Tatsumi", "TX-1 (Japan rev. B)",                      MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1983, tx1jc,      tx1,      tx1,      tx1j, driver_device,     0,     ROT0, "Tatsumi", "TX-1 (Japan rev. C)",                      MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1985, buggyboy,   0,        buggyboy, buggyboy, driver_device, 0,     ROT0, "Tatsumi", "Buggy Boy/Speed Buggy (cockpit)",          0, layout_buggyboy )
-GAMEL( 1986, buggyboyjr, buggyboy, buggybjr, buggybjr, driver_device, 0,     ROT0, "Tatsumi", "Buggy Boy Junior/Speed Buggy (upright)",   0, layout_buggybjr )
+GAMEL( 1983, tx1,        0,        tx1,      tx1,      tx1_state, 0,     ROT0, "Tatsumi (Atari/Namco/Taito license)", "TX-1 (World)",        MACHINE_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1983, tx1jb,      tx1,      tx1,      tx1j,     tx1_state, 0,     ROT0, "Tatsumi",                             "TX-1 (Japan rev. B)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1983, tx1jc,      tx1,      tx1,      tx1j,     tx1_state, 0,     ROT0, "Tatsumi",                             "TX-1 (Japan rev. C)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1985, buggyboy,   0,        buggyboy, buggyboy, tx1_state, 0,     ROT0, "Tatsumi", "Buggy Boy/Speed Buggy (cockpit)",          0, layout_buggyboy )
+GAMEL( 1986, buggyboyjr, buggyboy, buggybjr, buggybjr, tx1_state, 0,     ROT0, "Tatsumi", "Buggy Boy Junior/Speed Buggy (upright)",   0, layout_buggybjr )

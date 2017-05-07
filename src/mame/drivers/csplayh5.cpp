@@ -429,7 +429,7 @@ static const z80_daisy_config daisy_chain_sound[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
+static MACHINE_CONFIG_START( csplayh5 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,16000000) /* TMP68301-16 */

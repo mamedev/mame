@@ -6,9 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_FDC_WATFORD_H
+#define MAME_BUS_BBC_FDC_WATFORD_H
 
-#ifndef __BBC_WATFORD__
-#define __BBC_WATFORD__
+#pragma once
 
 #include "fdc.h"
 #include "machine/wd_fdc.h"
@@ -25,13 +26,14 @@ class bbc_watfordfdc_device :
 
 {
 public:
-	// construction/destruction
-	bbc_watfordfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+
+protected:
+	// construction/destruction
+	bbc_watfordfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class bbc_weddb2_device : public bbc_watfordfdc_device
@@ -52,7 +54,7 @@ protected:
 
 private:
 	required_memory_region m_dfs_rom;
-	required_device<wd_fdc_t> m_fdc;
+	required_device<wd_fdc_device_base> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 
@@ -77,7 +79,7 @@ protected:
 
 private:
 	required_memory_region m_dfs_rom;
-	required_device<wd_fdc_t> m_fdc;
+	required_device<wd_fdc_device_base> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 
@@ -86,8 +88,8 @@ private:
 
 
 // device type definition
-extern const device_type BBC_WEDDB2;
-extern const device_type BBC_WEDDB3;
+DECLARE_DEVICE_TYPE(BBC_WEDDB2, bbc_weddb2_device)
+DECLARE_DEVICE_TYPE(BBC_WEDDB3, bbc_weddb3_device)
 
 
-#endif /* __BBC_WATFORD__ */
+#endif // MAME_BUS_BBC_FDC_WATFORD_H

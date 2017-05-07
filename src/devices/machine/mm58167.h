@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MM58167_H
+#define MAME_MACHINE_MM58167_H
 
-#ifndef __MM58167_H__
-#define __MM58167_H__
+#pragma once
 
 #include "dirtc.h"
 
@@ -38,7 +38,7 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	template<class _Object> static devcb_base &set_irq_cb(device_t &device, _Object wr) { return downcast<mm58167_device &>(device).m_irq_w.set_callback(wr); }
+	template <class Object> static devcb_base &set_irq_cb(device_t &device, Object &&wr) { return downcast<mm58167_device &>(device).m_irq_w.set_callback(std::forward<Object>(wr)); }
 
 	devcb_write_line m_irq_w;
 
@@ -65,6 +65,6 @@ private:
 };
 
 // device type definition
-extern const device_type MM58167;
+DECLARE_DEVICE_TYPE(MM58167, mm58167_device)
 
-#endif
+#endif // MAME_MACHINE_MM58167_H

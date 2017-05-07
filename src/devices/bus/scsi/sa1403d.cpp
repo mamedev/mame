@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SA1403D = device_creator<sa1403d_device>;
+DEFINE_DEVICE_TYPE(SA1403D, sa1403d_device, "sa1403d", "Shugart SA1403D")
 
 
 //-------------------------------------------------
@@ -124,7 +124,7 @@ ioport_constructor sa1403d_device::device_input_ports() const
 //-------------------------------------------------
 
 sa1403d_device::sa1403d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: scsihd_device(mconfig, SA1403D, "Shugart SA1403D", tag, owner, clock, "sa1403d", __FILE__)
+	: scsihd_device(mconfig, SA1403D, tag, owner, clock)
 {
 }
 

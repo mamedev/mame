@@ -3,10 +3,10 @@
 #include "emu.h"
 #include "ti99defs.h"
 
-const device_type EVPC_CONN = device_creator<evpc_clock_connector>;
+DEFINE_DEVICE_TYPE(EVPC_CONN, evpc_clock_connector, "ti99_evpc_clock", "EVPC clock connector")
 
 evpc_clock_connector::evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, EVPC_CONN, "EVPC clock connector", tag, owner, clock, "ti99_evpc_clock", __FILE__)
+	: device_t(mconfig, EVPC_CONN, tag, owner, clock)
 	, m_vdpint(*this)
 {
 }

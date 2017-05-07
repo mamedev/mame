@@ -10,10 +10,11 @@
 #include "atadev.h"
 
 //-------------------------------------------------
-//  ata_device_interface - constructor
+//  device_ata_interface - constructor
 //-------------------------------------------------
 
-ata_device_interface::ata_device_interface(const machine_config &mconfig, device_t &device) :
+device_ata_interface::device_ata_interface(const machine_config &mconfig, device_t &device) :
+	device_slot_card_interface(mconfig, device),
 	m_irq_handler(device),
 	m_dmarq_handler(device),
 	m_dasp_handler(device),

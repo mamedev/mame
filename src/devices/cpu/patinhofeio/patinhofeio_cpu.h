@@ -53,16 +53,15 @@ public:
 	// construction/destruction
 	patinho_feio_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	template<class _Object> static devcb_base &set_rc_read_callback(device_t &device, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_rc_read_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_buttons_read_callback(device_t &device, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_buttons_read_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_iodev_read_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_read_cb[devnumber].set_callback(object); }
-	template<class _Object> static devcb_base &set_iodev_write_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_write_cb[devnumber].set_callback(object); }
-	template<class _Object> static devcb_base &set_iodev_status_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_status_cb[devnumber].set_callback(object); }
+	template <class Object> static devcb_base &set_rc_read_callback(device_t &device, Object &&cb) { return downcast<patinho_feio_cpu_device &>(device).m_rc_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_buttons_read_callback(device_t &device, Object &&cb) { return downcast<patinho_feio_cpu_device &>(device).m_buttons_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_iodev_read_callback(device_t &device, int devnumber, Object &&cb) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_read_cb[devnumber].set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_iodev_write_callback(device_t &device, int devnumber, Object &&cb) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_write_cb[devnumber].set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_iodev_status_callback(device_t &device, int devnumber, Object &&cb) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_status_cb[devnumber].set_callback(std::forward<Object>(cb)); }
 
 	void transfer_byte_from_external_device(uint8_t channel, uint8_t data);
-	void set_iodev_status(uint8_t channel, bool status) {
-		m_iodev_status[channel] = status;
-	}
+	void set_iodev_status(uint8_t channel, bool status) { m_iodev_status[channel] = status; }
+
 protected:
 
 	virtual void execute_run() override;
@@ -120,7 +119,7 @@ protected:
 	virtual uint32_t execute_max_cycles() const override { return 2; }
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
@@ -139,6 +138,6 @@ private:
 	uint8_t m_mode;
 };
 
-extern const device_type PATO_FEIO_CPU;
+DECLARE_DEVICE_TYPE(PATO_FEIO_CPU, patinho_feio_cpu_device)
 
 #endif // MAME_DEVICES_CPU_PATINHOFEIO_CPU_H

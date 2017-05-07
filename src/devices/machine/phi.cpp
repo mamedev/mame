@@ -167,11 +167,11 @@ enum {
 #define CONTROLLER_ADDR         0x1e    // PHI always has this address when it's a controller
 
 // Device type definition
-const device_type PHI = device_creator<phi_device>;
+DEFINE_DEVICE_TYPE(PHI, phi_device, "hp_phi", "HP Processor-to-HPIB Interface")
 
 // Constructors
-phi_device::phi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+phi_device::phi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 	  m_dio_read_func(*this),
 	  m_dio_write_func(*this),
 	  m_signal_wr_fns{
@@ -189,20 +189,7 @@ phi_device::phi_device(const machine_config &mconfig, device_type type, const ch
 }
 
 phi_device::phi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PHI, "HP PHI", tag, owner, clock, "phi", __FILE__),
-	  m_dio_read_func(*this),
-	  m_dio_write_func(*this),
-	  m_signal_wr_fns{
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this),
-		  devcb_write_line(*this) },
-	  m_int_write_func(*this),
-	  m_dmarq_write_func(*this)
+	: phi_device(mconfig, PHI, tag, owner, clock)
 {
 }
 

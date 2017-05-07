@@ -345,7 +345,7 @@ printf("io_expander_w: PORTA (io_SC=%02X)\n", data);
 	}
 }
 
-static MACHINE_CONFIG_START( pve500, pve500_state )
+static MACHINE_CONFIG_START( pve500 )
 	/* Main CPU */
 	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(maincpu_prg)
@@ -435,5 +435,5 @@ ROM_START( pve500 )
 	ROM_LOAD( "pve500.ice3", 0x0000, 0x080, NO_DUMP )
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS           INIT   COMPANY    FULLNAME                    FLAGS */
-COMP( 1995, pve500, 0,      0,      pve500,     pve500, pve500_state, pve500, "SONY", "PVE-500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS         INIT    COMPANY  FULLNAME   FLAGS
+COMP( 1995, pve500, 0,      0,      pve500,     pve500, pve500_state, pve500, "SONY",  "PVE-500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

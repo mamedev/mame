@@ -1,28 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* 32X */
+#ifndef MAME_MACHINE_MEGA32X_H
+#define MAME_MACHINE_MEGA32X_H
 
-
-// Fifa96 needs the CPUs swapped for the gameplay to enter due to some race conditions
-// when using the DRC core.  Needs further investigation, the non-DRC core works either
-// way
-#define _32X_SWAP_MASTER_SLAVE_HACK
-#define _32X_COMMS_PORT_SYNC 0
-#define MAX_HPOSITION 480
-/* need to make some pwm stuff part of device */
-#define PWM_FIFO_SIZE m_pwm_tm_reg // guess, Marsch calls this register as FIFO width
-#define PWM_CLOCK m_32x_pal ? ((MASTER_CLOCK_PAL*3) / 7) : ((MASTER_CLOCK_NTSC*3) / 7)
-
-
-
-#define SH2_VRES_IRQ_LEVEL 14
-#define SH2_VINT_IRQ_LEVEL 12
-#define SH2_HINT_IRQ_LEVEL 10
-#define SH2_CINT_IRQ_LEVEL 8
-#define SH2_PINT_IRQ_LEVEL 6
-
-#define MASTER_CLOCK_NTSC 53693175
-#define MASTER_CLOCK_PAL  53203424
+#pragma once
 
 #include "cpu/sh2/sh2.h"
 #include "cpu/sh2/sh2comn.h"
@@ -31,22 +13,19 @@
 class sega_32x_device : public device_t
 {
 public:
-	sega_32x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
-	required_device<sh2_device> m_master_cpu;
-	required_device<sh2_device> m_slave_cpu;
-	required_device<dac_word_interface> m_ldac;
-	required_device<dac_word_interface> m_rdac;
-
-	required_shared_ptr<uint32_t> m_sh2_shared;
-
 	void pause_cpu();
 
 	// set some variables at start, depending on region (shall be moved to a device interface?)
 	void set_framerate(int rate) { m_framerate = rate; }
 	void set_32x_pal(bool pal) { m_32x_pal = pal ? 1 : 0; }
 	void set_total_scanlines(int total) { m_base_total_scanlines = total; }     // this get set at start only
-	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
+
+	void screen_eof(bool mode3)
+	{
+		m_32x_vblank_flag = 0;
+		m_32x_hcount_compare_val = -1;
+		update_total_scanlines(mode3);
+	}
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
@@ -126,7 +105,25 @@ public:
 	void _32x_check_irqs();
 	void _32x_interrupt_cb(int scanline, int irq6);
 
+protected:
+	sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	required_shared_ptr<uint32_t> m_sh2_shared;
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
+
+	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
+
 	/* our main vblank handler resets this */
+	required_device<sh2_device> m_master_cpu;
+	required_device<sh2_device> m_slave_cpu;
+	required_device<dac_word_interface> m_ldac;
+	required_device<dac_word_interface> m_rdac;
+
 	int m_32x_hcount_compare_val;
 	int m_32x_vblank_flag;
 	int m_sh2_are_running;
@@ -146,14 +143,6 @@ public:
 	uint16_t get_hposition(void);
 
 	emu_timer *m_32x_pwm_timer;
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// optional information overrides
-//  virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 
@@ -213,22 +202,24 @@ private:
 
 class sega_32x_ntsc_device : public sega_32x_device
 {
-	public:
-		sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+public:
+	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 };
 
 class sega_32x_pal_device : public sega_32x_device
 {
-	public:
-		sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	protected:
-		virtual machine_config_constructor device_mconfig_additions() const override;
+public:
+	sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 
-extern const device_type SEGA_32X_NTSC;
-extern const device_type SEGA_32X_PAL;
+DECLARE_DEVICE_TYPE(SEGA_32X_NTSC, sega_32x_ntsc_device)
+DECLARE_DEVICE_TYPE(SEGA_32X_PAL,  sega_32x_pal_device)
 
 #define MCFG_SEGA_32X_PALETTE(_palette_tag) \
 	sega_32x_device::static_set_palette_tag(*device, "^" _palette_tag);
+
+#endif // MAME_MACHINE_MEGA32X_H

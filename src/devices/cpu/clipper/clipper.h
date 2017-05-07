@@ -1,39 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
-#pragma once
+#ifndef MAME_CPU_CLIPPER_CLIPPER_H
+#define MAME_CPU_CLIPPER_CLIPPER_H
 
-#ifndef __CLIPPER_H__
-#define __CLIPPER_H__
+#pragma once
 
 #include <limits.h>
 
-// convenience macros for frequently used instruction fields
-#define R1 (m_info.r1)
-#define R2 (m_info.r2)
-
-// convenience macros for dealing with the psw
-#define PSW(mask) (m_psw & PSW_##mask)
-#define SSW(mask) (m_ssw & SSW_##mask)
-
-// macros for setting psw condition codes
-#define FLAGS(C,V,Z,N) \
-	m_psw = (m_psw & ~(PSW_C | PSW_V | PSW_Z | PSW_N)) | (((C) << 3) | ((V) << 2) | ((Z) << 1) | ((N) << 0));
-#define FLAGS_CV(C,V) \
-	m_psw = (m_psw & ~(PSW_C | PSW_V)) | (((C) << 3) | ((V) << 2));
-#define FLAGS_ZN(Z,N) \
-	m_psw = (m_psw & ~(PSW_Z | PSW_N)) | (((Z) << 1) | ((N) << 0));
-
-// over/underflow for addition/subtraction from here: http://stackoverflow.com/questions/199333/how-to-detect-integer-overflow-in-c-c
-#define OF_ADD(a, b) ((b > 0) && (a > INT_MAX - b))
-#define UF_ADD(a, b) ((b < 0) && (a < INT_MIN - b))
-#define OF_SUB(a, b) ((b < 0) && (a > INT_MAX + b))
-#define UF_SUB(a, b) ((b > 0) && (a < INT_MIN + b))
-
-// CLIPPER logic for carry and overflow flags
-#define C_ADD(a, b) ((u32)a + (u32)b < (u32)a)
-#define V_ADD(a, b) (OF_ADD((s32)a, (s32)b) || UF_ADD((s32)a, (s32)b))
-#define C_SUB(a, b) ((u32)a < (u32)b)
-#define V_SUB(a, b) (OF_SUB((s32)a, (s32)b) || UF_SUB((s32)a, (s32)b))
 
 class clipper_device : public cpu_device
 {
@@ -191,24 +164,24 @@ class clipper_device : public cpu_device
 	};
 
 public:
-	clipper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
-
 	DECLARE_READ_LINE_MEMBER(ssw) { return m_ssw; }
 
 protected:
+	clipper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual u32 execute_min_cycles() const override { return 1; };
-	virtual u32 execute_max_cycles() const override { return 1; }; // FIXME: don't know, especially macro instructions
-	virtual u32 execute_input_lines() const override { return 2; }; // number of input/interrupt lines (irq/nmi)
+	virtual u32 execute_min_cycles() const override { return 1; }
+	virtual u32 execute_max_cycles() const override { return 1; } // FIXME: don't know, especially macro instructions
+	virtual u32 execute_input_lines() const override { return 2; } // number of input/interrupt lines (irq/nmi)
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 
 	// device_state_interface overrides
 #if 0
@@ -288,9 +261,10 @@ public:
 	clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
-extern const device_type CLIPPER_C100;
-extern const device_type CLIPPER_C300;
-extern const device_type CLIPPER_C400;
+DECLARE_DEVICE_TYPE(CLIPPER_C100, clipper_c100_device)
+DECLARE_DEVICE_TYPE(CLIPPER_C300, clipper_c300_device)
+DECLARE_DEVICE_TYPE(CLIPPER_C400, clipper_c400_device)
 
 extern CPU_DISASSEMBLE(clipper);
-#endif /* __CLIPPER_H__ */
+
+#endif // MAME_CPU_CLIPPER_CLIPPER_H

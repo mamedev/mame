@@ -146,7 +146,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( sdk86, sdk86_state )
+static MACHINE_CONFIG_START( sdk86 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_14_7456MHz/3) /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
 	MCFG_CPU_PROGRAM_MAP(sdk86_mem)
@@ -218,5 +218,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR   NAME  PARENT  COMPAT   MACHINE    INPUT          STATE  INIT     COMPANY   FULLNAME                FLAGS */
-COMP( 1979, sdk86,      0,      0,    sdk86,   sdk86, driver_device,    0,    "Intel",  "SDK-86", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY   FULLNAME  FLAGS */
+COMP( 1979, sdk86,  0,      0,      sdk86,   sdk86, sdk86_state, 0,    "Intel",  "SDK-86", MACHINE_NO_SOUND_HW)

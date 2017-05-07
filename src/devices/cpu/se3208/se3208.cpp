@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:ElSemi
 #include "emu.h"
-#include "debugger.h"
 #include "se3208.h"
+
+#include "debugger.h"
+
 
 /*
     SE3208 CPU Emulator by ElSemi
@@ -42,12 +44,13 @@
 // are such accesses simply illegal, be handled in a different way, or simply not be happening in the first place?
 #define ALLOW_UNALIGNED_DWORD_ACCESS 0
 
-const device_type SE3208 = device_creator<se3208_device>;
+DEFINE_DEVICE_TYPE(SE3208, se3208_device, "se3208", "SE3208")
 
 
 se3208_device::se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SE3208, "SE3208", tag, owner, clock, "se3208", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0), m_PC(0), m_SR(0), m_SP(0), m_ER(0), m_PPC(0), m_program(nullptr), m_direct(nullptr), m_IRQ(0), m_NMI(0), m_icount(0)
+	: cpu_device(mconfig, SE3208, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_PC(0), m_SR(0), m_SP(0), m_ER(0), m_PPC(0), m_program(nullptr), m_direct(nullptr), m_IRQ(0), m_NMI(0), m_icount(0)
 {
 }
 
@@ -1438,7 +1441,7 @@ INST(MVFC)
 }
 
 
-se3208_device::_OP se3208_device::DecodeOp(uint16_t Opcode)
+se3208_device::OP se3208_device::DecodeOp(uint16_t Opcode)
 {
 	switch(EXTRACT(Opcode,14,15))
 	{

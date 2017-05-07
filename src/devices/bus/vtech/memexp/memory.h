@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VTECH_MEMEXP_MEMORY_H
+#define MAME_BUS_VTECH_MEMEXP_MEMORY_H
 
-#ifndef __VTECH_MEMEXP_MEMORY__
-#define __VTECH_MEMEXP_MEMORY__
+#pragma once
 
 #include "memexp.h"
 
@@ -18,13 +18,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> laser110_16k_device
+// ======================> vtech_laser110_16k_device
 
-class laser110_16k_device : public device_t, public device_memexp_interface
+class vtech_laser110_16k_device : public device_t, public device_vtech_memexp_interface
 {
 public:
 	// construction/destruction
-	laser110_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_laser110_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -34,13 +34,13 @@ private:
 	std::vector<uint8_t> m_ram;
 };
 
-// ======================> laser210_16k_device
+// ======================> vtech_laser210_16k_device
 
-class laser210_16k_device : public device_t, public device_memexp_interface
+class vtech_laser210_16k_device : public device_t, public device_vtech_memexp_interface
 {
 public:
 	// construction/destruction
-	laser210_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_laser210_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -50,13 +50,13 @@ private:
 	std::vector<uint8_t> m_ram;
 };
 
-// ======================> laser310_16k_device
+// ======================> vtech_laser310_16k_device
 
-class laser310_16k_device : public device_t, public device_memexp_interface
+class vtech_laser310_16k_device : public device_t, public device_vtech_memexp_interface
 {
 public:
 	// construction/destruction
-	laser310_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_laser310_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -66,13 +66,13 @@ private:
 	std::vector<uint8_t> m_ram;
 };
 
-// ======================> laser_64k_device
+// ======================> vtech_laser_64k_device
 
-class laser_64k_device : public device_t, public device_memexp_interface
+class vtech_laser_64k_device : public device_t, public device_vtech_memexp_interface
 {
 public:
 	// construction/destruction
-	laser_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_laser_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
 
@@ -85,9 +85,9 @@ private:
 };
 
 // device type definition
-extern const device_type LASER110_16K;
-extern const device_type LASER210_16K;
-extern const device_type LASER310_16K;
-extern const device_type LASER_64K;
+DECLARE_DEVICE_TYPE(VTECH_LASER110_16K, vtech_laser110_16k_device)
+DECLARE_DEVICE_TYPE(VTECH_LASER210_16K, vtech_laser210_16k_device)
+DECLARE_DEVICE_TYPE(VTECH_LASER310_16K, vtech_laser310_16k_device)
+DECLARE_DEVICE_TYPE(VTECH_LASER_64K,    vtech_laser_64k_device)
 
-#endif // __VTECH_MEMEXP_MEMORY__
+#endif // MAME_BUS_VTECH_MEMEXP_MEMORY_H

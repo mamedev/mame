@@ -327,7 +327,7 @@ INTERRUPT_GEN_MEMBER(starfire_state::vblank_int)
 }
 
 
-static MACHINE_CONFIG_START( fireone, starfire_state )
+static MACHINE_CONFIG_START( fireone )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, STARFIRE_CPU_CLOCK)

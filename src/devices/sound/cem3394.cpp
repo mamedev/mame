@@ -41,42 +41,42 @@
 
     From the datasheet:
 
-    CEM3394_VCO_FREQUENCY:
+    VCO_FREQUENCY:
         -4.0 ... +4.0
         -0.75 V/octave
         f = exp(V) * 431.894
 
-    CEM3394_MODULATION_AMOUNT
+    MODULATION_AMOUNT
          0.0 ... +3.5
          0.0 == 0.01 x frequency
          3.5 == 2.00 x frequency
 
-    CEM3394_WAVE_SELECT
+    WAVE_SELECT
         -0.5 ... -0.2 == triangle
         +0.9 ... +1.5 == triangle + sawtooth
         +2.3 ... +3.9 == sawtooth
 
-    CEM3394_PULSE_WIDTH
+    PULSE_WIDTH
          0.0 ... +2.0
          0.0 ==   0% duty cycle
         +2.0 == 100% duty cycle
 
-    CEM3394_MIXER_BALANCE
+    MIXER_BALANCE
         -4.0 ... +4.0
          0.0 both at -6dB
          -20 dB/V
 
-    CEM3394_FILTER_RESONANCE
+    FILTER_RESONANCE
          0.0 ... +2.5
          0.0 == no resonance
         +2.5 == oscillation
 
-    CEM3394_FILTER_FREQENCY
+    FILTER_FREQENCY
         -3.0 ... +4.0
         -0.375 V/octave
          0.0 == 1300Hz
 
-    CEM3394_FINAL_GAIN
+    FINAL_GAIN
          0.0 ... +4.0
          -20 dB/V
          0.0 == -90dB
@@ -105,7 +105,7 @@
 
 
 // device type definition
-const device_type CEM3394 = device_creator<cem3394_device>;
+DEFINE_DEVICE_TYPE(CEM3394, cem3394_device, "cem3394", "CEM3394")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -116,7 +116,7 @@ const device_type CEM3394 = device_creator<cem3394_device>;
 //-------------------------------------------------
 
 cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CEM3394, "CEM3394", tag, owner, clock, "cem3394", __FILE__),
+	: device_t(mconfig, CEM3394, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_vco_zero_freq(0.0),
@@ -217,7 +217,7 @@ void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	if (int_volume != 0)
 	{
 		if (m_wave_select == 0 && !ext_volume)
-			logerror("%f V didn't cut it\n", m_values[CEM3394_WAVE_SELECT]);
+			logerror("%f V didn't cut it\n", m_values[WAVE_SELECT]);
 
 		/* handle the pulse component; it maxes out at 0x1932, which is 27% smaller than */
 		/* the sawtooth (since the value is constant, this is the best place to have an */
@@ -327,7 +327,7 @@ void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 void cem3394_device::device_start()
 {
 	/* copy global parameters */
-	m_sample_rate = CEM3394_SAMPLE_RATE;
+	m_sample_rate = SAMPLE_RATE;
 	m_inv_sample_rate = 1.0 / (double)m_sample_rate;
 
 	/* allocate stream channels, 1 per chip */
@@ -426,13 +426,13 @@ void cem3394_device::set_voltage(int input, double voltage)
 	switch (input)
 	{
 		/* frequency varies from -4.0 to +4.0, at 0.75V/octave */
-		case CEM3394_VCO_FREQUENCY:
+		case VCO_FREQUENCY:
 			temp = m_vco_zero_freq * pow(2.0, -voltage * (1.0 / 0.75));
 			m_step = (uint32_t)(temp * m_inv_sample_rate * FRACTION_ONE_D);
 			break;
 
 		/* wave select determines triangle/sawtooth enable */
-		case CEM3394_WAVE_SELECT:
+		case WAVE_SELECT:
 			m_wave_select &= ~(WAVE_TRIANGLE | WAVE_SAWTOOTH);
 			if (voltage >= -0.5 && voltage <= -0.2)
 				m_wave_select |= WAVE_TRIANGLE;
@@ -443,7 +443,7 @@ void cem3394_device::set_voltage(int input, double voltage)
 			break;
 
 		/* pulse width determines duty cycle; 0.0 means 0%, 2.0 means 100% */
-		case CEM3394_PULSE_WIDTH:
+		case PULSE_WIDTH:
 			if (voltage < 0.0)
 			{
 				m_pulse_width = 0;
@@ -460,13 +460,13 @@ void cem3394_device::set_voltage(int input, double voltage)
 			break;
 
 		/* final gain is pretty self-explanatory; 0.0 means ~90dB, 4.0 means 0dB */
-		case CEM3394_FINAL_GAIN:
+		case FINAL_GAIN:
 			m_volume = compute_db_volume(voltage);
 			break;
 
 		/* mixer balance is a pan between the external input and the internal input */
 		/* 0.0 is equal parts of both; positive values favor external, negative favor internal */
-		case CEM3394_MIXER_BALANCE:
+		case MIXER_BALANCE:
 			if (voltage >= 0.0)
 			{
 				m_mixer_internal = compute_db_volume(3.55 - voltage);
@@ -480,14 +480,14 @@ void cem3394_device::set_voltage(int input, double voltage)
 			break;
 
 		/* filter frequency varies from -4.0 to +4.0, at 0.375V/octave */
-		case CEM3394_FILTER_FREQENCY:
+		case FILTER_FREQENCY:
 			temp = m_filter_zero_freq * pow(2.0, -voltage * (1.0 / 0.375));
 			m_filter_step = (uint32_t)(temp * m_inv_sample_rate * FRACTION_ONE_D);
 			break;
 
 		/* modulation depth is 0.01 at 0V and 2.0 at 3.5V; how it grows from one to the other */
 		/* is still unclear at this point */
-		case CEM3394_MODULATION_AMOUNT:
+		case MODULATION_AMOUNT:
 			if (voltage < 0.0)
 				m_modulation_depth = (uint32_t)(0.01 * FRACTION_ONE_D);
 			else if (voltage > 3.5)
@@ -497,7 +497,7 @@ void cem3394_device::set_voltage(int input, double voltage)
 			break;
 
 		/* this is not yet implemented */
-		case CEM3394_FILTER_RESONANCE:
+		case FILTER_RESONANCE:
 			break;
 	}
 }
@@ -509,13 +509,13 @@ double cem3394_device::get_parameter(int input)
 
 	switch (input)
 	{
-		case CEM3394_VCO_FREQUENCY:
+		case VCO_FREQUENCY:
 			return m_vco_zero_freq * pow(2.0, -voltage * (1.0 / 0.75));
 
-		case CEM3394_WAVE_SELECT:
+		case WAVE_SELECT:
 			return voltage;
 
-		case CEM3394_PULSE_WIDTH:
+		case PULSE_WIDTH:
 			if (voltage <= 0.0)
 				return 0.0;
 			else if (voltage >= 2.0)
@@ -523,13 +523,13 @@ double cem3394_device::get_parameter(int input)
 			else
 				return voltage * 0.5;
 
-		case CEM3394_FINAL_GAIN:
+		case FINAL_GAIN:
 			return compute_db(voltage);
 
-		case CEM3394_MIXER_BALANCE:
+		case MIXER_BALANCE:
 			return voltage * 0.25;
 
-		case CEM3394_MODULATION_AMOUNT:
+		case MODULATION_AMOUNT:
 			if (voltage < 0.0)
 				return 0.01;
 			else if (voltage > 3.5)
@@ -537,7 +537,7 @@ double cem3394_device::get_parameter(int input)
 			else
 				return (voltage * (1.0 / 3.5)) * 1.99 + 0.01;
 
-		case CEM3394_FILTER_RESONANCE:
+		case FILTER_RESONANCE:
 			if (voltage < 0.0)
 				return 0.0;
 			else if (voltage > 2.5)
@@ -545,7 +545,7 @@ double cem3394_device::get_parameter(int input)
 			else
 				return voltage * (1.0 / 2.5);
 
-		case CEM3394_FILTER_FREQENCY:
+		case FILTER_FREQENCY:
 			return m_filter_zero_freq * pow(2.0, -voltage * (1.0 / 0.375));
 	}
 	return 0.0;

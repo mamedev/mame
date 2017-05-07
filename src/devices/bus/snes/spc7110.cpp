@@ -16,34 +16,52 @@
 #include "spc7110.h"
 
 
+namespace {
+
+enum RTC_State
+{
+	RTCS_Inactive,
+	RTCS_ModeSelect,
+	RTCS_IndexSelect,
+	RTCS_Write
+};
+
+enum RTC_Mode
+{
+	RTCM_Linear = 0x03,
+	RTCM_Indexed = 0x0c
+};
+
+} // anonymous namespace
+
 //-------------------------------------------------
 //  constructor
 //-------------------------------------------------
 
-const device_type SNS_HIROM_SPC7110 = device_creator<sns_rom_spc7110_device>;
-const device_type SNS_HIROM_SPC7110_RTC = device_creator<sns_rom_spc7110rtc_device>;
+DEFINE_DEVICE_TYPE(SNS_HIROM_SPC7110,     sns_rom_spc7110_device,    "sns_rom_spc7110",    "SNES Cart + SPC7110")
+DEFINE_DEVICE_TYPE(SNS_HIROM_SPC7110_RTC, sns_rom_spc7110rtc_device, "sns_rom_spc7110rtc", "SNES Cart + SPC7110 + RTC")
 
 
-sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-			: sns_rom21_device(mconfig, type, name, tag, owner, clock, shortname, source), m_r4801(0), m_r4802(0), m_r4803(0), m_r4804(0), m_r4805(0), m_r4806(0), m_r4807(0),
-	m_r4808(0), m_r4809(0), m_r480a(0), m_r480b(0), m_r480c(0), m_decomp(nullptr), m_r4811(0), m_r4812(0), m_r4813(0), m_r4814(0), m_r4815(0), m_r4816(0), m_r4817(0), m_r4818(0),
-	m_r481x(0), m_r4814_latch(0), m_r4815_latch(0), m_r4820(0), m_r4821(0), m_r4822(0), m_r4823(0), m_r4824(0), m_r4825(0), m_r4826(0), m_r4827(0), m_r4828(0), m_r4829(0), m_r482a(0),
-	m_r482b(0), m_r482c(0), m_r482d(0), m_r482e(0), m_r482f(0), m_r4830(0), m_r4831(0), m_r4832(0), m_r4833(0), m_r4834(0), m_dx_offset(0), m_ex_offset(0), m_fx_offset(0), m_r4840(0),
-	m_r4841(0), m_r4842(0), m_rtc_state(0), m_rtc_mode(0), m_rtc_index(0), m_rtc_offset(0)
-		{
+sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: sns_rom21_device(mconfig, type, tag, owner, clock)
+	, m_r4801(0), m_r4802(0), m_r4803(0), m_r4804(0), m_r4805(0), m_r4806(0), m_r4807(0), m_r4808(0), m_r4809(0), m_r480a(0), m_r480b(0), m_r480c(0)
+	, m_decomp(nullptr)
+	, m_r4811(0), m_r4812(0), m_r4813(0), m_r4814(0), m_r4815(0), m_r4816(0), m_r4817(0), m_r4818(0), m_r481x(0), m_r4814_latch(0), m_r4815_latch(0)
+	, m_r4820(0), m_r4821(0), m_r4822(0), m_r4823(0), m_r4824(0), m_r4825(0), m_r4826(0), m_r4827(0), m_r4828(0), m_r4829(0), m_r482a(0), m_r482b(0), m_r482c(0), m_r482d(0), m_r482e(0), m_r482f(0)
+	, m_r4830(0), m_r4831(0), m_r4832(0), m_r4833(0), m_r4834(0)
+	, m_dx_offset(0), m_ex_offset(0), m_fx_offset(0)
+	, m_r4840(0), m_r4841(0), m_r4842(0)
+	, m_rtc_state(0), m_rtc_mode(0), m_rtc_index(0), m_rtc_offset(0)
+{
 }
 
 sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: sns_rom21_device(mconfig, SNS_HIROM_SPC7110, "SNES Cart + SPC-7110", tag, owner, clock, "sns_rom_spc7110", __FILE__), m_r4801(0), m_r4802(0), m_r4803(0), m_r4804(0), m_r4805(0), m_r4806(0), m_r4807(0),
-	m_r4808(0), m_r4809(0), m_r480a(0), m_r480b(0), m_r480c(0), m_decomp(nullptr), m_r4811(0), m_r4812(0), m_r4813(0), m_r4814(0), m_r4815(0), m_r4816(0), m_r4817(0), m_r4818(0),
-	m_r481x(0), m_r4814_latch(0), m_r4815_latch(0), m_r4820(0), m_r4821(0), m_r4822(0), m_r4823(0), m_r4824(0), m_r4825(0), m_r4826(0), m_r4827(0), m_r4828(0), m_r4829(0), m_r482a(0),
-	m_r482b(0), m_r482c(0), m_r482d(0), m_r482e(0), m_r482f(0), m_r4830(0), m_r4831(0), m_r4832(0), m_r4833(0), m_r4834(0), m_dx_offset(0), m_ex_offset(0), m_fx_offset(0), m_r4840(0),
-	m_r4841(0), m_r4842(0), m_rtc_state(0), m_rtc_mode(0), m_rtc_index(0), m_rtc_offset(0)
+	: sns_rom_spc7110_device(mconfig, SNS_HIROM_SPC7110, tag, owner, clock)
 {
 }
 
 sns_rom_spc7110rtc_device::sns_rom_spc7110rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: sns_rom_spc7110_device(mconfig, SNS_HIROM_SPC7110_RTC, "SNES Cart + SPC-7110 + RTC", tag, owner, clock, "sns_rom_spc7110rtc", __FILE__)
+	: sns_rom_spc7110_device(mconfig, SNS_HIROM_SPC7110_RTC, tag, owner, clock)
 {
 }
 
@@ -297,30 +315,21 @@ static const uint8_t spc7110_mode2_context_table[32][2] =
 	{ 31, 31 },
 };
 
-SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
-				:  m_machine(machine)
+sns_rom_spc7110_device::SPC7110_Decomp::SPC7110_Decomp(running_machine &machine) :  m_machine(machine)
 {
 	m_decomp_buffer = std::make_unique<uint8_t[]>(SPC7110_DECOMP_BUFFER_SIZE);
 	reset();
 
-	for (int i = 0; i < 256; i++)
+	for (uint32_t i = 0; i < 256; i++)
 	{
-#define map(x, y) (((i >> x) & 1) << y)
 		//2x8-bit
-		m_morton16[1][i] = map(7, 15) + map(6,  7) + map(5, 14) + map(4,  6)
-		+ map(3, 13) + map(2,  5) + map(1, 12) + map(0,  4);
-		m_morton16[0][i] = map(7, 11) + map(6,  3) + map(5, 10) + map(4,  2)
-		+ map(3,  9) + map(2,  1) + map(1,  8) + map(0,  0);
+		m_morton16[0][i] = (bitswap<4>(i, 7, 5, 3, 1) << 8) | (bitswap<4>(i, 6, 4, 2, 0) << 0);
+		m_morton16[1][i] = m_morton16[0][i] << 4;
 		//4x8-bit
-		m_morton32[3][i] = map(7, 31) + map(6, 23) + map(5, 15) + map(4,  7)
-		+ map(3, 30) + map(2, 22) + map(1, 14) + map(0,  6);
-		m_morton32[2][i] = map(7, 29) + map(6, 21) + map(5, 13) + map(4,  5)
-		+ map(3, 28) + map(2, 20) + map(1, 12) + map(0,  4);
-		m_morton32[1][i] = map(7, 27) + map(6, 19) + map(5, 11) + map(4,  3)
-		+ map(3, 26) + map(2, 18) + map(1, 10) + map(0,  2);
-		m_morton32[0][i] = map(7, 25) + map(6, 17) + map(5,  9) + map(4,  1)
-		+ map(3, 24) + map(2, 16) + map(1,  8) + map(0,  0);
-#undef map
+		m_morton32[0][i] = (bitswap<2>(i, 7, 3) << 24) | (bitswap<2>(i, 6, 2) << 16) | (bitswap<2>(i, 5, 1) << 8) | (bitswap<2>(i, 4, 0) << 0);
+		m_morton32[1][i] = m_morton32[0][i] << 2;
+		m_morton32[2][i] = m_morton32[0][i] << 4;
+		m_morton32[3][i] = m_morton32[0][i] << 6;
 	}
 
 	m_machine.save().save_item(m_decomp_mode, "SNES_SPC7110/m_decomp_mode");
@@ -368,7 +377,7 @@ SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 	m_machine.save().save_item(m_m2_in_count, "SNES_SPC7110/m_m2_in_count");
 }
 
-void SPC7110_Decomp::reset()
+void sns_rom_spc7110_device::SPC7110_Decomp::reset()
 {
 	//mode 3 is invalid; this is treated as a special case to always return 0x00
 	//set to mode 3 so that reading decomp port before starting first decomp will return 0x00
@@ -379,7 +388,7 @@ void SPC7110_Decomp::reset()
 	m_decomp_buffer_length   = 0;
 }
 
-void SPC7110_Decomp::init(running_machine &machine, uint8_t *ROM, uint32_t len, uint32_t mode, uint32_t offset, uint32_t index)
+void sns_rom_spc7110_device::SPC7110_Decomp::init(running_machine &machine, uint8_t *ROM, uint32_t len, uint32_t mode, uint32_t offset, uint32_t index)
 {
 	m_decomp_mode = mode;
 	m_decomp_offset = offset;
@@ -409,7 +418,7 @@ void SPC7110_Decomp::init(running_machine &machine, uint8_t *ROM, uint32_t len, 
 	}
 }
 
-uint8_t SPC7110_Decomp::read(uint8_t *ROM, uint32_t len)
+uint8_t sns_rom_spc7110_device::SPC7110_Decomp::read(uint8_t *ROM, uint32_t len)
 {
 	uint8_t data;
 
@@ -441,14 +450,14 @@ uint8_t SPC7110_Decomp::read(uint8_t *ROM, uint32_t len)
 	return data;
 }
 
-void SPC7110_Decomp::write(uint8_t data)
+void sns_rom_spc7110_device::SPC7110_Decomp::write(uint8_t data)
 {
 	m_decomp_buffer[m_decomp_buffer_wroffset++] = data;
 	m_decomp_buffer_wroffset &= SPC7110_DECOMP_BUFFER_SIZE - 1;
 	m_decomp_buffer_length++;
 }
 
-uint8_t SPC7110_Decomp::dataread(uint8_t *ROM, uint32_t len)
+uint8_t sns_rom_spc7110_device::SPC7110_Decomp::dataread(uint8_t *ROM, uint32_t len)
 {
 	uint32_t size = len - 0x100000;
 	while (m_decomp_offset >= size)
@@ -458,7 +467,7 @@ uint8_t SPC7110_Decomp::dataread(uint8_t *ROM, uint32_t len)
 	return ROM[0x100000 + m_decomp_offset++];
 }
 
-void SPC7110_Decomp::mode0(uint8_t init, uint8_t *ROM, uint32_t len)
+void sns_rom_spc7110_device::SPC7110_Decomp::mode0(uint8_t init, uint8_t *ROM, uint32_t len)
 {
 	if (init == 1)
 	{
@@ -543,7 +552,7 @@ void SPC7110_Decomp::mode0(uint8_t init, uint8_t *ROM, uint32_t len)
 	}
 }
 
-void SPC7110_Decomp::mode1(uint8_t init, uint8_t *ROM, uint32_t len)
+void sns_rom_spc7110_device::SPC7110_Decomp::mode1(uint8_t init, uint8_t *ROM, uint32_t len)
 {
 	if (init == 1)
 	{
@@ -704,7 +713,7 @@ void SPC7110_Decomp::mode1(uint8_t init, uint8_t *ROM, uint32_t len)
 	}
 }
 
-void SPC7110_Decomp::mode2(uint8_t init, uint8_t *ROM, uint32_t len)
+void sns_rom_spc7110_device::SPC7110_Decomp::mode2(uint8_t init, uint8_t *ROM, uint32_t len)
 {
 	if (init == 1)
 	{
@@ -882,27 +891,27 @@ void SPC7110_Decomp::mode2(uint8_t init, uint8_t *ROM, uint32_t len)
 	}
 }
 
-uint8_t SPC7110_Decomp::probability(uint32_t n)
+uint8_t sns_rom_spc7110_device::SPC7110_Decomp::probability(uint32_t n)
 {
 	return spc7110_evolution_table[m_context[n].index][0];
 }
 
-uint8_t SPC7110_Decomp::next_lps(uint32_t n)
+uint8_t sns_rom_spc7110_device::SPC7110_Decomp::next_lps(uint32_t n)
 {
 	return spc7110_evolution_table[m_context[n].index][1];
 }
 
-uint8_t SPC7110_Decomp::next_mps(uint32_t n)
+uint8_t sns_rom_spc7110_device::SPC7110_Decomp::next_mps(uint32_t n)
 {
 	return spc7110_evolution_table[m_context[n].index][2];
 }
 
-uint8_t SPC7110_Decomp::toggle_invert(uint32_t n)
+uint8_t sns_rom_spc7110_device::SPC7110_Decomp::toggle_invert(uint32_t n)
 {
 	return spc7110_evolution_table[m_context[n].index][3];
 }
 
-uint32_t SPC7110_Decomp::morton_2x8(uint32_t data)
+uint32_t sns_rom_spc7110_device::SPC7110_Decomp::morton_2x8(uint32_t data)
 {
 	//reverse morton lookup: de-interleave two 8-bit values
 	//15, 13, 11,  9,  7,  5,  3,  1 -> 15- 8
@@ -910,7 +919,7 @@ uint32_t SPC7110_Decomp::morton_2x8(uint32_t data)
 	return m_morton16[0][(data >>  0) & 255] + m_morton16[1][(data >>  8) & 255];
 }
 
-uint32_t SPC7110_Decomp::morton_4x8(uint32_t data)
+uint32_t sns_rom_spc7110_device::SPC7110_Decomp::morton_4x8(uint32_t data)
 {
 	//reverse morton lookup: de-interleave four 8-bit values
 	//31, 27, 23, 19, 15, 11,  7,  3 -> 31-24

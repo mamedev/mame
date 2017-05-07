@@ -6,12 +6,10 @@
 
 ***************************************************************************/
 
+#ifndef MAME_CPU_I8089_I8089_H
+#define MAME_CPU_I8089_I8089_H
+
 #pragma once
-
-#ifndef __I8089_H__
-#define __I8089_H__
-
-#include "i8089_channel.h"
 
 
 //**************************************************************************
@@ -33,21 +31,21 @@
 //**************************************************************************
 
 // forward declaration
-class i8089_channel;
+class i8089_channel_device;
 
 // ======================> i8089_device
 
 class i8089_device : public cpu_device
 {
-	friend class i8089_channel;
+	friend class i8089_channel_device;
 
 public:
 	// construction/destruction
 	i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template<class _sintr1> devcb_base &set_sintr1_callback(_sintr1 sintr1) { return m_write_sintr1.set_callback(sintr1); }
-	template<class _sintr2> devcb_base &set_sintr2_callback(_sintr2 sintr2) { return m_write_sintr2.set_callback(sintr2); }
+	template <class Object> devcb_base &set_sintr1_callback(Object &&sintr1) { return m_write_sintr1.set_callback(std::forward<Object>(sintr1)); }
+	template <class Object> devcb_base &set_sintr2_callback(Object &&sintr2) { return m_write_sintr2.set_callback(std::forward<Object>(sintr2)); }
 
 	// static configuration helpers
 	static void set_databus_width(device_t &device, uint8_t databus_width) { downcast<i8089_device &>(device).m_databus_width = databus_width; }
@@ -76,7 +74,7 @@ protected:
 	int m_icount;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -102,8 +100,8 @@ private:
 	void write_byte(bool space, offs_t address, uint8_t data);
 	void write_word(bool space, offs_t address, uint16_t data);
 
-	required_device<i8089_channel> m_ch1;
-	required_device<i8089_channel> m_ch2;
+	required_device<i8089_channel_device> m_ch1;
+	required_device<i8089_channel_device> m_ch2;
 
 	devcb_write_line m_write_sintr1;
 	devcb_write_line m_write_sintr2;
@@ -151,7 +149,7 @@ private:
 
 
 // device type definition
-extern const device_type I8089;
+DECLARE_DEVICE_TYPE(I8089, i8089_device)
 
 
-#endif  /* __I8089_H__ */
+#endif // MAME_CPU_I8089_I8089_H

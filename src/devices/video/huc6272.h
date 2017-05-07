@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_VIDEO_HUC6272_H
+#define MAME_VIDEO_HUC6272_H
 
-#ifndef __huc6272DEV_H__
-#define __huc6272DEV_H__
+#pragma once
 
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
@@ -20,14 +20,14 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_HUC6272_ADD(_tag,_freq) \
-	MCFG_DEVICE_ADD(_tag, huc6272, _freq)
+#define MCFG_HUC6272_ADD(tag, freq) \
+		MCFG_DEVICE_ADD((tag), HUC6272, (freq))
 
-#define MCFG_HUC6272_IRQ_CHANGED_CB(_devcb) \
-	devcb = &huc6272_device::set_irq_changed_callback(*device, DEVCB_##_devcb);
+#define MCFG_HUC6272_IRQ_CHANGED_CB(cb) \
+		devcb = &huc6272_device::set_irq_changed_callback(*device, (DEVCB_##cb));
 
-#define MCFG_HUC6272_RAINBOW(_tag) \
-	huc6272_device::set_rainbow_tag(*device, _tag);
+#define MCFG_HUC6272_RAINBOW(tag) \
+		huc6272_device::set_rainbow_tag(*device, (tag));
 
 
 //**************************************************************************
@@ -43,7 +43,7 @@ public:
 	// construction/destruction
 	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_irq_changed_callback(device_t &device, _Object object) { return downcast<huc6272_device &>(device).m_irq_changed_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_changed_callback(device_t &device, Object &&cb) { return downcast<huc6272_device &>(device).m_irq_changed_cb.set_callback(std::forward<Object>(cb)); }
 	static void set_rainbow_tag(device_t &device, const char *tag) { downcast<huc6272_device &>(device).m_huc6271_tag = tag; }
 
 	// I/O operations
@@ -97,7 +97,7 @@ private:
 	required_shared_ptr<uint16_t>   m_microprg_ram;
 	required_shared_ptr<uint32_t>   m_kram_page0;
 	required_shared_ptr<uint32_t>   m_kram_page1;
-	required_device<SCSI_PORT_DEVICE> m_scsibus;
+	required_device<scsi_port_device> m_scsibus;
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_ctrl_in;
@@ -111,14 +111,6 @@ private:
 };
 
 // device type definition
-extern const device_type huc6272;
+DECLARE_DEVICE_TYPE(HUC6272, huc6272_device)
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
-
-#endif
+#endif // MAME_VIDEO_HUC6272_H

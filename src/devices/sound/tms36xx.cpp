@@ -4,8 +4,8 @@
 #include "tms36xx.h"
 
 #define VERBOSE 1
+#include "logmacro.h"
 
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 /* the frequencies are later adjusted by "* clock / FSCALE" */
 #define FSCALE  1024
@@ -309,7 +309,7 @@ static const int *const tunes[] = {nullptr,tune1,tune2,tune3,tune4};
 
 
 // device type definition
-const device_type TMS36XX = device_creator<tms36xx_device>;
+DEFINE_DEVICE_TYPE(TMS36XX, tms36xx_device, "tms36xx", "TMS36XX")
 
 
 //**************************************************************************
@@ -321,7 +321,7 @@ const device_type TMS36XX = device_creator<tms36xx_device>;
 //-------------------------------------------------
 
 tms36xx_device::tms36xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TMS36XX, "TMS36XX", tag, owner, clock, "tms36xx", __FILE__),
+	: device_t(mconfig, TMS36XX, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_subtype(nullptr),
 		m_channel(nullptr),
@@ -369,12 +369,12 @@ void tms36xx_device::device_start()
 	}
 	tms3617_enable(enable);
 
-	LOG(("TMS36xx samplerate    %d\n", m_samplerate));
-	LOG(("TMS36xx basefreq      %d\n", m_basefreq));
-	LOG(("TMS36xx decay         %d,%d,%d,%d,%d,%d\n",
+	LOG("TMS36xx samplerate    %d\n", m_samplerate);
+	LOG("TMS36xx basefreq      %d\n", m_basefreq);
+	LOG("TMS36xx decay         %d,%d,%d,%d,%d,%d\n",
 		m_decay[0], m_decay[1], m_decay[2],
-		m_decay[3], m_decay[4], m_decay[5]));
-	LOG(("TMS36xx speed         %d\n", m_speed));
+		m_decay[3], m_decay[4], m_decay[5]);
+	LOG("TMS36xx speed         %d\n", m_speed);
 
 	save_item(NAME(m_octave));
 	save_item(NAME(m_tune_counter));
@@ -460,7 +460,7 @@ void tms36xx_device::mm6221aa_tune_w(int tune)
 	if( tune == m_tune_num )
 		return;
 
-	LOG(("%s tune:%X\n", m_subtype, tune));
+	LOG("%s tune:%X\n", m_subtype, tune);
 
 	/* update the stream before changing the tune */
 	m_channel->update();
@@ -483,7 +483,7 @@ void tms36xx_device::tms36xx_note_w(int octave, int note)
 	if (note > 12)
 		return;
 
-	LOG(("%s octave:%X note:%X\n", m_subtype, octave, note));
+	LOG("%s octave:%X note:%X\n", m_subtype, octave, note);
 
 	/* update the stream before changing the tune */
 	m_channel->update();
@@ -532,7 +532,7 @@ void tms36xx_device::tms3617_enable(int enable)
 	/* update the stream before changing the tune */
 	m_channel->update();
 
-	LOG(("%s enable voices", m_subtype));
+	LOG("%s enable voices", m_subtype);
 	for (i = 0; i < 6; i++)
 	{
 		if (enable & (1 << i))
@@ -541,17 +541,17 @@ void tms36xx_device::tms3617_enable(int enable)
 
 			switch (i)
 			{
-			case 0: LOG((" 16'")); break;
-			case 1: LOG((" 8'")); break;
-			case 2: LOG((" 5 1/3'")); break;
-			case 3: LOG((" 4'")); break;
-			case 4: LOG((" 2 2/3'")); break;
-			case 5: LOG((" 2'")); break;
+			case 0: LOG(" 16'"); break;
+			case 1: LOG(" 8'"); break;
+			case 2: LOG(" 5 1/3'"); break;
+			case 3: LOG(" 4'"); break;
+			case 4: LOG(" 2 2/3'"); break;
+			case 5: LOG(" 2'"); break;
 			}
 		}
 	}
 	/* set the enable mask and number of active voices */
 	m_enable = enable;
 	m_voices = bits;
-	LOG(("%s\n", bits ? "" : " none"));
+	LOG("%s\n", bits ? "" : " none");
 }

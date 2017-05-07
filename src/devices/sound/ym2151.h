@@ -30,10 +30,10 @@
 ** Ishmair - for the datasheet and motivation.
 */
 
-#pragma once
+#ifndef MAME_SOUND_YM2151_H
+#define MAME_SOUND_YM2151_H
 
-#ifndef __YM2151_H__
-#define __YM2151_H__
+#pragma once
 
 
 //**************************************************************************
@@ -64,8 +64,8 @@ public:
 	ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ym2151_device &>(device).m_irqhandler.set_callback(object); }
-	template<class _Object> static devcb_base &set_port_write_handler(device_t &device, _Object object) { return downcast<ym2151_device &>(device).m_portwritehandler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ym2151_device &>(device).m_irqhandler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port_write_handler(device_t &device, Object &&cb) { return downcast<ym2151_device &>(device).m_portwritehandler.set_callback(std::forward<Object>(cb)); }
 
 	// read/write
 	DECLARE_READ8_MEMBER( read );
@@ -273,7 +273,7 @@ private:
 
 
 // device type definition
-extern const device_type YM2151;
+DECLARE_DEVICE_TYPE(YM2151, ym2151_device)
 
 
-#endif /* __2151INTF_H__ */
+#endif // MAME_SOUND_YM2151_H

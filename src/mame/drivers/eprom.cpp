@@ -386,7 +386,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( eprom, eprom_state )
+static MACHINE_CONFIG_START( eprom )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -434,7 +434,7 @@ static MACHINE_CONFIG_START( eprom, eprom_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( klaxp, eprom_state )
+static MACHINE_CONFIG_START( klaxp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -478,7 +478,7 @@ static MACHINE_CONFIG_START( klaxp, eprom_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( guts, eprom_state )
+static MACHINE_CONFIG_START( guts )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -761,4 +761,4 @@ GAME( 1989, eprom,  0,     eprom, eprom, eprom_state, eprom, ROT0, "Atari Games"
 GAME( 1989, eprom2, eprom, eprom, eprom, eprom_state, eprom, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, klaxp1, klax,  klaxp, klaxp, eprom_state, klaxp, ROT0, "Atari Games", "Klax (prototype set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, klaxp2, klax,  klaxp, klaxp, eprom_state, klaxp, ROT0, "Atari Games", "Klax (prototype set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, guts,   0,     guts,  guts, eprom_state,  guts,  ROT0, "Atari Games", "Guts n' Glory (prototype)", 0 )
+GAME( 1989, guts,   0,     guts,  guts,  eprom_state, guts,  ROT0, "Atari Games", "Guts n' Glory (prototype)", 0 )

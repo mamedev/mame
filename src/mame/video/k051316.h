@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
+#ifndef MAME_VIDEO_K051316_H
+#define MAME_VIDEO_K051316_H
+
 #pragma once
-#ifndef __K051316_H__
-#define __K051316_H__
+
 
 typedef device_delegate<void (int *code, int *color, int *flags)> k051316_cb_delegate;
 #define K051316_CB_MEMBER(_name)   void _name(int *code, int *color, int *flags)
@@ -24,12 +26,10 @@ typedef device_delegate<void (int *code, int *color, int *flags)> k051316_cb_del
 	k051316_device::set_wrap(*device, _wrap);
 
 
-class k051316_device : public device_t,
-						public device_gfx_interface
+class k051316_device : public device_t, public device_gfx_interface
 {
 public:
 	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~k051316_device() {}
 
 	static const gfx_layout charlayout4;
 	static const gfx_layout charlayout7;
@@ -95,6 +95,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
-extern const device_type K051316;
+DECLARE_DEVICE_TYPE(K051316, k051316_device)
 
-#endif
+#endif // MAME_VIDEO_K051316_H

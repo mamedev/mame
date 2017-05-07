@@ -188,7 +188,7 @@ void hcastle_state::machine_reset()
 	m_old_pf2 = -1;
 }
 
-static MACHINE_CONFIG_START( hcastle, hcastle_state )
+static MACHINE_CONFIG_START( hcastle )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)    /* Derived from 24 MHz clock */
@@ -381,8 +381,8 @@ ROM_END
 
 
 
-GAME( 1988, hcastle,   0,       hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Haunted Castle (version M)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hcastlek,  hcastle, hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Haunted Castle (version K)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hcastlee,  hcastle, hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Haunted Castle (version E)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, akumajou,  hcastle, hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Akuma-Jou Dracula (Japan version P)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, akumajoun, hcastle, hcastle, hcastle, driver_device, 0, ROT0, "Konami", "Akuma-Jou Dracula (Japan version N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hcastle,   0,       hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Haunted Castle (version M)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hcastlek,  hcastle, hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Haunted Castle (version K)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hcastlee,  hcastle, hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Haunted Castle (version E)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, akumajou,  hcastle, hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Akuma-Jou Dracula (Japan version P)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, akumajoun, hcastle, hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Akuma-Jou Dracula (Japan version N)", MACHINE_SUPPORTS_SAVE )

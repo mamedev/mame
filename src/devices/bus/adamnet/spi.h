@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ADAMNET_SPI_H
+#define MAME_BUS_ADAMNET_SPI_H
 
-#ifndef __ADAM_SPI__
-#define __ADAM_SPI__
+#pragma once
 
 #include "adamnet.h"
 #include "bus/centronics/ctronics.h"
@@ -52,8 +52,6 @@ protected:
 
 
 // device type definition
-extern const device_type ADAM_SPI;
+DECLARE_DEVICE_TYPE(ADAM_SPI, adam_spi_device)
 
-
-
-#endif
+#endif // MAME_BUS_ADAMNET_SPI_H

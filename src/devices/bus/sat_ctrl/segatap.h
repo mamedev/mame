@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SAT_CTRL_SEGATAP_H
+#define MAME_BUS_SAT_CTRL_SEGATAP_H
 
-#ifndef __SATURN_SEGATAP__
-#define __SATURN_SEGATAP__
+#pragma once
 
 
 #include "ctrl.h"
@@ -51,7 +51,6 @@ private:
 
 
 // device type definition
-extern const device_type SATURN_SEGATAP;
+DECLARE_DEVICE_TYPE(SATURN_SEGATAP, saturn_segatap_device)
 
-
-#endif
+#endif // MAME_BUS_SAT_CTRL_SEGATAP_H

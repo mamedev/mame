@@ -180,7 +180,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( subs, subs_state )
+static MACHINE_CONFIG_START( subs )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,12096000/16)      /* clock input is the "4H" signal */
@@ -256,4 +256,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, subs, 0, subs, subs, driver_device, 0, ROT0, "Atari", "Subs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, subs, 0, subs, subs, subs_state, 0, ROT0, "Atari", "Subs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

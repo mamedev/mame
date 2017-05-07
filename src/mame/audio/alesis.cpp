@@ -19,7 +19,7 @@
 #define LOG 1
 
 // device type definition
-const device_type ALESIS_DM3AG = device_creator<alesis_dm3ag_device>;
+DEFINE_DEVICE_TYPE(ALESIS_DM3AG, alesis_dm3ag_device, "alesis_dm3ag", "Alesis DM3AG")
 
 /***************************************************************************
     IMPLEMENTATION
@@ -38,9 +38,9 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 alesis_dm3ag_device::alesis_dm3ag_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ALESIS_DM3AG, "Alesis DM3AG", tag, owner, clock, "alesis_dm3ag", __FILE__),
-		m_dac(*this, "dac"),
-		m_samples(*this, DEVICE_SELF)
+	: device_t(mconfig, ALESIS_DM3AG, tag, owner, clock)
+	, m_dac(*this, "dac")
+	, m_samples(*this, DEVICE_SELF)
 {
 }
 

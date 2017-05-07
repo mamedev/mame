@@ -469,7 +469,7 @@ INTERRUPT_GEN_MEMBER(hitpoker_state::hitpoker_irq)
 	device.execute().set_input_line(MC68HC11_IRQ_LINE, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( hitpoker, hitpoker_state )
+static MACHINE_CONFIG_START( hitpoker )
 	MCFG_CPU_ADD("maincpu", MC68HC11,1000000)
 	MCFG_CPU_PROGRAM_MAP(hitpoker_map)
 	MCFG_CPU_IO_MAP(hitpoker_io)

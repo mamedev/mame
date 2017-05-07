@@ -194,7 +194,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PC_KBD_MICROSOFT_NATURAL      = device_creator<pc_kbd_microsoft_natural_device>;
+DEFINE_DEVICE_TYPE(PC_KBD_MICROSOFT_NATURAL, pc_kbd_microsoft_natural_device, "kb_ms_natural", "Microsoft Natural Keyboard")
 
 /*****************************************************************************
     ADDRESS MAPS
@@ -229,25 +229,12 @@ ROM_END
 
 
 pc_kbd_microsoft_natural_device::pc_kbd_microsoft_natural_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC_KBD_MICROSOFT_NATURAL, "Microsoft Natural Keyboard", tag, owner, clock, "ms_natural", __FILE__)
+	: device_t(mconfig, PC_KBD_MICROSOFT_NATURAL, tag, owner, clock)
 	, device_pc_kbd_interface(mconfig, *this)
 	, m_cpu(*this, "ms_natrl_cpu")
-	, m_p2_0(*this, "P2.0")
-	, m_p2_1(*this, "P2.1")
-	, m_p2_2(*this, "P2.2")
-	, m_p2_3(*this, "P2.3")
-	, m_p2_4(*this, "P2.4")
-	, m_p2_5(*this, "P2.5")
-	, m_p2_6(*this, "P2.6")
-	, m_p2_7(*this, "P2.7")
-	, m_p1_0(*this, "P1.0")
-	, m_p1_1(*this, "P1.1")
-	, m_p1_2(*this, "P1.2")
-	, m_p1_3(*this, "P1.3")
-	, m_p1_4(*this, "P1.4")
-	, m_p1_5(*this, "P1.5")
-	, m_p1_6(*this, "P1.6")
-	, m_p1_7(*this, "P1.7"), m_p0(0), m_p1(0), m_p2(0), m_p3(0)
+	, m_p2_r(*this, "P2.%u", 0)
+	, m_p1_r(*this, "P1.%u", 0)
+	, m_p0(0), m_p1(0), m_p2(0), m_p3(0)
 {
 }
 
@@ -321,84 +308,52 @@ READ8_MEMBER( pc_kbd_microsoft_natural_device::p0_read )
 		logerror("%s: P0 read. P1 = %02x, P2 = %02x\n", tag(), m_p1, m_p2 );
 
 	if ( ! ( m_p2 & 0x01 ) )
-	{
-		data &= m_p2_0->read();
-	}
+		data &= m_p2_r[0]->read();
 
 	if ( ! ( m_p2 & 0x02 ) )
-	{
-		data &= m_p2_1->read();
-	}
+		data &= m_p2_r[1]->read();
 
 	if ( ! ( m_p2 & 0x04 ) )
-	{
-		data &= m_p2_2->read();
-	}
+		data &= m_p2_r[2]->read();
 
 	if ( ! ( m_p2 & 0x08 ) )
-	{
-		data &= m_p2_3->read();
-	}
+		data &= m_p2_r[3]->read();
 
 	if ( ! ( m_p2 & 0x10 ) )
-	{
-		data &= m_p2_4->read();
-	}
+		data &= m_p2_r[4]->read();
 
 	if ( ! ( m_p2 & 0x20 ) )
-	{
-		data &= m_p2_5->read();
-	}
+		data &= m_p2_r[5]->read();
 
 	if ( ! ( m_p2 & 0x40 ) )
-	{
-		data &= m_p2_6->read();
-	}
+		data &= m_p2_r[6]->read();
 
 	if ( ! ( m_p2 & 0x80 ) )
-	{
-		data &= m_p2_7->read();
-	}
+		data &= m_p2_r[7]->read();
 
 	if ( ! ( m_p1 & 0x01 ) )
-	{
-		data &= m_p1_0->read();
-	}
+		data &= m_p1_r[0]->read();
 
 	if ( ! ( m_p1 & 0x02 ) )
-	{
-		data &= m_p1_1->read();
-	}
+		data &= m_p1_r[1]->read();
 
 	if ( ! ( m_p1 & 0x04 ) )
-	{
-		data &= m_p1_2->read();
-	}
+		data &= m_p1_r[2]->read();
 
 	if ( ! ( m_p1 & 0x08 ) )
-	{
-		data &= m_p1_3->read();
-	}
+		data &= m_p1_r[3]->read();
 
 	if ( ! ( m_p1 & 0x10 ) )
-	{
-		data &= m_p1_4->read();
-	}
+		data &= m_p1_r[4]->read();
 
 	if ( ! ( m_p1 & 0x20 ) )
-	{
-		data &= m_p1_5->read();
-	}
+		data &= m_p1_r[5]->read();
 
 	if ( ! ( m_p1 & 0x40 ) )
-	{
-		data &= m_p1_6->read();
-	}
+		data &= m_p1_r[6]->read();
 
 	if ( ! ( m_p1 & 0x80 ) )
-	{
-		data &= m_p1_7->read();
-	}
+		data &= m_p1_r[7]->read();
 
 	return data;
 }

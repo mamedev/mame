@@ -51,10 +51,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_KB3600_H
+#define MAME_MACHINE_KB3600_H
 
-#ifndef __AY3600__
-#define __AY3600__
+#pragma once
 
 
 
@@ -96,7 +96,7 @@
 
 // ======================> ay3600_device
 
-class ay3600_device :   public device_t
+class ay3600_device : public device_t
 {
 public:
 	// construction/destruction
@@ -105,23 +105,19 @@ public:
 	// public interface
 	uint16_t b_r();
 
-	template<class _Object> static devcb_base &set_x0_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x0.set_callback(rd); }
-	template<class _Object> static devcb_base &set_x1_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x1.set_callback(rd); }
-	template<class _Object> static devcb_base &set_x2_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x2.set_callback(rd); }
-	template<class _Object> static devcb_base &set_x3_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x3.set_callback(rd); }
-	template<class _Object> static devcb_base &set_x4_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x4.set_callback(rd); }
-	template<class _Object> static devcb_base &set_x5_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x5.set_callback(rd); }
-	template<class _Object> static devcb_base &set_x6_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x6.set_callback(rd); }
-	template<class _Object> static devcb_base &set_x7_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x7.set_callback(rd); }
-	template<class _Object> static devcb_base &set_x8_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x8.set_callback(rd); }
-	template<class _Object> static devcb_base &set_shift_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_shift.set_callback(rd); }
-	template<class _Object> static devcb_base &set_control_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_control.set_callback(rd); }
-	template<class _Object> static devcb_base &set_data_ready_cb(device_t &device, _Object wr) { return downcast<ay3600_device &>(device).m_write_data_ready.set_callback(wr); }
-	template<class _Object> static devcb_base &set_ako_cb(device_t &device, _Object wr) { return downcast<ay3600_device &>(device).m_write_ako.set_callback(wr); }
-
-	devcb_read16 m_read_x0, m_read_x1, m_read_x2, m_read_x3, m_read_x4, m_read_x5, m_read_x6, m_read_x7, m_read_x8;
-	devcb_read_line m_read_shift, m_read_control;
-	devcb_write_line m_write_data_ready, m_write_ako;
+	template <class Object> static devcb_base &set_x0_cb(device_t &device, Object &&rd) { return downcast<ay3600_device &>(device).m_read_x0.set_callback(std::forward<Object>(rd)); }
+	template <class Object> static devcb_base &set_x1_cb(device_t &device, Object &&rd) { return downcast<ay3600_device &>(device).m_read_x1.set_callback(std::forward<Object>(rd)); }
+	template <class Object> static devcb_base &set_x2_cb(device_t &device, Object &&rd) { return downcast<ay3600_device &>(device).m_read_x2.set_callback(std::forward<Object>(rd)); }
+	template <class Object> static devcb_base &set_x3_cb(device_t &device, Object &&rd) { return downcast<ay3600_device &>(device).m_read_x3.set_callback(std::forward<Object>(rd)); }
+	template <class Object> static devcb_base &set_x4_cb(device_t &device, Object &&rd) { return downcast<ay3600_device &>(device).m_read_x4.set_callback(std::forward<Object>(rd)); }
+	template <class Object> static devcb_base &set_x5_cb(device_t &device, Object &&rd) { return downcast<ay3600_device &>(device).m_read_x5.set_callback(std::forward<Object>(rd)); }
+	template <class Object> static devcb_base &set_x6_cb(device_t &device, Object &&rd) { return downcast<ay3600_device &>(device).m_read_x6.set_callback(std::forward<Object>(rd)); }
+	template <class Object> static devcb_base &set_x7_cb(device_t &device, Object &&rd) { return downcast<ay3600_device &>(device).m_read_x7.set_callback(std::forward<Object>(rd)); }
+	template <class Object> static devcb_base &set_x8_cb(device_t &device, Object &&rd) { return downcast<ay3600_device &>(device).m_read_x8.set_callback(std::forward<Object>(rd)); }
+	template <class Object> static devcb_base &set_shift_cb(device_t &device, Object &&rd) { return downcast<ay3600_device &>(device).m_read_shift.set_callback(std::forward<Object>(rd)); }
+	template <class Object> static devcb_base &set_control_cb(device_t &device, Object &&rd) { return downcast<ay3600_device &>(device).m_read_control.set_callback(std::forward<Object>(rd)); }
+	template <class Object> static devcb_base &set_data_ready_cb(device_t &device, Object &&wr) { return downcast<ay3600_device &>(device).m_write_data_ready.set_callback(std::forward<Object>(wr)); }
+	template <class Object> static devcb_base &set_ako_cb(device_t &device, Object &&wr) { return downcast<ay3600_device &>(device).m_write_ako.set_callback(std::forward<Object>(wr)); }
 
 protected:
 	// device-level overrides
@@ -129,8 +125,12 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	devcb_read16 m_read_x0, m_read_x1, m_read_x2, m_read_x3, m_read_x4, m_read_x5, m_read_x6, m_read_x7, m_read_x8;
+	devcb_read_line m_read_shift, m_read_control;
+	devcb_write_line m_write_data_ready, m_write_ako;
+
 private:
-	static const int MAX_KEYS_DOWN = 4;
+	static constexpr int MAX_KEYS_DOWN = 4;
 
 	int m_b;                    // output buffer
 	int m_ako;                  // any key down
@@ -143,8 +143,6 @@ private:
 
 
 // device type definition
-extern const device_type AY3600;
+DECLARE_DEVICE_TYPE(AY3600, ay3600_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_KB3600_H

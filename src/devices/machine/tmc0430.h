@@ -10,8 +10,10 @@
     February 2012: Rewritten as class
 
 ***************************************************************************/
-#ifndef __TMC0430__
-#define __TMC0430__
+#ifndef MAME_MACHINE_TMC0430_H
+#define MAME_MACHINE_TMC0430_H
+
+#pragma once
 
 extern const device_type TMC0430;
 
@@ -31,7 +33,7 @@ class tmc0430_device : public device_t
 public:
 	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<tmc0430_device &>(device).m_gromready.set_callback(object); }
+	template <class Object> static devcb_base &set_ready_wr_callback(device_t &device, Object &&cb) { return downcast<tmc0430_device &>(device).m_gromready.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
@@ -57,8 +59,8 @@ public:
 	bool idle() { return (m_phase == 0 && m_current_clock_level==CLEAR_LINE); }
 
 protected:
-	void device_start(void) override;
-	void device_reset(void) override;
+	void device_start() override;
+	void device_reset() override;
 
 private:
 	// Ready callback. This line is usually connected to the READY pin of the CPU.
@@ -107,8 +109,8 @@ private:
 };
 
 #define MCFG_GROM_ADD(_tag, _ident, _region, _offset, _ready)    \
-	MCFG_DEVICE_ADD(_tag, TMC0430, 0)  \
-	tmc0430_device::set_region_and_ident(*device, _region, _offset, _ident); \
-	tmc0430_device::set_ready_wr_callback(*device, DEVCB_##_ready);
+		MCFG_DEVICE_ADD(_tag, TMC0430, 0)  \
+		tmc0430_device::set_region_and_ident(*device, _region, _offset, _ident); \
+		tmc0430_device::set_ready_wr_callback(*device, DEVCB_##_ready);
 
-#endif
+#endif // MAME_MACHINE_TMC0430_H

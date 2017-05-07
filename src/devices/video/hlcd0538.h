@@ -6,18 +6,10 @@
 
 */
 
-#ifndef _HLCD0538_H_
-#define _HLCD0538_H_
+#ifndef MAME_VIDEO_HLCD0538_H
+#define MAME_VIDEO_HLCD0538_H
 
-
-// C/R pins (0538: d0-d7 for rows)
-#define MCFG_HLCD0538_WRITE_COLS_CB(_devcb) \
-	devcb = &hlcd0538_device::set_write_cols_callback(*device, DEVCB_##_devcb);
-
-// INTERRUPT pin
-#define MCFG_HLCD0538_INTERRUPT_CB(_devcb) \
-	devcb = &hlcd0538_device::set_write_interrupt_callback(*device, DEVCB_##_devcb);
-
+#pragma once
 
 // pinout reference
 
@@ -47,21 +39,32 @@
     HLCD 0539 has 8 more C pins(1-8) in place of R pins.
 */
 
+
+// C/R pins (0538: d0-d7 for rows)
+#define MCFG_HLCD0538_WRITE_COLS_CB(_devcb) \
+	devcb = &hlcd0538_device::set_write_cols_callback(*device, DEVCB_##_devcb);
+
+// INTERRUPT pin
+#define MCFG_HLCD0538_INTERRUPT_CB(_devcb) \
+	devcb = &hlcd0538_device::set_write_interrupt_callback(*device, DEVCB_##_devcb);
+
+
 class hlcd0538_device : public device_t
 {
 public:
 	hlcd0538_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	hlcd0538_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
-	template<typename Object> static devcb_base &set_write_cols_callback(device_t &device, Object &&object) { return downcast<hlcd0538_device &>(device).m_write_cols.set_callback(std::forward<Object>(object)); }
-	template<typename Object> static devcb_base &set_write_interrupt_callback(device_t &device, Object &&object) { return downcast<hlcd0538_device &>(device).m_write_interrupt.set_callback(std::forward<Object>(object)); }
+	template <typename Object> static devcb_base &set_write_cols_callback(device_t &device, Object &&cb) { return downcast<hlcd0538_device &>(device).m_write_cols.set_callback(std::forward<Object>(cb)); }
+	template <typename Object> static devcb_base &set_write_interrupt_callback(device_t &device, Object &&cb) { return downcast<hlcd0538_device &>(device).m_write_interrupt.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_clk);
 	DECLARE_WRITE_LINE_MEMBER(write_lcd);
 	DECLARE_WRITE_LINE_MEMBER(write_data) { m_data = (state) ? 1 : 0; }
 
 protected:
+	hlcd0538_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -84,8 +87,7 @@ public:
 
 
 
-extern const device_type HLCD0538;
-extern const device_type HLCD0539;
+DECLARE_DEVICE_TYPE(HLCD0538, hlcd0538_device)
+DECLARE_DEVICE_TYPE(HLCD0539, hlcd0539_device)
 
-
-#endif /* _HLCD0538_H_ */
+#endif // MAME_VIDEO_HLCD0538_H

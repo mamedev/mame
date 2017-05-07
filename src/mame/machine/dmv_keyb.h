@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_DMV_KEYB_H
+#define MAME_MACHINE_DMV_KEYB_H
 
-#ifndef __DMV_KEYBOARD__
-#define __DMV_KEYBOARD__
+#pragma once
 
 
 #include "cpu/mcs48/mcs48.h"
@@ -49,7 +49,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { m_shortname = "dmv_keyb"; }
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -64,7 +63,7 @@ private:
 
 
 // device type definition
-extern const device_type DMV_KEYBOARD;
+DECLARE_DEVICE_TYPE(DMV_KEYBOARD, dmv_keyboard_device)
 
 
-#endif
+#endif // MAME_MACHINE_DMV_KEYB_H

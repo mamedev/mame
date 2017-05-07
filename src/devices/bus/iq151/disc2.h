@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-#pragma once
+#ifndef MAME_BUS_IQ151_DISC2_H
+#define MAME_BUS_IQ151_DISC2_H
 
-#ifndef __IQ151_DISC2_H__
-#define __IQ151_DISC2_H__
+#pragma once
 
 #include "iq151.h"
 #include "machine/upd765.h"
@@ -39,7 +39,6 @@ protected:
 	virtual void io_write(offs_t offset, uint8_t data) override;
 
 private:
-
 	required_device<upd765a_device> m_fdc;
 	uint8_t *     m_rom;
 	bool        m_rom_enabled;
@@ -47,6 +46,6 @@ private:
 
 
 // device type definition
-extern const device_type IQ151_DISC2;
+DECLARE_DEVICE_TYPE(IQ151_DISC2, iq151_disc2_device)
 
-#endif  /* __IQ151_DISC2_H__ */
+#endif // MAME_BUS_IQ151_DISC2_H

@@ -25,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type LUXOR_4105 = device_creator<luxor_4105_device>;
+DEFINE_DEVICE_TYPE(LUXOR_4105, luxor_4105_device, "lux4105", "Luxor 4105")
 
 
 WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_bsy )
@@ -176,7 +176,7 @@ inline void luxor_4105_device::update_trrq_int()
 //-------------------------------------------------
 
 luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, LUXOR_4105, "Luxor 4105", tag, owner, clock, "lux4105", __FILE__),
+	device_t(mconfig, LUXOR_4105, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
 	m_sasibus(*this, SASIBUS_TAG),
 	m_sasi_data_out(*this, "sasi_data_out"),

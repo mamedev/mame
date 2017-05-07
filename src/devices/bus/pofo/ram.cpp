@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PORTFOLIO_RAM_CARD = device_creator<portfolio_ram_card_t>;
+DEFINE_DEVICE_TYPE(PORTFOLIO_RAM_CARD, portfolio_ram_card_device, "portfolio_ram_card", "Atari Portfolio RAM card")
 
 
 //**************************************************************************
@@ -23,11 +23,11 @@ const device_type PORTFOLIO_RAM_CARD = device_creator<portfolio_ram_card_t>;
 //**************************************************************************
 
 //-------------------------------------------------
-//  portfolio_ram_card_t - constructor
+//  portfolio_ram_card_device - constructor
 //-------------------------------------------------
 
-portfolio_ram_card_t::portfolio_ram_card_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PORTFOLIO_RAM_CARD, "Atari Portfolio RAM card", tag, owner, clock, "portfolio_ram_card", __FILE__),
+portfolio_ram_card_device::portfolio_ram_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, PORTFOLIO_RAM_CARD, tag, owner, clock),
 	device_portfolio_memory_card_slot_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this)
 {
@@ -38,7 +38,7 @@ portfolio_ram_card_t::portfolio_ram_card_t(const machine_config &mconfig, const 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void portfolio_ram_card_t::device_start()
+void portfolio_ram_card_device::device_start()
 {
 	m_nvram.allocate(0x20000);
 }
@@ -48,7 +48,7 @@ void portfolio_ram_card_t::device_start()
 //  nrdi_r - read
 //-------------------------------------------------
 
-uint8_t portfolio_ram_card_t::nrdi_r(address_space &space, offs_t offset)
+uint8_t portfolio_ram_card_device::nrdi_r(address_space &space, offs_t offset)
 {
 	return m_nvram[offset];
 }
@@ -58,7 +58,7 @@ uint8_t portfolio_ram_card_t::nrdi_r(address_space &space, offs_t offset)
 //  nwri_w - write
 //-------------------------------------------------
 
-void portfolio_ram_card_t::nwri_w(address_space &space, offs_t offset, uint8_t data)
+void portfolio_ram_card_device::nwri_w(address_space &space, offs_t offset, uint8_t data)
 {
 	m_nvram[offset] = data;
 }

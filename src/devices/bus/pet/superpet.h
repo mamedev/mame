@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_PET_SUPERPET_H
+#define MAME_BUS_PET_SUPERPET_H
 
-#ifndef __SUPERPET__
-#define __SUPERPET__
+#pragma once
 
 #include "exp.h"
 #include "machine/mos6551.h"
@@ -74,7 +74,7 @@ private:
 
 
 // device type definition
-extern const device_type SUPERPET;
+DECLARE_DEVICE_TYPE(SUPERPET, superpet_device)
 
 
-#endif
+#endif // MAME_BUS_PET_SUPERPET_H

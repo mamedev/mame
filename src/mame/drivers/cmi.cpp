@@ -219,7 +219,6 @@ static const int ch_int_levels[8] =
 class cmi01a_device : public device_t, public device_sound_interface {
 public:
 	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	cmi01a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	static void set_channel_number(device_t &device, int channel) { dynamic_cast<cmi01a_device&>(device).m_channel = channel; }
 
@@ -298,10 +297,10 @@ private:
 	int     m_irq_state;
 };
 
-const device_type CMI01A_CHANNEL_CARD = device_creator<cmi01a_device>;
+DEFINE_DEVICE_TYPE(CMI01A_CHANNEL_CARD, cmi01a_device, "cmi_01a", "Fairlight CMI-01A Channel Card")
 
 cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CMI01A_CHANNEL_CARD, "Fairlight CMI-01A Channel Card", tag, owner, clock, "cmi_01a", __FILE__)
+	: device_t(mconfig, CMI01A_CHANNEL_CARD, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_pia_0(*this, "cmi01a_pia_0")
 	, m_pia_1(*this, "cmi01a_pia_1")
@@ -601,7 +600,7 @@ protected:
 	required_memory_region m_qfc9_region;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-	required_device<fd1791_t> m_wd1791;
+	required_device<fd1791_device> m_wd1791;
 
 	required_device_array<cmi01a_device, 8> m_channels;
 
@@ -2745,7 +2744,7 @@ static SLOT_INTERFACE_START( cmi2x_floppies )
 	SLOT_INTERFACE( "8dssd", FLOPPY_8_DSSD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( cmi2x, cmi_state )
+static MACHINE_CONFIG_START( cmi2x )
 	MCFG_CPU_ADD("maincpu1", M6809E, Q209_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(maincpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cmi_state, cmi_iix_vblank)

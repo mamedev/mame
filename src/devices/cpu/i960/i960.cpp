@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Farfetch'd, R. Belmont
 #include "emu.h"
-#include "debugger.h"
 #include "i960.h"
+#include "debugger.h"
 
 CPU_DISASSEMBLE( i960  );
 
@@ -13,13 +13,14 @@ CPU_DISASSEMBLE( i960  );
 #endif
 
 
-const device_type I960 = device_creator<i960_cpu_device>;
+DEFINE_DEVICE_TYPE(I960, i960_cpu_device, "i960kb", "i960KB")
 
 
 i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, I960, "i960kb", tag, owner, clock, "i960kb", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0), m_rcache_pos(0), m_SAT(0), m_PRCB(0), m_PC(0), m_AC(0), m_IP(0), m_PIP(0), m_ICR(0), m_bursting(0), m_immediate_irq(0),
-	m_immediate_vector(0), m_immediate_pri(0), m_program(nullptr), m_direct(nullptr), m_icount(0)
+	: cpu_device(mconfig, I960, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_rcache_pos(0), m_SAT(0), m_PRCB(0), m_PC(0), m_AC(0), m_IP(0), m_PIP(0), m_ICR(0), m_bursting(0), m_immediate_irq(0)
+	, m_immediate_vector(0), m_immediate_pri(0), m_program(nullptr), m_direct(nullptr), m_icount(0)
 {
 }
 

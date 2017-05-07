@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VIP_VP620_H
+#define MAME_BUS_VIP_VP620_H
 
-#ifndef __VP620__
-#define __VP620__
+#pragma once
 
 #include "byteio.h"
 #include "machine/keyboard.h"
@@ -33,7 +33,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public
-	DECLARE_WRITE8_MEMBER( kb_w );
+	void kb_w(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -50,7 +50,6 @@ private:
 
 
 // device type definition
-extern const device_type VP620;
+DECLARE_DEVICE_TYPE(VP620, vp620_device)
 
-
-#endif
+#endif // MAME_BUS_VIP_VP620_H

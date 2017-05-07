@@ -97,7 +97,7 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<pc1512_keyboard_t> m_kb;
+	required_device<pc1512_keyboard_device> m_kb;
 	required_device<ram_device> m_ram;
 	required_device<floppy_image_device> m_floppy0;
 	optional_device<floppy_image_device> m_floppy1;

@@ -12,25 +12,19 @@
 #include "snapquik.h"
 
 // device type definition
-const device_type SNAPSHOT = device_creator<snapshot_image_device>;
+DEFINE_DEVICE_TYPE(SNAPSHOT, snapshot_image_device, "snapsot_image", "Snapshot")
 
 //-------------------------------------------------
 //  snapshot_image_device - constructor
 //-------------------------------------------------
 
 snapshot_image_device::snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SNAPSHOT, "Snapshot", tag, owner, clock, "snapshot_image", __FILE__),
-		device_image_interface(mconfig, *this),
-		m_file_extensions(nullptr),
-		m_interface(nullptr),
-		m_delay_seconds(0),
-		m_delay_attoseconds(0),
-		m_timer(nullptr)
+	: snapshot_image_device(mconfig, SNAPSHOT, tag, owner, clock)
 {
 }
 
-snapshot_image_device::snapshot_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+snapshot_image_device::snapshot_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	m_file_extensions(nullptr),
 	m_interface(nullptr),
@@ -78,13 +72,13 @@ image_init_result snapshot_image_device::call_load()
 }
 
 // device type definition
-const device_type QUICKLOAD = device_creator<quickload_image_device>;
+DEFINE_DEVICE_TYPE(QUICKLOAD, quickload_image_device, "quickload", "Quickload")
 
 //-------------------------------------------------
 //  quickload_image_device - constructor
 //-------------------------------------------------
 
 quickload_image_device::quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: snapshot_image_device(mconfig, QUICKLOAD, "Quickload", tag, owner, clock, "quickload", __FILE__)
+	: snapshot_image_device(mconfig, QUICKLOAD, tag, owner, clock)
 {
 }

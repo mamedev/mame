@@ -18,12 +18,14 @@ maybe close to jalmah.cpp?
 */
 
 #include "emu.h"
+#include "machine/nmk112.h"
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+
 #include "screen.h"
 #include "speaker.h"
-#include "machine/nmk112.h"
+
 
 class patapata_state : public driver_device
 {
@@ -277,7 +279,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(patapata_state::scanline)
 	if (param==128) m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-	static MACHINE_CONFIG_START( patapata, patapata_state )
+static MACHINE_CONFIG_START( patapata )
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // 16 MHz XTAL, 16 MHz CPU
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -299,10 +301,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(patapata_state::scanline)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz / 4, OKIM6295_PIN7_LOW) // not verified
+	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz / 4, PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz / 4, OKIM6295_PIN7_LOW) // not verified
+	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz / 4, PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0) // or 212? difficult to read (maybe 212 is 2* 112?)
@@ -338,4 +340,4 @@ ROM_START( patapata )
 ROM_END
 
 // cabinet shows Atlus logo, though there's no copyright on the title screen and PCB is NTC / NMK
-GAME( 1993, patapata, 0, patapata, patapata, driver_device, 0, ROT0,  "Atlus", "Pata Pata Panic", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, patapata, 0, patapata, patapata, patapata_state, 0, ROT0,  "Atlus", "Pata Pata Panic", MACHINE_SUPPORTS_SAVE )

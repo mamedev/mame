@@ -116,7 +116,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type M3COMM = device_creator<m3comm_device>;
+DEFINE_DEVICE_TYPE(M3COMM, m3comm_device, "m3comm", "Model 3 Communication Board")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -137,7 +137,7 @@ machine_config_constructor m3comm_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 m3comm_device::m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, M3COMM, "MODEL-3 COMMUNICATION BD", tag, owner, clock, "m3comm", __FILE__),
+	device_t(mconfig, M3COMM, tag, owner, clock),
 	m68k_ram(*this, "m68k_ram"),
 	m_commcpu(*this, M68K_TAG),
 	m_ram(*this, RAM_TAG),

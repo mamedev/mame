@@ -99,8 +99,8 @@ private:
 	required_device<mc6847_base_device> m_mc6847;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
-	required_device<ioexp_slot_device> m_ioexp;
-	required_device<memexp_slot_device> m_memexp;
+	required_device<vtech_ioexp_slot_device> m_ioexp;
+	required_device<vtech_memexp_slot_device> m_memexp;
 };
 
 
@@ -419,7 +419,7 @@ INPUT_PORTS_END
 
 static const int16_t speaker_levels[] = {-32768, 0, 32767, 0};
 
-static MACHINE_CONFIG_START( laser110, vtech1_state )
+static MACHINE_CONFIG_START( laser110 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, VTECH1_CLK)  /* 3.57950 MHz */
@@ -433,7 +433,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
 	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
 	MCFG_MC6847_BW(true)
-	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM1)
+	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM1)
 	// GM2 = GND, GM0 = GND, INTEXT = GND
 	// other lines not connected
 
@@ -465,7 +465,7 @@ static MACHINE_CONFIG_DERIVED( laser200, laser110 )
 	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
 	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
-	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM1)
+	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM1)
 	// GM2 = GND, GM0 = GND, INTEXT = GND
 	// other lines not connected
 MACHINE_CONFIG_END
@@ -489,7 +489,7 @@ static MACHINE_CONFIG_DERIVED( laser310h, laser310 )
 	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
 	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
-	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM1)
+	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM1)
 	// INTEXT = GND
 	// other lines not connected
 MACHINE_CONFIG_END
@@ -550,7 +550,7 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT   INIT                   COMPANY                   FULLNAME                          FLAGS
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT   STATE         INIT     COMPANY                   FULLNAME                          FLAGS
 COMP( 1983, laser110,  0,        0,      laser110,  vtech1, vtech1_state, vtech1,  "Video Technology",       "Laser 110",                      0 )
 COMP( 1983, laser200,  0,        0,      laser200,  vtech1, vtech1_state, vtech1,  "Video Technology",       "Laser 200",                      0 )
 COMP( 1983, vz200de,   laser200, 0,      laser200,  vtech1, vtech1_state, vtech1,  "Video Technology",       "VZ-200 (Germany & Netherlands)", MACHINE_NOT_WORKING )
@@ -560,4 +560,4 @@ COMP( 1984, laser210,  0,        0,      laser210,  vtech1, vtech1_state, vtech1
 COMP( 1984, vz200,     laser210, 0,      laser210,  vtech1, vtech1_state, vtech1,  "Dick Smith Electronics", "VZ-200 (Oceania)",               0 )
 COMP( 1984, laser310,  0,        0,      laser310,  vtech1, vtech1_state, vtech1,  "Video Technology",       "Laser 310",                      0 )
 COMP( 1984, vz300,     laser310, 0,      laser310,  vtech1, vtech1_state, vtech1,  "Dick Smith Electronics", "VZ-300 (Oceania)",               0 )
-COMP( 1984, laser310h, laser310, 0,      laser310h, vtech1, vtech1_state, vtech1h, "Video Technology",       "Laser 310 (SHRG)",               MACHINE_UNOFFICIAL)
+COMP( 1984, laser310h, laser310, 0,      laser310h, vtech1, vtech1_state, vtech1h, "Video Technology",       "Laser 310 (SHRG)",               MACHINE_UNOFFICIAL )

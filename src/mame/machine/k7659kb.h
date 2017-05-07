@@ -6,11 +6,10 @@
 
 *********************************************************************/
 
+#ifndef MAME_MACHINE_K7659KB_H
+#define MAME_MACHINE_K7659KB_H
+
 #pragma once
-
-#ifndef __K7659_KEYBOARD__
-#define __K7659_KEYBOARD__
-
 
 
 
@@ -68,7 +67,7 @@ private:
 
 // device type definition
 extern const device_type K7659_KEYBOARD;
+DECLARE_DEVICE_TYPE(K7659_KEYBOARD, k7659_keyboard_device)
 
 
-
-#endif
+#endif // MAME_MACHINE_K7659KB_H

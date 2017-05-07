@@ -23,7 +23,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCOCART_SLOT = device_creator<cococart_slot_device>;
+DEFINE_DEVICE_TYPE(COCOCART_SLOT, cococart_slot_device, "cococart_slot", "CoCo Cartridge Slot")
 
 
 
@@ -35,12 +35,12 @@ const device_type COCOCART_SLOT = device_creator<cococart_slot_device>;
 //  cococart_slot_device - constructor
 //-------------------------------------------------
 cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, COCOCART_SLOT, "CoCo Cartridge Slot", tag, owner, clock, "cococart_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this),
-		m_cart_callback(*this),
-		m_nmi_callback(*this),
-		m_halt_callback(*this), m_cart(nullptr)
+	device_t(mconfig, COCOCART_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	device_image_interface(mconfig, *this),
+	m_cart_callback(*this),
+	m_nmi_callback(*this),
+	m_halt_callback(*this), m_cart(nullptr)
 {
 }
 

@@ -6,8 +6,10 @@
  *
  ****************************************************************************/
 
-#ifndef SPECIAL_H_
-#define SPECIAL_H_
+#ifndef MAME_INCLUDES_SPECIAL_H
+#define MAME_INCLUDES_SPECIAL_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
@@ -117,7 +119,7 @@ private:
 	uint8_t m_RC_register;
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8255_device> m_ppi;
-	optional_device<fd1793_t> m_fdc;
+	optional_device<fd1793_device> m_fdc;
 	optional_device<dac_bit_interface> m_dac;
 	optional_device<pit8253_device> m_pit;
 	optional_device<cassette_image_device> m_cassette;
@@ -148,4 +150,4 @@ private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-#endif /* SPECIAL_H_ */
+#endif // MAME_INCLUDES_SPECIAL_H

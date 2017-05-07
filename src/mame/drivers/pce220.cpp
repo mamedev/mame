@@ -925,7 +925,7 @@ PALETTE_INIT_MEMBER(pce220_state,pce220)
 }
 
 
-static MACHINE_CONFIG_START( pce220, pce220_state )
+static MACHINE_CONFIG_START( pce220 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, 3072000 ) // CMOS-SC7852
 	MCFG_CPU_PROGRAM_MAP(pce220_mem)
@@ -961,7 +961,7 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pcg815, pcg850v_state )
+static MACHINE_CONFIG_START( pcg815 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz ) // 3.54MHz
 	MCFG_CPU_PROGRAM_MAP(pce220_mem)
@@ -997,7 +997,7 @@ static MACHINE_CONFIG_START( pcg815, pcg850v_state )
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pcg850v, pcg850v_state )
+static MACHINE_CONFIG_START( pcg850v )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz ) // CMOS-SC7852
 	MCFG_CPU_PROGRAM_MAP(pce220_mem)
@@ -1104,7 +1104,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT COMPANY      FULLNAME       FLAGS */
-COMP( 1991, pce220,  0,       0,    pce220,     pce220,  driver_device,  0,   "Sharp",   "PC-E220",      MACHINE_NOT_WORKING )
-COMP( 1992, pcg815,  0,       0,    pcg815,     pcg850v, driver_device,  0,   "Sharp",   "PC-G815",      MACHINE_NOT_WORKING )
-COMP( 2001, pcg850v, 0,       0,    pcg850v,    pcg850v, driver_device,  0,   "Sharp",   "PC-G850V",     MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT  COMPANY    FULLNAME        FLAGS
+COMP( 1991, pce220,  0,      0,      pce220,   pce220,  pce220_state,  0,    "Sharp",   "PC-E220",      MACHINE_NOT_WORKING )
+COMP( 1992, pcg815,  0,      0,      pcg815,   pcg850v, pcg850v_state, 0,    "Sharp",   "PC-G815",      MACHINE_NOT_WORKING )
+COMP( 2001, pcg850v, 0,      0,      pcg850v,  pcg850v, pcg850v_state, 0,    "Sharp",   "PC-G850V",     MACHINE_NOT_WORKING )

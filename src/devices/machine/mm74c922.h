@@ -30,10 +30,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MM74C922_H
+#define MAME_MACHINE_MM74C922_H
 
-#ifndef __MM74C922__
-#define __MM74C922__
+#pragma once
 
 
 
@@ -83,12 +83,12 @@ public:
 	static void static_set_cap_osc(device_t &device, double value) { downcast<mm74c922_device &>(device).m_cap_osc = value; }
 	static void static_set_cap_debounce(device_t &device, double value) { downcast<mm74c922_device &>(device).m_cap_debounce = value; }
 
-	template<class _Object> static devcb_base &set_da_wr_callback(device_t &device, _Object object) { return downcast<mm74c922_device &>(device).m_write_da.set_callback(object); }
-	template<class _Object> static devcb_base &set_x1_rd_callback(device_t &device, _Object object) { return downcast<mm74c922_device &>(device).m_read_x1.set_callback(object); }
-	template<class _Object> static devcb_base &set_x2_rd_callback(device_t &device, _Object object) { return downcast<mm74c922_device &>(device).m_read_x2.set_callback(object); }
-	template<class _Object> static devcb_base &set_x3_rd_callback(device_t &device, _Object object) { return downcast<mm74c922_device &>(device).m_read_x3.set_callback(object); }
-	template<class _Object> static devcb_base &set_x4_rd_callback(device_t &device, _Object object) { return downcast<mm74c922_device &>(device).m_read_x4.set_callback(object); }
-	template<class _Object> static devcb_base &set_x5_rd_callback(device_t &device, _Object object) { return downcast<mm74c922_device &>(device).m_read_x5.set_callback(object); }
+	template <class Object> static devcb_base &set_da_wr_callback(device_t &device, Object &&cb) { return downcast<mm74c922_device &>(device).m_write_da.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_x1_rd_callback(device_t &device, Object &&cb) { return downcast<mm74c922_device &>(device).m_read_x1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_x2_rd_callback(device_t &device, Object &&cb) { return downcast<mm74c922_device &>(device).m_read_x2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_x3_rd_callback(device_t &device, Object &&cb) { return downcast<mm74c922_device &>(device).m_read_x3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_x4_rd_callback(device_t &device, Object &&cb) { return downcast<mm74c922_device &>(device).m_read_x4.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_x5_rd_callback(device_t &device, Object &&cb) { return downcast<mm74c922_device &>(device).m_read_x5.set_callback(std::forward<Object>(cb)); }
 
 	uint8_t read();
 
@@ -129,9 +129,7 @@ private:
 
 
 // device type definition
-extern const device_type MM74C922;
+DECLARE_DEVICE_TYPE(MM74C922, mm74c922_device)
 extern const device_type MM74C923;
 
-
-
-#endif
+#endif // MAME_MACHINE_MM74C922_H

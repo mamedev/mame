@@ -55,7 +55,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type QUBIDE = device_creator<qubide_t>;
+DEFINE_DEVICE_TYPE(QUBIDE, qubide_device, "ql_qubide", "QubIDE")
 
 
 //-------------------------------------------------
@@ -82,7 +82,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *qubide_t::device_rom_region() const
+const tiny_rom_entry *qubide_device::device_rom_region() const
 {
 	return ROM_NAME( qubide );
 }
@@ -102,7 +102,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor qubide_t::device_mconfig_additions() const
+machine_config_constructor qubide_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( qubide );
 }
@@ -154,7 +154,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor qubide_t::device_input_ports() const
+ioport_constructor qubide_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( qubide );
 }
@@ -166,11 +166,11 @@ ioport_constructor qubide_t::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  qubide_t - constructor
+//  qubide_device - constructor
 //-------------------------------------------------
 
-qubide_t::qubide_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, QUBIDE, "QubIDE", tag, owner, clock, "ql_qubide", __FILE__),
+qubide_device::qubide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, QUBIDE, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_ata(*this, "ata"),
 	m_rom(*this, "rom"),
@@ -185,7 +185,7 @@ qubide_t::qubide_t(const machine_config &mconfig, const char *tag, device_t *own
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void qubide_t::device_start()
+void qubide_device::device_start()
 {
 }
 
@@ -194,7 +194,7 @@ void qubide_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void qubide_t::device_reset()
+void qubide_device::device_reset()
 {
 	int j1_j5 = m_j1_j5->read();
 
@@ -211,7 +211,7 @@ void qubide_t::device_reset()
 //  read -
 //-------------------------------------------------
 
-uint8_t qubide_t::read(address_space &space, offs_t offset, uint8_t data)
+uint8_t qubide_device::read(address_space &space, offs_t offset, uint8_t data)
 {
 	if ((offset & 0xfc000) == m_base)
 	{
@@ -256,7 +256,7 @@ uint8_t qubide_t::read(address_space &space, offs_t offset, uint8_t data)
 //  write -
 //-------------------------------------------------
 
-void qubide_t::write(address_space &space, offs_t offset, uint8_t data)
+void qubide_device::write(address_space &space, offs_t offset, uint8_t data)
 {
 	if ((offset & 0xfc000) == m_base)
 	{

@@ -108,8 +108,8 @@
 //  ctor
 //-------------------------------------------------
 
-gime_base_device::gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, const char *shortname, const char *source)
-	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, true, 263, 25+192+26+3, false, shortname, source),
+gime_base_device::gime_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata)
+	:   mc6847_friend_device(mconfig, type, tag, owner, clock, fontdata, true, 263, 25+192+26+3, false),
 		m_write_irq(*this),
 		m_write_firq(*this),
 		m_read_floating_bus(*this),
@@ -2023,8 +2023,8 @@ const uint8_t gime_base_device::hires_font[128][12] =
 //  VARIATIONS
 //**************************************************************************
 
-const device_type GIME_NTSC = device_creator<gime_ntsc_device>;
-const device_type GIME_PAL = device_creator<gime_pal_device>;
+DEFINE_DEVICE_TYPE(GIME_NTSC, gime_ntsc_device, "gime_ntsc", "CoCo GIME (NTSC)")
+DEFINE_DEVICE_TYPE(GIME_PAL,  gime_pal_device,  "gime_pal",  "CoCo GIME (PAL)")
 
 
 
@@ -2033,7 +2033,7 @@ const device_type GIME_PAL = device_creator<gime_pal_device>;
 //-------------------------------------------------
 
 gime_ntsc_device::gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gime_base_device(mconfig, GIME_NTSC, "GIME_NTSC", tag, owner, clock, ntsc_round_fontdata8x12, "gime_ntsc", __FILE__)
+	: gime_base_device(mconfig, GIME_NTSC, tag, owner, clock, ntsc_round_fontdata8x12)
 {
 }
 
@@ -2044,6 +2044,6 @@ gime_ntsc_device::gime_ntsc_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 gime_pal_device::gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gime_base_device(mconfig, GIME_PAL, "GIME_PAL", tag, owner, clock, pal_round_fontdata8x12, "gime_pal", __FILE__)
+	: gime_base_device(mconfig, GIME_PAL, tag, owner, clock, pal_round_fontdata8x12)
 {
 }

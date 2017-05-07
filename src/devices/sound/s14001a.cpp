@@ -106,11 +106,110 @@ and off as it normally does during speech). Once START has gone low-high-low, th
 #include "emu.h"
 #include "s14001a.h"
 
+namespace {
+
+uint8_t Mux8To2(bool bVoicedP2, uint8_t uPPQtrP2, uint8_t uDeltaAdrP2, uint8_t uRomDataP2)
+{
+	// pick two bits of rom data as delta
+
+	if (bVoicedP2 && (uPPQtrP2 & 0x01)) // mirroring
+		uDeltaAdrP2 ^= 0x03; // count backwards
+
+	// emulate 8 to 2 mux to obtain delta from byte (bigendian)
+	switch (uDeltaAdrP2)
+	{
+	case 0x00:
+		return (uRomDataP2 & 0xC0) >> 6;
+	case 0x01:
+		return (uRomDataP2 & 0x30) >> 4;
+	case 0x02:
+		return (uRomDataP2 & 0x0C) >> 2;
+	case 0x03:
+		return (uRomDataP2 & 0x03) >> 0;
+	default:
+		return 0xFF;
+	}
+}
+
+
+void CalculateIncrement(bool bVoicedP2, uint8_t uPPQtrP2, bool bPPQStartP2, uint8_t uDelta, uint8_t uDeltaOldP2, uint8_t &uDeltaOldP1, uint8_t &uIncrementP2, bool &bAddP2)
+{
+	// uPPQtr, pitch period quarter counter; 2 lsb of uLength
+	// bPPStart, start of a pitch period
+	// implemented to mimic silicon (a bit)
+
+	// beginning of a pitch period
+	if ((uPPQtrP2 == 0x00) && bPPQStartP2) // note this is done for voiced and unvoiced
+		uDeltaOldP2 = 0x02;
+
+	static constexpr uint8_t uIncrements[4][4] =
+	{
+	//    00  01  10  11
+		{ 3,  3,  1,  1,}, // 00
+		{ 1,  1,  0,  0,}, // 01
+		{ 0,  0,  1,  1,}, // 10
+		{ 1,  1,  3,  3 }, // 11
+	};
+
+	bool const MIRROR = BIT(uPPQtrP2, 0);
+
+	// calculate increment from delta, always done even if silent to update uDeltaOld
+	// in silicon a PLA determined 0,1,3 and add/subtract and passed uDelta to uDeltaOld
+	if (!bVoicedP2 || !MIRROR)
+	{
+		uIncrementP2 = uIncrements[uDelta][uDeltaOldP2];
+		bAddP2       = uDelta >= 0x02;
+	}
+	else
+	{
+		uIncrementP2 = uIncrements[uDeltaOldP2][uDelta];
+		bAddP2       = uDeltaOldP2 < 0x02;
+	}
+	uDeltaOldP1 = uDelta;
+	if (bVoicedP2 && bPPQStartP2 && MIRROR)
+		uIncrementP2 = 0; // no change when first starting mirroring
+}
+
+
+uint8_t CalculateOutput(bool bVoiced, bool bXSilence, uint8_t uPPQtr, bool bPPQStart, uint8_t uLOutput, uint8_t uIncrementP2, bool bAddP2)
+{
+	// implemented to mimic silicon (a bit)
+	// limits output to 0x00 and 0x0f
+
+	bool const SILENCE = BIT(uPPQtr, 1);
+
+	// determine output
+	if (bXSilence || (bVoiced && SILENCE))
+		return 7;
+
+	// beginning of a pitch period
+	if ((uPPQtr == 0x00) && bPPQStart) // note this is done for voiced and nonvoiced
+		uLOutput = 7;
+
+	// adder
+	uint8_t uTmp = uLOutput;
+	if (!bAddP2)
+		uTmp ^= 0x0F; // turns subtraction into addition
+
+	// add 0, 1, 3; limit at 15
+	uTmp += uIncrementP2;
+	if (uTmp > 15)
+		uTmp = 15;
+
+	if (!bAddP2)
+		uTmp ^= 0x0F; // turns addition back to subtraction
+
+	return uTmp;
+}
+
+} // anonymous namespace
+
+
 // device definition
-const device_type S14001A = device_creator<s14001a_device>;
+DEFINE_DEVICE_TYPE(S14001A, s14001a_device, "s14001a", "SSi TSI S14001A")
 
 s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, S14001A, "S14001A", tag, owner, clock, "s14001a", __FILE__),
+	: device_t(mconfig, S14001A, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_SpeechRom(*this, DEVICE_SELF),
 		m_stream(nullptr),
@@ -469,96 +568,6 @@ bool s14001a_device::Clock()
 	}
 
 	return true;
-}
-
-uint8_t s14001a_device::Mux8To2(bool bVoicedP2, uint8_t uPPQtrP2, uint8_t uDeltaAdrP2, uint8_t uRomDataP2)
-{
-	// pick two bits of rom data as delta
-
-	if (bVoicedP2 && uPPQtrP2&0x01) // mirroring
-	{
-		uDeltaAdrP2 ^= 0x03; // count backwards
-	}
-	// emulate 8 to 2 mux to obtain delta from byte (bigendian)
-	switch (uDeltaAdrP2)
-	{
-	case 0x00:
-		return (uRomDataP2&0xC0)>>6;
-	case 0x01:
-		return (uRomDataP2&0x30)>>4;
-	case 0x02:
-		return (uRomDataP2&0x0C)>>2;
-	case 0x03:
-		return (uRomDataP2&0x03)>>0;
-	}
-	return 0xFF;
-}
-
-void s14001a_device::CalculateIncrement(bool bVoicedP2, uint8_t uPPQtrP2, bool bPPQStartP2, uint8_t uDelta, uint8_t uDeltaOldP2, uint8_t &uDeltaOldP1, uint8_t &uIncrementP2, bool &bAddP2)
-{
-	// uPPQtr, pitch period quarter counter; 2 lsb of uLength
-	// bPPStart, start of a pitch period
-	// implemented to mimic silicon (a bit)
-
-	// beginning of a pitch period
-	if (uPPQtrP2 == 0x00 && bPPQStartP2) // note this is done for voiced and unvoiced
-	{
-		uDeltaOldP2 = 0x02;
-	}
-	static const uint8_t uIncrements[4][4] =
-	{
-	//    00  01  10  11
-		{ 3,  3,  1,  1,}, // 00
-		{ 1,  1,  0,  0,}, // 01
-		{ 0,  0,  1,  1,}, // 10
-		{ 1,  1,  3,  3 }, // 11
-	};
-
-#define MIRROR  (uPPQtrP2&0x01)
-
-	// calculate increment from delta, always done even if silent to update uDeltaOld
-	// in silicon a PLA determined 0,1,3 and add/subtract and passed uDelta to uDeltaOld
-	if (!bVoicedP2 || !MIRROR)
-	{
-		uIncrementP2 = uIncrements[uDelta][uDeltaOldP2];
-		bAddP2       = uDelta >= 0x02;
-	}
-	else
-	{
-		uIncrementP2 = uIncrements[uDeltaOldP2][uDelta];
-		bAddP2       = uDeltaOldP2 < 0x02;
-	}
-	uDeltaOldP1 = uDelta;
-	if (bVoicedP2 && bPPQStartP2 && MIRROR) uIncrementP2 = 0; // no change when first starting mirroring
-}
-
-uint8_t s14001a_device::CalculateOutput(bool bVoiced, bool bXSilence, uint8_t uPPQtr, bool bPPQStart, uint8_t uLOutput, uint8_t uIncrementP2, bool bAddP2)
-{
-	// implemented to mimic silicon (a bit)
-	// limits output to 0x00 and 0x0f
-	uint8_t uTmp; // used for subtraction
-
-#define SILENCE (uPPQtr&0x02)
-
-	// determine output
-	if (bXSilence || (bVoiced && SILENCE)) return 7;
-
-	// beginning of a pitch period
-	if (uPPQtr == 0x00 && bPPQStart) // note this is done for voiced and nonvoiced
-	{
-		uLOutput = 7;
-	}
-
-	// adder
-	uTmp = uLOutput;
-	if (!bAddP2) uTmp ^= 0x0F; // turns subtraction into addition
-
-	// add 0, 1, 3; limit at 15
-	uTmp += uIncrementP2;
-	if (uTmp > 15) uTmp = 15;
-
-	if (!bAddP2) uTmp ^= 0x0F; // turns addition back to subtraction
-	return uTmp;
 }
 
 void s14001a_device::ClearStatistics()

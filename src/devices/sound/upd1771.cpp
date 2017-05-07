@@ -172,8 +172,11 @@
 #include "emu.h"
 #include "upd1771.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
-#define LOG 0
+
+namespace {
 
 /*
   Each of the 8 waveforms have been extracted from the uPD1771c-017 internal
@@ -202,7 +205,7 @@ const signed char WAVEFORMS[8][32]={
 #define NOISE_SIZE 255
 
 
-static unsigned char noise_tbl[]=
+const unsigned char noise_tbl[]=
 {
 	0x1c,0x86,0x8a,0x8f,0x98,0xa1,0xad,0xbe,0xd9,0x8a,0x66,0x4d,0x40,0x33,0x2b,0x23,
 	0x1e,0x8a,0x90,0x97,0xa4,0xae,0xb8,0xd6,0xec,0xe9,0x69,0x4a,0x3e,0x34,0x2d,0x27,
@@ -223,20 +226,21 @@ static unsigned char noise_tbl[]=
 };
 
 
-
 #define STATE_SILENCE 0
 #define STATE_NOISE   1
 #define STATE_TONE    2
 #define STATE_ADPCM   3
 
+} // anonymous namespace
 
-const device_type UPD1771C = device_creator<upd1771c_device>;
+
+DEFINE_DEVICE_TYPE(UPD1771C, upd1771c_device, "upd1771c", "NEC uPD1771C 017")
 
 
 upd1771c_device::upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-				: device_t(mconfig, UPD1771C, "NEC uPD1771C 017", tag, owner, clock, "upd1771c", __FILE__),
-					device_sound_interface(mconfig, *this),
-					m_ack_handler(*this)
+	: device_t(mconfig, UPD1771C, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_ack_handler(*this)
 {
 }
 
@@ -363,8 +367,7 @@ Byte9: 0b???VVVVV  Low Freq2 volume
 
 WRITE8_MEMBER( upd1771c_device::write )
 {
-	//if (LOG)
-	//  logerror( "upd1771_w: received byte 0x%02x\n", data );
+	LOG("upd1771_w: received byte 0x%02x\n", data);
 
 	m_ack_handler(0);
 

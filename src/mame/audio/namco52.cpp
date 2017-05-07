@@ -157,10 +157,10 @@ ROM_START( namco_52xx )
 ROM_END
 
 
-const device_type NAMCO_52XX = device_creator<namco_52xx_device>;
+DEFINE_DEVICE_TYPE(NAMCO_52XX, namco_52xx_device, "namco52", "Namco 52xx")
 
 namco_52xx_device::namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_52XX, "Namco 52xx", tag, owner, clock, "namco52", __FILE__),
+	: device_t(mconfig, NAMCO_52XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_discrete(*this, finder_base::DUMMY_TAG),
 	m_basenode(0),

@@ -21,7 +21,7 @@
 
 #define CASSETTE_ROM_REGION "casrom"
 
-const device_type A1BUS_CASSETTE = device_creator<a1bus_cassette_device>;
+DEFINE_DEVICE_TYPE(A1BUS_CASSETTE, a1bus_cassette_device, "a1cass", "Apple I cassette board")
 
 /* sound output */
 
@@ -57,17 +57,17 @@ const tiny_rom_entry *a1bus_cassette_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a1bus_cassette_device::a1bus_cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, A1BUS_CASSETTE, "Apple I cassette board", tag, owner, clock, "a1cass", __FILE__),
-		device_a1bus_card_interface(mconfig, *this),
-		m_cassette(*this, "cassette"), m_rom(nullptr), m_cassette_output_flipflop(0)
+a1bus_cassette_device::a1bus_cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a1bus_cassette_device(mconfig, A1BUS_CASSETTE, tag, owner, clock)
 {
 }
 
-a1bus_cassette_device::a1bus_cassette_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_a1bus_card_interface(mconfig, *this),
-		m_cassette(*this, "cassette"), m_rom(nullptr), m_cassette_output_flipflop(0)
+a1bus_cassette_device::a1bus_cassette_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_a1bus_card_interface(mconfig, *this)
+	, m_cassette(*this, "cassette")
+	, m_rom(nullptr),
+	m_cassette_output_flipflop(0)
 {
 }
 

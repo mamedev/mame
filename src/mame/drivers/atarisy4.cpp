@@ -175,7 +175,7 @@ struct gpu_
  *************************************/
 
 atarisy4_renderer::atarisy4_renderer(atarisy4_state &state, screen_device &screen)
-	: poly_manager<float, atarisy4_polydata, 2, 8192>(screen, POLYFLAG_NO_WORK_QUEUE),
+	: poly_manager<float, atarisy4_polydata, 2, 8192>(screen, FLAG_NO_WORK_QUEUE),
 		m_state(state)
 {
 }
@@ -757,7 +757,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarisy4, atarisy4_state )
+static MACHINE_CONFIG_START( atarisy4 )
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", atarisy4_state,  vblank_int)

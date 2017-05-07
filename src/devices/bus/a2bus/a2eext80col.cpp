@@ -20,20 +20,19 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2EAUX_EXT80COL = device_creator<a2eaux_ext80col_device>;
+DEFINE_DEVICE_TYPE(A2EAUX_EXT80COL, a2eaux_ext80col_device, "a2eext80", "Apple IIe Extended 80-Column Card")
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 a2eaux_ext80col_device::a2eaux_ext80col_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, A2EAUX_EXT80COL, "Apple IIe Extended 80-Column Card", tag, owner, clock, "a2eext80", __FILE__),
-		device_a2eauxslot_card_interface(mconfig, *this)
+		a2eaux_ext80col_device(mconfig, A2EAUX_EXT80COL, tag, owner, clock)
 {
 }
 
-a2eaux_ext80col_device::a2eaux_ext80col_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2eaux_ext80col_device::a2eaux_ext80col_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, type, tag, owner, clock),
 		device_a2eauxslot_card_interface(mconfig, *this)
 {
 }

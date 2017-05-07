@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-#pragma once
+#ifndef MAME_BUS_DMV_K803_H
+#define MAME_BUS_DMV_K803_H
 
-#ifndef __DMV_K803_H__
-#define __DMV_K803_H__
+#pragma once
 
 #include "dmvbus.h"
 #include "machine/mm58167.h"
@@ -48,6 +48,6 @@ private:
 
 
 // device type definition
-extern const device_type DMV_K803;
+DECLARE_DEVICE_TYPE(DMV_K803, dmv_k803_device)
 
-#endif  /* __DMV_K803_H__ */
+#endif // MAME_BUS_DMV_K803_H

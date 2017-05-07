@@ -32,7 +32,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SERIAL_BOX = device_creator<serial_box_device>;
+DEFINE_DEVICE_TYPE(SERIAL_BOX, serial_box_device, "serbox", "Serial Box")
 
 
 //-------------------------------------------------
@@ -95,7 +95,7 @@ machine_config_constructor serial_box_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 serial_box_device::serial_box_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SERIAL_BOX, "Serial Box", tag, owner, clock, "serbox", __FILE__),
+	: device_t(mconfig, SERIAL_BOX, tag, owner, clock),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG)
 {

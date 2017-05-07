@@ -141,7 +141,7 @@ private:
 	void refresh_memory();
 
 	required_device<cpu_device> m_maincpu;
-	required_device<fd1797_t> m_fdc;
+	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<ram_device> m_ram;
@@ -572,7 +572,7 @@ MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE) \
 MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8) \
 MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
-static MACHINE_CONFIG_START( gimix, gimix_state )
+static MACHINE_CONFIG_START( gimix )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6809E, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(gimix_mem)
@@ -684,4 +684,4 @@ ROM_START( gimix )
 		ROM_LOAD( "gimixhd.h11",  0x000000, 0x001000, CRC(35c12201) SHA1(51ac9052f9757d79c7f5bd3aa5d8421e98cfcc37) )
 ROM_END
 
-COMP( 1980, gimix,    0,      0,      gimix,        gimix, driver_device, 0,      "Gimix",  "Gimix 6809 System",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1980, gimix,    0,      0,      gimix,        gimix, gimix_state, 0,      "Gimix",  "Gimix 6809 System",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

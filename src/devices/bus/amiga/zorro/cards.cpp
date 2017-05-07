@@ -9,6 +9,13 @@
 #include "emu.h"
 #include "cards.h"
 
+#include "a2052.h"
+#include "a2232.h"
+#include "a590.h"
+#include "action_replay.h"
+#include "buddha.h"
+
+
 SLOT_INTERFACE_START( a1000_expansion_cards )
 SLOT_INTERFACE_END
 

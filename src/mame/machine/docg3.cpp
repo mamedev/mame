@@ -32,15 +32,15 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 ***************************************************************************/
 
 // device type definition
-const device_type DISKONCHIP_G3 = device_creator<diskonchip_g3_device>;
+DEFINE_DEVICE_TYPE(DISKONCHIP_G3, diskonchip_g3_device, "diskonchip_g3", "DiskOnChip G3")
 
 //-------------------------------------------------
 //  diskonchip_g3_device - constructor
 //-------------------------------------------------
 
 diskonchip_g3_device::diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DISKONCHIP_G3, "DiskOnChip G3", tag, owner, clock, "diskonchip_g3", __FILE__),
-		device_nvram_interface(mconfig, *this)
+	: device_t(mconfig, DISKONCHIP_G3, tag, owner, clock)
+	, device_nvram_interface(mconfig, *this)
 {
 }
 

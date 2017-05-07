@@ -864,7 +864,7 @@ DRIVER_INIT_MEMBER(dectalk_state,dectalk)
 	timer_set(attotime::from_hz(10000), TIMER_OUTFIFO_READ);
 }
 
-static MACHINE_CONFIG_START( dectalk, dectalk_state )
+static MACHINE_CONFIG_START( dectalk )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
 	MCFG_CPU_PROGRAM_MAP(m68k_mem)
@@ -1010,5 +1010,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT      COMPANY     FULLNAME            FLAGS */
-COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, dectalk,  "Digital Equipment Corporation",      "DECtalk DTC-01",   MACHINE_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT      COMPANY                          FULLNAME            FLAGS */
+COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, dectalk,  "Digital Equipment Corporation", "DECtalk DTC-01",   MACHINE_NOT_WORKING )

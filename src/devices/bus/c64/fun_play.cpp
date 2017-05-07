@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_FUN_PLAY = device_creator<c64_fun_play_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_FUN_PLAY, c64_fun_play_cartridge_device, "c64_fun_play", "C64 Fun Play cartridge")
 
 
 
@@ -28,7 +28,7 @@ const device_type C64_FUN_PLAY = device_creator<c64_fun_play_cartridge_device>;
 //-------------------------------------------------
 
 c64_fun_play_cartridge_device::c64_fun_play_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_FUN_PLAY, "C64 Fun Play cartridge", tag, owner, clock, "c64_fun_play", __FILE__),
+	device_t(mconfig, C64_FUN_PLAY, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_bank(0)
 {

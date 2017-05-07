@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PORTFOLIO_ROM_CARD = device_creator<portfolio_rom_card_t>;
+DEFINE_DEVICE_TYPE(PORTFOLIO_ROM_CARD, portfolio_rom_card_device, "portfolio_rom_card", "Atari Portfolio ROM card")
 
 
 //**************************************************************************
@@ -23,11 +23,11 @@ const device_type PORTFOLIO_ROM_CARD = device_creator<portfolio_rom_card_t>;
 //**************************************************************************
 
 //-------------------------------------------------
-//  portfolio_rom_card_t - constructor
+//  portfolio_rom_card_device - constructor
 //-------------------------------------------------
 
-portfolio_rom_card_t::portfolio_rom_card_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PORTFOLIO_ROM_CARD, "Atari Portfolio ROM card", tag, owner, clock, "portfolio_rom_card", __FILE__),
+portfolio_rom_card_device::portfolio_rom_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, PORTFOLIO_ROM_CARD, tag, owner, clock),
 	device_portfolio_memory_card_slot_interface(mconfig, *this)
 {
 }
@@ -37,7 +37,7 @@ portfolio_rom_card_t::portfolio_rom_card_t(const machine_config &mconfig, const 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void portfolio_rom_card_t::device_start()
+void portfolio_rom_card_device::device_start()
 {
 }
 
@@ -46,7 +46,7 @@ void portfolio_rom_card_t::device_start()
 //  nrdi_r - read
 //-------------------------------------------------
 
-uint8_t portfolio_rom_card_t::nrdi_r(address_space &space, offs_t offset)
+uint8_t portfolio_rom_card_device::nrdi_r(address_space &space, offs_t offset)
 {
 	return m_rom[offset];
 }

@@ -187,7 +187,7 @@ void vector06_state::update_mem()
 
 WRITE8_MEMBER(vector06_state::vector06_ramdisk_w)
 {
-	uint8_t oldbank = m_rambank;
+	const uint8_t oldbank = m_rambank;
 	m_rambank = data;
 	if (oldbank != m_rambank)
 		update_mem();
@@ -195,8 +195,8 @@ WRITE8_MEMBER(vector06_state::vector06_ramdisk_w)
 
 WRITE8_MEMBER(vector06_state::vector06_status_callback)
 {
-	bool oldstate = m_stack_state;
-	m_stack_state = (data & I8085_STATUS_STACK) ? true : false;
+	const bool oldstate = m_stack_state;
+	m_stack_state = bool(data & i8080_cpu_device::STATUS_STACK);
 	if (oldstate != m_stack_state && (m_rambank & 0x10))
 		update_mem();
 }

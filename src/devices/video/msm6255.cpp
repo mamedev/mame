@@ -9,14 +9,13 @@
 #include "emu.h"
 #include "msm6255.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
-
 
 #define MOR_GRAPHICS        0x01
 #define MOR_4_BIT_PARALLEL  0x02
@@ -52,7 +51,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type MSM6255 = device_creator<msm6255_device>;
+DEFINE_DEVICE_TYPE(MSM6255, msm6255_device, "msm6255", "Oki MSM6255 LCD Controller")
 
 // I/O map
 DEVICE_ADDRESS_MAP_START( map, 8, msm6255_device )
@@ -76,7 +75,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 msm6255_device::msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MSM6255, "MSM6255", tag, owner, clock, "msm6255", __FILE__),
+	device_t(mconfig, MSM6255, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, nullptr, *ADDRESS_MAP_NAME(msm6255)),

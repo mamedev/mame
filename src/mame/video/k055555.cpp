@@ -64,7 +64,8 @@ Lots of byte-wise registers.  A partial map:
 
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
+
 
 /* K055555 5-bit-per-pixel priority encoder */
 /* This device has 48 8-bit-wide registers */
@@ -83,7 +84,7 @@ void k055555_device::K055555_write_reg(uint8_t regnum, uint8_t regdat)
 
 	if (regdat != m_regs[regnum])
 	{
-		LOG(("5^5: %x to reg %x (%s)\n", regdat, regnum, rnames[regnum]));
+		LOG("5^5: %x to reg %x (%s)\n", regdat, regnum, rnames[regnum]);
 	}
 
 	m_regs[regnum] = regdat;
@@ -140,10 +141,10 @@ int k055555_device::K055555_get_palette_index(int idx)
 
 
 
-const device_type K055555 = device_creator<k055555_device>;
+DEFINE_DEVICE_TYPE(K055555, k055555_device, "k055555", "K055555 Priority Encoder")
 
 k055555_device::k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K055555, "K055555 Priority Encoder", tag, owner, clock, "k055555", __FILE__)
+	: device_t(mconfig, K055555, tag, owner, clock)
 {
 }
 
@@ -163,5 +164,5 @@ void k055555_device::device_start()
 
 void k055555_device::device_reset()
 {
-	memset(m_regs, 0, 64 * sizeof(uint8_t));
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }

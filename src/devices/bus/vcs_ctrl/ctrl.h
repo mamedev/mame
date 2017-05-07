@@ -9,10 +9,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CVS_CTRL_CTRL_H
+#define MAME_BUS_CVS_CTRL_CTRL_H
 
-#ifndef __VCS_CONTROL_PORT__
-#define __VCS_CONTROL_PORT__
+#pragma once
 
 
 
@@ -68,10 +68,9 @@ class vcs_control_port_device : public device_t,
 public:
 	// construction/destruction
 	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~vcs_control_port_device() { }
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_trigger_wr_callback(device_t &device, _Object object) { return downcast<vcs_control_port_device &>(device).m_write_trigger.set_callback(object); }
+	template <class Object> static devcb_base &set_trigger_wr_callback(device_t &device, Object &&cb) { return downcast<vcs_control_port_device &>(device).m_write_trigger.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 
@@ -113,10 +112,8 @@ private:
 
 
 // device type definition
-extern const device_type VCS_CONTROL_PORT;
+DECLARE_DEVICE_TYPE(VCS_CONTROL_PORT, vcs_control_port_device)
 
 SLOT_INTERFACE_EXTERN( vcs_control_port_devices );
 
-
-
-#endif
+#endif // MAME_BUS_CVS_CTRL_CTRL_H

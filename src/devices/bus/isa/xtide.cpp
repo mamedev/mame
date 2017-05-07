@@ -262,7 +262,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_XTIDE = device_creator<xtide_device>;
+DEFINE_DEVICE_TYPE(ISA8_XTIDE, xtide_device, "xtide", "XT-IDE Fixed Drive Adapter")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -301,7 +301,7 @@ const tiny_rom_entry *xtide_device::device_rom_region() const
 //-------------------------------------------------
 
 xtide_device::xtide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ISA8_XTIDE, "XT-IDE Fixed Drive Adapter", tag, owner, clock, "isa8_xtide", __FILE__),
+	: device_t(mconfig, ISA8_XTIDE, tag, owner, clock),
 	device_isa8_card_interface( mconfig, *this ),
 	m_ata(*this, "ata"),
 	m_eeprom(*this, "eeprom"), m_irq_number(0), m_d8_d15_latch(0)

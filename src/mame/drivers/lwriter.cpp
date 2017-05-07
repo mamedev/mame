@@ -349,7 +349,7 @@ WRITE_LINE_MEMBER(lwriter_state::scc_int)
 #define CPU_CLK (XTAL_22_3210MHz / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
 #define RXC_CLK ((CPU_CLK - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
 
-static MACHINE_CONFIG_START( lwriter, lwriter_state )
+static MACHINE_CONFIG_START( lwriter )
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLK)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 	MCFG_SCC8530_ADD("scc", CPU_CLK, RXC_CLK, 0, RXC_CLK, 0)
@@ -435,5 +435,5 @@ ROM_START(lwriter)
 
 ROM_END
 
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      INIT,             COMPANY,                FULLNAME,                   FLAGS */
-CONS( 1988, lwriter,    0,        0,      lwriter,   lwriter,   driver_device, 0, "Apple",                "Apple Laser Writer II NT", MACHINE_IS_SKELETON)
+/*    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      STATE          INIT  COMPANY            FULLNAME                    FLAGS */
+CONS( 1988, lwriter,    0,        0,      lwriter,   lwriter,   lwriter_state, 0,    "Apple Computer",  "Apple Laser Writer II NT", MACHINE_IS_SKELETON)

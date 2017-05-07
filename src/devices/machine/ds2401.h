@@ -8,8 +8,10 @@
  *
  */
 
-#ifndef __DS2401_H__
-#define __DS2401_H__
+#ifndef MAME_MACHINE_DS2401_H
+#define MAME_MACHINE_DS2401_H
+
+#pragma once
 
 #define MCFG_DS2401_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, DS2401, 0)
@@ -66,6 +68,6 @@ private:
 
 
 // device type definition
-extern const device_type DS2401;
+DECLARE_DEVICE_TYPE(DS2401, ds2401_device)
 
-#endif
+#endif // MAME_MACHINE_DS2401_H

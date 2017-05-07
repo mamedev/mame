@@ -38,6 +38,6 @@ private:
 	required_ioport m_rs232_stopbits;
 };
 
-extern const device_type SERIAL_TERMINAL;
+DECLARE_DEVICE_TYPE(SERIAL_TERMINAL, serial_terminal_device)
 
 #endif // MAME_BUS_RS232_TERMINAL_H

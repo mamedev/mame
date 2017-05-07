@@ -77,7 +77,7 @@ public:
 
 protected:
 	// construction/destruction
-	cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
+	cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 	virtual ~cpu_device();
 
 private:

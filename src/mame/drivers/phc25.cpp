@@ -306,7 +306,7 @@ void phc25_state::video_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( phc25, phc25_state )
+static MACHINE_CONFIG_START( phc25 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(phc25_mem)
@@ -348,7 +348,7 @@ static MACHINE_CONFIG_DERIVED( pal, phc25 )
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(phc25_state, irq_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(phc25_state, video_ram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, pal_char_rom_r)
-	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM2 | MC6847_MODE_GM1 | MC6847_MODE_INTEXT)
+	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM2 | mc6847_pal_device::MODE_GM1 | mc6847_pal_device::MODE_INTEXT)
 	// other lines not connected
 MACHINE_CONFIG_END
 
@@ -360,7 +360,7 @@ static MACHINE_CONFIG_DERIVED( ntsc, phc25 )
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(phc25_state, irq_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(phc25_state, video_ram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, ntsc_char_rom_r)
-	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM2 | MC6847_MODE_GM1 | MC6847_MODE_INTEXT)
+	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1 | mc6847_ntsc_device::MODE_INTEXT)
 	// other lines not connected
 MACHINE_CONFIG_END
 
@@ -389,6 +389,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS          INIT    COMPANY     FULLNAME            FLAGS */
-COMP( 1983, phc25,  0,      0,      pal,    phc25,  driver_device,  0,     "Sanyo",  "PHC-25 (Europe)",  MACHINE_NO_SOUND )
-COMP( 1983, phc25j, phc25,  0,      ntsc,   phc25j, driver_device,  0,     "Sanyo",  "PHC-25 (Japan)",   MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY   FULLNAME            FLAGS
+COMP( 1983, phc25,  0,      0,      pal,     phc25,  phc25_state,  0,    "Sanyo",  "PHC-25 (Europe)",  MACHINE_NO_SOUND )
+COMP( 1983, phc25j, phc25,  0,      ntsc,    phc25j, phc25_state,  0,    "Sanyo",  "PHC-25 (Japan)",   MACHINE_NO_SOUND )

@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef M24KBD_H_
-#define M24KBD_H_
+#ifndef MAME_MACHINE_M24_KBD_H
+#define MAME_MACHINE_M24_KBD_H
+
+#pragma once
 
 #include "cpu/mcs48/mcs48.h"
 
@@ -13,15 +15,11 @@ class m24_keyboard_device :  public device_t
 public:
 	m24_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_data_handler(device_t &device, _Object object) { return downcast<m24_keyboard_device &>(device).m_out_data.set_callback(object); }
+	template <class Object> static devcb_base &set_out_data_handler(device_t &device, Object &&cb) { return downcast<m24_keyboard_device &>(device).m_out_data.set_callback(std::forward<Object>(cb)); }
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
-
-	void device_start() override;
-	void device_reset() override;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	DECLARE_WRITE8_MEMBER(bus_w);
 	DECLARE_READ8_MEMBER(p1_r);
@@ -31,6 +29,12 @@ public:
 	DECLARE_READ_LINE_MEMBER(t1_r);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	DECLARE_WRITE_LINE_MEMBER(data_w);
+
+protected:
+	void device_start() override;
+	void device_reset() override;
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
 	required_ioport_array<16> m_rows;
 	required_ioport m_mousebtn;
@@ -41,6 +45,6 @@ private:
 	emu_timer *m_reset_timer;
 };
 
-extern const device_type M24_KEYBOARD;
+DECLARE_DEVICE_TYPE(M24_KEYBOARD, m24_keyboard_device)
 
-#endif /* M24KBD_H_ */
+#endif // MAME_MACHINE_M24_KBD_H

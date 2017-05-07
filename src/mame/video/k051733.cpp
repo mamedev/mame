@@ -60,12 +60,13 @@ reads from 0x0006, and only uses bit 1.
 #include "konami_helper.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
-const device_type K051733 = device_creator<k051733_device>;
+
+DEFINE_DEVICE_TYPE(K051733, k051733_device, "k051733", "K051733 Protection")
 
 k051733_device::k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K051733, "K051733 Protection", tag, owner, clock, "k051733", __FILE__),
+	: device_t(mconfig, K051733, tag, owner, clock),
 	//m_ram[0x20],
 	m_rng(0)
 {

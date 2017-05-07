@@ -472,6 +472,9 @@
 #include "neogeo.lh"
 
 
+#define VERBOSE     (0)
+
+
 #define LOG_VIDEO_SYSTEM         (0)
 #define LOG_MAIN_CPU_BANKING     (0)
 #define LOG_AUDIO_CPU_BANKING    (0)
@@ -1639,7 +1642,7 @@ INPUT_CHANGED_MEMBER(aes_state::aes_jp1)
  *
  *************************************/
 
-MACHINE_CONFIG_START( neogeo_base, neogeo_state )
+MACHINE_CONFIG_START( neogeo_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, NEOGEO_MAIN_CPU_CLOCK)
@@ -1773,7 +1776,7 @@ MACHINE_START_MEMBER(aes_state, aes)
 }
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( aes, neogeo_base, aes_state )
+static MACHINE_CONFIG_DERIVED( aes, neogeo_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aes_main_map)
 
@@ -2038,8 +2041,8 @@ DRIVER_INIT_MEMBER(neogeo_state, neogeo)
 
 
 /*    YEAR  NAME    PARENT  COMPAT MACHINE   INPUT          INIT    */
-CONS( 1990, neogeo, 0,      0,     mvs,      neogeo_6slot,  neogeo_state,   neogeo,  "SNK", "Neo-Geo", MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
-CONS( 1990, aes,    0,      0,     aes,      aes,           driver_device,  0,       "SNK", "Neo-Geo AES", MACHINE_SUPPORTS_SAVE )
+CONS( 1990, neogeo, 0,      0,     mvs,      neogeo_6slot,  neogeo_state,  neogeo,  "SNK", "Neo-Geo",     MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
+CONS( 1990, aes,    0,      0,     aes,      aes,           aes_state,     0,       "SNK", "Neo-Geo AES", MACHINE_SUPPORTS_SAVE )
 
 
 // Include standalone drivers for the single games

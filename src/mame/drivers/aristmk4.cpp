@@ -1709,7 +1709,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_state::aristmk4_pf)
 	}
 }
 
-static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
+static MACHINE_CONFIG_START( aristmk4 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8) // 1.5mhz
 	MCFG_CPU_PROGRAM_MAP(aristmk4_map)

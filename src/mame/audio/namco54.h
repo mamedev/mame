@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef NAMCO54_H
-#define NAMCO54_H
+#ifndef MAME_AUDIO_NAMCO54_H
+#define MAME_AUDIO_NAMCO54_H
 
 #include "sound/discrete.h"
 #include "cpu/mb88xx/mb88xx.h"
@@ -48,7 +48,7 @@ private:
 	uint8_t m_latched_cmd;
 };
 
-extern const device_type NAMCO_54XX;
+DECLARE_DEVICE_TYPE(NAMCO_54XX, namco_54xx_device)
 
 
 
@@ -59,4 +59,4 @@ extern const device_type NAMCO_54XX;
 #define NAMCO_54XX_P_DATA(base)     (NODE_RELATIVE(base, 3))
 
 
-#endif  /* NAMCO54_H */
+#endif // MAME_AUDIO_NAMCO54_H

@@ -412,7 +412,7 @@ static const z80_daisy_config k7070_daisy_chain[] =
  *
  * (framebuffer and terminal should be slot devices.)
  */
-static MACHINE_CONFIG_START( a7150, a7150_state )
+static MACHINE_CONFIG_START( a7150 )
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_9_832MHz/2)
 	MCFG_CPU_PROGRAM_MAP(a7150_mem)
 	MCFG_CPU_IO_MAP(a7150_io)
@@ -508,5 +508,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1986, a7150,  0,      0,       a7150,     a7150, driver_device,    0,     "VEB Robotron",   "A7150", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY           FULLNAME  FLAGS
+COMP( 1986, a7150,  0,      0,       a7150,     a7150, a7150_state, 0,     "VEB Robotron",   "A7150",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

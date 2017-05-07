@@ -47,7 +47,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_SPORTS_PAD = device_creator<sms_sports_pad_device>;
+DEFINE_DEVICE_TYPE(SMS_SPORTS_PAD, sms_sports_pad_device, "sms_sports_pad", "Sega SMS Sports Pad (US)")
 
 // time interval not verified
 #define SPORTS_PAD_INTERVAL attotime::from_hz(XTAL_10_738635MHz/3/512)
@@ -161,7 +161,7 @@ ioport_constructor sms_sports_pad_device::device_input_ports() const
 //-------------------------------------------------
 
 sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SMS_SPORTS_PAD, "Sega SMS Sports Pad US", tag, owner, clock, "sms_sports_pad", __FILE__),
+	device_t(mconfig, SMS_SPORTS_PAD, tag, owner, clock),
 	device_sms_control_port_interface(mconfig, *this),
 	m_sports_in(*this, "SPORTS_IN"),
 	m_sports_out(*this, "SPORTS_OUT"),
@@ -171,7 +171,8 @@ sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, cons
 	m_th_pin_state(0),
 	m_x_axis_reset_value(0x80), // value 0x80 helps when start playing paddle games.
 	m_y_axis_reset_value(0x80),
-	m_interval(SPORTS_PAD_INTERVAL), m_sportspad_timer(nullptr)
+	m_interval(SPORTS_PAD_INTERVAL),
+	m_sportspad_timer(nullptr)
 {
 }
 

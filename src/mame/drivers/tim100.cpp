@@ -168,7 +168,7 @@ WRITE_LINE_MEMBER( tim100_state::clock_w )
 }
 
 
-static MACHINE_CONFIG_START( tim100, tim100_state )
+static MACHINE_CONFIG_START( tim100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4_9152MHz) // divider unknown
 	MCFG_CPU_PROGRAM_MAP(tim100_mem)
@@ -239,4 +239,4 @@ ROM_START( tim100 )
 ROM_END
 
 /* Driver */
-COMP( 1985, tim100, 0, 0, tim100, tim100, driver_device, 0, "Mihajlo Pupin Institute", "TIM-100", MACHINE_IS_SKELETON)
+COMP( 1985, tim100, 0, 0, tim100, tim100, tim100_state, 0, "Mihajlo Pupin Institute", "TIM-100", MACHINE_IS_SKELETON)

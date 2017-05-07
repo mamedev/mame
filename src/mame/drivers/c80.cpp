@@ -251,7 +251,7 @@ void c80_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( c80, c80_state )
+static MACHINE_CONFIG_START( c80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000) /* U880D */
 	MCFG_CPU_PROGRAM_MAP(c80_mem)
@@ -294,5 +294,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  CLASS            INIT  COMPANY      FULLNAME    FLAGS */
-COMP( 1986, c80,    0,      0,      c80,    c80,   driver_device,    0, "Joachim Czepa", "C-80", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  CLASS       INIT  COMPANY           FULLNAME  FLAGS */
+COMP( 1986, c80,    0,      0,      c80,    c80,   c80_state,  0,    "Joachim Czepa", "C-80",    MACHINE_SUPPORTS_SAVE )

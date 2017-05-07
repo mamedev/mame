@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef _MIDIOUTPORT_H_
-#define _MIDIOUTPORT_H_
+#ifndef MAME_BUS_MIDI_MIDIOUTPORT_H
+#define MAME_BUS_MIDI_MIDIOUTPORT_H
+
+#pragma once
 
 #include "midi.h"
 #include "imagedev/midiout.h"
@@ -31,6 +33,6 @@ private:
 	required_device<midiout_device> m_midiout;
 };
 
-extern const device_type MIDIOUT_PORT;
+DECLARE_DEVICE_TYPE(MIDIOUT_PORT, midiout_port_device)
 
-#endif
+#endif // MAME_BUS_MIDI_MIDIOUTPORT_H

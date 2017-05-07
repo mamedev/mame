@@ -31,7 +31,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
 private:
@@ -74,7 +74,7 @@ READ8_MEMBER( jade_state::status_r )
 	return (m_term_data) ? 5 : 4;
 }
 
-WRITE8_MEMBER( jade_state::kbd_put )
+void jade_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -84,7 +84,7 @@ void jade_state::machine_reset()
 	m_term_data = 0;
 }
 
-static MACHINE_CONFIG_START( jade, jade_state )
+static MACHINE_CONFIG_START( jade )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(jade_mem)
@@ -92,7 +92,7 @@ static MACHINE_CONFIG_START( jade, jade_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(jade_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(jade_state, kbd_put))
 
 	/* Devices */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
@@ -106,5 +106,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT  CLASS         INIT  COMPANY  FULLNAME   FLAGS */
-COMP( 19??, jade,    0,      0,       jade,      jade,  driver_device, 0,   "Jade", "JGZ80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT  CLASS       INIT  COMPANY  FULLNAME   FLAGS
+COMP( 19??, jade,    0,      0,       jade,    jade,  jade_state, 0,    "Jade",  "JGZ80",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

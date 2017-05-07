@@ -8,10 +8,10 @@
  *
  */
 
-#pragma once
+#ifndef MAME_BUS_ISA_SC499_H
+#define MAME_BUS_ISA_SC499_H
 
-#ifndef SC499_H_
-#define SC499_H_
+#pragma once
 
 #include "bus/isa/isa.h"
 #include "softlist_dev.h"
@@ -52,7 +52,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override { };
+	virtual void device_start() override { }
 
 	std::vector<uint8_t> m_ctape_data;
 };
@@ -65,6 +65,7 @@ public:
 	// construction/destruction
 	sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	required_ioport m_iobase;
 	required_ioport m_irqdrq;
 
@@ -154,6 +155,6 @@ private:
 
 
 // device type definition
-extern const device_type ISA8_SC499;
+DECLARE_DEVICE_TYPE(ISA8_SC499, sc499_device)
 
-#endif /* SC499_H_ */
+#endif // MAME_BUS_ISA_SC499_H

@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef __K053250PS_H__
-#define __K053250PS_H__
+#ifndef MAME_VIDEO_K053250PS_H
+#define MAME_VIDEO_K053250PS_H
+
+#pragma once
 
 //
 //  Konami 053250 road generator (Pirate Ship version)
@@ -75,6 +77,6 @@ private:
 									uint32_t clipmask, uint32_t wrapmask, uint32_t orientation, bitmap_ind8 &priority, uint8_t pri);
 };
 
-extern const device_type K053250PS;
+DECLARE_DEVICE_TYPE(K053250PS, k053250ps_device)
 
-#endif
+#endif // MAME_VIDEO_K053250PS_H

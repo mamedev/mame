@@ -167,7 +167,7 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( palm, palm_state )
+static MACHINE_CONFIG_START( palm )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", M68000, 32768*506 )        /* 16.580608 MHz */
 	MCFG_CPU_PROGRAM_MAP( palm_map)
@@ -465,22 +465,22 @@ static MACHINE_CONFIG_DERIVED( palmvx, palm )
 	MCFG_RAM_DEFAULT_SIZE("8M")
 MACHINE_CONFIG_END
 
-/*    YEAR  NAME      PARENT    COMPAT   MACHINE      INPUT     INIT     COMPANY   FULLNAME */
-COMP( 1996, pilot1k,  0,        0,       pilot1k,     palm, driver_device,     0,     "U.S. Robotics", "Pilot 1000", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1996, pilot5k,  pilot1k,  0,       pilot5k,     palm, driver_device,     0,     "U.S. Robotics", "Pilot 5000", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1997, palmpers, pilot1k,  0,       pilot5k,     palm, driver_device,     0,     "U.S. Robotics", "Palm Pilot Personal", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1997, palmpro,  pilot1k,  0,       palmpro,     palm, driver_device,     0,     "U.S. Robotics", "Palm Pilot Pro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1998, palmiii,  pilot1k,  0,       palmiii,     palm, driver_device,     0,     "3Com", "Palm III", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1998, palmiiic, pilot1k,  0,       palmiii,     palm, driver_device,     0,     "Palm Inc", "Palm IIIc", MACHINE_NOT_WORKING )
-COMP( 2000, palmm100, pilot1k,  0,       palmiii,     palm, driver_device,     0,     "Palm Inc", "Palm m100", MACHINE_NOT_WORKING )
-COMP( 2000, palmm130, pilot1k,  0,       palmiii,     palm, driver_device,     0,     "Palm Inc", "Palm m130", MACHINE_NOT_WORKING )
-COMP( 2001, palmm505, pilot1k,  0,       palmiii,     palm, driver_device,     0,     "Palm Inc", "Palm m505", MACHINE_NOT_WORKING )
-COMP( 2001, palmm515, pilot1k,  0,       palmiii,     palm, driver_device,     0,     "Palm Inc", "Palm m515", MACHINE_NOT_WORKING )
-COMP( 1999, palmv,    pilot1k,  0,       palmv,       palm, driver_device,     0,     "3Com", "Palm V", MACHINE_NOT_WORKING )
-COMP( 1999, palmvx,   pilot1k,  0,       palmvx,      palm, driver_device,     0,     "Palm Inc", "Palm Vx", MACHINE_NOT_WORKING )
-COMP( 2001, visor,    pilot1k,  0,       palmvx,      palm, driver_device,     0,     "Handspring", "Visor Edge", MACHINE_NOT_WORKING )
-COMP( 19??, spt1500,  pilot1k,  0,       palmvx,      palm, driver_device,     0,     "Symbol", "SPT 1500", MACHINE_NOT_WORKING )
-COMP( 19??, spt1700,  pilot1k,  0,       palmvx,      palm, driver_device,     0,     "Symbol", "SPT 1700", MACHINE_NOT_WORKING )
-COMP( 19??, spt1740,  pilot1k,  0,       palmvx,      palm, driver_device,     0,     "Symbol", "SPT 1740", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT   MACHINE      INPUT STATE       INIT   COMPANY          FULLNAME               FLAGS
+COMP( 1996, pilot1k,  0,        0,       pilot1k,     palm, palm_state, 0,     "U.S. Robotics", "Pilot 1000",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1996, pilot5k,  pilot1k,  0,       pilot5k,     palm, palm_state, 0,     "U.S. Robotics", "Pilot 5000",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1997, palmpers, pilot1k,  0,       pilot5k,     palm, palm_state, 0,     "U.S. Robotics", "Palm Pilot Personal", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1997, palmpro,  pilot1k,  0,       palmpro,     palm, palm_state, 0,     "U.S. Robotics", "Palm Pilot Pro",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1998, palmiii,  pilot1k,  0,       palmiii,     palm, palm_state, 0,     "3Com",          "Palm III",            MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1998, palmiiic, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm IIIc",           MACHINE_NOT_WORKING )
+COMP( 2000, palmm100, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm m100",           MACHINE_NOT_WORKING )
+COMP( 2000, palmm130, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm m130",           MACHINE_NOT_WORKING )
+COMP( 2001, palmm505, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm m505",           MACHINE_NOT_WORKING )
+COMP( 2001, palmm515, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm m515",           MACHINE_NOT_WORKING )
+COMP( 1999, palmv,    pilot1k,  0,       palmv,       palm, palm_state, 0,     "3Com",          "Palm V",              MACHINE_NOT_WORKING )
+COMP( 1999, palmvx,   pilot1k,  0,       palmvx,      palm, palm_state, 0,     "Palm Inc",      "Palm Vx",             MACHINE_NOT_WORKING )
+COMP( 2001, visor,    pilot1k,  0,       palmvx,      palm, palm_state, 0,     "Handspring",    "Visor Edge",          MACHINE_NOT_WORKING )
+COMP( 19??, spt1500,  pilot1k,  0,       palmvx,      palm, palm_state, 0,     "Symbol",        "SPT 1500",            MACHINE_NOT_WORKING )
+COMP( 19??, spt1700,  pilot1k,  0,       palmvx,      palm, palm_state, 0,     "Symbol",        "SPT 1700",            MACHINE_NOT_WORKING )
+COMP( 19??, spt1740,  pilot1k,  0,       palmvx,      palm, palm_state, 0,     "Symbol",        "SPT 1740",            MACHINE_NOT_WORKING )
 
 #include "palm_dbg.hxx"

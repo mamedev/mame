@@ -27,10 +27,10 @@ HP38G             09/??/95              1LT8             Yorke
 /* 4 bit processor
    20 address lines */
 
-#pragma once
+#ifndef MAME_CPU_SATURN_SATURN_H
+#define MAME_CPU_SATURN_SATURN_H
 
-#ifndef __SATURN_H__
-#define _SATURN_H
+#pragma once
 
 
 #define SATURN_INT_NONE 0
@@ -79,14 +79,14 @@ public:
 	saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_out_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_out_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_in_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_reset_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_reset_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_config_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_config_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_unconfig_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_unconfig_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_id_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_id_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_crc_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_crc_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_rsi_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_rsi_func.set_callback(object); }
+	template <class Object> static devcb_base &set_out_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_out_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_in_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_reset_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_reset_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_config_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_config_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_unconfig_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_unconfig_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_id_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_id_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_crc_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_crc_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rsi_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_rsi_func.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides
@@ -134,7 +134,7 @@ typedef uint8_t Saturn64[16];
 
 	uint8_t m_p; // 4 bit pointer
 
-		uint16_t m_out; // 12 bit (packed)
+	uint16_t m_out; // 12 bit (packed)
 	uint8_t  m_carry, m_decimal;
 	uint16_t m_st; // status 16 bit
 
@@ -289,7 +289,6 @@ typedef uint8_t Saturn64[16];
 	void saturn_instruction();
 };
 
-extern const device_type SATURN;
+DECLARE_DEVICE_TYPE(SATURN, saturn_device)
 
-
-#endif /* __SATURN_H__ */
+#endif // MAME_CPU_SATURN_SATURN_H

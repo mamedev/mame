@@ -10,10 +10,10 @@
 #include "speaker.h"
 
 
-const device_type AD1848 = device_creator<ad1848_device>;
+DEFINE_DEVICE_TYPE(AD1848, ad1848_device, "ad1848", "Analog Device AD1848")
 
 ad1848_device::ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, AD1848, "Analog Devices AD1848", tag, owner, clock, "ad1848", __FILE__),
+	device_t(mconfig, AD1848, tag, owner, clock),
 	m_irq_cb(*this),
 	m_drq_cb(*this),
 	m_ldac(*this, "ldac"),
@@ -81,7 +81,7 @@ READ8_MEMBER(ad1848_device::read)
 
 WRITE8_MEMBER(ad1848_device::write)
 {
-	const int div_factor[] = {3072, 1536, 896, 768, 448, 384, 512, 2560};
+	static constexpr int div_factor[] = {3072, 1536, 896, 768, 448, 384, 512, 2560};
 	switch(offset)
 	{
 		case 0:

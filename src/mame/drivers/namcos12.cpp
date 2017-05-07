@@ -1672,7 +1672,7 @@ DRIVER_INIT_MEMBER(namcos12_state,technodr)
 	*( (uint32_t *)( memregion( "sub" )->base() + 0x14b6 ) ) = 0;
 }
 
-static MACHINE_CONFIG_START( coh700, namcos12_state )
+static MACHINE_CONFIG_START( coh700 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CXD8661R, XTAL_100MHz)
@@ -1681,7 +1681,7 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate(&namcos12_state::namcos12_rom_read, (namcos12_state *) owner ))
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, (namcos12_state *) owner ))
 
 	MCFG_CPU_ADD("sub", H83002, 16934400) // frequency based on research (superctr)
 	MCFG_CPU_PROGRAM_MAP(s12h8rwmap)

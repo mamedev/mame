@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ariane Fugmann
-#pragma once
-
 #ifndef MAME_VIDEO_VICDUAL_97269PB_H
 #define MAME_VIDEO_VICDUAL_97269PB_H
+
+#pragma once
 
 #define MCFG_S97269PB_ADD(_tag ) \
 	MCFG_DEVICE_ADD(_tag, S97269PB, 0)
@@ -37,6 +37,6 @@ private:
 };
 
 // device type definition
-extern const device_type S97269PB;
+DECLARE_DEVICE_TYPE(S97269PB, s97269pb_device)
 
-#endif  /* MAME_VIDEO_VICDUAL_97269PB_H */
+#endif // MAME_VIDEO_VICDUAL_97269PB_H

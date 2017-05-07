@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_MACHINE_MC8123
-#define MAME_MACHINE_MC8123 1
+#define MAME_MACHINE_MC8123
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 
@@ -39,5 +39,6 @@ private:
 };
 
 extern const device_type MC8123;
+DECLARE_DEVICE_TYPE(MC8123, mc8123_device)
 
-#endif
+#endif // MAME_MACHINE_MC8123

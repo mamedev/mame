@@ -3,27 +3,15 @@
 #include "emu.h"
 #include "rs232.h"
 
-const device_type RS232_PORT = device_creator<rs232_port_device>;
+DEFINE_DEVICE_TYPE(RS232_PORT, rs232_port_device, "rs232", "RS232 Port")
 
 rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, RS232_PORT, "RS232 Port", tag, owner, clock, "rs232", __FILE__),
-	device_slot_interface(mconfig, *this),
-	m_rxd(0),
-	m_dcd(0),
-	m_dsr(0),
-	m_ri(0),
-	m_cts(0),
-	m_rxd_handler(*this),
-	m_dcd_handler(*this),
-	m_dsr_handler(*this),
-	m_ri_handler(*this),
-	m_cts_handler(*this),
-	m_dev(nullptr)
+	rs232_port_device(mconfig, RS232_PORT, tag, owner, clock)
 {
 }
 
-rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_rxd(0),
 	m_dcd(0),

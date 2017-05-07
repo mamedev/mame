@@ -15,13 +15,13 @@
 #include "screen.h"
 
 
-const device_type TECMO_SPRITE = device_creator<tecmo_spr_device>;
+DEFINE_DEVICE_TYPE(TECMO_SPRITE, tecmo_spr_device, "tecmo_spr", "Tecmo Chained Sprites")
 
 tecmo_spr_device::tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TECMO_SPRITE, "Tecmo Chained Sprites", tag, owner, clock, "tecmo_spr", __FILE__),
-m_gfxregion(0),
-m_bootleg(0),
-m_yoffset(0)
+	: device_t(mconfig, TECMO_SPRITE, tag, owner, clock)
+	, m_gfxregion(0)
+	, m_bootleg(0)
+	, m_yoffset(0)
 {
 }
 

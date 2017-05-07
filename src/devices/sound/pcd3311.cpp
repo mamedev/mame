@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PCD3311 = device_creator<pcd3311_t>;
+DEFINE_DEVICE_TYPE(PCD3311, pcd3311_device, "pcd3311", "PCD3311")
 
 
 
@@ -24,11 +24,11 @@ const device_type PCD3311 = device_creator<pcd3311_t>;
 //**************************************************************************
 
 //-------------------------------------------------
-//  pcd3311_t - constructor
+//  pcd3311_device - constructor
 //-------------------------------------------------
 
-pcd3311_t::pcd3311_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PCD3311, "PCD3311", tag, owner, clock, "pcd3311", __FILE__),
+pcd3311_device::pcd3311_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, PCD3311, tag, owner, clock),
 	device_sound_interface(mconfig, *this)
 {
 }
@@ -38,7 +38,7 @@ pcd3311_t::pcd3311_t(const machine_config &mconfig, const char *tag, device_t *o
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pcd3311_t::device_start()
+void pcd3311_device::device_start()
 {
 	save_item(NAME(m_a0));
 	save_item(NAME(m_mode));
@@ -52,6 +52,6 @@ void pcd3311_t::device_start()
 //  our sound stream
 //-------------------------------------------------
 
-void pcd3311_t::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void pcd3311_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 }

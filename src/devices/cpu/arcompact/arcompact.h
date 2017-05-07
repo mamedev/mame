@@ -6,10 +6,10 @@
 
 \*********************************/
 
-#pragma once
+#ifndef MAME_CPU_ARCOMPACT_ARCOMPACT_H
+#define MAME_CPU_ARCOMPACT_ARCOMPACT_H
 
-#ifndef __ARCOMPACT_H__
-#define __ARCOMPACT_H__
+#pragma once
 
 enum
 {
@@ -894,7 +894,7 @@ private:
 #define CONDITION_LT ((STATUS32_CHECK_N && !STATUS32_CHECK_V) || (!STATUS32_CHECK_N && STATUS32_CHECK_V))
 #define CONDITION_MI (STATUS32_CHECK_N)
 
-extern const device_type ARCA5;
 
+DECLARE_DEVICE_TYPE(ARCA5, arcompact_device)
 
-#endif /* __ARCOMPACT_H__ */
+#endif // MAME_CPU_ARCOMPACT_ARCOMPACT_H

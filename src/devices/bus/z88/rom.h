@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-#pragma once
+#ifndef MAME_BUS_Z88_ROM_H
+#define MAME_BUS_Z88_ROM_H
 
-#ifndef __Z88_ROM_H__
-#define __Z88_ROM_H__
+#pragma once
 
 #include "z88.h"
 
@@ -19,9 +19,10 @@ class z88_32k_rom_device : public device_t,
 public:
 	// construction/destruction
 	z88_32k_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	z88_32k_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
+	z88_32k_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -62,8 +63,8 @@ protected:
 };
 
 // device type definition
-extern const device_type Z88_32K_ROM;
-extern const device_type Z88_128K_ROM;
-extern const device_type Z88_256K_ROM;
+DECLARE_DEVICE_TYPE(Z88_32K_ROM,  z88_32k_rom_device)
+DECLARE_DEVICE_TYPE(Z88_128K_ROM, z88_128k_rom_device)
+DECLARE_DEVICE_TYPE(Z88_256K_ROM, z88_256k_rom_device)
 
-#endif  /* __Z88_ROM_H__ */
+#endif // MAME_BUS_Z88_ROM_H

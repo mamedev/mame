@@ -6,13 +6,13 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_NES_CTRL_KONAMIHS_H
+#define MAME_BUS_NES_CTRL_KONAMIHS_H
+
 #pragma once
 
-#ifndef __NES_KONAMIHS__
-#define __NES_KONAMIHS__
-
-
 #include "ctrl.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -43,6 +43,6 @@ protected:
 };
 
 // device type definition
-extern const device_type NES_KONAMIHS;
+DECLARE_DEVICE_TYPE(NES_KONAMIHS, nes_konamihs_device)
 
-#endif
+#endif // MAME_BUS_NES_CTRL_KONAMIHS_H

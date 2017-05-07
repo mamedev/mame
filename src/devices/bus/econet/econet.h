@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ECONET_ECONET_H
+#define MAME_BUS_ECONET_ECONET_H
 
-#ifndef __ECONET__
-#define __ECONET__
+#pragma once
 
 
 
@@ -57,8 +57,8 @@ public:
 	// construction/destruction
 	econet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_clk_wr_callback(device_t &device, _Object object) { return downcast<econet_device &>(device).m_write_clk.set_callback(object); }
-	template<class _Object> static devcb_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<econet_device &>(device).m_write_data.set_callback(object); }
+	template <class Object> static devcb_base &set_clk_wr_callback(device_t &device, Object &&cb) { return downcast<econet_device &>(device).m_write_clk.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data_wr_callback(device_t &device, Object &&cb) { return downcast<econet_device &>(device).m_write_data.set_callback(std::forward<Object>(cb)); }
 
 	void add_device(device_t *target, int address);
 
@@ -135,30 +135,35 @@ private:
 class device_econet_interface : public device_slot_card_interface
 {
 	friend class econet_device;
+	template <class ElementType> friend class simple_list;
 
 public:
-	// construction/destruction
-	device_econet_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_econet_interface() { }
-
 	device_econet_interface *next() const { return m_next; }
-	device_econet_interface *m_next;
 
 	virtual void econet_clk(int state) = 0;
 	virtual void econet_data(int state) = 0;
 
+protected:
+	// construction/destruction
+	device_econet_interface(const machine_config &mconfig, device_t &device);
+
 	econet_device  *m_econet;
 	uint8_t m_address;
+
+private:
+	device_econet_interface *m_next;
 };
 
 
 // device type definition
 extern const device_type ECONET;
 extern const device_type ECONET_SLOT;
+DECLARE_DEVICE_TYPE(ECONET,      econet_device)
+DECLARE_DEVICE_TYPE(ECONET_SLOT, econet_slot_device)
 
 
 SLOT_INTERFACE_EXTERN( econet_devices );
 
 
 
-#endif
+#endif // MAME_BUS_ECONET_ECONET_H

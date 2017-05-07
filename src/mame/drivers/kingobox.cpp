@@ -460,7 +460,7 @@ void kingofb_state::machine_reset()
 	m_palette_bank = 0;
 }
 
-static MACHINE_CONFIG_START( kingofb, kingofb_state )
+static MACHINE_CONFIG_START( kingofb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
@@ -514,7 +514,7 @@ MACHINE_CONFIG_END
 
 
 /* Ring King */
-static MACHINE_CONFIG_START( ringking, kingofb_state )
+static MACHINE_CONFIG_START( ringking )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
@@ -859,9 +859,9 @@ DRIVER_INIT_MEMBER(kingofb_state,ringkingw)
 }
 
 
-GAME( 1985, kingofb,   0,       kingofb,  kingofb,  driver_device, 0,         ROT90, "Wood Place Inc.", "King of Boxer (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, kingofbj,  kingofb, kingofb,  kingofb,  driver_device, 0,         ROT90, "Wood Place Inc.", "King of Boxer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kingofb,   0,       kingofb,  kingofb,  kingofb_state, 0,         ROT90, "Wood Place Inc.", "King of Boxer (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kingofbj,  kingofb, kingofb,  kingofb,  kingofb_state, 0,         ROT90, "Wood Place Inc.", "King of Boxer (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, ringkingw, kingofb, kingofb,  kingofb,  kingofb_state, ringkingw, ROT90, "Wood Place Inc.", "Ring King (US, Wood Place Inc.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking,  kingofb, ringking, ringking, driver_device, 0,         ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking2, kingofb, ringking, ringking, driver_device, 0,         ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking,  kingofb, ringking, ringking, kingofb_state, 0,         ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking2, kingofb, ringking, ringking, kingofb_state, 0,         ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, ringking3, kingofb, kingofb,  kingofb,  kingofb_state, ringking3, ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 3)", MACHINE_SUPPORTS_SAVE )

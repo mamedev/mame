@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Tomasz Slanina
-#pragma once
+#ifndef MAME_CPU_V810_V810_H
+#define MAME_CPU_V810_V810_H
 
-#ifndef __V810_H__
-#define __V810_H__
+#pragma once
 
 
 enum
@@ -194,11 +194,9 @@ private:
 	uint32_t opFpoint(uint32_t op);
 	uint32_t opBSU(uint32_t op);
 	void take_interrupt();
-
 };
 
 
-extern const device_type V810;
+DECLARE_DEVICE_TYPE(V810, v810_device)
 
-
-#endif /* __V810_H__ */
+#endif // MAME_CPU_V810_V810_H

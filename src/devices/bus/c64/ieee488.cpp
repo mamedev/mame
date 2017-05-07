@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_IEEE488 = device_creator<c64_ieee488_device>;
+DEFINE_DEVICE_TYPE(C64_IEEE488, c64_ieee488_device, "c64_ieee488_device", "C64 IEEE-488 cartridge")
 
 
 //-------------------------------------------------
@@ -175,7 +175,7 @@ machine_config_constructor c64_ieee488_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 c64_ieee488_device::c64_ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_IEEE488, "IEEE-488", tag, owner, clock, "c64_ieee488", __FILE__),
+	device_t(mconfig, C64_IEEE488, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_tpi(*this, MOS6525_TAG),
 	m_bus(*this, IEEE488_TAG),

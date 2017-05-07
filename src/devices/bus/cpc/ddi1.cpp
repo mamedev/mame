@@ -7,13 +7,14 @@
 #include "emu.h"
 #include "ddi1.h"
 #include "softlist.h"
+
 SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_DDI1 = device_creator<cpc_ddi1_device>;
+DEFINE_DEVICE_TYPE(CPC_DDI1, cpc_ddi1_device, "cpc_ddi1", "Amstrad DDI-1")
 
 static SLOT_INTERFACE_START( ddi1_floppies )
 	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
@@ -62,7 +63,7 @@ machine_config_constructor cpc_ddi1_device::device_mconfig_additions() const
 //**************************************************************************
 
 cpc_ddi1_device::cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CPC_DDI1, "DDI-1", tag, owner, clock, "cpc_ddi1", __FILE__),
+	device_t(mconfig, CPC_DDI1, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_fdc(*this,"upd765"),
 	m_connector(*this,"upd765:0"), m_rom_active(false), m_romen(false)

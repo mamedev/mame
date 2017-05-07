@@ -288,7 +288,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 		int cloneof = driver_list::non_bios_clone(*driver);
 
 		if (cloneof != -1)
-			tempbuf[2] = string_format(_("Driver is clone of: %1$-.100s"), driver_list::driver(cloneof).description);
+			tempbuf[2] = string_format(_("Driver is clone of: %1$-.100s"), driver_list::driver(cloneof).type.fullname());
 		else
 			tempbuf[2] = _("Driver is parent");
 

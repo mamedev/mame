@@ -2,34 +2,14 @@
 // copyright-holders:Tomasz Slanina, David Haywood
 /* ST0016 - CPU (z80) + Sound + Video */
 
-#ifndef MAME_MACHINE_ST0016_CPU_H
-#define MAME_MACHINE_ST0016_CPU_H
+#ifndef MAME_MACHINE_ST0016_H
+#define MAME_MACHINE_ST0016_H
 
 #pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/st0016.h"
 #include "screen.h"
-
-#define ISMACS  (m_game_flag & 0x80)
-#define ISMACS1 (((m_game_flag & 0x180) == 0x180))
-#define ISMACS2 (((m_game_flag & 0x180) == 0x080))
-
-
-#define ST0016_MAX_SPR_BANK   0x10
-#define ST0016_MAX_CHAR_BANK  0x10000
-#define ST0016_MAX_PAL_BANK   4
-
-#define ST0016_SPR_BANK_SIZE  0x1000
-#define ST0016_CHAR_BANK_SIZE 0x20
-#define ST0016_PAL_BANK_SIZE  0x200
-
-#define UNUSED_PEN 1024
-
-#define ST0016_SPR_BANK_MASK  (ST0016_MAX_SPR_BANK-1)
-#define ST0016_CHAR_BANK_MASK (ST0016_MAX_CHAR_BANK-1)
-#define ST0016_PAL_BANK_MASK  (ST0016_MAX_PAL_BANK-1)
-
 
 typedef device_delegate<uint8_t (void)> st0016_dma_offs_delegate;
 #define ST0016_DMA_OFFS_CB(name)  uint8_t name(void)
@@ -83,6 +63,26 @@ public:
 	std::unique_ptr<uint8_t[]> m_charram;
 
 protected:
+	bool ismacs() const { return m_game_flag & 0x80; }
+	bool ismacs1() const { return (m_game_flag & 0x180) == 0x180; }
+	bool ismacs2() const { return (m_game_flag & 0x180) == 0x080; }
+
+
+	static constexpr unsigned MAX_SPR_BANK   = 0x10;
+	static constexpr unsigned MAX_CHAR_BANK  = 0x10000;
+	static constexpr unsigned MAX_PAL_BANK   = 4;
+
+	static constexpr unsigned SPR_BANK_SIZE  = 0x1000;
+	static constexpr unsigned CHAR_BANK_SIZE = 0x20;
+	static constexpr unsigned PAL_BANK_SIZE  = 0x200;
+
+	static constexpr unsigned UNUSED_PEN = 1024;
+
+	static constexpr unsigned SPR_BANK_MASK  = MAX_SPR_BANK - 1;
+	static constexpr unsigned CHAR_BANK_MASK = MAX_CHAR_BANK - 1;
+	static constexpr unsigned PAL_BANK_MASK  = MAX_PAL_BANK - 1;
+
+
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
@@ -111,7 +111,7 @@ private:
 
 
 // device type definition
-extern const device_type ST0016_CPU;
+DECLARE_DEVICE_TYPE(ST0016_CPU, st0016_cpu_device)
 
 
-#endif // MAME_MACHINE_ST0016_CPU_H
+#endif // MAME_MACHINE_ST0016_H

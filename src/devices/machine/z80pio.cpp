@@ -16,7 +16,6 @@
 
 #include "emu.h"
 #include "z80pio.h"
-#include "cpu/z80/z80daisy.h"
 
 
 //**************************************************************************
@@ -32,14 +31,14 @@
 //**************************************************************************
 
 // device type definition
-const device_type Z80PIO = device_creator<z80pio_device>;
+DEFINE_DEVICE_TYPE(Z80PIO, z80pio_device, "z80pio", "Z80 PIO")
 
 //-------------------------------------------------
 //  z80pio_device - constructor
 //-------------------------------------------------
 
 z80pio_device::z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, Z80PIO, "Z80 PIO", tag, owner, clock, "z80pio", __FILE__),
+	device_t(mconfig, Z80PIO, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this),
 	m_out_int_cb(*this),
 	m_in_pa_cb(*this),

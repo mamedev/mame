@@ -355,7 +355,7 @@ void jackal_state::machine_reset()
 	m_irq_enable = 0;
 }
 
-static MACHINE_CONFIG_START( jackal, jackal_state )
+static MACHINE_CONFIG_START( jackal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", M6809, MASTER_CLOCK/12) // verified on pcb
@@ -571,9 +571,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, jackal,   0,      jackal, jackal,  driver_device, 0, ROT90, "Konami",  "Jackal (World, 8-way Joystick)", 0 )
-GAME( 1986, jackalr,  jackal, jackal, jackalr, driver_device, 0, ROT90, "Konami",  "Jackal (World, Rotary Joystick)", 0 )
-GAME( 1986, topgunr,  jackal, jackal, jackal,  driver_device, 0, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)", 0 )
-GAME( 1986, jackalj,  jackal, jackal, jackal,  driver_device, 0, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
-GAME( 1986, jackalbl, jackal, jackal, jackalr, driver_device, 0, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)", 0 )
-GAME( 1986, topgunbl, jackal, jackal, jackalr, driver_device, 0, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)", 0 )
+GAME( 1986, jackal,   0,      jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Jackal (World, 8-way Joystick)",               0 )
+GAME( 1986, jackalr,  jackal, jackal, jackalr, jackal_state, 0, ROT90, "Konami",  "Jackal (World, Rotary Joystick)",              0 )
+GAME( 1986, topgunr,  jackal, jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)",              0 )
+GAME( 1986, jackalj,  jackal, jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
+GAME( 1986, jackalbl, jackal, jackal, jackalr, jackal_state, 0, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)",            0 )
+GAME( 1986, topgunbl, jackal, jackal, jackalr, jackal_state, 0, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)",        0 )

@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_ALFAM2__
-#define __A2BUS_ALFAM2__
+#ifndef MAME_BUS_A2BUS_A2ALFAM2_H
+#define MAME_BUS_A2BUS_A2ALFAM2_H
+
+#pragma once
 
 #include "a2bus.h"
 #include "sound/sn76496.h"
@@ -23,18 +25,13 @@ class a2bus_sn76489_device:
 	public device_a2bus_card_interface
 {
 public:
-	// construction/destruction
-	a2bus_sn76489_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	required_device<sn76489_device> m_sn1;
-	required_device<sn76489_device> m_sn2;
-	required_device<sn76489_device> m_sn3;
-	optional_device<sn76489_device> m_sn4;
-
 protected:
+	// construction/destruction
+	a2bus_sn76489_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -42,6 +39,11 @@ protected:
 	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
 	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
 	virtual bool take_c800() override;
+
+	required_device<sn76489_device> m_sn1;
+	required_device<sn76489_device> m_sn2;
+	required_device<sn76489_device> m_sn3;
+	optional_device<sn76489_device> m_sn4;
 
 private:
 	uint8_t m_latch0, m_latch1, m_latch2, m_latch3;
@@ -65,7 +67,7 @@ public:
 };
 
 // device type definition
-extern const device_type A2BUS_ALFAM2;
-extern const device_type A2BUS_AESMS;
+DECLARE_DEVICE_TYPE(A2BUS_ALFAM2, a2bus_alfam2_device)
+DECLARE_DEVICE_TYPE(A2BUS_AESMS, a2bus_aesms_device)
 
-#endif /* __A2BUS_ALFAM2__ */
+#endif // MAME_BUS_A2BUS_A2ALFAM2_H

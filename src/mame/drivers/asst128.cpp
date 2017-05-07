@@ -2,9 +2,14 @@
 // copyright-holders:Sergey Svishchev
 #include "emu.h"
 #include "machine/genpc.h"
+
+#include "cpu/i86/i86.h"
+#include "bus/pc_joy/pc_joy.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "machine/pc_fdc.h"
+
 #include "formats/asst128_dsk.h"
+
 
 extern const device_type ASST128_MOTHERBOARD;
 
@@ -13,7 +18,9 @@ class asst128_mb_device : public ibm5150_mb_device
 public:
 	// construction/destruction
 	asst128_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: ibm5150_mb_device(mconfig, ASST128_MOTHERBOARD, "ASST128_MOTHERBOARD", tag, owner, clock, "asst128_mb", __FILE__) { }
+		: ibm5150_mb_device(mconfig, ASST128_MOTHERBOARD, tag, owner, clock)
+	{
+	}
 
 	DECLARE_ADDRESS_MAP(map, 8);
 };
@@ -26,7 +33,7 @@ DEVICE_ADDRESS_MAP_START( map, 8, asst128_mb_device )
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE(nmi_enable_w)
 ADDRESS_MAP_END
 
-const device_type ASST128_MOTHERBOARD = device_creator<asst128_mb_device>;
+DEFINE_DEVICE_TYPE(ASST128_MOTHERBOARD, asst128_mb_device, "asst128_mb", "ASST128_MOTHERBOARD")
 
 class asst128_state : public driver_device
 {
@@ -85,7 +92,7 @@ static DEVICE_INPUT_DEFAULTS_START( asst128 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x20)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( asst128, asst128_state )
+static MACHINE_CONFIG_START( asst128 )
 	MCFG_CPU_ADD("maincpu", I8086, 4772720)
 	MCFG_CPU_PROGRAM_MAP(asst128_map)
 	MCFG_CPU_IO_MAP(asst128_io)
@@ -126,5 +133,5 @@ ROM_START( asst128 )
 	ROM_LOAD( "asst128cg.bin", 0, 0x2000, NO_DUMP )
 ROM_END
 
-/*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY            FULLNAME */
-COMP( 198?, asst128,    ibm5150,    0,          asst128,    0,      driver_device, 0,   "Schetmash", "Assistent 128", MACHINE_NOT_WORKING)
+//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT   STATE          INIT  COMPANY      FULLNAME         FLAGS
+COMP( 198?, asst128,    ibm5150,    0,          asst128,    0,      asst128_state, 0,    "Schetmash", "Assistent 128", MACHINE_NOT_WORKING)

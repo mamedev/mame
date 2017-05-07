@@ -4,17 +4,17 @@
 #include "rom.h"
 
 
-const device_type MSX_SLOT_ROM = device_creator<msx_slot_rom_device>;
+DEFINE_DEVICE_TYPE(MSX_SLOT_ROM, msx_slot_rom_device, "msx_slot_rom", "MSX Internal ROM")
 
 
 msx_slot_rom_device::msx_slot_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_rom_device(mconfig, MSX_SLOT_ROM, "MSX Internal ROM", tag, owner, clock, "msx_slot_rom", __FILE__)
+	: msx_slot_rom_device(mconfig, MSX_SLOT_ROM, tag, owner, clock)
 {
 }
 
 
-msx_slot_rom_device::msx_slot_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+msx_slot_rom_device::msx_slot_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, msx_internal_slot_interface()
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
 	, m_region_offset(0)

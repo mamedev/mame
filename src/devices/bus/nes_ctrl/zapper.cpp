@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_ZAPPER = device_creator<nes_zapper_device>;
+DEFINE_DEVICE_TYPE(NES_ZAPPER, nes_zapper_device, "nes_zapper", "Nintendo Zapper Lightgun")
 
 
 static INPUT_PORTS_START( nes_zapper )
@@ -46,11 +46,11 @@ ioport_constructor nes_zapper_device::device_input_ports() const
 //-------------------------------------------------
 
 nes_zapper_device::nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, NES_ZAPPER, "Nintendo Zapper Lightgun", tag, owner, clock, "nes_zapper", __FILE__),
-					device_nes_control_port_interface(mconfig, *this),
-					m_lightx(*this, "ZAPPER_X"),
-					m_lighty(*this, "ZAPPER_Y"),
-					m_trigger(*this, "ZAPPER_T")
+	device_t(mconfig, NES_ZAPPER, tag, owner, clock),
+	device_nes_control_port_interface(mconfig, *this),
+	m_lightx(*this, "ZAPPER_X"),
+	m_lighty(*this, "ZAPPER_Y"),
+	m_trigger(*this, "ZAPPER_T")
 {
 }
 

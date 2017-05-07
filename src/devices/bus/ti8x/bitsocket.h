@@ -9,17 +9,14 @@
  bit 1 = set tip
  bit 2 = set ring
  */
-#ifndef MAME_DEVICES_BUS_TI8X_BITSOCKET_H
-#define MAME_DEVICES_BUS_TI8X_BITSOCKET_H
+#ifndef MAME_BUS_TI8X_BITSOCKET_H
+#define MAME_BUS_TI8X_BITSOCKET_H
 
 #pragma once
 
 #include "ti8x.h"
 
 #include "imagedev/bitbngr.h"
-
-
-extern device_type const TI8X_BIT_SOCKET;
 
 
 namespace bus { namespace ti8x {
@@ -52,4 +49,7 @@ private:
 
 } } // namespace bus::ti8x
 
-#endif // MAME_DEVICES_BUS_TI8X_BITSOCKET_H
+
+DECLARE_DEVICE_TYPE_NS(TI8X_BIT_SOCKET, bus::ti8x, bit_socket_device)
+
+#endif // MAME_BUS_TI8X_BITSOCKET_H

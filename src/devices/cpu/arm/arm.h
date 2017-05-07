@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-#pragma once
+#ifndef MAME_CPU_ARM_ARM_H
+#define MAME_CPU_ARM_ARM_H
 
-#ifndef __ARM_H__
-#define __ARM_H__
+#pragma once
 
 /****************************************************************************************************
  *  INTERRUPT CONSTANTS
@@ -16,36 +16,36 @@
  *  PUBLIC FUNCTIONS
  ***************************************************************************************************/
 
-enum
-{
-	ARM_COPRO_TYPE_UNKNOWN_CP15 = 0,
-	ARM_COPRO_TYPE_VL86C020
-};
-
 #define MCFG_ARM_COPRO(_type) \
-	arm_cpu_device::set_copro_type(*device, _type);
-
-
-enum
-{
-	ARM32_PC=0,
-	ARM32_R0, ARM32_R1, ARM32_R2, ARM32_R3, ARM32_R4, ARM32_R5, ARM32_R6, ARM32_R7,
-	ARM32_R8, ARM32_R9, ARM32_R10, ARM32_R11, ARM32_R12, ARM32_R13, ARM32_R14, ARM32_R15,
-	ARM32_FR8, ARM32_FR9, ARM32_FR10, ARM32_FR11, ARM32_FR12, ARM32_FR13, ARM32_FR14,
-	ARM32_IR13, ARM32_IR14, ARM32_SR13, ARM32_SR14
-};
+	arm_cpu_device::set_copro_type(*device, arm_cpu_device::copro_type::_type);
 
 
 class arm_cpu_device : public cpu_device
 {
 public:
+	enum class copro_type : uint8_t
+	{
+		UNKNOWN_CP15 = 0,
+		VL86C020
+	};
+
 	// construction/destruction
 	arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	arm_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, endianness_t endianness);
 
-	static void set_copro_type(device_t &device, int type) { downcast<arm_cpu_device &>(device).m_copro_type = type; }
+	static void set_copro_type(device_t &device, copro_type type) { downcast<arm_cpu_device &>(device).m_copro_type = type; }
 
 protected:
+	enum
+	{
+		ARM32_PC = 0,
+		ARM32_R0, ARM32_R1, ARM32_R2, ARM32_R3, ARM32_R4, ARM32_R5, ARM32_R6, ARM32_R7,
+		ARM32_R8, ARM32_R9, ARM32_R10, ARM32_R11, ARM32_R12, ARM32_R13, ARM32_R14, ARM32_R15,
+		ARM32_FR8, ARM32_FR9, ARM32_FR10, ARM32_FR11, ARM32_FR12, ARM32_FR13, ARM32_FR14,
+		ARM32_IR13, ARM32_IR14, ARM32_SR13, ARM32_SR14
+	};
+
+	arm_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -78,7 +78,7 @@ protected:
 	address_space *m_program;
 	direct_read_data *m_direct;
 	endianness_t m_endian;
-	uint8_t m_copro_type;
+	copro_type m_copro_type;
 
 	void cpu_write32( int addr, uint32_t data );
 	void cpu_write8( int addr, uint8_t data );
@@ -117,8 +117,7 @@ protected:
 };
 
 
-extern const device_type ARM;
-extern const device_type ARM_BE;
+DECLARE_DEVICE_TYPE(ARM,    arm_cpu_device)
+DECLARE_DEVICE_TYPE(ARM_BE, arm_be_cpu_device)
 
-
-#endif /* __ARM_H__ */
+#endif // MAME_CPU_ARM_ARM_H

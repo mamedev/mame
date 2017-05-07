@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_PACHINKO = device_creator<snes_pachinko_device>;
+DEFINE_DEVICE_TYPE(SNES_PACHINKO, snes_pachinko_device, "snes_pachinko", "Sunsoft Pachinko Controller")
 
 
 static INPUT_PORTS_START( snes_pachinko )
@@ -46,10 +46,11 @@ ioport_constructor snes_pachinko_device::device_input_ports() const
 //-------------------------------------------------
 
 snes_pachinko_device::snes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, SNES_PACHINKO, "Sunsoft Pachinko Controller", tag, owner, clock, "snes_pachinko", __FILE__),
-					device_snes_control_port_interface(mconfig, *this),
-					m_dial(*this, "DIAL"),
-					m_button(*this, "BUTTON"), m_strobe(0), m_latch(0)
+	device_t(mconfig, SNES_PACHINKO, tag, owner, clock),
+	device_snes_control_port_interface(mconfig, *this),
+	m_dial(*this, "DIAL"),
+	m_button(*this, "BUTTON"),
+	m_strobe(0), m_latch(0)
 {
 }
 

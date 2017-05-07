@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __VCS_SCHARGER_H
-#define __VCS_SCHARGER_H
+#ifndef MAME_BUS_VCS_SCHARGER_H
+#define MAME_BUS_VCS_SCHARGER_H
+
+#pragma once
 
 #include "rom.h"
 #include "imagedev/cassette.h"
@@ -18,17 +20,18 @@ public:
 	// construction/destruction
 	a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void device_reset() override;
-
-	required_device<cassette_image_device> m_cassette;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom) override;
 
 private:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	required_device<cassette_image_device> m_cassette;
+
 	cpu_device   *m_maincpu;
 	inline uint8_t read_byte(uint32_t offset);
 
@@ -42,6 +45,6 @@ private:
 
 
 // device type definition
-extern const device_type A26_ROM_SUPERCHARGER;
+DECLARE_DEVICE_TYPE(A26_ROM_SUPERCHARGER, a26_rom_ss_device)
 
-#endif
+#endif // MAME_BUS_VCS_SCHARGER_H

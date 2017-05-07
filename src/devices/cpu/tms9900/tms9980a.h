@@ -5,8 +5,10 @@
     See tms9980a.c and tms9900.c for documentation
 */
 
-#ifndef __TMS9980A_H__
-#define __TMS9980A_H__
+#ifndef MAME_CPU_TMS9900_TMS9980A_H
+#define MAME_CPU_TMS9900_TMS9980A_H
+
+#pragma once
 
 #include "debugger.h"
 #include "tms9900.h"
@@ -50,6 +52,6 @@ protected:
 };
 
 // device type definition
-extern const device_type TMS9980A;
+DECLARE_DEVICE_TYPE(TMS9980A, tms9980a_device)
 
-#endif /* __TMS9980A_H__ */
+#endif // MAME_CPU_TMS9900_TMS9980A_H

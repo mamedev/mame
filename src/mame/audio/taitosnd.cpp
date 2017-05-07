@@ -11,8 +11,9 @@
 **********************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "taitosnd.h"
+
+#include "cpu/z80/z80.h"
 
 
 /**********************************************************************************************
@@ -29,7 +30,7 @@
 
 
 // device type definition
-const device_type TC0140SYT = device_creator<tc0140syt_device>;
+DEFINE_DEVICE_TYPE(TC0140SYT, tc0140syt_device, "tc0140syt", "Taito TC0140SYT")
 
 
 //**************************************************************************
@@ -41,7 +42,7 @@ const device_type TC0140SYT = device_creator<tc0140syt_device>;
 //-------------------------------------------------
 
 tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0140SYT, "Taito TC0140SYT", tag, owner, clock, "tc0140syt", __FILE__)
+	: device_t(mconfig, TC0140SYT, tag, owner, clock)
 	, m_mainmode(0)
 	, m_submode(0)
 	, m_status(0)

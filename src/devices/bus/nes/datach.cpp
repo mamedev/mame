@@ -43,10 +43,10 @@
 //-------------------------------------------------
 
 datach_cart_interface::datach_cart_interface(const machine_config &mconfig, device_t &device)
-					: device_slot_card_interface(mconfig, device),
-						m_i2cmem(*this, "i2cmem"),
-						m_rom(nullptr), m_bank(0)
-				{
+	: device_slot_card_interface(mconfig, device)
+	, m_i2cmem(*this, "i2cmem")
+	, m_rom(nullptr), m_bank(0)
+{
 }
 
 datach_cart_interface::~datach_cart_interface()
@@ -65,12 +65,13 @@ READ8_MEMBER(datach_cart_interface::read)
 //  sub-cart slot device
 //-------------------------------------------------
 
-const device_type NES_DATACH_SLOT = device_creator<nes_datach_slot_device>;
+DEFINE_DEVICE_TYPE(NES_DATACH_SLOT, nes_datach_slot_device, "nes_datach_slot", "NES Datach Cartridge Slot")
 
-nes_datach_slot_device::nes_datach_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, NES_DATACH_SLOT, "NES Datach Cartridge Slot", tag, owner, clock, "nes_datach_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this), m_cart(nullptr)
+nes_datach_slot_device::nes_datach_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NES_DATACH_SLOT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_slot_interface(mconfig, *this)
+	, m_cart(nullptr)
 {
 }
 
@@ -159,23 +160,22 @@ ROM_START( datach_rom )
 	ROM_REGION(0x40000, "datachrom", ROMREGION_ERASEFF)
 ROM_END
 
-const device_type NES_DATACH_ROM = device_creator<nes_datach_rom_device>;
-const device_type NES_DATACH_24C01 = device_creator<nes_datach_24c01_device>;
+DEFINE_DEVICE_TYPE(NES_DATACH_ROM,   nes_datach_rom_device,   "nes_datach_rom", "NES Datach ROM")
+DEFINE_DEVICE_TYPE(NES_DATACH_24C01, nes_datach_24c01_device, "nes_datach_ep1", "NES Datach + 24C01 PCB")
 
-nes_datach_rom_device::nes_datach_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						datach_cart_interface( mconfig, *this )
+nes_datach_rom_device::nes_datach_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, datach_cart_interface(mconfig, *this)
 {
 }
 
 nes_datach_rom_device::nes_datach_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, NES_DATACH_ROM, "NES Datach ROM", tag, owner, clock, "nes_datach_rom", __FILE__),
-						datach_cart_interface( mconfig, *this )
+	: nes_datach_rom_device(mconfig, NES_DATACH_ROM, tag, owner, clock)
 {
 }
 
 nes_datach_24c01_device::nes_datach_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_datach_rom_device(mconfig, NES_DATACH_24C01, "NES Datach + 24C01 PCB", tag, owner, clock, "nes_datach_ep1", __FILE__)
+	: nes_datach_rom_device(mconfig, NES_DATACH_24C01, tag, owner, clock)
 {
 }
 
@@ -218,15 +218,18 @@ machine_config_constructor nes_datach_24c01_device::device_mconfig_additions() c
 //
 //---------------------------------
 
-const device_type NES_DATACH = device_creator<nes_datach_device>;
+DEFINE_DEVICE_TYPE(NES_DATACH, nes_datach_device, "nes_datach", "NES Cart Bandai Datach PCB")
 
 
 nes_datach_device::nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_lz93d50_device(mconfig, NES_DATACH, "NES Cart Bandai Datach PCB", tag, owner, clock, "nes_datach", __FILE__), m_datach_latch(0),
-						m_i2cmem(*this, "i2cmem"),
-						m_reader(*this, "datach"),
-						m_subslot(*this, "datach_slot"), m_i2c_dir(0), m_i2c_in_use(0), serial_timer(nullptr)
-				{
+	: nes_lz93d50_device(mconfig, NES_DATACH, tag, owner, clock)
+	, m_datach_latch(0)
+	, m_i2cmem(*this, "i2cmem")
+	, m_reader(*this, "datach")
+	, m_subslot(*this, "datach_slot")
+	, m_i2c_dir(0), m_i2c_in_use(0)
+	, serial_timer(nullptr)
+{
 }
 
 

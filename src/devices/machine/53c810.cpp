@@ -394,7 +394,7 @@ void lsi53c810_device::dma_exec()
 	}
 }
 
-uint8_t lsi53c810_device::lsi53c810_reg_r( int offset )
+uint8_t lsi53c810_device::reg_r(int offset)
 {
 //  logerror("53c810: read reg %d:0x%x (PC=%x)\n", offset, offset, space.device().safe_pc());
 	switch(offset)
@@ -477,7 +477,7 @@ uint8_t lsi53c810_device::lsi53c810_reg_r( int offset )
 	//return 0;
 }
 
-void lsi53c810_device::lsi53c810_reg_w(int offset, uint8_t data)
+void lsi53c810_device::reg_w(int offset, uint8_t data)
 {
 //  logerror("53c810: %02x to reg %d:0x%x (PC=%x)\n", data, offset, offset, space.device().safe_pc());
 	switch(offset)
@@ -622,7 +622,7 @@ void lsi53c810_device::add_opcode(uint8_t op, uint8_t mask, opcode_handler_deleg
 }
 
 lsi53c810_device::lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: legacy_scsi_host_adapter(mconfig, LSI53C810, "53C810 SCSI", tag, owner, clock, "lsi53c810", __FILE__)
+	: legacy_scsi_host_adapter(mconfig, LSI53C810, tag, owner, clock)
 {
 }
 
@@ -813,4 +813,4 @@ unsigned lsi53c810_device::lsi53c810_dasm(char *buf, uint32_t pc)
 	return result;
 }
 
-const device_type LSI53C810 = device_creator<lsi53c810_device>;
+DEFINE_DEVICE_TYPE(LSI53C810, lsi53c810_device, "lsi53c810", "LSI 53C810 SCSI")

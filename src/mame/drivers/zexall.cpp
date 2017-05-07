@@ -139,7 +139,7 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( zexall, zexall_state )
+static MACHINE_CONFIG_START( zexall )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz*10)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
@@ -167,5 +167,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
-COMP( 2009, zexall,   0,          0,      zexall,   zexall, zexall_state, zexall,      "Frank Cringle & MESSDEV",   "ZEXALL Z80 instruction set exerciser (modified for MESS)", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT   STATE         INIT    COMPANY                    FULLNAME                                                    FLAGS
+COMP( 2009, zexall,  0,      0,      zexall,   zexall, zexall_state, zexall, "Frank Cringle & MESSDEV", "ZEXALL Z80 instruction set exerciser (modified for MESS)", MACHINE_NO_SOUND_HW )

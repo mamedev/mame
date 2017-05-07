@@ -227,29 +227,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<i8741_device> m_kbdmcu;
-	required_device<ram_device> m_ram;
-	required_device<crt5027_device> m_crtc;
-	required_device<address_map_bank_device> m_48kbank;
-	required_device<fd1791_t> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<beep_device> m_beep;
-
-	required_ioport_array<16> m_keyrows;
-
-	// shared pointers
-	required_shared_ptr<uint8_t> m_vram;
-
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-protected:
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 public:
 
 	DECLARE_READ8_MEMBER(vsync_r);
@@ -269,6 +249,27 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
 	DECLARE_PALETTE_INIT(itt3030);
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<i8741_device> m_kbdmcu;
+	required_device<ram_device> m_ram;
+	required_device<crt5027_device> m_crtc;
+	required_device<address_map_bank_device> m_48kbank;
+	required_device<fd1791_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<beep_device> m_beep;
+
+	required_ioport_array<16> m_keyrows;
+
+	// shared pointers
+	required_shared_ptr<uint8_t> m_vram;
 
 private:
 	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
@@ -655,7 +656,7 @@ PALETTE_INIT_MEMBER(itt3030_state, itt3030)
 	palette.set_pen_color(2, rgb_t::black());
 }
 
-static MACHINE_CONFIG_START( itt3030, itt3030_state )
+static MACHINE_CONFIG_START( itt3030 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_4MHz)
@@ -732,4 +733,4 @@ ROM_START( itt3030 )
 	ROM_LOAD( "8741ad.bin", 0x0000, 0x0400, CRC(cabf4394) SHA1(e5d1416b568efa32b578ca295a29b7b5d20c0def))
 ROM_END
 
-COMP( 1982, itt3030,  0,   0,  itt3030,  itt3030,  driver_device, 0,  "ITT RFA",      "ITT3030", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, itt3030,  0,   0,  itt3030,  itt3030,  itt3030_state, 0,  "ITT RFA",      "ITT3030", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

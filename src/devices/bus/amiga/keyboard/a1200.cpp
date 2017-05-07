@@ -23,7 +23,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-device_type const A1200_KBD = device_creator<bus::amiga::keyboard::a1200_kbd_device>;
+DEFINE_DEVICE_TYPE_NS(A1200_KBD, bus::amiga::keyboard, a1200_kbd_device, "a1200kbd_rb", "Amiga 1200 Keyboard Rev B")
 
 
 
@@ -74,7 +74,7 @@ ROM_END
 //**************************************************************************
 
 a1200_kbd_device::a1200_kbd_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, A1200_KBD, "Amiga 1200 Keyboard Rev B", tag, owner, clock, "a1200kbd_rb", __FILE__)
+	: device_t(mconfig, A1200_KBD, tag, owner, clock)
 	, device_amiga_keyboard_interface(mconfig, *this)
 	, m_rows(*this, "ROW%u", 0)
 	, m_mpu(*this, "mpu")

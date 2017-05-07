@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf,Vas Crabb
-#ifndef MAME_BUS_RS232_H
-#define MAME_BUS_RS232_H
+#ifndef MAME_BUS_RS232_RS232_H
+#define MAME_BUS_RS232_RS232_H
 
 #pragma once
 
@@ -117,15 +117,14 @@ class rs232_port_device : public device_t,
 
 public:
 	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	rs232_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual ~rs232_port_device();
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_rxd_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_rxd_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_dcd_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_dcd_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_dsr_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_dsr_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_ri_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_ri_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_cts_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_cts_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_rxd_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_rxd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dcd_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_dcd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dsr_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_dsr_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ri_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_ri_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_cts_handler(device_t &device, Object &&cb) { return downcast<rs232_port_device &>(device).m_cts_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_txd );
 	DECLARE_WRITE_LINE_MEMBER( write_dtr );
@@ -139,6 +138,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( cts_r ) { return m_cts; }
 
 protected:
+	rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 
@@ -163,13 +164,12 @@ class device_rs232_port_interface : public device_slot_card_interface
 	friend class rs232_port_device;
 
 public:
-	device_rs232_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_rs232_port_interface();
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_dtr ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_rts ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_etc ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_dtr ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_rts ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_etc ) { }
 
 	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_dcd ) { m_port->m_dcd = state; m_port->m_dcd_handler(state); }
@@ -178,6 +178,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( output_cts ) { m_port->m_cts = state; m_port->m_cts_handler(state); }
 
 protected:
+	device_rs232_port_interface(const machine_config &mconfig, device_t &device);
+
 	rs232_port_device *m_port;
 
 	static int convert_baud(uint8_t baud)
@@ -265,8 +267,8 @@ public:
 	}
 
 protected:
-	buffered_rs232_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-		: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	buffered_rs232_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, type, tag, owner, clock)
 		, device_buffered_serial_interface<FIFO_LENGTH>(mconfig, *this)
 		, device_rs232_port_interface(mconfig, *this)
 	{
@@ -285,8 +287,8 @@ protected:
 	using device_buffered_serial_interface<FIFO_LENGTH>::device_timer;
 };
 
-extern const device_type RS232_PORT;
+DECLARE_DEVICE_TYPE(RS232_PORT, rs232_port_device)
 
 SLOT_INTERFACE_EXTERN( default_rs232_devices );
 
-#endif // MAME_BUS_RS232_H
+#endif // MAME_BUS_RS232_RS232_H

@@ -5,11 +5,11 @@
     Namco 6-speed Gearbox device
 
 ***************************************************************************/
+#ifndef MAME_MACHINE_NAMCOIO_GEARBOX_H
+#define MAME_MACHINE_NAMCOIO_GEARBOX_H
 
 #pragma once
 
-#ifndef __NAMCOIO_GEARBOXDEV_H__
-#define __NAMCOIO_GEARBOXDEV_H__
 
 
 
@@ -47,7 +47,7 @@ protected:
 
 
 // device type definition
-extern const device_type NAMCOIO_GEARBOX;
+DECLARE_DEVICE_TYPE(NAMCOIO_GEARBOX, namcoio_gearbox_device)
 
 
 
@@ -57,4 +57,4 @@ extern const device_type NAMCOIO_GEARBOX;
 
 
 
-#endif
+#endif // MAME_MACHINE_NAMCOIO_GEARBOX_H

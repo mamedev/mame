@@ -2302,7 +2302,7 @@ void viper_state::machine_reset()
 	m_ds2430_unk_status = 1;
 }
 
-static MACHINE_CONFIG_START( viper, viper_state )
+static MACHINE_CONFIG_START( viper )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MPC8240, 200000000)

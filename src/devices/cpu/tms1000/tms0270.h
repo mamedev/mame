@@ -6,8 +6,10 @@
 
 */
 
-#ifndef _TMS0270_H_
-#define _TMS0270_H_
+#ifndef MAME_CPU_TMS1000_TMS0270_H
+#define MAME_CPU_TMS1000_TMS0270_H
+
+#pragma once
 
 #include "tms0980.h"
 
@@ -29,9 +31,9 @@ public:
 	tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_ctl_callback(device_t &device, _Object object) { return downcast<tms0270_cpu_device &>(device).m_read_ctl.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_ctl_callback(device_t &device, _Object object) { return downcast<tms0270_cpu_device &>(device).m_write_ctl.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_pdc_callback(device_t &device, _Object object) { return downcast<tms0270_cpu_device &>(device).m_write_pdc.set_callback(object); }
+	template <class Object> static devcb_base &set_read_ctl_callback(device_t &device, Object &&cb) { return downcast<tms0270_cpu_device &>(device).m_read_ctl.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_ctl_callback(device_t &device, Object &&cb) { return downcast<tms0270_cpu_device &>(device).m_write_ctl.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_pdc_callback(device_t &device, Object &&cb) { return downcast<tms0270_cpu_device &>(device).m_write_pdc.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// overrides
@@ -66,6 +68,6 @@ private:
 };
 
 
-extern const device_type TMS0270;
+DECLARE_DEVICE_TYPE(TMS0270, tms0270_cpu_device)
 
-#endif /* _TMS0270_H_ */
+#endif // MAME_CPU_TMS1000_TMS0270_H

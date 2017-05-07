@@ -7,8 +7,10 @@
 **********************************************************************/
 
 
-#ifndef __BBC_ACORN__
-#define __BBC_ACORN__
+#ifndef MAME_BUS__BBC_FDC_ACORN_H
+#define MAME_BUS__BBC_FDC_ACORN_H
+
+#pragma once
 
 #include "fdc.h"
 #include "machine/i8271.h"
@@ -78,7 +80,7 @@ protected:
 
 private:
 	required_memory_region m_dfs_rom;
-	required_device<wd1770_t> m_fdc;
+	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 
@@ -87,8 +89,8 @@ private:
 
 
 // device type definition
-extern const device_type BBC_ACORN8271;
-extern const device_type BBC_ACORN1770;
+DECLARE_DEVICE_TYPE(BBC_ACORN8271, bbc_acorn8271_device)
+DECLARE_DEVICE_TYPE(BBC_ACORN1770, bbc_acorn1770_device)
 
 
-#endif /* __BBC_ACORN__ */
+#endif // MAME_BUS__BBC_FDC_ACORN_H

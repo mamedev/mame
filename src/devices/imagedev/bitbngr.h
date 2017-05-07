@@ -50,6 +50,6 @@ private:
 	bitbanger_image_device::static_set_interface(*device, _interface);
 
 // device type definition
-extern const device_type BITBANGER;
+DECLARE_DEVICE_TYPE(BITBANGER, bitbanger_device)
 
 #endif // MAME_DEVICES_IMAGEDEV_BITBNGR_H

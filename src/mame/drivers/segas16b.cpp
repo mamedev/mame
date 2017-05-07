@@ -3596,7 +3596,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( system16b, segas16b_state )
+static MACHINE_CONFIG_START( system16b )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_10MHz)
@@ -3748,7 +3748,7 @@ static MACHINE_CONFIG_DERIVED( fpointbl, system16b )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lockonph, segas16b_state )
+static MACHINE_CONFIG_START( lockonph )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) // ?
@@ -3787,7 +3787,7 @@ static MACHINE_CONFIG_START( lockonph, segas16b_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.5)
 	MCFG_SOUND_ROUTE(1, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW) // clock / pin not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_LOW) // clock / pin not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
@@ -8665,7 +8665,7 @@ DRIVER_INIT_MEMBER(segas16b_state,dunkshot_5358_small)
 {
 	DRIVER_INIT_CALL(generic_5358_small);
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::dunkshot_custom_io_r), this);
-	m_tilemap_type = SEGAIC16_TILEMAP_16B_ALT;
+	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,exctleag_5358)
@@ -8740,13 +8740,13 @@ DRIVER_INIT_MEMBER(segas16b_state,sjryuko_5358_small)
 	DRIVER_INIT_CALL(generic_5358_small);
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sjryuko_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segas16b_state::sjryuko_custom_io_w), this);
-	m_tilemap_type = SEGAIC16_TILEMAP_16B_ALT;
+	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,timescan_5358_small)
 {
 	DRIVER_INIT_CALL(generic_5358_small);
-	m_tilemap_type = SEGAIC16_TILEMAP_16B_ALT;
+	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,tturf_5704)
@@ -9398,7 +9398,7 @@ void isgsm_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( isgsm, system16b, isgsm_state )
+static MACHINE_CONFIG_DERIVED( isgsm, system16b )
 	// basic machine hardware
 
 	MCFG_DEVICE_REMOVE("maincpu")

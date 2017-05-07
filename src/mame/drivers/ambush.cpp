@@ -667,7 +667,7 @@ WRITE8_MEMBER( ambush_state::unk_w )
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( ambush, ambush_state )
+static MACHINE_CONFIG_START( ambush )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
@@ -872,10 +872,10 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT   MACHINE    INPUT      CLASS          INIT  ROTATION  COMPANY                              FULLNAME                                      FLAGS
-GAME( 1983, ambush,    0,       ambush,    ambusht,   driver_device, 0,    ROT0,     "Tecfri",                            "Ambush",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ambushh,   ambush,  ambush,    ambusht,   driver_device, 0,    ROT0,     "Tecfri",                            "Ambush (hack?)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ambushj,   ambush,  ambush,    ambush,    driver_device, 0,    ROT0,     "Tecfri (Nippon Amuse license)",     "Ambush (Japan)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ambushv,   ambush,  ambush,    ambush,    driver_device, 0,    ROT0,     "Tecfri (Volt Electronics license)", "Ambush (Volt Electronics)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mariobl,   mario,   mariobl,   mariobl,   driver_device, 0,    ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, dkong3abl, dkong3,  dkong3abl, dkong3abl, driver_device, 0,    ROT90,    "bootleg",                           "Donkey Kong 3 (bootleg on Ambush hardware)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   MACHINE    INPUT      CLASS         INIT  ROTATION  COMPANY                              FULLNAME                                      FLAGS
+GAME( 1983, ambush,    0,       ambush,    ambusht,   ambush_state, 0,    ROT0,     "Tecfri",                            "Ambush",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ambushh,   ambush,  ambush,    ambusht,   ambush_state, 0,    ROT0,     "Tecfri",                            "Ambush (hack?)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ambushj,   ambush,  ambush,    ambush,    ambush_state, 0,    ROT0,     "Tecfri (Nippon Amuse license)",     "Ambush (Japan)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ambushv,   ambush,  ambush,    ambush,    ambush_state, 0,    ROT0,     "Tecfri (Volt Electronics license)", "Ambush (Volt Electronics)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mariobl,   mario,   mariobl,   mariobl,   ambush_state, 0,    ROT180,   "bootleg",                           "Mario Bros. (bootleg on Ambush Hardware)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dkong3abl, dkong3,  dkong3abl, dkong3abl, ambush_state, 0,    ROT90,    "bootleg",                           "Donkey Kong 3 (bootleg on Ambush hardware)", MACHINE_SUPPORTS_SAVE )

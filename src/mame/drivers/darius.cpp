@@ -734,7 +734,7 @@ void darius_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( darius, darius_state )
+static MACHINE_CONFIG_START( darius )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)  /* 8 MHz */
@@ -823,7 +823,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(darius_state, darius_adpcm_int))   /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz   */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz   */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.l", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.r", 1.0)
 
@@ -1160,8 +1160,8 @@ ROM_START( dariuse )
 ROM_END
 
 
-GAME( 1986, darius,   0,        darius,   darius,  driver_device, 0, ROT0, "Taito Corporation Japan",   "Darius (World, rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariusu,  darius,   darius,   dariusu, driver_device, 0, ROT0, "Taito America Corporation", "Darius (US, rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariusj,  darius,   darius,   dariusj, driver_device, 0, ROT0, "Taito Corporation",         "Darius (Japan, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariuso,  darius,   darius,   dariusj, driver_device, 0, ROT0, "Taito Corporation",         "Darius (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariuse,  darius,   darius,   dariusu, driver_device, 0, ROT0, "Taito Corporation",         "Darius Extra Version (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darius,   0,        darius,   darius,  darius_state, 0, ROT0, "Taito Corporation Japan",   "Darius (World, rev 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariusu,  darius,   darius,   dariusu, darius_state, 0, ROT0, "Taito America Corporation", "Darius (US, rev 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariusj,  darius,   darius,   dariusj, darius_state, 0, ROT0, "Taito Corporation",         "Darius (Japan, rev 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariuso,  darius,   darius,   dariusj, darius_state, 0, ROT0, "Taito Corporation",         "Darius (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariuse,  darius,   darius,   dariusu, darius_state, 0, ROT0, "Taito Corporation",         "Darius Extra Version (Japan)", MACHINE_SUPPORTS_SAVE )

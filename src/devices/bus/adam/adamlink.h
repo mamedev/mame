@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ADAM_ADAMLINK_H
+#define MAME_BUS_ADAM_ADAMLINK_H
 
-#ifndef __ADAMLINK__
-#define __ADAMLINK__
+#pragma once
 
 #include "exp.h"
 
@@ -39,8 +39,6 @@ protected:
 
 
 // device type definition
-extern const device_type ADAMLINK;
+DECLARE_DEVICE_TYPE(ADAMLINK, adamlink_device)
 
-
-
-#endif
+#endif // MAME_BUS_ADAM_ADAMLINK_H

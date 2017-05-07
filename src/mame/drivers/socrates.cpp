@@ -1367,7 +1367,7 @@ INTERRUPT_GEN_MEMBER(socrates_state::assert_irq)
 	m_kbmcu_rscount = 0; // clear the mcu poke count
 }
 
-static MACHINE_CONFIG_START( socrates, socrates_state )
+static MACHINE_CONFIG_START( socrates )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
@@ -1399,7 +1399,7 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "socrates")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( socrates_pal, socrates_state )
+static MACHINE_CONFIG_START( socrates_pal )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_26_601712MHz/6)  /* Toshiba TMPZ84C00AP @ 4.433 MHz? /6 or 7 or 8? TODO: verify divider!*/
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
@@ -1445,7 +1445,7 @@ static MACHINE_CONFIG_DERIVED( socrates_pal, socrates )
 MACHINE_CONFIG_END
 */
 
-static MACHINE_CONFIG_START( iqunlimz, iqunlim_state )
+static MACHINE_CONFIG_START( iqunlimz )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) /* not accurate */
 	MCFG_CPU_PROGRAM_MAP(iqunlim_mem)
@@ -1583,11 +1583,11 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT       COMPANY                     FULLNAME                            FLAGS */
-COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates_state, socrates, "Video Technology",        "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // English NTSC, no title copyright
-COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates_state, socrates, "Video Technology",        "Socrates SAITOUT", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // French Canandian NTSC, 1988 title copyright
-COMP( 1988, profweis,   socrates,   0,      socrates_pal,   socrates, socrates_state, socrates, "Video Technology/Yeno",        "Professor Weiss-Alles", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // German PAL, 1988 title copyright
+//    YEAR  NAME      PARENT    COMPAT  MACHINE       INPUT     STATE           INIT      COMPANY                  FULLNAME                             FLAGS
+COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, socrates, "Video Technology",      "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // English NTSC, no title copyright
+COMP( 1988, socratfc, socrates, 0,      socrates,     socrates, socrates_state, socrates, "Video Technology",      "Socrates SAITOUT",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // French Canandian NTSC, 1988 title copyright
+COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, socrates, "Video Technology/Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // German PAL, 1988 title copyright
 // Yeno Professeur Saitout goes here (french SECAM)
 // ? goes here (spanish PAL)
 
-COMP( 1991, iqunlimz, 0,       0,     iqunlimz,  iqunlimz, driver_device, 0,  "Video Technology", "IQ Unlimited (Z80)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlim_state,  0,        "Video Technology",      "IQ Unlimited (Z80)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -276,7 +276,7 @@ WRITE8_MEMBER(pcipc_state::boot_state_award_w)
 
 }
 
-static MACHINE_CONFIG_START(pcipc, pcipc_state)
+static MACHINE_CONFIG_START(pcipc)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 90000000)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
 
@@ -288,7 +288,7 @@ static MACHINE_CONFIG_START(pcipc, pcipc_state)
 	MCFG_MGA2064W_ADD(    ":pci:12.0")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(pcipctx, pcipc_state)
+static MACHINE_CONFIG_START(pcipctx)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
 
@@ -326,5 +326,5 @@ ROM_END
 static INPUT_PORTS_START(pcipc)
 INPUT_PORTS_END
 
-COMP(1998, pcipc,   0, 0, pcipc,   pcipc, driver_device, 0, "Hack Inc.", "Sandbox PCI PC (440HX)", MACHINE_NO_SOUND)
-COMP(1998, pcipctx, 0, 0, pcipctx, pcipc, driver_device, 0, "Hack Inc.", "Sandbox PCI PC (440TX)", MACHINE_NO_SOUND)
+COMP(1998, pcipc,   0, 0, pcipc,   pcipc, pcipc_state, 0, "Hack Inc.", "Sandbox PCI PC (440HX)", MACHINE_NO_SOUND)
+COMP(1998, pcipctx, 0, 0, pcipctx, pcipc, pcipc_state, 0, "Hack Inc.", "Sandbox PCI PC (440TX)", MACHINE_NO_SOUND)

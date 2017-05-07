@@ -11,8 +11,8 @@
 #include "emu.h"
 #include "i8x9x.h"
 
-i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	mcs96_device(mconfig, type, name, tag, owner, clock, 8, "i8x9x", __FILE__),
+i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	mcs96_device(mconfig, type, tag, owner, clock, 8),
 	io_config("io", ENDIANNESS_LITTLE, 16, 16, -1), io(nullptr), base_timer2(0), ad_done(0), hso_command(0), ad_command(0), hso_time(0), ad_result(0),
 	ios0(0), ios1(0), ioc0(0), ioc1(0), sbuf(0), sp_stat(0), serial_send_buf(0), serial_send_timer(0)
 {
@@ -359,16 +359,16 @@ void i8x9x_device::internal_update(uint64_t current_time)
 }
 
 c8095_device::c8095_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	i8x9x_device(mconfig, C8095, "C8095", tag, owner, clock, "c8095", __FILE__)
+	i8x9x_device(mconfig, C8095, tag, owner, clock)
 {
 }
 
 p8098_device::p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	i8x9x_device(mconfig, P8098, "P8098", tag, owner, clock, "p8098", __FILE__)
+	i8x9x_device(mconfig, P8098, tag, owner, clock)
 {
 }
 
-const device_type C8095 = device_creator<c8095_device>;
-const device_type P8098 = C8095;
+DEFINE_DEVICE_TYPE(C8095, c8095_device, "c8095", "C8095")
+DEFINE_DEVICE_TYPE(P8098, p8098_device, "p8098", "P8098")
 
 #include "cpu/mcs96/i8x9x.hxx"

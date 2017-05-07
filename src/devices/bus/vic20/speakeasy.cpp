@@ -26,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC20_SPEAKEASY = device_creator<vic20_speakeasy_t>;
+DEFINE_DEVICE_TYPE(VIC20_SPEAKEASY, vic20_speakeasy_device, "vic20_speakeasy", "PPP Speakeasy VIC-20")
 
 
 //-------------------------------------------------
@@ -46,7 +46,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor vic20_speakeasy_t::device_mconfig_additions() const
+machine_config_constructor vic20_speakeasy_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( speakeasy );
 }
@@ -58,11 +58,11 @@ machine_config_constructor vic20_speakeasy_t::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  vic20_speakeasy_t - constructor
+//  vic20_speakeasy_device - constructor
 //-------------------------------------------------
 
-vic20_speakeasy_t::vic20_speakeasy_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VIC20_SPEAKEASY, "Speakeasy VIC20", tag, owner, clock, "speakeasyvic20", __FILE__),
+vic20_speakeasy_device::vic20_speakeasy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VIC20_SPEAKEASY, tag, owner, clock),
 	device_vic20_expansion_card_interface(mconfig, *this),
 	m_votrax(*this, SC01A_TAG)
 {
@@ -73,7 +73,7 @@ vic20_speakeasy_t::vic20_speakeasy_t(const machine_config &mconfig, const char *
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void vic20_speakeasy_t::device_start()
+void vic20_speakeasy_device::device_start()
 {
 }
 
@@ -82,7 +82,7 @@ void vic20_speakeasy_t::device_start()
 //  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t vic20_speakeasy_t::vic20_cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+uint8_t vic20_speakeasy_device::vic20_cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (!io2)
 	{
@@ -97,7 +97,7 @@ uint8_t vic20_speakeasy_t::vic20_cd_r(address_space &space, offs_t offset, uint8
 //  vic20_cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic20_speakeasy_t::vic20_cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic20_speakeasy_device::vic20_cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (!io2)
 	{

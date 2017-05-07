@@ -28,10 +28,10 @@
 *
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_68153BIM_H
+#define MAME_MACHINE_68153BIM_H
 
-#ifndef MC68153BIM_H
-#define MC68153BIM_H
+#pragma once
 
 
 //**************************************************************************
@@ -128,27 +128,26 @@ protected:
 };
 
 
-class bim68153_device :  public device_t
+class bim68153_device : public device_t
 {
 	friend class bim68153_channel;
 
 public:
 	// construction/destruction
-	bim68153_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
 	bim68153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	IRQ_CALLBACK_MEMBER(iack);
 	int acknowledge();
 	int get_irq_level();
 
-	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<bim68153_device &>(device).m_out_int_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_intal0_callback(device_t &device, _Object object) { return downcast<bim68153_device &>(device).m_out_intal0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_intal1_callback(device_t &device, _Object object) { return downcast<bim68153_device &>(device).m_out_intal1_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<bim68153_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_intal0_callback(device_t &device, Object &&cb) { return downcast<bim68153_device &>(device).m_out_intal0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_intal1_callback(device_t &device, Object &&cb) { return downcast<bim68153_device &>(device).m_out_intal1_cb.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_out_iack0_callback(device_t &device, _Object object) { return downcast<bim68153_device &>(device).m_chn[CHN_0]->m_out_iack_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_iack1_callback(device_t &device, _Object object) { return downcast<bim68153_device &>(device).m_chn[CHN_1]->m_out_iack_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_iack2_callback(device_t &device, _Object object) { return downcast<bim68153_device &>(device).m_chn[CHN_2]->m_out_iack_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_iack4_callback(device_t &device, _Object object) { return downcast<bim68153_device &>(device).m_chn[CHN_3]->m_out_iack_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_iack0_callback(device_t &device, Object &&cb) { return downcast<bim68153_device &>(device).m_chn[CHN_0]->m_out_iack_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_iack1_callback(device_t &device, Object &&cb) { return downcast<bim68153_device &>(device).m_chn[CHN_1]->m_out_iack_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_iack2_callback(device_t &device, Object &&cb) { return downcast<bim68153_device &>(device).m_chn[CHN_2]->m_out_iack_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_iack4_callback(device_t &device, Object &&cb) { return downcast<bim68153_device &>(device).m_chn[CHN_3]->m_out_iack_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -161,6 +160,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( int3_w ) { m_chn[CHN_3]->int_w(state); }
 
 protected:
+	bim68153_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -217,8 +218,8 @@ public :
 };
 
 // device type definition
-extern const device_type MC68153;
-extern const device_type EI68C153;
-extern const device_type MC68153_CHANNEL;
+DECLARE_DEVICE_TYPE(MC68153,         bim68153_device)
+DECLARE_DEVICE_TYPE(EI68C153,        ei68c153_device)
+DECLARE_DEVICE_TYPE(MC68153_CHANNEL, bim68153_channel)
 
-#endif /* MC68153BIM_H */
+#endif // MAME_MACHINE_68153BIM_H

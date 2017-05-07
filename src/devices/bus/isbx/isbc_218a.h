@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ISBX_ISBC_218A_H
+#define MAME_BUS_ISBX_ISBC_218A_H
 
-#ifndef __ISBC_218A__
-#define __ISBC_218A__
+#pragma once
 
 #include "isbx.h"
 #include "formats/pc_dsk.h"
@@ -60,7 +60,7 @@ private:
 
 
 // device type definition
-extern const device_type ISBC_218A;
+DECLARE_DEVICE_TYPE(ISBC_218A, isbc_218a_device)
 
 
-#endif
+#endif // MAME_BUS_ISBX_ISBC_218A_H
