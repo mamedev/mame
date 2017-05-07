@@ -34,24 +34,24 @@ public:
 	int execute(std::vector<std::string> &args);
 
 	// direct access to the command operations
-	void listxml(const char *gamename = "*");
-	void listfull(const char *gamename = "*");
-	void listsource(const char *gamename = "*");
-	void listclones(const char *gamename = "*");
-	void listbrothers(const char *gamename = "*");
-	void listcrc(const char *gamename = "*");
-	void listroms(const char *gamename = "*");
-	void listsamples(const char *gamename = "*");
-	void listdevices(const char *gamename = "*");
-	void listslots(const char *gamename = "*");
-	void listmedia(const char *gamename = "*");
-	void listsoftware(const char *gamename = "*");
-	void verifysoftware(const char *gamename = "*");
-	void verifyroms(const char *gamename = "*");
-	void verifysamples(const char *gamename = "*");
-	void romident(const char *filename);
-	void getsoftlist(const char *gamename = "*");
-	void verifysoftlist(const char *gamename = "*");
+	void listxml(const std::string &gamename = "*");
+	void listfull(const std::string &gamename = "*");
+	void listsource(const std::string &gamename = "*");
+	void listclones(const std::string &gamename = "*");
+	void listbrothers(const std::string &gamename = "*");
+	void listcrc(const std::string &gamename = "*");
+	void listroms(const std::string &gamename = "*");
+	void listsamples(const std::string &gamename = "*");
+	void listdevices(const std::string &gamename = "*");
+	void listslots(const std::string &gamename = "*");
+	void listmedia(const std::string &gamename = "*");
+	void listsoftware(const std::string &gamename = "*");
+	void verifysoftware(const std::string &gamename = "*");
+	void verifyroms(const std::string &gamename = "*");
+	void verifysamples(const std::string &gamename = "*");
+	void romident(const std::string &filename);
+	void getsoftlist(const std::string &gamename = "*");
+	void verifysoftlist(const std::string &gamename = "*");
 
 private:
 	// internal helpers
@@ -60,6 +60,7 @@ private:
 	void display_suggestions(const char *gamename);
 	void output_single_softlist(FILE *out, software_list_device &swlist);
 	void start_execution(mame_machine_manager *manager, std::vector<std::string> &args);
+	emu_options create_clean_options();
 
 	// internal state
 	emu_options &       m_options;

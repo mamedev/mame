@@ -735,7 +735,7 @@ void core_options::throw_options_exception_if_appropriate(core_options::conditio
 		throw options_warning_exception(error_stream.str());
 
 	case condition_type::ERR:
-		throw options_warning_exception(error_stream.str());
+		throw options_error_exception(error_stream.str());
 
 	default:
 		// should not get here

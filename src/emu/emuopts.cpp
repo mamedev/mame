@@ -445,6 +445,9 @@ void emu_options::set_system_name(const std::string &new_system_name)
 {
 	const game_driver *new_system = nullptr;
 
+	// we are making an attempt - record what we're attempting
+	m_attempted_system_name = new_system_name;
+
 	// was a system name specified?
 	if (!new_system_name.empty())
 	{
