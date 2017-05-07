@@ -694,7 +694,7 @@ static MACHINE_CONFIG_DERIVED( spnchout, punchout )
 	MCFG_CPU_IO_MAP(spnchout_io_map)
 
 	MCFG_DEVICE_ADD("rtc", RP5C01, 0) // OSCIN -> Vcc
-	MCFG_RP5C01_REMOVE_BATTERY()
+	MCFG_DEVICE_HAS_BATTERY(false)
 	MCFG_RP5H01_ADD("rp5h01")
 
 	MCFG_MACHINE_RESET_OVERRIDE(punchout_state, spnchout)

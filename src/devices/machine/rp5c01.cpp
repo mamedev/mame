@@ -171,9 +171,8 @@ inline void rp5c01_device::check_alarm()
 rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RP5C01, "RP5C01", tag, owner, clock, "rp5c01", __FILE__),
 		device_rtc_interface(mconfig, *this),
-		device_nvram_interface(mconfig, *this),
+		device_optional_nvram_interface(mconfig, *this, true),
 		m_out_alarm_cb(*this),
-		m_battery_backed(true),
 		m_mode(0),
 		m_reset(0),
 		m_alarm(1),
@@ -204,6 +203,7 @@ void rp5c01_device::device_start()
 
 	memset(m_reg, 0, sizeof(m_reg));
 	memset(m_ram, 0, sizeof(m_ram));
+	memarray().set(m_ram, RAM_SIZE, 8, ENDIANNESS_LITTLE, 1);
 
 	// 24 hour mode
 	m_reg[MODE01][REGISTER_12_24_SELECT] = 1;
@@ -273,30 +273,6 @@ void rp5c01_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 
 void rp5c01_device::nvram_default()
 {
-}
-
-
-//-------------------------------------------------
-//  nvram_read - called to read NVRAM from the
-//  .nv file
-//-------------------------------------------------
-
-void rp5c01_device::nvram_read(emu_file &file)
-{
-	if (m_battery_backed)
-		file.read(m_ram, RAM_SIZE);
-}
-
-
-//-------------------------------------------------
-//  nvram_write - called to write NVRAM to the
-//  .nv file
-//-------------------------------------------------
-
-void rp5c01_device::nvram_write(emu_file &file)
-{
-	if (m_battery_backed)
-		file.write(m_ram, RAM_SIZE);
 }
 
 

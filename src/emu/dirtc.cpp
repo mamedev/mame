@@ -78,6 +78,10 @@ void device_rtc_interface::set_time(bool update, int year, int month, int day, i
 
 void device_rtc_interface::set_current_time(const system_time &systime)
 {
+	device_nvram_interface *nvram;
+	if (device().interface(nvram) && !nvram->has_battery_backup())
+		return;
+
 	set_time(true, systime.local_time.year, systime.local_time.month + 1, systime.local_time.mday, systime.local_time.weekday + 1,
 		systime.local_time.hour, systime.local_time.minute, systime.local_time.second);
 }
