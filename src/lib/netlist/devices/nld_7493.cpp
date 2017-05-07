@@ -22,15 +22,15 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(7493)
 		, m_R1(*this, "R1")
 		, m_R2(*this, "R2")
+		, m_reset(*this, "_m_reset", 0)
+		, m_a(*this, "_m_a", 0)
+		, m_bcd(*this, "_m_b", 0)
 		, m_CLKA(*this, "CLKA", NETLIB_DELEGATE(7493, updA))
 		, m_CLKB(*this, "CLKB", NETLIB_DELEGATE(7493, updB))
 		, m_QA(*this, "QA")
 		, m_QB(*this, "QB")
 		, m_QC(*this, "QC")
 		, m_QD(*this, "QD")
-		, m_reset(*this, "_m_reset", 0)
-		, m_a(*this, "_m_a", 0)
-		, m_bcd(*this, "_m_b", 0)
 		{
 		}
 
@@ -61,6 +61,10 @@ namespace netlist
 		logic_input_t m_R1;
 		logic_input_t m_R2;
 
+		state_var_sig m_reset;
+		state_var_sig m_a;
+		state_var_sig m_bcd;
+
 		logic_input_t m_CLKA;
 		logic_input_t m_CLKB;
 
@@ -68,10 +72,6 @@ namespace netlist
 		logic_output_t m_QB;
 		logic_output_t m_QC;
 		logic_output_t m_QD;
-
-		state_var_sig m_reset;
-		state_var_sig m_a;
-		state_var_sig m_bcd;
 	};
 
 	NETLIB_OBJECT_DERIVED(7493_dip, 7493)
