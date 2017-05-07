@@ -1115,7 +1115,7 @@ image_init_result device_image_interface::load_software(const std::string &softw
 
 	// check if image should be read-only
 	const char *read_only = get_feature("read_only");
-	if (read_only && !strcmp(read_only, "true"))
+	if (loaded_through_softlist() || (read_only && !strcmp(read_only, "true")))
 	{
 		// Copy some image information when we have been loaded through a software list
 		software_info &swinfo = m_software_part_ptr->info();
