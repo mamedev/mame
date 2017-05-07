@@ -45,19 +45,23 @@ menu_sound_options::menu_sound_options(mame_ui_manager &mui, render_container &c
 
 menu_sound_options::~menu_sound_options()
 {
+	std::string error_string;
 	emu_options &moptions = machine().options();
 
 	if (strcmp(moptions.value(OSDOPTION_SOUND),m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE)!=0)
 	{
-		moptions.set_value(OSDOPTION_SOUND, m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE, OPTION_PRIORITY_CMDLINE);
+		moptions.set_value(OSDOPTION_SOUND, m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE, OPTION_PRIORITY_CMDLINE, error_string);
+		machine().options().mark_changed(OSDOPTION_SOUND);
 	}
 	if (moptions.int_value(OPTION_SAMPLERATE)!=m_sound_rate[m_cur_rates])
 	{
-		moptions.set_value(OPTION_SAMPLERATE, m_sound_rate[m_cur_rates], OPTION_PRIORITY_CMDLINE);
+		moptions.set_value(OPTION_SAMPLERATE, m_sound_rate[m_cur_rates], OPTION_PRIORITY_CMDLINE, error_string);
+		machine().options().mark_changed(OPTION_SAMPLERATE);
 	}
 	if (moptions.bool_value(OPTION_SAMPLES)!=m_samples)
 	{
-		moptions.set_value(OPTION_SAMPLES, m_samples, OPTION_PRIORITY_CMDLINE);
+		moptions.set_value(OPTION_SAMPLES, m_samples, OPTION_PRIORITY_CMDLINE, error_string);
+		machine().options().mark_changed(OPTION_SAMPLES);
 	}
 }
 

@@ -27,9 +27,9 @@ device_slot_option *menu_slot_devices::slot_get_current_option(device_slot_inter
 	std::string current;
 
 	const char *slot_option_name = slot.device().tag() + 1;
-	if (!slot.fixed())
+	if (!slot.fixed() && machine().options().slot_options().count(slot_option_name) > 0)
 	{
-		current = machine().options().slot_option(slot_option_name).value();
+		current = machine().options().slot_options()[slot_option_name].value();
 	}
 	else
 	{
@@ -140,7 +140,9 @@ const char *menu_slot_devices::slot_get_option(device_slot_interface &slot, int 
 
 void menu_slot_devices::set_slot_device(device_slot_interface &slot, const char *val)
 {
-	machine().options().set_value(slot.device().tag()+1, val, OPTION_PRIORITY_CMDLINE);
+	std::string error;
+	machine().options().set_value(slot.device().tag()+1, val, OPTION_PRIORITY_CMDLINE, error);
+	assert(error.empty());
 }
 
 /*-------------------------------------------------
@@ -198,6 +200,7 @@ void menu_slot_devices::handle()
 	{
 		if ((uintptr_t)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
 		{
+			mame_options::add_slot_options(machine().options());
 			machine().schedule_hard_reset();
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)

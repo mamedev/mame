@@ -124,38 +124,36 @@ void mame_machine_manager::start_luaengine()
 		std::vector<std::string> exclude = split(options().no_plugin(),',');
 		{
 			// parse the file
+			std::string error;
 			// attempt to open the output file
 			emu_file file(options().ini_path(), OPEN_FLAG_READ);
 			if (file.open("plugin.ini") == osd_file::error::NONE)
 			{
-				try
-				{
-					m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, false);
-				}
-				catch (options_exception &)
-				{
-					osd_printf_error("**Error loading plugin.ini**\n");
-				}
+				bool result = m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+				if (!result)
+					osd_printf_error("**Error loading plugin.ini**");
 			}
 		}
-		for (auto &curentry : m_plugins->entries())
+		for (auto &curentry : *m_plugins)
 		{
-			if (curentry->type() != core_options::option_type::HEADER)
+			if (!curentry.is_header())
 			{
-				if (std::find(include.begin(), include.end(), curentry->name()) != include.end())
+				if (std::find(include.begin(), include.end(), curentry.name()) != include.end())
 				{
-					m_plugins->set_value(curentry->name(), "1", OPTION_PRIORITY_CMDLINE);
+					std::string error_string;
+					m_plugins->set_value(curentry.name(), "1", OPTION_PRIORITY_CMDLINE, error_string);
 				}
-				if (std::find(exclude.begin(), exclude.end(), curentry->name()) != exclude.end())
+				if (std::find(exclude.begin(), exclude.end(), curentry.name()) != exclude.end())
 				{
-					m_plugins->set_value(curentry->name(), "0", OPTION_PRIORITY_CMDLINE);
+					std::string error_string;
+					m_plugins->set_value(curentry.name(), "0", OPTION_PRIORITY_CMDLINE, error_string);
 				}
 			}
 		}
 	}
-	if (options().console())
-	{
-		m_plugins->set_value("console", "1", OPTION_PRIORITY_CMDLINE);
+	if (options().console()) {
+		std::string error_string;
+		m_plugins->set_value("console", "1", OPTION_PRIORITY_CMDLINE, error_string);
 	}
 
 	m_lua->initialize();
@@ -204,8 +202,9 @@ int mame_machine_manager::execute()
 		// parse any INI files as the first thing
 		if (m_options.read_config())
 		{
-			std::ostringstream errors;
-			mame_options::parse_standard_inis(m_options, errors);
+			m_options.revert(OPTION_PRIORITY_INI);
+			std::string errors;
+			mame_options::parse_standard_inis(m_options,errors);
 		}
 
 		// otherwise, perform validity checks before anything else
@@ -215,6 +214,11 @@ int mame_machine_manager::execute()
 			validity_checker valid(m_options);
 			valid.set_verbose(false);
 			valid.check_shared_source(*system);
+		}
+
+		// reevaluate slot options until nothing changes
+		while (mame_options::reevaluate_slot_options(m_options))
+		{
 		}
 
 		// create the machine configuration
@@ -233,13 +237,12 @@ int mame_machine_manager::execute()
 		if (m_new_driver_pending)
 		{
 			// set up new system name and adjust device options accordingly
-			m_options.set_system_name(m_new_driver_pending->name);
+			mame_options::set_system_name(m_options,m_new_driver_pending->name);
 			m_firstrun = true;
 		}
 		else
 		{
-			if (machine.exit_pending())
-				m_options.set_system_name("");
+			if (machine.exit_pending()) mame_options::set_system_name(m_options,"");
 		}
 
 		if (machine.exit_pending() && (!started_empty || is_empty))

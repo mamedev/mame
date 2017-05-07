@@ -721,6 +721,7 @@ void lua_engine::initialize()
 	emu["app_version"] = &emulator_info::get_bare_build_version;
 	emu["gamename"] = [this](){ return machine().system().description; };
 	emu["romname"] = [this](){ return machine().basename(); };
+	emu["softname"] = [this](){ return machine().options().software_name(); };
 	emu["keypost"] = [this](const char *keys){ machine().ioport().natkeyboard().post_utf8(keys); };
 	emu["time"] = [this](){ return machine().time().as_double(); };
 	emu["start"] = [this](const char *driver) {
@@ -921,11 +922,9 @@ void lua_engine::initialize()
 			"entries", sol::property([this](core_options &options) {
 				sol::table table = sol().create_table();
 				int unadorned_index = 0;
-				for (auto &curentry : options.entries())
+				for(core_options::entry &curentry : options)
 				{
-					const char *name = curentry->names().size() > 0
-						? curentry->name().c_str()
-						: nullptr;
+					const char *name = curentry.name();
 					bool is_unadorned = false;
 					// check if it's unadorned
 					if (name && strlen(name) && !strcmp(name, options.unadorned(unadorned_index)))
@@ -933,8 +932,8 @@ void lua_engine::initialize()
 						unadorned_index++;
 						is_unadorned = true;
 					}
-					if (curentry->type() != core_options::option_type::HEADER && curentry->type() != core_options::option_type::COMMAND && !is_unadorned)
-						table[name] = &*curentry;
+					if (!curentry.is_header() && !curentry.is_command() && !curentry.is_internal() && !is_unadorned)
+						table[name] = &curentry;
 				}
 				return table;
 			}));
@@ -975,19 +974,18 @@ void lua_engine::initialize()
 						e.set_value(val, OPTION_PRIORITY_CMDLINE);
 				},
 				[this](core_options::entry &e) -> sol::object {
-					if (e.type() == core_options::option_type::INVALID)
+					if(!e.type())
 						return sol::make_object(sol(), sol::nil);
 					switch(e.type())
 					{
-						case core_options::option_type::BOOLEAN:
+						case OPTION_BOOLEAN:
 							return sol::make_object(sol(), atoi(e.value()) != 0);
-						case core_options::option_type::INTEGER:
+						case OPTION_INTEGER:
 							return sol::make_object(sol(), atoi(e.value()));
-						case core_options::option_type::FLOAT:
+						case OPTION_FLOAT:
 							return sol::make_object(sol(), atof(e.value()));
-						default:
-							return sol::make_object(sol(), e.value());
 					}
+					return sol::make_object(sol(), e.value());
 				}),
 			"description", &core_options::entry::description,
 			"default_value", &core_options::entry::default_value,

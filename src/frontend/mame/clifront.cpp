@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    clifront.cpp
+    clifront.c
 
     Command-line interface frontend for MAME.
 
@@ -190,26 +190,26 @@ cli_frontend::cli_frontend(emu_options &options, osd_interface &osd)
 
 cli_frontend::~cli_frontend()
 {
+	// nuke any device options since they will leak memory
+	mame_options::remove_device_options(m_options);
 }
 
 void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<std::string> &args)
 {
-	std::ostringstream option_errors;
+	std::string option_errors;
 
 	// parse the command line, adding any system-specific options
-	try
-	{
-		m_options.parse_command_line(args, OPTION_PRIORITY_CMDLINE);
-	}
-	catch (options_exception &ex)
+	if (!mame_options::parse_command_line(m_options, args, option_errors))
 	{
 		// if we failed, check for no command and a system name first; in that case error on the name
 		if (m_options.command().empty() && mame_options::system(m_options) == nullptr && *(m_options.system_name()) != 0)
 			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
 		// otherwise, error on the options
-		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "%s", ex.message().c_str());
+		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "%s", strtrimspace(option_errors).c_str());
 	}
+	if (!option_errors.empty())
+		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
 
 	// determine the base name of the EXE
 	std::string exename = core_filename_extract_base(args[0], true);
@@ -232,11 +232,8 @@ void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<st
 
 	manager->start_luaengine();
 
-	if (option_errors.tellp() > 0)
-	{
-		std::string option_errors_string = option_errors.str();
-		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors_string).c_str());
-	}
+	if (!option_errors.empty())
+		osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
 
 	// if we can't find it, give an appropriate error
 	const game_driver *system = mame_options::system(m_options);
@@ -782,13 +779,8 @@ void cli_frontend::listmedia(const char *gamename)
 //-------------------------------------------------
 void cli_frontend::verifyroms(const char *gamename)
 {
-	// create our own copy of options for the purposes of ROM validation
-	// so we are not "polluted" with driver-specific slot/image options
-	emu_options options(true);
-	options.copy_from(m_options);
-
 	// determine which drivers to output;
-	driver_enumerator drivlist(options, gamename);
+	driver_enumerator drivlist(m_options, gamename);
 
 	unsigned correct = 0;
 	unsigned incorrect = 0;
@@ -1364,10 +1356,10 @@ void cli_frontend::execute_commands(const char *exename)
 	}
 
 	// other commands need the INIs parsed
-	std::ostringstream option_errors;
+	std::string option_errors;
 	mame_options::parse_standard_inis(m_options,option_errors);
-	if (option_errors.tellp() > 0)
-		osd_printf_error("%s\n", option_errors.str().c_str());
+	if (!option_errors.empty())
+		osd_printf_error("%s\n", option_errors.c_str());
 
 	// createconfig?
 	if (m_options.command() == CLICOMMAND_CREATECONFIG)
