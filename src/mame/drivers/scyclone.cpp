@@ -1,38 +1,41 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-	Space Cyclone
+    Space Cyclone
 
-	3 board stack? - the PCB pictures make it very difficult to figure much out
+    3 board stack? - the PCB pictures make it very difficult to figure much out
 
-	seems a bit like 8080bw hardware but with extra sprites and a z80 cpu?
-	maybe an evolution of Polaris etc.?
-
-
-	there's an MB14241 near the Sprite ROM
-
-	1x 8DSW, 1x 4DSW
-
-	there are 11 HM4716AP RAM chips near the main CPU (1 is unmarked, could be different?)
-	HM4716AP is 16384 * 1-bit (2048 [0x800] bytes)
-
-	1bpp of video needs 0x3800 bytes
-
-	1bpp video would need 4 of these (with 0x400 bytes leftover)
-	2bpp video would need 7 of these
-	3bpp video would need 11 of these (with 0x400 bytes leftover)
-	mainram is 0x400 bytes (so the leftover in above calc?)
+    seems a bit like 8080bw hardware but with extra sprites and a z80 cpu?
+    maybe an evolution of Polaris etc.?
 
 
-	Notes:
+    there's an MB14241 near the Sprite ROM
 
-	(to check on hardware)
-	the stars scroll backwards when in cocktail mode, the direction changes when the screen
-	is flipped but is still reversed compared to upright.  We would have no way of knowing
-	if we're in cocktail mode without checking the dipswitch, so I think this is a game bug
-	furthermore the game seems to set what I believe to be the 'flipscreen' bit for player 2
-	even when in 'upright' mode, so it's possible this romset was only really made for a
-	cocktail table?
+    1x 8DSW, 1x 4DSW
+
+    there are 11 HM4716AP RAM chips near the main CPU (1 is unmarked, could be different?)
+    HM4716AP is 16384 * 1-bit (2048 [0x800] bytes)
+
+    1bpp of video needs 0x3800 bytes
+
+    1bpp video would need 4 of these (with 0x400 bytes leftover)
+    2bpp video would need 7 of these
+    3bpp video would need 11 of these (with 0x400 bytes leftover)
+    mainram is 0x400 bytes (so the leftover in above calc?)
+
+
+    Notes:
+
+    (to check on hardware)
+    the stars scroll backwards when in cocktail mode, the direction changes when the screen
+    is flipped but is still reversed compared to upright.  We would have no way of knowing
+    if we're in cocktail mode without checking the dipswitch, so I think this is a game bug
+    furthermore the game seems to set what I believe to be the 'flipscreen' bit for player 2
+    even when in 'upright' mode, so it's possible this romset was only really made for a
+    cocktail table?
+
+    it looks like the stars should roughly align with the constellations during the
+    intermissions
 */
 
 #include "emu.h"
@@ -41,18 +44,22 @@
 #include "screen.h"
 #include "speaker.h"
 #include "machine/mb14241.h"
+#include "sound/sn76477.h"
+#include "sound/dac.h"
+#include "machine/gen_latch.h"
+#include "sound/volt_reg.h"
 
 class scyclone_state : public driver_device
 {
 public:
 	scyclone_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		//m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_stars(*this, "stars"),
 		m_gfx1pal(*this, "gfx1pal"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
 		{ }
 
 	DECLARE_WRITE8_MEMBER(vidctrl_w);
@@ -63,13 +70,15 @@ public:
 	DECLARE_WRITE8_MEMBER(sprite_tile_w);
 	DECLARE_WRITE8_MEMBER(starscroll_w);
 	DECLARE_WRITE8_MEMBER(port0e_w);
-	DECLARE_WRITE8_MEMBER(port0f_w);
-
 	DECLARE_WRITE8_MEMBER(port06_w);
 	DECLARE_WRITE8_MEMBER(videomask1_w);
 	DECLARE_WRITE8_MEMBER(videomask2_w);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(vram_r);
+	DECLARE_WRITE8_MEMBER(snd_3001_w);
+//  DECLARE_WRITE8_MEMBER(snd_3003_w);
+//  DECLARE_WRITE8_MEMBER(snd_3004_w);
+	DECLARE_WRITE8_MEMBER(snd_3005_w);
 
 	uint32_t screen_update_scyclone(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -88,6 +97,7 @@ private:
 	required_region_ptr<uint8_t> m_stars;
 	required_region_ptr<uint8_t> m_gfx1pal;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
 	std::unique_ptr<uint8_t[]> m_vram;
@@ -101,7 +111,6 @@ private:
 	uint8_t m_sprite_tile;
 	uint8_t m_starscroll;
 	uint8_t m_p0e;
-	uint8_t m_p0f;
 	uint8_t m_vidctrl;
 
 	uint8_t m_hascollided;
@@ -124,6 +133,8 @@ private:
 void scyclone_state::video_start()
 {
 	m_vram = std::make_unique<uint8_t []>(0x3800*3);
+	save_pointer(&m_vram[0], "m_vram", 0x3800*3);
+
 	m_videowritemask = 0x00;
 	m_videowritemask2 = 0x00;
 
@@ -195,17 +206,17 @@ uint32_t scyclone_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bit
 	for (int strip=0;strip<16;strip++)
 	{
 		for (int x=0;x<256;x++)
-		{		
+		{
 			const uint8_t star = m_stars[((x+m_starscroll) & 0x3f)+(strip*0x40)];
 
 			for (int y=0;y<16;y++)
 			{
 				const int ypos = (y+16*strip)-32;
-				
+
 				if (ypos>=0 && ypos<256)
 				{
 					int noclipped = 0;
-					
+
 					if (m_vidctrl & 0x08)
 						noclipped = x < 64*3;
 					else
@@ -251,7 +262,7 @@ uint32_t scyclone_state::draw_bitmap_and_sprite(screen_device &screen, bitmap_rg
 
 
 				uint8_t pal = get_bitmap_pixel(realx, realy);
-				
+
 				if (pal) bitmap.pix32(y, (x*8)+i) = paldata[pal];
 
 				uint8_t pal2 = get_sprite_pixel(realx, realy);
@@ -274,7 +285,7 @@ uint32_t scyclone_state::screen_update_scyclone(screen_device &screen, bitmap_rg
 	draw_starfield(screen,bitmap,cliprect);
 	draw_bitmap_and_sprite(screen,bitmap,cliprect);
 
-	//popmessage("%02x %02x %02x %02x %02x %02x %02x", m_sprite_xpos, m_sprite_ypos, m_sprite_colour, m_sprite_tile, m_starscroll, m_p0e, m_p0f);
+	//popmessage("%02x %02x %02x %02x %02x %02x", m_sprite_xpos, m_sprite_ypos, m_sprite_colour, m_sprite_tile, m_starscroll, m_p0e);
 
 	return 0;
 }
@@ -297,23 +308,27 @@ static ADDRESS_MAP_START( scyclone_iomap, AS_IO, 8, scyclone_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE(vidctrl_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sprite_xpos_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(sprite_ypos_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w) // possible watchdog or star twinkle related
+	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w) // possible watchdog, unlikely to be twinkle related.
 	AM_RANGE(0x08, 0x08) AM_WRITE(sprite_colour_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(sprite_tile_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(starscroll_w)
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(port0e_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(port0f_w)
+	AM_RANGE(0x0f, 0x0f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x40, 0x40) AM_WRITE(videomask1_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(videomask2_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( scyclone_sub_map, AS_PROGRAM, 8, scyclone_state )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x1fff) AM_ROM // maybe
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 
-	AM_RANGE(0x3000, 0x3005) AM_RAM // comms?
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("dac", dac_byte_interface, write) // music
+	AM_RANGE(0x3001, 0x3001) AM_WRITE(snd_3001_w) // written at the same time, with the same data as 0x3005
+	AM_RANGE(0x3002, 0x3002) AM_DEVWRITE("dac2", dac_byte_interface, write) // speech
+//  AM_RANGE(0x3003, 0x3003) AM_WRITE(snd_3003_w) // writes 02 or 00
+//  AM_RANGE(0x3004, 0x3004) AM_WRITE(snd_3004_w) // always writes 00?
+	AM_RANGE(0x3005, 0x3005) AM_WRITE(snd_3005_w) // written at the same time, with the same data as 0x3001
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scyclone_sub_iomap, AS_IO, 8, scyclone_state )
@@ -332,7 +347,7 @@ CUSTOM_INPUT_MEMBER(scyclone_state::collision_r)
 
 static INPUT_PORTS_START( scyclone )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
@@ -342,12 +357,12 @@ static INPUT_PORTS_START( scyclone )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scyclone_state,collision_r, nullptr) // hw collision?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scyclone_state, collision_r, nullptr) // hw collision?
 	// maybe these 4 are the 4xdsw bank?
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_CONDITION("DSW0",0x04,EQUALS,0x00)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL PORT_CONDITION("DSW0",0x04,EQUALS,0x00)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL PORT_CONDITION("DSW0",0x04,EQUALS,0x00)
@@ -386,10 +401,6 @@ READ8_MEMBER(scyclone_state::vram_r)
 
 WRITE8_MEMBER(scyclone_state::vram_w)
 {
-	// this seems to give good colours for most things?
-	// although the lives appear to be solid pink in video?
-	// CREDIT text looks poor, but seems to be same on real HW?
-
 #if 0
 	// halves are NOT equal in between level cutscenes
 	// this is used when drawing the pointing stick, need closeup reference
@@ -397,62 +408,57 @@ WRITE8_MEMBER(scyclone_state::vram_w)
 	// 0x40 and 0x80 ports always seem equal tho
 	if ((m_videowritemask & 0xf) != ((m_videowritemask>>4) & 0xf))
 	{
-		printf("m_videowritemask halves not equal %02x\n", m_videowritemask);
+		logerror("m_videowritemask halves not equal %02x\n", m_videowritemask);
 	}
 
 	if ((m_videowritemask2 & 0xf) != ((m_videowritemask2>>4) & 0xf))
 	{
-		printf("m_videowritemask2 halves not equal %02x\n", m_videowritemask2);
+		logerror("m_videowritemask2 halves not equal %02x\n", m_videowritemask2);
 	}
 
 	if ((m_videowritemask) != (m_videowritemask2))
 	{
-		printf("m_videowritemask != m_videowritemask2 %02x %02x\n", m_videowritemask, m_videowritemask2);
+		logerror("m_videowritemask != m_videowritemask2 %02x %02x\n", m_videowritemask, m_videowritemask2);
 	}
 #endif
 
 
-	for (int i=0 ;i<8 ;i++)
+	for (int i=0; i<8; i++)
 	{
-		uint8_t databit = data & (1<<i);
+		const uint8_t databit = data & (1<<i);
+		const uint8_t nodatabit = (1<<i);
 
 		uint8_t videowritemask = 0;
 
 		if (i>=6) videowritemask = (m_videowritemask>>4) & 0x0f;
 		else if (i>=4) videowritemask = (m_videowritemask>>0) & 0x0f;
-		if (i>=2) videowritemask = (m_videowritemask2>>4) & 0x0f;
+		else if (i>=2) videowritemask = (m_videowritemask2>>4) & 0x0f;
 		else videowritemask = (m_videowritemask2>>0) & 0x0f;
 
-		if (databit)
-		{
-			if (!(videowritemask & 1)) m_vram[offset] |= databit;
-			if (!(videowritemask & 2)) m_vram[offset+0x3800] |= databit;
-			if (!(videowritemask & 4)) m_vram[offset+0x3800+0x3800] |= databit;
-		}
-		else
-		{
-			uint8_t nodatabit = (1<<i);
+		if (!(videowritemask & 1) && databit) m_vram[offset] |= databit;
+		else m_vram[offset] &= ~nodatabit;
 
-			m_vram[offset] &= ~nodatabit;
-			m_vram[offset+0x3800] &= ~nodatabit;
-			m_vram[offset+0x3800+0x3800] &= ~nodatabit;
+		if (!(videowritemask & 2) && databit) m_vram[offset+0x3800] |= databit;
+		else m_vram[offset+0x3800] &= ~nodatabit;
 
-		}
+		if (!(videowritemask & 4) && databit) m_vram[offset+0x3800+0x3800] |= databit;
+		else m_vram[offset+0x3800+0x3800] &= ~nodatabit;
 	}
 }
 
 
 WRITE8_MEMBER(scyclone_state::vidctrl_w)
 {
-	// ---- fa-u
+	// ---- facu
 	// f = flipscreen (always set during player 2 turn, even in upright mode?!)
 	// a = alternates during attract mode, enabled during gameplay
 	// u = unknown but used (set to 1 during gameplay)
+	// c = coinlock
 	m_vidctrl = data;
 
-	if (data & 0xf2)
+	if (data & 0xf0)
 	{
-		printf("vidctrl_w %02x\n", data);
+		logerror("vidctrl_w %02x\n", data);
 	}
 }
 
@@ -483,21 +489,14 @@ WRITE8_MEMBER(scyclone_state::starscroll_w)
 
 WRITE8_MEMBER(scyclone_state::port0e_w)
 {
-	// sound trigger?
+	// could be related to basic sound effects?
+	//logerror("port0e_w %02x\n",data);
 	m_p0e = data;
 }
-
-WRITE8_MEMBER(scyclone_state::port0f_w)
-{
-	m_p0f = data;
-}
-
-
 
 WRITE8_MEMBER(scyclone_state::port06_w)
 {
 	// watchdog?
-	// goes through values 0x06 to 0x01 could also be star related?
 }
 
 // these seem to select where the vram writes go
@@ -512,6 +511,33 @@ WRITE8_MEMBER(scyclone_state::videomask2_w)
 {
 	// format seems to be -xxx -xxx
 	m_videowritemask2 = data;
+}
+
+// Sound CPU handlers
+
+WRITE8_MEMBER(scyclone_state::snd_3001_w)
+{
+	// need to clear the latch somewhere, the command value is written back here and at 3005
+	// after acknowledging a command
+	// might actually reset the DACs as there are (at least) 2 of them?
+	m_soundlatch->clear_w(space, 0, data);
+}
+
+/*
+WRITE8_MEMBER(scyclone_state::snd_3003_w)
+{
+//  m_soundlatch->clear_w(space, 0, data);
+}
+
+WRITE8_MEMBER(scyclone_state::snd_3004_w)
+{
+//  m_soundlatch->clear_w(space, 0, data);
+}
+*/
+
+WRITE8_MEMBER(scyclone_state::snd_3005_w)
+{
+//  m_soundlatch->clear_w(space, 0, data);
 }
 
 
@@ -534,6 +560,16 @@ GFXDECODE_END
 
 void scyclone_state::machine_start()
 {
+	save_item(NAME(m_videowritemask));
+	save_item(NAME(m_videowritemask2));
+	save_item(NAME(m_sprite_xpos));
+	save_item(NAME(m_sprite_ypos));
+	save_item(NAME(m_sprite_colour));
+	save_item(NAME(m_sprite_tile));
+	save_item(NAME(m_starscroll));
+	save_item(NAME(m_p0e));
+	save_item(NAME(m_vidctrl));
+	save_item(NAME(m_hascollided));
 }
 
 void scyclone_state::machine_reset()
@@ -544,7 +580,6 @@ void scyclone_state::machine_reset()
 	m_sprite_tile = 0;
 	m_starscroll = 0;
 	m_p0e = 0;
-	m_p0f = 0;
 
 	m_hascollided = 0;
 }
@@ -570,6 +605,10 @@ static MACHINE_CONFIG_START( scyclone, scyclone_state )
 	MCFG_CPU_ADD("subcpu", Z80, 5000000/2) // LH0080 Z80-CPU SHARP  ? MHz   (5Mhz XTAL on this sub-pcb)
 	MCFG_CPU_PROGRAM_MAP(scyclone_sub_map)
 	MCFG_CPU_IO_MAP(scyclone_sub_iomap)
+	// no idea, but it does wait on an irq in places, irq0 increases a register checked in the wait loop so without it sound dies after a while
+	MCFG_CPU_PERIODIC_INT_DRIVER(scyclone_state, irq0_line_hold, 400*60)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -587,8 +626,34 @@ static MACHINE_CONFIG_START( scyclone, scyclone_state )
 	MCFG_PALETTE_ADD("palette", 8 + 4*4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	// 2x SN76477N
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_SOUND_ADD("snsnd0", SN76477, 0)
+	MCFG_SN76477_ENABLE(1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
+
+	MCFG_SOUND_ADD("snsnd1", SN76477, 0)
+	MCFG_SN76477_ENABLE(1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
+
+	// this is just taken from route16.cpp
+
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0)
+	MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+
+	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+
+	MCFG_DEVICE_ADD("vref2", VOLTAGE_REGULATOR, 0)
+	MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+
 MACHINE_CONFIG_END
 
 ROM_START( scyclone )
@@ -601,16 +666,15 @@ ROM_START( scyclone )
 	ROM_LOAD( "DE12.7H.2716", 0x2800, 0x0800, CRC(208e3e9a) SHA1(07f0e6c5417584eef171d8dcad83d741f88c9348) )
 
 	ROM_REGION( 0x2000, "subcpu", 0 )
-	ROM_LOAD( "DE18.IC1.2716", 0x0000, 0x0800, CRC(182a5c24) SHA1(0ba29b6b3e7ec97c0b0748a6e60bb1a737dc55fa) )
-	// maybe load here based on board layout
+	ROM_LOAD( "DE18.IC1.2716",  0x0000, 0x0800, CRC(182a5c24) SHA1(0ba29b6b3e7ec97c0b0748a6e60bb1a737dc55fa) )
 	ROM_LOAD( "DE04.IC9.2716",  0x0800, 0x0800, CRC(098269ac) SHA1(138af858bbbd73380086f971bcdd52ae47e2b667) )
 	ROM_LOAD( "DE05.IC14.2716", 0x1000, 0x0800, CRC(878f68b2) SHA1(2c2fa1b9053664ec26452ab0b35e2ae550601cc9) )
 	ROM_LOAD( "DE06.IC19.2716", 0x1800, 0x0800, CRC(0b1ead90) SHA1(38322b39f4420408c223cdbed3b75692a3d70746) )
 
-	ROM_REGION( 0x0800, "gfx1", 0 ) // 32x32x2 sprites?
+	ROM_REGION( 0x0800, "gfx1", 0 ) // 32x32x2 sprites
 	ROM_LOAD( "DE01.11C.2716", 0x0000, 0x0800, CRC(bf770730) SHA1(1d0f9235b0618e3f4dd6db47efbdf92e2b00f5f6) )
 
-	ROM_REGION( 0x0400, "gfx1pal", 0 ) // format is 00 xx xx xx 00 xx xx xx 00 xx xx xx 00 xx xx xx (rest of rom unused) so probably 4 palettes for the 2bpp sprites
+	ROM_REGION( 0x0400, "gfx1pal", 0 ) // only 16 bytes of this are actually used
 	ROM_LOAD( "DE02.5B.82S137", 0x0000, 0x0400, CRC(fe4b278c) SHA1(c03080ab4d3fb84b8eec7087b925d1a1d8565fcc) )
 
 	ROM_REGION( 0x0840, "stars", 0 ) // probably the starfield bitmap
@@ -621,4 +685,4 @@ ROM_START( scyclone )
 	ROM_LOAD( "DE17.2E.82S123", 0x0020, 0x0020, CRC(3c8572e4) SHA1(c908c4ed99828fff576c3d0963cd8b99edeb993b) )
 ROM_END
 
-GAME( 1980, scyclone,  0,    scyclone, scyclone, driver_device, 0, ROT270, "Taito Corporation", "Space Cyclone", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )
+GAME( 1980, scyclone,  0,    scyclone, scyclone, driver_device, 0, ROT270, "Taito Corporation", "Space Cyclone", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

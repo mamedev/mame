@@ -1091,9 +1091,10 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 		// will only find CHDs for the default configuration.  I believe that this in practice will
 		// be acceptable.
 		emu_options driver_specific_options;
-		driver_specific_options.set_value(OPTION_SYSTEMNAME, options.system_name(), OPTION_PRIORITY_DEFAULT);
-		driver_specific_options.set_value(OPTION_MEDIAPATH, options.media_path(), OPTION_PRIORITY_DEFAULT);
-		driver_specific_options.set_value(OPTION_DIFF_DIRECTORY, options.diff_directory(), OPTION_PRIORITY_DEFAULT);
+		std::string error_string;
+		driver_specific_options.set_value(OPTION_SYSTEMNAME, options.system_name(), OPTION_PRIORITY_DEFAULT, error_string);
+		driver_specific_options.set_value(OPTION_MEDIAPATH, options.media_path(), OPTION_PRIORITY_DEFAULT, error_string);
+		driver_specific_options.set_value(OPTION_DIFF_DIRECTORY, options.diff_directory(), OPTION_PRIORITY_DEFAULT, error_string);
 
 		// Now that we have an emu_options structure properly set up, we can create a machine_config
 		machine_config config(current_driver, driver_specific_options);
@@ -1495,13 +1496,12 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 				specbios.assign(machine.options().bios());
 			else
 			{
-				const device_slot_interface *slot = dynamic_cast<const device_slot_interface *>(&device);
-				const slot_option *slot_opt = slot
-					? &machine.options().slot_option(slot->slot_name())
+				const char *slot_option_name = device.owner()->tag() + 1;
+				const slot_option *opt = machine.options().slot_options().count(slot_option_name)
+					? &machine.options().slot_options()[slot_option_name]
 					: nullptr;
-
-				specbios = slot_opt && !slot_opt->bios().empty()
-					? slot_opt->bios().c_str()
+				specbios = opt && !opt->bios().empty()
+					? opt->bios().c_str()
 					: device.default_bios_tag();
 			}
 			determine_bios_rom(device, specbios.c_str());

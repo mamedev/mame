@@ -618,6 +618,51 @@ ROM_START( kingofb )
 	ROM_LOAD( "pal14h4-vh07.bin",   0x0100, 0x003c, CRC(7e59d45a) SHA1(4a900e424c9edc9f8664f935edccbe4b4759188a) )
 ROM_END
 
+ROM_START( kingofbj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "22.d9",  0x00000, 0x4000, CRC(6220bfa2) SHA1(cb329406ed07b71f9d2c40fc6c2c196daaa56fc8) ) // 27128
+	ROM_LOAD( "23.e9",  0x04000, 0x4000, CRC(5782fdd8) SHA1(6c8c1114ce7863f9e8331796e2c5fb4928904b55) ) // 27128
+
+	ROM_REGION( 0x10000, "video", 0 )     /* 64k for the video cpu */
+	ROM_LOAD( "21.b9",  0x00000, 0x4000, CRC(3fb39489) SHA1(cddd939cb57bb684427cf5c8538ad0e9f8f4586d) ) // 27128
+
+	ROM_REGION( 0x10000, "sprite", 0 )     /* 64k for the sprite cpu */
+	ROM_LOAD( "j9.17",  0x00000, 0x2000, CRC(379f4f84) SHA1(c8171e15fe243857b6ca8f32c1cc09f12fa4c07c) ) // 2764
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "18.f4",  0x00000, 0x4000, CRC(c057e28e) SHA1(714d8f14d55a070efcf205f8946269181bf2198b) ) // 27128
+	ROM_LOAD( "19.h4",  0x04000, 0x4000, CRC(060253dd) SHA1(9a24fc6aca64262e935971f96b3a103df9711f20) ) // 27128
+	ROM_LOAD( "20.j4",  0x08000, 0x4000, CRC(64c137a4) SHA1(e38adeb19e24357cc5581f0a3097c1d24914e25c) ) // 27128
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "13.d14", 0x00000, 0x2000, CRC(988a77bf) SHA1(c047c076d47479448ce2454c10010b672a1b457d) ) // 2764
+
+	ROM_REGION( 0x18000, "gfx2", 0 )    /* sprites */
+	ROM_LOAD( "1.b1",   0x00000, 0x4000, CRC(7b6f390e) SHA1(8338d6af1c1825ce0b1fc118f33f49a4f7222b9c) ) // 27128
+	ROM_LOAD( "3.b4",   0x04000, 0x4000, CRC(cf74ea50) SHA1(9b0bdf636f9b31e6c7074d606d431a849a51e518) ) // 27128
+	ROM_LOAD( "5.b7",   0x08000, 0x4000, CRC(d8b53975) SHA1(52ad0b26fef7bb20d1bf953c5ebd519656682bac) ) // 27128
+	ROM_LOAD( "2.b3",   0x0c000, 0x4000, CRC(4ab506d2) SHA1(8c293d38429a1462f49462d623c47c402e3372f0) ) // 27128
+	ROM_LOAD( "4.b5",   0x10000, 0x4000, CRC(ecf95a2c) SHA1(b93d0ebdbde9311194a91fb3d6e5d5f33cc87e9d) ) // 27128
+	ROM_LOAD( "6.b8",   0x14000, 0x4000, CRC(8200cb2b) SHA1(c9e66027d796dd523eddf378d0e9a62ebcc8f6c8) ) // 27128
+
+	ROM_REGION( 0xc000, "gfx3", 0 ) /* tiles */
+	ROM_LOAD( "7.d1",   0x00000, 0x2000, CRC(3d472a22) SHA1(85a2e25cee8f85ac0d2ee12f60f97e26539ebd52) ) // 2764
+	ROM_LOAD( "9.d4",   0x02000, 0x2000, CRC(cc002ea9) SHA1(194aa60809c2ae12be2d7533170988e47549c239) ) // 2764
+	ROM_LOAD( "11.d7",  0x04000, 0x2000, CRC(23c1b3ee) SHA1(8a8a187920243f3d3870a2fa71b0f6494e53107a) ) // 2764
+	ROM_LOAD( "8.d3",   0x06000, 0x2000, CRC(d6b1b8fe) SHA1(6bbe02a0a9e080f3ed3c32d64afb81905b42082f) ) // 2764
+	ROM_LOAD( "10.d5",  0x08000, 0x2000, CRC(fce71e5a) SHA1(a68ad30e8e207d24bc5543dcbcbc3e39260b6cc5) ) // 2764
+	ROM_LOAD( "12.d8",  0x0a000, 0x2000, CRC(3f68b991) SHA1(487e7d793fe6c1dbecd5f54f790105bbb44a21de) ) // 2764
+
+	ROM_REGION( 0x0300, "proms", 0 ) // not dumped for this set, probably identical
+	ROM_LOAD( "vb14_col.bin", 0x0000, 0x0100, CRC(c58e5121) SHA1(2e6658e24c183d8dacf4ff84a38060e57d11f265) )    /* red component */
+	ROM_LOAD( "vb15_col.bin", 0x0100, 0x0100, CRC(5ab06f25) SHA1(f5e0aabf40ce6d11771e0678fea248abd5b95b3c) )    /* green component */
+	ROM_LOAD( "vb16_col.bin", 0x0200, 0x0100, CRC(1171743f) SHA1(ddfce0ff213381a2fc94337681e599cb28db840c) )    /* blue component */
+
+	ROM_REGION( 0x0200, "plds", 0 )  // not dumped for this set, probably identical
+	ROM_LOAD( "pal12h6-vh02.bin",   0x0000, 0x0034, CRC(6cc0fdf2) SHA1(12eef0d49def671aa7dbb4cce91cfbe40697dcea) )
+	ROM_LOAD( "pal14h4-vh07.bin",   0x0100, 0x003c, CRC(7e59d45a) SHA1(4a900e424c9edc9f8664f935edccbe4b4759188a) )
+ROM_END
+
 /* Ring King */
 ROM_START( ringking )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -813,7 +858,8 @@ DRIVER_INIT_MEMBER(kingofb_state,ringkingw)
 }
 
 
-GAME( 1985, kingofb,   0,       kingofb,  kingofb, driver_device,  0,        ROT90, "Wood Place Inc.", "King of Boxer (English)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kingofb,   0,       kingofb,  kingofb, driver_device,  0,        ROT90, "Wood Place Inc.", "King of Boxer (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kingofbj,  kingofb, kingofb,  kingofb, driver_device,  0,        ROT90, "Wood Place Inc.", "King of Boxer (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, ringking,  kingofb, ringking, ringking, driver_device, 0,        ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, ringking2, kingofb, ringking, ringking, driver_device, 0,        ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, ringking3, kingofb, kingofb,  kingofb, kingofb_state,  ringking3,ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 3)", MACHINE_SUPPORTS_SAVE )

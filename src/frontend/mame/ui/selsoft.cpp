@@ -144,6 +144,9 @@ menu_select_software::menu_select_software(mame_ui_manager &mui, render_containe
 	ui_globals::switch_image = true;
 	ui_globals::cur_sw_dats_view = 0;
 	ui_globals::cur_sw_dats_total = 1;
+
+	std::string error_string;
+	mui.machine().options().set_value(OPTION_SOFTWARENAME, "", OPTION_PRIORITY_CMDLINE, error_string);
 }
 
 //-------------------------------------------------
@@ -715,10 +718,11 @@ void menu_select_software::inkey_select(const event *menu_event)
 				return;
 			}
 
-			machine().options().set_system_name(m_driver->name);
-			machine().options().set_value(OPTION_SOFTWARENAME, ui_swinfo->shortname, OPTION_PRIORITY_CMDLINE);
+			std::string error_string;
+			std::string string_list = std::string(ui_swinfo->listname).append(":").append(ui_swinfo->shortname).append(":").append(ui_swinfo->part).append(":").append(ui_swinfo->instance);
+			machine().options().set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 			std::string snap_list = std::string(ui_swinfo->listname).append(PATH_SEPARATOR).append(ui_swinfo->shortname);
-			machine().options().set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE);
+			machine().options().set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 			reselect_last::driver = drivlist.driver().name;
 			reselect_last::software = ui_swinfo->shortname;
 			reselect_last::swlist = ui_swinfo->listname;
@@ -1284,8 +1288,9 @@ void software_parts::handle()
 		{
 			if ((void*)&elem == menu_event->itemref)
 			{
+				std::string error_string;
 				std::string string_list = std::string(m_uiinfo->listname).append(":").append(m_uiinfo->shortname).append(":").append(elem.first).append(":").append(m_uiinfo->instance);
-				machine().options().set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE);
+				machine().options().set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 
 				reselect_last::driver = m_uiinfo->driver->name;
 				reselect_last::software = m_uiinfo->shortname;
@@ -1293,7 +1298,7 @@ void software_parts::handle()
 				reselect_last::set(true);
 
 				std::string snap_list = std::string(m_uiinfo->listname).append("/").append(m_uiinfo->shortname);
-				machine().options().set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE);
+				machine().options().set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 
 				mame_machine_manager::instance()->schedule_new_driver(*m_uiinfo->driver);
 				machine().schedule_hard_reset();
@@ -1395,7 +1400,8 @@ void bios_selection::handle()
 						reselect_last::set(true);
 					}
 
-					moptions.set_value(OPTION_BIOS, elem.second, OPTION_PRIORITY_CMDLINE);
+					std::string error;
+					moptions.set_value(OPTION_BIOS, elem.second, OPTION_PRIORITY_CMDLINE, error);
 					mame_machine_manager::instance()->schedule_new_driver(*s_driver);
 					machine().schedule_hard_reset();
 					stack_reset();
@@ -1403,7 +1409,8 @@ void bios_selection::handle()
 				else
 				{
 					ui_software_info *ui_swinfo = (ui_software_info *)m_driver;
-					machine().options().set_value(OPTION_BIOS, elem.second, OPTION_PRIORITY_CMDLINE);
+					std::string error;
+					machine().options().set_value(OPTION_BIOS, elem.second, OPTION_PRIORITY_CMDLINE, error);
 					driver_enumerator drivlist(machine().options(), *ui_swinfo->driver);
 					drivlist.next();
 					software_list_device *swlist = software_list_device::find_by_name(*drivlist.config(), ui_swinfo->listname.c_str());
@@ -1424,10 +1431,11 @@ void bios_selection::handle()
 						menu::stack_push<software_parts>(ui(), container(), parts, ui_swinfo);
 						return;
 					}
+					std::string error_string;
 					std::string string_list = std::string(ui_swinfo->listname).append(":").append(ui_swinfo->shortname).append(":").append(ui_swinfo->part).append(":").append(ui_swinfo->instance);
-					moptions.set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE);
+					moptions.set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 					std::string snap_list = std::string(ui_swinfo->listname).append(PATH_SEPARATOR).append(ui_swinfo->shortname);
-					moptions.set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE);
+					moptions.set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 					reselect_last::driver = drivlist.driver().name;
 					reselect_last::software = ui_swinfo->shortname;
 					reselect_last::swlist = ui_swinfo->listname;

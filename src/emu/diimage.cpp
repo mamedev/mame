@@ -1226,7 +1226,7 @@ void device_image_interface::reset_and_load(const std::string &path)
 	device().machine().schedule_hard_reset();
 
 	// and record the new load
-	device().machine().options().image_option(instance_name()).specify(path);
+	device().machine().options().image_options()[instance_name()] = path;
 }
 
 
@@ -1310,10 +1310,9 @@ void device_image_interface::update_names()
 	if (brief_name == nullptr)
 		brief_name = device_brieftypename(image_type());
 
-	m_cannonical_instance_name = string_format("%s%d", inst_name, index + 1);
 	if (count > 1)
 	{
-		m_instance_name = m_cannonical_instance_name;
+		m_instance_name = string_format("%s%d", inst_name, index + 1);
 		m_brief_instance_name = string_format("%s%d", brief_name, index + 1);
 	}
 	else
@@ -1464,11 +1463,11 @@ std::string device_image_interface::software_get_default_slot(const char *defaul
 {
 	std::string result;
 
-	const std::string &image_name(device().mconfig().options().image_option(instance_name()).value());
-	if (!image_name.empty())
+	auto iter = device().mconfig().options().image_options().find(instance_name());
+	if (iter != device().mconfig().options().image_options().end() && !iter->second.empty())
 	{
 		result.assign(default_card_slot);
-		const software_part *swpart = find_software_item(image_name, true);
+		const software_part *swpart = find_software_item(iter->second, true);
 		if (swpart != nullptr)
 		{
 			const char *slot = swpart->feature("slot");

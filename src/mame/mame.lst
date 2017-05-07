@@ -15240,6 +15240,7 @@ zzyzzyxx2                       // (c) 1982 Cinematronics + Advanced Microcomput
 
 @source:jackal.cpp
 jackal                          // GX631 (c) 1986 (World)
+jackalbl                        // bootleg
 jackalj                         // GX631 (c) 1986 (Japan)
 jackalr                         // GX631 (c) 1986 (World)
 topgunbl                        // bootleg
@@ -16924,6 +16925,7 @@ kingdrby                        // (c) 1981 Tatsumi
 
 @source:kingobox.cpp
 kingofb                         // (c) 1985 Wood Place Inc.
+kingofbj                        // (c) 1985 Wood Place Inc.
 ringking                        // (c) 1985 Data East USA
 ringking2                       // (c) 1985 Data East USA
 ringking3                       // (c) 1985 Data East USA
@@ -28265,7 +28267,8 @@ souledgeaa                      // 1996.02 Soul Edge (Asia, SO2/VER.A)
 souledgeja                      // 1996.02 Soul Edge (Japan, SO1/VER.A)
 souledgeua                      // 1996.01 Soul Edge (US, SO3/VER.A)
 souledgeuc                      // 1996.05 Soul Edge Ver. II (US, SO3/VER.C)
-starswep                        // 1997.07 Star Sweep (Japan, STP1/VER.A)
+starswep                        // 1997.07 Star Sweep (Japan, STP2/VER.A)
+starswepj                       // 1997.07 Star Sweep (Japan, STP1/VER.A)
 tekken                          // 1995.01 Tekken (World, TE4/VER.C)
 tekken2                         // 1996.04 Tekken 2 Ver.B (US, TES3/VER.D)
 tekken2aa                       // 1995.08 Tekken 2 (Asia, TES2/VER.A)
@@ -34740,6 +34743,7 @@ sss                             // 1998.12 Steep Slope Sliders (Capcom / Cave / 
 stress                          // 1998.10 Stress Busters
 stvbios                         //
 suikoenb                        // 1995.03 Suiko Enbu (Data East)
+tatacot                         // 1995.?? Tatacot
 techbowl                        // 1997.12 Technical Bowling
 thunt                           // 1997.09 Puzzle & Action Treasure Hunt (Sega (Deniam License))
 thuntk                          //
@@ -35487,6 +35491,7 @@ spacegunu                       // C57 (c) 1990 Taito America Corporation (US)
 ainferno                        // C45 (c) 1990 Taito America Corporation (US)
 ainfernoj                       // C45 (c) 1990 Taito Corporation (Japan)
 topland                         // B62 (c) 1988 Taito Corporation Japan (World)
+toplandj						// B62 (c) 1988 Taito Corporation (Japan)	
 
 @source:taitogn.cpp
 chaoshea                        // 1998.10 Chaos Heat (V2.09O)
@@ -36955,6 +36960,7 @@ vsmile                          //
 vsmilef                         //
 walle                           //
 wirels60                        // Wireless 60
+zone60                          // Zone 60
 
 @source:vsmilepro.cpp
 vsmilpro
