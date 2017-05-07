@@ -23,15 +23,17 @@
   - KB1013VK1-2/KB1013VK4-2 manual
 
   TODO:
+  - finish SM500 emulation
   - proper support for LFSR program counter in debugger
   - callback for lcd screen as MAME bitmap (when needed)
   - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
+  - wake up after CEND doesn't work right
   - SM510 buzzer control divider bit is mask-programmable?
   - SM511 undocumented/guessed opcodes:
     * $01 is guessed as DIV to ACC transfer, unknown which bits
     * $5d is certainly CEND
     * $65 is certainly divider reset, but not sure if it behaves same as on SM510
-    * $6036 may be instruction timing? (16KHz vs 8KHz)
+    * $6036 and $6037 may be instruction timing? (16kHz and 8kHz), mnemonics unknown
 
 */
 
@@ -69,7 +71,7 @@ void sm510_base_device::device_start()
 	m_write_segbs.resolve_safe();
 	m_write_segc.resolve_safe();
 
-	// zerofill
+	// init/zerofill
 	memset(m_stack, 0, sizeof(m_stack));
 	m_pc = 0;
 	m_prev_pc = 0;
@@ -99,6 +101,7 @@ void sm510_base_device::device_start()
 	m_melody_duty_count = 0;
 	m_melody_duty_index = 0;
 	m_melody_address = 0;
+	m_clk_div = 2; // 16kHz
 
 	// register for savestates
 	save_item(NAME(m_stack));
@@ -130,6 +133,7 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_melody_duty_count));
 	save_item(NAME(m_melody_duty_index));
 	save_item(NAME(m_melody_address));
+	save_item(NAME(m_clk_div));
 
 	// register state for debugger
 	state_add(SM510_PC,  "PC",  m_pc).formatstr("%04X");
@@ -174,7 +178,6 @@ void sm510_base_device::device_reset()
 
 	m_r = m_r_out = 0;
 	m_write_r(0, 0, 0xff);
-	m_melody_rd &= ~1;
 }
 
 

@@ -40,7 +40,8 @@ primglex   Prime Goal EX (PG1/VER.A)               COH-100 / COH-110   SYSTEM11 
 danceyes   Dancing Eyes (DC3/VER.C)                COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C431     5
 danceyesj  Dancing Eyes (DC1/VER.A)                COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C431     5
 pocketrc   Pocket Racer (PKR1/VER.B)               COH-110             SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C432     5
-starswep   Star Sweep (STP1/VER.A)                 COH-100 / COH-110   SYSTEM11 MOTHER(B) PCB                           C442     -
+starswep   Star Sweep (STP2/VER.A)                 COH-100 / COH-110   SYSTEM11 MOTHER(B) PCB                           C442     -
+starswepj  Star Sweep (STP1/VER.A)                 COH-100 / COH-110   SYSTEM11 MOTHER(B) PCB                           C442     -
 myangel3   Kosodate Quiz My Angel 3 (KQT1/VER.A)   COH-110             SYSTEM11 MOTHER(B) PCB   SYSTEM11 ROM8(64) PCB   C443     2
 ptblank2ua Point Blank 2 (GNB3/VER.A)              COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8(64) PCB   C443     2
 
@@ -1338,6 +1339,21 @@ ROM_END
 
 ROM_START( starswep )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "stp2vera.2l",   0x0000000, 0x100000, CRC(a03f4bac) SHA1(a9b5e5e540105c325a4b8f7f1ae863b6fd6227f9) )
+	ROM_LOAD16_BYTE( "stp2vera.2j",   0x0000001, 0x100000, CRC(590da032) SHA1(be0af7b68ab7cc666424ca07edebc17d813b2d03) )
+	ROM_LOAD16_BYTE( "stp2vera.2k",   0x0200000, 0x100000, CRC(ac8717d5) SHA1(66dbc734de78041202e7d32ccceec306a6df34f8) )
+	ROM_LOAD16_BYTE( "stp2vera.2f",   0x0200001, 0x100000, CRC(42733309) SHA1(d28cb6dc03ccf992e0b1c67db7f39b4fd8a38392) )
+
+	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
+	ROM_LOAD( "stp2vera.6d", 0x0000000, 0x040000, CRC(08aaaf6a) SHA1(51c913a39ff7c154aef8bb10139cc8b92eb4756a) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "stp1wave.8k",  0x000000, 0x400000, CRC(18f30e92) SHA1(b3819455856298527a7224495f541145aecf23dd) )
+	ROM_RELOAD( 0x800000, 0x400000 )
+ROM_END
+
+ROM_START( starswepj )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD( "stp1vera.1j",         0x0000000, 0x200000, CRC(ef83e126) SHA1(f721b43358cedad0f28af5d2b292b44043fd47a0) )
 	ROM_LOAD( "stp1vera.1l",         0x0200000, 0x200000, CRC(0ee7fe1e) SHA1(8c2f5b0e7b49dbe0e8105bf55c493acd46a4f59d) )
 
@@ -1626,6 +1642,7 @@ GAME( 1996, primglex,   0,        primglex,   tekken,     driver_device, 0, ROT0
 GAME( 1996, danceyes,   0,        danceyes,   namcos11,   driver_device, 0, ROT0, "Namco", "Dancing Eyes (US, DC3/VER.C)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, danceyesj,  danceyes, danceyes,   namcos11,   driver_device, 0, ROT0, "Namco", "Dancing Eyes (Japan, DC1/VER.A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   driver_device, 0, ROT0, "Namco", "Pocket Racer (Japan, PKR1/VER.B)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, starswep,   0,        starswep,   namcos11,   driver_device, 0, ROT0, "Axela / Namco", "Star Sweep (Japan, STP1/VER.A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, starswep,   0,        starswep,   namcos11,   driver_device, 0, ROT0, "Axela / Namco", "Star Sweep (Asia, STP2/VER.A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, starswepj,  starswep, starswep,   namcos11,   driver_device, 0, ROT0, "Axela / Namco", "Star Sweep (Japan, STP1/VER.A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, myangel3,   0,        myangel3,   myangel3,   driver_device, 0, ROT0, "MOSS / Namco", "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, ptblank2ua, ptblank2, ptblank2ua, ptblank2ua, driver_device, 0, ROT0, "Namco", "Point Blank 2 (US, GNB3/VER.A)", MACHINE_IMPERFECT_GRAPHICS )

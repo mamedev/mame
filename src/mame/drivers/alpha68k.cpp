@@ -1902,14 +1902,6 @@ MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
 }
 
 
-static ADDRESS_MAP_START( i8748_portmap, AS_IO, 8, alpha68k_state )
-//  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(saiyugoub1_mcu_command_r)
-//  AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVWRITE_LEGACY("adpcm", saiyugoub1_m5205_clk_w)     /* Drives the clock on the m5205 at 1/8 of this frequency */
-//  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(saiyugoub1_m5205_irq_r)
-//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(saiyugoub1_adpcm_rom_addr_w)
-//  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE_LEGACY("adpcm", saiyugoub1_adpcm_control_w)
-ADDRESS_MAP_END
-
 // Pixel clock, assuming that it can't be 4 MHz because 4 MHz / 15,20 KHz = 263 HTOTAL (VERY unlikely).
 #define ALPHA68K_PIXEL_CLOCK XTAL_24MHz/4
 #define ALPHA68K_HTOTAL 394
@@ -1935,7 +1927,11 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 
 	MCFG_CPU_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
 //  MCFG_CPU_PROGRAM_MAP(i8748_map)
-	MCFG_CPU_IO_MAP(i8748_portmap)
+//  MCFG_MCS48_PORT_BUS_IN_CB(READ8(alpha68k_state, saiyugoub1_mcu_command_r))
+//  MCFG_MCS48_PORT_T0_CLK_CUSTOM(alpha68k_state, saiyugoub1_m5205_clk_w)     /* Drives the clock on the m5205 at 1/8 of this frequency */
+//  MCFG_MCS48_PORT_T1_IN_CB(READLINE(alpha68k_state, saiyugoub1_m5205_irq_r))
+//  MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(alpha68k_state, saiyugoub1_adpcm_rom_addr_w))
+//  MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(alpha68k_state, saiyugoub1_adpcm_control_w))
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)

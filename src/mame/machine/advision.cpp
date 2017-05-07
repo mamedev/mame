@@ -157,7 +157,7 @@ WRITE8_MEMBER( advision_state::av_control_w )
 	m_video_bank = (data & 0xe0) >> 5;
 }
 
-READ8_MEMBER( advision_state::vsync_r )
+READ_LINE_MEMBER( advision_state::vsync_r )
 {
 	if (m_frame_start)
 	{

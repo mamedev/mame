@@ -47,25 +47,17 @@ const tiny_rom_entry *pc1512_keyboard_t::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( pc1512_keyboard_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( pc1512_keyboard_io, AS_IO, 8, pc1512_keyboard_t )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(kb_bus_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kb_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(kb_p2_r, kb_p2_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(kb_t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(kb_t1_r)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( pc1512_keyboard )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( pc1512_keyboard )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(pc1512_keyboard_io)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pc1512_keyboard_t, kb_bus_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pc1512_keyboard_t, kb_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(pc1512_keyboard_t, kb_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pc1512_keyboard_t, kb_p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(pc1512_keyboard_t, kb_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pc1512_keyboard_t, kb_t1_r))
 
 	MCFG_VCS_CONTROL_PORT_ADD("joy", vcs_control_port_devices, nullptr)
 MACHINE_CONFIG_END
@@ -476,7 +468,7 @@ WRITE8_MEMBER( pc1512_keyboard_t::kb_p2_w )
 //  kb_t0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_keyboard_t::kb_t0_r )
+READ_LINE_MEMBER( pc1512_keyboard_t::kb_t0_r )
 {
 	return m_m1;
 }
@@ -486,7 +478,7 @@ READ8_MEMBER( pc1512_keyboard_t::kb_t0_r )
 //  kb_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_keyboard_t::kb_t1_r )
+READ_LINE_MEMBER( pc1512_keyboard_t::kb_t1_r )
 {
 	return m_m2;
 }

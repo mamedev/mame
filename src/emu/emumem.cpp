@@ -4337,7 +4337,8 @@ void handler_entry::configure_subunits(u64 handlermask, int handlerbits, int &st
 		if ((scanmask & unitmask) != 0)
 			count++;
 	}
-	assert(count > 0 && count <= maxunits);
+	if (count == 0 || count > maxunits)
+		throw emu_fatalerror("Invalid subunit mask %s for %d-bit space", core_i64_hex_format(handlermask, m_datawidth / 4), m_datawidth);
 
 	// make sure that the multiplier is a power of 2
 	int multiplier = count;

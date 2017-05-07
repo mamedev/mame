@@ -103,9 +103,9 @@ READ8_MEMBER(quasar_state::quasar_sh_command_r)
 	return m_soundlatch->read(space, 0) + (ioport("DSW2")->read() & 0x30);
 }
 
-READ8_MEMBER(quasar_state::audio_t1_r)
+READ_LINE_MEMBER(quasar_state::audio_t1_r)
 {
-	return (m_soundlatch->read(space, 0) == 0);
+	return (m_soundlatch->read(machine().dummy_space(), 0) == 0);
 }
 
 // memory map taken from the manual
@@ -144,8 +144,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, quasar_state )
 	AM_RANGE(0x00, 0x7f) AM_RAM
 	AM_RANGE(0x80, 0x80) AM_READ(quasar_sh_command_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(audio_t1_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
 ADDRESS_MAP_END
 
 /************************************************************************
@@ -307,6 +305,8 @@ static MACHINE_CONFIG_START( quasar, quasar_state )
 	MCFG_CPU_ADD("soundcpu",I8035,6000000)          /* 6MHz crystal divide by 15 in CPU */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(quasar_state, audio_t1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
 
 	MCFG_MACHINE_START_OVERRIDE(quasar_state,quasar)
 	MCFG_MACHINE_RESET_OVERRIDE(quasar_state,quasar)

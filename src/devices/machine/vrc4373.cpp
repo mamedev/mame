@@ -62,9 +62,10 @@ void vrc4373_device::device_start()
 	status = 0x0280;
 	// Reserve 8M for ram
 	m_ram.reserve(0x00800000 / 4);
+	m_ram.resize(m_ram_size);
 	// Reserve 32M for simm[0]
 	m_simm[0].reserve(0x02000000 / 4);
-
+	m_simm[0].resize(m_simm0_size / 4);
 	// ROM
 	uint32_t romSize = m_romRegion->bytes();
 	m_cpu_space->install_rom(0x1fc00000, 0x1fc00000 + romSize - 1, m_romRegion->base());
@@ -92,7 +93,13 @@ void vrc4373_device::device_start()
 	save_item(NAME(m_pci_io_laddr));
 	save_item(NAME(m_target1_laddr));
 	save_item(NAME(m_target2_laddr));
-	machine().save().register_postload(save_prepost_delegate(FUNC(vrc4373_device::map_cpu_space), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(vrc4373_device::postload), this));
+}
+
+void vrc4373_device::postload()
+{
+	map_cpu_space();
+	//remap_cb();
 }
 
 void vrc4373_device::device_reset()

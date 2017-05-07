@@ -93,6 +93,16 @@ void iteagle_fpga_device::device_start()
 	m_ram[0x0c/4] = 0x00000001;
 	m_ram[0x10/4] = 0x00000018;
 
+	// Save states
+	save_item(NAME(m_fpga_regs));
+	save_item(NAME(m_rtc_regs));
+	save_item(NAME(m_ram));
+	save_item(NAME(m_prev_reg));
+	// m_version
+	save_item(NAME(m_seq_init));
+	save_item(NAME(m_seq));
+	save_item(NAME(m_seq_rem1));
+	save_item(NAME(m_seq_rem2));
 }
 
 void iteagle_fpga_device::device_reset()
@@ -756,6 +766,9 @@ void iteagle_periph_device::device_start()
 	m_rtc_regs[0xa] = 0x20; // 32.768 MHz
 	m_rtc_regs[0xb] = 0x02; // 24-hour format
 	m_rtc->set_base(m_rtc_regs, sizeof(m_rtc_regs));
+
+	// Save states
+	save_item(NAME(m_ctrl_regs));
 }
 
 void iteagle_periph_device::device_reset()

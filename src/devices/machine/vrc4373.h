@@ -77,6 +77,7 @@ public:
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+	void postload(void);
 
 	void set_cpu_tag(const char *tag);
 	void set_ram_size(const int size) { m_ram_size = size; };

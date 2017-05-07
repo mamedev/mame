@@ -42,12 +42,8 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_READ8_MEMBER(getbus);
-	DECLARE_READ8_MEMBER(t0_r);
-	DECLARE_READ8_MEMBER(t1_r);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_WRITE8_MEMBER(putbus);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload);
 
 	DECLARE_READ8_MEMBER(i8155_read);
@@ -111,29 +107,6 @@ WRITE8_MEMBER(cp1_state::port2_w)
 	}
 
 	m_port2 = data;
-}
-
-READ8_MEMBER(cp1_state::t0_r)
-{
-	logerror("t0_r\n");
-	return 0;
-}
-
-READ8_MEMBER(cp1_state::t1_r)
-{
-	logerror("t1_r\n");
-	return 0;
-}
-
-READ8_MEMBER(cp1_state::getbus)
-{
-	logerror("getbus\n");
-	return 0;
-}
-
-WRITE8_MEMBER(cp1_state::putbus)
-{
-	logerror("putbus\n");
 }
 
 READ8_MEMBER(cp1_state::i8155_read)
@@ -209,11 +182,6 @@ WRITE8_MEMBER(cp1_state::i8155_portc_w)
 static ADDRESS_MAP_START( cp1_io , AS_IO, 8, cp1_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00,             0xff )          AM_READWRITE( i8155_read, i8155_write)
-	AM_RANGE( MCS48_PORT_P1,    MCS48_PORT_P1)  AM_READWRITE( port1_r, port1_w )
-	AM_RANGE( MCS48_PORT_P2,    MCS48_PORT_P2)  AM_READWRITE( port2_r, port2_w )
-	AM_RANGE( MCS48_PORT_BUS,   MCS48_PORT_BUS) AM_READWRITE( getbus, putbus )
-	AM_RANGE( MCS48_PORT_T0,    MCS48_PORT_T0)  AM_READ( t0_r )
-	AM_RANGE( MCS48_PORT_T1,    MCS48_PORT_T1)  AM_READ( t1_r )
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -287,6 +255,14 @@ static MACHINE_CONFIG_START( cp1, cp1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8049, XTAL_6MHz)
 	MCFG_CPU_IO_MAP(cp1_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(cp1_state, port1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(cp1_state, port1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(cp1_state, port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(cp1_state, port2_w))
+	MCFG_MCS48_PORT_BUS_IN_CB(LOGGER("getbus"))
+	MCFG_MCS48_PORT_BUS_OUT_CB(LOGGER("putbus"))
+	MCFG_MCS48_PORT_T0_IN_CB(LOGGER("t0_r"))
+	MCFG_MCS48_PORT_T1_IN_CB(LOGGER("t1_r"))
 
 	MCFG_DEVICE_ADD("i8155", I8155, 0)
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(cp1_state, i8155_porta_w))
