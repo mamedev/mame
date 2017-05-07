@@ -3424,6 +3424,20 @@ ROM_START( nclubv2 )
 	ROM_LOAD( "nclubv2.nv", 0x0000, 0x0080, CRC(96d55fa9) SHA1(b3c821d6cd4ed52d0e20565e12a06d8f81a08dbc) )
 ROM_END
 
+ROM_START( patocar )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP( "ic22.bin",     0x0200000, 0x200000, CRC(b7e6d425) SHA1(b7496cb390fe50ee786815082415427056e4e3e1) )
+	ROM_LOAD16_WORD_SWAP( "ic24.bin",     0x0400000, 0x200000, CRC(cbbb687e) SHA1(cfc87ae6124f9978bb2432b98d77f0da07d020b7) )
+	ROM_LOAD16_WORD_SWAP( "ic26.bin",     0x0600000, 0x200000, CRC(91db9dbe) SHA1(8652fe45ce56633016403c75e8b3a7b77f279819) )
+	ROM_LOAD16_WORD_SWAP( "ic28.bin",     0x0800000, 0x200000, CRC(bff0cd9c) SHA1(3c62aa2d7f71bd6fb147fdcd8d99cd7815f3047e) )
+	ROM_LOAD16_WORD_SWAP( "ic30.bin",     0x0a00000, 0x200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) )	// empty / FF filled
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "patocar.nv", 0x0000, 0x0080, CRC(d9873ee8) SHA1(e74747816bba6745afd718b0beec67a884c6a31c) )
+ROM_END
+
 
 
 GAME( 1996, stvbios,   0,       stv_slot, stv, stv_state,      stv,         ROT0,   "Sega",                         "ST-V Bios", MACHINE_IS_BIOS_ROOT )
@@ -3458,6 +3472,7 @@ GAME( 1997, maruchan,  stvbios, stv,      stv, stv_state,        maruchan,   ROT
 GAME( 1996, mausuke,   stvbios, stv,      stv, stv_state,        mausuke,    ROT0,   "Data East",                    "Mausuke no Ojama the World (J 960314 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, myfairld,  stvbios, stv,      myfairld, stv_state,   stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, othellos,  stvbios, stv,      stv, stv_state,        othellos,   ROT0,   "Success",                      "Othello Shiyouyo (J 980423 V1.002)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, patocar,   stvbios, stv,      stv, stv_state,        pblbeach,   ROT0,   "Sega",                         "Hashire Patrol Car (J 990326 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1995, pblbeach,  stvbios, stv,      stv, stv_state,        pblbeach,   ROT0,   "T&E Soft",                     "Pebble Beach - The Great Shot (JUE 950913 V0.990)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, prikura,   stvbios, stv,      stv, stv_state,        prikura,    ROT0,   "Atlus",                        "Princess Clara Daisakusen (J 960910 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, puyosun,   stvbios, stv,      stv, stv_state,        puyosun,    ROT0,   "Compile",                      "Puyo Puyo Sun (J 961115 V0.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
