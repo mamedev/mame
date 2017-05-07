@@ -18,6 +18,18 @@
 #include "mameopts.h"
 
 
+/***************************************************************************
+	CONSTANTS
+***************************************************************************/
+
+#define ITEMREF_RESET	((void *)1)
+#define DIVIDER			"------"
+
+
+/***************************************************************************
+	SLOT MENU
+***************************************************************************/
+
 namespace ui {
 /*-------------------------------------------------
     slot_get_current_option - returns
@@ -26,9 +38,9 @@ device_slot_option *menu_slot_devices::slot_get_current_option(device_slot_inter
 {
 	std::string current;
 
-	const char *slot_option_name = slot.device().tag() + 1;
 	if (!slot.fixed())
 	{
+		const char *slot_option_name = slot.slot_name();
 		current = machine().options().slot_option(slot_option_name).value();
 	}
 	else
@@ -134,14 +146,106 @@ const char *menu_slot_devices::slot_get_option(device_slot_interface &slot, int 
 
 
 /*-------------------------------------------------
-    set_use_natural_keyboard - specifies
-    whether the natural keyboard is active
+    set_slot_device
 -------------------------------------------------*/
 
 void menu_slot_devices::set_slot_device(device_slot_interface &slot, const char *val)
 {
-	machine().options().set_value(slot.device().tag()+1, val, OPTION_PRIORITY_CMDLINE);
+	// we might change slot options; in the spirit of user friendliness, we should record all current
+	// options
+	record_current_options();
+
+	// find the slot option
+	slot_option &opt(machine().options().slot_option(slot.slot_name()));
+
+	// specify it
+	opt.specify(val);
+
+	// erase this from our recorded options list - this is the slot we're trying to change!
+	m_slot_options.erase(slot.slot_name());
+
+	// refresh any options that we might have annotated earlier
+	refresh_current_options();
+
+	// changing the options may result in options changing; we need to reset
+	reset(reset_options::REMEMBER_POSITION);
 }
+
+
+//-------------------------------------------------
+//	record_current_options
+//-------------------------------------------------
+
+void menu_slot_devices::record_current_options()
+{
+	for (device_slot_interface &slot : slot_interface_iterator(m_config->root_device()))
+	{
+		// we're doing this out of a desire to honor user-selectable options; therefore it only
+		// makes sense to record values for selectable options
+		if (slot.has_selectable_options())
+		{
+			// get the slot option
+			const slot_option &opt(machine().options().slot_option(slot.slot_name()));
+
+			// and record the value in our local cache
+			m_slot_options[slot.slot_name()] = opt.specified_value();
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//	refresh_current_options
+//-------------------------------------------------
+
+void menu_slot_devices::refresh_current_options()
+{
+	while (try_refresh_current_options())
+		;
+}
+
+
+//-------------------------------------------------
+//	try_refresh_current_options
+//-------------------------------------------------
+
+bool menu_slot_devices::try_refresh_current_options()
+{
+	// cycle through all devices for this system
+	machine_config config(machine().system(), machine().options());
+	for (device_slot_interface &slot : slot_interface_iterator(m_config->root_device()))
+	{
+		if (slot.has_selectable_options())
+		{
+			auto iter = m_slot_options.find(slot.slot_name());
+			if (iter != m_slot_options.end() && machine().options().has_slot_option(slot.slot_name()))
+			{
+				slot_option &slotopt(machine().options().slot_option(slot.slot_name()));
+
+				if (slotopt.specified_value() != iter->second)
+				{
+					// specify this option (but catch errors)
+					try
+					{
+						slotopt.specify(iter->second);
+
+						// the option was successfully specified; it isn't safe to continue
+						// checking slots as the options may be radically different
+						return true;
+					}
+					catch (options_exception &)
+					{
+						// this threw an exception - that is fine; we can just proceed
+					}
+				}
+			}
+		}
+	}
+
+	// we've went through all options without changing anything
+	return false;
+}
+
 
 /*-------------------------------------------------
     menu_slot_devices_populate - populates the main
@@ -154,14 +258,18 @@ menu_slot_devices::menu_slot_devices(mame_ui_manager &mui, render_container &con
 
 void menu_slot_devices::populate(float &customtop, float &custombottom)
 {
+	// we need to keep our own copy of the machine_config because we
+	// can change this out from under the caller
+	m_config = std::make_unique<machine_config>(machine().system(), machine().options());
+
 	// cycle through all devices for this system
-	for (device_slot_interface &slot : slot_interface_iterator(machine().root_device()))
+	for (device_slot_interface &slot : slot_interface_iterator(m_config->root_device()))
 	{
 		// does this slot have any selectable options?
 		bool has_selectable_options = slot.has_selectable_options();
 
 		// name this option
-		std::string opt_name("------");
+		std::string opt_name(DIVIDER);
 		const device_slot_option *option = slot_get_current_option(slot);
 		if (option)
 		{
@@ -175,11 +283,12 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 			? FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW
 			: FLAG_DISABLE;
 
-		item_append(slot.device().tag() + 1, opt_name, item_flags, (void *)&slot);
+		item_append(slot.slot_name(), opt_name, item_flags, (void *)&slot);
 	}
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset"), "", 0, (void *)1);
+	item_append(_("Reset"), "", 0, ITEMREF_RESET);
 }
+
 
 menu_slot_devices::~menu_slot_devices()
 {
@@ -196,7 +305,7 @@ void menu_slot_devices::handle()
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		if ((uintptr_t)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
+		if (menu_event->itemref == ITEMREF_RESET && menu_event->iptkey == IPT_UI_SELECT)
 		{
 			machine().schedule_hard_reset();
 		}
@@ -205,7 +314,6 @@ void menu_slot_devices::handle()
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
 			const char *val = (menu_event->iptkey == IPT_UI_LEFT) ? slot_get_prev(*slot) : slot_get_next(*slot);
 			set_slot_device(*slot, val);
-			reset(reset_options::REMEMBER_REF);
 		}
 		else if (menu_event->iptkey == IPT_UI_SELECT)
 		{

@@ -215,6 +215,7 @@ public:
 	core_options::entry::shared_ptr option_entry() const { return m_entry.lock(); }
 
 	// seters
+	void specify(const std::string &text, bool peg_priority = true);
 	void specify(std::string &&text, bool peg_priority = true);
 	void set_bios(std::string &&text);
 	void set_default_card_software(std::string &&s);

@@ -1091,6 +1091,16 @@ void slot_option::specify(std::string &&text, bool peg_priority)
 
 
 //-------------------------------------------------
+//  slot_option::specify
+//-------------------------------------------------
+
+void slot_option::specify(const std::string &text, bool peg_priority)
+{
+	specify(std::string(text), peg_priority);
+}
+
+
+//-------------------------------------------------
 //  slot_option::set_default_card_software
 //-------------------------------------------------
 
