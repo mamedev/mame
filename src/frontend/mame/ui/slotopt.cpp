@@ -19,22 +19,84 @@
 
 
 /***************************************************************************
-	CONSTANTS
+	UTILITY
 ***************************************************************************/
 
-#define ITEMREF_RESET	((void *)1)
-#define DIVIDER			"------"
+namespace {
+
+// constants
+void *ITEMREF_RESET = ((void *)1);
+char DIVIDER[] = "------";
 
 
+//-------------------------------------------------
+//	get_slot_length
+//-------------------------------------------------
+
+int get_slot_length(const device_slot_interface &slot)
+{
+	int val = 0;
+	for (auto &option : slot.option_list())
+		if (option.second->selectable())
+			val++;
+
+	return val;
+}
+
+
+//-------------------------------------------------
+//	get_slot_option
+//-------------------------------------------------
+
+const char *get_slot_option(device_slot_interface &slot, int index)
+{
+	if (index >= 0)
+	{
+		int val = 0;
+		for (auto &option : slot.option_list())
+		{
+			if (val == index)
+				return option.second->name();
+
+			if (option.second->selectable())
+				val++;
+		}
+	}
+
+	return "";
+}
+
+	
+};
 /***************************************************************************
 	SLOT MENU
 ***************************************************************************/
 
 namespace ui {
-/*-------------------------------------------------
-    slot_get_current_option - returns
--------------------------------------------------*/
-device_slot_option *menu_slot_devices::slot_get_current_option(device_slot_interface &slot)
+
+//-------------------------------------------------
+//	menu_slot_devices constructor
+//-------------------------------------------------
+
+menu_slot_devices::menu_slot_devices(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+{
+}
+
+//-------------------------------------------------
+//	menu_slot_devices destructor
+//-------------------------------------------------
+
+menu_slot_devices::~menu_slot_devices()
+{
+}
+
+
+//-------------------------------------------------
+//	get_current_option - returns the current
+//	slot option
+//-------------------------------------------------
+
+device_slot_option *menu_slot_devices::get_current_option(device_slot_interface &slot) const
 {
 	std::string current;
 
@@ -53,12 +115,14 @@ device_slot_option *menu_slot_devices::slot_get_current_option(device_slot_inter
 	return slot.option(current.c_str());
 }
 
-/*-------------------------------------------------
-    slot_get_current_index - returns
--------------------------------------------------*/
-int menu_slot_devices::slot_get_current_index(device_slot_interface &slot)
+
+//-------------------------------------------------
+//	get_current_index
+//-------------------------------------------------
+
+int menu_slot_devices::get_current_index(device_slot_interface &slot) const
 {
-	const device_slot_option *current = slot_get_current_option(slot);
+	const device_slot_option *current = get_current_option(slot);
 
 	if (current != nullptr)
 	{
@@ -76,78 +140,48 @@ int menu_slot_devices::slot_get_current_index(device_slot_interface &slot)
 	return -1;
 }
 
-/*-------------------------------------------------
-    slot_get_length - returns
--------------------------------------------------*/
-int menu_slot_devices::slot_get_length(device_slot_interface &slot)
-{
-	int val = 0;
-	for (auto &option : slot.option_list())
-		if (option.second->selectable())
-			val++;
 
-	return val;
-}
+//-------------------------------------------------
+//	get_next_slot
+//-------------------------------------------------
 
-/*-------------------------------------------------
-    slot_get_next - returns
--------------------------------------------------*/
-const char *menu_slot_devices::slot_get_next(device_slot_interface &slot)
+const char *menu_slot_devices::get_next_slot(device_slot_interface &slot) const
 {
-	int idx = slot_get_current_index(slot);
+	int idx = get_current_index(slot);
 	if (idx < 0)
 		idx = 0;
 	else
 		idx++;
 
-	if (idx >= slot_get_length(slot))
+	if (idx >= get_slot_length(slot))
 		return "";
 
-	return slot_get_option(slot, idx);
+	return get_slot_option(slot, idx);
 }
 
-/*-------------------------------------------------
-    slot_get_prev - returns
--------------------------------------------------*/
-const char *menu_slot_devices::slot_get_prev(device_slot_interface &slot)
+
+//-------------------------------------------------
+//	get_previous_slot
+//-------------------------------------------------
+
+const char *menu_slot_devices::get_previous_slot(device_slot_interface &slot) const
 {
-	int idx = slot_get_current_index(slot);
+	int idx = get_current_index(slot);
 	if (idx < 0)
-		idx = slot_get_length(slot) - 1;
+		idx = get_slot_length(slot) - 1;
 	else
 		idx--;
 
 	if (idx < 0)
 		return "";
 
-	return slot_get_option(slot, idx);
-}
-
-/*-------------------------------------------------
-    slot_get_option - returns
--------------------------------------------------*/
-const char *menu_slot_devices::slot_get_option(device_slot_interface &slot, int index)
-{
-	if (index >= 0)
-	{
-		int val = 0;
-		for (auto &option : slot.option_list())
-		{
-			if (val == index)
-				return option.second->name();
-
-			if (option.second->selectable())
-				val++;
-		}
-	}
-
-	return "";
+	return get_slot_option(slot, idx);
 }
 
 
-/*-------------------------------------------------
-    set_slot_device
--------------------------------------------------*/
+//-------------------------------------------------
+//	set_slot_device
+//-------------------------------------------------
 
 void menu_slot_devices::set_slot_device(device_slot_interface &slot, const char *val)
 {
@@ -247,14 +281,9 @@ bool menu_slot_devices::try_refresh_current_options()
 }
 
 
-/*-------------------------------------------------
-    menu_slot_devices_populate - populates the main
-    slot device menu
--------------------------------------------------*/
-
-menu_slot_devices::menu_slot_devices(mame_ui_manager &mui, render_container &container) : menu(mui, container)
-{
-}
+//-------------------------------------------------
+//	populate
+//-------------------------------------------------
 
 void menu_slot_devices::populate(float &customtop, float &custombottom)
 {
@@ -270,7 +299,7 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 
 		// name this option
 		std::string opt_name(DIVIDER);
-		const device_slot_option *option = slot_get_current_option(slot);
+		const device_slot_option *option = get_current_option(slot);
 		if (option)
 		{
 			opt_name = has_selectable_options
@@ -290,17 +319,13 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 }
 
 
-menu_slot_devices::~menu_slot_devices()
-{
-}
-
-/*-------------------------------------------------
-    menu_slot_devices - menu that
--------------------------------------------------*/
+//-------------------------------------------------
+//	handle
+//-------------------------------------------------
 
 void menu_slot_devices::handle()
 {
-	/* process the menu */
+	// process the menu
 	const event *menu_event = process(0);
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
@@ -312,13 +337,13 @@ void menu_slot_devices::handle()
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
-			const char *val = (menu_event->iptkey == IPT_UI_LEFT) ? slot_get_prev(*slot) : slot_get_next(*slot);
+			const char *val = (menu_event->iptkey == IPT_UI_LEFT) ? get_previous_slot(*slot) : get_next_slot(*slot);
 			set_slot_device(*slot, val);
 		}
 		else if (menu_event->iptkey == IPT_UI_SELECT)
 		{
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
-			device_slot_option *option = slot_get_current_option(*slot);
+			device_slot_option *option = get_current_option(*slot);
 			if (option)
 				menu::stack_push<menu_device_config>(ui(), container(), slot, option);
 		}

@@ -3382,9 +3382,9 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 			pgraph[0x100 / 4] |= 1;
 			pgraph[0x108 / 4] |= 1;
 			if (update_interrupts() == true)
-				interruptdevice->ir3_w(1); // IRQ 3
+				irq_callback(1); // IRQ 3
 			else
-				interruptdevice->ir3_w(0); // IRQ 3
+				irq_callback(0); // IRQ 3
 			return 2;
 		}
 		else
@@ -4504,9 +4504,9 @@ WRITE_LINE_MEMBER(nv2a_renderer::vblank_callback)
 		pcrtc[0x808 / 4] &= ~0x10000;
 	}
 	if (update_interrupts() == true)
-		interruptdevice->ir3_w(1); // IRQ 3
+		irq_callback(1); // IRQ 3
 	else
-		interruptdevice->ir3_w(0); // IRQ 3
+		irq_callback(0); // IRQ 3
 }
 
 bool nv2a_renderer::update_interrupts()
@@ -4842,9 +4842,9 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 	//      machine().logerror("NV_2A: write at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,data);
 	if (update_int == true) {
 		if (update_interrupts() == true)
-			interruptdevice->ir3_w(1); // IRQ 3
+			irq_callback(1); // IRQ 3
 		else
-			interruptdevice->ir3_w(0); // IRQ 3
+			irq_callback(0); // IRQ 3
 	}
 }
 
@@ -4858,9 +4858,4 @@ void nv2a_renderer::start(address_space *cpu_space)
 	topmempointer = basemempointer + 512 * 1024 * 1024 - 1;
 	puller_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nv2a_renderer::puller_timer_work), this), (void *)"NV2A Puller Timer");
 	puller_timer->enable(false);
-}
-
-void nv2a_renderer::set_interrupt_device(pic8259_device *device)
-{
-	interruptdevice = device;
 }

@@ -856,9 +856,8 @@ ohci_function::ohci_function()
 {
 }
 
-void ohci_function::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
+void ohci_function::initialize(running_machine &machine)
 {
-	busmanager = usb_bus_manager;
 	state = DefaultState;
 	descriptors = auto_alloc_array(machine, uint8_t, 1024);
 	descriptors_pos = 0;
@@ -880,6 +879,12 @@ void ohci_function::initialize(running_machine &machine, ohci_usb_controller *us
 	latest_configuration = nullptr;
 	latest_alternate = nullptr;
 }
+
+void ohci_function::set_bus_manager(ohci_usb_controller *usb_bus_manager)
+{
+	busmanager = usb_bus_manager;
+}
+
 
 void ohci_function::add_device_descriptor(const USBStandardDeviceDescriptor &descriptor)
 {
@@ -1403,9 +1408,9 @@ ohci_game_controller::ohci_game_controller(const machine_config &mconfig, const 
 {
 }
 
-void ohci_game_controller::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
+void ohci_game_controller::initialize(running_machine &machine)
 {
-	ohci_function::initialize(machine, usb_bus_manager);
+	ohci_function::initialize(machine);
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
