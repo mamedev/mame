@@ -186,19 +186,9 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool ne
 		return matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(newton_raphson);
 	}
 
-	if (newton_raphson)
-	{
-		nl_double err = this->delta(new_V);
-
-		this->store(new_V);
-
-		return (err > this->m_params.m_accuracy) ? 2 : 1;
-	}
-	else
-	{
-		this->store(new_V);
-		return 1;
-	}
+	const nl_double err = (newton_raphson ? this->delta(new_V) : 0.0);
+	this->store(new_V);
+	return (err > this->m_params.m_accuracy) ? 2 : 1;
 }
 
 template <typename T>

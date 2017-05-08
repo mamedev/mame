@@ -114,9 +114,6 @@ private:
 template <std::size_t m_N, std::size_t storage_N>
 matrix_solver_sm_t<m_N, storage_N>::~matrix_solver_sm_t()
 {
-#if (NL_USE_DYNAMIC_ALLOCATION)
-	plib::pfree_array(m_A);
-#endif
 }
 
 template <std::size_t m_N, std::size_t storage_N>
@@ -290,19 +287,9 @@ unsigned matrix_solver_sm_t<m_N, storage_N>::solve_non_dynamic(const bool newton
 
 	this->LE_compute_x(new_V);
 
-	if (newton_raphson)
-	{
-		nl_double err = delta(new_V);
-
-		store(new_V);
-
-		return (err > this->m_params.m_accuracy) ? 2 : 1;
-	}
-	else
-	{
-		store(new_V);
-		return 1;
-	}
+	const nl_double err = (newton_raphson ? delta(new_V) : 0.0);
+	store(new_V);
+	return (err > this->m_params.m_accuracy) ? 2 : 1;
 }
 
 template <std::size_t m_N, std::size_t storage_N>

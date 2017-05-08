@@ -139,6 +139,9 @@ public:
 		return std::pair<pstring, pstring>("", plib::pfmt("/* solver doesn't support static compile */\n\n"));
 	}
 
+	/* return number of floating point operations for solve */
+	std::size_t ops() { return m_ops; }
+
 protected:
 
 	matrix_solver_t(netlist_t &anetlist, const pstring &name,
@@ -191,6 +194,7 @@ private:
 
 	void step(const netlist_time &delta);
 
+	std::size_t m_ops;
 	const eSortType m_sort;
 };
 
