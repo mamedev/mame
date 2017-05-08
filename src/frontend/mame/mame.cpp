@@ -131,7 +131,7 @@ void mame_machine_manager::start_luaengine()
 			{
 				bool result = m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
 				if (!result)
-					osd_printf_error("**Error loading plugin.ini**");
+					osd_printf_error("**Error loading plugin.ini**\n");
 			}
 		}
 		for (auto &curentry : *m_plugins)
