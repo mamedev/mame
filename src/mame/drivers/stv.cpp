@@ -113,6 +113,7 @@ READ8_MEMBER(stv_state::stv_ioga_r)
 		case 0x07: res = m_system_output; break; // port D, read-backs value written
 		case 0x09: res = ioport("PORTE")->read(); break; // P3
 		case 0x0b: res = ioport("PORTF")->read(); break; // P4
+		case 0x0d: res = 0; break; // PORT-G
 		case 0x1b: res = 0; break; // Serial COM READ status
 	}
 
@@ -129,6 +130,8 @@ WRITE8_MEMBER(stv_state::stv_ioga_w)
 	switch(offset)
 	{
 		case 0x07:
+//			if (data != m_system_output)
+//				printf("OUT %02x\n", data);
 			m_system_output = data;
 			/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
 			machine().bookkeeping().coin_counter_w(0,~data & 0x01);
@@ -1629,6 +1632,32 @@ static INPUT_PORTS_START( vmahjong )
 	PORT_START("P2_KEY4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( patocar )
+	PORT_INCLUDE( stv )
+
+	PORT_MODIFY("PORTA")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )	// hopper ?
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )	// hopper ?
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW,  IPT_UNUSED )
+
+	PORT_MODIFY("PORTB")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 )	// ??
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 )	// Door switch ?
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW,  IPT_BUTTON5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN3 )		// Medal
+	PORT_BIT( 0xd0, IP_ACTIVE_LOW,  IPT_UNUSED )
+
+	PORT_MODIFY("PORTC")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTE")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTF")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -3472,7 +3501,7 @@ GAME( 1997, maruchan,  stvbios, stv,      stv, stv_state,        maruchan,   ROT
 GAME( 1996, mausuke,   stvbios, stv,      stv, stv_state,        mausuke,    ROT0,   "Data East",                    "Mausuke no Ojama the World (J 960314 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, myfairld,  stvbios, stv,      myfairld, stv_state,   stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, othellos,  stvbios, stv,      stv, stv_state,        othellos,   ROT0,   "Success",                      "Othello Shiyouyo (J 980423 V1.002)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, patocar,   stvbios, stv,      stv, stv_state,        pblbeach,   ROT0,   "Sega",                         "Hashire Patrol Car (J 990326 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, patocar,   stvbios, stv,      patocar, stv_state,    stv,        ROT0,   "Sega",                         "Hashire Patrol Car (J 990326 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1995, pblbeach,  stvbios, stv,      stv, stv_state,        pblbeach,   ROT0,   "T&E Soft",                     "Pebble Beach - The Great Shot (JUE 950913 V0.990)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, prikura,   stvbios, stv,      stv, stv_state,        prikura,    ROT0,   "Atlus",                        "Princess Clara Daisakusen (J 960910 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, puyosun,   stvbios, stv,      stv, stv_state,        puyosun,    ROT0,   "Compile",                      "Puyo Puyo Sun (J 961115 V0.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

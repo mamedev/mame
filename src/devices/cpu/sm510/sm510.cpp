@@ -17,13 +17,19 @@
   - *SM531: x
   - *KB1013VK1-2: Soviet-era clone of SM500, minor differences
 
+  Sharp SM590 MCU family:
+  - *SM590: x
+  - *SM591: x
+  - *SM595: x
+
   References:
   - 1990 Sharp Microcomputers Data Book
   - 1996 Sharp Microcomputer Databook
   - KB1013VK1-2/KB1013VK4-2 manual
 
   TODO:
-  - finish SM500 emulation
+  - finish SM500 emulation (gen.1 Game & Watch)
+  - add SM590/SM595 emulation (NES/SNES CIC)
   - proper support for LFSR program counter in debugger
   - callback for lcd screen as MAME bitmap (when needed)
   - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)

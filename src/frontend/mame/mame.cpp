@@ -134,7 +134,7 @@ void mame_machine_manager::start_luaengine()
 				}
 				catch (options_exception &)
 				{
-					osd_printf_error("**Error loading plugin.ini**");
+					osd_printf_error("**Error loading plugin.ini**\n");
 				}
 			}
 		}

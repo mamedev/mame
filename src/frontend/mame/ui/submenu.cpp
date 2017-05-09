@@ -300,7 +300,7 @@ void submenu::handle()
 			}
 			break;
 		default:
-			osd_printf_error("Unhandled option: %s", _(sm_option.description));
+			osd_printf_error("Unhandled option: %s\n", _(sm_option.description));
 			break;
 		}
 	}
@@ -408,7 +408,7 @@ void submenu::populate(float &customtop, float &custombottom)
 			}
 			break;
 		default:
-			osd_printf_error("Unknown option type: %s", _(sm_option->description));
+			osd_printf_error("Unknown option type: %s\n", _(sm_option->description));
 			break;
 		}
 	}
