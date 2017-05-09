@@ -98,6 +98,7 @@ public:
 	int         m_sprite_xoffs;
 	int         m_sprite_yoffs;
 	int         m_sprite_xoffs_dx;
+	emu_timer   *m_blit_done_timer;
 
 	std::unique_ptr<uint8_t[]>      m_expanded_gfx1;
 
@@ -105,8 +106,9 @@ public:
 	int         m_vblank_bit;
 	int         m_blitter_bit;
 	int         m_irq_line;
-	uint8_t       m_requested_int[8];
+	uint8_t     m_requested_int[8];
 	emu_timer   *m_mouja_irq_timer;
+	emu_timer   *m_karatour_irq_timer;
 
 	/* sound related */
 	uint16_t      m_soundstatus;

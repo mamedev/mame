@@ -222,6 +222,7 @@
 #include "includes/goldstar.h"
 
 #include "cpu/z80/z80.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
@@ -9107,10 +9108,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( bonusch, unkch_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(bonusch_map)
 	MCFG_CPU_IO_MAP(bonusch_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
+
+	MCFG_CPU_ADD("mcu", I80C51, XTAL_12MHz)
+	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -10552,6 +10556,43 @@ ROM_START( cmast99b )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) BAD_DUMP )
 ROM_END
 
+/*
+	A-Plan
+	(C) 1993 WeaShing H.K.
+
+	TMP91P640 @ 5MHz or 10MHz (or SDIP64 gfx chip of some kind?)
+	Z80 [clock probably 12/4]
+	8255 x2
+	YM2149 [clock probably 12/8]
+	12MHz and 10MHz XTALs
+	6116 2kx8 SRAM x4
+	BPROM 82S129 x2
+	8-position DIPSW x5
+	PCB number only says 'WEASHING'
+*/
+
+ROM_START( aplan ) // Has "DYNA QL-1  V1.01" string.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u18", 0x00000, 0x10000, CRC(e0e5328d) SHA1(fd02c65fecada69a0953372a39e520a80c744109) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "u64",   0x00000, 0x8000, CRC(2e593152) SHA1(ca0f587b26ed6e962e100d9178b6f79995a26fec) )
+	ROM_LOAD( "u67",   0x08000, 0x8000, CRC(aa865924) SHA1(574c4ba06e0bb37624ebd0fd7f5bfa4d0be62eba) )
+	ROM_LOAD( "u68",   0x10000, 0x8000, CRC(3043a99c) SHA1(cf936a866cc90b1cb477914e484e1d21165d6526) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 ) /* ??? */
+	ROM_LOAD( "u56",   0x0000, 0x4000, CRC(e1ea0658) SHA1(1f31c493556f6ff6564be439040914a18a56ea64) )
+	ROM_LOAD( "u58",   0x4000, 0x4000, CRC(aa5ae1a5) SHA1(f4a9b3d97ac4df81fc071962698eab4b63e2e608) )
+	ROM_LOAD( "u60",   0x8000, 0x4000, CRC(ba6cc02d) SHA1(80f06761eeb08b3852041f7a1773059c69420c44) )
+	ROM_LOAD( "u62",   0xc000, 0x4000, CRC(609a6300) SHA1(ec8301c603a2af2aeecbef83d5cfba1796209988) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_FILL( 0x0000, 0x10000, 0xff ) // (girl bitmaps, not present)
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u45",   0x000, 0x100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u46",   0x100, 0x100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+ROM_END
 
 ROM_START( chryangl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -14294,6 +14335,9 @@ ROM_START( bonusch )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "10.1u", 0x00000, 0x10000, CRC(5098eba6) SHA1(40a33a25d3589dfe7e228f1874239fbfbc5250e4) )
 
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "0.5p", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "1.1c",  0x00000, 0x10000, CRC(33ce67c0) SHA1(8f3d7e78a4616bebafed2779b7f793d41576c9c8) )
 	ROM_LOAD( "2.1e",  0x10000, 0x10000, CRC(fc394767) SHA1(645bf0e60a7061771aa73bb4d10603eaaad17f20) )
@@ -16027,6 +16071,7 @@ GAME(  1991, cmast91,   0,        cmast91,  cmast91,  goldstar_state, cmast91,  
 GAME(  1992, cmast92,   0,        cmast91,  cmast91,  goldstar_state, cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           MACHINE_NOT_WORKING ) // no gfx roms are dumped
 GAME(  1999, cmast99,   0,        cm,       cmast99,  cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
 GAME(  1999, cmast99b,  cmast99,  cm,       cmast99,  cmaster_state,  cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
+GAME(  1993, aplan,     0,        cm,       cmast99,  cmaster_state,  cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )
 
 
 // --- Wing W-4 hardware ---

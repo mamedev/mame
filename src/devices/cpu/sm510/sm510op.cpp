@@ -9,14 +9,14 @@
 
 // internal helpers
 
-inline u8 sm510_base_device::ram_r()
+u8 sm510_base_device::ram_r()
 {
 	int bmh = (m_sbm) ? (1 << (m_datawidth-1)) : 0; // from SBM
 	u8 address = (bmh | m_bm << 4 | m_bl) & m_datamask;
 	return m_data->read_byte(address) & 0xf;
 }
 
-inline void sm510_base_device::ram_w(u8 data)
+void sm510_base_device::ram_w(u8 data)
 {
 	int bmh = (m_sbm) ? (1 << (m_datawidth-1)) : 0; // from SBM
 	u8 address = (bmh | m_bm << 4 | m_bl) & m_datamask;
@@ -43,7 +43,7 @@ void sm510_base_device::do_branch(u8 pu, u8 pm, u8 pl)
 	m_pc = ((pu << 10 & 0xc00) | (pm << 6 & 0x3c0) | (pl & 0x03f)) & m_prgmask;
 }
 
-inline u8 sm510_base_device::bitmask(u16 param)
+u8 sm510_base_device::bitmask(u16 param)
 {
 	// bitmask from immediate opcode param
 	return 1 << (param & 3);

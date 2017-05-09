@@ -235,7 +235,7 @@ INTERRUPT_GEN_MEMBER(metro_state::karatour_interrupt)
 	m_requested_int[m_vblank_bit] = 1;
 
 	/* write to scroll registers, the duration is a guess */
-	timer_set(attotime::from_usec(2500), TIMER_KARATOUR_IRQ);
+	m_karatour_irq_timer->adjust(attotime::from_usec(2500));
 	m_requested_int[5] = 1;
 
 	update_irq_state();
@@ -617,7 +617,7 @@ WRITE16_MEMBER(metro_state::metro_blitter_w)
 				       another blit. */
 				if (b1 == 0)
 				{
-					timer_set(attotime::from_usec(500), TIMER_METRO_BLIT_DONE);
+					m_blit_done_timer->adjust(attotime::from_usec(500));
 					return;
 				}
 
@@ -6214,6 +6214,8 @@ void metro_state::metro_common(  )
 	m_irq_line = 2;
 
 	*m_irq_enable = 0;
+
+	m_blit_done_timer = timer_alloc(TIMER_METRO_BLIT_DONE);
 }
 
 
@@ -6240,6 +6242,8 @@ DRIVER_INIT_MEMBER(metro_state,karatour)
 		m_vram_1[i] = machine().rand();
 		m_vram_2[i] = machine().rand();
 	}
+
+	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
 
 	DRIVER_INIT_CALL(metro);
 }
@@ -6297,6 +6301,8 @@ DRIVER_INIT_MEMBER(metro_state,blzntrnd)
 {
 	metro_common();
 	m_irq_line = 1;
+
+	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
 }
 
 DRIVER_INIT_MEMBER(metro_state,vmetal)
