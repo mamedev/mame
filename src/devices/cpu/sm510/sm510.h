@@ -220,7 +220,7 @@ protected:
 	devcb_write8 m_write_r;
 
 	// misc internal helpers
-	void increment_pc();
+	virtual void increment_pc();
 	virtual void get_opcode_param() { }
 	virtual void update_w_latch() { }
 
@@ -228,7 +228,7 @@ protected:
 	void ram_w(u8 data);
 	void pop_stack();
 	void push_stack();
-	void do_branch(u8 pu, u8 pm, u8 pl);
+	virtual void do_branch(u8 pu, u8 pm, u8 pl);
 	u8 bitmask(u16 param);
 
 	// opcode handlers
