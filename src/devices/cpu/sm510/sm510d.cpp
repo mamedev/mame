@@ -2,7 +2,7 @@
 // copyright-holders:hap, Jonathan Gevaryahu
 /*
 
-  Sharp SM510/SM500 MCU family disassembler
+  Sharp SM5xx MCU family disassembler
 
 */
 
@@ -175,7 +175,6 @@ static offs_t sm510_common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended
 	// get raw opcode
 	u8 op = oprom[0];
 	u8 instr = lut_mnemonic[op];
-	s8 s_next_pc = ((pclen==6)?s_next_pc_6[pc & 0x3f]:s_next_pc_7[pc & 0x7f]);
 	int len = 1;
 
 	int bits = s_bits[instr];
@@ -183,9 +182,8 @@ static offs_t sm510_common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended
 	u16 param = mask;
 	if (bits >= 8)
 	{
-		// note: disasm view shows correct parameter, but raw view does not
-		// note2: oprom array negative index doesn't work either :(
-		param = oprom[s_next_pc];
+		// note: doesn't work with lfsr pc
+		param = oprom[1];
 		len++;
 	}
 
@@ -218,7 +216,10 @@ static offs_t sm510_common_disasm(const u8 *lut_mnemonic, const u8 *lut_extended
 
 		// show param offset
 		if (bits >= 8)
-			util::stream_format(stream, " [$%03X]", pc + s_next_pc);
+		{
+			s8 next_pc_delta = ((pclen == 6) ? s_next_pc_6[pc & 0x3f] : s_next_pc_7[pc & 0x7f]);
+			util::stream_format(stream, " [$%03X]", pc + next_pc_delta);
+		}
 	}
 
 	return len | s_flags[instr] | DASMFLAG_SUPPORTED;

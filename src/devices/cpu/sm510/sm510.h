@@ -148,7 +148,7 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual u32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual u32 disasm_max_opcode_bytes() const override { return 0x40; } // actually 2, but debugger doesn't like non-linear pc
+	virtual u32 disasm_max_opcode_bytes() const override { return 2; }
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -164,7 +164,7 @@ protected:
 	u16 m_op, m_prev_op;
 	u8 m_param;
 	int m_stack_levels;
-	u16 m_stack[2];
+	u16 m_stack[4]; // max 4
 	int m_icount;
 
 	u8 m_acc;

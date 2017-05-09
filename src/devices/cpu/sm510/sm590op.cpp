@@ -75,7 +75,7 @@ void sm590_device::op_debm()
 void sm590_device::op_tc()
 {
 	// TC: skip next if carry
-	m_skip = m_c;
+	m_skip = bool(m_c);
 }
 
 void sm590_device::op_rta()
@@ -108,7 +108,7 @@ void sm590_device::op_ads()
 {
 	// ADS: add RAM to ACC, skip next on carry
 	m_acc += ram_r();
-	m_skip = (m_c == 1);
+	m_skip = bool(m_acc & 0x10);
 	m_acc &= 0xf;
 }
 
