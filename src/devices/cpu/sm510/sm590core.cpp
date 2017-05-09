@@ -153,7 +153,7 @@ void sm590_device::execute_one()
 		case 0x51: op_debm(); break;
 		case 0x52: op_incb(); break; // aka inbl
 		case 0x53: op_decb(); break; // aka debl
-		case 0x54: op_tc(); break; // check this?
+		case 0x54: op_tc(); break;
 		case 0x55: op_rta(); break;
 		case 0x56: op_blta(); break;
 		case 0x57: op_exbla(); break; // aka xbla
@@ -166,18 +166,6 @@ void sm590_device::execute_one()
 		case 0x71: op_ads(); break;
 		case 0x72: op_adc(); break;
 		case 0x73: op_add11(); break; // aka adcs
-
-		/*// extended opcodes
-		case 0x5e:
-			m_op = m_op << 8 | m_param;
-			switch (m_param)
-			{
-		case 0x00: op_cend(); break;
-		case 0x04: op_dta(); break;
-
-		default: op_illegal(); break;
-			}
-			break; // 0x5e*/
 
 		default: op_illegal(); break;
 			}
