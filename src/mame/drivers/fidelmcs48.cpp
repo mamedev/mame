@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:yovan
+// thanks-to:yoyo_chessboard
 /******************************************************************************
 
     Fidelity generic MCS-48 based chess computer driver
