@@ -194,8 +194,7 @@ MACHINE_CONFIG_END
 
 ROM_START( xbox )
 	ROM_REGION( 0x400, "mcpx", 0 )
-	// mcpx_1_0.bin is bad, first byte (0x7f) sould be removed and a byte with value 0xee added at the end
-	ROM_LOAD( "mcpx_1_0.bin", 0, 0x200, CRC(f31429fc) SHA1(a9ecbf8896d10db81594923e485862aa3aac7b58) )
+	ROM_LOAD( "mcpx_1_0.bin", 0, 0x200, CRC(0b07d1f1) SHA1(5d270675b54eb8071b480e42d22a3015ac211cef) )
 	ROM_LOAD( "mcpx_1_1.bin", 0x200, 0x200, CRC(94ce376b) SHA1(6c875f17f773aaec51eb434068bb6c657c4343c0) )
 
 	ROM_REGION( 0x100000, "bios", 0)
