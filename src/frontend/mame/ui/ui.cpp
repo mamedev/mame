@@ -2233,7 +2233,7 @@ void mame_ui_manager::load_ui_options()
 	emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
 	if (file.open("ui.ini") == osd_file::error::NONE)
 	{
-		bool result = options().parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+		bool result = options().parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, error);
 		if (!result)
 			osd_printf_error("**Error loading ui.ini**\n");
 	}
@@ -2274,7 +2274,7 @@ void mame_ui_manager::save_main_option()
 		emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
 		if (file.open(emulator_info::get_configname(), ".ini") == osd_file::error::NONE)
 		{
-			bool result = options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+			bool result = options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, error);
 			if (!result)
 			{
 				osd_printf_error("**Error loading %s.ini**\n", emulator_info::get_configname());

@@ -424,7 +424,7 @@ bool core_options::parse_command_line(std::vector<std::string> &args, int priori
 //  an INI file
 //-------------------------------------------------
 
-bool core_options::parse_ini_file(util::core_file &inifile, int priority, int ignore_priority, std::string &error_string)
+bool core_options::parse_ini_file(util::core_file &inifile, int priority, bool ignore_unknown_options, std::string &error_string)
 {
 	// loop over lines in the file
 	char buffer[4096];
@@ -472,7 +472,7 @@ bool core_options::parse_ini_file(util::core_file &inifile, int priority, int ig
 		auto curentry = m_entrymap.find(optionname);
 		if (curentry == m_entrymap.end())
 		{
-			if (priority >= ignore_priority)
+			if (!ignore_unknown_options)
 				error_string.append(string_format("Warning: unknown option in INI: %s\n", optionname));
 			continue;
 		}
