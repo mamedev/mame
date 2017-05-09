@@ -653,7 +653,7 @@ void core_options::parse_command_line(std::vector<std::string> &args, int priori
 //  an INI file
 //-------------------------------------------------
 
-void core_options::parse_ini_file(util::core_file &inifile, int priority, bool always_override)
+void core_options::parse_ini_file(util::core_file &inifile, int priority, bool ignore_unknown_options, bool always_override)
 {
 	std::ostringstream error_stream;
 	condition_type condition = condition_type::NONE;
@@ -705,8 +705,11 @@ void core_options::parse_ini_file(util::core_file &inifile, int priority, bool a
 		entry::shared_ptr curentry = get_entry(optionname);
 		if (!curentry)
 		{
-			condition = std::max(condition, condition_type::WARN);
-			util::stream_format(error_stream, "Warning: unknown option in INI: %s\n", optionname);
+			if (!ignore_unknown_options)
+			{
+				condition = std::max(condition, condition_type::WARN);
+				util::stream_format(error_stream, "Warning: unknown option in INI: %s\n", optionname);
+			}
 			continue;
 		}
 

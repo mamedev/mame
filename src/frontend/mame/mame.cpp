@@ -130,7 +130,7 @@ void mame_machine_manager::start_luaengine()
 			{
 				try
 				{
-					m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, false);
+					m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, false);
 				}
 				catch (options_exception &)
 				{

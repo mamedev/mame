@@ -128,7 +128,7 @@ void mame_options::parse_one_ini(emu_options &options, const char *basename, int
 	osd_printf_verbose("Parsing %s.ini\n", basename);
 	try
 	{
-		options.parse_ini_file((util::core_file&)file, priority, false);
+		options.parse_ini_file((util::core_file&)file, priority, priority < OPTION_PRIORITY_DRIVER_INI, false);
 	}
 	catch (options_exception &ex)
 	{

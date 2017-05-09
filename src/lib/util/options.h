@@ -173,7 +173,7 @@ public:
 
 	// parsing/input
 	void parse_command_line(std::vector<std::string> &args, int priority);
-	void parse_ini_file(util::core_file &inifile, int priority, bool always_override);
+	void parse_ini_file(util::core_file &inifile, int priority, bool ignore_unknown_options, bool always_override);
 	void copy_from(const core_options &that);
 
 	// output

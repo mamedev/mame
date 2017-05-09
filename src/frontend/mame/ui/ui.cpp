@@ -2234,7 +2234,7 @@ void mame_ui_manager::load_ui_options()
 	{
 		try
 		{
-			options().parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, true);
+			options().parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, true);
 		}
 		catch (options_exception &)
 		{
@@ -2281,7 +2281,7 @@ void mame_ui_manager::save_main_option()
 		{
 			try
 			{
-				options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, true);
+				options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, true);
 			}
 			catch(options_error_exception &ex)
 			{
