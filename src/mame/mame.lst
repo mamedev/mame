@@ -210,6 +210,7 @@ spacecom                        // bootleg
 spaceph                         // Zilec Games
 spacerng                        // bootleg
 spacewr3                        // bootleg
+spacewr3b                       // bootleg
 spacmiss                        // bootleg?
 spceking                        // (c) 1978 Leijac Corporation (Konami)
 spcewarl                        // (c) 1979 Leijac Corporation (Konami)
@@ -13748,6 +13749,7 @@ wupndownc                       // (c) 1998, Video Klein
 wupndownd                       // (c) 1998, Video Klein
 
 @source:goldstar.cpp
+aplan                           // bootleg (WeaShing)
 bingowng                        // (c) 1993 Wing Co. Ltd
 bingownga                       // (c) 1993 Wing Co. Ltd
 bonusch                         // (c) 1990 Wing Co. Ltd
