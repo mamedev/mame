@@ -29,7 +29,7 @@
 
   TODO:
   - finish SM500 emulation (gen.1 Game & Watch)
-  - add SM590/SM595 emulation (NES/SNES CIC)
+  - finish SM590/SM595 emulation (NES/SNES CIC)
   - proper support for LFSR program counter in debugger
   - callback for lcd screen as MAME bitmap (when needed)
   - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
