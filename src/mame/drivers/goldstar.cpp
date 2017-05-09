@@ -222,6 +222,7 @@
 #include "includes/goldstar.h"
 
 #include "cpu/z80/z80.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
@@ -9107,10 +9108,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( bonusch, unkch_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(bonusch_map)
 	MCFG_CPU_IO_MAP(bonusch_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
+
+	MCFG_CPU_ADD("mcu", I80C51, XTAL_12MHz)
+	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -14330,6 +14334,9 @@ ROM_END
 ROM_START( bonusch )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "10.1u", 0x00000, 0x10000, CRC(5098eba6) SHA1(40a33a25d3589dfe7e228f1874239fbfbc5250e4) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "0.5p", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "1.1c",  0x00000, 0x10000, CRC(33ce67c0) SHA1(8f3d7e78a4616bebafed2779b7f793d41576c9c8) )
