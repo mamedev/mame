@@ -277,6 +277,10 @@ static INPUT_PORTS_START( wicat )
 
 INPUT_PORTS_END
 
+static SLOT_INTERFACE_START(wicat_floppies)
+	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
+SLOT_INTERFACE_END
+
 void wicat_state::driver_start()
 {
 	m_video_timer = timer_alloc(VIDEO_TIMER);
@@ -900,8 +904,16 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_CPU_PROGRAM_MAP(wicat_wd1000_mem)
 	MCFG_CPU_IO_MAP(wicat_wd1000_io)
 	MCFG_FD1795_ADD("fdc",XTAL_8MHz)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", wicat_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "wicat")
 MACHINE_CONFIG_END
 
 /* ROM definition */

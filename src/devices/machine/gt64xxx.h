@@ -38,6 +38,12 @@
 #define MCFG_GT64XXX_SET_CS(_cs_num, _map) \
 	downcast<gt64xxx_device *>(device)->set_map(_cs_num, address_map_delegate(ADDRESS_MAP_NAME(_map), #_map), owner);
 
+#define MCFG_GT64XX_SET_SIMM0(_size) \
+	downcast<gt64xxx_device *>(device)->set_simm0_size(_size);
+
+#define MCFG_GT64XX_SET_SIMM1(_size) \
+	downcast<gt64xxx_device *>(device)->set_simm1_size(_size);
+
 /*************************************
  *
  *  Galileo constants
@@ -198,6 +204,8 @@ public:
 	void set_autoconfig(const int autoconfig) {m_autoconfig = autoconfig;}
 	void set_irq_num(const int irq_num) {m_irq_num = irq_num;}
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+	void set_simm0_size(const int size) { m_simm0_size = size; };
+	void set_simm1_size(const int size) { m_simm1_size = size; };
 
 	DECLARE_WRITE_LINE_MEMBER(pci_stall);
 
@@ -248,6 +256,7 @@ private:
 	uint32_t m_clock;
 	int m_be, m_autoconfig;
 	int m_irq_num;
+	int m_simm0_size, m_simm1_size;
 
 	int m_pci_stall_state;
 	int m_retry_count;

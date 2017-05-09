@@ -11,11 +11,11 @@
 
 #include "emu.h"
 #include "includes/xbox.h"
+#include "includes/xbox_pci.h"
 
 #include "cpu/i386/i386.h"
 #include "machine/atapicdr.h"
 #include "machine/idehd.h"
-#include "machine/lpci.h"
 #include "machine/pit8253.h"
 
 #include "debug/debugcmd.h"
@@ -136,8 +136,8 @@ void xbox_state::machine_start()
 	xbox_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
 	usb_device = machine().device<ohci_game_controller>("ohci_gamepad");
 	if (usb_device != nullptr) {
-		usb_device->initialize(machine(), ohci_usb);
-		ohci_usb->usb_ohci_plug(3, usb_device); // connect to root hub port 3, chihiro needs to use 1 and 2
+		usb_device->initialize(machine());
+		machine().device<mcpx_ohci_device>(":pci:02.0")->plug_usb_device(3, usb_device); // connect to root hub port 3, chihiro needs to use 1 and 2
 	}
 	// savestates
 	//save_item(NAME(item));

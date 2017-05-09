@@ -8277,6 +8277,43 @@ ROM_START( ngdup23e )
 	ROM_LOAD("317-0387-com.pic", 0x00, 0x4000, CRC(8728aeaa) SHA1(07983ab41d143f845c3150dfc9b7301968708e18) )
 ROM_END
 
+// requires 837-14381 "G2 EXPANSION BD" I/O board, NetDIMM, IC Card reader SAXA HW210 and coin mechanics
+ROM_START( dragntra )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0030a", 0, SHA1(fa7fb0ff09f1c7b0cfacca45495ac8c6a22cc061) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0363-COM)
+	//(sticker 253-5508-0363)
+	ROM_LOAD("317-0363-com.pic", 0x00, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x4000, "satl_pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0364-COM)
+	//(sticker 253-5508-0364)
+	ROM_LOAD("317-0364-com.pic", 0x00, 0x4000, CRC(82975008) SHA1(6732842d4af630d6c6d96bb11ba98caed1cb6b24) )
+ROM_END
+
+ROM_START( dragntr )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0030b", 0, SHA1(a49e1ae2090e5d1fd4e3e10fa3b7626c23fec677) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0363-COM)
+	//(sticker 253-5508-0363)
+	ROM_LOAD("317-0363-com.pic", 0x00, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x4000, "satl_pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0364-COM)
+	//(sticker 253-5508-0364)
+	ROM_LOAD("317-0364-com.pic", 0x00, 0x4000, CRC(82975008) SHA1(6732842d4af630d6c6d96bb11ba98caed1cb6b24) )
+ROM_END
+
 /*
 0C03F492: MOV     R5,R0
 0C03F494: MOV     R0,R5
@@ -10069,8 +10106,8 @@ ROM_END
 // 0028
 // 0029  Club Kart for Cycraft (GDS-0029)
 /* 0029A */ GAME( 2003, clubkcyc, naomi2,  naomi2gd, naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Club Kart for Cycraft (Rev A) (GDS-0029A)", GAME_FLAGS )
-// 0030A Dragon Treasure (GDS-0030A)
-// 0030B Dragon Treasure (GDS-0030B)
+/* 0030A */ GAME( 2003, dragntra, dragntr, naomigd,  naomi,   naomi_state,  naomigd, ROT0, "Sega", "Dragon Treasure (Rev A) (GDS-0030A)", GAME_FLAGS )
+/* 0030B */ GAME( 2003, dragntr,  naomigd, naomigd,  naomi,   naomi_state,  naomigd, ROT0, "Sega", "Dragon Treasure (Rev B) (GDS-0030B)", GAME_FLAGS )
 /* 0031  */ GAME( 2003, puyofev,  naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Puyo Puyo Fever (Japan) (GDS-0031)", GAME_FLAGS )
 // 0032  Initial D Arcade Stage Ver. 3 (Japan) (GDS-0032)
 // 0032A Initial D Arcade Stage Ver. 3 (Japan) (Rev A) (GDS-0032A)

@@ -75,15 +75,10 @@ void ide_pci_device::device_start()
 	pci_device::device_start();
 
 	add_map(8,    M_IO,  FUNC(ide_pci_device::chan1_data_command_map));
-	bank_infos[0].adr = (m_legacy_top << 20) | 0x1f0;
 	add_map(4,    M_IO,  FUNC(ide_pci_device::chan1_control_map));
-	bank_infos[1].adr = (m_legacy_top << 20) | 0x3f4;
 	add_map(8,    M_IO,  FUNC(ide_pci_device::chan2_data_command_map));
-	bank_infos[2].adr = (m_legacy_top << 20) | 0x170;
 	add_map(4,    M_IO,  FUNC(ide_pci_device::chan2_control_map));
-	bank_infos[3].adr = (m_legacy_top << 20) | 0x374;
 	add_map(16,   M_IO,  FUNC(ide_pci_device::bus_master_map));
-	bank_infos[4].adr = 0xf00;
 
 	// Setup stored BARs
 	pci_bar[0] = 0x1f0;
@@ -106,6 +101,14 @@ void ide_pci_device::device_start()
 void ide_pci_device::device_reset()
 {
 	pci_device::device_reset();
+	bank_infos[0].adr = (m_legacy_top << 20) | 0x1f0;
+	bank_infos[1].adr = (m_legacy_top << 20) | 0x3f4;
+	bank_infos[2].adr = (m_legacy_top << 20) | 0x170;
+	bank_infos[3].adr = (m_legacy_top << 20) | 0x374;
+	bank_infos[4].adr = 0xf00;
+	pclass = 0x01018a;
+	remap_cb();
+
 	// PCI0646U allow BAR
 	if (main_id == 0x10950646)
 		m_config_data[0x10 / 4] |= 0x0C40;
