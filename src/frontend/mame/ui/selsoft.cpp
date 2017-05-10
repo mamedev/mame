@@ -48,18 +48,18 @@ bool compare_software(ui_software_info a, ui_software_info b)
 	ui_software_info *x = &a;
 	ui_software_info *y = &b;
 
-	bool clonex = (x->parentname[0] != '\0');
-	bool cloney = (y->parentname[0] != '\0');
+	bool clonex = !x->parentname.empty();
+	bool cloney = !y->parentname.empty();
 
 	if (!clonex && !cloney)
 		return (strmakelower(x->longname) < strmakelower(y->longname));
 
 	std::string cx(x->parentlongname), cy(y->parentlongname);
 
-	if (clonex && cx[0] == '\0')
+	if (cx.empty())
 		clonex = false;
 
-	if (cloney && cy[0] == '\0')
+	if (cy.empty())
 		cloney = false;
 
 	if (!clonex && !cloney)
