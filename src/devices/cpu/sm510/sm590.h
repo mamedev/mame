@@ -108,7 +108,7 @@ protected:
 
 	// opcode handlers
 	// 00-3f
-	// adx (same as sm510)
+	virtual void op_adx() override;
 	virtual void op_tax();
 	virtual void op_lblx();
 	// lax (same as sm510)

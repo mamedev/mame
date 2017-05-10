@@ -16,16 +16,24 @@ void sm590_device::do_branch(u8 pu, u8 pm, u8 pl)
 
 // instruction set
 
-void sm590_device::op_lblx()
+void sm590_device::op_adx()
 {
-	// LBL x: load BL with 4-bit immediate value
-	m_bl = (m_op & 0xf);
+	// ADX x: add immediate value to ACC, skip next on carry
+	m_acc += (m_op & 0xf);
+	m_skip = bool(m_acc & 0x10);
+	m_acc &= 0xf;
 }
 
 void sm590_device::op_tax()
 {
 	// TAX: skip next if ACC equals 4-bit immediate value
 	m_skip = (m_acc == (m_op & 0xf));
+}
+
+void sm590_device::op_lblx()
+{
+	// LBL x: load BL with 4-bit immediate value
+	m_bl = (m_op & 0xf);
 }
 
 void sm590_device::op_lda()
