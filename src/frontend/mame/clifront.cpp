@@ -319,7 +319,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 
 void cli_frontend::listxml(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : nullptr;
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
 
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
@@ -339,7 +339,7 @@ void cli_frontend::listxml(const std::vector<std::string> &args)
 
 void cli_frontend::listfull(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : nullptr;
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
 
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
@@ -363,7 +363,7 @@ void cli_frontend::listfull(const std::vector<std::string> &args)
 
 void cli_frontend::listsource(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : nullptr;
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
 
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
@@ -383,7 +383,7 @@ void cli_frontend::listsource(const std::vector<std::string> &args)
 
 void cli_frontend::listclones(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : nullptr;
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
 
 	// start with a filtered list of drivers
 	driver_enumerator drivlist(m_options, gamename);
@@ -432,7 +432,7 @@ void cli_frontend::listclones(const std::vector<std::string> &args)
 
 void cli_frontend::listbrothers(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : nullptr;
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
 
 	// start with a filtered list of drivers; return an error if none found
 	driver_enumerator initial_drivlist(m_options, gamename);
@@ -477,7 +477,7 @@ void cli_frontend::listbrothers(const std::vector<std::string> &args)
 
 void cli_frontend::listcrc(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : nullptr;
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
 
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
@@ -507,7 +507,7 @@ void cli_frontend::listcrc(const std::vector<std::string> &args)
 
 void cli_frontend::listroms(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : nullptr;
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
 
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
@@ -570,7 +570,7 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 
 void cli_frontend::listsamples(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : nullptr;
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
 
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
@@ -610,7 +610,7 @@ void cli_frontend::listsamples(const std::vector<std::string> &args)
 
 void cli_frontend::listdevices(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : nullptr;
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
 
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
@@ -687,7 +687,7 @@ void cli_frontend::listdevices(const std::vector<std::string> &args)
 
 void cli_frontend::listslots(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : nullptr;
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
 
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
@@ -747,7 +747,7 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 
 void cli_frontend::listmedia(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : nullptr;
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
 
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
@@ -801,7 +801,7 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 //-------------------------------------------------
 void cli_frontend::verifyroms(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : nullptr;
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
 
 	// determine which drivers to output;
 	driver_enumerator drivlist(m_options, gamename);
@@ -882,7 +882,7 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 
 void cli_frontend::verifysamples(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() == 0 ? "*" : args[0].c_str();
+	const char *gamename = args.empty() ? "*" : args[0].c_str();
 
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
@@ -1118,7 +1118,7 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
 
 void cli_frontend::listsoftware(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : nullptr;
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
 
 	FILE *out = stdout;
 	std::unordered_set<std::string> list_map;
@@ -1442,26 +1442,27 @@ void cli_frontend::execute_commands(const char *exename)
 		int min_args;
 		int max_args;
 		void (cli_frontend::*function)(const std::vector<std::string> &args);
+		const char *usage;
 	} info_commands[] =
 	{
-		{ CLICOMMAND_LISTXML,			0, 1, &cli_frontend::listxml },
-		{ CLICOMMAND_LISTFULL,			0, 1, &cli_frontend::listfull },
-		{ CLICOMMAND_LISTSOURCE,		0, 1, &cli_frontend::listsource },
-		{ CLICOMMAND_LISTCLONES,		0, 1, &cli_frontend::listclones },
-		{ CLICOMMAND_LISTBROTHERS,		0, 1, &cli_frontend::listbrothers },
-		{ CLICOMMAND_LISTCRC,			0, 1, &cli_frontend::listcrc },
-		{ CLICOMMAND_LISTDEVICES,		0, 1, &cli_frontend::listdevices },
-		{ CLICOMMAND_LISTSLOTS,			0, 1, &cli_frontend::listslots },
-		{ CLICOMMAND_LISTROMS,			0, 1, &cli_frontend::listroms },
-		{ CLICOMMAND_LISTSAMPLES,		0, 1, &cli_frontend::listsamples },
-		{ CLICOMMAND_VERIFYROMS,		0, 1, &cli_frontend::verifyroms },
-		{ CLICOMMAND_VERIFYSAMPLES,		0, 1, &cli_frontend::verifysamples },
-		{ CLICOMMAND_LISTMEDIA,			0, 1, &cli_frontend::listmedia },
-		{ CLICOMMAND_LISTSOFTWARE,		0, 1, &cli_frontend::listsoftware },
-		{ CLICOMMAND_VERIFYSOFTWARE,	0, 1, &cli_frontend::verifysoftware },
-		{ CLICOMMAND_ROMIDENT,			1, 1, &cli_frontend::romident },
-		{ CLICOMMAND_GETSOFTLIST,		0, 1, &cli_frontend::getsoftlist },
-		{ CLICOMMAND_VERIFYSOFTLIST,	0, 1, &cli_frontend::verifysoftlist },
+		{ CLICOMMAND_LISTXML,			0, 1, &cli_frontend::listxml,			"[system name]" },
+		{ CLICOMMAND_LISTFULL,			0, 1, &cli_frontend::listfull,			"[system name]" },
+		{ CLICOMMAND_LISTSOURCE,		0, 1, &cli_frontend::listsource,		"[system name]" },
+		{ CLICOMMAND_LISTCLONES,		0, 1, &cli_frontend::listclones,		"[system name]" },
+		{ CLICOMMAND_LISTBROTHERS,		0, 1, &cli_frontend::listbrothers,		"[system name]" },
+		{ CLICOMMAND_LISTCRC,			0, 1, &cli_frontend::listcrc,			"[system name]" },
+		{ CLICOMMAND_LISTDEVICES,		0, 1, &cli_frontend::listdevices,		"[system name]" },
+		{ CLICOMMAND_LISTSLOTS,			0, 1, &cli_frontend::listslots,			"[system name]" },
+		{ CLICOMMAND_LISTROMS,			0, 1, &cli_frontend::listroms,			"[system name]" },
+		{ CLICOMMAND_LISTSAMPLES,		0, 1, &cli_frontend::listsamples,		"[system name]" },
+		{ CLICOMMAND_VERIFYROMS,		0, 1, &cli_frontend::verifyroms,		"[system name]" },
+		{ CLICOMMAND_VERIFYSAMPLES,		0, 1, &cli_frontend::verifysamples,		"[system name|*]" },
+		{ CLICOMMAND_LISTMEDIA,			0, 1, &cli_frontend::listmedia,			"[system name]" },
+		{ CLICOMMAND_LISTSOFTWARE,		0, 1, &cli_frontend::listsoftware,		"[system name]" },
+		{ CLICOMMAND_VERIFYSOFTWARE,	0, 1, &cli_frontend::verifysoftware,	"[system name|*]" },
+		{ CLICOMMAND_ROMIDENT,			1, 1, &cli_frontend::romident,			"(system name)" },
+		{ CLICOMMAND_GETSOFTLIST,		0, 1, &cli_frontend::getsoftlist,		"[system name|*]" },
+		{ CLICOMMAND_VERIFYSOFTLIST,	0, 1, &cli_frontend::verifysoftlist,	"[system name|*]" },
 	};
 
 	// find the command
@@ -1470,10 +1471,18 @@ void cli_frontend::execute_commands(const char *exename)
 		if (m_options.command() == info_command.option)
 		{
 			// validate argument count
+			const char *error_message = nullptr;
 			if (m_options.command_arguments().size() < info_command.min_args)
-				throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "Auxillary verb -%s requires at least %d argument(s)", info_command.option, info_command.min_args);
+				error_message = "Auxillary verb -%s requires at least %d argument(s)\n";
 			if (m_options.command_arguments().size() > info_command.max_args)
-				throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "Auxillary verb -%s takes at most %d argument(s)", info_command.option, info_command.max_args);
+				error_message = "Auxillary verb -%s takes at most %d argument(s)\n";
+			if (error_message)
+			{
+				osd_printf_info(error_message, info_command.option, info_command.max_args);
+				osd_printf_info("\n");
+				osd_printf_info("Usage:  %s -%s %s\n", exename, info_command.option, info_command.usage);
+				return;
+			}
 
 			// invoke the auxillary command!
 			(this->*info_command.function)(m_options.command_arguments());
