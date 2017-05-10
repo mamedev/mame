@@ -681,7 +681,7 @@ bool mame_options::parse_one_ini(emu_options &options, const char *basename, int
 	// parse the file
 	osd_printf_verbose("Parsing %s.ini\n", basename);
 	std::string error;
-	bool result = options.parse_ini_file((util::core_file&)file, priority, OPTION_PRIORITY_DRIVER_INI, error);
+	bool result = options.parse_ini_file((util::core_file&)file, priority, priority < OPTION_PRIORITY_DRIVER_INI, error);
 
 	// append errors if requested
 	if (!error.empty() && error_string)

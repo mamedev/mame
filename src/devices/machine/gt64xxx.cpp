@@ -208,6 +208,10 @@ void gt64xxx_device::map_cpu_space()
 	{
 		winStart = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex/2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
 		winEnd = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
+		// Cap window end at physical memory bounds
+		uint32_t winSize = winEnd - winStart + 1;
+		if (winSize > m_ram[ramIndex].size() * 4)
+			winEnd = winStart + m_ram[ramIndex].size() * 4 - 1;
 		//m_ram[ramIndex].resize((winEnd + 1 - winStart) / 4);
 		if (m_ram[ramIndex].size()>0)
 			m_cpu_space->install_ram(winStart, winEnd, m_ram[ramIndex].data());

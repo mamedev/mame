@@ -6,8 +6,8 @@
 
 */
 
-#ifndef _SM510_H_
-#define _SM510_H_
+#ifndef MAME_CPU_SM510_SM510_H
+#define MAME_CPU_SM510_SM510_H
 
 
 // I/O ports setup
@@ -148,7 +148,7 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual u32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual u32 disasm_max_opcode_bytes() const override { return 0x40; } // actually 2, but debugger doesn't like non-linear pc
+	virtual u32 disasm_max_opcode_bytes() const override { return 2; }
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -164,7 +164,7 @@ protected:
 	u16 m_op, m_prev_op;
 	u8 m_param;
 	int m_stack_levels;
-	u16 m_stack[2];
+	u16 m_stack[4]; // max 4
 	int m_icount;
 
 	u8 m_acc;
@@ -220,7 +220,7 @@ protected:
 	devcb_write8 m_write_r;
 
 	// misc internal helpers
-	void increment_pc();
+	virtual void increment_pc();
 	virtual void get_opcode_param() { }
 	virtual void update_w_latch() { }
 
@@ -228,7 +228,7 @@ protected:
 	void ram_w(u8 data);
 	void pop_stack();
 	void push_stack();
-	void do_branch(u8 pu, u8 pm, u8 pl);
+	virtual void do_branch(u8 pu, u8 pm, u8 pl);
 	u8 bitmask(u16 param);
 
 	// opcode handlers
@@ -350,4 +350,4 @@ extern const device_type SM511;
 extern const device_type SM512;
 
 
-#endif /* _SM510_H_ */
+#endif /* MAME_CPU_SM510_SM510_H */

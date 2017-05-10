@@ -92,19 +92,23 @@ static const gfx_layout charlayout =
 
 static const gfx_layout charlayout2 =
 {
-	8,8,
+	8,32,
 	RGN_FRAC(1,4),
 	4,
-	{ 0, RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4)},
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
+	{ 0*8, 1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
+		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8,
+		16*8,17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8,
+		24*8,25*8, 26*8, 27*8, 28*8, 29*8, 30*8, 31*8
+	},
+	32*8
 };
 
 
 static GFXDECODE_START( tcl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,     0, 16 ) /* wrong */
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,  128, 4 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( tcl, tcl_state )

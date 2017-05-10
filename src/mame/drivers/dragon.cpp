@@ -147,8 +147,11 @@ static SLOT_INTERFACE_START( dragon_alpha_floppies )
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( dragon_base, dragon_state )
+	MCFG_DEVICE_MODIFY(":")
+	MCFG_DEVICE_CLOCK(XTAL_4_433619MHz)
+
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_4_433619MHz)
+	MCFG_CPU_ADD("maincpu", M6809E, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(dragon_mem)
 
 	// devices

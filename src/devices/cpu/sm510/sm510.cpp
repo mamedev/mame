@@ -18,9 +18,9 @@
   - *KB1013VK1-2: Soviet-era clone of SM500, minor differences
 
   Sharp SM590 MCU family:
-  - *SM590: x
-  - *SM591: x
-  - *SM595: x
+  - *SM590: 512x8 ROM, 32x4 RAM
+  - *SM591: 1kx8 ROM, 56x4 RAM
+  - *SM595: 768x8 ROM, 32x4 RAM
 
   References:
   - 1990 Sharp Microcomputers Data Book
@@ -29,7 +29,7 @@
 
   TODO:
   - finish SM500 emulation (gen.1 Game & Watch)
-  - add SM590/SM595 emulation (NES/SNES CIC)
+  - finish SM590/SM595 emulation (NES/SNES CIC)
   - proper support for LFSR program counter in debugger
   - callback for lcd screen as MAME bitmap (when needed)
   - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
@@ -54,7 +54,7 @@
 
 enum
 {
-	SM510_PC=1, SM510_ACC, SM510_BL, SM510_BM,
+	SM510_PC=1, SM510_ACC, SM510_X, SM510_BL, SM510_BM,
 	SM510_C, SM510_W
 };
 
@@ -144,6 +144,7 @@ void sm510_base_device::device_start()
 	// register state for debugger
 	state_add(SM510_PC,  "PC",  m_pc).formatstr("%04X");
 	state_add(SM510_ACC, "ACC", m_acc).formatstr("%01X");
+	state_add(SM510_X,   "X",   m_x).formatstr("%01X");
 	state_add(SM510_BL,  "BL",  m_bl).formatstr("%01X");
 	state_add(SM510_BM,  "BM",  m_bm).formatstr("%01X");
 	state_add(SM510_C,   "C",   m_c).formatstr("%01X");
