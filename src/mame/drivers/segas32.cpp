@@ -462,7 +462,7 @@ Extra Controls PCB
 ------------------
 837-7968
 |------------------------|
-|CN2  PC817(x6)          |
+|CN2  PC817(x5)          |
 |                        |
 |   CN3          MB89255B|
 |                        |
@@ -475,7 +475,8 @@ CN3      - Multi-pin connector for extra controls (most likely for buttons only)
 CN2/4/5  - Purpose unknown (not used on Dark Edge)
 CN1      - Connector joining to CNA on main PCB
 MB89255B - Fujitsu MB89255B Parallel Data I/O Interface (8-bit data bus & 3x 8-bit parallel I/O ports)
-           This chip is very small and is a SSOP40 package. The chip is functionally compatible with Intel 8255A
+           This chip is very small and is a SSOP40 package. The chip is functionally compatible with Intel 8255A.
+           (The equivalent TMP82C55AM-10 sometimes replaces this on other games using the 837-7968 board.)
 A1603C   - NEC uPA1603C Quad Monolithic N-Channel Power MOS FET Array
 JP1234   - Four 2-pin jumpers. JP3 is shorted, the others are not shorted
            JP1/2/3/4 are tied to the 74F139 pins 4,5,6,7 respectively. The 74F139 is tied to CN1 and the MB89255B
