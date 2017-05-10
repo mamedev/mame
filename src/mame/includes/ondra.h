@@ -39,6 +39,7 @@ public:
 	uint8_t m_video_enable;
 	uint8_t m_bank1_status;
 	uint8_t m_bank2_status;
+	emu_timer *m_nmi_check_timer;
 	DECLARE_READ8_MEMBER(ondra_keyboard_r);
 	DECLARE_WRITE8_MEMBER(ondra_port_03_w);
 	DECLARE_WRITE8_MEMBER(ondra_port_09_w);
