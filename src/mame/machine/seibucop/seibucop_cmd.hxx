@@ -69,7 +69,7 @@ instead of
 [:raiden2cop] COPDIS: 130e s=10 f1=0 l=7 f2=0e 5 bf7f 17 a9a 15.0.1a [:raiden2cop] sub32 34(r0)
 cop_angle is actually Y flipped when this is called
 
-
+TODO: it really needs actual opcode fetching from macro tables
 */
 void raiden2cop_device::execute_130e(int offset, uint16_t data, bool is_yflip)
 {
