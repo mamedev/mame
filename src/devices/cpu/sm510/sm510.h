@@ -6,8 +6,8 @@
 
 */
 
-#ifndef _SM510_H_
-#define _SM510_H_
+#ifndef MAME_CPU_SM510_SM510_H
+#define MAME_CPU_SM510_SM510_H
 
 
 // I/O ports setup
@@ -350,4 +350,4 @@ extern const device_type SM511;
 extern const device_type SM512;
 
 
-#endif /* _SM510_H_ */
+#endif /* MAME_CPU_SM510_SM510_H */

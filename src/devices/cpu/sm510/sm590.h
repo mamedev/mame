@@ -6,8 +6,8 @@
 
 */
 
-#ifndef _SM590_H_
-#define _SM590_H_
+#ifndef MAME_CPU_SM510_SM590_H
+#define MAME_CPU_SM510_SM590_H
 
 #include "sm510.h"
 
@@ -184,4 +184,4 @@ protected:
 extern const device_type SM590;
 
 
-#endif /* _SM590_H_ */
+#endif /* MAME_CPU_SM510_SM590_H */

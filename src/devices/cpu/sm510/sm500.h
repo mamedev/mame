@@ -6,8 +6,8 @@
 
 */
 
-#ifndef _SM500_H_
-#define _SM500_H_
+#ifndef MAME_CPU_SM510_SM500_H
+#define MAME_CPU_SM510_SM500_H
 
 #include "sm510.h"
 
@@ -79,4 +79,4 @@ protected:
 extern const device_type SM500;
 
 
-#endif /* _SM500_H_ */
+#endif /* MAME_CPU_SM510_SM500_H */
