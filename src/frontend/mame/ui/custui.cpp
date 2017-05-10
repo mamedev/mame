@@ -688,13 +688,14 @@ void menu_colors_ui::restore_colors()
 //  ctor
 //-------------------------------------------------
 
-menu_rgb_ui::menu_rgb_ui(mame_ui_manager &mui, render_container &container, rgb_t *_color, std::string _title) : menu(mui, container)
+menu_rgb_ui::menu_rgb_ui(mame_ui_manager &mui, render_container &container, rgb_t *_color, std::string _title)
+	: menu(mui, container),
+		m_color(_color),
+		m_search(),
+		m_key_active(false),
+		m_lock_ref(0),
+		m_title(_title)
 {
-	m_color = _color;
-	m_key_active = false;
-	m_lock_ref = 0;
-	m_title = _title;
-	m_search[0] = '\0';
 }
 
 //-------------------------------------------------

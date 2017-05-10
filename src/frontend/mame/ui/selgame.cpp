@@ -335,10 +335,10 @@ void menu_select_game::handle()
 			// handle UI_RIGHT_PANEL
 			ui_globals::rpanel = RP_INFOS;
 		}
-		else if (menu_event->iptkey == IPT_UI_CANCEL && m_search[0] != 0)
+		else if (menu_event->iptkey == IPT_UI_CANCEL && !m_search.empty())
 		{
 			// escape pressed with non-empty text clears the text
-			m_search[0] = '\0';
+			m_search.clear();
 			reset(reset_options::SELECT_FIRST);
 		}
 		else if (menu_event->iptkey == IPT_UI_DATS)
@@ -465,7 +465,7 @@ void menu_select_game::handle()
 	// handle filters selection from key shortcuts
 	if (check_filter)
 	{
-		m_search[0] = '\0';
+		m_search.clear();
 		if (l_hover == FILTER_CATEGORY)
 		{
 			main_filters::actual = l_hover;
@@ -503,12 +503,12 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	if (!isfavorite())
 	{
 		// if search is not empty, find approximate matches
-		if (m_search[0] != 0)
+		if (!m_search.empty())
 			populate_search();
 		else
 		{
 			// reset search string
-			m_search[0] = '\0';
+			m_search.clear();
 			m_displaylist.clear();
 
 			// if filter is set on category, build category list
@@ -554,7 +554,7 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	else
 	{
 		// populate favorites list
-		m_search[0] = '\0';
+		m_search.clear();
 		int curitem = 0;
 
 		// iterate over entries
@@ -1332,7 +1332,7 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 void menu_select_game::inkey_export()
 {
 	std::vector<game_driver const *> list;
-	if (m_search[0] != 0)
+	if (!m_search.empty())
 	{
 		for (int curitem = 0; m_searchlist[curitem]; ++curitem)
 			list.push_back(m_searchlist[curitem]);
