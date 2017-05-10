@@ -3755,6 +3755,15 @@ ROM_START( spacewr3 )
 	ROM_LOAD( "ic32.bin",     0x4000, 0x0800, CRC(1e5a753c) SHA1(5b7cd7b347203f4edf816f02c366bd3b1b9517c4) )
 ROM_END
 
+ROM_START( swipeout )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sw1.bin",     0x0000, 0x0800, CRC(576b5897) SHA1(aa749f745560f33b9bbdf0f3a56b947130862bb2) ) // 2516
+	ROM_LOAD( "sw2.bin",     0x0800, 0x0800, CRC(40c2d55b) SHA1(b641b63046d242ad23911143ed840011fc98eaff) ) // 2516
+	ROM_LOAD( "sw3.bin",     0x1000, 0x0800, CRC(65e8ce64) SHA1(8da1836d710e06cd0ac566ba13049326b6295f0b) ) // 2516
+	ROM_LOAD( "sw4.bin",     0x1800, 0x0800, CRC(ddf1fb9c) SHA1(25184fe9126054f6b5907d8a6a9e95e43126f4e3) ) // 2516
+	ROM_LOAD( "sw5.bin",     0x4000, 0x0800, CRC(1e5a753c) SHA1(5b7cd7b347203f4edf816f02c366bd3b1b9517c4) ) // 2516
+ROM_END
+
 ROM_START( invaderl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c01",          0x0000, 0x0400, CRC(499f253a) SHA1(e13353194277f5d35e92db9b11912b5f392f51b7) )
@@ -5030,6 +5039,7 @@ GAMEL(19??, alieninvp2, invaders, invaders,  searthin,  driver_device, 0, ROT270
 GAMEL(1979, jspecter,   invaders, invaders,  jspecter,  driver_device, 0, ROT270, "bootleg (Jatre)", "Jatre Specter (set 1)", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1979, jspecter2,  invaders, invaders,  jspecter,  driver_device, 0, ROT270, "bootleg (Jatre)", "Jatre Specter (set 2)", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spacewr3,   invaders, spcewars,  sicv,      driver_device, 0, ROT270, "bootleg", "Space War Part 3", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // unrelated to Sanritsu's version?
+GAMEL(1978, swipeout,   invaders, spcewars,  sicv,      driver_device, 0, ROT270, "bootleg (Beyer and Brown)", "Space Wipeout", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, invader4,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg", "Space Invaders Part Four", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAME( 1978, darthvdr,   invaders, darthvdr,  darthvdr,  driver_device, 0, ROT270, "bootleg", "Darth Vader (bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAMEL(19??, tst_invd,   invaders, invaders,  sicv,      driver_device, 0, ROT0,   "<unknown>", "Space Invaders Test ROM", MACHINE_SUPPORTS_SAVE, layout_invaders )
