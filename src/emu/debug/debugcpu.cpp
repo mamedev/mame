@@ -364,7 +364,7 @@ u8 debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_tran
 	device_memory_interface &memory = space.device().memory();
 
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	/* translate if necessary; if not mapped, return 0xff */
 	u8 result;
@@ -389,7 +389,7 @@ u8 debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_tran
 u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_translation)
 {
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	u16 result;
 	if (!WORD_ALIGNED(address))
@@ -430,7 +430,7 @@ u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_tra
 u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_translation)
 {
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	u32 result;
 	if (!DWORD_ALIGNED(address))
@@ -470,7 +470,7 @@ u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_tr
 u64 debugger_cpu::read_qword(address_space &space, offs_t address, bool apply_translation)
 {
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	u64 result;
 	if (!QWORD_ALIGNED(address))
@@ -532,7 +532,7 @@ void debugger_cpu::write_byte(address_space &space, offs_t address, u8 data, boo
 	device_memory_interface &memory = space.device().memory();
 
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	/* translate if necessary; if not mapped, we're done */
 	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
@@ -554,7 +554,7 @@ void debugger_cpu::write_byte(address_space &space, offs_t address, u8 data, boo
 void debugger_cpu::write_word(address_space &space, offs_t address, u16 data, bool apply_translation)
 {
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	/* if this is a misaligned write, or if there are no word writers, just read two bytes */
 	if (!WORD_ALIGNED(address))
@@ -597,7 +597,7 @@ void debugger_cpu::write_word(address_space &space, offs_t address, u16 data, bo
 void debugger_cpu::write_dword(address_space &space, offs_t address, u32 data, bool apply_translation)
 {
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	/* if this is a misaligned write, or if there are no dword writers, just read two words */
 	if (!DWORD_ALIGNED(address))
@@ -640,7 +640,7 @@ void debugger_cpu::write_dword(address_space &space, offs_t address, u32 data, b
 void debugger_cpu::write_qword(address_space &space, offs_t address, u64 data, bool apply_translation)
 {
 	/* mask against the logical byte mask */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	/* if this is a misaligned write, or if there are no qword writers, just read two dwords */
 	if (!QWORD_ALIGNED(address))
@@ -704,7 +704,7 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 	u64 result = ~u64(0) & (~u64(0) >> (64 - 8*size));
 
 	/* keep in logical range */
-	address &= space.logbytemask();
+	address &= space.logaddrmask();
 
 	/* if we're bigger than the address bus, break into smaller pieces */
 	if (size > space.data_width() / 8)
@@ -724,7 +724,7 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 		return result;
 
 	/* keep in physical range */
-	address &= space.bytemask();
+	address &= space.addrmask();
 
 	/* switch off the size and handle unaligned accesses */
 	switch (size)
@@ -3048,8 +3048,8 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 		m_index(index),
 		m_enabled(true),
 		m_type(type),
-		m_address(space.address_to_byte(address) & space.bytemask()),
-		m_length(space.address_to_byte(length)),
+		m_address(address & space.addrmask()),
+		m_length(length),
 		m_condition(&symbols, (condition != nullptr) ? condition : "1"),
 		m_action((action != nullptr) ? action : "")
 {

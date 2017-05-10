@@ -120,9 +120,9 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(xtheball_state::scanline_update)
 TMS340X0_TO_SHIFTREG_CB_MEMBER(xtheball_state::to_shiftreg)
 {
 	if (address >= 0x01000000 && address <= 0x010fffff)
-		memcpy(shiftreg, &m_vram_bg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
+		memcpy(shiftreg, &m_vram_bg[(address & 0xff000) >> 4], 0x200);
 	else if (address >= 0x02000000 && address <= 0x020fffff)
-		memcpy(shiftreg, &m_vram_fg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
+		memcpy(shiftreg, &m_vram_fg[(address & 0xff000) >> 4], 0x200);
 	else
 		logerror("%s:to_shiftreg(%08X)\n", space.machine().describe_context(), address);
 }
@@ -131,9 +131,9 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(xtheball_state::to_shiftreg)
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(xtheball_state::from_shiftreg)
 {
 	if (address >= 0x01000000 && address <= 0x010fffff)
-		memcpy(&m_vram_bg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
+		memcpy(&m_vram_bg[(address & 0xff000) >> 4], shiftreg, 0x200);
 	else if (address >= 0x02000000 && address <= 0x020fffff)
-		memcpy(&m_vram_fg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
+		memcpy(&m_vram_fg[(address & 0xff000) >> 4], shiftreg, 0x200);
 	else
 		logerror("%s:from_shiftreg(%08X)\n", space.machine().describe_context(), address);
 }

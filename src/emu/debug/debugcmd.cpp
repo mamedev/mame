@@ -1645,7 +1645,6 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	u64 offset, endoffset, length;
 	address_space *space;
 	FILE *f;
-	u64 i;
 
 	/* validate parameters */
 	if (!validate_number_parameter(params[1], offset))
@@ -1656,8 +1655,8 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 		return;
 
 	/* determine the addresses to write */
-	endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
-	offset = space->address_to_byte(offset) & space->bytemask();
+	endoffset = (offset + length - 1) & space->addrmask();
+	offset = offset & space->addrmask();
 
 	/* open the file */
 	f = fopen(params[0].c_str(), "wb");
@@ -1668,10 +1667,46 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	}
 
 	/* now write the data out */
-	for (i = offset; i <= endoffset; i++)
+	auto dis = space->machine().disable_side_effect();
+	switch (space->addrbus_shift())
 	{
-		u8 byte = m_cpu.read_byte(*space, i, true);
-		fwrite(&byte, 1, 1, f);
+	case -3:
+		for (offs_t i = offset; i != endoffset; i++)
+		{
+			u64 data = space->read_qword(i);
+			fwrite(&data, 8, 1, f);
+		}
+		break;
+	case -2:
+		for (offs_t i = offset; i != endoffset; i++)
+		{
+			u32 data = space->read_dword(i);
+			fwrite(&data, 4, 1, f);
+		}
+		break;
+	case -1:
+		for (offs_t i = offset; i != endoffset; i++)
+		{
+			u16 byte = space->read_word(i);
+			fwrite(&byte, 2, 1, f);
+		}
+		break;
+	case  0:
+		for (offs_t i = offset; i != endoffset; i++)
+		{
+			u8 byte = space->read_word(i);
+			fwrite(&byte, 1, 1, f);
+		}
+		break;
+	case  3:
+		offset &= ~15;
+		endoffset &= ~15;
+		for (offs_t i = offset; i != endoffset; i+=16)
+		{
+			u16 byte = space->read_word(i >> 4);
+			fwrite(&byte, 2, 1, f);
+		}
+		break;
 	}
 
 	/* close the file */
@@ -1688,7 +1723,6 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 {
 	u64 offset, endoffset, length = 0;
 	address_space *space;
-	u64 i;
 
 	// validate parameters
 	if (!validate_number_parameter(params[1], offset))
@@ -1713,19 +1747,66 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 		f.seekg(0, std::ios::end);
 		length = f.tellg();
 		f.seekg(0);
+		if (space->addrbus_shift() < 0)
+			length >>= -space->addrbus_shift();
+		else if (space->addrbus_shift() > 0)
+			length <<= space->addrbus_shift();
 	}
 
 	// determine the addresses to read
-	endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
-	offset = space->address_to_byte(offset) & space->bytemask();
-
+	endoffset = (offset + length - 1) & space->addrmask();
+	offset = offset & space->addrmask();
+	offs_t i = 0;
 	// now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1)
-	for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
+	switch (space->addrbus_shift())
 	{
-		char byte;
-		f.read(&byte, 1);
-		if (f)
-			m_cpu.write_byte(*space, i, byte, true);
+	case -3:
+		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
+		{
+			u64 data;
+			f.read((char *)&data, 8);
+			if (f)
+				space->write_qword(i, data);
+		}
+		break;
+	case -2:
+		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
+		{
+			u32 data;
+			f.read((char *)&data, 4);
+			if (f)
+				space->write_dword(i, data);
+		}
+		break;
+	case -1:
+		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
+		{
+			u16 data;
+			f.read((char *)&data, 2);
+			if (f)
+				space->write_word(i, data);
+		}
+		break;
+	case  0:
+		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
+		{
+			u8 data;
+			f.read((char *)&data, 1);
+			if (f)
+				space->write_byte(i, data);
+		}
+		break;
+	case  3:
+		offset &= ~15;
+		endoffset &= ~15;
+		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 16); i+=16)
+		{
+			u16 data;
+			f.read((char *)&data, 2);
+			if (f)
+				space->write_word(i >> 4, data);
+		}
+		break;
 	}
 
 	if (!f.good())
@@ -1768,6 +1849,9 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	if (!validate_cpu_space_parameter((params.size() > 6) ? params[6].c_str() : nullptr, ref, space))
 		return;
 
+	int shift = space->addrbus_shift();
+	u64 granularity = shift > 0 ? 2 : 1 << -shift;
+
 	/* further validation */
 	if (width == 0)
 		width = space->data_width() / 8;
@@ -1778,14 +1862,19 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 		m_console.printf("Invalid width! (must be 1,2,4 or 8)\n");
 		return;
 	}
+	if (width < granularity)
+	{
+		m_console.printf("Invalid width! (must be at least %d)\n", granularity);
+		return;
+	}
 	if (rowsize == 0 || (rowsize % width) != 0)
 	{
 		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", width);
 		return;
 	}
 
-	u64 endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
-	offset = space->address_to_byte(offset) & space->bytemask();
+	u64 endoffset = (offset + length - 1) & space->addrmask();
+	offset = offset & space->addrmask();
 
 	/* open the file */
 	FILE* f = fopen(params[0].c_str(), "w");
@@ -1798,13 +1887,22 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	/* now write the data out */
 	util::ovectorstream output;
 	output.reserve(200);
-	for (u64 i = offset; i <= endoffset; i += rowsize)
+
+	if (shift > 0)
+		width <<= shift;
+	else if(shift < 0)
+		width >>= -shift;
+
+	auto dis = space->machine().disable_side_effect();
+	bool be = space->endianness() == ENDIANNESS_BIG;
+
+	for (offs_t i = offset; i <= endoffset; i += rowsize)
 	{
 		output.clear();
 		output.rdbuf()->clear();
 
 		/* print the address */
-		util::stream_format(output, "%0*X: ", space->logaddrchars(), u32(space->byte_to_address(i)));
+		util::stream_format(output, "%0*X: ", space->logaddrchars(), i);
 
 		/* print the bytes */
 		for (u64 j = 0; j < rowsize; j += width)
@@ -1814,8 +1912,21 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 				offs_t curaddr = i + j;
 				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
 				{
-					u64 value = m_cpu.read_memory(*space, i + j, width, true);
-					util::stream_format(output, " %0*X", width * 2, value);
+					switch (width)
+					{
+					case 8:
+						util::stream_format(output, " %016X", space->read_qword(i+j));
+						break;
+					case 4:
+						util::stream_format(output, " %08X", space->read_dword(i+j));
+						break;
+					case 2:
+						util::stream_format(output, " %04X", space->read_word(i+j));
+						break;
+					case 1:
+						util::stream_format(output, " %02X", space->read_byte(i+j));
+						break;
+					}
 				}
 				else
 				{
@@ -1835,8 +1946,26 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 				offs_t curaddr = i + j;
 				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
 				{
-					u8 byte = m_cpu.read_byte(*space, i + j, true);
-					util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
+					u64 data = 0;
+					switch (width)
+					{
+					case 8:
+						data = space->read_qword(i+j);
+						break;
+					case 4:
+						data = space->read_dword(i+j);
+						break;
+					case 2:
+						data = space->read_word(i+j);
+						break;
+					case 1:
+						data = space->read_byte(i+j);
+						break;
+					}
+					for (unsigned int b = 0; b != width; b++) {
+						u8 byte = data >> (8 * (be ? (width-i-b) : b));
+						util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
+					}
 				}
 				else
 				{
@@ -1921,8 +2050,8 @@ void debugger_commands::execute_cheatinit(int ref, const std::vector<std::string
 	{
 		for (address_map_entry &entry : space->map()->m_entrylist)
 		{
-			cheat_region[region_count].offset = space->address_to_byte(entry.m_addrstart) & space->bytemask();
-			cheat_region[region_count].endoffset = space->address_to_byte(entry.m_addrend) & space->bytemask();
+			cheat_region[region_count].offset = entry.m_addrstart & space->addrmask();
+			cheat_region[region_count].endoffset = entry.m_addrend & space->addrmask();
 			cheat_region[region_count].share = entry.m_share;
 			cheat_region[region_count].disabled = (entry.m_write.m_type == AMH_RAM) ? false : true;
 
@@ -1945,8 +2074,8 @@ void debugger_commands::execute_cheatinit(int ref, const std::vector<std::string
 			return;
 
 		/* force region to the specified range */
-		cheat_region[region_count].offset = space->address_to_byte(offset) & space->bytemask();
-		cheat_region[region_count].endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
+		cheat_region[region_count].offset = offset & space->addrmask();
+		cheat_region[region_count].endoffset = (offset + length - 1) & space->addrmask();
 		cheat_region[region_count].share = nullptr;
 		cheat_region[region_count].disabled = false;
 		region_count++;
@@ -2321,9 +2450,9 @@ void debugger_commands::execute_find(int ref, const std::vector<std::string> &pa
 		return;
 
 	/* further validation */
-	endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
-	offset = space->address_to_byte(offset) & space->bytemask();
-	cur_data_size = space->address_to_byte(1);
+	endoffset = (offset + length - 1) & space->addrmask();
+	offset = offset & space->addrmask();
+	cur_data_size = space->addrbus_shift() > 0 ? 2 : 1 << -space->addrbus_shift();
 	if (cur_data_size == 0)
 		cur_data_size = 1;
 
@@ -2834,7 +2963,7 @@ void debugger_commands::execute_map(int ref, const std::vector<std::string> &par
 	for (intention = TRANSLATE_READ_DEBUG; intention <= TRANSLATE_FETCH_DEBUG; intention++)
 	{
 		static const char *const intnames[] = { "Read", "Write", "Fetch" };
-		taddress = space->address_to_byte(address) & space->bytemask();
+		taddress = address & space->addrmask();
 		if (space->device().memory().translate(space->spacenum(), intention, taddress))
 		{
 			const char *mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? read_or_write::WRITE : read_or_write::READ, taddress);
@@ -2842,7 +2971,7 @@ void debugger_commands::execute_map(int ref, const std::vector<std::string> &par
 					"%7s: %0*X logical == %0*X physical -> %s\n",
 					intnames[intention & 3],
 					space->logaddrchars(), address,
-					space->addrchars(), space->byte_to_address(taddress),
+					space->addrchars(), taddress,
 					mapname);
 		}
 		else

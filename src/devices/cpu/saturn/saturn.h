@@ -149,7 +149,7 @@ typedef uint8_t Saturn64[16];
 	int     m_monitor_id;
 	int     m_monitor_in;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	int m_icount;
 	int64_t m_debugger_temp;
 

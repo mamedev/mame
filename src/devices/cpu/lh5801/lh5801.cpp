@@ -92,7 +92,7 @@ void lh5801_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	m_in_func.resolve_safe(0);
 

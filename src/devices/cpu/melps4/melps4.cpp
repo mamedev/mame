@@ -454,7 +454,7 @@ void melps4_cpu_device::execute_run()
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
 		m_icount--;
-		m_op = m_program->read_word(m_pc << 1) & 0x1ff;
+		m_op = m_program->read_word(m_pc) & 0x1ff;
 		m_bitmask = 1 << (m_op & 3);
 		m_pc = (m_pc & ~0x7f) | ((m_pc + 1) & 0x7f); // stays in the same page
 

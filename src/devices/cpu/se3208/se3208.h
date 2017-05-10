@@ -54,7 +54,7 @@ private:
 	uint32_t m_PPC;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	uint8_t m_IRQ;
 	uint8_t m_NMI;
 

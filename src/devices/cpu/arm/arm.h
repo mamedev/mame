@@ -74,7 +74,7 @@ protected:
 	uint8_t m_pendingIrq;
 	uint8_t m_pendingFiq;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	endianness_t m_endian;
 	copro_type m_copro_type;
 

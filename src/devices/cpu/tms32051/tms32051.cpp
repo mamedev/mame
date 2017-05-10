@@ -126,7 +126,7 @@ util::disasm_interface *tms32051_device::create_disassembler()
 
 #define CYCLES(x)       (m_icount -= x)
 
-#define ROPCODE()       m_direct->read_word((m_pc++) << 1)
+#define ROPCODE()       m_direct->read_word(m_pc++)
 
 void tms32051_device::CHANGE_PC(uint16_t new_pc)
 {
@@ -135,22 +135,22 @@ void tms32051_device::CHANGE_PC(uint16_t new_pc)
 
 uint16_t tms32051_device::PM_READ16(uint16_t address)
 {
-	return m_program->read_word(address << 1);
+	return m_program->read_word(address);
 }
 
 void tms32051_device::PM_WRITE16(uint16_t address, uint16_t data)
 {
-	m_program->write_word(address << 1, data);
+	m_program->write_word(address, data);
 }
 
 uint16_t tms32051_device::DM_READ16(uint16_t address)
 {
-	return m_data->read_word(address << 1);
+	return m_data->read_word(address);
 }
 
 void tms32051_device::DM_WRITE16(uint16_t address, uint16_t data)
 {
-	m_data->write_word(address << 1, data);
+	m_data->write_word(address, data);
 }
 
 #include "32051ops.hxx"
@@ -183,7 +183,7 @@ void tms32051_device::delay_slot(uint16_t startpc)
 void tms32051_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-1>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
@@ -515,7 +515,7 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 		case 0x5d:
 		case 0x5e:
 		case 0x5f:
-			return m_io->read_word(offset << 1);
+			return m_io->read_word(offset);
 
 		default:
 			if (!machine().side_effect_disabled())
@@ -626,7 +626,7 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 		case 0x5d:
 		case 0x5e:
 		case 0x5f:
-			m_io->write_word(offset << 1, data);
+			m_io->write_word(offset, data);
 			break;
 
 		default:

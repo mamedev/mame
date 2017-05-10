@@ -555,7 +555,7 @@ bool arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &addr
 void arm7_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	save_item(NAME(m_r));
 	save_item(NAME(m_pendingIrq));

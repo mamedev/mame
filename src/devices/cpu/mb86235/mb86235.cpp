@@ -57,7 +57,7 @@ void mb86235_device::execute_run()
 void mb86235_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-3>();
 	m_dataa = &space(AS_DATA);
 	m_datab = &space(AS_IO);
 

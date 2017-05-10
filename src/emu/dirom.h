@@ -42,7 +42,7 @@ protected:
 private:
 	const char *m_rom_tag;
 	const address_space_config m_rom_config;
-	direct_read_data *m_rom_direct;
+	direct_read_data<0> *m_rom_direct;
 
 	memory_bank *m_bank;
 	int m_cur_bank, m_bank_count;

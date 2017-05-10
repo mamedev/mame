@@ -1236,9 +1236,9 @@ uint16_t m68000_base_device::m68008_read_immediate_16(offs_t address)
 void m68000_base_device::init8(address_space &space, address_space &ospace)
 {
 	m_space = &space;
-	m_direct = &space.direct();
+	m_direct = space.direct<0>();
 	m_ospace = &ospace;
-	m_odirect = &ospace.direct();
+	m_odirect = ospace.direct<0>();
 //  m_cpustate = this;
 	opcode_xor = 0;
 
@@ -1275,9 +1275,9 @@ void m68000_base_device::m68000_write_byte(offs_t address, uint8_t data)
 void m68000_base_device::init16(address_space &space, address_space &ospace)
 {
 	m_space = &space;
-	m_direct = &space.direct();
+	m_direct = space.direct<0>();
 	m_ospace = &ospace;
-	m_odirect = &ospace.direct();
+	m_odirect = ospace.direct<0>();
 
 	opcode_xor = 0;
 
@@ -1302,9 +1302,9 @@ void m68000_base_device::init16(address_space &space, address_space &ospace)
 void m68000_base_device::init32(address_space &space, address_space &ospace)
 {
 	m_space = &space;
-	m_direct = &space.direct();
+	m_direct = space.direct<0>();
 	m_ospace = &ospace;
-	m_odirect = &ospace.direct();
+	m_odirect = ospace.direct<0>();
 	opcode_xor = WORD_XOR_BE(0);
 
 	readimm16 = m68k_readimm16_delegate(&m68000_base_device::read_immediate_16, this);
@@ -1521,9 +1521,9 @@ void m68000_base_device::writelong_d32_mmu(offs_t address, uint32_t data)
 void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 {
 	m_space = &space;
-	m_direct = &space.direct();
+	m_direct = space.direct<0>();
 	m_ospace = &ospace;
-	m_odirect = &ospace.direct();
+	m_odirect = ospace.direct<0>();
 	opcode_xor = WORD_XOR_BE(0);
 
 	readimm16 = m68k_readimm16_delegate(&m68000_base_device::read_immediate_16_mmu, this);
@@ -1649,9 +1649,9 @@ void m68000_base_device::writelong_d32_hmmu(offs_t address, uint32_t data)
 void m68000_base_device::init32hmmu(address_space &space, address_space &ospace)
 {
 	m_space = &space;
-	m_direct = &space.direct();
+	m_direct = space.direct<0>();
 	m_ospace = &ospace;
-	m_odirect = &ospace.direct();
+	m_odirect = ospace.direct<0>();
 	opcode_xor = WORD_XOR_BE(0);
 
 	readimm16 = m68k_readimm16_delegate(&m68000_base_device::read_immediate_16_hmmu, this);

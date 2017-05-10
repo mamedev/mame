@@ -188,7 +188,7 @@ void tms7000_device::device_start()
 {
 	// init/zerofill
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	m_icountptr = &m_icount;
 

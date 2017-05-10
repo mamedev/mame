@@ -110,7 +110,7 @@ void sc61860_device::device_start()
 	m_2ms_tick_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_reset.resolve();
 	m_brk.resolve();
 	m_x.resolve();

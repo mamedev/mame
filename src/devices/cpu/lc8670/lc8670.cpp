@@ -195,7 +195,7 @@ void lc8670_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	// set our instruction counter
 	m_icountptr = &m_icount;

@@ -2103,7 +2103,7 @@ void i960_cpu_device::execute_set_input(int irqline, int state)
 void i960_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	save_item(NAME(m_IP));
 	save_item(NAME(m_PIP));

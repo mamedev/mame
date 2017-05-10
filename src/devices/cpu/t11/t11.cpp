@@ -261,7 +261,7 @@ void t11_device::device_start()
 
 	m_initial_pc = initial_pc[c_initial_mode >> 13];
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_out_reset_func.resolve_safe();
 
 	save_item(NAME(m_ppc.w.l));

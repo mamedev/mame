@@ -298,35 +298,35 @@ WRITE16_MEMBER(midtunit_state::jdredd_prot_w)
 
 	switch (offset)
 	{
-		case TOWORD(0x10740):
+		case 0x1074:
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_10740;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_10740);
 			logerror("-- reset prot table 10740\n");
 			break;
 
-		case TOWORD(0x13240):
+		case 0x1324:
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_13240;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_13240);
 			logerror("-- reset prot table 13240\n");
 			break;
 
-		case TOWORD(0x76540):
+		case 0x7654:
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_76540;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_76540);
 			logerror("-- reset prot table 76540\n");
 			break;
 
-		case TOWORD(0x77760):
+		case 0x7776:
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_77760;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_77760);
 			logerror("-- reset prot table 77760\n");
 			break;
 
-		case TOWORD(0x80020):
+		case 0x8002:
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_80020;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_80020);

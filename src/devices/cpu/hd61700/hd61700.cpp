@@ -2754,7 +2754,7 @@ inline uint8_t hd61700_cpu_device::read_op()
 
 	if (m_pc <= INT_ROM)
 	{
-		data = m_program->read_word(addr18<<1);
+		data = m_program->read_word(addr18);
 
 		if (!(m_fetch_addr&1))
 			data = (data>>8) ;
@@ -2762,9 +2762,9 @@ inline uint8_t hd61700_cpu_device::read_op()
 	else
 	{
 		if (m_fetch_addr&1)
-			data = m_program->read_word((addr18+1)<<1);
+			data = m_program->read_word(addr18 + 1);
 		else
-			data = m_program->read_word((addr18+0)<<1);
+			data = m_program->read_word(addr18 + 0);
 	}
 
 	m_fetch_addr += ((m_pc > INT_ROM) ? 2 : 1);
@@ -2780,12 +2780,12 @@ inline uint8_t hd61700_cpu_device::read_op()
 
 inline uint8_t hd61700_cpu_device::mem_readbyte(uint8_t segment, uint16_t offset)
 {
-	return m_program->read_word(make_18bit_addr(segment, offset)<<1) & 0xff;
+	return m_program->read_word(make_18bit_addr(segment, offset)) & 0xff;
 }
 
 inline void hd61700_cpu_device::mem_writebyte(uint8_t segment, uint16_t offset, uint8_t data)
 {
-	m_program->write_word(make_18bit_addr(segment, offset)<<1, data);
+	m_program->write_word(make_18bit_addr(segment, offset), data);
 }
 
 inline uint32_t hd61700_cpu_device::make_18bit_addr(uint8_t segment, uint16_t offset)

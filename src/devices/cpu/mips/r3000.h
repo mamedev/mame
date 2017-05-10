@@ -212,7 +212,7 @@ protected:
 	const address_space_config m_program_config_be;
 	const address_space_config m_program_config_le;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 
 	// configuration
 	chip_type       m_chip_type;

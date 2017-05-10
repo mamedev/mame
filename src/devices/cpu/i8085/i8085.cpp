@@ -338,8 +338,8 @@ void i8085a_cpu_device::device_start()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
-	m_opcode_direct = has_space(AS_OPCODES) ? &space(AS_OPCODES).direct() : m_direct;
+	m_direct = m_program->direct<0>();
+	m_opcode_direct = has_space(AS_OPCODES) ? space(AS_OPCODES).direct<0>() : m_direct;
 	m_io = &space(AS_IO);
 
 	/* resolve callbacks */

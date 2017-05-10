@@ -134,8 +134,8 @@ void m6809_base_device::device_start()
 	m_mintf->m_program  = &space(AS_PROGRAM);
 	m_mintf->m_sprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_mintf->m_program;
 
-	m_mintf->m_direct  = &m_mintf->m_program->direct();
-	m_mintf->m_sdirect = &m_mintf->m_sprogram->direct();
+	m_mintf->m_direct  = m_mintf->m_program->direct<0>();
+	m_mintf->m_sdirect = m_mintf->m_sprogram->direct<0>();
 
 	m_lic_func.resolve_safe();
 

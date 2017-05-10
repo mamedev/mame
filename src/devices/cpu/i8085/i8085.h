@@ -139,8 +139,8 @@ private:
 	bool m_ietemp;       /* import/export temp space */
 
 	address_space *m_program;
-	direct_read_data *m_direct;
-	direct_read_data *m_opcode_direct;
+	direct_read_data<0> *m_direct;
+	direct_read_data<0> *m_opcode_direct;
 	address_space *m_io;
 	int m_icount;
 

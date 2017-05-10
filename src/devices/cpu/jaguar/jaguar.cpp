@@ -338,7 +338,7 @@ void jaguar_cpu_device::device_start()
 	init_tables();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_cpu_interrupt.resolve_safe();
 
 	save_item(NAME(m_r));

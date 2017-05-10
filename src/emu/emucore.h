@@ -431,4 +431,14 @@ inline u64 d2u(double d)
 	return u.vv;
 }
 
+
+// constexpr absolute value of an integer
+inline constexpr int iabs(int v)
+{
+	if(v < 0)
+		return -v;
+	else
+		return v;
+}
+
 #endif  /* MAME_EMU_EMUCORE_H */

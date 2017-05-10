@@ -193,7 +193,7 @@ protected:
 	uint8_t   *m_lbrm;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<-3> *m_direct;
 
 	int     m_icount;
 

@@ -170,7 +170,7 @@ void pic16c62x_device::update_internalram_ptr()
 	m_internalram = (uint8_t *)m_data->get_write_ptr(0x00);
 }
 
-#define PIC16C62x_RDOP(A)         (m_direct->read_word((A)<<1))
+#define PIC16C62x_RDOP(A)         (m_direct->read_word(A))
 #define PIC16C62x_RAM_RDMEM(A)    ((uint8_t)m_data->read_byte(A))
 #define PIC16C62x_RAM_WRMEM(A,V)  (m_data->write_byte(A,V))
 #define PIC16C62x_In(Port)        ((uint8_t)m_io->read_byte((Port)))
@@ -867,7 +867,7 @@ void pic16c62x_device::build_opcode_table(void)
 void pic16c62x_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-1>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 

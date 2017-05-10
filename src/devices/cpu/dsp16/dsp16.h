@@ -146,7 +146,7 @@ protected:
 	// address spaces
 	address_space* m_program;
 	address_space* m_data;
-	direct_read_data* m_direct;
+	direct_read_data<-1> *m_direct;
 
 	// other internal states
 	int m_icount;

@@ -1959,7 +1959,7 @@ void f8_cpu_device::device_start()
 {
 	// TODO register debug state
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_iospace = &space(AS_IO);
 
 	save_item(NAME(m_pc0));

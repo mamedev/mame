@@ -73,7 +73,7 @@ void i8x9x_device::commit_hso_cam()
 
 void i8x9x_device::ad_start(uint64_t current_time)
 {
-	ad_result = (io->read_word(2*((ad_command & 7) + A0)) << 6) | 8 | (ad_command & 7);
+	ad_result = (io->read_word((ad_command & 7) + A0) << 6) | 8 | (ad_command & 7);
 	ad_done = current_time + 88;
 	internal_update(current_time);
 }
@@ -87,7 +87,7 @@ void i8x9x_device::serial_send(uint8_t data)
 void i8x9x_device::serial_send_done()
 {
 	serial_send_timer = 0;
-	io->write_word(SERIAL*2, serial_send_buf);
+	io->write_word(SERIAL, serial_send_buf);
 	pending_irq |= IRQ_SERIAL;
 	sp_stat |= 0x20;
 	check_irq();
@@ -134,11 +134,11 @@ void i8x9x_device::io_w8(uint8_t adr, uint8_t data)
 		break;
 	case 0x0f:
 		logerror("%s: io port 1 %02x (%04x)\n", tag(), data, PPC);
-		io->write_word(P1*2, data);
+		io->write_word(P1, data);
 		break;
 	case 0x10:
 		logerror("%s: io port 2 %02x (%04x)\n", tag(), data, PPC);
-		io->write_word(P2*2, data);
+		io->write_word(P2, data);
 		break;
 	case 0x11:
 		logerror("%s: sp con %02x (%04x)\n", tag(), data, PPC);
@@ -217,16 +217,16 @@ uint8_t i8x9x_device::io_r8(uint8_t adr)
 		return timer_value(2, total_cycles()) >> 8;
 	case 0x0e: {
 		static int last = -1;
-		if(io->read_word(P0*2) != last) {
-			last = io->read_word(P0*2);
+		if(io->read_word(P0) != last) {
+			last = io->read_word(P0);
 			logerror("%s: read p0 %02x\n", tag(), io->read_word(P0*2));
 		}
-		return io->read_word(P0*2);
+		return io->read_word(P0);
 	}
 	case 0x0f:
-		return io->read_word(P1*2);
+		return io->read_word(P1);
 	case 0x10:
-		return io->read_word(P2*2);
+		return io->read_word(P2);
 	case 0x11: {
 		uint8_t res = sp_stat;
 		sp_stat &= 0x80;

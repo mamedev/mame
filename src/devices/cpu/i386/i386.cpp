@@ -3244,7 +3244,7 @@ void i386_device::i386_common_init()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 	m_smi = false;
 	m_debugger_temp = 0;

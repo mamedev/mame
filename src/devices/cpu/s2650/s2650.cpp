@@ -826,7 +826,7 @@ void s2650_device::device_start()
 	m_flag_handler.resolve_safe();
 	m_intack_handler.resolve_safe();
 
-	m_direct = &space(AS_PROGRAM).direct();
+	m_direct = space(AS_PROGRAM).direct<0>();
 
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_page));

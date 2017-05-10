@@ -378,7 +378,7 @@ void rsp_device::device_start()
 		m_exec_output = fopen("rsp_execute.txt", "wt");
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	resolve_cb();
 
 	if (m_isdrc)

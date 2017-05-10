@@ -72,7 +72,7 @@ protected:
 	bool m_increment_pc;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_io;
 
 	uint16_t m_PC;  // Program Counter

@@ -1030,7 +1030,7 @@ void hyperstone_device::init(int scale_mask)
 	m_icount = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyperstone_device::timer_callback), this));
@@ -1269,7 +1269,7 @@ void hyperstone_device::device_reset()
 	//TODO: Add different reset initializations for BCR, MCR, FCR, TPR
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	m_tr_clocks_per_tick = 2;

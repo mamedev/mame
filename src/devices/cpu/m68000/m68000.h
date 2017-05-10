@@ -312,7 +312,7 @@ public:
 //  m68k_memory_interface memory;
 
 	address_space *m_space, *m_ospace;
-	direct_read_data *m_direct, *m_odirect;
+	direct_read_data<0> *m_direct, *m_odirect;
 
 	uint32_t      iotemp;
 

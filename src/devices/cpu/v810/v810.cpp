@@ -1256,7 +1256,7 @@ const v810_device::opcode_func v810_device::s_OpCodeTable[64] =
 void v810_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	m_irq_line = 0;
