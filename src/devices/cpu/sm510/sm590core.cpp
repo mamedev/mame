@@ -45,7 +45,7 @@ ADDRESS_MAP_END
 
 // device definitions
 sm590_device::sm590_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm510_base_device(mconfig, SM590, "SM590", tag, owner, clock, 4 /* stack levels */, 10 /* prg width */, ADDRESS_MAP_NAME(program_1x128x4), 5 /* data width */, ADDRESS_MAP_NAME(data_16x2x4), "sm590", __FILE__)
+	: sm510_base_device(mconfig, SM590, "SM590", tag, owner, clock, 4 /* stack levels */, 9 /* prg width */, ADDRESS_MAP_NAME(program_1x128x4), 5 /* data width */, ADDRESS_MAP_NAME(data_16x2x4), "sm590", __FILE__)
 { }
 
 //sm590_device::sm591_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -77,14 +77,21 @@ void sm590_device::device_reset()
 	// ACL
 	m_skip = false;
 	m_halt = false;
-	m_sbm = false;
+	m_sbm = false; // needed?
 	m_op = m_prev_op = 0;
 	do_branch(0, 0, 0);
 	m_prev_pc = m_pc;
 
 	m_rports[0] = m_rports[1] = m_rports[2] = m_rports[3] = 0;
-	//m_write_r(0, 0, 0xff);
+	//m_write_r(0, 0, 0xff); // TODO: are the four ports zeroed on reset?
 }
+
+//-------------------------------------------------
+//  init overrides
+//-------------------------------------------------
+void sm590_device::init_divider() {} // doesn't have it
+void sm590_device::init_lcd_driver() {} // doesn't have it
+void sm590_device::init_melody() {} // doesn't have it
 
 //-------------------------------------------------
 //  execute

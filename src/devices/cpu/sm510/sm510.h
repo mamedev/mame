@@ -209,7 +209,7 @@ protected:
 	bool m_1s;
 
 	bool wake_me_up();
-	void init_divider();
+	virtual void init_divider();
 	TIMER_CALLBACK_MEMBER(div_timer_cb);
 
 	// other i/o handlers
