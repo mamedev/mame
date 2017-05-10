@@ -18,15 +18,15 @@ const device_type SM590 = device_creator<sm590_device>;
 
 // internal memory maps
 static ADDRESS_MAP_START(program_1x128x4, AS_PROGRAM, 8, sm510_base_device)
-	AM_RANGE(0x000, 0x200) AM_ROM 
+	AM_RANGE(0x000, 0x1ff) AM_ROM 
 ADDRESS_MAP_END
 
 /*static ADDRESS_MAP_START(program_2x128x4, AS_PROGRAM, 8, sm510_base_device)
-	AM_RANGE(0x000, 0x400) AM_ROM 
+	AM_RANGE(0x000, 0x3ff) AM_ROM 
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(program_1x128x4_1x128x2, AS_PROGRAM, 8, sm510_base_device)
-	AM_RANGE(0x000, 0x300) AM_ROM 
+	AM_RANGE(0x000, 0x2ff) AM_ROM 
 ADDRESS_MAP_END*/
 
 static ADDRESS_MAP_START(data_16x2x4, AS_DATA, 8, sm510_base_device)
