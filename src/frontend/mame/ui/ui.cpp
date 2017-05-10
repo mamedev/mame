@@ -1276,7 +1276,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 uint32_t mame_ui_manager::handler_load_save(render_container &container, uint32_t state)
 {
-	char filename[20];
+	std::string filename;
 	char file = 0;
 
 	// if we're not in the middle of anything, skip
@@ -1340,7 +1340,7 @@ uint32_t mame_ui_manager::handler_load_save(render_container &container, uint32_
 			for (input_item_id id = ITEM_ID_BUTTON1; id <= ITEM_ID_BUTTON32; ++id)
 				if (machine().input().code_pressed_once(input_code(DEVICE_CLASS_JOYSTICK, joy_index, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 				{
-					snprintf(filename, sizeof(filename), "joy%i-%i", joy_index, id - ITEM_ID_BUTTON1 + 1);
+					filename = util::string_format("joy%i-%i", joy_index, id - ITEM_ID_BUTTON1 + 1);
 					found = true;
 					break;
 				}
@@ -1350,19 +1350,19 @@ uint32_t mame_ui_manager::handler_load_save(render_container &container, uint32_
 	}
 	else
 	{
-		sprintf(filename, "%c", file);
+		filename = util::string_format("%c", file);
 	}
 
 	// display a popup indicating that the save will proceed
 	if (state == LOADSAVE_SAVE)
 	{
 		machine().popmessage(_("Save to position %s"), filename);
-		machine().schedule_save(filename);
+		machine().schedule_save(std::move(filename));
 	}
 	else
 	{
 		machine().popmessage(_("Load from position %s"), filename);
-		machine().schedule_load(filename);
+		machine().schedule_load(std::move(filename));
 	}
 
 	// avoid handling the name of the save state slot as a seperate input
