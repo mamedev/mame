@@ -29,12 +29,9 @@
       The other games have a different color test, not using the busy loop.
 
     - Fix flip screen support for The Dealer and Beastie Feastie.
-
-	- dealer/beastf/revngr84: Fix default NVRAM
 	
-	- dealer/beastf/revngr84: PSG registers not OK in service mode?
-	
-	- dealer: use default gambling inputs;
+	- dealer/beastf/revngr84: "PSG registers not OK" in service mode thru 
+	  sound menu;
 
 ***************************************************************************/
 
@@ -366,11 +363,11 @@ static INPUT_PORTS_START( dealer )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -702,10 +699,10 @@ EPOS TRISTAR 9000
 
 ROM_START( revenger )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "r06124.u1",    0x0000, 0x2000, CRC(fad1a2a5) BAD_DUMP SHA1(a31052c91fe67e2e90441abc40b6483f921ecfe3) )
-	ROM_LOAD( "r06124.u2",    0x2000, 0x2000, CRC(a8e0ee7b) BAD_DUMP SHA1(f6f78e8ce40eab07de461b364876c1eb4a78d96e) )
-	ROM_LOAD( "r06124.u3",    0x4000, 0x2000, CRC(cca414a5) BAD_DUMP SHA1(1c9dd3ff63d57e9452e63083cdbd7f5d693bb686) )
-	ROM_LOAD( "r06124.u4",    0x6000, 0x2000, CRC(0b81c303) BAD_DUMP SHA1(9022d18dec11312eb4bb471c22b563f5f897b4f7) )
+	ROM_LOAD( "r06124.u1",    0x0000, 0x2000, BAD_DUMP CRC(fad1a2a5) SHA1(a31052c91fe67e2e90441abc40b6483f921ecfe3) )
+	ROM_LOAD( "r06124.u2",    0x2000, 0x2000, BAD_DUMP CRC(a8e0ee7b) SHA1(f6f78e8ce40eab07de461b364876c1eb4a78d96e) )
+	ROM_LOAD( "r06124.u3",    0x4000, 0x2000, BAD_DUMP CRC(cca414a5) SHA1(1c9dd3ff63d57e9452e63083cdbd7f5d693bb686) )
+	ROM_LOAD( "r06124.u4",    0x6000, 0x2000, BAD_DUMP CRC(0b81c303) SHA1(9022d18dec11312eb4bb471c22b563f5f897b4f7) )
 	
 	ROM_REGION( 0x1000, "nvram", 0)
 	ROM_LOAD( "revngr84.nv", 0, 0x1000, CRC(a4417770) SHA1(92eded82db0810e7818d2f52a0497032f390fcc1) )
