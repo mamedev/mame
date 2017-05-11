@@ -30,6 +30,12 @@
 
     - Fix flip screen support for The Dealer and Beastie Feastie.
 
+	- dealer/beastf/revngr84: Fix default NVRAM
+	
+	- dealer/beastf/revngr84: PSG registers not OK in service mode?
+	
+	- dealer: use default gambling inputs;
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -95,6 +101,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dealer_io_map, AS_IO, 8, epos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x0f) AM_WRITE(dealer_pal_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x20, 0x24) AM_WRITE(dealer_decrypt_rom)
 	AM_RANGE(0x34, 0x34) AM_DEVWRITE("aysnd", ay8910_device, data_w)
@@ -408,14 +415,14 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(epos_state,epos)
 {
-	save_item(NAME(m_palette));
+	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_input_multiplex));
 }
 
 void epos_state::machine_reset()
 {
-	m_palette = 0;
+	m_palette_bank = 0;
 	m_counter = 0;
 	m_input_multiplex = 3;
 }
@@ -451,6 +458,9 @@ static MACHINE_CONFIG_START( epos, epos_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 271, 0, 235)
 	MCFG_SCREEN_UPDATE_DRIVER(epos_state, screen_update)
 
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(epos_state, epos)
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 11000000/4)
@@ -472,6 +482,10 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 
 	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
 
+	// RAM-based palette instead of prom
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 32)
+//	MCFG_PALETTE_INIT_OWNER(epos_state, epos)
+	
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
@@ -479,7 +493,7 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(272, 241)
-	MCFG_SCREEN_VISIBLE_AREA(0, 271, 0, 235)
+	MCFG_SCREEN_VISIBLE_AREA(0, 271, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(epos_state, screen_update)
 
 	/* sound hardware */
@@ -615,9 +629,46 @@ ROM_START( dealer )
 	ROM_LOAD( "u2.bin",         0x2000, 0x2000, CRC(726bbbd6) SHA1(3538f3d655899c2a0f984c43fb7545ea4be1b231) )
 	ROM_LOAD( "u3.bin",         0x4000, 0x2000, CRC(ab721455) SHA1(a477da0590e0431172baae972e765473e19dcbff) )
 	ROM_LOAD( "u4.bin",         0x6000, 0x2000, CRC(ddb903e4) SHA1(4c06a2048b1c6989c363b110a17c33180025b9c8) )
+ROM_END
+
+/*
+
+Revenger 84 - EPOS
+^^^^^^^^^^^^^^^^^^
+Dumped by Andrew Welburn
+http://www.andys-arcade.com
+on 11/05/17
+
+
+
+EPOS Tristar 9000 board, all 4 2764's dumped.
+
+there are 2x secuirty looking chips (like other epos games)
+one is a PAL10L8, the other has all markings scrubbed off.
+
+the pcb uses a battery and the high score table (when the game booted) showed 
+a large table of kept scores.
+
+pcb xtal speed is : 22.1184mhz
+
+cpu pin 6 (clk) = 2763300 hz
+ay-3-8910 clock =  682900 hz
+
+4116 RAS is = 2763300 hz
+4116 CAS is = 1381660 hz
+
+
+*/
+
+ROM_START( revngr84 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+    ROM_LOAD( "revenger.u1",  0x0000, 0x2000, CRC(308f231f) SHA1(cf06695601bd0387e4fcb64d9b34143323e98b07) )
+    ROM_LOAD( "revenger.u2",  0x2000, 0x2000, CRC(e80bbfb4) SHA1(9302beaef8bbb7376b6a20e9ee5adbcf60d66dd8) )
+    ROM_LOAD( "revenger.u3",  0x4000, 0x2000, CRC(d9270929) SHA1(a95034b5387a40e02f04bdfa79e1d8e65dad30fe) )
+    ROM_LOAD( "revenger.u4",  0x6000, 0x2000, CRC(d6e6cfa8) SHA1(f10131bb2e9d088c7b6d6a5d5520073d78ad69cc) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, NO_DUMP )   /* missing */
+	ROM_LOAD( "revenger.u60", 0x0000, 0x0020, CRC(be2b0641) SHA1(26982903b6d942af8e0a526412d8e01978d76420) ) // unknown purpose
 ROM_END
 
 /*
@@ -646,10 +697,9 @@ ROM_START( revenger )
 	ROM_LOAD( "r06124.u2",    0x2000, 0x2000, CRC(a8e0ee7b) BAD_DUMP SHA1(f6f78e8ce40eab07de461b364876c1eb4a78d96e) )
 	ROM_LOAD( "r06124.u3",    0x4000, 0x2000, CRC(cca414a5) BAD_DUMP SHA1(1c9dd3ff63d57e9452e63083cdbd7f5d693bb686) )
 	ROM_LOAD( "r06124.u4",    0x6000, 0x2000, CRC(0b81c303) BAD_DUMP SHA1(9022d18dec11312eb4bb471c22b563f5f897b4f7) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, NO_DUMP )   /* missing */
 ROM_END
+
+
 
 ROM_START( beastf )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -657,9 +707,6 @@ ROM_START( beastf )
 	ROM_LOAD( "bf-b09084.u2",    0x2000, 0x2000, CRC(967405d8) SHA1(dd763be909e6966521b01ee878df9cef865c3b30) )
 	ROM_LOAD( "bf-b09084.u3",    0x4000, 0x2000, CRC(3edb5381) SHA1(14c236045e6df7a475c32222652860689d4f68ce) )
 	ROM_LOAD( "bf-b09084.u4",    0x6000, 0x2000, CRC(c8cd9640) SHA1(72da881b903ead873cc3f4df27646d1ffdd63c1c) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, CRC(f4f6ddc5) BAD_DUMP SHA1(cab915acbefb5f451f538dd538bf9b3dd14bb1f5) ) // not dumped, taken from suprglob
 ROM_END
 
 DRIVER_INIT_MEMBER(epos_state,dealer)
@@ -715,7 +762,8 @@ GAME( 1983, suprglob, 0,        epos,   suprglob, driver_device, 0,       ROT270
 GAME( 1983, theglob,  suprglob, epos,   suprglob, driver_device, 0,       ROT270, "Epos Corporation", "The Glob", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglob2, suprglob, epos,   suprglob, driver_device, 0,       ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglob3, suprglob, epos,   suprglob, driver_device, 0,       ROT270, "Epos Corporation", "The Glob (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, igmo,     0,        epos,   igmo, driver_device,     0,       ROT270, "Epos Corporation", "IGMO", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dealer,   0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "The Dealer", MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, revenger, 0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "Revenger", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, beastf,   suprglob, dealer, beastf, epos_state,   dealer,   ROT270, "Epos Corporation", "Beaste Feastie", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, igmo,     0,        epos,   igmo,     driver_device, 0,       ROT270, "Epos Corporation", "IGMO", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dealer,   0,        dealer, dealer,   epos_state,    dealer,   ROT270, "Epos Corporation", "The Dealer", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, revngr84, 0,        dealer, beastf,   epos_state,    dealer,   ROT270, "Epos Corporation", "Revenger '84 (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, revenger, revngr84, dealer, beastf,   epos_state,    dealer,   ROT270, "Epos Corporation", "Revenger '84 (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, beastf,   suprglob, dealer, beastf,   epos_state,    dealer,   ROT270, "Epos Corporation", "Beastie Feastie", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
