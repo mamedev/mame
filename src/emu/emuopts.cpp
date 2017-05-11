@@ -949,31 +949,39 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 
 
 //-------------------------------------------------
+//  find_slot_option
+//-------------------------------------------------
+
+const slot_option *emu_options::find_slot_option(const std::string &device_name) const
+{
+	auto iter = m_slot_options.find(device_name);
+	return iter != m_slot_options.end() ? &iter->second : nullptr;
+}
+
+slot_option *emu_options::find_slot_option(const std::string &device_name)
+{
+	auto iter = m_slot_options.find(device_name);
+	return iter != m_slot_options.end() ? &iter->second : nullptr;
+}
+
+
+
+//-------------------------------------------------
 //  slot_option
 //-------------------------------------------------
 
 const slot_option &emu_options::slot_option(const std::string &device_name) const
 {
-	auto iter = m_slot_options.find(device_name);
-	assert(iter != m_slot_options.end() && "Attempt to access non-existent slot option");
-	return iter->second;
+	const ::slot_option *opt = find_slot_option(device_name);
+	assert(opt && "Attempt to access non-existent slot option");
+	return *opt;
 }
 
 slot_option &emu_options::slot_option(const std::string &device_name)
 {
-	auto iter = m_slot_options.find(device_name);
-	assert(iter != m_slot_options.end() && "Attempt to access non-existent slot option");
-	return iter->second;
-}
-
-
-//-------------------------------------------------
-//  has_slot_option
-//-------------------------------------------------
-
-bool emu_options::has_slot_option(const std::string &device_name) const
-{
-	return m_slot_options.find(device_name) != m_slot_options.end();
+	::slot_option *opt = find_slot_option(device_name);
+	assert(opt && "Attempt to access non-existent slot option");
+	return *opt;
 }
 
 

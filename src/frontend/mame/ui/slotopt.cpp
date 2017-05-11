@@ -245,33 +245,26 @@ void menu_slot_devices::refresh_current_options()
 
 bool menu_slot_devices::try_refresh_current_options()
 {
-	// cycle through all devices for this system
-	machine_config config(machine().system(), machine().options());
-	for (device_slot_interface &slot : slot_interface_iterator(m_config->root_device()))
+	// enumerate through all slot options that we've tracked
+	for (const auto &opt : m_slot_options)
 	{
-		if (slot.has_selectable_options())
+		// do we have a value different than what we're tracking?
+		slot_option *slotopt = machine().options().find_slot_option(opt.first);
+		if (slotopt && slotopt->specified_value() != opt.second)
 		{
-			auto iter = m_slot_options.find(slot.slot_name());
-			if (iter != m_slot_options.end() && machine().options().has_slot_option(slot.slot_name()))
+			// specify this option (but catch errors)
+			try
 			{
-				slot_option &slotopt(machine().options().slot_option(slot.slot_name()));
+				slotopt->specify(opt.second);
 
-				if (slotopt.specified_value() != iter->second)
-				{
-					// specify this option (but catch errors)
-					try
-					{
-						slotopt.specify(iter->second);
-
-						// the option was successfully specified; it isn't safe to continue
-						// checking slots as the options may be radically different
-						return true;
-					}
-					catch (options_exception &)
-					{
-						// this threw an exception - that is fine; we can just proceed
-					}
-				}
+				// the option was successfully specified; it isn't safe to continue
+				// checking slots as the act of specifying the slot may have drastically
+				// changed the options list
+				return true;
+			}
+			catch (options_exception &)
+			{
+				// this threw an exception - that is fine; we can just proceed
 			}
 		}
 	}

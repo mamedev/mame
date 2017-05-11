@@ -464,7 +464,9 @@ public:
 	// structure
 	const ::slot_option &slot_option(const std::string &device_name) const;
 	::slot_option &slot_option(const std::string &device_name);
-	bool has_slot_option(const std::string &device_name) const;
+	const ::slot_option *find_slot_option(const std::string &device_name) const;
+	::slot_option *find_slot_option(const std::string &device_name);
+	bool has_slot_option(const std::string &device_name) const { return find_slot_option(device_name) ? true : false; }
 	const ::image_option &image_option(const std::string &device_name) const;
 	::image_option &image_option(const std::string &device_name);
 
