@@ -1113,28 +1113,23 @@ image_init_result device_image_interface::load_software(const std::string &softw
 		? core_filename_extract_extension(m_mame_file->filename(), true)
 		: "";
 
-	// check if image should be read-only
-	const char *read_only = get_feature("read_only");
-	if (read_only && !strcmp(read_only, "true"))
-	{
-		// Copy some image information when we have been loaded through a software list
-		software_info &swinfo = m_software_part_ptr->info();
+	// Copy some image information when we have been loaded through a software list
+	software_info &swinfo = m_software_part_ptr->info();
 
-		// sanitize
-		if (swinfo.longname().empty() || swinfo.publisher().empty() || swinfo.year().empty())
-			fatalerror("Each entry in an XML list must have all of the following fields: description, publisher, year!\n");
+	// sanitize
+	if (swinfo.longname().empty() || swinfo.publisher().empty() || swinfo.year().empty())
+		fatalerror("Each entry in an XML list must have all of the following fields: description, publisher, year!\n");
 
-		// store
-		m_longname = swinfo.longname();
-		m_manufacturer = swinfo.publisher();
-		m_year = swinfo.year();
+	// store
+	m_longname = swinfo.longname();
+	m_manufacturer = swinfo.publisher();
+	m_year = swinfo.year();
 
-		// set file type
-		std::string filename = (m_mame_file != nullptr) && (m_mame_file->filename() != nullptr)
-				? m_mame_file->filename()
-				: "";
-		m_filetype = core_filename_extract_extension(filename, true);
-	}
+	// set file type
+	std::string filename = (m_mame_file != nullptr) && (m_mame_file->filename() != nullptr)
+			? m_mame_file->filename()
+			: "";
+	m_filetype = core_filename_extract_extension(filename, true);
 
 	// call finish_load if necessary
 	if (init_phase() == false && (finish_load() != image_init_result::PASS))

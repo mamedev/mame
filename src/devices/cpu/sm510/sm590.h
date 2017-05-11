@@ -6,8 +6,8 @@
 
 */
 
-#ifndef _SM590_H_
-#define _SM590_H_
+#ifndef MAME_CPU_SM510_SM590_H
+#define MAME_CPU_SM510_SM590_H
 
 #include "sm510.h"
 
@@ -101,6 +101,9 @@ public:
 protected:
 	virtual void device_reset() override;
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual void init_divider() override;
+	virtual void init_lcd_driver() override;
+	virtual void init_melody() override;
 	virtual void increment_pc() override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
@@ -108,7 +111,7 @@ protected:
 
 	// opcode handlers
 	// 00-3f
-	// adx (same as sm510)
+	virtual void op_adx() override;
 	virtual void op_tax();
 	virtual void op_lblx();
 	// lax (same as sm510)
@@ -184,4 +187,4 @@ protected:
 extern const device_type SM590;
 
 
-#endif /* _SM590_H_ */
+#endif /* MAME_CPU_SM510_SM590_H */

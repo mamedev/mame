@@ -278,7 +278,7 @@ menu_add_change_folder::menu_add_change_folder(mame_ui_manager &mui, render_cont
 {
 	m_ref = ref;
 	m_change = (s_folders[ref].action == CHANGE);
-	m_search[0] = '\0';
+	m_search.clear();
 
 	// configure the starting path
 	osd_get_full_path(m_current_path, ".");
@@ -338,7 +338,7 @@ void menu_add_change_folder::handle()
 			}
 
 			// reset the char buffer also in this case
-			m_search[0] = '\0';
+			m_search.clear();
 			reset(reset_options::SELECT_FIRST);
 		}
 		else if (menu_event->iptkey == IPT_SPECIAL)

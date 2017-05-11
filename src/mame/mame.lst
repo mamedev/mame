@@ -220,6 +220,7 @@ starw                           // bootleg
 starw1                          // bootleg
 steelwkr                        // (c) 1980 Taito
 superinv                        // bootleg
+swipeout                        // bootleg
 tst_invd                        // Test ROM
 ultrainv                        //
 vortex                          // 852 [1980] Zilec Electronics Ltd.
@@ -289,9 +290,6 @@ abc806                          //
 ac1                             // 1984 Amateurcomputer AC1
 ac1_32                          // 1984 Amateurcomputer AC1 (32 lines)
 ac1scch                         // 1984 Amateurcomputer AC1 SCCH
-
-@source:acchi.cpp
-acchi                           // 1993 NTC / NMK
 
 @source:aceex.cpp
 aceex2814
@@ -29566,6 +29564,7 @@ ohmygod                         // (c) 1993 Atlus (Japan)
 ccasino                         // [1987] V-System Co. (Japan)
 ojanko2                         // [1987] V-System Co. (Japan)
 ojankoc                         // [1986] V-System Co. (Japan)
+ojankoca                        // [1986] V-System Co. (Japan)
 ojankohs                        // [1988] V-System Co. (Japan)
 ojankoy                         // [1986] V-System Co. (Japan)
 
@@ -29875,6 +29874,9 @@ pass                            // (c) 1992 Oksan
 galds                           // (c) 1985
 pastelg                         // (c) 1985
 threeds                         // (c) 1985
+
+@source:patapata.cpp
+patapata                        // 1993 NTC / NMK / ATLUS
 
 @source:patinho_feio.cpp
 patinho                         // 1972 Patinho Feio
