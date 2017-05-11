@@ -376,7 +376,6 @@ bool core_options::parse_command_line(std::vector<std::string> &args, int priori
 		// special case - collect unadorned arguments after commands into a special place
 		if (is_unadorned && !m_command.empty())
 		{
-			trim_spaces_and_quotes(args[arg]);
 			m_command_arguments.push_back(std::move(args[arg]));
 			args[arg].clear();
 			continue;
@@ -507,7 +506,9 @@ bool core_options::parse_ini_file(util::core_file &inifile, int priority, int ig
 		}
 
 		// set the new data
-		validate_and_set_data(*curentry->second, optiondata, priority, error_string);
+		std::string data = optiondata;
+		trim_spaces_and_quotes(data);
+		validate_and_set_data(*curentry->second, std::move(data), priority, error_string);
 	}
 	return true;
 }
@@ -861,8 +862,6 @@ void core_options::copyfrom(const core_options &src)
 
 bool core_options::validate_and_set_data(core_options::entry &curentry, std::string &&data, int priority, std::string &error_string)
 {
-	trim_spaces_and_quotes(data);
-
 	// let derived classes override how we set this data
 	if (override_set_value(curentry.name(), data))
 		return true;
