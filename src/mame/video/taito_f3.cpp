@@ -1388,7 +1388,7 @@ void taito_f3_state::init_alpha_blend_func()
 }
 
 #define UPDATE_PIXMAP_SP(pf_num) \
-	if(cx>=clip_als && cx<clip_ars-1 && !(cx>=clip_bls && cx<clip_brs)) \
+	if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)) \
 	{ \
 		sprite_pri=sprite[pf_num]&m_pval; \
 		if(sprite_pri) \
@@ -1404,7 +1404,7 @@ void taito_f3_state::init_alpha_blend_func()
 	}
 
 #define UPDATE_PIXMAP_LP(pf_num) \
-	if (cx>=m_clip_al##pf_num && cx<m_clip_ar##pf_num-1 && !(cx>=m_clip_bl##pf_num && cx<m_clip_br##pf_num)) \
+	if (cx>=m_clip_al##pf_num && cx<m_clip_ar##pf_num && !(cx>=m_clip_bl##pf_num && cx<m_clip_br##pf_num)) \
 	{ \
 		m_tval=*m_tsrc##pf_num; \
 		if(m_tval&0xf0) \
@@ -1924,17 +1924,9 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		_y_zoom[y] = (line_zoom&0xff) << 9;
 
 		/* Evaluate clipping */
-		/* Notes:
-		   kludge: line-disable breaks quizhuhu text & landmakr "you win / you lose" text.
-		   somehow I think 0x0800 has nothing to do with line-disable.
-		   although tcobra2 uses this to clip the sides of the playfield
-		*/
-
-		if (pri&0x0800 && m_f3_game != QUIZHUHU && m_f3_game != LANDMAKR)
-		{
+		if (pri&0x0800)
 			line_enable=0;
-		}
-		else if (pri&0x0330 && m_f3_game != PBOBBLE4) // kludge: clipping breaks win/lose animation
+		else if (pri&0x0330)
 		{
 			//fast path todo - remove line enable
 			calculate_clip(y, pri&0x0330, &line_t->clip0[y], &line_t->clip1[y], &line_enable);
@@ -2077,11 +2069,6 @@ void taito_f3_state::get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_til
 			line_enable=3;
 		else
 			line_enable=1;
-
-		if ((m_f3_game == ARABIANM || m_f3_game == GSEEKER) && line_enable)
-		{ // force opaque vram & pixel layer kludge: fixes arabianm missing cutscene text, gseeker missing continue screen
-			line_enable = 1;
-		}
 
 		line_t->pri[y]=pri;
 
