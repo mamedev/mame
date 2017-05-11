@@ -395,6 +395,11 @@ MACHINE_RESET_MEMBER(pacman_state,superabc)
 	superabc_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
+MACHINE_RESET_MEMBER(pacman_state,pac4n1)
+{
+	pac4n1_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+}
+
 
 
 /*************************************
@@ -824,6 +829,28 @@ WRITE8_MEMBER(pacman_state::superabc_bank_w)
 	{
 		m_spritebank = bank;
 		m_charbank = bank;
+		m_bg_tilemap->mark_all_dirty();
+	}
+}
+
+
+/************************************
+ *
+ *  Pac-Man 4-in-1
+ *
+ ************************************/
+
+WRITE8_MEMBER(pacman_state::pac4n1_bank_w)
+{
+	// Connected to pin 1 (A15) of 27C512
+	membank("bank1")->set_entry(data & 1);
+	membank("bank2")->set_entry(data & 1);
+
+	// Also connected to pin 26 (A13) of 27128
+	if (m_charbank != (data & 1))
+	{
+		m_spritebank = data & 1;
+		m_charbank = data & 1;
 		m_bg_tilemap->mark_all_dirty();
 	}
 }
@@ -1336,6 +1363,32 @@ static ADDRESS_MAP_START( superabc_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3")
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( pac4n1_map, AS_PROGRAM, 8, pacman_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x4800, 0x4fef) AM_MIRROR(0xb000) AM_RAM AM_SHARE("nvram") // Additional RAM required by v3.0 and up
+	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xb000) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", namco_device, pacman_sound_enable_w)
+	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
+	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
+	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
+	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(pac4n1_bank_w)
+	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
+	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
+	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
+	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf3f) AM_READ_PORT("IN0")
+	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0xaf3f) AM_READ_PORT("IN1")
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW1")
+	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW2")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 
@@ -3546,6 +3599,12 @@ static GFXDECODE_START( superabc )
 GFXDECODE_END
 
 
+static GFXDECODE_START( pac4n1 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128 )
+	GFXDECODE_ENTRY( "gfx1", 0x2000, spritelayout, 0, 128 )
+GFXDECODE_END
+
+
 static GFXDECODE_START( crush4 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, crush4_tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, crush4_spritelayout, 0, 128 )
@@ -3835,6 +3894,18 @@ static MACHINE_CONFIG_DERIVED( superabc, pacman )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( pac4n1, pacman )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pac4n1_map)
+
+	MCFG_NVRAM_ADD_0FILL("nvram") // High score save starting in v2.0
+
+	MCFG_MACHINE_RESET_OVERRIDE(pacman_state, pac4n1)
+
+	MCFG_GFXDECODE_MODIFY("gfxdecode", pac4n1)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( crush4, mschamp )
 
 	/* basic machine hardware */
@@ -3960,6 +4031,32 @@ ROM_START( puckmanb )
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
+ROM_END
+
+ROM_START( puckmanbf ) // ROMs identical to parent set except for erased Namco logo tiles
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "01.BIN",  0x0000, 0x0800, CRC(f36e88ab) SHA1(813cecf44bf5464b1aed64b36f5047e4c79ba176) )
+	ROM_LOAD( "05.BIN",  0x0800, 0x0800, CRC(618bd9b3) SHA1(b9ca52b63a49ddece768378d331deebbe34fe177) )
+	ROM_LOAD( "02.BIN",  0x1000, 0x0800, CRC(7d177853) SHA1(9b5ddaaa8b564654f97af193dbcc29f81f230a25) )
+	ROM_LOAD( "06.BIN",  0x1800, 0x0800, CRC(d3e8914c) SHA1(c2f00e1773c6864435f29c8b7f44f2ef85d227d3) )
+	ROM_LOAD( "03.BIN",  0x2000, 0x0800, CRC(6bf4f625) SHA1(afe72fdfec66c145b53ed865f98734686b26e921) )
+	ROM_LOAD( "07.BIN",  0x2800, 0x0800, CRC(a948ce83) SHA1(08759833f7e0690b2ccae573c929e2a48e5bde7f) )
+	ROM_LOAD( "04.BIN",  0x3000, 0x0800, CRC(b6289b26) SHA1(d249fa9cdde774d5fee7258147cd25fa3f4dc2b3) )
+	ROM_LOAD( "08.BIN",  0x3800, 0x0800, CRC(17a88c13) SHA1(eb462de79f49b7aa8adb0cc6d31535b10550c0ce) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "09.BIN",  0x0000, 0x0800, CRC(7a7b48b3) SHA1(a12f08d76f9aee3c1fc8401d0aa087d2187c1803) )
+	ROM_LOAD( "11.BIN",  0x0800, 0x0800, CRC(3591b89d) SHA1(79bb456be6c39c1ccd7d077fbe181523131fb300) )
+	ROM_LOAD( "10.BIN",  0x1000, 0x0800, CRC(9e39323a) SHA1(be933e691df4dbe7d12123913c3b7b7b585b7a35) )
+	ROM_LOAD( "12.BIN",  0x1800, 0x0800, CRC(1b1d9096) SHA1(53771c573051db43e7185b1d188533056290a620) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "pm1-1.7f",     0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) ) // 82s123
+	ROM_LOAD( "pm1-4.4a",     0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) ) // 82s126
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "pm1-3.1m",     0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // 82s126
+	ROM_LOAD( "pm1-2.3m",     0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // 82s126 - timing - not used
 ROM_END
 
 
@@ -5288,6 +5385,27 @@ ROM_START( superabco )
 
 	ROM_REGION( 0x0020, "unknown", 0 )
 	ROM_LOAD( "82s123.u18", 0x0000, 0x0020, CRC(23b2863c) SHA1(e62f87d2145e94be06dbd90fa8d9a79760bfcc4b) )  /* prom on daughterboard, unknown function */
+ROM_END
+
+
+ROM_START( pac4n1 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "4PACROW6.512", 0x00000, 0x10000, CRC(5bbf374a) SHA1(426451a9cd4e8680ab19c2ce635435c0b43cba95) ) // 27C512 at 6E, 6F, or 6H
+	// 27C020 version also available with same code in both halves - CRC(82035513) SHA1(9d05e5a07b47a2668e497a66cd6ceb29bbcab659)
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "2PACROW5.128", 0x0000, 0x1000, CRC(949a50a2) SHA1(2b661e584b35740ce8b530f51485865a620354e6) ) // 27128 at 5E or 5F
+	ROM_CONTINUE( 0x2000, 0x1000 )
+	ROM_CONTINUE( 0x1000, 0x1000 )
+	ROM_CONTINUE( 0x3000, 0x1000 )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "pm1-1.7f",     0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) ) // 82s123
+	ROM_LOAD( "pm1-4.4a",     0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) ) // 82s126
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "pm1-3.1m",     0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // 82s126
+	ROM_LOAD( "pm1-2.3m",     0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // 82s126 - timing - not used
 ROM_END
 
 
@@ -7107,6 +7225,12 @@ DRIVER_INIT_MEMBER(pacman_state,pacplus)
 	pacplus_decode();
 }
 
+DRIVER_INIT_MEMBER(pacman_state,pac4n1)
+{
+	membank("bank1")->configure_entries(0, 4, &memregion("maincpu")->as_u8(0x0000), 0x8000);
+	membank("bank2")->configure_entries(0, 4, &memregion("maincpu")->as_u8(0x4000), 0x8000);
+}
+
 DRIVER_INIT_MEMBER(pacman_state,jumpshot)
 {
 	jumpshot_decode();
@@ -7278,6 +7402,7 @@ DRIVER_INIT_MEMBER(pacman_state,cannonbp)
 /*          rom       parent    machine   inp       init */
 GAME( 1980, puckman,  0,        pacman,   pacman,   driver_device, 0,        ROT90,  "Namco", "Puck Man (Japan set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, puckmanb, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg", "Puck Man (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, puckmanbf,puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg (Famaresa)", "Puck Man (Famaresa bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, puckmanf, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Puck Man (speedup hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, puckmanh, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg (Falcom?)", "Puck Man (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, pacman,   puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "Namco (Midway license)", "Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
@@ -7418,6 +7543,8 @@ GAME( 1985, cannonbp, 0,        pacman,   cannonbp, pacman_state,  cannonbp, ROT
 
 GAME( 1999, superabc, 0,        superabc, superabc, pacman_state,  superabc, ROT90,  "hack (Two-Bit Score)", "Super ABC (Pac-Man multigame kit, Sep. 03 1999)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, superabco,superabc, superabc, superabc, pacman_state,  superabc, ROT90,  "hack (Two-Bit Score)", "Super ABC (Pac-Man multigame kit, Mar. 08 1999)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 2010, pac4n1,   puckman,  pac4n1,   pacman,   pacman_state,  pac4n1,   ROT90,  "hack (Jason Souza)", "Pac-Man 4-in-1 (v3.3)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, pengojpm, pengo,    pengojpm, pengojpm, driver_device, 0,        ROT90,  "bootleg", "Pengo (bootleg on Pac-Man hardware, set 1)", MACHINE_SUPPORTS_SAVE ) // conversion of pacmanjpm board with wire mods
 GAME( 1981, pengopac, pengo,    pengojpm, pengojpm, driver_device, 0,        ROT90,  "bootleg", "Pengo (bootleg on Pac-Man hardware, set 2)", MACHINE_SUPPORTS_SAVE ) // different conversion?
