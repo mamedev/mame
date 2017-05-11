@@ -44,6 +44,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/watchdog.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
@@ -80,7 +81,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dealer_map, AS_PROGRAM, 8, epos_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -480,8 +481,10 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 	MCFG_I8255_IN_PORTA_CB(READ8(epos_state, read_prta))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(epos_state, write_prtc))
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	
 	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
-
+	
 	// RAM-based palette instead of prom
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 32)
 //	MCFG_PALETTE_INIT_OWNER(epos_state, epos)
@@ -493,7 +496,7 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(272, 241)
-	MCFG_SCREEN_VISIBLE_AREA(0, 271, 0, 239)
+	MCFG_SCREEN_VISIBLE_AREA(0, 271, 0, 235)
 	MCFG_SCREEN_UPDATE_DRIVER(epos_state, screen_update)
 
 	/* sound hardware */
@@ -629,6 +632,9 @@ ROM_START( dealer )
 	ROM_LOAD( "u2.bin",         0x2000, 0x2000, CRC(726bbbd6) SHA1(3538f3d655899c2a0f984c43fb7545ea4be1b231) )
 	ROM_LOAD( "u3.bin",         0x4000, 0x2000, CRC(ab721455) SHA1(a477da0590e0431172baae972e765473e19dcbff) )
 	ROM_LOAD( "u4.bin",         0x6000, 0x2000, CRC(ddb903e4) SHA1(4c06a2048b1c6989c363b110a17c33180025b9c8) )
+	
+	ROM_REGION( 0x1000, "nvram", 0)
+	ROM_LOAD( "dealer.nv", 0, 0x1000, CRC(a6f88459) SHA1(1deda2a71433c97fe3e5cb39defc285f4fa9c9b8) )
 ROM_END
 
 /*
@@ -669,6 +675,9 @@ ROM_START( revngr84 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "revenger.u60", 0x0000, 0x0020, CRC(be2b0641) SHA1(26982903b6d942af8e0a526412d8e01978d76420) ) // unknown purpose
+
+	ROM_REGION( 0x1000, "nvram", 0)
+	ROM_LOAD( "revngr84.nv", 0, 0x1000, CRC(a4417770) SHA1(92eded82db0810e7818d2f52a0497032f390fcc1) )
 ROM_END
 
 /*
@@ -697,6 +706,9 @@ ROM_START( revenger )
 	ROM_LOAD( "r06124.u2",    0x2000, 0x2000, CRC(a8e0ee7b) BAD_DUMP SHA1(f6f78e8ce40eab07de461b364876c1eb4a78d96e) )
 	ROM_LOAD( "r06124.u3",    0x4000, 0x2000, CRC(cca414a5) BAD_DUMP SHA1(1c9dd3ff63d57e9452e63083cdbd7f5d693bb686) )
 	ROM_LOAD( "r06124.u4",    0x6000, 0x2000, CRC(0b81c303) BAD_DUMP SHA1(9022d18dec11312eb4bb471c22b563f5f897b4f7) )
+	
+	ROM_REGION( 0x1000, "nvram", 0)
+	ROM_LOAD( "revngr84.nv", 0, 0x1000, CRC(a4417770) SHA1(92eded82db0810e7818d2f52a0497032f390fcc1) )
 ROM_END
 
 
@@ -707,6 +719,9 @@ ROM_START( beastf )
 	ROM_LOAD( "bf-b09084.u2",    0x2000, 0x2000, CRC(967405d8) SHA1(dd763be909e6966521b01ee878df9cef865c3b30) )
 	ROM_LOAD( "bf-b09084.u3",    0x4000, 0x2000, CRC(3edb5381) SHA1(14c236045e6df7a475c32222652860689d4f68ce) )
 	ROM_LOAD( "bf-b09084.u4",    0x6000, 0x2000, CRC(c8cd9640) SHA1(72da881b903ead873cc3f4df27646d1ffdd63c1c) )
+	
+	ROM_REGION( 0x1000, "nvram", 0)
+	ROM_LOAD( "beastf.nv", 0, 0x1000, CRC(98017b09) SHA1(0e2b2071bb47fc179d5bc36ef9431a9d2727d36a) )
 ROM_END
 
 DRIVER_INIT_MEMBER(epos_state,dealer)
