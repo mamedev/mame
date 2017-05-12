@@ -27,11 +27,9 @@
       between the two palettes.  This effect is not emulated, but since both
       halfs of the palette are identical, this is not an issue.  See $039c.
       The other games have a different color test, not using the busy loop.
-
-    - Fix flip screen support for The Dealer and Beastie Feastie.
 	
 	- dealer/beastf/revngr84: "PSG registers not OK" in service mode thru 
-	  sound menu;
+	  sound menu, internal ay8910 not right?
 
 ***************************************************************************/
 
