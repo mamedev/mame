@@ -363,6 +363,25 @@ bool core_options::parse_command_line(std::vector<std::string> &args, int priori
 	error_string.clear();
 	m_command.clear();
 
+	// we want to identify commands first
+	for (size_t arg = 1; arg < args.size(); arg++)
+	{
+		if (!args[arg].empty() && args[arg][0] == '-')
+		{
+			auto curentry = m_entrymap.find(&args[arg][1]);
+			if (curentry != m_entrymap.end() && curentry->second->type() == OPTION_COMMAND)
+			{
+				// can only have one command
+				if (!m_command.empty())
+				{
+					error_string.append(string_format("Error: multiple commands specified -%s and %s\n", m_command, args[arg]));
+					return false;
+				}
+				m_command = curentry->second->name();
+			}
+		}
+	}
+
 	// iterate through arguments
 	int unadorned_index = 0;
 	size_t new_argc = 1;
@@ -403,18 +422,9 @@ bool core_options::parse_command_line(std::vector<std::string> &args, int priori
 			continue;
 		}
 
-		// process commands first
+		// at this point, we've already processed commands
 		if (curentry->second->type() == OPTION_COMMAND)
-		{
-			// can only have one command
-			if (!m_command.empty())
-			{
-				error_string.append(string_format("Error: multiple commands specified -%s and %s\n", m_command, curarg));
-				return false;
-			}
-			m_command = curentry->second->name();
 			continue;
-		}
 
 		// get the data for this argument, special casing booleans
 		std::string newdata;
