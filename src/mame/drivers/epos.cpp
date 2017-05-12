@@ -439,7 +439,7 @@ MACHINE_START_MEMBER(epos_state,dealer)
 static MACHINE_CONFIG_START( epos, epos_state ) /* EPOS TRISTAR 8000 PCB */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_11MHz/4)    /* 2.75 MHz schematics comfirm 11MHz XTAL (see notes) */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_11MHz/4)    /* 2.75 MHz schematics confirm 11MHz XTAL (see notes) */
 	MCFG_CPU_PROGRAM_MAP(epos_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
