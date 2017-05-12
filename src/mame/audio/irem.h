@@ -2,7 +2,6 @@
 // copyright-holders:Couriersud
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-#include "machine/gen_latch.h"
 #include "machine/netlist.h"
 #include "audio/nl_kidniki.h"
 
@@ -13,6 +12,7 @@ public:
 	~irem_audio_device() {}
 
 	DECLARE_WRITE8_MEMBER( cmd_w );
+	DECLARE_READ8_MEMBER( soundlatch_r );
 	DECLARE_WRITE8_MEMBER( m6803_port1_w );
 	DECLARE_WRITE8_MEMBER( m6803_port2_w );
 	DECLARE_READ8_MEMBER( m6803_port1_r );
@@ -30,13 +30,14 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
 	uint8_t           m_port1;
 	uint8_t           m_port2;
 
-	required_device<generic_latch_8_device> m_soundlatch;
+	uint8_t           m_soundlatch;
 	/* FIXME: using required / optional device would be better */
 	// required_device<ay8910_device> m_ay_45L;
 	// required_device<ay8910_device> m_ay_45M;
