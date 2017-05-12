@@ -439,7 +439,7 @@ MACHINE_START_MEMBER(epos_state,dealer)
 static MACHINE_CONFIG_START( epos, epos_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 11000000/4)    /* 2.75 MHz (see notes) */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_11MHz/4)    /* 2.75 MHz schamatics comfirm 11MHz XTAL (see notes) */
 	MCFG_CPU_PROGRAM_MAP(epos_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
@@ -459,7 +459,7 @@ static MACHINE_CONFIG_START( epos, epos_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 11000000/4)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_11MHz/4) /* should be a devisor of 16? - clock not confirmed - schamatics show 8912 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
