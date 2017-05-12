@@ -323,15 +323,17 @@ int cli_frontend::execute(std::vector<std::string> &args)
 //  games
 //-------------------------------------------------
 
-void cli_frontend::listxml(const std::string &gamename)
+void cli_frontend::listxml(const std::vector<std::string> &args)
 {
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+
 	// determine which drivers to output; return an error if none found
-	driver_enumerator drivlist(m_options, gamename.c_str());
+	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename.c_str());
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename ? gamename : "");
 
 	// create the XML and print it to stdout
-	info_xml_creator creator(drivlist, !gamename.empty());
+	info_xml_creator creator(drivlist, gamename && *gamename);
 	creator.output(stdout);
 }
 
@@ -341,12 +343,14 @@ void cli_frontend::listxml(const std::string &gamename)
 //  one or more games
 //-------------------------------------------------
 
-void cli_frontend::listfull(const std::string &gamename)
+void cli_frontend::listfull(const std::vector<std::string> &args)
 {
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+
 	// determine which drivers to output; return an error if none found
-	driver_enumerator drivlist(m_options, gamename.c_str());
+	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename.c_str());
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// print the header
 	osd_printf_info("Name:             Description:\n");
@@ -363,12 +367,14 @@ void cli_frontend::listfull(const std::string &gamename)
 //  filename of one or more games
 //-------------------------------------------------
 
-void cli_frontend::listsource(const std::string &gamename)
+void cli_frontend::listsource(const std::vector<std::string> &args)
 {
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+
 	// determine which drivers to output; return an error if none found
-	driver_enumerator drivlist(m_options, gamename.c_str());
+	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename.c_str());
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// iterate through drivers and output the info
 	while (drivlist.next())
@@ -381,10 +387,12 @@ void cli_frontend::listsource(const std::string &gamename)
 //  clones matching the given pattern
 //-------------------------------------------------
 
-void cli_frontend::listclones(const std::string &gamename)
+void cli_frontend::listclones(const std::vector<std::string> &args)
 {
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+
 	// start with a filtered list of drivers
-	driver_enumerator drivlist(m_options, gamename.c_str());
+	driver_enumerator drivlist(m_options, gamename);
 	int original_count = drivlist.count();
 
 	// iterate through the remaining ones to see if their parent matches
@@ -393,7 +401,7 @@ void cli_frontend::listclones(const std::string &gamename)
 		// if we have a non-bios clone and it matches, keep it
 		int clone_of = drivlist.clone();
 		if (clone_of != -1 && (drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) == 0)
-			if (drivlist.matches(gamename.c_str(), drivlist.driver(clone_of).name))
+			if (drivlist.matches(gamename, drivlist.driver(clone_of).name))
 				drivlist.include();
 	}
 
@@ -402,9 +410,9 @@ void cli_frontend::listclones(const std::string &gamename)
 	{
 		// see if we match but just weren't a clone
 		if (original_count == 0)
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename.c_str());
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 		else
-			osd_printf_info("Found %lu matches for '%s' but none were clones\n", (unsigned long)drivlist.count(), gamename.c_str());
+			osd_printf_info("Found %lu matches for '%s' but none were clones\n", (unsigned long)drivlist.count(), gamename);
 		return;
 	}
 
@@ -428,12 +436,14 @@ void cli_frontend::listclones(const std::string &gamename)
 //  source file
 //-------------------------------------------------
 
-void cli_frontend::listbrothers(const std::string &gamename)
+void cli_frontend::listbrothers(const std::vector<std::string> &args)
 {
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+
 	// start with a filtered list of drivers; return an error if none found
-	driver_enumerator initial_drivlist(m_options, gamename.c_str());
+	driver_enumerator initial_drivlist(m_options, gamename);
 	if (initial_drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename.c_str());
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// for the final list, start with an empty driver list
 	driver_enumerator drivlist(m_options);
@@ -471,12 +481,14 @@ void cli_frontend::listbrothers(const std::string &gamename)
 //  referenced by the emulator
 //-------------------------------------------------
 
-void cli_frontend::listcrc(const std::string &gamename)
+void cli_frontend::listcrc(const std::vector<std::string> &args)
 {
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+
 	// determine which drivers to output; return an error if none found
-	driver_enumerator drivlist(m_options, gamename.c_str());
+	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename.c_str());
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// iterate through matches, and then through ROMs
 	while (drivlist.next())
@@ -499,12 +511,14 @@ void cli_frontend::listcrc(const std::string &gamename)
 //  by a given game or set of games
 //-------------------------------------------------
 
-void cli_frontend::listroms(const std::string &gamename)
+void cli_frontend::listroms(const std::vector<std::string> &args)
 {
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+
 	// determine which drivers to output; return an error if none found
-	driver_enumerator drivlist(m_options, gamename.c_str());
+	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename.c_str());
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// iterate through matches
 	bool first = true;
@@ -560,12 +574,14 @@ void cli_frontend::listroms(const std::string &gamename)
 //  referenced by a given game or set of games
 //-------------------------------------------------
 
-void cli_frontend::listsamples(const std::string &gamename)
+void cli_frontend::listsamples(const std::vector<std::string> &args)
 {
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+
 	// determine which drivers to output; return an error if none found
-	driver_enumerator drivlist(m_options, gamename.c_str());
+	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename.c_str());
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// iterate over drivers, looking for SAMPLES devices
 	bool first = true;
@@ -598,12 +614,14 @@ void cli_frontend::listsamples(const std::string &gamename)
 //  referenced by a given game or set of games
 //-------------------------------------------------
 
-void cli_frontend::listdevices(const std::string &gamename)
+void cli_frontend::listdevices(const std::vector<std::string> &args)
 {
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+
 	// determine which drivers to output; return an error if none found
-	driver_enumerator drivlist(m_options, gamename.c_str());
+	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename.c_str());
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// iterate over drivers, looking for SAMPLES devices
 	bool first = true;
@@ -673,12 +691,14 @@ void cli_frontend::listdevices(const std::string &gamename)
 //  referenced by a given game or set of games
 //-------------------------------------------------
 
-void cli_frontend::listslots(const std::string &gamename)
+void cli_frontend::listslots(const std::vector<std::string> &args)
 {
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+
 	// determine which drivers to output; return an error if none found
-	driver_enumerator drivlist(m_options, gamename.c_str());
+	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename.c_str());
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// print header
 	printf("%-16s %-16s %-16s %s\n", "SYSTEM", "SLOT NAME", "SLOT OPTIONS", "SLOT DEVICE NAME");
@@ -731,12 +751,14 @@ void cli_frontend::listslots(const std::string &gamename)
 //  referenced by a given game or set of games
 //-------------------------------------------------
 
-void cli_frontend::listmedia(const std::string &gamename)
+void cli_frontend::listmedia(const std::vector<std::string> &args)
 {
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+
 	// determine which drivers to output; return an error if none found
-	driver_enumerator drivlist(m_options, gamename.c_str());
+	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename.c_str());
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// print header
 	printf("%-16s %-16s %-10s %s\n", "SYSTEM", "MEDIA NAME", "(brief)", "IMAGE FILE EXTENSIONS SUPPORTED");
@@ -783,15 +805,12 @@ void cli_frontend::listmedia(const std::string &gamename)
 //  verifyroms - verify the ROM sets of one or
 //  more games
 //-------------------------------------------------
-void cli_frontend::verifyroms(const std::string &gamename)
+void cli_frontend::verifyroms(const std::vector<std::string> &args)
 {
-	// create our own copy of options for the purposes of ROM validation
-	// so we are not "polluted" with driver-specific slot/image options
-	emu_options options(true);
-	options.copy_from(m_options);
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
 
 	// determine which drivers to output;
-	driver_enumerator drivlist(options, gamename.c_str());
+	driver_enumerator drivlist(m_options, gamename);
 
 	unsigned correct = 0;
 	unsigned incorrect = 0;
@@ -820,7 +839,7 @@ void cli_frontend::verifyroms(const std::string &gamename)
 	for (device_type type : registered_device_types)
 	{
 		device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
-		if (gamename.empty() || !core_strwildcmp(gamename.c_str(), dev->shortname()))
+		if (!gamename || !core_strwildcmp(gamename, dev->shortname()))
 		{
 			matched++;
 
@@ -841,15 +860,15 @@ void cli_frontend::verifyroms(const std::string &gamename)
 
 	// return an error if none found
 	if (matched == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename.c_str());
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// if we didn't get anything at all, display a generic end message
 	if (matched > 0 && correct == 0 && incorrect == 0)
 	{
 		if (notfound > 0)
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" not found!\n", gamename.c_str());
+			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" not found!\n", gamename);
 		else
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" has no roms!\n", gamename.c_str());
+			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" has no roms!\n", gamename);
 	}
 
 	// otherwise, print a summary
@@ -867,9 +886,9 @@ void cli_frontend::verifyroms(const std::string &gamename)
 //  one or more games
 //-------------------------------------------------
 
-void cli_frontend::verifysamples(const std::string &gamename_str)
+void cli_frontend::verifysamples(const std::vector<std::string> &args)
 {
-	const char *gamename = gamename_str.empty() ? "*" : gamename_str.c_str();
+	const char *gamename = args.empty() ? "*" : args[0].c_str();
 
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
@@ -1103,16 +1122,18 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
         identifying duplicate lists.
 -------------------------------------------------*/
 
-void cli_frontend::listsoftware(const std::string &gamename)
+void cli_frontend::listsoftware(const std::vector<std::string> &args)
 {
+	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+
 	FILE *out = stdout;
 	std::unordered_set<std::string> list_map;
 	bool isfirst = true;
 
 	// determine which drivers to output; return an error if none found
-	driver_enumerator drivlist(m_options, gamename.c_str());
+	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename.c_str());
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	while (drivlist.next())
 	{
@@ -1136,9 +1157,9 @@ void cli_frontend::listsoftware(const std::string &gamename)
     verifysoftware - verify roms from the software
     list of the specified driver(s)
 -------------------------------------------------*/
-void cli_frontend::verifysoftware(const std::string &gamename_str)
+void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 {
-	const char *gamename = gamename_str.empty() ? "*" : gamename_str.c_str();
+	const char *gamename = args.size() > 0 ? args[0].c_str() : "*";
 
 	std::unordered_set<std::string> list_map;
 
@@ -1212,9 +1233,9 @@ void cli_frontend::verifysoftware(const std::string &gamename_str)
     getsoftlist - retrieve software list by name
 -------------------------------------------------*/
 
-void cli_frontend::getsoftlist(const std::string &gamename_str)
+void cli_frontend::getsoftlist(const std::vector<std::string> &args)
 {
-	const char *gamename = gamename_str.empty() ? "*" : gamename_str.c_str();
+	const char *gamename = args.size() > 0 ? args[0].c_str() : "*";
 
 	FILE *out = stdout;
 	std::unordered_set<std::string> list_map;
@@ -1242,9 +1263,9 @@ void cli_frontend::getsoftlist(const std::string &gamename_str)
 /*-------------------------------------------------
     verifysoftlist - verify software list by name
 -------------------------------------------------*/
-void cli_frontend::verifysoftlist(const std::string &gamename_str)
+void cli_frontend::verifysoftlist(const std::vector<std::string> &args)
 {
-	const char *gamename = gamename_str.empty() ? "*" : gamename_str.c_str();
+	const char *gamename = args.size() > 0 ? args[0].c_str() : "*";
 
 	std::unordered_set<std::string> list_map;
 	unsigned correct = 0;
@@ -1308,18 +1329,20 @@ void cli_frontend::verifysoftlist(const std::string &gamename_str)
 //  matches in our internal database
 //-------------------------------------------------
 
-void cli_frontend::romident(const std::string &filename)
+void cli_frontend::romident(const std::vector<std::string> &args)
 {
+	const char *filename = args[0].c_str();
+
 	// create our own copy of options for the purposes of ROM identification
 	// so we are not "polluted" with driver-specific slot/image options
-	emu_options options(true);
-	options.copy_from(m_options);
+	emu_options options;
+	options.set_value(OPTION_MEDIAPATH, m_options.media_path(), OPTION_PRIORITY_DEFAULT);
 
 	media_identifier ident(options);
 
 	// identify the file, then output results
-	osd_printf_info("Identifying %s....\n", filename.c_str());
-	ident.identify(filename.c_str());
+	osd_printf_info("Identifying %s....\n", filename);
+	ident.identify(filename);
 
 	// return the appropriate error code
 	if (ident.matches() == ident.total())
@@ -1421,27 +1444,30 @@ void cli_frontend::execute_commands(const char *exename)
 	static const struct
 	{
 		const char *option;
-		void (cli_frontend::*function)(const std::string &gamename);
+		int min_args;
+		int max_args;
+		void (cli_frontend::*function)(const std::vector<std::string> &args);
+		const char *usage;
 	} info_commands[] =
 	{
-		{ CLICOMMAND_LISTXML,       &cli_frontend::listxml },
-		{ CLICOMMAND_LISTFULL,      &cli_frontend::listfull },
-		{ CLICOMMAND_LISTSOURCE,    &cli_frontend::listsource },
-		{ CLICOMMAND_LISTCLONES,    &cli_frontend::listclones },
-		{ CLICOMMAND_LISTBROTHERS,  &cli_frontend::listbrothers },
-		{ CLICOMMAND_LISTCRC,       &cli_frontend::listcrc },
-		{ CLICOMMAND_LISTDEVICES,   &cli_frontend::listdevices },
-		{ CLICOMMAND_LISTSLOTS,     &cli_frontend::listslots },
-		{ CLICOMMAND_LISTROMS,      &cli_frontend::listroms },
-		{ CLICOMMAND_LISTSAMPLES,   &cli_frontend::listsamples },
-		{ CLICOMMAND_VERIFYROMS,    &cli_frontend::verifyroms },
-		{ CLICOMMAND_VERIFYSAMPLES, &cli_frontend::verifysamples },
-		{ CLICOMMAND_LISTMEDIA,     &cli_frontend::listmedia },
-		{ CLICOMMAND_LISTSOFTWARE,  &cli_frontend::listsoftware },
-		{ CLICOMMAND_VERIFYSOFTWARE,&cli_frontend::verifysoftware },
-		{ CLICOMMAND_ROMIDENT,      &cli_frontend::romident },
-		{ CLICOMMAND_GETSOFTLIST,   &cli_frontend::getsoftlist },
-		{ CLICOMMAND_VERIFYSOFTLIST,&cli_frontend::verifysoftlist },
+		{ CLICOMMAND_LISTXML,			0, 1, &cli_frontend::listxml,			"[system name]" },
+		{ CLICOMMAND_LISTFULL,			0, 1, &cli_frontend::listfull,			"[system name]" },
+		{ CLICOMMAND_LISTSOURCE,		0, 1, &cli_frontend::listsource,		"[system name]" },
+		{ CLICOMMAND_LISTCLONES,		0, 1, &cli_frontend::listclones,		"[system name]" },
+		{ CLICOMMAND_LISTBROTHERS,		0, 1, &cli_frontend::listbrothers,		"[system name]" },
+		{ CLICOMMAND_LISTCRC,			0, 1, &cli_frontend::listcrc,			"[system name]" },
+		{ CLICOMMAND_LISTDEVICES,		0, 1, &cli_frontend::listdevices,		"[system name]" },
+		{ CLICOMMAND_LISTSLOTS,			0, 1, &cli_frontend::listslots,			"[system name]" },
+		{ CLICOMMAND_LISTROMS,			0, 1, &cli_frontend::listroms,			"[system name]" },
+		{ CLICOMMAND_LISTSAMPLES,		0, 1, &cli_frontend::listsamples,		"[system name]" },
+		{ CLICOMMAND_VERIFYROMS,		0, 1, &cli_frontend::verifyroms,		"[system name]" },
+		{ CLICOMMAND_VERIFYSAMPLES,		0, 1, &cli_frontend::verifysamples,		"[system name|*]" },
+		{ CLICOMMAND_LISTMEDIA,			0, 1, &cli_frontend::listmedia,			"[system name]" },
+		{ CLICOMMAND_LISTSOFTWARE,		0, 1, &cli_frontend::listsoftware,		"[system name]" },
+		{ CLICOMMAND_VERIFYSOFTWARE,	0, 1, &cli_frontend::verifysoftware,	"[system name|*]" },
+		{ CLICOMMAND_ROMIDENT,			1, 1, &cli_frontend::romident,			"(system name)" },
+		{ CLICOMMAND_GETSOFTLIST,		0, 1, &cli_frontend::getsoftlist,		"[system name|*]" },
+		{ CLICOMMAND_VERIFYSOFTLIST,	0, 1, &cli_frontend::verifysoftlist,	"[system name|*]" },
 	};
 
 	// find the command
@@ -1449,8 +1475,22 @@ void cli_frontend::execute_commands(const char *exename)
 	{
 		if (m_options.command() == info_command.option)
 		{
-			// parse any relevant INI files before proceeding
-			(this->*info_command.function)(m_options.attempted_system_name());
+			// validate argument count
+			const char *error_message = nullptr;
+			if (m_options.command_arguments().size() < info_command.min_args)
+				error_message = "Auxillary verb -%s requires at least %d argument(s)\n";
+			if (m_options.command_arguments().size() > info_command.max_args)
+				error_message = "Auxillary verb -%s takes at most %d argument(s)\n";
+			if (error_message)
+			{
+				osd_printf_info(error_message, info_command.option, info_command.max_args);
+				osd_printf_info("\n");
+				osd_printf_info("Usage:  %s -%s %s\n", exename, info_command.option, info_command.usage);
+				return;
+			}
+
+			// invoke the auxillary command!
+			(this->*info_command.function)(m_options.command_arguments());
 			return;
 		}
 	}

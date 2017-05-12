@@ -45,6 +45,26 @@ const char *const core_options::s_option_unadorned[MAX_UNADORNED_OPTIONS] =
 
 
 //**************************************************************************
+//  UTILITY
+//**************************************************************************
+
+namespace
+{
+	void trim_spaces_and_quotes(std::string &data)
+	{
+		// trim any whitespace
+		strtrimspace(data);
+
+		// trim quotes
+		if (data.find_first_of('"') == 0 && data.find_last_of('"') == data.length() - 1)
+		{
+			data.erase(0, 1);
+			data.erase(data.length() - 1, 1);
+		}
+	}
+};
+
+//**************************************************************************
 //  OPTIONS EXCEPTION CLASS
 //**************************************************************************
 
@@ -583,6 +603,14 @@ void core_options::parse_command_line(std::vector<std::string> &args, int priori
 		bool is_unadorned = (curarg[0] != '-');
 		const char *optionname = is_unadorned ? core_options::unadorned(unadorned_index++) : &curarg[1];
 
+		// special case - collect unadorned arguments after commands into a special place
+		if (is_unadorned && !m_command.empty())
+		{
+			m_command_arguments.push_back(std::move(args[arg]));
+			args[arg].clear();
+			continue;
+		}
+
 		// find our entry; if not found, continue
 		auto curentry = get_entry(optionname);
 		if (!curentry)
@@ -638,7 +666,7 @@ void core_options::parse_command_line(std::vector<std::string> &args, int priori
 		args[arg].clear();
 
 		// set the new data
-		prettify_and_set_value(*curentry, std::move(newdata), priority, error_stream, condition);
+		do_set_value(*curentry, std::move(newdata), priority, error_stream, condition);
 	}
 
 	args.resize(new_argc);
@@ -714,7 +742,9 @@ void core_options::parse_ini_file(util::core_file &inifile, int priority, bool i
 		}
 
 		// set the new data
-		prettify_and_set_value(*curentry, optiondata, priority, error_stream, condition);
+		std::string data = optiondata;
+		trim_spaces_and_quotes(data);
+		do_set_value(*curentry, std::move(data), priority, error_stream, condition);
 	}
 
 	// did we have any errors that may need to be aggregated?
@@ -935,21 +965,11 @@ void core_options::remove_entry(core_options::entry &delentry)
 
 
 //-------------------------------------------------
-//  prettify_and_set_value
+//  do_set_value
 //-------------------------------------------------
 
-void core_options::prettify_and_set_value(entry &curentry, std::string &&data, int priority, std::ostream &error_stream, condition_type &condition)
+void core_options::do_set_value(entry &curentry, std::string &&data, int priority, std::ostream &error_stream, condition_type &condition)
 {
-	// trim any whitespace
-	strtrimspace(data);
-
-	// trim quotes
-	if (data.find_first_of('"') == 0 && data.find_last_of('"') == data.length() - 1)
-	{
-		data.erase(0, 1);
-		data.erase(data.length() - 1, 1);
-	}
-
 	// this is called when parsing a command line or an INI - we want to catch the option_exception and write
 	// any exception messages to the error stream
 	try

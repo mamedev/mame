@@ -75,12 +75,14 @@
   - gckong random lockups (tap the jump button repeatedly): mcu stack overflow,
     works ok if stack levels is increased, 38800 B rev. has more stack levels?
     Or it could be a race condition: irq happening too late/early.
-  - bultrman building explosions are wrong, especially visible on the first one
   - epacman booting the game in demo mode, pacman should go straight to the
     upper-left power pill: mcu cycle/interrupt timing related
-  - Though very uncommon when compared to games with LED/lamp display,
-    some games may manipulate VFD plate brightness by strobing it longer,
+  - Though very uncommon when compared to games with LED/lamp display, some
+    games may manipulate VFD plate brightness by strobing it longer/shorter,
     eg. cgalaxn when the player ship explodes.
+  - Related to the above issue: bultrman sometimes strobes D0/D1/D2 for a very
+    short duration, causing (unwanted) dimly lit segments on the real machine.
+    On MAME they will show with full brightness, see eg. building explosions.
   - bzaxxon 3D effect is difficult to simulate
 
 ***************************************************************************/

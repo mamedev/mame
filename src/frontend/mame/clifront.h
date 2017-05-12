@@ -33,27 +33,27 @@ public:
 	// execute based on the incoming argc/argv
 	int execute(std::vector<std::string> &args);
 
-	// direct access to the command operations
-	void listxml(const std::string &gamename = "*");
-	void listfull(const std::string &gamename = "*");
-	void listsource(const std::string &gamename = "*");
-	void listclones(const std::string &gamename = "*");
-	void listbrothers(const std::string &gamename = "*");
-	void listcrc(const std::string &gamename = "*");
-	void listroms(const std::string &gamename = "*");
-	void listsamples(const std::string &gamename = "*");
-	void listdevices(const std::string &gamename = "*");
-	void listslots(const std::string &gamename = "*");
-	void listmedia(const std::string &gamename = "*");
-	void listsoftware(const std::string &gamename = "*");
-	void verifysoftware(const std::string &gamename = "*");
-	void verifyroms(const std::string &gamename = "*");
-	void verifysamples(const std::string &gamename = "*");
-	void romident(const std::string &filename);
-	void getsoftlist(const std::string &gamename = "*");
-	void verifysoftlist(const std::string &gamename = "*");
-
 private:
+	// commands
+	void listxml(const std::vector<std::string> &args);
+	void listfull(const std::vector<std::string> &args);
+	void listsource(const std::vector<std::string> &args);
+	void listclones(const std::vector<std::string> &args);
+	void listbrothers(const std::vector<std::string> &args);
+	void listcrc(const std::vector<std::string> &args);
+	void listroms(const std::vector<std::string> &args);
+	void listsamples(const std::vector<std::string> &args);
+	void listdevices(const std::vector<std::string> &args);
+	void listslots(const std::vector<std::string> &args);
+	void listmedia(const std::vector<std::string> &args);
+	void listsoftware(const std::vector<std::string> &args);
+	void verifysoftware(const std::vector<std::string> &args);
+	void verifyroms(const std::vector<std::string> &args);
+	void verifysamples(const std::vector<std::string> &args);
+	void romident(const std::vector<std::string> &args);
+	void getsoftlist(const std::vector<std::string> &args);
+	void verifysoftlist(const std::vector<std::string> &args);
+
 	// internal helpers
 	void execute_commands(const char *exename);
 	void display_help(const char *exename);

@@ -154,6 +154,7 @@ public:
 
 	// getters
 	const std::string &command() const { return m_command; }
+	const std::vector<std::string> &command_arguments() const { assert(!m_command.empty()); return m_command_arguments; }
 	const entry::shared_ptr get_entry(const std::string &name) const;
 	entry::shared_ptr get_entry(const std::string &name);
 	const std::vector<entry::shared_ptr> &entries() const { return m_entries; }
@@ -237,13 +238,14 @@ private:
 
 	// internal helpers
 	void add_to_entry_map(std::string &&name, entry::shared_ptr &entry);
-	void prettify_and_set_value(entry &curentry, std::string &&data, int priority, std::ostream &error_stream, condition_type &condition);
+	void do_set_value(entry &curentry, std::string &&data, int priority, std::ostream &error_stream, condition_type &condition);
 	void throw_options_exception_if_appropriate(condition_type condition, std::ostringstream &error_stream);
 
 	// internal state
 	std::vector<entry::shared_ptr>                      m_entries;              // cannonical list of entries
 	std::unordered_map<std::string, entry::weak_ptr>    m_entrymap;             // map for fast lookup
 	std::string                                         m_command;              // command found
+	std::vector<std::string>                            m_command_arguments;	// command arguments
 	static const char *const                            s_option_unadorned[];   // array of unadorned option "names"
 };
 
