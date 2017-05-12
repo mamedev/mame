@@ -44,26 +44,6 @@ const char *const core_options::s_option_unadorned[MAX_UNADORNED_OPTIONS] =
 };
 
 
-//**************************************************************************
-//  UTILITY
-//**************************************************************************
-
-namespace
-{
-	void trim_spaces_and_quotes(std::string &data)
-	{
-		// trim any whitespace
-		strtrimspace(data);
-
-		// trim quotes
-		if (data.find_first_of('"') == 0 && data.find_last_of('"') == data.length() - 1)
-		{
-			data.erase(0, 1);
-			data.erase(data.length() - 1, 1);
-		}
-	}
-};
-
 
 //**************************************************************************
 //  CORE OPTIONS ENTRY
@@ -373,14 +353,6 @@ bool core_options::parse_command_line(std::vector<std::string> &args, int priori
 		bool is_unadorned = (curarg[0] != '-');
 		const char *optionname = is_unadorned ? core_options::unadorned(unadorned_index++) : &curarg[1];
 
-		// special case - collect unadorned arguments after commands into a special place
-		if (is_unadorned && !m_command.empty())
-		{
-			m_command_arguments.push_back(std::move(args[arg]));
-			args[arg].clear();
-			continue;
-		}
-
 		// find our entry; if not found, continue
 		auto curentry = m_entrymap.find(optionname);
 		if (curentry == m_entrymap.end())
@@ -506,9 +478,7 @@ bool core_options::parse_ini_file(util::core_file &inifile, int priority, bool i
 		}
 
 		// set the new data
-		std::string data = optiondata;
-		trim_spaces_and_quotes(data);
-		validate_and_set_data(*curentry->second, std::move(data), priority, error_string);
+		validate_and_set_data(*curentry->second, optiondata, priority, error_string);
 	}
 	return true;
 }
@@ -862,6 +832,16 @@ void core_options::copyfrom(const core_options &src)
 
 bool core_options::validate_and_set_data(core_options::entry &curentry, std::string &&data, int priority, std::string &error_string)
 {
+	// trim any whitespace
+	strtrimspace(data);
+
+	// trim quotes
+	if (data.find_first_of('"') == 0 && data.find_last_of('"') == data.length() - 1)
+	{
+		data.erase(0, 1);
+		data.erase(data.length() - 1, 1);
+	}
+
 	// let derived classes override how we set this data
 	if (override_set_value(curentry.name(), data))
 		return true;
