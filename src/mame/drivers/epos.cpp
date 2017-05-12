@@ -467,7 +467,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( dealer, epos_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 11000000/4)    /* 2.75 MHz (see notes) */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_22_1184MHz/8)    /* 2.7648 MHz (measured) */
 	MCFG_CPU_PROGRAM_MAP(dealer_map)
 	MCFG_CPU_IO_MAP(dealer_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
@@ -496,7 +496,7 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 11000000/4)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_22_1184MHz/32)    /* 0.6912 MHz (measured) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	// port a writes?
@@ -636,65 +636,57 @@ ROM_END
 /*
 
 Revenger 84 - EPOS
-^^^^^^^^^^^^^^^^^^
-Dumped by Andrew Welburn
-http://www.andys-arcade.com
-on 11/05/17
 
+EPOS TRISTAR 9000
++--------------------------------+
+|                                |
+|  DSW                           |
+|             4116 4116          |
+| 8910  Z80A  4116 4116          |
+|             4116 4116          |
+|  6116  BAT  4116 4116          |
+|  6116       4116 4116          |
+|  U4         4116 4116   74S189 |
+|  U3         4116 4116   4S189  |
+|  U2 PAL.U13 4116 4116          |
+|  U1 PAL10L8 8255  DM74S288N    |
+|                      22.1184MHz|
+|                                |
+|                       LM384N   |
+|                         VOL    |
++-|28 pin Connector|-------------+
 
+  CPU: Z80A        2.764800 MHz [22.1184MHz/8]
+Sound: AY-3-8910   0.691200 MHz [22.1184MHz/32]
+ XTAL: 22.1184MHz
+  DSW: 8 position dipswitch bank
+  BAT: Battery (battery backed up RAM for high scores)
+  VOL: Volume Pot
 
-EPOS Tristar 9000 board, all 4 2764's dumped.
+28 Pin non-JAMMA connector
 
-there are 2x secuirty looking chips (like other epos games)
-one is a PAL10L8, the other has all markings scrubbed off.
+ 4 ROMs at U1 through U4 are 2764 type
+ BPROM at U60 is a DM74S288N
+ 2 pals, U12 is a PAL10L8, U13 PAL type is unknown (markings scrubbed off)
 
-the pcb uses a battery and the high score table (when the game booted) showed 
-a large table of kept scores.
-
-pcb xtal speed is : 22.1184mhz
-
-cpu pin 6 (clk) = 2763300 hz
-ay-3-8910 clock =  682900 hz
-
-4116 RAS is = 2763300 hz
-4116 CAS is = 1381660 hz
-
+4116 RAS is = 2.764800 MHz [22.1184MHz/8]
+4116 CAS is = 1.382400 MHz [22.1184MHz/16]
 
 */
 
 ROM_START( revngr84 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-    ROM_LOAD( "revenger.u1",  0x0000, 0x2000, CRC(308f231f) SHA1(cf06695601bd0387e4fcb64d9b34143323e98b07) )
-    ROM_LOAD( "revenger.u2",  0x2000, 0x2000, CRC(e80bbfb4) SHA1(9302beaef8bbb7376b6a20e9ee5adbcf60d66dd8) )
-    ROM_LOAD( "revenger.u3",  0x4000, 0x2000, CRC(d9270929) SHA1(a95034b5387a40e02f04bdfa79e1d8e65dad30fe) )
-    ROM_LOAD( "revenger.u4",  0x6000, 0x2000, CRC(d6e6cfa8) SHA1(f10131bb2e9d088c7b6d6a5d5520073d78ad69cc) )
+    ROM_LOAD( "u1_revenger_r06254.u1",  0x0000, 0x2000, CRC(308f231f) SHA1(cf06695601bd0387e4fcb64d9b34143323e98b07) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
+    ROM_LOAD( "u2_revenger_r06254.u2",  0x2000, 0x2000, CRC(e80bbfb4) SHA1(9302beaef8bbb7376b6a20e9ee5adbcf60d66dd8) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
+    ROM_LOAD( "u3_revenger_r06254.u3",  0x4000, 0x2000, CRC(d9270929) SHA1(a95034b5387a40e02f04bdfa79e1d8e65dad30fe) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
+    ROM_LOAD( "u4_revenger_r06254.u4",  0x6000, 0x2000, CRC(d6e6cfa8) SHA1(f10131bb2e9d088c7b6d6a5d5520073d78ad69cc) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "revenger.u60", 0x0000, 0x0020, CRC(be2b0641) SHA1(26982903b6d942af8e0a526412d8e01978d76420) ) // unknown purpose
+	ROM_LOAD( "dm74s288n.u60", 0x0000, 0x0020, CRC(be2b0641) SHA1(26982903b6d942af8e0a526412d8e01978d76420) ) // unknown purpose
 
 	ROM_REGION( 0x1000, "nvram", 0)
 	ROM_LOAD( "revngr84.nv", 0, 0x1000, CRC(a4417770) SHA1(92eded82db0810e7818d2f52a0497032f390fcc1) )
 ROM_END
-
-/*
-
-Revenger EPOS 1984
-
-EPOS TRISTAR 9000
-
-
-
-   8910   Z80A    4116  4116
-                  4116  4116
-                  4116  4116
-    6116          4116  4116
-    6116          4116  4116
-    U4            4116  4116     74S189
-    U3            4116  4116     74S189
-    U2            4116  4116
-    U1        8255
-                             22.1184MHz
-*/
 
 ROM_START( revenger )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -702,6 +694,9 @@ ROM_START( revenger )
 	ROM_LOAD( "r06124.u2",    0x2000, 0x2000, BAD_DUMP CRC(a8e0ee7b) SHA1(f6f78e8ce40eab07de461b364876c1eb4a78d96e) )
 	ROM_LOAD( "r06124.u3",    0x4000, 0x2000, BAD_DUMP CRC(cca414a5) SHA1(1c9dd3ff63d57e9452e63083cdbd7f5d693bb686) )
 	ROM_LOAD( "r06124.u4",    0x6000, 0x2000, BAD_DUMP CRC(0b81c303) SHA1(9022d18dec11312eb4bb471c22b563f5f897b4f7) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) /* this PROM not included in dump, but assumed to be the same */
+	ROM_LOAD( "dm74s288n.u60", 0x0000, 0x0020, CRC(be2b0641) SHA1(26982903b6d942af8e0a526412d8e01978d76420) ) // unknown purpose
 	
 	ROM_REGION( 0x1000, "nvram", 0)
 	ROM_LOAD( "revngr84.nv", 0, 0x1000, CRC(a4417770) SHA1(92eded82db0810e7818d2f52a0497032f390fcc1) )
