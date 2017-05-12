@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( dealer_io_map, AS_IO, 8, epos_state )
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x20, 0x24) AM_WRITE(dealer_decrypt_rom)
 	AM_RANGE(0x34, 0x34) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x38, 0x38) AM_READ_PORT("DSW")
+	AM_RANGE(0x38, 0x38) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x3c, 0x3c) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
@@ -500,6 +500,7 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 11000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	// port a writes?
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(epos_state, flip_screen_w))
 MACHINE_CONFIG_END

@@ -62,8 +62,10 @@ WRITE8_MEMBER(epos_state::dealer_pal_w)
 }
 
 WRITE8_MEMBER(epos_state::flip_screen_w)
-{
+{	
 	flip_screen_set(BIT(data, 7));
+
+	// bit 6: ay8910 port A/B multiplexer read? 
 }
 
 WRITE8_MEMBER(epos_state::port_1_w)
