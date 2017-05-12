@@ -83,6 +83,7 @@
   - Related to the above issue: bultrman sometimes strobes D0/D1/D2 for a very
     short duration, causing (unwanted) dimly lit segments on the real machine.
     On MAME they will show with full brightness, see eg. building explosions.
+    Currently there's a workaround in place.
   - bzaxxon 3D effect is difficult to simulate
 
 ***************************************************************************/
@@ -1611,7 +1612,8 @@ WRITE16_MEMBER(bultrman_state::grid_w)
 	m_grid = data >> 8 & 0xff;
 
 	// D0-D2: plate 15-17 (update display there)
-	plate_w(space, 4, data & 7);
+	//plate_w(space, 4, data & 7);
+	plate_w(space, 4, data & (1 << offset) & 7);
 }
 
 
