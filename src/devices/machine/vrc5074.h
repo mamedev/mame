@@ -168,10 +168,6 @@ public:
 	DECLARE_READ32_MEMBER (target1_r);
 	DECLARE_WRITE32_MEMBER(target1_w);
 
-	virtual DECLARE_ADDRESS_MAP(target2_map, 32);
-	DECLARE_READ32_MEMBER (target2_r);
-	DECLARE_WRITE32_MEMBER(target2_w);
-
 protected:
 	address_space *m_cpu_space;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
@@ -209,7 +205,6 @@ private:
 
 	void setup_pci_space(void);
 	uint32_t m_pci_laddr[2], m_pci_mask[2], m_pci_type[2];
-	uint32_t m_target1_laddr, m_target2_laddr;
 	uint32_t m_sdram_addr[2];
 
 };

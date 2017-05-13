@@ -33,11 +33,6 @@ DEVICE_ADDRESS_MAP_START(target1_map, 32, vrc5074_device)
 	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    target1_r,          target1_w)
 ADDRESS_MAP_END
 
-// Target Window 2 map
-DEVICE_ADDRESS_MAP_START(target2_map, 32, vrc5074_device)
-	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    target2_r,          target2_w)
-ADDRESS_MAP_END
-
 vrc5074_device::vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, VRC5074, "NEC VRC5074 System Controller", tag, owner, clock, "vrc5074", __FILE__),
 		m_cpu_space(nullptr), m_cpu(nullptr), cpu_tag(nullptr),
@@ -116,16 +111,13 @@ void vrc5074_device::device_start()
 	m_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrc5074_device::nile_timer_callback), this));
 
 	// Save states
-	// m_ram
-	//save_pointer(NAME(m_ram.data()), m_ram_size / 4);
-	// m_simm
-	//save_pointer(NAME(m_simm[0].data()), m_simm0_size / 4);
-	//save_item(NAME(m_cpu_regs));
-	//save_item(NAME(m_pci1_laddr));
-	//save_item(NAME(m_pci2_laddr));
-	//save_item(NAME(m_pci_io_laddr));
-	//save_item(NAME(m_target1_laddr));
-	//save_item(NAME(m_target2_laddr));
+	// m_sdram
+	save_pointer(NAME(m_sdram[0].data()), m_sdram_size[0] / 4);
+	save_pointer(NAME(m_sdram[1].data()), m_sdram_size[1] / 4);
+	save_item(NAME(m_cpu_regs));
+	save_item(NAME(m_serial_regs));
+	save_item(NAME(m_nile_irq_state));
+	save_item(NAME(m_sdram_addr));
 	machine().save().register_postload(save_prepost_delegate(FUNC(vrc5074_device::postload), this));
 }
 
@@ -465,21 +457,6 @@ WRITE32_MEMBER (vrc5074_device::target1_w)
 	//m_sdram[0][offset] = data;
 	if (LOG_NILE_TARGET)
 		logerror("%08X:nile target1 write to offset %02X = %08X & %08X\n", m_cpu->device_t::safe_pc(), offset*4, data, mem_mask);
-}
-
-// PCI Target Window 2
-READ32_MEMBER (vrc5074_device::target2_r)
-{
-	uint32_t result = m_cpu->space(AS_PROGRAM).read_dword(m_target2_laddr | (offset*4), mem_mask);
-	if (LOG_NILE_TARGET)
-		logerror("%08X:nile target2 read from offset %02X = %08X & %08X\n", m_cpu->device_t::safe_pc(), offset*4, result, mem_mask);
-	return result;
-}
-WRITE32_MEMBER (vrc5074_device::target2_w)
-{
-	m_cpu->space(AS_PROGRAM).write_dword(m_target2_laddr | (offset*4), data, mem_mask);
-	if (LOG_NILE_TARGET)
-		logerror("%08X:nile target2 write to offset %02X = %08X & %08X\n", m_cpu->device_t::safe_pc(), offset*4, data, mem_mask);
 }
 
 // DMA Transfer

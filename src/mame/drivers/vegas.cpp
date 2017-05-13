@@ -340,7 +340,6 @@ public:
 	uint8_t m_pending_analog_read;
 	uint8_t m_cmos_unlocked;
 	uint8_t m_dcs_idma_cs;
-	int m_count;
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 	DECLARE_DRIVER_INIT(gauntleg);
@@ -421,7 +420,6 @@ void vegas_state::machine_start()
 	save_item(NAME(m_sio_led_state));
 	save_item(NAME(m_pending_analog_read));
 	save_item(NAME(m_cmos_unlocked));
-	//machine().save().register_postload(save_prepost_delegate(FUNC(vegas_state::remap_dynamic_addresses), this));
 }
 
 
