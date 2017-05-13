@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="jaguarcd" description="Jaguar CD-ROMs">
+<!--Skeleton test list based in TOSEC-v2012-07-22 Jaguar CD Homebrew list-->
+<!--I'll improve this list using TOSEC-v2015-06-04 soon-->
+<!--Author: Shideravan-->
+
+	<software name="beebris">
+		<description>Beebris</description>
+		<year>2009</year>
+		<publisher>Bad Brew Crew</publisher>
+		<part name="cdrom" interface="jag_cdrom">
+			<diskarea name="cdrom">
+				<disk name="beebris_cd" sha1="28528dc840133ab61407a04dc4ef8bc147a6a14a" />
+			</diskarea>
+		</part>	
+	</software>
+
+	<software name="frog">
+		<description>Frog Feast (demo)</description>
+		<year>2005</year>
+		<publisher>Raster Soft</publisher>
+		<part name="cdrom" interface="jag_cdrom">
+			<diskarea name="cdrom">
+				<disk name="frog" sha1="e3299744bef98665593b854e7bbe55e65a0322d4"/>
+			</diskarea>
+		</part>
+	</software>
+</softwarelist>
