@@ -1091,7 +1091,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 		// will only find CHDs for the default configuration.  I believe that this in practice will
 		// be acceptable.
 		emu_options driver_specific_options;
-		driver_specific_options.set_value(OPTION_SYSTEMNAME, options.system_name(), OPTION_PRIORITY_DEFAULT);
+		driver_specific_options.set_system_name(current_driver.name);
 		driver_specific_options.set_value(OPTION_MEDIAPATH, options.media_path(), OPTION_PRIORITY_DEFAULT);
 		driver_specific_options.set_value(OPTION_DIFF_DIRECTORY, options.diff_directory(), OPTION_PRIORITY_DEFAULT);
 

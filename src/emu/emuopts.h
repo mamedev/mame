@@ -279,7 +279,7 @@ public:
 	~emu_options();
 
 	// mutation
-	void set_system_name(const std::string &new_system_name);
+	void set_system_name(std::string &&new_system_name);
 	void set_software(std::string &&new_software);
 
 	// core options

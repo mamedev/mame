@@ -241,7 +241,7 @@ namespace
 	protected:
 		virtual void internal_set_value(std::string &&newvalue) override
 		{
-			m_host.set_system_name(newvalue);
+			m_host.set_system_name(std::move(newvalue));
 		}
 
 	private:
@@ -454,24 +454,24 @@ const char *emu_options::system_name() const
 //  name; will adjust slot/image options as appropriate
 //-------------------------------------------------
 
-void emu_options::set_system_name(const std::string &new_system_name)
+void emu_options::set_system_name(std::string &&new_system_name)
 {
 	const game_driver *new_system = nullptr;
 
 	// we are making an attempt - record what we're attempting
-	m_attempted_system_name = new_system_name;
+	m_attempted_system_name = std::move(new_system_name);
 
 	// was a system name specified?
-	if (!new_system_name.empty())
+	if (!m_attempted_system_name.empty())
 	{
 		// if so, first extract the base name (the reason for this is drag-and-drop on Windows; a side
 		// effect is a command line like 'mame pacman.foo' will work correctly, but so be it)
-		std::string new_system_base_name = core_filename_extract_base(new_system_name, true);
+		std::string new_system_base_name = core_filename_extract_base(m_attempted_system_name, true);
 
 		// perform the lookup (and error if it cannot be found)
 		int index = driver_list::find(new_system_base_name.c_str());
 		if (index < 0)
-			throw options_error_exception("Unknown system '%s'", new_system_name);
+			throw options_error_exception("Unknown system '%s'", m_attempted_system_name);
 		new_system = &driver_list::driver(index);
 	}
 
