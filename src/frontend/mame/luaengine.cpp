@@ -721,6 +721,7 @@ void lua_engine::initialize()
 	emu["app_version"] = &emulator_info::get_bare_build_version;
 	emu["gamename"] = [this](){ return machine().system().description; };
 	emu["romname"] = [this](){ return machine().basename(); };
+	emu["softname"] = [this]() { return machine().options().software_name(); };
 	emu["keypost"] = [this](const char *keys){ machine().ioport().natkeyboard().post_utf8(keys); };
 	emu["time"] = [this](){ return machine().time().as_double(); };
 	emu["start"] = [this](const char *driver) {

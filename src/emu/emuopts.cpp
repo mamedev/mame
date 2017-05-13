@@ -261,7 +261,7 @@ namespace
 	protected:
 		virtual void internal_set_value(std::string &&newvalue) override
 		{
-			m_host.set_software(newvalue);
+			m_host.set_software(std::move(newvalue));
 		}
 
 	private:
@@ -480,6 +480,7 @@ void emu_options::set_system_name(const std::string &new_system_name)
 	{
 		// if so, specify the new system and update
 		m_system = new_system;
+		m_software_name.clear();
 		update_slot_and_image_options();
 	}
 }
@@ -781,7 +782,7 @@ std::string emu_options::get_default_card_software(device_slot_interface &slot)
 //  software out of a software list (e.g. - "mame nes 'zelda'")
 //-------------------------------------------------
 
-void emu_options::set_software(const std::string &new_software)
+void emu_options::set_software(std::string &&new_software)
 {
 	// identify any options as a result of softlists
 	software_options softlist_opts = evaluate_initial_softlist_options(new_software);
@@ -823,6 +824,9 @@ void emu_options::set_software(const std::string &new_software)
 		if ((after_size > 0) && after_size >= before_size)
 			throw options_error_exception("Could not assign software option");
 	}
+
+	// we've succeeded; update the set name
+	m_software_name = std::move(new_software);
 }
 
 

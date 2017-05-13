@@ -280,12 +280,13 @@ public:
 
 	// mutation
 	void set_system_name(const std::string &new_system_name);
-	void set_software(const std::string &new_software);
+	void set_software(std::string &&new_software);
 
 	// core options
 	const game_driver *system() const { return m_system; }
 	const char *system_name() const;
 	const std::string &attempted_system_name() const { return m_attempted_system_name; }
+	const std::string &software_name() const { return m_software_name; }
 
 	// core configuration options
 	bool read_config() const { return bool_value(OPTION_READCONFIG); }
@@ -505,6 +506,9 @@ private:
 
 	// special option; the system name we tried to specify
 	std::string											m_attempted_system_name;
+
+	// special option; the software set name that we did specify
+	std::string                                         m_software_name;
 };
 
 #endif  // MAME_EMU_EMUOPTS_H
