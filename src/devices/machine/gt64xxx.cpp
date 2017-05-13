@@ -29,7 +29,7 @@ ADDRESS_MAP_END
 
 gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, GT64XXX, "Galileo GT-64XXX System Controller", tag, owner, clock, "gt64xxx", __FILE__),
-		m_be(0), m_autoconfig(0), m_irq_num(-1), m_simm0_size(0), m_simm1_size(0),
+		m_be(0), m_autoconfig(0), m_irq_num(-1),
 		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
 		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32),
 		m_romRegion(*this, "rom"),
@@ -37,6 +37,7 @@ gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, d
 {
 	for (int csIndex = 0; csIndex < 4; csIndex++) {
 		m_cs_devices[csIndex] = nullptr;
+		m_simm_size[csIndex] = 0;
 	}
 }
 
@@ -73,8 +74,8 @@ void gt64xxx_device::device_start()
 	m_dma_timer->adjust(attotime::never, 0, DMA_TIMER_PERIOD);
 
 	// Reserve RAM
-	m_ram[0].resize(m_simm0_size / 4);
-	m_ram[1].resize(m_simm1_size / 4);
+	for (int i=0; i<4; i++)
+		m_ram[i].resize(m_simm_size[i] / 4);
 
 	// ROM
 	uint32_t romSize = m_romRegion->bytes();
@@ -113,8 +114,10 @@ void gt64xxx_device::device_start()
 	}
 	save_item(NAME(m_dma_active));
 	// m_ram[4]
-	save_pointer(NAME(m_ram[0].data()), m_simm0_size / 4);
-	save_pointer(NAME(m_ram[1].data()), m_simm1_size / 4);
+	save_pointer(NAME(m_ram[0].data()), m_simm_size[0] / 4);
+	save_pointer(NAME(m_ram[1].data()), m_simm_size[1] / 4);
+	save_pointer(NAME(m_ram[2].data()), m_simm_size[2] / 4);
+	save_pointer(NAME(m_ram[3].data()), m_simm_size[3] / 4);
 	save_item(NAME(m_last_dma));
 	machine().save().register_postload(save_prepost_delegate(FUNC(gt64xxx_device::map_cpu_space), this));
 }
@@ -200,7 +203,7 @@ void gt64xxx_device::map_cpu_space()
 	winStart = m_reg[GREG_INTERNAL_SPACE]<<21;
 	winEnd = winStart + sizeof(m_reg) - 1;
 	m_cpu_space->install_device(winStart, winEnd, *static_cast<gt64xxx_device *>(this), &gt64xxx_device::cpu_map);
-	if (LOG_GALILEO)
+	if (1 || LOG_GALILEO)
 		logerror("%s: map_cpu_space cpu_reg start: %08X end: %08X\n", tag(), winStart, winEnd);
 
 	// RAS[0:3]
@@ -217,7 +220,7 @@ void gt64xxx_device::map_cpu_space()
 			m_cpu_space->install_ram(winStart, winEnd, m_ram[ramIndex].data());
 		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(m_ram[ramIndex][0]), false, &m_ram[ramIndex][0]);
 		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(uint32_t), false, m_ram[ramIndex].data());
-		if (LOG_GALILEO)
+		if (1 || LOG_GALILEO)
 			logerror("%s: map_cpu_space ras[%i] start: %08X end: %08X\n", tag(), ramIndex, winStart, winEnd);
 		//printf("%s: map_cpu_space ras[%i] start: %08X end: %08X size: %08X\n", tag(), ramIndex, winStart, winEnd, winEnd-winStart+1);
 	}
@@ -228,7 +231,7 @@ void gt64xxx_device::map_cpu_space()
 		winStart = (m_reg[GREG_CS_2_0_LO + 0x10 / 4 * (csIndex / 3)] << 21) | (m_reg[GREG_CS0_LO + 0x8 / 4 * csIndex] << 20);
 		winEnd = (m_reg[GREG_CS_2_0_LO + 0x10 / 4 * (csIndex / 3)] << 21) | (m_reg[GREG_CS0_HI + 0x8 / 4 * csIndex] << 20) | 0xfffff;
 		m_cpu_space->install_device_delegate(winStart, winEnd, *m_cs_devices[csIndex], m_cs_maps[csIndex]);
-		if (LOG_GALILEO)
+		if (1 || LOG_GALILEO)
 			logerror("%s: map_cpu_space cs[%i] start: %08X end: %08X\n", tag(), csIndex, winStart, winEnd);
 	}
 
@@ -237,7 +240,7 @@ void gt64xxx_device::map_cpu_space()
 	winEnd =   (m_reg[GREG_PCI_IO_LO]<<21) | (m_reg[GREG_PCI_IO_HI]<<21) | 0x1fffff;
 	m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::master_io_r), this));
 	m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::master_io_w), this));
-	if (LOG_GALILEO)
+	if (1 || LOG_GALILEO)
 		logerror("%s: map_cpu_space pci_io start: %08X end: %08X\n", tag(), winStart, winEnd);
 
 	// PCI MEM0 Window
@@ -245,7 +248,7 @@ void gt64xxx_device::map_cpu_space()
 	winEnd =   (m_reg[GREG_PCI_MEM0_LO]<<21) | (m_reg[GREG_PCI_MEM0_HI]<<21) | 0x1fffff;
 	m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::master_mem0_r), this));
 	m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::master_mem0_w), this));
-	if (LOG_GALILEO)
+	if (1 || LOG_GALILEO)
 		logerror("%s: map_cpu_space pci_mem0 start: %08X end: %08X\n", tag(), winStart, winEnd);
 
 	// PCI MEM1 Window
@@ -253,7 +256,7 @@ void gt64xxx_device::map_cpu_space()
 	winEnd =   (m_reg[GREG_PCI_MEM1_LO]<<21) | (m_reg[GREG_PCI_MEM1_HI]<<21) | 0x1fffff;
 	m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::master_mem1_r), this));
 	m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::master_mem1_w), this));
-	if (LOG_GALILEO)
+	if (1 || LOG_GALILEO)
 		logerror("%s: map_cpu_space pci_mem1 start: %08X end: %08X\n", tag(), winStart, winEnd);
 
 	// Setup the address mapping table for DMA lookups
