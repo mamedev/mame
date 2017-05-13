@@ -56,7 +56,7 @@ machine_config_constructor voodoo_pci_device::device_mconfig_additions() const
 const device_type VOODOO_PCI = device_creator<voodoo_pci_device>;
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, voodoo_pci_device)
-	AM_RANGE(0x40, 0x4f) AM_READWRITE  (pcictrl_r,  pcictrl_w)
+	AM_RANGE(0x40, 0x5f) AM_READWRITE  (pcictrl_r,  pcictrl_w)
 	AM_INHERIT_FROM(pci_device::config_map)
 ADDRESS_MAP_END
 
@@ -160,21 +160,35 @@ uint32_t voodoo_pci_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 READ32_MEMBER (voodoo_pci_device::pcictrl_r)
 {
 	uint32_t result = m_pcictrl_reg[offset];
+	// The address map starts at 0x40
+	switch (offset + 0x40 / 4) {
+	case 0x40/4:
+		// Vegas driver needs this value at PCI 0x40
+		result = 0x00044000; // FAB ID
+		break;
+	case 0x54/4:
+		// AGP Capability Register: 8 bit 0, 4 bit AGP Major, 4 bit AGP Minor, 8 bit Next Ptr, 8 bit Capability ID
+		// Tenthdeg (vegas) checks this
+		result = 0x00006002;
+		break;
+	}
+
 	if (1)
-		logerror("%06X:voodoo_pci_device pcictrl_r from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
+		logerror("%s:voodoo_pci_device pcictrl_r from offset %02X = %08X & %08X\n", machine().describe_context(), offset*4 + 0x40, result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER (voodoo_pci_device::pcictrl_w)
 {
 	COMBINE_DATA(&m_pcictrl_reg[offset]);
-	switch (offset) {
-		case 0x0/4:  // The address map starts at 0x40
+	// The address map starts at 0x40
+	switch (offset + 0x40 / 4) {
+		case 0x40/4:
 			// HW initEnable
 			m_voodoo->voodoo_set_init_enable(data);
-			logerror("%06X:voodoo_pci_device pcictrl_w to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+			logerror("%s:voodoo_pci_device pcictrl_w (initEnable) offset %02X = %08X & %08X\n", machine().describe_context(), offset * 4 + 0x40, data, mem_mask);
 			break;
 		default:
-			logerror("%06X:voodoo_pci_device pcictrl_w to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+			logerror("%s:voodoo_pci_device pcictrl_w to offset %02X = %08X & %08X\n", machine().describe_context(), offset*4 + 0x40, data, mem_mask);
 			break;
 	}
 }

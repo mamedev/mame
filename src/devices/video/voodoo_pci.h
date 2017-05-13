@@ -51,7 +51,7 @@ private:
 	int m_fbmem, m_tmumem0, m_tmumem1;
 	const char *m_cpu_tag;
 
-	uint32_t m_pcictrl_reg[0x10];
+	uint32_t m_pcictrl_reg[0x20];
 	DECLARE_ADDRESS_MAP(voodoo_reg_map, 32);
 	DECLARE_ADDRESS_MAP(banshee_reg_map, 32);
 	DECLARE_ADDRESS_MAP(lfb_map, 32);
