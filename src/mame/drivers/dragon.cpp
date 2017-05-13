@@ -16,6 +16,7 @@
 #include "cpu/m6809/m6809.h"
 #include "bus/coco/coco_232.h"
 #include "bus/coco/coco_orch90.h"
+#include "bus/coco/coco_gmc.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_fdc.h"
 #include "bus/coco/coco_multi.h"
