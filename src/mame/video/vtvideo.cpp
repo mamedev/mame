@@ -108,7 +108,8 @@ void vt100_video_device::device_start()
 	m_write_clear_video_interrupt.resolve_safe();
 
 	// LBA7 is scan line frequency update
-	machine().scheduler().timer_pulse(attotime::from_nsec(31778), timer_expired_delegate(FUNC(vt100_video_device::lba7_change), this));
+	m_lba7_change_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vt100_video_device::lba7_change), this));
+	m_lba7_change_timer->adjust(attotime::from_nsec(31778), 0, attotime::from_nsec(31778));
 
 	save_item(NAME(m_lba7));
 	save_item(NAME(m_scroll_latch));

@@ -62,6 +62,7 @@ private:
 	uint8_t m_mux_data;
 	bool m_video_wl;
 	bool m_ram_bank;
+	emu_timer *m_pio_timer;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -272,7 +273,8 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 	membank("bank1")->configure_entries(0, 2, &ram[0x00000], 0x10000);
 	membank("bank2")->configure_entry(0, &ram[0x10000]);
 
-	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(pasopia_state::pio_timer),this));
+	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia_state::pio_timer), this));
+	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
 static MACHINE_CONFIG_START( pasopia, pasopia_state )

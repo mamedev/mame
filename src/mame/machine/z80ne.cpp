@@ -351,8 +351,9 @@ MACHINE_START_MEMBER(z80ne_state,z80ne)
 	save_item(NAME(m_lx383_scan_counter));
 	save_item(NAME(m_lx383_downsampler));
 	save_item(NAME(m_lx383_key));
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::z80ne_cassette_tc),this));
-	machine().scheduler().timer_pulse( attotime::from_hz(1000), timer_expired_delegate(FUNC(z80ne_state::z80ne_kbd_scan),this));
+	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::z80ne_cassette_tc), this));
+	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::z80ne_kbd_scan), this));
+	m_kbd_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
 }
 
 MACHINE_START_MEMBER(z80ne_state,z80net)

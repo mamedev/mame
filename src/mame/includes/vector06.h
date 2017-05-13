@@ -116,6 +116,7 @@ private:
 	uint8_t m_aylatch;
 	bool m_stack_state;
 	bool m_romen;
+	emu_timer *m_reset_check_timer;
 
 	void update_mem();
 };

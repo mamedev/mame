@@ -1110,11 +1110,15 @@ void hp48_state::hp48_machine_start( hp48_models model )
 	}
 
 	/* timers */
-	machine().scheduler().timer_pulse(attotime::from_hz( 16 ), timer_expired_delegate(FUNC(hp48_state::hp48_timer1_cb),this));
-	machine().scheduler().timer_pulse(attotime::from_hz( 8192 ), timer_expired_delegate(FUNC(hp48_state::hp48_timer2_cb),this));
+	m_1st_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::hp48_timer1_cb), this));
+	m_1st_timer->adjust(attotime::from_hz( 16 ), 0, attotime::from_hz( 16 ));
+
+	m_2nd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::hp48_timer2_cb), this));
+	m_2nd_timer->adjust(attotime::from_hz( 8192 ), 0, attotime::from_hz( 8192 ));
 
 	/* 1ms keyboard polling */
-	machine().scheduler().timer_pulse(attotime::from_msec( 1 ), timer_expired_delegate(FUNC(hp48_state::hp48_kbd_cb),this));
+	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::hp48_kbd_cb), this));
+	m_kbd_timer->adjust(attotime::from_msec( 1 ), 0, attotime::from_msec( 1 ));
 
 	/* save state */
 	save_item(NAME(m_out) );

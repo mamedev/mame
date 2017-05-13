@@ -114,6 +114,7 @@ public:
 	int m_lx383_downsampler;
 	uint8_t m_lx385_ctrl;
 	emu_timer *m_cassette_timer;
+	emu_timer *m_kbd_timer;
 	z80ne_cass_data_t m_cass_data;
 	wd17xx_state_t m_wd17xx_state;
 	DECLARE_READ8_MEMBER(lx383_r);

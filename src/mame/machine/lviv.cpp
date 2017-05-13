@@ -2,7 +2,7 @@
 // copyright-holders:Krzysztof Strzecha
 /***************************************************************************
 
-  machine.c
+  lviv.cpp
 
   Functions to emulate general aspects of PK-01 Lviv (RAM, ROM, interrupts,
   I/O ports)
@@ -207,8 +207,6 @@ void lviv_state::machine_reset()
 	membank("bank2")->set_base(mem + 0x010000);
 	membank("bank3")->set_base(mem + 0x010000);
 	membank("bank4")->set_base(mem + 0x010000);
-
-	/*machine().scheduler().timer_pulse(TIME_IN_NSEC(200), FUNC(lviv_draw_pixel));*/
 
 	/*memset(m_ram->pointer(), 0, sizeof(unsigned char)*0xffff);*/
 }
