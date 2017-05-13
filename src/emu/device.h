@@ -353,6 +353,7 @@ public:
 	virtual ~device_t();
 
 	// getters
+	bool has_running_machine() const { return m_machine != nullptr; }
 	running_machine &machine() const { /*assert(m_machine != nullptr);*/ return *m_machine; }
 	const char *tag() const { return m_tag.c_str(); }
 	const char *basetag() const { return m_basetag.c_str(); }
@@ -516,6 +517,7 @@ protected:
 private:
 	// internal helpers
 	device_t *subdevice_slow(const char *tag) const;
+	void calculate_derived_clock();
 
 	// private state; accessor use required
 	running_machine *       m_machine;

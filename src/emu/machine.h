@@ -223,7 +223,8 @@ public:
 	screen_device *first_screen() const { return primary_screen; }
 
 	// RAII-based side effect disable
-	side_effect_disabler disable_side_effect() { return side_effect_disabler(this); }
+	// NOP-ed when passed false, to make it more easily conditional
+	side_effect_disabler disable_side_effect(bool disable_se = true) { return side_effect_disabler(this, disable_se); }
 	bool side_effect_disabled() const { return m_side_effect_disabled != 0; }
 
 	// additional helpers
@@ -256,8 +257,8 @@ public:
 	void schedule_exit();
 	void schedule_hard_reset();
 	void schedule_soft_reset();
-	void schedule_save(const char *filename);
-	void schedule_load(const char *filename);
+	void schedule_save(std::string &&filename);
+	void schedule_load(std::string &&filename);
 
 	// date & time
 	void base_datetime(system_time &systime);
@@ -272,7 +273,7 @@ public:
 	void strlog(const char *str) const;
 	u32 rand();
 	const char *describe_context();
-	std::string compose_saveload_filename(const char *base_filename, const char **searchpath = nullptr);
+	std::string compose_saveload_filename(std::string &&base_filename, const char **searchpath = nullptr);
 
 	// CPU information
 	cpu_device *            firstcpu;           // first CPU
@@ -291,13 +292,16 @@ public:
 private:
 	struct side_effect_disabler {
 		running_machine *m_machine;
+		bool m_disable_se;
 
-		side_effect_disabler(running_machine *m) : m_machine(m) {
-			m_machine->disable_side_effect_count();
+		side_effect_disabler(running_machine *m, bool disable_se) : m_machine(m), m_disable_se(disable_se) {
+			if(m_disable_se)
+				m_machine->disable_side_effect_count();
 		}
 
 		~side_effect_disabler() {
-			m_machine->enable_side_effect_count();
+			if(m_disable_se)
+				m_machine->enable_side_effect_count();
 		}
 
 		side_effect_disabler(const side_effect_disabler &) = delete;
@@ -311,7 +315,7 @@ private:
 	template <typename T> struct is_null { template <typename U> static bool value(U &&x) { return false; } };
 	template <typename T> struct is_null<T *> { template <typename U> static bool value(U &&x) { return !x; } };
 	void start();
-	void set_saveload_filename(const char *filename);
+	void set_saveload_filename(std::string &&filename);
 	std::string get_statename(const char *statename_opt) const;
 	void handle_saveload();
 	void soft_reset(void *ptr = nullptr, s32 param = 0);
@@ -370,11 +374,11 @@ private:
 	std::unique_ptr<emu_file>  m_logfile;              // pointer to the active log file
 
 	// load/save management
-	enum saveload_schedule
+	enum class saveload_schedule
 	{
-		SLS_NONE,
-		SLS_SAVE,
-		SLS_LOAD
+		NONE,
+		SAVE,
+		LOAD
 	};
 	saveload_schedule       m_saveload_schedule;
 	attotime                m_saveload_schedule_time;

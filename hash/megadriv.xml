@@ -59,7 +59,6 @@ Known undumped pirates
   * Chinese Checkers (by RealTec) - 中國象棋 ?
   * Shizen Mahjong / Competition Mahjong (by Sachen, apparently dumped but hoarded)
   * Magic 7 Block - 百変七巧板
-  * Chinese Battle Chess (?) - 戦 棊
 
 NOTE
 
@@ -11321,6 +11320,18 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="battletech - a game of armored combat (usa).bin" size="2097152" crc="409e5d14" sha1="ee22ae12053928b652f9b9f513499181b01c8429" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlchess">
+		<description>Zhan Qi - Chinese Battle Chess (Tw)</description>
+		<year>199?</year>
+		<publisher>Creaton</publisher>
+		<info name="alt_title" value="戦棊 - Chinese Battle Chess"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="chinese battle chess.rom" size="1048576" crc="9d3dde48" sha1="bc256272419564c48e17c6824d734dc9e86c03b5" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>

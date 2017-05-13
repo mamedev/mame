@@ -3,7 +3,7 @@
 // thanks-to:Kenneth Lin (original driver author)
 /***************************************************************************
 
-  jackal.c
+  jackal.cpp
 
 Notes:
 - This game uses two 005885 gfx chip in parallel. The unique thing about it is
@@ -488,6 +488,49 @@ ROM_START( jackalj ) /* 8-Way Joystick: You can only shoot in the direction you'
 	ROM_LOAD( "631r09.14h", 0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) ) /* MMI 63S141AN or compatible (silkscreened 6301) */
 ROM_END
 
+ROM_START( jackalbl ) // This is based on jackalr. Was dumped from 2 different PCBs.
+	ROM_REGION( 0x20000, "master", 0 )  /* Banked 64k for 1st CPU */
+	ROM_LOAD( "EPR-A-3.BIN", 0x04000, 0x8000, CRC(5fffee27) SHA1(224d5fd26dd1e0f15a3c99fd2fffbb76f641416e) ) // also found labeled "3.17"
+	ROM_LOAD( "EPR-A-2.BIN", 0x0c000, 0x4000, CRC(ae2a290a) SHA1(e9bee75a02aef5cf330dccb9e7a45b0171a8c1d7) ) // also found labeled "2.20"
+	ROM_LOAD( "EPR-A-4.BIN", 0x14000, 0x8000, CRC(976c8431) SHA1(c199f57c25380d741aec85b0e0bfb6acf383e6a6) ) // also found labeled "4.18"
+
+	ROM_REGION( 0x10000, "slave", 0 )     /* 64k for 2nd cpu (Graphics & Sound)*/
+	ROM_LOAD( "EPR-A-1.BIN", 0x8000, 0x8000, CRC(54aa2d29) SHA1(ebc6b3a5db5120cc33d62e3213d0e881f658282d) ) // also found labeled "1.19"
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	/* same data, different layout */
+	ROM_LOAD16_WORD_SWAP( "EPR-A-17.BIN", 0x00000, 0x08000, CRC(a96720b6) SHA1(d3c2a1848fa9d9d1232e58e412bdd69032fe2c83) ) // also found labeled "17.5"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-18.BIN", 0x08000, 0x08000, CRC(932d0ecb) SHA1(20bf789f45c5b3ba90012e1a945523236578a014) ) // also found labeled "18.6"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-19.BIN", 0x10000, 0x08000, CRC(1e3412e7) SHA1(dc0be23d6c89b7b131c3bd5cd117123e5f9d971c) ) // also found labeled "19.7"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-20.BIN", 0x18000, 0x08000, CRC(4b0d15be) SHA1(657c861357b5881e4ff356b1f27345b11e6c0696) ) // also found labeled "20.8"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-6.BIN",  0x20000, 0x08000, CRC(ec7141ad) SHA1(eb631ca58364827659fba1cb3dca326c2e5bf5b7) ) // also found labeled "6.9"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-5.BIN",  0x28000, 0x08000, CRC(c6375c74) SHA1(55090485307c6581556632fadbf704431734b145) ) // also found labeled "5.10"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-7.BIN",  0x30000, 0x08000, CRC(03e1de04) SHA1(c5f17633f4d5907310effb490488053861a55f6c) ) // also found labeled "7.11"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-8.BIN",  0x38000, 0x08000, CRC(f946ada7) SHA1(fd9a0786436cbdb4c844f71342232e4e6645d98f) ) // also found labeled "8.12"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-13.BIN", 0x40000, 0x08000, CRC(7c29c59e) SHA1(c2764f99ab4b39e7c0e43f58f69d6c353d0357aa) ) // also found labeled "13.1"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-14.BIN", 0x48000, 0x08000, CRC(f2bbff39) SHA1(f39dfdb3301f9b01d58071ffee41c467757d99d9) ) // also found labeled "14.2"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-15.BIN", 0x50000, 0x08000, CRC(594dbaaf) SHA1(e3f05acbdba8e8644dbabb065832476c1cb20569) ) // also found labeled "15.3"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-16.BIN", 0x58000, 0x08000, CRC(069bf945) SHA1(93ecc7dd779d16d825680bbc4986a312758db52f) ) // also found labeled "16.4"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-9.BIN",  0x60000, 0x08000, CRC(c00cef79) SHA1(94af2f4a67d1425fbb64b58ed7e618c8b38df203) ) // also found labeled "9.13"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-10.BIN", 0x68000, 0x08000, CRC(0aed6cd7) SHA1(88f81be5d8b2679349bf5cf2d4e02aff25c5118b) ) // also found labeled "10.14"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-11.BIN", 0x70000, 0x08000, CRC(a48e9f60) SHA1(6d5af16c16b40fb092fdba6dce852b94ac4767f4) ) // also found labeled "11.15"
+	ROM_LOAD16_WORD_SWAP( "EPR-A-12.BIN", 0x78000, 0x08000, CRC(79b7c71c) SHA1(8510226114ab9098ec48e02840465fc8b69b5262) ) // also found labeled "12.16"
+
+	ROM_REGION( 0x0200, "proms", 0 )    /* color lookup tables */
+	ROM_LOAD( "n82s129n.prom2", 0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) )
+	ROM_LOAD( "n82s129n.prom1", 0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) )
+
+	ROM_REGION( 0x1000, "pals", 0 ) /* currently not used by the emulation */
+	ROM_LOAD( "pal16r6cn.pal1",     0x0000, 0x0104, CRC(9bba948f) SHA1(5f42568489f16f8b3719eb2ec178e7c61d7ce25f) )
+	ROM_LOAD( "ampal16l8pc.pal2",   0x0200, 0x0104, CRC(17c9de2f) SHA1(2db42618f9ca1174bdcdbf92ea91ebc1a79bc6d2) )
+	ROM_LOAD( "ampal16r4pc.pal3",   0x0400, 0x0104, CRC(e54cd288) SHA1(5b8ae5a2a4a9ec3fab603b063fd18c96dd1fd0cf) )
+	ROM_LOAD( "pal16r8acn.pal4",    0x0600, 0x0104, CRC(5cc45e00) SHA1(cbd871addbac6310c8593fe8e8d5a962c2b45b2c) )
+	ROM_LOAD( "pal20l8a-2cns.pal5", 0x0800, 0x0144, NO_DUMP ) // read protected
+	ROM_LOAD( "pal20l8acns.pal6",   0x0a00, 0x0144, NO_DUMP ) // read protected
+	ROM_LOAD( "pal16l8pc.pal7",     0x0c00, 0x0104, CRC(e8cdc259) SHA1(6917ef8f4f09aa099a48b8ae2d10bcd10961fb43) )
+	ROM_LOAD( "d5c121.ep1200",      0x0e00, 0x0200, NO_DUMP ) // not dumped yet
+ROM_END
+
 ROM_START( topgunbl ) /* Rotary Joystick: Shot direction is controlled via the Rotary function of the joystick */
 	ROM_REGION( 0x20000, "master", 0 )  /* Banked 64k for 1st CPU */
 	ROM_LOAD( "t-3.c5", 0x04000, 0x8000, CRC(7826ad38) SHA1(875e87867924905b9b83bc203eb7ffe81cf72233) )
@@ -532,4 +575,5 @@ GAME( 1986, jackal,   0,      jackal, jackal,  driver_device, 0, ROT90, "Konami"
 GAME( 1986, jackalr,  jackal, jackal, jackalr, driver_device, 0, ROT90, "Konami",  "Jackal (World, Rotary Joystick)", 0 )
 GAME( 1986, topgunr,  jackal, jackal, jackal,  driver_device, 0, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)", 0 )
 GAME( 1986, jackalj,  jackal, jackal, jackal,  driver_device, 0, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
+GAME( 1986, jackalbl, jackal, jackal, jackalr, driver_device, 0, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)", 0 )
 GAME( 1986, topgunbl, jackal, jackal, jackalr, driver_device, 0, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)", 0 )

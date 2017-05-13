@@ -92,43 +92,43 @@ protected:
 	address_space_config m_program_config;
 
 	typedef void (g65816_device::*opcode_func) ();
-	typedef uint (g65816_device::*get_reg_func)(int regnum);
-	typedef void (g65816_device::*set_reg_func)(int regnum, uint val);
+	typedef unsigned (g65816_device::*get_reg_func)(int regnum);
+	typedef void (g65816_device::*set_reg_func)(int regnum, unsigned val);
 	typedef void (g65816_device::*set_line_func)(int line, int state);
 	typedef int (g65816_device::*execute_func)(int cycles);
 
 	static const opcode_func g65816i_opcodes_M0X0[];
-	uint g65816i_get_reg_M0X0(int regnum);
-	void g65816i_set_reg_M0X0(int regnum, uint val);
+	unsigned g65816i_get_reg_M0X0(int regnum);
+	void g65816i_set_reg_M0X0(int regnum, unsigned val);
 	void g65816i_set_line_M0X0(int line, int state);
 	int  g65816i_execute_M0X0(int cycles);
 
 	static const opcode_func g65816i_opcodes_M0X1[];
-	uint g65816i_get_reg_M0X1(int regnum);
-	void g65816i_set_reg_M0X1(int regnum, uint val);
+	unsigned g65816i_get_reg_M0X1(int regnum);
+	void g65816i_set_reg_M0X1(int regnum, unsigned val);
 	void g65816i_set_line_M0X1(int line, int state);
 	int  g65816i_execute_M0X1(int cycles);
 
 	static const opcode_func g65816i_opcodes_M1X0[];
-	uint g65816i_get_reg_M1X0(int regnum);
-	void g65816i_set_reg_M1X0(int regnum, uint val);
+	unsigned g65816i_get_reg_M1X0(int regnum);
+	void g65816i_set_reg_M1X0(int regnum, unsigned val);
 	void g65816i_set_line_M1X0(int line, int state);
 	int  g65816i_execute_M1X0(int cycles);
 
 	static const opcode_func g65816i_opcodes_M1X1[];
-	uint g65816i_get_reg_M1X1(int regnum);
-	void g65816i_set_reg_M1X1(int regnum, uint val);
+	unsigned g65816i_get_reg_M1X1(int regnum);
+	void g65816i_set_reg_M1X1(int regnum, unsigned val);
 	void g65816i_set_line_M1X1(int line, int state);
 	int  g65816i_execute_M1X1(int cycles);
 
 	static const opcode_func g65816i_opcodes_E[];
-	uint g65816i_get_reg_E(int regnum);
-	void g65816i_set_reg_E(int regnum, uint val);
+	unsigned g65816i_get_reg_E(int regnum);
+	void g65816i_set_reg_E(int regnum, unsigned val);
 	void g65816i_set_line_E(int line, int state);
 	int  g65816i_execute_E(int cycles);
 
-	void g65816i_set_execution_mode(uint mode);
-	int bus_5A22_cycle_burst(uint addr);
+	void g65816i_set_execution_mode(unsigned mode);
+	int bus_5A22_cycle_burst(unsigned addr);
 	unsigned g65816_get_pc();
 	void g65816_set_pc(unsigned val);
 	unsigned g65816_get_sp();
@@ -136,101 +136,101 @@ protected:
 	unsigned g65816_get_reg(int regnum);
 	void g65816_set_reg(int regnum, unsigned value);
 	void g65816_restore_state();
-	uint g65816i_read_8_normal(uint address);
-	uint g65816i_read_8_immediate(uint address);
-	uint g65816i_read_8_direct(uint address);
-	uint g65816i_read_8_vector(uint address);
-	void g65816i_write_8_normal(uint address, uint value);
-	void g65816i_write_8_direct(uint address, uint value);
-	uint g65816i_read_16_normal(uint address);
-	uint g65816i_read_16_immediate(uint address);
-	uint g65816i_read_16_direct(uint address);
-	uint g65816i_read_16_vector(uint address);
-	void g65816i_write_16_normal(uint address, uint value);
-	void g65816i_write_16_direct(uint address, uint value);
-	uint g65816i_read_24_normal(uint address);
-	uint g65816i_read_24_immediate(uint address);
-	uint g65816i_read_24_direct(uint address);
-	void g65816i_push_8(uint value);
-	uint g65816i_pull_8();
-	void g65816i_push_16(uint value);
-	uint g65816i_pull_16();
-	void g65816i_push_24(uint value);
-	uint g65816i_pull_24();
-	void g65816i_jump_16(uint address);
-	void g65816i_jump_24(uint address);
-	void g65816i_branch_8(uint offset);
-	void g65816i_branch_16(uint offset);
-	void g65816i_set_flag_mx(uint value);
-	void g65816i_set_flag_e(uint value);
-	void g65816i_set_flag_i(uint value);
-	uint g65816i_get_reg_p();
-	void g65816i_set_reg_p(uint value);
-	void g65816i_interrupt_hardware(uint vector);
-	void g65816i_interrupt_software(uint vector);
+	unsigned g65816i_read_8_normal(unsigned address);
+	unsigned g65816i_read_8_immediate(unsigned address);
+	unsigned g65816i_read_8_direct(unsigned address);
+	unsigned g65816i_read_8_vector(unsigned address);
+	void g65816i_write_8_normal(unsigned address, unsigned value);
+	void g65816i_write_8_direct(unsigned address, unsigned value);
+	unsigned g65816i_read_16_normal(unsigned address);
+	unsigned g65816i_read_16_immediate(unsigned address);
+	unsigned g65816i_read_16_direct(unsigned address);
+	unsigned g65816i_read_16_vector(unsigned address);
+	void g65816i_write_16_normal(unsigned address, unsigned value);
+	void g65816i_write_16_direct(unsigned address, unsigned value);
+	unsigned g65816i_read_24_normal(unsigned address);
+	unsigned g65816i_read_24_immediate(unsigned address);
+	unsigned g65816i_read_24_direct(unsigned address);
+	void g65816i_push_8(unsigned value);
+	unsigned g65816i_pull_8();
+	void g65816i_push_16(unsigned value);
+	unsigned g65816i_pull_16();
+	void g65816i_push_24(unsigned value);
+	unsigned g65816i_pull_24();
+	void g65816i_jump_16(unsigned address);
+	void g65816i_jump_24(unsigned address);
+	void g65816i_branch_8(unsigned offset);
+	void g65816i_branch_16(unsigned offset);
+	void g65816i_set_flag_mx(unsigned value);
+	void g65816i_set_flag_e(unsigned value);
+	void g65816i_set_flag_i(unsigned value);
+	unsigned g65816i_get_reg_p();
+	void g65816i_set_reg_p(unsigned value);
+	void g65816i_interrupt_hardware(unsigned vector);
+	void g65816i_interrupt_software(unsigned vector);
 	void g65816i_interrupt_nmi();
 	void g65816i_check_maskable_interrupt();
-	uint EA_IMM8();
-	uint EA_IMM16();
-	uint EA_IMM24();
-	uint EA_D();
-	uint EA_A();
-	uint EA_AL();
-	uint EA_DX();
-	uint EA_DY();
-	uint EA_AX();
-	uint EA_ALX();
-	uint EA_AY();
-	uint EA_DI();
-	uint EA_DLI();
-	uint EA_AI();
-	uint EA_ALI();
-	uint EA_DXI();
-	uint EA_DIY();
-	uint EA_DLIY();
-	uint EA_AXI();
-	uint EA_S();
-	uint EA_SIY();
+	unsigned EA_IMM8();
+	unsigned EA_IMM16();
+	unsigned EA_IMM24();
+	unsigned EA_D();
+	unsigned EA_A();
+	unsigned EA_AL();
+	unsigned EA_DX();
+	unsigned EA_DY();
+	unsigned EA_AX();
+	unsigned EA_ALX();
+	unsigned EA_AY();
+	unsigned EA_DI();
+	unsigned EA_DLI();
+	unsigned EA_AI();
+	unsigned EA_ALI();
+	unsigned EA_DXI();
+	unsigned EA_DIY();
+	unsigned EA_DLIY();
+	unsigned EA_AXI();
+	unsigned EA_S();
+	unsigned EA_SIY();
 
 	static const get_reg_func s_g65816_get_reg[5];
 	static const set_reg_func s_g65816_set_reg[5];
 	static const set_line_func s_g65816_set_line[5];
 	static const execute_func s_g65816_execute[5];
 
-	uint m_a;             /* Accumulator */
-	uint m_b;             /* holds high byte of accumulator */
-	uint m_x;             /* Index Register X */
-	uint m_y;             /* Index Register Y */
-	uint m_s;             /* Stack Pointer */
-	uint m_pc;            /* Program Counter */
-	uint m_ppc;           /* Previous Program Counter */
-	uint m_pb;            /* Program Bank (shifted left 16) */
-	uint m_db;            /* Data Bank (shifted left 16) */
-	uint m_d;             /* Direct Register */
-	uint m_flag_e;        /* Emulation Mode Flag */
-	uint m_flag_m;        /* Memory/Accumulator Select Flag */
-	uint m_flag_x;        /* Index Select Flag */
-	uint m_flag_n;        /* Negative Flag */
-	uint m_flag_v;        /* Overflow Flag */
-	uint m_flag_d;        /* Decimal Mode Flag */
-	uint m_flag_i;        /* Interrupt Mask Flag */
-	uint m_flag_z;        /* Zero Flag (inverted) */
-	uint m_flag_c;        /* Carry Flag */
-	uint m_line_irq;      /* Status of the IRQ line */
-	uint m_line_nmi;      /* Status of the NMI line */
-	uint m_fastROM;       /* SNES specific */
-	uint m_ir;            /* Instruction Register */
-	uint m_irq_delay;     /* delay 1 instruction before checking irq */
+	unsigned m_a;             /* Accumulator */
+	unsigned m_b;             /* holds high byte of accumulator */
+	unsigned m_x;             /* Index Register X */
+	unsigned m_y;             /* Index Register Y */
+	unsigned m_s;             /* Stack Pointer */
+	unsigned m_pc;            /* Program Counter */
+	unsigned m_ppc;           /* Previous Program Counter */
+	unsigned m_pb;            /* Program Bank (shifted left 16) */
+	unsigned m_db;            /* Data Bank (shifted left 16) */
+	unsigned m_d;             /* Direct Register */
+	unsigned m_flag_e;        /* Emulation Mode Flag */
+	unsigned m_flag_m;        /* Memory/Accumulator Select Flag */
+	unsigned m_flag_x;        /* Index Select Flag */
+	unsigned m_flag_n;        /* Negative Flag */
+	unsigned m_flag_v;        /* Overflow Flag */
+	unsigned m_flag_d;        /* Decimal Mode Flag */
+	unsigned m_flag_i;        /* Interrupt Mask Flag */
+	unsigned m_flag_z;        /* Zero Flag (inverted) */
+	unsigned m_flag_c;        /* Carry Flag */
+	unsigned m_line_irq;      /* Status of the IRQ line */
+	unsigned m_line_nmi;      /* Status of the NMI line */
+	unsigned m_fastROM;       /* SNES specific */
+	unsigned m_ir;            /* Instruction Register */
+	unsigned m_irq_delay;     /* delay 1 instruction before checking irq */
 	address_space *m_program;
 	read8_delegate m_read_vector; /* Read vector override */
-	uint m_stopped;       /* Sets how the CPU is stopped */
+	unsigned m_stopped;       /* Sets how the CPU is stopped */
 	const opcode_func* m_opcodes;
 	get_reg_func m_get_reg;
 	set_reg_func m_set_reg;
 	set_line_func m_set_line;
 	execute_func m_execute;
-	uint m_source;
-	uint m_destination;
+	unsigned m_source;
+	unsigned m_destination;
 	int m_ICount;
 	int m_cpu_type;
 	uint8_t m_rw8_cycles, m_rw16_cycles, m_rw24_cycles;

@@ -57,6 +57,7 @@ private:
 	uint8_t m_keyboard_cnt;
 	uint8_t m_ppi_porta;
 	uint8_t m_ppi_portc;
+	emu_timer *m_key_timer;
 	void update_speaker();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -361,7 +362,8 @@ void irisha_state::machine_start()
 	for ( uint8_t i = 0; i < 10; i++ )
 		m_io_ports[i] = ioport( keynames[i] );
 
-	machine().scheduler().timer_pulse(attotime::from_msec(30), timer_expired_delegate(FUNC(irisha_state::irisha_key),this));
+	m_key_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(irisha_state::irisha_key),this));
+	m_key_timer->adjust(attotime::from_msec(30), 0, attotime::from_msec(30));
 }
 
 void irisha_state::machine_reset()

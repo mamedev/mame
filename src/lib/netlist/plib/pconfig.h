@@ -12,20 +12,52 @@
  * Define this for more accurate measurements if you processor supports
  * RDTSCP.
  */
+#ifndef PHAS_RDTSCP
 #define PHAS_RDTSCP (1)
+#endif
 
 /*
  * Define this to use accurate timing measurements. Only works
  * if PHAS_RDTSCP == 1
  */
+#ifndef PUSE_ACCURATE_STATS
 #define PUSE_ACCURATE_STATS (1)
+#endif
 
 /*
  * Set this to one if you want to use 128 bit int for ptime.
  * This is for tests only.
  */
 
+#ifndef PHAS_INT128
 #define PHAS_INT128 (0)
+#endif
+
+/*============================================================
+ *  Check for CPP Version
+ *
+ *   C++11:     __cplusplus is 201103L.
+ *   C++14:     __cplusplus is 201402L.
+ *   c++17/c++1z__cplusplus is 201703L.
+ *
+ *   VS2015 returns 199711L here. This is the bug filed in
+ *   2012 which obviously never was picked up by MS:
+ *   https://connect.microsoft.com/VisualStudio/feedback/details/763051/a-value-of-predefined-macro-cplusplus-is-still-199711l
+ *
+ *
+ *============================================================*/
+
+#if __cplusplus == 201103L
+#define C14CONSTEXPR
+#elif __cplusplus == 201402L
+#define C14CONSTEXPR constexpr
+#elif __cplusplus == 201703L
+#define C14CONSTEXPR constexpr
+#elif defined(_MSC_VER)
+#define C14CONSTEXPR
+#else
+#error "C++ version not supported"
+#endif
 
 #ifndef PHAS_INT128
 #define PHAS_INT128 (0)

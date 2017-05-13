@@ -2165,10 +2165,12 @@ ROM_END
 /* SCC init 1-2 for the keyboard is identical to Sun 4/75 init 1-2 */
 ROM_START( sun4_50 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS( 0, "v29", "V2.9")
+	ROM_SYSTEM_BIOS( 0, "v29", "V2.9" )
 	ROMX_LOAD( "ipx-29.h1.u0501", 0x0000, 0x40000, CRC(1910aa65) SHA1(7d8832fea8e299b89e6ec7137fcde497673c14f8), ROM_BIOS(1)) // 525-1177-06(?) Boot (Version 2.9 version 20, supposedly?)
-	ROM_SYSTEM_BIOS( 1, "v26", "V2.6")
+	ROM_SYSTEM_BIOS( 1, "v26", "V2.6" )
 	ROMX_LOAD( "525-1177-05__(c)_sun_1992.am27c020.h1.u0501", 0x0000, 0x40000, CRC(aad28dee) SHA1(18075afa479fdc8d318df9aef9847dfb20591d79), ROM_BIOS(2)) // 525-1177-05 Boot (Version 2.6 version 410, supposedly?)
+	ROM_SYSTEM_BIOS( 2, "v23", "V2.3" )
+	ROMX_LOAD( "525-1177-03.h1.u0501", 0x0000, 0x40000, CRC(dcc1e66c) SHA1(a4dc3d8631aaa8416e22de273707c4ed7a2fe561), ROM_BIOS(3)) // 525-1177-03 Boot (Version 2.3)
 ROM_END
 
 // SPARCstation SLC (Sun 4/20)
@@ -2247,7 +2249,10 @@ ROM_END
 */
 ROM_START( sun4_75 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
-	ROM_LOAD( "ss2-29.rom", 0x0000, 0x40000, CRC(d04132b3) SHA1(ef26afafa2800b8e2e5e994b3a76ca17ce1314b1))
+	ROM_SYSTEM_BIOS( 0, "v29", "V2.9" )
+	ROMX_LOAD( "ss2-29.rom", 0x0000, 0x40000, CRC(d04132b3) SHA1(ef26afafa2800b8e2e5e994b3a76ca17ce1314b1), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v22", "V2.2" )
+	ROMX_LOAD( "525-1107-06.rom", 0x0000, 0x40000, CRC(7f5b58b4) SHA1(10a3eb3ddee667e7cf3c04aef6f6549e1b7f8311), ROM_BIOS(2) )
 ROM_END
 
 // SPARCstation 10 (Sun S10)

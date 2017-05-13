@@ -33,7 +33,7 @@ public:
 		m_accel(*this, "ACCEL"),
 		m_brake(*this, "BRAKE"),
 		m_wheel(*this, "WHEEL"),
-		m_shareram(*this, "shareram") { }
+		m_shareram(*this, "shareram", 32) { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
@@ -46,6 +46,8 @@ public:
 	optional_ioport m_brake;
 	optional_ioport m_wheel;
 	emu_timer *m_raster_interrupt_timer;
+	emu_timer *m_vblank_interrupt_timer;
+	emu_timer *m_network_interrupt_timer;
 	std::unique_ptr<uint32_t[]> m_workram;
 	required_shared_ptr<uint16_t> m_shareram;
 	uint8_t m_mcu_port6;
@@ -56,8 +58,6 @@ public:
 	DECLARE_READ32_MEMBER(namcofl_sysreg_r);
 	DECLARE_WRITE32_MEMBER(namcofl_sysreg_w);
 	DECLARE_WRITE8_MEMBER(namcofl_c116_w);
-	DECLARE_READ32_MEMBER(namcofl_share_r);
-	DECLARE_WRITE32_MEMBER(namcofl_share_w);
 	DECLARE_WRITE16_MEMBER(mcu_shared_w);
 	DECLARE_READ8_MEMBER(port6_r);
 	DECLARE_WRITE8_MEMBER(port6_w);
@@ -84,4 +84,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
 	void common_init();
+	int FLobjcode2tile(int code);
+	void TilemapCB(uint16_t code, int *tile, int *mask);
 };

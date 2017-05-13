@@ -1111,7 +1111,7 @@ WRITE_LINE_MEMBER( pia6821_device::cb2_w )
 bool pia6821_device::cb2_output()
 {
 	m_out_cb2_needs_pulled = false;
-	
+
 	return m_out_cb2;
 }
 
@@ -1130,17 +1130,17 @@ bool pia6821_device::cb2_output_z()
 //  control byte wrappers
 //-------------------------------------------------
 
-bool pia6821_device::irq1_enabled(uint8_t c)	{ return (c >> 0) & 0x01 ? true : false; }
-bool pia6821_device::c1_low_to_high(uint8_t c)	{ return (c >> 1) & 0x01 ? true : false; }
-bool pia6821_device::c1_high_to_low(uint8_t c)	{ return !(c >> 1) & 0x01 ? true : false; }
-bool pia6821_device::output_selected(uint8_t c)	{ return (c >> 2) & 0x01 ? true : false; }
-bool pia6821_device::irq2_enabled(uint8_t c)	{ return (c >> 3) & 0x01 ? true : false; }
-bool pia6821_device::strobe_e_reset(uint8_t c)	{ return (c >> 3) & 0x01 ? true : false; }
-bool pia6821_device::strobe_c1_reset(uint8_t c)	{ return !(c >> 3) & 0x01 ? true : false; }
-bool pia6821_device::c2_set(uint8_t c)			{ return (c >> 3) & 0x01 ? true : false; }
-bool pia6821_device::c2_low_to_high(uint8_t c)	{ return (c >> 4) & 0x01 ? true : false; }
-bool pia6821_device::c2_high_to_low(uint8_t c)	{ return !(c >> 4) & 0x01 ? true : false; }
-bool pia6821_device::c2_set_mode(uint8_t c)		{ return (c >> 4) & 0x01 ? true : false; }
-bool pia6821_device::c2_strobe_mode(uint8_t c)	{ return !(c >> 4) & 0x01 ? true : false; }
-bool pia6821_device::c2_output(uint8_t c)		{ return (c >> 5) & 0x01 ? true : false; }
-bool pia6821_device::c2_input(uint8_t c)		{ return !(c >> 5) & 0x01 ? true : false; }
+bool pia6821_device::irq1_enabled(uint8_t c)    { return  bool((c >> 0) & 0x01); }
+bool pia6821_device::c1_low_to_high(uint8_t c)  { return  bool((c >> 1) & 0x01); }
+bool pia6821_device::c1_high_to_low(uint8_t c)  { return !bool((c >> 1) & 0x01); }
+bool pia6821_device::output_selected(uint8_t c) { return  bool((c >> 2) & 0x01); }
+bool pia6821_device::irq2_enabled(uint8_t c)    { return  bool((c >> 3) & 0x01); }
+bool pia6821_device::strobe_e_reset(uint8_t c)  { return  bool((c >> 3) & 0x01); }
+bool pia6821_device::strobe_c1_reset(uint8_t c) { return !bool((c >> 3) & 0x01); }
+bool pia6821_device::c2_set(uint8_t c)          { return  bool((c >> 3) & 0x01); }
+bool pia6821_device::c2_low_to_high(uint8_t c)  { return  bool((c >> 4) & 0x01); }
+bool pia6821_device::c2_high_to_low(uint8_t c)  { return !bool((c >> 4) & 0x01); }
+bool pia6821_device::c2_set_mode(uint8_t c)     { return  bool((c >> 4) & 0x01); }
+bool pia6821_device::c2_strobe_mode(uint8_t c)  { return !bool((c >> 4) & 0x01); }
+bool pia6821_device::c2_output(uint8_t c)       { return  bool((c >> 5) & 0x01); }
+bool pia6821_device::c2_input(uint8_t c)        { return !bool((c >> 5) & 0x01); }

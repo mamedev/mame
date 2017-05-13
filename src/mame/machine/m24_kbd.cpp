@@ -16,17 +16,14 @@ const tiny_rom_entry *m24_keyboard_device::device_rom_region() const
 	return ROM_NAME( m24_keyboard );
 }
 
-static ADDRESS_MAP_START( m24_keyboard_io, AS_IO, 8, m24_keyboard_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(bus_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(p2_r) AM_WRITENOP
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
-ADDRESS_MAP_END
-
 static MACHINE_CONFIG_FRAGMENT( m24_keyboard )
 	MCFG_CPU_ADD("mcu", I8049, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(m24_keyboard_io)
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(m24_keyboard_device, bus_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(m24_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(m24_keyboard_device, p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(m24_keyboard_device, p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(m24_keyboard_device, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(m24_keyboard_device, t1_r))
 MACHINE_CONFIG_END
 
 machine_config_constructor m24_keyboard_device::device_mconfig_additions() const
@@ -259,12 +256,12 @@ READ8_MEMBER( m24_keyboard_device::p2_r )
 	return (m_keypress << 7) | m_mousebtn->read();
 }
 
-READ8_MEMBER( m24_keyboard_device::t0_r )
+READ_LINE_MEMBER( m24_keyboard_device::t0_r )
 {
 	return 0;
 }
 
-READ8_MEMBER( m24_keyboard_device::t1_r )
+READ_LINE_MEMBER( m24_keyboard_device::t1_r )
 {
 	return 0;
 }

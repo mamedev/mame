@@ -30,7 +30,7 @@ local function compile(indentlevel, prj, cfg, commonbasepath)
 
 	local firstflag = true
 	for _, cfgexclude in ipairs(cfg.excludes) do
-		if path.isSourceFile(cfgexclude) then
+		if path.issourcefile(cfgexclude) then
 			if firstflag then
 				_p(indentlevel, '// Excluded files:')
 				firstflag = false
@@ -418,7 +418,7 @@ function premake.fastbuild.project(prj)
 
 	local cppfiles = {}
 	for file in premake.project.eachfile(prj) do
-		if path.isSourceFile(file.name) then
+		if path.issourcefile(file.name) then
 			table.insert(cppfiles, file.name)
 		end
 	end

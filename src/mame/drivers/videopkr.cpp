@@ -349,8 +349,8 @@ public:
 	DECLARE_READ8_MEMBER(videopkr_p2_data_r);
 	DECLARE_WRITE8_MEMBER(videopkr_p1_data_w);
 	DECLARE_WRITE8_MEMBER(videopkr_p2_data_w);
-	DECLARE_READ8_MEMBER(videopkr_t0_latch);
-	DECLARE_WRITE8_MEMBER(prog_w);
+	DECLARE_READ_LINE_MEMBER(videopkr_t0_latch);
+	DECLARE_WRITE_LINE_MEMBER(prog_w);
 	DECLARE_READ8_MEMBER(sound_io_r);
 	DECLARE_WRITE8_MEMBER(sound_io_w);
 	DECLARE_READ8_MEMBER(sound_p2_r);
@@ -751,14 +751,14 @@ WRITE8_MEMBER(videopkr_state::videopkr_p2_data_w)
 	m_p2 = data;
 }
 
-READ8_MEMBER(videopkr_state::videopkr_t0_latch)
+READ_LINE_MEMBER(videopkr_state::videopkr_t0_latch)
 {
 	return m_t0_latch;
 }
 
-WRITE8_MEMBER(videopkr_state::prog_w)
+WRITE_LINE_MEMBER(videopkr_state::prog_w)
 {
-	if (!data)
+	if (!state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);   /* clear interrupt FF */
 }
 
@@ -963,11 +963,7 @@ static ADDRESS_MAP_START( i8039_map, AS_PROGRAM, 8, videopkr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_io_port, AS_IO, 8, videopkr_state )
-	AM_RANGE(0x00,            0xff           ) AM_READWRITE(videopkr_io_r, videopkr_io_w)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1  ) AM_READWRITE(videopkr_p1_data_r, videopkr_p1_data_w)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2  ) AM_READWRITE(videopkr_p2_data_r, videopkr_p2_data_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_WRITE(prog_w)
-	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0  ) AM_READ(videopkr_t0_latch)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(videopkr_io_r, videopkr_io_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_sound_mem, AS_PROGRAM, 8, videopkr_state )
@@ -975,9 +971,7 @@ static ADDRESS_MAP_START( i8039_sound_mem, AS_PROGRAM, 8, videopkr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_sound_port, AS_IO, 8, videopkr_state )
-	AM_RANGE(0x00         , 0xff         ) AM_READWRITE(sound_io_r, sound_io_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(sound_p2_r, sound_p2_w)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(sound_io_r, sound_io_w)
 ADDRESS_MAP_END
 
 
@@ -1235,12 +1229,22 @@ static MACHINE_CONFIG_START( videopkr, videopkr_state )
 	MCFG_CPU_ADD("maincpu", I8039, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(i8039_map)
 	MCFG_CPU_IO_MAP(i8039_io_port)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(videopkr_state, videopkr_p1_data_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(videopkr_state, videopkr_p1_data_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(videopkr_state, videopkr_p2_data_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(videopkr_state, videopkr_p2_data_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(videopkr_state, prog_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(videopkr_state, videopkr_t0_latch))
 
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", videopkr_state,  irq0_line_assert)
 
 	MCFG_CPU_ADD("soundcpu", I8039, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(i8039_sound_mem)
 	MCFG_CPU_IO_MAP(i8039_sound_port)
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(videopkr_state, sound_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(videopkr_state, sound_p2_w))
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("t1_timer", videopkr_state, sound_t1_callback, attotime::from_hz(50))
@@ -1262,7 +1266,7 @@ static MACHINE_CONFIG_START( videopkr, videopkr_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275) // unknown DAC
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END

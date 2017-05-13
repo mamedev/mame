@@ -93,6 +93,8 @@ VIDEO_START_MEMBER(midtunit_state,midtunit)
 	/* allocate memory */
 	local_videoram = std::make_unique<uint16_t[]>(0x100000/2);
 
+	m_dma_timer = timer_alloc(TIMER_DMA);
+
 	/* reset all the globals */
 	gfxbank_offset[0] = 0x000000;
 	gfxbank_offset[1] = 0x400000;
@@ -790,7 +792,7 @@ if (LOG_DMA)
 
 	/* signal we're done */
 skipdma:
-	timer_set(attotime::from_nsec(41 * pixels), TIMER_DMA);
+	m_dma_timer->adjust(attotime::from_nsec(41 * pixels));
 
 	g_profiler.stop();
 }

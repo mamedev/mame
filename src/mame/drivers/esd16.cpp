@@ -39,9 +39,6 @@ Other ESD games:
 Tang Tang           (c) 2000 - Undumped ESD 05-28-99 version
 Fire Hawk           (c) 2001 - see nmk16.cpp driver
 
-Head Panic
-- Nude / Bikini pics don't show in-game, even when set in test mode?
-
 ---------------------------------------------------------------------------
 
  Jumping Pop
@@ -336,8 +333,8 @@ static INPUT_PORTS_START( jumppop )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0800, 0x0800, "BG Modesty" )               PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(      0x0800, "Less" )
-	PORT_DIPSETTING(      0x0000, "More" )
+	PORT_DIPSETTING(      0x0800, "More" )
+	PORT_DIPSETTING(      0x0000, "Less" )
 	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )

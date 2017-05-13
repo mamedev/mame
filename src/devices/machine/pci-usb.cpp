@@ -3,8 +3,28 @@
 #include "emu.h"
 #include "pci-usb.h"
 
+const device_type USB_OHCI = device_creator<usb_ohci_device>;
 const device_type USB_UHCI = device_creator<usb_uhci_device>;
 const device_type USB_EHCI = device_creator<usb_ehci_device>;
+
+DEVICE_ADDRESS_MAP_START(map, 32, usb_ohci_device)
+ADDRESS_MAP_END
+
+usb_ohci_device::usb_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, USB_OHCI, "USB 1.1 OHCI interface", tag, owner, clock, "usb_ohci", __FILE__)
+{
+}
+
+void usb_ohci_device::device_start()
+{
+	pci_device::device_start();
+	add_map(4096, M_MEM, FUNC(usb_ohci_device::map));
+}
+
+void usb_ohci_device::device_reset()
+{
+	pci_device::device_reset();
+}
 
 DEVICE_ADDRESS_MAP_START(map, 32, usb_uhci_device)
 ADDRESS_MAP_END

@@ -876,7 +876,7 @@ ROM_START( shinygld )
 	ROM_LOAD( "22.u145", 0x080000, 0x20000, CRC(113ccf81) SHA1(c2192e81a4be38911c971e1593b902f92d9a02d5) ) // 27C1001
 
 	/* Dumper's note: Board carries five PLDs : one GAL22V10 near the 68000 CPU (which most likely acts as main address decoder),
-       three PALCE22V10H (two are near the GFX ROMs, probably for enabling them), one PALCE16V8H.*/
+	   three PALCE22V10H (two are near the GFX ROMs, probably for enabling them), one PALCE16V8H.*/
 	ROM_REGION( 0x1000, "plds", 0)
 	ROM_LOAD( "gal22v10.bin", 0x0400, 0x02e5, NO_DUMP ) // soldered
 	ROM_LOAD( "palce22v10_1.bin",   0x2dd, 0x2dd, NO_DUMP ) // soldered

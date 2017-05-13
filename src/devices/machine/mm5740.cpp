@@ -73,7 +73,7 @@ uint32_t mm5740_device::calc_effective_clock_key_debounce(uint32_t capacitance)
 void mm5740_device::device_start()
 {
 	// resolve callbacks
-	for(int i = 0; i < 9; i++) 
+	for(int i = 0; i < 9; i++)
 	{
 		m_read_x[i].resolve_safe(0x3ff);
 	}

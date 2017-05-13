@@ -123,6 +123,12 @@ void voodoo_pci_device::device_start()
 	}
 
 	save_item(NAME(m_pcictrl_reg));
+	machine().save().register_postload(save_prepost_delegate(FUNC(voodoo_pci_device::postload), this));
+}
+
+void voodoo_pci_device::postload()
+{
+	remap_cb();
 }
 
 void voodoo_pci_device::device_reset()

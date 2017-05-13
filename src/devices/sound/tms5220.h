@@ -83,7 +83,7 @@ public:
 	go active or inactive at slightly different times by separate write_line
 	writes, which causes the chip to incorrectly reset itself on the 99/8,
 	where the writes are supposed to happen simultaneously;
-	/RS is bit 1, /WS is bit 0 
+	/RS is bit 1, /WS is bit 0
 	Note this is a hack and probably can be removed later, once the 'real'
 	line handlers above defer by at least 4 clock cycles before taking effect */
 	DECLARE_WRITE8_MEMBER( data_w );

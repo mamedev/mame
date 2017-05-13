@@ -15,15 +15,17 @@
 
   FIP = fluorescent indicator panel
   g = number of grids
-  A = revision of the VFD
-  M = custom display
-  20 = unique display part number
+  r = revision of the VFD
+  c = custom display
+  s = unique display part number
 
 
   known chips:
 
   serial  device   etc.
 ----------------------------------------------------------------
+ *055     uPD546C  1979, Fidelity Checker Challenger (CR)
+
  @017     uPD552C  1979, Bambino UFO Master-Blaster Station (ET-02)
  @042     uPD552C  1980, Tomy Cosmic Combat (TN-??)
  @043     uPD552C  1979, Bambino Kick The Goal Soccer (ET-10)

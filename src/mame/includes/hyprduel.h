@@ -61,6 +61,8 @@ public:
 
 	/* misc */
 	emu_timer *m_magerror_irq_timer;
+	emu_timer *m_vblank_end_timer;
+	emu_timer *m_blit_done_timer;
 	int       m_blitter_bit;
 	int       m_requested_int;
 	int       m_subcpu_resetline;
@@ -74,22 +76,22 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ16_MEMBER(hyprduel_irq_cause_r);
-	DECLARE_WRITE16_MEMBER(hyprduel_irq_cause_w);
-	DECLARE_WRITE16_MEMBER(hyprduel_subcpu_control_w);
+	DECLARE_READ16_MEMBER(irq_cause_r);
+	DECLARE_WRITE16_MEMBER(irq_cause_w);
+	DECLARE_WRITE16_MEMBER(subcpu_control_w);
 	DECLARE_READ16_MEMBER(hyprduel_cpusync_trigger1_r);
 	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger1_w);
 	DECLARE_READ16_MEMBER(hyprduel_cpusync_trigger2_r);
 	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger2_w);
-	DECLARE_READ16_MEMBER(hyprduel_bankedrom_r);
-	DECLARE_WRITE16_MEMBER(hyprduel_blitter_w);
-	DECLARE_WRITE16_MEMBER(hyprduel_paletteram_w);
-	DECLARE_WRITE16_MEMBER(hyprduel_vram_0_w);
-	DECLARE_WRITE16_MEMBER(hyprduel_vram_1_w);
-	DECLARE_WRITE16_MEMBER(hyprduel_vram_2_w);
-	DECLARE_WRITE16_MEMBER(hyprduel_window_w);
-	DECLARE_WRITE16_MEMBER(hyprduel_scrollreg_w);
-	DECLARE_WRITE16_MEMBER(hyprduel_scrollreg_init_w);
+	DECLARE_READ16_MEMBER(bankedrom_r);
+	DECLARE_WRITE16_MEMBER(blitter_w);
+	DECLARE_WRITE16_MEMBER(paletteram_w);
+	DECLARE_WRITE16_MEMBER(vram_0_w);
+	DECLARE_WRITE16_MEMBER(vram_1_w);
+	DECLARE_WRITE16_MEMBER(vram_2_w);
+	DECLARE_WRITE16_MEMBER(window_w);
+	DECLARE_WRITE16_MEMBER(scrollreg_w);
+	DECLARE_WRITE16_MEMBER(scrollreg_init_w);
 	void blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask );
 	DECLARE_DRIVER_INIT(magerror);
 	DECLARE_DRIVER_INIT(hyprduel);
@@ -102,18 +104,18 @@ public:
 	DECLARE_MACHINE_START(magerror);
 	DECLARE_VIDEO_START(magerror_14220);
 	DECLARE_VIDEO_START(common_14220);
-	uint32_t screen_update_hyprduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(vblank_end_callback);
 	TIMER_CALLBACK_MEMBER(magerror_irq_callback);
-	TIMER_CALLBACK_MEMBER(hyprduel_blit_done);
-	TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_interrupt);
-	void hyprduel_postload();
+	TIMER_CALLBACK_MEMBER(blit_done);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void postload();
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint16_t *vram);
 	inline void get_tile_info_8bit( tile_data &tileinfo, int tile_index, int layer, uint16_t *vram );
 	inline void get_tile_info_16x16_8bit( tile_data &tileinfo, int tile_index, int layer, uint16_t *vram );
-	inline void hyprduel_vram_w( offs_t offset, uint16_t data, uint16_t mem_mask, int layer, uint16_t *vram );
+	inline void vram_w( offs_t offset, uint16_t data, uint16_t mem_mask, int layer, uint16_t *vram );
 	void alloc_empty_tiles(  );
-	void expand_gfx1(hyprduel_state &state);
+	void expand_gfx1(  );
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_layers( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int layers_ctrl );
 	void dirty_tiles( int layer, uint16_t *vram );

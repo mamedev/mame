@@ -154,7 +154,7 @@ image_init_result c64_expansion_slot_device::call_load()
 				int exrom = 1;
 				int game = 1;
 
-				if (cbm_crt_read_header(*m_file, &roml_size, &romh_size, &exrom, &game))
+				if (cbm_crt_read_header(image_core_file(), &roml_size, &romh_size, &exrom, &game))
 				{
 					uint8_t *roml = nullptr;
 					uint8_t *romh = nullptr;
@@ -165,7 +165,7 @@ image_init_result c64_expansion_slot_device::call_load()
 					if (roml_size) roml = m_card->m_roml;
 					if (romh_size) romh = m_card->m_roml;
 
-					cbm_crt_read_data(*m_file, roml, romh);
+					cbm_crt_read_data(image_core_file(), roml, romh);
 				}
 
 				m_card->m_exrom = exrom;
@@ -206,14 +206,12 @@ image_init_result c64_expansion_slot_device::call_load()
 //  get_default_card_software -
 //-------------------------------------------------
 
-std::string c64_expansion_slot_device::get_default_card_software()
+std::string c64_expansion_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
-		if (is_filetype("crt"))
-			return cbm_crt_get_card(*m_file);
-
-		clear();
+		if (hook.is_filetype("crt"))
+			return cbm_crt_get_card(*hook.image_file());
 	}
 
 	return software_get_default_slot("standard");

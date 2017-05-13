@@ -977,7 +977,14 @@ static MACHINE_CONFIG_START( ninjakd2_core, ninjakd2_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ninjakd2, ninjakd2_core )
+	MCFG_CPU_REPLACE("soundcpu", MC8123, MAIN_CLOCK_5)     /* verified */
+	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ninjakd2b, ninjakd2_core )
 	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
@@ -1070,7 +1077,7 @@ ROM_START( ninjakd2 )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nk2_06.rom",   0x00000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) )  // encrypted
 
-	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "soundcpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "ninjakd2.key",  0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
@@ -1153,7 +1160,7 @@ ROM_START( ninjakd2c )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nk2_06.rom",   0x00000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) )  // encrypted
 
-	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "soundcpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "ninjakd2.key",  0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
@@ -1182,7 +1189,7 @@ ROM_START( rdaction )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nk2_06.rom",   0x0000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) )   // 6.3h  encrypted
 
-	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "soundcpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "ninjakd2.key",  0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
@@ -1222,7 +1229,7 @@ ROM_START( jt104 ) // identical to radaction set with different gfx rom and decr
 	ROM_LOAD( "nk2_06.bin",   0x10000, 0x8000, CRC(7bfe6c9e) SHA1(aef8cbeb0024939bf65f77113a5cf777f6613722) )   // decrypted opcodes
 	ROM_CONTINUE(             0x00000, 0x8000 )                                                                 // decrypted data
 
-	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "soundcpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "ninjakd2.key",  0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
@@ -1628,7 +1635,7 @@ void ninjakd2_state::gfx_unscramble()
 
 DRIVER_INIT_MEMBER(ninjakd2_state,ninjakd2)
 {
-	mc8123_decode(memregion("soundcpu")->base(), m_decrypted_opcodes, memregion("user1")->base(), 0x8000);
+	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_decrypted_opcodes, 0x8000);
 
 	gfx_unscramble();
 }
@@ -1691,8 +1698,8 @@ DRIVER_INIT_MEMBER(ninjakd2_state,robokidj)
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,                     MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1987, ninjakd2,  0,        ninjakd2, ninjakd2, ninjakd2_state, ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjakd2a, ninjakd2, ninjakd2, ninjakd2, ninjakd2_state, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjakd2b, ninjakd2, ninjakd2, rdaction, ninjakd2_state, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjakd2a, ninjakd2, ninjakd2b, ninjakd2, ninjakd2_state, bootleg, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjakd2b, ninjakd2, ninjakd2b, rdaction, ninjakd2_state, bootleg, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ninjakd2c, ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 4)", MACHINE_SUPPORTS_SAVE ) // close to set 3
 GAME( 1987, rdaction,  ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL (World Games license)",       "Rad Action / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, jt104,     ninjakd2, ninjakd2, rdaction, ninjakd2_state, bootleg,  ROT0,   "UPL (United Amusements license)", "JT-104 (title screen modification of Rad Action)", MACHINE_SUPPORTS_SAVE )

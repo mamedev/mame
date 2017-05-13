@@ -835,13 +835,6 @@ static ADDRESS_MAP_START( tnzsb_io_map, AS_IO, 8, tnzsb_state )
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8742_map, AS_IO, 8, tnzs_mcu_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(mcu_port1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mcu_port2_r, mcu_port2_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ_PORT("COIN1")
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ_PORT("COIN2")
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8, jpopnics_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("mainbank", address_map_bank_device, amap8)
@@ -1550,7 +1543,11 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( tnzs, tnzs_base, tnzs_state )
 	MCFG_CPU_ADD("mcu", I8742, 12000000/2)  /* 400KHz ??? - Main board Crystal is 12MHz */
-	MCFG_CPU_IO_MAP(i8742_map)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(tnzs_mcu_state, mcu_port1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(tnzs_mcu_state, mcu_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(tnzs_mcu_state, mcu_port2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COIN1"))
+	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("COIN2"))
 
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(tnzs_sub_map)

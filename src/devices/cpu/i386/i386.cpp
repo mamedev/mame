@@ -30,6 +30,7 @@
 const device_type I386 = device_creator<i386_device>;
 const device_type I386SX = device_creator<i386SX_device>;
 const device_type I486 = device_creator<i486_device>;
+const device_type I486DX4 = device_creator<i486dx4_device>;
 const device_type PENTIUM = device_creator<pentium_device>;
 const device_type MEDIAGX = device_creator<mediagx_device>;
 const device_type PENTIUM_PRO = device_creator<pentium_pro_device>;
@@ -75,6 +76,16 @@ i386SX_device::i386SX_device(const machine_config &mconfig, const char *tag, dev
 
 i486_device::i486_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i386_device(mconfig, I486, "I486", tag, owner, clock, "i486", __FILE__)
+{
+}
+
+i486_device::i486_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+	: i386_device(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
+i486dx4_device::i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i486_device(mconfig, I486DX4, "I486DX4", tag, owner, clock, "i486dx4", __FILE__)
 {
 }
 
@@ -3569,6 +3580,7 @@ void i386_device::state_string_export(const device_state_entry &entry, std::stri
 			str = string_format("%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
 			break;
 	}
+	float_exception_flags = 0; // kill any float exceptions that occur here
 }
 
 void i386_device::build_opcode_table(uint32_t features)
@@ -4074,6 +4086,16 @@ void i486_device::device_reset()
 	CHANGE_PC(m_eip);
 }
 
+void i486dx4_device::device_reset()
+{
+	i486_device::device_reset();
+	m_cpuid_id0 = 0x756e6547;   // Genu
+	m_cpuid_id1 = 0x49656e69;   // ineI
+	m_cpuid_id2 = 0x6c65746e;   // ntel
+
+	m_cpuid_max_input_value_eax = 0x01;
+	m_cpu_version = REG32(EDX);
+}
 
 /*****************************************************************************/
 /* Pentium */

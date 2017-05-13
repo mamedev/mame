@@ -119,4 +119,6 @@ public:
 
 	int NB1objcode2tile(int code);
 	int NB2objcode2tile(int code);
+	void NB1TilemapCB(uint16_t code, int *tile, int *mask);
+	void NB2TilemapCB(uint16_t code, int *tile, int *mask);
 };

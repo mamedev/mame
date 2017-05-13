@@ -44,7 +44,7 @@
     Doraemon Meikyuu Daisakusen (20)
   * Doraemon II
     Down Load (43)
-  * Dragon Egg!
+    Dragon Egg! (137)
     Dragon Saber (65)
     Dragon Spirit (?)
     Drop Rock Hora Hora (12)

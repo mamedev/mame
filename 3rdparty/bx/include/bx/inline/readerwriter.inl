@@ -1,0 +1,452 @@
+/*
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ */
+
+#ifndef BX_READERWRITER_H_HEADER_GUARD
+#	error "Must be included from bx/readerwriter!"
+#endif // BX_READERWRITER_H_HEADER_GUARD
+
+namespace bx
+{
+	inline ReaderI::~ReaderI()
+	{
+	}
+
+	inline WriterI::~WriterI()
+	{
+	}
+
+	inline SeekerI::~SeekerI()
+	{
+	}
+
+	inline ReaderOpenI::~ReaderOpenI()
+	{
+	}
+
+	inline WriterOpenI::~WriterOpenI()
+	{
+	}
+
+	inline CloserI::~CloserI()
+	{
+	}
+
+	inline StaticMemoryBlock::StaticMemoryBlock(void* _data, uint32_t _size)
+		: m_data(_data)
+		, m_size(_size)
+	{
+	}
+
+	inline StaticMemoryBlock::~StaticMemoryBlock()
+	{
+	}
+
+	inline void* StaticMemoryBlock::more(uint32_t _size)
+	{
+		BX_UNUSED(_size);
+		return m_data;
+	}
+
+	inline uint32_t StaticMemoryBlock::getSize()
+	{
+		return m_size;
+	}
+
+	inline MemoryBlock::MemoryBlock(AllocatorI* _allocator)
+		: m_allocator(_allocator)
+		, m_data(NULL)
+		, m_size(0)
+	{
+	}
+
+	inline MemoryBlock::~MemoryBlock()
+	{
+		BX_FREE(m_allocator, m_data);
+	}
+
+	inline void* MemoryBlock::more(uint32_t _size)
+	{
+		if (0 < _size)
+		{
+			m_size += _size;
+			m_data = BX_REALLOC(m_allocator, m_data, m_size);
+		}
+
+		return m_data;
+	}
+
+	inline uint32_t MemoryBlock::getSize()
+	{
+		return m_size;
+	}
+
+	inline SizerWriter::SizerWriter()
+		: m_pos(0)
+		, m_top(0)
+	{
+	}
+
+	inline SizerWriter::~SizerWriter()
+	{
+	}
+
+	inline int64_t SizerWriter::seek(int64_t _offset, Whence::Enum _whence)
+	{
+		switch (_whence)
+		{
+			case Whence::Begin:
+				m_pos = int64_clamp(_offset, 0, m_top);
+				break;
+
+			case Whence::Current:
+				m_pos = int64_clamp(m_pos + _offset, 0, m_top);
+				break;
+
+			case Whence::End:
+				m_pos = int64_clamp(m_top - _offset, 0, m_top);
+				break;
+		}
+
+		return m_pos;
+	}
+
+	inline int32_t SizerWriter::write(const void* /*_data*/, int32_t _size, Error* _err)
+	{
+		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+		int32_t morecore = int32_t(m_pos - m_top) + _size;
+
+		if (0 < morecore)
+		{
+			m_top += morecore;
+		}
+
+		int64_t remainder = m_top-m_pos;
+		int32_t size = uint32_min(_size, uint32_t(int64_min(remainder, INT32_MAX) ) );
+		m_pos += size;
+		if (size != _size)
+		{
+			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "SizerWriter: write truncated.");
+		}
+		return size;
+	}
+
+	inline MemoryReader::MemoryReader(const void* _data, uint32_t _size)
+		: m_data( (const uint8_t*)_data)
+		, m_pos(0)
+		, m_top(_size)
+	{
+	}
+
+	inline MemoryReader::~MemoryReader()
+	{
+	}
+
+	inline int64_t MemoryReader::seek(int64_t _offset, Whence::Enum _whence)
+	{
+		switch (_whence)
+		{
+			case Whence::Begin:
+				m_pos = int64_clamp(_offset, 0, m_top);
+				break;
+
+			case Whence::Current:
+				m_pos = int64_clamp(m_pos + _offset, 0, m_top);
+				break;
+
+			case Whence::End:
+				m_pos = int64_clamp(m_top - _offset, 0, m_top);
+				break;
+		}
+
+		return m_pos;
+	}
+
+	inline int32_t MemoryReader::read(void* _data, int32_t _size, Error* _err)
+	{
+		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+		int64_t remainder = m_top-m_pos;
+		int32_t size = uint32_min(_size, uint32_t(int64_min(remainder, INT32_MAX) ) );
+		memCopy(_data, &m_data[m_pos], size);
+		m_pos += size;
+		if (size != _size)
+		{
+			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "MemoryReader: read truncated.");
+		}
+		return size;
+	}
+
+	inline const uint8_t* MemoryReader::getDataPtr() const
+	{
+		return &m_data[m_pos];
+	}
+
+	inline int64_t MemoryReader::getPos() const
+	{
+		return m_pos;
+	}
+
+	inline int64_t MemoryReader::remaining() const
+	{
+		return m_top-m_pos;
+	}
+
+	inline MemoryWriter::MemoryWriter(MemoryBlockI* _memBlock)
+		: m_memBlock(_memBlock)
+		  , m_data(NULL)
+		  , m_pos(0)
+		  , m_top(0)
+		  , m_size(0)
+	{
+	}
+
+	inline MemoryWriter::~MemoryWriter()
+	{
+	}
+
+	inline int64_t MemoryWriter::seek(int64_t _offset, Whence::Enum _whence)
+	{
+		switch (_whence)
+		{
+			case Whence::Begin:
+				m_pos = int64_clamp(_offset, 0, m_top);
+				break;
+
+			case Whence::Current:
+				m_pos = int64_clamp(m_pos + _offset, 0, m_top);
+				break;
+
+			case Whence::End:
+				m_pos = int64_clamp(m_top - _offset, 0, m_top);
+				break;
+		}
+
+		return m_pos;
+	}
+
+	inline int32_t MemoryWriter::write(const void* _data, int32_t _size, Error* _err)
+	{
+		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+		int32_t morecore = int32_t(m_pos - m_size) + _size;
+
+		if (0 < morecore)
+		{
+			morecore = BX_ALIGN_MASK(morecore, 0xfff);
+			m_data = (uint8_t*)m_memBlock->more(morecore);
+			m_size = m_memBlock->getSize();
+		}
+
+		int64_t remainder = m_size-m_pos;
+		int32_t size = uint32_min(_size, uint32_t(int64_min(remainder, INT32_MAX) ) );
+		memCopy(&m_data[m_pos], _data, size);
+		m_pos += size;
+		m_top = int64_max(m_top, m_pos);
+		if (size != _size)
+		{
+			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "MemoryWriter: write truncated.");
+		}
+		return size;
+	}
+
+	inline StaticMemoryBlockWriter::StaticMemoryBlockWriter(void* _data, uint32_t _size)
+		: MemoryWriter(&m_smb)
+		, m_smb(_data, _size)
+	{
+	}
+
+	inline StaticMemoryBlockWriter::~StaticMemoryBlockWriter()
+	{
+	}
+
+	inline int32_t read(ReaderI* _reader, void* _data, int32_t _size, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+		return _reader->read(_data, _size, _err);
+	}
+
+	template<typename Ty>
+	int32_t read(ReaderI* _reader, Ty& _value, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
+		return _reader->read(&_value, sizeof(Ty), _err);
+	}
+
+	template<typename Ty>
+	int32_t readHE(ReaderI* _reader, Ty& _value, bool _fromLittleEndian, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
+		Ty value;
+		int32_t result = _reader->read(&value, sizeof(Ty), _err);
+		_value = toHostEndian(value, _fromLittleEndian);
+		return result;
+	}
+
+	inline int32_t write(WriterI* _writer, const void* _data, int32_t _size, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+		return _writer->write(_data, _size, _err);
+	}
+
+	inline int32_t writeRep(WriterI* _writer, uint8_t _byte, int32_t _size, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+		const uint32_t tmp0      = uint32_sels(64   - _size,   64, _size);
+		const uint32_t tmp1      = uint32_sels(256  - _size,  256, tmp0);
+		const uint32_t blockSize = uint32_sels(1024 - _size, 1024, tmp1);
+		uint8_t* temp = (uint8_t*)alloca(blockSize);
+		memSet(temp, _byte, blockSize);
+
+		int32_t size = 0;
+		while (0 < _size)
+		{
+			int32_t bytes = write(_writer, temp, uint32_min(blockSize, _size), _err);
+			size  += bytes;
+			_size -= bytes;
+		}
+
+		return size;
+	}
+
+	template<typename Ty>
+	int32_t write(WriterI* _writer, const Ty& _value, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
+		return _writer->write(&_value, sizeof(Ty), _err);
+	}
+
+	template<typename Ty>
+	int32_t writeLE(WriterI* _writer, const Ty& _value, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
+		Ty value = toLittleEndian(_value);
+		int32_t result = _writer->write(&value, sizeof(Ty), _err);
+		return result;
+	}
+
+	template<typename Ty>
+	int32_t writeBE(WriterI* _writer, const Ty& _value, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
+		Ty value = toBigEndian(_value);
+		int32_t result = _writer->write(&value, sizeof(Ty), _err);
+		return result;
+	}
+
+	inline int32_t writePrintf(WriterI* _writer, const char* _format, ...)
+	{
+		va_list argList;
+		va_start(argList, _format);
+
+		char temp[2048];
+		char* out = temp;
+		int32_t max = sizeof(temp);
+		int32_t len = vsnprintf(out, max, _format, argList);
+		if (len > max)
+		{
+			out = (char*)alloca(len);
+			len = vsnprintf(out, len, _format, argList);
+		}
+
+		int32_t size = write(_writer, out, len);
+
+		va_end(argList);
+
+		return size;
+	}
+
+	inline int64_t skip(SeekerI* _seeker, int64_t _offset)
+	{
+		return _seeker->seek(_offset, Whence::Current);
+	}
+
+	inline int64_t seek(SeekerI* _seeker, int64_t _offset, Whence::Enum _whence)
+	{
+		return _seeker->seek(_offset, _whence);
+	}
+
+	inline int64_t getSize(SeekerI* _seeker)
+	{
+		int64_t offset = _seeker->seek();
+		int64_t size = _seeker->seek(0, Whence::End);
+		_seeker->seek(offset, Whence::Begin);
+		return size;
+	}
+
+	inline int32_t peek(ReaderSeekerI* _reader, void* _data, int32_t _size, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+		int64_t offset = bx::seek(_reader);
+		int32_t size = _reader->read(_data, _size, _err);
+		bx::seek(_reader, offset, bx::Whence::Begin);
+		return size;
+	}
+
+	template<typename Ty>
+	int32_t peek(ReaderSeekerI* _reader, Ty& _value, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
+		return peek(_reader, &_value, sizeof(Ty), _err);
+	}
+
+	inline int32_t align(ReaderSeekerI* _reader, uint32_t _alignment, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+		const int64_t current = bx::seek(_reader);
+		const int64_t aligned = ( (current + _alignment-1)/_alignment) * _alignment;
+		const int32_t size    = int32_t(aligned - current);
+		if (0 != size)
+		{
+			const int64_t offset  = bx::seek(_reader, size);
+			if (offset != aligned)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "Align: read truncated.");
+			}
+			return int32_t(offset - current);
+		}
+
+		return 0;
+	}
+
+	inline int32_t align(WriterSeekerI* _writer, uint32_t _alignment, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+		const int64_t current = bx::seek(_writer);
+		const int64_t aligned = ( (current + _alignment-1)/_alignment) * _alignment;
+		const int32_t size    = int32_t(aligned - current);
+		if (0 != size)
+		{
+			return writeRep(_writer, 0, size, _err);
+		}
+
+		return 0;
+	}
+
+	inline bool open(ReaderOpenI* _reader, const char* _filePath, Error* _err)
+	{
+		BX_ERROR_USE_TEMP_WHEN_NULL(_err);
+		return _reader->open(_filePath, _err);
+	}
+
+	inline bool open(WriterOpenI* _writer, const char* _filePath, bool _append, Error* _err)
+	{
+		BX_ERROR_USE_TEMP_WHEN_NULL(_err);
+		return _writer->open(_filePath, _append, _err);
+	}
+
+	inline void close(CloserI* _reader)
+	{
+		_reader->close();
+	}
+
+} // namespace bx

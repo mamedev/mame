@@ -56,10 +56,10 @@ documentation still exists.
 
 
 /*
- Colour codes are as below acording to os-9 headers, however the presise values
- may not be quite correct, also this will need changing as the pallate seems to
- be controled by a 4x4bit register file in the video hardware
- The text video ram seems to be aranged of words of character, attribute
+ Colour codes are as below according to os-9 headers, however the precise values
+ may not be quite correct, also this will need changing as the palette seems to
+ be controlled by a 4x4bit register file in the video hardware
+ The text video ram seems to be arranged of words of character, attribute
  The colour codes are stored in the attribute byte along with :
     Underline bit   $40
     Flash bit   $80
@@ -94,8 +94,8 @@ static const unsigned char dgnbeta_palette[] =
 /*
     2005-05-10
 
-    I *THINK* I know how the memory paging works, the 64K memory map is devided
-    into 16x 4K pages, what is mapped into each page is controled by the IO at
+    I *THINK* I know how the memory paging works, the 64K memory map is divided
+    into 16x 4K pages, what is mapped into each page is controlled by the IO at
     FE00-FE0F like so :-
 
     Location    Memory page     Initialised to
@@ -117,7 +117,7 @@ static const unsigned char dgnbeta_palette[] =
     $FE0F       $F000-$FFFF     $FF
 
     The value stored at each location maps it's page to a 4K page within a 1M address
-    space. Acording to the Beta product descriptions released by Dragon Data, the
+    space. According to the Beta product descriptions released by Dragon Data, the
     machine could have up to 768K of RAM, if this where true then pages $00-$BF could
     potentially be RAM, and pages $C0-$FF would be ROM. The initialisation code maps in
     the memory as described above.
@@ -127,16 +127,16 @@ static const unsigned char dgnbeta_palette[] =
     enable the paging hardware.
 
     It appears to be more complicated than this, whilst the above is true, there appear to
-    be 16 sets of banking registers, the active set is controled by the bottom 4 bits of
+    be 16 sets of banking registers, the active set is controlled by the bottom 4 bits of
     FCC0, bit 6 has something to do with enabling and disabling banking.
 
     2005-11-28
 
-    The value $C0 is guaranteed not to have any memory in it acording to the os9 headers,
+    The value $C0 is guaranteed not to have any memory in it according to the os9 headers,
     quite how the MMU deals with this is still unknown to me.
 
     Bit 7 of $FCC0, sets maps in the system task which has fixed values for some pages,
-    the presise nature of this is yet to be descovered.
+    the precise nature of this is yet to be discovered.
 
 */
 
@@ -164,12 +164,12 @@ static ADDRESS_MAP_START( dgnbeta_map, AS_PROGRAM, 8, dgn_beta_state )
 	AM_RANGE(0xfc80, 0xfc80)    AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xfc81, 0xfc81)    AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0xfc82, 0xfC9F)    AM_NOP
-	AM_RANGE(0xFCA0, 0xFCA3)    AM_READNOP AM_WRITE(dgnbeta_colour_ram_w)           /* 4x4bit colour ram for graphics modes */
+	AM_RANGE(0xFCA0, 0xFCA3)    AM_READNOP AM_WRITE(dgnbeta_colour_ram_w)         /* 4x4bit colour ram for graphics modes */
 	AM_RANGE(0xFCC0, 0xFCC3)    AM_DEVREADWRITE(PIA_2_TAG, pia6821_device, read, write)
 	AM_RANGE(0xfcC4, 0xfcdf)    AM_NOP
-	AM_RANGE(0xfce0, 0xfce3)    AM_READWRITE(dgnbeta_wd2797_r   ,dgnbeta_wd2797_w)  /* Onboard disk interface */
+	AM_RANGE(0xfce0, 0xfce3)    AM_READWRITE(dgnbeta_wd2797_r, dgnbeta_wd2797_w)  /* Onboard disk interface */
 	AM_RANGE(0xfce4, 0xfdff)    AM_NOP
-	AM_RANGE(0xFE00, 0xFE0F)    AM_READWRITE(dgn_beta_page_r    ,dgn_beta_page_w)
+	AM_RANGE(0xFE00, 0xFE0F)    AM_READWRITE(dgn_beta_page_r, dgn_beta_page_w)
 	AM_RANGE(0xfe10, 0xfEff)    AM_NOP
 	AM_RANGE(0xFF00, 0xFFFF)    AM_RAMBANK("bank17")
 
@@ -285,9 +285,7 @@ INPUT_PORTS_END
 
 PALETTE_INIT_MEMBER(dgn_beta_state, dgn)
 {
-	int i;
-
-	for ( i = 0; i < sizeof(dgnbeta_palette) / 3; i++ ) {
+	for ( int i = 0; i < sizeof(dgnbeta_palette) / 3; i++ ) {
 		palette.set_pen_color(i, dgnbeta_palette[i*3], dgnbeta_palette[i*3+1], dgnbeta_palette[i*3+2]);
 	}
 }
@@ -297,7 +295,7 @@ static const gfx_layout dgnbeta_charlayout =
 {
 	8, 10,                  /* 8 x 10 characters */
 	256,                    /* 256 characters */
-	1,                  /* 1 bits per pixel */
+	1,                      /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -310,13 +308,13 @@ static GFXDECODE_START( dgnbeta )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dgnbeta_charlayout, 0, 8 )
 GFXDECODE_END
 
-FLOPPY_FORMATS_MEMBER( dgn_beta_state::floppy_formats )
+FLOPPY_FORMATS_MEMBER(dgn_beta_state::floppy_formats )
 	FLOPPY_VDK_FORMAT,
 	FLOPPY_DMK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( dgn_beta_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
+static SLOT_INTERFACE_START( dgnbeta_floppies )
+	SLOT_INTERFACE("dd", FLOPPY_35_DD)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
@@ -325,7 +323,7 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	MCFG_CPU_PROGRAM_MAP(dgnbeta_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(dgn_beta_state, dgnbeta_dasm_override)
 
-	/* both cpus in the beta share the same address/data busses */
+	/* both cpus in the beta share the same address/data buses */
 	MCFG_CPU_ADD(DMACPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(dgnbeta_map)
 
@@ -344,42 +342,46 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 
 	/* PIA 0 at $FC20-$FC23 I46 */
 	MCFG_DEVICE_ADD(PIA_0_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(dgn_beta_state,d_pia0_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(dgn_beta_state,d_pia0_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(dgn_beta_state,d_pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(dgn_beta_state,d_pia0_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(dgn_beta_state,d_pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state,d_pia0_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state,d_pia0_irq_b))
+	MCFG_PIA_READPA_HANDLER(READ8(dgn_beta_state, d_pia0_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(dgn_beta_state, d_pia0_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(dgn_beta_state, d_pia0_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(dgn_beta_state, d_pia0_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(dgn_beta_state, d_pia0_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state, d_pia0_irq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state, d_pia0_irq_b))
 
 	/* PIA 1 at $FC24-$FC27 I63 */
 	MCFG_DEVICE_ADD(PIA_1_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(dgn_beta_state,d_pia1_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(dgn_beta_state,d_pia1_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(dgn_beta_state,d_pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(dgn_beta_state,d_pia1_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state,d_pia1_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state,d_pia1_irq_b))
+	MCFG_PIA_READPA_HANDLER(READ8(dgn_beta_state, d_pia1_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(dgn_beta_state, d_pia1_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(dgn_beta_state, d_pia1_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(dgn_beta_state, d_pia1_pb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state, d_pia1_irq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state, d_pia1_irq_b))
 
 	/* PIA 2 at FCC0-FCC3 I28 */
 	/* This seems to control the RAM paging system, and have the DRQ */
 	/* from the WD2797 */
 	MCFG_DEVICE_ADD(PIA_2_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(dgn_beta_state,d_pia2_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(dgn_beta_state,d_pia2_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(dgn_beta_state,d_pia2_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(dgn_beta_state,d_pia2_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state,d_pia2_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state,d_pia2_irq_b))
+	MCFG_PIA_READPA_HANDLER(READ8(dgn_beta_state, d_pia2_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(dgn_beta_state, d_pia2_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(dgn_beta_state, d_pia2_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(dgn_beta_state, d_pia2_pb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state, d_pia2_irq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state, d_pia2_irq_b))
 
 	MCFG_WD2797_ADD(FDC_TAG, XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dgn_beta_state, dgnbeta_fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dgn_beta_state, dgnbeta_fdc_drq_w))
 
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", dgn_beta_floppies, "qd", dgn_beta_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", dgn_beta_floppies, "qd", dgn_beta_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":2", dgn_beta_floppies, "qd", dgn_beta_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":3", dgn_beta_floppies, "qd", dgn_beta_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":2", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":3", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_12_288MHz / 16)    //XTAL is guessed
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -394,15 +396,18 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	/* Ram size can now be configured, since the machine was known as either the Dragon Beta or */
 	/* the Dragon 128, I have added a config for 128K, however, the only working machine known  */
 	/* to exist was fitted with 256K, so I have made this the default. Also available           */
-	/* documentation seems to sugest a maximum of 768K, so I have included configs increasing   */
+	/* documentation seems to suggest a maximum of 768K, so I have included configs increasing  */
 	/* in blocks of 128K up to this maximum.                                                    */
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "dgnbeta_flop")
 MACHINE_CONFIG_END
 
 ROM_START(dgnbeta)
 	ROM_REGION(0x4000,MAINCPU_TAG,0)
-	ROM_SYSTEM_BIOS( 0, "bootrom", "Dragon beta OS9 boot rom (1984)" )
+	ROM_SYSTEM_BIOS( 0, "bootrom", "Dragon Beta OS-9 Boot ROM (15.6.84)" )
 	ROMX_LOAD("beta_bt.rom"     ,0x0000 ,0x4000 ,CRC(4c54c1de) SHA1(141d9fcd2d187c305dff83fce2902a30072aed76), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "testrom", "Dragon beta test rom (1984?)" )
+	ROM_SYSTEM_BIOS( 1, "testrom", "Dragon Beta Test ROM (1984?)" )
 	ROMX_LOAD("beta_tst.rom"    ,0x2000 ,0x2000 ,CRC(01d79d00) SHA1(343e08cf7656b5e8970514868df37ea0af1e2362), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "cfiles", "cfiles rom" )
 	ROMX_LOAD("beta_cfi.rom"    ,0x2000 ,0x2000 ,CRC(d312e4c0) SHA1(5c00daac488eaf8d36d66de6ec6c746ab7b78ecf), ROM_BIOS(3))
@@ -413,5 +418,5 @@ ROM_START(dgnbeta)
 	ROM_LOAD("betachar.rom" ,0x0000 ,0x2000 ,CRC(ca79d66c) SHA1(8e2090d471dd97a53785a7f44a49d3c8c85b41f2))
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME                    FLAGS */
-COMP( 1984, dgnbeta,    0,      0,      dgnbeta,    dgnbeta, driver_device,    0,      "Dragon Data Ltd",  "Dragon Beta Prototype",    MACHINE_NO_SOUND )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    CLASS             INIT    COMPANY             FULLNAME                  FLAGS */
+COMP( 1984, dgnbeta,    0,      0,      dgnbeta,    dgnbeta, driver_device,    0,      "Dragon Data Ltd",  "Dragon 128 (Beta)",      MACHINE_NO_SOUND )

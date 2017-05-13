@@ -423,7 +423,7 @@ WRITE16_MEMBER(othunder_state::othunder_lightgun_w)
 	   The ADC60808 clock is 512kHz. Conversion takes between 0 and 8 clock
 	   cycles, so would end in a maximum of 15.625us. We'll use 10. */
 
-	timer_set(attotime::from_usec(10), TIMER_AD_INTERRUPT);
+	m_ad_interrupt_timer->adjust(attotime::from_usec(10));
 }
 
 
@@ -661,6 +661,8 @@ GFXDECODE_END
 void othunder_state::machine_start()
 {
 	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+
+	m_ad_interrupt_timer = timer_alloc(TIMER_AD_INTERRUPT);
 
 	save_item(NAME(m_vblank_irq));
 	save_item(NAME(m_ad_irq));

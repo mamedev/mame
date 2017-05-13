@@ -98,10 +98,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nespal, nes )
 	/* basic machine hardware */
-//  MCFG_CPU_MODIFY("maincpu")
-//  MCFG_CPU_CLOCK(PAL_APU_CLOCK) // this doesn't get inherited by the APU with DERIVED_CLOCK!
-
-	MCFG_CPU_REPLACE("maincpu", N2A03, PAL_APU_CLOCK)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(PAL_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(nes_map)
 
 	MCFG_DEVICE_REMOVE("ppu")
@@ -130,10 +128,8 @@ static MACHINE_CONFIG_DERIVED( famicom, nes )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nespalc, nespal )
-//  MCFG_CPU_MODIFY( "maincpu" )
-//  MCFG_CPU_CLOCK(PALC_APU_CLOCK)  // this doesn't get inherited by the APU with DERIVED_CLOCK!
-
-	MCFG_CPU_REPLACE("maincpu", N2A03, PALC_APU_CLOCK)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_CLOCK(PALC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(nes_map)
 
 	/* UMC 6538 and friends -- extends time for rendering dummy scanlines */

@@ -31,7 +31,7 @@ ADDRESS_MAP_END
 
 vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, VRC4373, "NEC VRC4373 System Controller", tag, owner, clock, "vrc4373", __FILE__),
-		m_cpu_space(nullptr), m_cpu(nullptr), cpu_tag(nullptr), m_irq_num(-1),
+		m_cpu_space(nullptr), m_cpu(nullptr), cpu_tag(nullptr), m_irq_num(-1), m_ram_size(0x0), m_simm0_size(0x0),
 		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
 		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32), m_pci1_laddr(0), m_pci2_laddr(0), m_pci_io_laddr(0), m_target1_laddr(0), m_target2_laddr(0),
 		m_romRegion(*this, "rom")
@@ -62,9 +62,10 @@ void vrc4373_device::device_start()
 	status = 0x0280;
 	// Reserve 8M for ram
 	m_ram.reserve(0x00800000 / 4);
+	m_ram.resize(m_ram_size);
 	// Reserve 32M for simm[0]
 	m_simm[0].reserve(0x02000000 / 4);
-
+	m_simm[0].resize(m_simm0_size / 4);
 	// ROM
 	uint32_t romSize = m_romRegion->bytes();
 	m_cpu_space->install_rom(0x1fc00000, 0x1fc00000 + romSize - 1, m_romRegion->base());
@@ -80,6 +81,25 @@ void vrc4373_device::device_start()
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrc4373_device::dma_transfer), this));
 	// Leave the timer disabled.
 	m_dma_timer->adjust(attotime::never, 0, DMA_TIMER_PERIOD);
+
+	// Save states
+	// m_ram
+	save_pointer(NAME(m_ram.data()), m_ram_size / 4);
+	// m_simm
+	save_pointer(NAME(m_simm[0].data()), m_simm0_size / 4);
+	save_item(NAME(m_cpu_regs));
+	save_item(NAME(m_pci1_laddr));
+	save_item(NAME(m_pci2_laddr));
+	save_item(NAME(m_pci_io_laddr));
+	save_item(NAME(m_target1_laddr));
+	save_item(NAME(m_target2_laddr));
+	machine().save().register_postload(save_prepost_delegate(FUNC(vrc4373_device::postload), this));
+}
+
+void vrc4373_device::postload()
+{
+	map_cpu_space();
+	//remap_cb();
 }
 
 void vrc4373_device::device_reset()
@@ -118,6 +138,7 @@ void vrc4373_device::map_cpu_space()
 		m_cpu->add_fastram(winStart, winEnd, false, m_ram.data());
 		if (LOG_NILE)
 			logerror("map_cpu_space ram_size=%08X ram_base=%08X\n", winSize, winStart);
+		//printf("map_cpu_space ram_size=%08X bytes ram_base=%08X\n", winSize, winStart);
 	}
 
 	// Map SIMMs
@@ -137,6 +158,7 @@ void vrc4373_device::map_cpu_space()
 			m_cpu->add_fastram(winStart, winEnd, false, m_simm[simIndex].data());
 			if (LOG_NILE)
 				logerror("map_cpu_space simm_size[%i]=%08X simm_base=%08X\n", simIndex, winSize, winStart);
+			//printf("map_cpu_space simm_size[%i]=%08X bytes simm_base=%08X\n", simIndex, winSize, winStart);
 		}
 	}
 

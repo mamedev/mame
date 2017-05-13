@@ -38,17 +38,25 @@ struct zeus2_poly_extra_data
 	const void *    palbase;
 	const void *    texbase;
 	uint16_t          solidcolor;
-	int32_t           zbufmin;
 	uint16_t          transcolor;
 	uint16_t          texwidth;
 	uint16_t          color;
-	uint32_t          alpha;
+	uint32_t          srcAlpha;
+	uint32_t          dstAlpha;
 	uint32_t          ctrl_word;
+	uint32_t          ucode_src;
+	uint32_t          tex_src;
+	bool            texture_alpha;
+	bool            texture_rgb555;
 	bool            blend_enable;
+	int32_t         zbuf_min;
 	bool            depth_min_enable;
 	bool            depth_test_enable;
 	bool            depth_write_enable;
+	bool            depth_clear_enable;
+
 	uint8_t(*get_texel)(const void *, int, int, int);
+	uint8_t(*get_alpha)(const void *, int, int, int);
 };
 
 /*************************************
@@ -131,20 +139,21 @@ public:
 	rectangle zeus_cliprect;
 
 	int m_palSize;
-	int m_zbufmin;
 	float zeus_matrix[3][3];
-	float zeus_point[3];
-	float zeus_point2[3];
+	float zeus_trans[4];
+	float zeus_light[3];
 	uint32_t zeus_texbase;
 	int zeus_quad_size;
+	bool m_useZOffset;
 
 	uint32_t *waveram;
 	std::unique_ptr<uint32_t[]> m_frameColor;
-	std::unique_ptr<uint32_t[]> m_frameDepth;
+	std::unique_ptr<int32_t[]> m_frameDepth;
 	uint32_t m_pal_table[0x100];
 	uint32_t m_ucode[0x200];
 	uint32_t m_curUCodeSrc;
 	uint32_t m_curPalTableSrc;
+	uint32_t m_texmodeReg;
 
 	emu_timer *int_timer;
 	emu_timer *vblank_timer;
@@ -187,7 +196,7 @@ private:
 	uint8_t zeus_fifo_words;
 
 	uint32_t m_fill_color;
-	uint32_t m_fill_depth;
+	int32_t m_fill_depth;
 
 	int m_yScale;
 
@@ -225,8 +234,18 @@ public:
 
 	inline uint32_t frame_addr_from_xy(uint32_t x, uint32_t y, bool render)
 	{
-		uint32_t addr = render ? frame_addr_from_phys_addr(m_renderRegs[0x4] << (15 + m_yScale))
-			: frame_addr_from_phys_addr((m_zeusbase[0x38] >> 1) << (m_yScale << 1));
+		uint32_t addr;
+		if (render) {
+			// Rendering is y location
+			addr = m_renderRegs[0x4] << (9 + m_yScale);
+		}
+		else {
+			// y.16:x.16 row/col
+			// Ignore col for now
+			addr = m_zeusbase[0x38] >> (16 - 9 - 2 * m_yScale);
+		}
+		//uint32_t addr = render ? frame_addr_from_phys_addr(m_renderRegs[0x4] << (15 + m_yScale))
+		//  : frame_addr_from_phys_addr((m_zeusbase[0x38] >> 1) << (m_yScale << 1));
 		addr += (y << (9 + m_yScale)) + x;
 		return addr;
 	}
@@ -311,7 +330,14 @@ public:
 	{
 		return ((color & 0x7c00) << 9) | ((color & 0x3e0) << 6) | ((color & 0x8000) >> 5) | ((color & 0x1f) << 3);
 	}
-
+	inline uint32_t conv_rgb332_to_rgb32(uint8_t color)
+	{
+		uint32_t result;
+		result =  ((((color) >> 0) & 0xe0) | (((color) >> 3) & 0x1c) | (((color) >> 6) & 0x03)) << 16;
+		result |= ((((color) << 3) & 0xe0) | (((color) >> 0) & 0x1c) | (((color) >> 3) & 0x03)) << 8;
+		result |= ((((color) << 6) & 0xc0) | (((color) << 4) & 0x30) | (((color) << 2) & 0x0c) | (((color) << 0) & 0x03)) << 0;
+		return result;
+	}
 #ifdef UNUSED_FUNCTION
 	inline void WAVERAM_plot(int y, int x, uint32_t color)
 	{
@@ -392,7 +418,21 @@ public:
 		uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 2) << 2) + ((y & 1) << 1) + (x & 1);
 		// Only grab RGB value for now
 		byteoffs <<= 1;
-		return WAVERAM_READ8(base, byteoffs);
+		return WAVERAM_READ8(base, byteoffs + 0);
+	}
+	static inline uint8_t get_alpha_8bit_2x2_alpha(const void *base, int y, int x, int width)
+	{
+		uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 2) << 2) + ((y & 1) << 1) + (x & 1);
+		// Only grab Alpha value for now
+		byteoffs <<= 1;
+		return WAVERAM_READ8(base, byteoffs + 1);
+	}
+	// 2x2 block size of r5g5r5 in 64 bits
+	static inline uint32_t get_rgb555(const void *base, int y, int x, int width)
+	{
+		uint32_t wordoffs = (y / 2) * (width * 2) + ((x / 2) << 2) + ((y & 1) << 1) + (x & 1);
+		uint16_t color = WAVERAM_READ16(base, wordoffs);
+		return ((color & 0x7c00) << 9) | ((color & 0x3e0) << 6) | ((color & 0x1f) << 3);
 	}
 
 };

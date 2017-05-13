@@ -12,7 +12,13 @@
 
 WRITE8_MEMBER(battlex_state::battlex_palette_w)
 {
+	int palette_num = offset / 8;
+	int color_num = offset & 7;
+
 	m_palette->set_pen_color(offset, pal1bit(data >> 0), pal1bit(data >> 2), pal1bit(data >> 1));
+	/* set darker colors */
+	m_palette->set_pen_color(64+palette_num*16+color_num, pal1bit(data >> 0), pal1bit(data >> 2), pal1bit(data >> 1));
+	m_palette->set_pen_color(64+palette_num*16+color_num+8, pal2bit((data >> 0)&1), pal2bit((data >> 2)&1), pal2bit( (data >> 1) &1));
 }
 
 WRITE8_MEMBER(battlex_state::battlex_scroll_x_lsb_w)
@@ -83,7 +89,7 @@ void battlex_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	{
 		int sx = (source[0] & 0x7f) * 2 - (source[0] & 0x80) * 2;
 		int sy = source[3];
-		int tile = source[2] & 0x7f;
+		int tile = source[2] ; /* dodgeman has 0x100 sprites */
 		int color = source[1] & 0x07;   /* bits 3,4,5 also used during explosions */
 		int flipy = source[1] & 0x80;
 		int flipx = source[1] & 0x40;
@@ -101,7 +107,6 @@ void battlex_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 
 }
-
 
 uint32_t battlex_state::screen_update_battlex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

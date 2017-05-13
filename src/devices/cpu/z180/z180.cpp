@@ -128,6 +128,16 @@ offs_t z180_device::disasm_disassemble(std::ostream &stream, offs_t pc, const ui
 #define Z180_TXA1     0x00200000  /*   O asynchronous transmit data 1 (active high) */
 #define Z180_TXS      0x00400000  /*   O clocked serial transmit data (active high) */
 
+bool z180_device::get_tend0()
+{
+	return !!(m_iol & Z180_TEND0);
+}
+
+bool z180_device::get_tend1()
+{
+	return !!(m_iol & Z180_TEND1);
+}
+
 /*
  * Prevent warnings on NetBSD.  All identifiers beginning with an underscore
  * followed by an uppercase letter are reserved by the C standard (ISO/IEC
@@ -1573,12 +1583,12 @@ int z180_device::z180_dma0(int max_cycles)
 	offs_t sar0 = 65536 * IO_SAR0B + 256 * IO_SAR0H + IO_SAR0L;
 	offs_t dar0 = 65536 * IO_DAR0B + 256 * IO_DAR0H + IO_DAR0L;
 	int bcr0 = 256 * IO_BCR0H + IO_BCR0L;
-	
-	if (bcr0 == 0) 
+
+	if (bcr0 == 0)
 	{
 		bcr0 = 0x10000;
 	}
-	
+
 	int count = (IO_DMODE & Z180_DMODE_MMOD) ? bcr0 : 1;
 	int cycles = 0;
 
@@ -1587,7 +1597,7 @@ int z180_device::z180_dma0(int max_cycles)
 		return 0;
 	}
 
-	while (count-- > 0)
+	while (count > 0)
 	{
 		/* last transfer happening now? */
 		if (bcr0 == 1)
@@ -1598,19 +1608,23 @@ int z180_device::z180_dma0(int max_cycles)
 		{
 		case 0x00:  /* memory SAR0+1 to memory DAR0+1 */
 			m_program->write_byte(dar0++, m_program->read_byte(sar0++));
+			bcr0--;
 			break;
 		case 0x04:  /* memory SAR0-1 to memory DAR0+1 */
 			m_program->write_byte(dar0++, m_program->read_byte(sar0--));
+			bcr0--;
 			break;
 		case 0x08:  /* memory SAR0 fixed to memory DAR0+1 */
 			m_program->write_byte(dar0++, m_program->read_byte(sar0));
+			bcr0--;
 			break;
 		case 0x0c:  /* I/O SAR0 fixed to memory DAR0+1 */
 			if (m_iol & Z180_DREQ0)
 			{
 				m_program->write_byte(dar0++, IN(sar0));
+				bcr0--;
 				/* edge sensitive DREQ0 ? */
-				if (IO_DCNTL & Z180_DCNTL_DIM0)
+				if (IO_DCNTL & Z180_DCNTL_DMS0)
 				{
 					m_iol &= ~Z180_DREQ0;
 					count = 0;
@@ -1619,19 +1633,23 @@ int z180_device::z180_dma0(int max_cycles)
 			break;
 		case 0x10:  /* memory SAR0+1 to memory DAR0-1 */
 			m_program->write_byte(dar0--, m_program->read_byte(sar0++));
+			bcr0--;
 			break;
 		case 0x14:  /* memory SAR0-1 to memory DAR0-1 */
 			m_program->write_byte(dar0--, m_program->read_byte(sar0--));
+			bcr0--;
 			break;
 		case 0x18:  /* memory SAR0 fixed to memory DAR0-1 */
 			m_program->write_byte(dar0--, m_program->read_byte(sar0));
+			bcr0--;
 			break;
 		case 0x1c:  /* I/O SAR0 fixed to memory DAR0-1 */
 			if (m_iol & Z180_DREQ0)
 			{
 				m_program->write_byte(dar0--, IN(sar0));
+				bcr0--;
 				/* edge sensitive DREQ0 ? */
-				if (IO_DCNTL & Z180_DCNTL_DIM0)
+				if (IO_DCNTL & Z180_DCNTL_DMS0)
 				{
 					m_iol &= ~Z180_DREQ0;
 					count = 0;
@@ -1640,9 +1658,11 @@ int z180_device::z180_dma0(int max_cycles)
 			break;
 		case 0x20:  /* memory SAR0+1 to memory DAR0 fixed */
 			m_program->write_byte(dar0, m_program->read_byte(sar0++));
+			bcr0--;
 			break;
 		case 0x24:  /* memory SAR0-1 to memory DAR0 fixed */
 			m_program->write_byte(dar0, m_program->read_byte(sar0--));
+			bcr0--;
 			break;
 		case 0x28:  /* reserved */
 			break;
@@ -1652,8 +1672,9 @@ int z180_device::z180_dma0(int max_cycles)
 			if (m_iol & Z180_DREQ0)
 			{
 				OUT(dar0, m_program->read_byte(sar0++));
+				bcr0--;
 				/* edge sensitive DREQ0 ? */
-				if (IO_DCNTL & Z180_DCNTL_DIM0)
+				if (IO_DCNTL & Z180_DCNTL_DMS0)
 				{
 					m_iol &= ~Z180_DREQ0;
 					count = 0;
@@ -1664,8 +1685,9 @@ int z180_device::z180_dma0(int max_cycles)
 			if (m_iol & Z180_DREQ0)
 			{
 				OUT(dar0, m_program->read_byte(sar0--));
+				bcr0--;
 				/* edge sensitive DREQ0 ? */
-				if (IO_DCNTL & Z180_DCNTL_DIM0)
+				if (IO_DCNTL & Z180_DCNTL_DMS0)
 				{
 					m_iol &= ~Z180_DREQ0;
 					count = 0;
@@ -1677,7 +1699,6 @@ int z180_device::z180_dma0(int max_cycles)
 		case 0x3c:  /* reserved */
 			break;
 		}
-		bcr0--;
 		count--;
 		cycles += 6;
 		if (cycles > max_cycles)
@@ -1710,12 +1731,12 @@ int z180_device::z180_dma1()
 	offs_t mar1 = 65536 * IO_MAR1B + 256 * IO_MAR1H + IO_MAR1L;
 	offs_t iar1 = 256 * IO_IAR1H + IO_IAR1L;
 	int bcr1 = 256 * IO_BCR1H + IO_BCR1L;
-	
-	if (bcr1 == 0) 
+
+	if (bcr1 == 0)
 	{
 		bcr1 = 0x10000;
 	}
-	
+
 	int cycles = 0;
 
 	if ((m_iol & Z180_DREQ1) == 0)
@@ -2391,7 +2412,7 @@ again:
 		else
 		{
 			do
-			{		
+			{
 				curcycles = check_interrupts();
 				m_icount -= curcycles;
 				handle_io_timers(curcycles);
@@ -2413,7 +2434,7 @@ again:
 				m_icount -= curcycles;
 
 				handle_io_timers(curcycles);
-				
+
 				/* if channel 0 was started in burst mode, go recheck the mode */
 				if ((IO_DSTAT & Z180_DSTAT_DE0) == Z180_DSTAT_DE0 &&
 					(IO_DMODE & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
@@ -2434,7 +2455,7 @@ again:
 				curcycles = z180_dma1();
 				m_icount -= curcycles;
 				handle_io_timers(curcycles);
-				
+
 				/* If DMA is done break out to the faster loop */
 				if ((IO_DSTAT & Z180_DSTAT_DME) != Z180_DSTAT_DME)
 					break;
@@ -2449,7 +2470,7 @@ again:
 			/* If DMA is started go to check the mode */
 			if ((IO_DSTAT & Z180_DSTAT_DME) == Z180_DSTAT_DME)
 				goto again;
-				
+
 			curcycles = check_interrupts();
 			m_icount -= curcycles;
 			handle_io_timers(curcycles);
@@ -2506,12 +2527,24 @@ void z180_device::execute_set_input(int irqline, int state)
 	{
 		LOG(("Z180 '%s' set_irq_line %d = %d\n",tag() , irqline,state));
 
-		/* update the IRQ state */
-		m_irq_state[irqline] = state;
-		if (daisy_chain_present())
-			m_irq_state[0] = daisy_update_irq_state();
+		if(irqline == Z180_INPUT_LINE_IRQ0 || irqline == Z180_INPUT_LINE_IRQ1 || irqline == Z180_INPUT_LINE_IRQ2) {
+			/* update the IRQ state */
+			m_irq_state[irqline] = state;
+			if(daisy_chain_present())
+				m_irq_state[0] = daisy_update_irq_state();
 
-		/* the main execute loop will take the interrupt */
+			/* the main execute loop will take the interrupt */
+		} else if(irqline == Z180_INPUT_LINE_DREQ0) {
+			auto iol = m_iol & ~Z180_DREQ0;
+			if(state == ASSERT_LINE)
+				iol |= Z180_DREQ0;
+			z180_write_iolines(iol);
+		} else if(irqline == Z180_INPUT_LINE_DREQ1) {
+			auto iol = m_iol & ~Z180_DREQ1;
+			if(state == ASSERT_LINE)
+				iol |= Z180_DREQ1;
+			z180_write_iolines(iol);
+		}
 	}
 }
 

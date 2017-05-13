@@ -147,6 +147,7 @@ eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconf
 	: eeprom_base_device(mconfig, devtype, name, tag, owner, shortname, file),
 		m_command_address_bits(0),
 		m_streaming_enabled(false),
+		m_output_on_falling_clock_enabled(false),
 		m_state(STATE_IN_RESET),
 		m_cs_state(CLEAR_LINE),
 		m_last_cs_rising_edge_time(attotime::zero),
@@ -183,6 +184,17 @@ void eeprom_serial_base_device::static_set_address_bits(device_t &device, int ad
 void eeprom_serial_base_device::static_enable_streaming(device_t &device)
 {
 	downcast<eeprom_serial_base_device &>(device).m_streaming_enabled = true;
+}
+
+
+//-----------------------------------------------------------------
+//  static_enable_output_on_falling_clock - configuration helper
+//  to enable updating the output on the falling edge of the clock
+//-----------------------------------------------------------------
+
+void eeprom_serial_base_device::static_enable_output_on_falling_clock(device_t &device)
+{
+	downcast<eeprom_serial_base_device &>(device).m_output_on_falling_clock_enabled = true;
 }
 
 
@@ -422,7 +434,7 @@ void eeprom_serial_base_device::handle_event(eeprom_event event)
 
 		// CS is asserted; reading data, clock the shift register; falling CS will reset us
 		case STATE_READING_DATA:
-			if (event == EVENT_CLK_RISING_EDGE)
+			if (event == (m_output_on_falling_clock_enabled ? EVENT_CLK_FALLING_EDGE : EVENT_CLK_RISING_EDGE))
 			{
 				int bit_index = m_bits_accum++;
 
@@ -1142,6 +1154,12 @@ DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c57, 93C57, 16, 128, 7)
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c66, 93C66, 16, 256, 8)
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c76, 93C76, 16, 512, 10)
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c86, 93C86, 16, 1024, 10)
+
+// Seiko S-29X90 class of 16-bit EEPROMs. They always use 13 address bits, despite needing only 6-8.
+// The output is updated on the falling edge of the clock. Streaming is enabled
+DEFINE_SERIAL_EEPROM_DEVICE(93cxx, s29190, S29190, 16, 64, 13)
+DEFINE_SERIAL_EEPROM_DEVICE(93cxx, s29290, S29290, 16, 128, 13)
+DEFINE_SERIAL_EEPROM_DEVICE(93cxx, s29390, S29390, 16, 256, 13)
 
 // some manufacturers use pin 6 as an "ORG" pin which, when pulled low, configures memory for 8-bit accesses
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c46, 93C46, 8, 128, 7)

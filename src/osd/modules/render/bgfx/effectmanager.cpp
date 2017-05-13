@@ -51,7 +51,9 @@ bgfx_effect* effect_manager::load_effect(std::string name)
 	if (full_name.length() < 5 || (full_name.compare(full_name.length() - 5, 5, ".json") != 0)) {
 		full_name = full_name + ".json";
 	}
-	std::string path = std::string(m_options.bgfx_path()) + "/effects/" + full_name;
+	std::string path;
+	osd_subst_env(path, util::string_format("%s" PATH_SEPARATOR "effects" PATH_SEPARATOR, m_options.bgfx_path()));
+	path += full_name;
 
 	bx::CrtFileReader reader;
 	if (!bx::open(&reader, path.c_str()))

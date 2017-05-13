@@ -37,7 +37,7 @@
 		v99x8_device::VERTICAL_ADJUST * 2, \
 		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2) \
 	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update) \
-	MCFG_SCREEN_PALETTE(_v9938_tag":palette")
+	MCFG_SCREEN_PALETTE(_v9938_tag)
 
 #define MCFG_V99X8_SCREEN_ADD_PAL(_screen_tag, _v9938_tag, _clock) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -49,7 +49,7 @@
 		v99x8_device::VERTICAL_ADJUST * 2, \
 		v99x8_device::VVISIBLE_PAL * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2) \
 	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update) \
-	MCFG_SCREEN_PALETTE(_v9938_tag":palette")
+	MCFG_SCREEN_PALETTE(_v9938_tag)
 
 #define MCFG_V99X8_INTERRUPT_CALLBACK(_irq) \
 	devcb = &downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
@@ -73,6 +73,7 @@ extern const device_type V9958;
 
 class v99x8_device :    public device_t,
 						public device_memory_interface,
+						public device_palette_interface,
 						public device_video_interface
 {
 protected:
@@ -133,6 +134,8 @@ protected:
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_DATA) const override { return (spacenum == AS_DATA) ? &m_space_config : nullptr; }
 
+	virtual void palette_init() = 0;
+
 	void configure_pal_ntsc();
 	void set_screen_parameters();
 
@@ -145,24 +148,24 @@ private:
 	void check_int();
 	void register_write(int reg, int data);
 
-	void default_border(const pen_t *pens, uint16_t *ln);
-	void graphic7_border(const pen_t *pens, uint16_t *ln);
-	void graphic5_border(const pen_t *pens, uint16_t *ln);
-	void mode_text1(const pen_t *pens, uint16_t *ln, int line);
-	void mode_text2(const pen_t *pens, uint16_t *ln, int line);
-	void mode_multi(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic1(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic23(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic4(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic5(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic6(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic7(const pen_t *pens, uint16_t *ln, int line);
-//  template<typename _PixelType, int _Width> void mode_yae(const pen_t *pens, _PixelType *ln, int line);
-//  template<typename _PixelType, int _Width> void mode_yjk(const pen_t *pens, _PixelType *ln, int line);
-	void mode_unknown(const pen_t *pens, uint16_t *ln, int line);
-	void default_draw_sprite(const pen_t *pens, uint16_t *ln, uint8_t *col);
-	void graphic5_draw_sprite(const pen_t *pens, uint16_t *ln, uint8_t *col);
-	void graphic7_draw_sprite(const pen_t *pens, uint16_t *ln, uint8_t *col);
+	void default_border(uint16_t *ln);
+	void graphic7_border(uint16_t *ln);
+	void graphic5_border(uint16_t *ln);
+	void mode_text1(uint16_t *ln, int line);
+	void mode_text2(uint16_t *ln, int line);
+	void mode_multi(uint16_t *ln, int line);
+	void mode_graphic1(uint16_t *ln, int line);
+	void mode_graphic23(uint16_t *ln, int line);
+	void mode_graphic4(uint16_t *ln, int line);
+	void mode_graphic5(uint16_t *ln, int line);
+	void mode_graphic6(uint16_t *ln, int line);
+	void mode_graphic7(uint16_t *ln, int line);
+//  template<typename _PixelType, int _Width> void mode_yae(_PixelType *ln, int line);
+//  template<typename _PixelType, int _Width> void mode_yjk(_PixelType *ln, int line);
+	void mode_unknown(uint16_t *ln, int line);
+	void default_draw_sprite(uint16_t *ln, uint8_t *col);
+	void graphic5_draw_sprite(uint16_t *ln, uint8_t *col);
+	void graphic7_draw_sprite(uint16_t *ln, uint8_t *col);
 
 	void sprite_mode1(int line, uint8_t *col);
 	void sprite_mode2(int line, uint8_t *col);
@@ -257,13 +260,12 @@ private:
 	struct v99x8_mode
 	{
 		uint8_t m;
-		void (v99x8_device::*visible_16)(const pen_t *, uint16_t*, int);
-		void (v99x8_device::*border_16)(const pen_t *, uint16_t*);
+		void (v99x8_device::*visible_16)(uint16_t*, int);
+		void (v99x8_device::*border_16)(uint16_t*);
 		void (v99x8_device::*sprites)(int, uint8_t*);
-		void (v99x8_device::*draw_sprite_16)(const pen_t *, uint16_t*, uint8_t*);
+		void (v99x8_device::*draw_sprite_16)(uint16_t*, uint8_t*);
 	} ;
 	static const v99x8_mode s_modes[];
-	required_device<palette_device> m_palette;
 	emu_timer *m_line_timer;
 	uint8_t m_pal_ntsc;
 	int m_scanline_start;
@@ -280,9 +282,9 @@ class v9938_device : public v99x8_device
 public:
 	v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(v9938);
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void palette_init() override;
+	virtual u32 palette_entries() const override { return 512; }
 };
 
 class v9958_device : public v99x8_device
@@ -290,10 +292,9 @@ class v9958_device : public v99x8_device
 public:
 	v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(v9958);
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void palette_init() override;
+	virtual u32 palette_entries() const override { return 19780; }
 };
 
 

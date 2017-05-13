@@ -780,7 +780,7 @@ if _OPTIONS["targetos"] == "macosx" then
 		end
 
 		linkoptions {
-			"-sectcreate __TEXT __info_plist " .. MAME_DIR .. "src/tools/aueffectutil-Info.plist",
+			"-sectcreate __TEXT __info_plist " .. _MAKE.esc(MAME_DIR) .. "src/tools/aueffectutil-Info.plist",
 		}
 
 		dependency {

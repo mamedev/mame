@@ -107,7 +107,7 @@ public:
 	DECLARE_WRITE8_MEMBER( saiyugoub1_adpcm_rom_addr_w );
 	DECLARE_WRITE8_MEMBER( saiyugoub1_adpcm_control_w );
 	DECLARE_WRITE8_MEMBER( saiyugoub1_m5205_clk_w );
-	DECLARE_READ8_MEMBER( saiyugoub1_m5205_irq_r );
+	DECLARE_READ_LINE_MEMBER(saiyugoub1_m5205_irq_r);
 	DECLARE_WRITE_LINE_MEMBER(saiyugoub1_m5205_irq_w);
 	optional_device<msm5205_device> m_adpcm;
 };
@@ -309,7 +309,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_m5205_clk_w )
 #endif
 }
 
-READ8_MEMBER(chinagat_state::saiyugoub1_m5205_irq_r )
+READ_LINE_MEMBER(chinagat_state::saiyugoub1_m5205_irq_r )
 {
 	if (m_adpcm_sound_irq)
 	{
@@ -394,14 +394,6 @@ static ADDRESS_MAP_START( i8748_map, AS_PROGRAM, 8, chinagat_state )
 	AM_RANGE(0x0400, 0x07ff) AM_ROM     /* i8749 version */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8748_portmap, AS_IO, 8, chinagat_state )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(saiyugoub1_mcu_command_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_WRITE(saiyugoub1_m5205_clk_w)      /* Drives the clock on the m5205 at 1/8 of this frequency */
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(saiyugoub1_m5205_irq_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(saiyugoub1_adpcm_rom_addr_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(saiyugoub1_adpcm_control_w)
-ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( chinagat )
@@ -461,20 +453,20 @@ static INPUT_PORTS_START( chinagat )
 	PORT_DIPSETTING(    0x40, "4" )
 
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
@@ -609,7 +601,12 @@ static MACHINE_CONFIG_START( saiyugoub1, chinagat_state )
 
 	MCFG_CPU_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
 	MCFG_CPU_PROGRAM_MAP(i8748_map)
-	MCFG_CPU_IO_MAP(i8748_portmap)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(chinagat_state, saiyugoub1_mcu_command_r))
+	//MCFG_MCS48_PORT_T0_CLK_CUSTOM(chinagat_state, saiyugoub1_m5205_clk_w)      /* Drives the clock on the m5205 at 1/8 of this frequency */
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(chinagat_state, saiyugoub1_m5205_irq_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(chinagat_state, saiyugoub1_adpcm_rom_addr_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(chinagat_state, saiyugoub1_adpcm_control_w))
+
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* heavy interleaving to sync up sprite<->main cpu's */
 

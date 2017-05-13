@@ -4,6 +4,10 @@
 
     National Semiconductor ADC0808/ADC0809 8-Bit A/D Converter emulation
 
+    The only difference between ADC0808 and ADC0809 is that the latter
+    chip allows twice as much adjusted error. Mitsubishi parts M58990P
+    and M58990P-1 are equivalent to ADC0808 and ADC0809.
+
 **********************************************************************/
 
 #include "emu.h"

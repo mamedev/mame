@@ -17,7 +17,7 @@ struct mess_hard_disk_file
 {
 	imgtool::stream *stream;
 	hard_disk_file *hard_disk;
-	chd_file *chd;
+	chd_file chd;
 };
 
 
@@ -25,7 +25,7 @@ struct mess_hard_disk_file
 imgtoolerr_t imghd_create(imgtool::stream &stream, uint32_t blocksize, uint32_t cylinders, uint32_t heads, uint32_t sectors, uint32_t seclen);
 
 /* opens a hard disk given an Imgtool stream */
-imgtoolerr_t imghd_open(imgtool::stream &stream, struct mess_hard_disk_file *hard_disk);
+imgtoolerr_t imghd_open(imgtool::stream &stream, mess_hard_disk_file *hard_disk);
 
 /* close a hard disk */
 void imghd_close(struct mess_hard_disk_file *disk);

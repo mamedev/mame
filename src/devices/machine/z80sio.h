@@ -193,11 +193,11 @@ public:
 	int m_txc;
 
 	// Register state
-    // read registers     enum
+	// read registers     enum
 	uint8_t m_rr0; // REG_RR0_STATUS
 	uint8_t m_rr1; // REG_RR1_SPEC_RCV_COND
 	uint8_t m_rr2; // REG_RR2_INTERRUPT_VECT
-    // write registers    enum
+	// write registers    enum
 	uint8_t m_wr0; // REG_WR0_COMMAND_REGPT
 	uint8_t m_wr1; // REG_WR1_INT_DMA_ENABLE
 	uint8_t m_wr2; // REG_WR2_INT_VECTOR
@@ -220,9 +220,9 @@ protected:
 
 	enum
 	{
-	    INT_RCV_SPC_PRI_LVL  = 0,
-	    INT_TRANSMIT_PRI_LVL = 1,
-	    INT_EXTERNAL_PRI_LVL = 2
+		INT_RCV_SPC_PRI_LVL  = 0,
+		INT_TRANSMIT_PRI_LVL = 1,
+		INT_EXTERNAL_PRI_LVL = 2
 	};
 
 	// Read registers
@@ -278,20 +278,20 @@ protected:
 
 	enum
 	{
-		WR0_REGISTER_MASK	= 0x07,
-		WR0_COMMAND_MASK	= 0x38,
-		WR0_NULL		= 0x00,
-		WR0_SEND_ABORT		= 0x08,
-		WR0_RESET_EXT_STATUS	= 0x10,
-		WR0_CHANNEL_RESET	= 0x18,
-		WR0_ENABLE_INT_NEXT_RX	= 0x20,
-		WR0_RESET_TX_INT	= 0x28,
-		WR0_ERROR_RESET		= 0x30,
-		WR0_RETURN_FROM_INT	= 0x38,
+		WR0_REGISTER_MASK   = 0x07,
+		WR0_COMMAND_MASK    = 0x38,
+		WR0_NULL        = 0x00,
+		WR0_SEND_ABORT      = 0x08,
+		WR0_RESET_EXT_STATUS    = 0x10,
+		WR0_CHANNEL_RESET   = 0x18,
+		WR0_ENABLE_INT_NEXT_RX  = 0x20,
+		WR0_RESET_TX_INT    = 0x28,
+		WR0_ERROR_RESET     = 0x30,
+		WR0_RETURN_FROM_INT = 0x38,
 		WR0_CRC_RESET_CODE_MASK = 0xc0,
-		WR0_CRC_RESET_NULL	= 0x00,
-		WR0_CRC_RESET_RX	= 0x40,
-		WR0_CRC_RESET_TX	= 0x80,
+		WR0_CRC_RESET_NULL  = 0x00,
+		WR0_CRC_RESET_RX    = 0x40,
+		WR0_CRC_RESET_TX    = 0x80,
 		WR0_CRC_RESET_TX_UNDERRUN = 0xc0
 	};
 
@@ -448,10 +448,10 @@ public:
 	static void static_set_cputag(device_t &device, const char *tag)
 	{
 		z80sio_device &dev = downcast<z80sio_device &>(device);
-        dev.m_cputag = tag;
-    }
-    
-    static void configure_channels(device_t &device, int rxa, int txa, int rxb, int txb)
+		dev.m_cputag = tag;
+	}
+
+	static void configure_channels(device_t &device, int rxa, int txa, int rxb, int txb)
 	{
 		z80sio_device &dev = downcast<z80sio_device &>(device);
 		dev.m_rxca = rxa;
@@ -506,12 +506,12 @@ protected:
 	// internal interrupt management
 	void check_interrupts();
 	void reset_interrupts();
-    int get_interrupt_prio(int index, int type);
-    uint8_t modify_vector(int index, int type);
+	int get_interrupt_prio(int index, int type);
+	uint8_t modify_vector(int index, int type);
 	void trigger_interrupt(int index, int state);
 	int get_channel_index(z80sio_channel *ch) { return (ch == m_chanA) ? 0 : 1; }
 
-    // CPU types that has slightly different behaviour
+	// CPU types that has slightly different behaviour
 	enum
 	{
 		TYPE_Z80SIO     = 0x001,

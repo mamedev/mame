@@ -55,7 +55,6 @@ write:
 #include "includes/dday.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "speaker.h"
 
 
@@ -240,8 +239,6 @@ GFXDECODE_END
 
 void dday_state::machine_start()
 {
-	m_ay1 = machine().device("ay1");
-
 	save_item(NAME(m_control));
 	save_item(NAME(m_sl_enable));
 	save_item(NAME(m_sl_image));

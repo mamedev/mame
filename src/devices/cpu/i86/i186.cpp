@@ -132,6 +132,7 @@ i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8086_common_cpu_device(mconfig, I80186, "I80186", tag, owner, clock, "i80186", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 20, 0)
+	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 16, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
 	, m_read_slave_ack_func(*this)
 	, m_out_chip_select_func(*this)
@@ -146,6 +147,7 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int data_bus_size)
 	: i8086_common_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
+	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, data_bus_size, 16, 0)
 	, m_read_slave_ack_func(*this)
 	, m_out_chip_select_func(*this)
@@ -154,16 +156,28 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type 
 {
 }
 
+
+const address_space_config *i80186_cpu_device::memory_space_config(address_spacenum spacenum) const
+{
+	switch(spacenum)
+	{
+	case AS_PROGRAM:           return &m_program_config;
+	case AS_IO:                return &m_io_config;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_opcodes_config : nullptr;
+	default:                   return nullptr;
+	}
+}
+
 uint8_t i80186_cpu_device::fetch_op()
 {
-	uint8_t data = m_direct->read_byte(pc(), m_fetch_xor);
+	uint8_t data = m_direct_opcodes->read_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
 
 uint8_t i80186_cpu_device::fetch()
 {
-	uint8_t data = m_direct->read_byte(pc(), m_fetch_xor);
+	uint8_t data = m_direct_opcodes->read_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }

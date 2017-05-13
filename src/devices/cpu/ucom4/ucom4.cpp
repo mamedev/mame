@@ -25,15 +25,16 @@
 #include "debugger.h"
 
 
-// uCOM-43 products: 2000x8 ROM, RAM size custom, supports full instruction set
-const device_type NEC_D553 = device_creator<upd553_cpu_device>; // 42-pin PMOS, 35 pins for I/O, Open Drain output, 96x4 RAM
-const device_type NEC_D557L = device_creator<upd557l_cpu_device>; // 28-pin PMOS, 21 pins for I/O, Open Drain output, 96x4 RAM
-const device_type NEC_D650 = device_creator<upd650_cpu_device>; // 42-pin CMOS, 35 pins for I/O, push-pull output, 96x4 RAM
+// uCOM-43 products: 2000x8 ROM, 96x4 RAM, supports full instruction set
+const device_type NEC_D546 = device_creator<upd546_cpu_device>; // 42-pin PMOS, 35 pins for I/O
+const device_type NEC_D553 = device_creator<upd553_cpu_device>; // 42-pin PMOS, 35 pins for I/O, high voltage
+const device_type NEC_D557L = device_creator<upd557l_cpu_device>; // 28-pin PMOS, 21 pins for I/O
+const device_type NEC_D650 = device_creator<upd650_cpu_device>; // 42-pin CMOS, 35 pins for I/O
 
-// uCOM-44 products: 1000x8 ROM, 64x4 RAM, does not support external interrupt
-const device_type NEC_D552 = device_creator<upd552_cpu_device>; // 42-pin PMOS, 35 pins for I/O, Open Drain output
+// uCOM-44 products: 1000x8 ROM, 64x4 RAM, 1-level stack, does not support external interrupt
+const device_type NEC_D552 = device_creator<upd552_cpu_device>; // 42-pin PMOS, 35 pins for I/O, high voltage
 
-// uCOM-45 products: ROM size custom, 32x4 RAM
+// uCOM-45 products: 1000x8 or 640x8 ROM, 32x4 RAM, 1-level stack
 //..
 
 
@@ -59,8 +60,12 @@ ADDRESS_MAP_END
 
 
 // device definitions
+upd546_cpu_device::upd546_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: ucom4_cpu_device(mconfig, NEC_D546, "uPD546", tag, owner, clock, NEC_UCOM43, 3 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_2k), 7 /* data width */, ADDRESS_MAP_NAME(data_96x4), "upd546", __FILE__)
+{ }
+
 upd553_cpu_device::upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: ucom4_cpu_device(mconfig, NEC_D553, "uPD553", tag, owner, clock, NEC_UCOM43, 3 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_2k), 7 /* data width */, ADDRESS_MAP_NAME(data_96x4), "upd553", __FILE__)
+	: ucom4_cpu_device(mconfig, NEC_D553, "uPD553", tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd553", __FILE__)
 { }
 
 upd557l_cpu_device::upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -209,7 +214,7 @@ void ucom4_cpu_device::device_reset()
 
 	// clear i/o
 	for (int i = NEC_UCOM4_PORTC; i <= NEC_UCOM4_PORTI; i++)
-		output_w(i, 0xf);
+		output_w(i, 0);
 }
 
 

@@ -13,14 +13,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_inputs(*this, { "INPUTS", "INPUTS2" }),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette")
+		{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_ioport_array<2> m_inputs;
 
 	/* video-related */
-	uint8_t    m_palette;
+	uint8_t    m_palette_bank;
 
 	/* misc */
 	int      m_counter;
@@ -30,11 +32,14 @@ public:
 	DECLARE_READ8_MEMBER(read_prta);
 	DECLARE_WRITE8_MEMBER(write_prtc);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(dealer_pal_w);
 	DECLARE_DRIVER_INIT(dealer);
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(epos);
 	DECLARE_MACHINE_START(dealer);
+	DECLARE_PALETTE_INIT(epos);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void get_pens( pen_t *pens );
+	void set_pal_color( uint8_t offset, uint8_t data );
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };

@@ -62,10 +62,7 @@ const tiny_rom_entry *iskr_1030_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( iskr_1030_keyboard_io, AS_IO, 8, iskr_1030_keyboard_device )
-	AM_RANGE(0x00, 0xFF) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(ram_r, ram_w)
 ADDRESS_MAP_END
 
 
@@ -76,6 +73,10 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_FRAGMENT( iskr_1030_keyboard )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5MHz)
 	MCFG_CPU_IO_MAP(iskr_1030_keyboard_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(iskr_1030_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(iskr_1030_keyboard_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(iskr_1030_keyboard_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(iskr_1030_keyboard_device, t1_r))
 MACHINE_CONFIG_END
 
 
@@ -347,7 +348,7 @@ WRITE_LINE_MEMBER( iskr_1030_keyboard_device::data_write )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( iskr_1030_keyboard_device::t1_r )
+READ_LINE_MEMBER( iskr_1030_keyboard_device::t1_r )
 {
 	uint8_t data = data_signal();
 	uint8_t bias = m_p1 & 15;

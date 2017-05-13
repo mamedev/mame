@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, ElSemi
-/* video/namcofl.c */
+/* video/namcofl.cpp */
 
 #include "emu.h"
 #include "includes/namcoic.h"
@@ -47,7 +47,7 @@ nth_byte32( const uint32_t *pSource, int which )
 } /* nth_byte32 */
 #endif
 
-static void TilemapCB(running_machine &machine, uint16_t code, int *tile, int *mask )
+void namcofl_state::TilemapCB(uint16_t code, int *tile, int *mask)
 {
 	*tile = code;
 	*mask = code;
@@ -64,7 +64,7 @@ uint32_t namcofl_state::screen_update_namcofl(screen_device &screen, bitmap_ind1
 	{
 		c169_roz_draw(screen, bitmap, cliprect, pri);
 		if((pri&1)==0)
-			namco_tilemap_draw( screen, bitmap, cliprect, pri>>1 );
+			c123_tilemap_draw( screen, bitmap, cliprect, pri>>1 );
 		c355_obj_draw(screen, bitmap, cliprect, pri );
 	}
 
@@ -80,17 +80,16 @@ WRITE32_MEMBER(namcofl_state::namcofl_spritebank_w)
 	COMBINE_DATA(&m_sprbank);
 }
 
-static int FLobjcode2tile( running_machine &machine, int code )
+int namcofl_state::FLobjcode2tile(int code)
 {
-	namcofl_state *state = machine.driver_data<namcofl_state>();
-	if ((code & 0x2000) && (state->m_sprbank & 2)) { code += 0x4000; }
+	if ((code & 0x2000) && (m_sprbank & 2)) { code += 0x4000; }
 
 	return code;
 }
 
 VIDEO_START_MEMBER(namcofl_state,namcofl)
 {
-	namco_tilemap_init(NAMCOFL_TILEGFX, memregion(NAMCOFL_TILEMASKREGION)->base(), TilemapCB );
-	c355_obj_init(NAMCOFL_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&FLobjcode2tile, &machine()));
+	c123_tilemap_init(NAMCOFL_TILEGFX, memregion(NAMCOFL_TILEMASKREGION)->base(), namcos2_shared_state::c123_tilemap_delegate(&namcofl_state::TilemapCB, this));
+	c355_obj_init(NAMCOFL_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namcofl_state::FLobjcode2tile, this));
 	c169_roz_init(NAMCOFL_ROTGFX,NAMCOFL_ROTMASKREGION);
 }

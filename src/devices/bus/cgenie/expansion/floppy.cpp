@@ -83,11 +83,11 @@ static MACHINE_CONFIG_FRAGMENT( cgenie_fdc )
 
 //  MCFG_SOFTWARE_LIST_ADD("floppy_list", "cgenie_flop")
 
-	MCFG_GENERIC_SOCKET_ADD("socket", generic_plain_slot, "cgenie_socket")
+	MCFG_GENERIC_SOCKET_ADD("socket", generic_plain_slot, "cgenie_flop_rom")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(cgenie_fdc_device, socket_load)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "cgenie_cart")
+	MCFG_SOFTWARE_LIST_ADD("rom_list", "cgenie_flop_rom")
 MACHINE_CONFIG_END
 
 machine_config_constructor cgenie_fdc_device::device_mconfig_additions() const

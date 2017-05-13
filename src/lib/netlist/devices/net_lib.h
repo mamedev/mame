@@ -15,10 +15,12 @@
 
 //#define NL_AUTO_DEVICES 1
 
+#define SOLVER(name, freq)                                                  \
+		NET_REGISTER_DEV(SOLVER, name)                                      \
+		PARAM(name.FREQ, freq)
+
 #ifdef NL_AUTO_DEVICES
 #include "nld_devinc.h"
-
-#include "solver/nld_solver.h"
 
 #include "macro/nlm_cd4xxx.h"
 #include "macro/nlm_ttl74xx.h"
@@ -28,10 +30,6 @@
 #include "nld_7448.h"
 
 #else
-
-#define SOLVER(name, freq)                                                  \
-		NET_REGISTER_DEV(SOLVER, name)                                      \
-		PARAM(name.FREQ, freq)
 
 #include "nld_system.h"
 

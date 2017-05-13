@@ -175,7 +175,12 @@ enum {
 #define ONE_BIT_LEN     1083    // Length of 1 bits at slow tape speed: 1.75 times ZERO_BIT_LEN
 #define QUICK_CMD_USEC  25      // usec for "quick" command execution (totally made up)
 #define FAST_BRAKE_DIST 3350450 // Braking distance at fast speed (~3.38 in)
-#define SLOW_BRAKE_DIST 197883  // Braking distance at slow speed (~0.2 in)
+// There are 2 braking distances here: The first one (commented out) is the theoretical value, the second one
+// is the value that works. Ideally we would always be using the first value but there is a kind of race
+// condition when loading the memory test from the exerciser that freezes the system. So, the second (shorter)
+// value is used to avoid this condition.
+//#define SLOW_BRAKE_DIST 197883  // Braking distance at slow speed (~0.2 in)
+#define SLOW_BRAKE_DIST 71000  // Braking distance at slow speed (~0.07 in)
 #define PREAMBLE_WORD   0       // Value of preamble word
 #define END_GAP_LENGTH  (6 * ONE_INCH_POS)      // Length of final gap: 6"
 // Minimum gap lengths are probably counted from tacho pulses in real TACO: short gaps could be equal to 64 pulses and long ones

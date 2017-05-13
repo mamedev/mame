@@ -61,7 +61,7 @@ struct ui_gfx_state
 	// palette-specific data
 	struct
 	{
-		palette_device *device;     // pointer to current device
+		device_palette_interface *interface; // pointer to current palette
 		int   devcount;             // how many palette devices exist
 		int   devindex;             // which palette device is visible
 		uint8_t which;                // which subset (pens or indirect colors)?
@@ -88,6 +88,7 @@ struct ui_gfx_state
 		int   yoffs;                // current Y offset
 		int   zoom;                 // zoom factor
 		uint8_t rotate;               // current rotation (orientation) value
+		uint32_t flags;				// render flags
 	} tilemap;
 };
 
@@ -158,6 +159,7 @@ void ui_gfx_init(running_machine &machine)
 
 	// set up the tilemap state
 	state->tilemap.rotate = rotate;
+	state->tilemap.flags = TILEMAP_DRAW_ALL_CATEGORIES;
 }
 
 
@@ -169,7 +171,7 @@ void ui_gfx_init(running_machine &machine)
 static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 {
 	// count the palette devices
-	state.palette.devcount = palette_device_iterator(machine.root_device()).count();
+	state.palette.devcount = palette_interface_iterator(machine.root_device()).count();
 
 	// set the pointer to the first palette
 	if (state.palette.devcount > 0)
@@ -330,8 +332,8 @@ cancel:
 
 static void palette_set_device(running_machine &machine, ui_gfx_state &state)
 {
-	palette_device_iterator pal_iter(machine.root_device());
-	state.palette.device = pal_iter.byindex(state.palette.devindex);
+	palette_interface_iterator pal_iter(machine.root_device());
+	state.palette.interface = pal_iter.byindex(state.palette.devindex);
 }
 
 
@@ -342,7 +344,8 @@ static void palette_set_device(running_machine &machine, ui_gfx_state &state)
 
 static void palette_handler(mame_ui_manager &mui, render_container &container, ui_gfx_state &state)
 {
-	palette_device *palette = state.palette.device;
+	device_palette_interface *palette = state.palette.interface;
+	palette_device *paldev = dynamic_cast<palette_device *>(&palette->device());
 
 	int total = state.palette.which ? palette->indirect_entries() : palette->entries();
 	const rgb_t *raw_color = palette->palette()->entry_list_raw();
@@ -381,7 +384,7 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 
 	// figure out the title
 	std::ostringstream title_buf;
-	util::stream_format(title_buf, "'%s'", palette->tag());
+	util::stream_format(title_buf, "'%s'", palette->device().tag());
 	if (palette->indirect_entries() > 0)
 		title_buf << (state.palette.which ? _(" COLORS") : _(" PENS"));
 
@@ -400,8 +403,8 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 			util::stream_format(title_buf, " #%X", index);
 			if (palette->indirect_entries() > 0 && !state.palette.which)
 				util::stream_format(title_buf, " => %X", palette->pen_indirect(index));
-			else if (palette->basemem().base() != nullptr)
-				util::stream_format(title_buf, " = %X", palette->read_entry(index));
+			else if (paldev != nullptr && paldev->basemem().base() != nullptr)
+				util::stream_format(title_buf, " = %X", paldev->read_entry(index));
 
 			rgb_t col = state.palette.which ? palette->indirect_color(index) : raw_color[index];
 			util::stream_format(title_buf, " (R:%X G:%X B:%X)", col.r(), col.g(), col.b());
@@ -492,7 +495,7 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 
 static void palette_handle_keys(running_machine &machine, ui_gfx_state &state)
 {
-	palette_device *palette = state.palette.device;
+	device_palette_interface *palette = state.palette.interface;
 	int rowcount, screencount;
 	int total;
 
@@ -517,7 +520,7 @@ static void palette_handle_keys(running_machine &machine, ui_gfx_state &state)
 		{
 			state.palette.devindex--;
 			palette_set_device(machine, state);
-			palette = state.palette.device;
+			palette = state.palette.interface;
 			state.palette.which = (palette->indirect_entries() > 0);
 		}
 	}
@@ -529,7 +532,7 @@ static void palette_handle_keys(running_machine &machine, ui_gfx_state &state)
 		{
 			state.palette.devindex++;
 			palette_set_device(machine, state);
-			palette = state.palette.device;
+			palette = state.palette.interface;
 			state.palette.which = 0;
 		}
 	}
@@ -1074,7 +1077,7 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 
 	// figure out the title
 	std::ostringstream title_buf;
-	util::stream_format(title_buf, "TILEMAP %d/%d", state.tilemap.which, mui.machine().tilemap().count() - 1);
+	util::stream_format(title_buf, "TILEMAP %d/%d", state.tilemap.which + 1, mui.machine().tilemap().count());
 
 	// if the mouse pointer is over a tile, add some info about its coordinates and color
 	int32_t mouse_target_x, mouse_target_y;
@@ -1104,6 +1107,9 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	}
 	else
 		util::stream_format(title_buf, " %dx%d OFFS %d,%d", tilemap->width(), tilemap->height(), state.tilemap.xoffs, state.tilemap.yoffs);
+
+	if (state.tilemap.flags != TILEMAP_DRAW_ALL_CATEGORIES)
+		util::stream_format(title_buf, " CAT %d", state.tilemap.flags);
 
 	// expand the outer box to fit the title
 	const std::string title = title_buf.str();
@@ -1190,6 +1196,31 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, i
 		state.bitmap_dirty = true;
 	}
 
+	// handle flags (category)
+	if (machine.ui_input().pressed(IPT_UI_PAGE_UP) && state.tilemap.flags != TILEMAP_DRAW_ALL_CATEGORIES)
+	{
+		if (state.tilemap.flags > 0)
+		{
+			state.tilemap.flags--;
+			machine.popmessage("Category = %d", state.tilemap.flags);
+		}
+		else
+		{
+			state.tilemap.flags = TILEMAP_DRAW_ALL_CATEGORIES;
+			machine.popmessage("Category All");
+		}
+		state.bitmap_dirty = true;
+	}
+	if (machine.ui_input().pressed(IPT_UI_PAGE_DOWN) && (state.tilemap.flags < TILEMAP_DRAW_CATEGORY_MASK || (state.tilemap.flags == TILEMAP_DRAW_ALL_CATEGORIES)))
+	{
+		if (state.tilemap.flags == TILEMAP_DRAW_ALL_CATEGORIES)
+			state.tilemap.flags = 0;
+		else
+			state.tilemap.flags++;
+		state.bitmap_dirty = true;
+		machine.popmessage("Category = %d", state.tilemap.flags);
+	}
+
 	// handle navigation (up,down,left,right), taking orientation into account
 	int step = 8; // this may be applied more than once if multiple directions are pressed
 	if (machine.input().code_pressed(KEYCODE_LSHIFT)) step = 1;
@@ -1251,7 +1282,7 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state &state,
 		std::swap(width, height);
 
 	// realloc the bitmap if it is too small
-	if (state.bitmap == nullptr || state.texture == nullptr || state.bitmap->width() != width || state.bitmap->height() != height)
+	if (state.bitmap_dirty || state.bitmap == nullptr || state.texture == nullptr || state.bitmap->width() != width || state.bitmap->height() != height)
 	{
 		// free the old stuff
 		machine.render().texture_free(state.texture);
@@ -1270,7 +1301,7 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state &state,
 	if (state.bitmap_dirty)
 	{
 		tilemap_t *tilemap = machine.tilemap().find(state.tilemap.which);
-		tilemap->draw_debug(*machine.first_screen(), *state.bitmap, state.tilemap.xoffs, state.tilemap.yoffs);
+		tilemap->draw_debug(*machine.first_screen(), *state.bitmap, state.tilemap.xoffs, state.tilemap.yoffs, state.tilemap.flags);
 
 		// reset the texture to force an update
 		state.texture->set_bitmap(*state.bitmap, state.bitmap->cliprect(), TEXFORMAT_RGB32);

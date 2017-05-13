@@ -177,6 +177,9 @@ WRITE16_MEMBER(tv990_state::tvi1111_w)
 		if(!m_rowh)
 			m_rowh = 16;
 		m_height = (tvi1111_regs[0xa] - tvi1111_regs[0x9]) / m_rowh;
+		// m_height can be 0 or -1 while machine is starting, leading to a crash on a debug build, so we sanitise it.
+		if(m_height < 8 || m_height > 99)
+			m_height = 0x1a;
 		m_screen->set_visible_area(0, m_width * 16 - 1, 0, m_height * m_rowh - 1);
 	}
 	if(offset == 0x17)

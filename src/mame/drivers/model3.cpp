@@ -735,6 +735,7 @@ JP4/5/6/7 - Jumpers to configure ROMs
 #include "includes/model3.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/clock.h"
 #include "machine/eepromser.h"
 #include "machine/53c810.h"
 #include "machine/nvram.h"
@@ -1315,6 +1316,9 @@ void model3_state::model3_init(int step)
 {
 	m_step = step;
 
+	if (m_uart.found())
+		m_uart->write_cts(0);
+
 	m_sound_irq_enable = 0;
 	m_sound_timer->adjust(attotime::never);
 
@@ -1684,8 +1688,19 @@ READ8_MEMBER(model3_state::model3_sound_r)
 {
 	switch (offset)
 	{
+		case 0:
+		{
+			if (m_uart.found())
+				return m_uart->data_r(space, 0);
+
+			break;
+		}
+
 		case 4:
 		{
+			if (m_uart.found())
+				return m_uart->status_r(space, 0);
+
 			uint8_t res = 0;
 			res |= 1;
 			res |= 0x2;     // magtruck country check
@@ -1703,10 +1718,8 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 			// clear the interrupt
 			set_irq_line(0x40, CLEAR_LINE);
 
-			if (m_dsbz80 != nullptr)
-			{
-				m_dsbz80->latch_w(space, 0, data&0xff);
-			}
+			if (m_uart.found())
+				m_uart->data_w(space, 0, data);
 
 			// send to the sound board
 			m_scsp1->midi_in(space, 0, data, 0);
@@ -1715,9 +1728,13 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 			{
 				m_sound_timer->adjust(attotime::from_msec(1));
 			}
+
 			break;
 
 		case 4:
+			if (m_uart.found())
+				m_uart->control_w(space, 0, data);
+
 			if (data == 0x27)
 			{
 				m_sound_irq_enable = 1;
@@ -1727,6 +1744,7 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 			{
 				m_sound_irq_enable = 0;
 			}
+
 			break;
 	}
 }
@@ -5783,6 +5801,13 @@ static MACHINE_CONFIG_DERIVED(scud, model3_15)
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
+
+	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START(model3_20, model3_state)

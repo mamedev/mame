@@ -226,12 +226,12 @@ image_init_result vc4000_cart_slot_device::call_load()
  get default card software
  -------------------------------------------------*/
 
-std::string vc4000_cart_slot_device::get_default_card_software()
+std::string vc4000_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t size = m_file->size();
+		uint32_t size = hook.image_file()->size();
 		int type = VC4000_STD;
 
 		// attempt to identify the non-standard types
@@ -243,7 +243,6 @@ std::string vc4000_cart_slot_device::get_default_card_software()
 		slot_string = vc4000_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		return std::string(slot_string);
 	}

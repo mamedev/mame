@@ -68,6 +68,56 @@ void es1373_device::device_start()
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(44100/2/16));
 
+	// Save states
+	save_item(NAME(m_ac97_regs));
+	save_item(NAME(m_es_regs));
+	save_item(NAME(m_sound_cache));
+	save_item(NAME(m_src_ram));
+	save_item(NAME(m_dac1.number));
+	save_item(NAME(m_dac1.enable));
+	save_item(NAME(m_dac1.int_en));
+	save_item(NAME(m_dac1.loop_en));
+	save_item(NAME(m_dac1.initialized));
+	save_item(NAME(m_dac1.format));
+	save_item(NAME(m_dac1.buf_wptr));
+	save_item(NAME(m_dac1.buf_rptr));
+	save_item(NAME(m_dac1.buf_count));
+	save_item(NAME(m_dac1.buf_size));
+	save_item(NAME(m_dac1.pci_addr));
+	save_item(NAME(m_dac1.pci_count));
+	save_item(NAME(m_dac1.pci_size));
+	save_item(NAME(m_dac2.number));
+	save_item(NAME(m_dac2.enable));
+	save_item(NAME(m_dac2.int_en));
+	save_item(NAME(m_dac2.loop_en));
+	save_item(NAME(m_dac2.initialized));
+	save_item(NAME(m_dac2.format));
+	save_item(NAME(m_dac2.buf_wptr));
+	save_item(NAME(m_dac2.buf_rptr));
+	save_item(NAME(m_dac2.buf_count));
+	save_item(NAME(m_dac2.buf_size));
+	save_item(NAME(m_dac2.pci_addr));
+	save_item(NAME(m_dac2.pci_count));
+	save_item(NAME(m_dac2.pci_size));
+	save_item(NAME(m_adc.number));
+	save_item(NAME(m_adc.enable));
+	save_item(NAME(m_adc.int_en));
+	save_item(NAME(m_adc.loop_en));
+	save_item(NAME(m_adc.initialized));
+	save_item(NAME(m_adc.format));
+	save_item(NAME(m_adc.buf_wptr));
+	save_item(NAME(m_adc.buf_rptr));
+	save_item(NAME(m_adc.buf_count));
+	save_item(NAME(m_adc.buf_size));
+	save_item(NAME(m_adc.pci_addr));
+	save_item(NAME(m_adc.pci_count));
+	save_item(NAME(m_adc.pci_size));
+	machine().save().register_postload(save_prepost_delegate(FUNC(es1373_device::postload), this));
+}
+
+void es1373_device::postload()
+{
+	remap_cb();
 }
 
 void es1373_device::device_reset()

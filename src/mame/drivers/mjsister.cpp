@@ -83,6 +83,8 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	emu_timer *m_dac_timer;
 };
 
 
@@ -204,7 +206,7 @@ TIMER_CALLBACK_MEMBER(mjsister_state::dac_callback)
 	m_dac->write(DACROM[(m_dac_bank * 0x10000 + m_dac_adr++) & 0x1ffff]);
 
 	if (((m_dac_adr & 0xff00 ) >> 8) !=  m_dac_adr_e)
-		timer_set(attotime::from_hz(MCLK) * 1024, TIMER_DAC);
+		m_dac_timer->adjust(attotime::from_hz(MCLK) * 1024);
 	else
 		m_dac_busy = 0;
 }
@@ -443,6 +445,8 @@ void mjsister_state::machine_start()
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
+
+	m_dac_timer = timer_alloc(TIMER_DAC);
 
 	save_item(NAME(m_dac_busy));
 	save_item(NAME(m_flip_screen));

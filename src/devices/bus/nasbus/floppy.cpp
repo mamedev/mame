@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "floppy.h"
 #include "formats/nascom_dsk.h"
-#include "softlist.h"
 
 //**************************************************************************
 //  CONSTANTS/MACROS
@@ -46,8 +45,6 @@ static MACHINE_CONFIG_FRAGMENT( nascom_fdc )
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:2", nascom_floppies, nullptr,  nascom_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:3", nascom_floppies, nullptr,  nascom_fdc_device::floppy_formats)
-
-	MCFG_SOFTWARE_LIST_ADD("floppy_list", "nascom_flop")
 MACHINE_CONFIG_END
 
 machine_config_constructor nascom_fdc_device::device_mconfig_additions() const

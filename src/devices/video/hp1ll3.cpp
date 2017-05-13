@@ -3,32 +3,32 @@
 /*
     HP 1LL3-0005 GPU emulation.
 
-	Used by HP Integral PC, possibly other HP products.
+    Used by HP Integral PC, possibly other HP products.
 
-	On IPC, memory is 4 16Kx4bit DRAM chips = 32KB total (16K words),
-	but firmware probes memory size and can work with 128KB memory.
-	Undocumented "_desktop" mode requires this.
+    On IPC, memory is 4 16Kx4bit DRAM chips = 32KB total (16K words),
+    but firmware probes memory size and can work with 128KB memory.
+    Undocumented "_desktop" mode requires this.
 
-	Capabilities:
-	- up to 1024x1024 px on screen
-	- lines
-	- rectangles
-	- area fill with user-defined pattern
-	- 16x16 user-defined proportional font, with automatic cursor
-	- 16x16 user-defined sprite for mouse cursor (not a sprite layer)
-	- windows with blitter (copy, fill and scroll) and clipping
+    Capabilities:
+    - up to 1024x1024 px on screen
+    - lines
+    - rectangles
+    - area fill with user-defined pattern
+    - 16x16 user-defined proportional font, with automatic cursor
+    - 16x16 user-defined sprite for mouse cursor (not a sprite layer)
+    - windows with blitter (copy, fill and scroll) and clipping
 
-	To do:
-	. proper cursor and mouse pointers [cursor can be offset from the pen location]
-	+ variable width fonts [?? placed relative to current window]
-	+ basic lines
-	- patterned lines
-	. bit blits & scroll
-	. meaning of WRRR bits
-	. meaning of CONF data [+ autoconfiguration]
-	- interrupt generation
-	- realistic timing?
-	- &c.
+    To do:
+    . proper cursor and mouse pointers [cursor can be offset from the pen location]
+    + variable width fonts [?? placed relative to current window]
+    + basic lines
+    - patterned lines
+    . bit blits & scroll
+    . meaning of WRRR bits
+    . meaning of CONF data [+ autoconfiguration]
+    - interrupt generation
+    - realistic timing?
+    - &c.
 */
 
 #include "emu.h"
@@ -54,7 +54,7 @@
 	} while (0)
 
 
-#define HPGPU_VRAM_SIZE	16384 // *4	// experiment
+#define HPGPU_VRAM_SIZE 16384 // *4 // experiment
 #define HPGPU_HORZ_TOTAL 512
 #define HPGPU_VERT_TOTAL 256
 
@@ -96,7 +96,7 @@ void hp1ll3_device::device_start()
 	m_cursor.allocate(16, 16);
 	m_sprite.allocate(16, 16);
 
-	m_videoram = std::make_unique<uint16_t[]>(HPGPU_VRAM_SIZE*2);	// x2 size to make WRWIN/RDWIN easier
+	m_videoram = std::make_unique<uint16_t[]>(HPGPU_VRAM_SIZE*2);   // x2 size to make WRWIN/RDWIN easier
 }
 
 void hp1ll3_device::device_reset()
@@ -397,14 +397,14 @@ uint32_t hp1ll3_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 //-------------------------------------------------
 
 /*
- * 	offset 0: CSR
+ *  offset 0: CSR
  *
- * 	bit 0	gpu is busy
- * 	bit 1	data is ready
- * 	bit 3	vert blank time
- * 	bit 7	out of window
+ *  bit 0   gpu is busy
+ *  bit 1   data is ready
+ *  bit 3   vert blank time
+ *  bit 7   out of window
  *
- * 	offset 2: data
+ *  offset 2: data
  */
 
 READ8_MEMBER( hp1ll3_device::read )

@@ -6,6 +6,7 @@
 #define __SEGAM1AUDIO_H__
 
 #include "cpu/m68000/m68000.h"
+#include "machine/i8251.h"
 #include "sound/2612intf.h"
 #include "sound/multipcm.h"
 
@@ -16,6 +17,9 @@
 #define MCFG_SEGAM1AUDIO_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGAM1AUDIO, 0)
 
+#define MCFG_SEGAM1AUDIO_RXD_HANDLER(_devcb) \
+	devcb = &segam1audio_device::set_rxd_handler(*device, DEVCB_##_devcb);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -24,38 +28,34 @@
 class segam1audio_device : public device_t
 {
 public:
-		// construction/destruction
-		segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// construction/destruction
+	segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override;
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-		required_device<cpu_device> m_audiocpu;
-		required_device<multipcm_device> m_multipcm_1;
-		required_device<multipcm_device> m_multipcm_2;
-		required_device<ym3438_device> m_ym;
+	// static configuration
+	template<class _Object> static devcb_base &set_rxd_handler(device_t &device, _Object &&object) { return downcast<segam1audio_device &>(device).m_rxd_handler.set_callback(std::forward<_Object>(object)); }
 
-		DECLARE_READ16_MEMBER(m1_snd_68k_latch_r);
-		DECLARE_READ16_MEMBER(m1_snd_v60_ready_r);
-		DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
-		DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);
-		DECLARE_WRITE16_MEMBER(m1_snd_68k_latch1_w);
-		DECLARE_WRITE16_MEMBER(m1_snd_68k_latch2_w);
-		DECLARE_READ16_MEMBER(ready_r);
+	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
+	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);
 
-		void check_fifo_irq();
-		void write_fifo(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(write_txd);
+	DECLARE_WRITE_LINE_MEMBER(output_txd);
 
 protected:
-		// device-level overrides
-		virtual void device_start() override;
-		virtual void device_reset() override;
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
-	int m_to_68k[8];
-	int m_fifo_rptr;
-	int m_fifo_wptr;
-	devcb_write_line   m_main_irq_cb;
+	required_device<cpu_device> m_audiocpu;
+	required_device<multipcm_device> m_multipcm_1;
+	required_device<multipcm_device> m_multipcm_2;
+	required_device<ym3438_device> m_ym;
+	required_device<i8251_device> m_uart;
+
+	devcb_write_line   m_rxd_handler;
 };
 
 

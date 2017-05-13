@@ -578,7 +578,7 @@ void hmcs40_cpu_device::execute_run()
 	while (m_icount > 0)
 	{
 		// LPU is handled 1 cycle later
-		if ((m_prev_op & 0x3e0) == 0x340)
+		if ((m_prev_op & 0x7e0) == 0x340)
 			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_pcmask;
 
 		// remember previous state

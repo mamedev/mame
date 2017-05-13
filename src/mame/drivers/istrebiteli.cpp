@@ -94,7 +94,7 @@ void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, stream_
 
 		// below is huge guess
 		if ((m_prev_data & 0x40) == 0)              // b6 noice enable ?
-			smpl &= rand() & 1;
+			smpl &= machine().rand() & 1;
 		smpl *= (m_prev_data & 0x80) ? 1000 : 4000; // b7 volume ?
 
 		*sample++ = smpl;

@@ -4,8 +4,8 @@
     video/dgn_beta.c
 
 The Dragon Beta uses a 68B45 for it's display generation, this is used in the
-conventional wat with a character generator ROM in the two text modes, which are
-standard 40x25 and 80x25. In adition to the 6845 there is some TTL logic which
+conventional way with a character generator ROM in the two text modes, which are
+standard 40x25 and 80x25. In addition to the 6845 there is some TTL logic which
 provides colour and attributes. In text modes the video ram is organised as pairs
 of character and attribute, in alternate bytes.
 
@@ -18,7 +18,7 @@ The attributes decode as follows :-
     u=underline
 
     FFF = foreground colour
-    BBB = bakcground colour
+    BBB = background colour
 
         000 black
         001 red
@@ -34,16 +34,16 @@ The attributes decode as follows :-
 It is interesting to note that the 6845 uses 16 bit wide access to the ram, in contrast
 to the 8 bit accesses from the CPUs, this allows each increment of the MA lines to move
 2 bytes at a time, and therefore feed both the character rom and the attribute decode
-circuit simultaniously.
+circuit simultaneously.
 
 The RAM addresses are made up of two parts, the MA0..13 from the 6845, plus two output
 lines from the 6821 PIA, I28, the lines are BP6 and PB7, with PB7 being the most
-significant. This effectivly allows the 6845 access to the first 128K of memory, as there
+significant. This effectively allows the 6845 access to the first 128K of memory, as there
 are 16 address lines, accessing a 16 bit wide memory.
 
 The relationship between how the cpu sees the RAM, and the way the 6845 sees it is simply
 CPU addr=2x6845 addr. So for the default video address of $1F000, the CPU sees this as
-being at $1F000 (after DAT trasnlation). The 6845 is programmed to start it's MA lines
+being at $1F000 (after DAT translation). The 6845 is programmed to start it's MA lines
 counting at $3800, plus A14 and A15 being supplied by PB6 and PB7 from I28, gives an address
 of $F800, which is the same as $1F000 / 2.
 
@@ -84,13 +84,13 @@ the access to the video memory is unclear to me at the moment.
 #include "emu.h"
 #include "includes/dgn_beta.h"
 
-/* GCtrl bitmasks, infered from bits of Beta schematic */
-#define GCtrlWI     0x01
-#define GCtrlSWChar 0x02    /* Character set select */
-#define GCtrlHiLo   0x04    /* Hi/Lo res graphics, Hi=1, Lo=0 */
-#define GCtrlChrGfx 0x08    /* Character=1 / Graphics=0 */
+/* GCtrl bitmasks, inferred from bits of Beta schematic */
+#define GCtrlWI         0x01
+#define GCtrlSWChar     0x02    /* Character set select */
+#define GCtrlHiLo       0x04    /* Hi/Lo res graphics, Hi=1, Lo=0 */
+#define GCtrlChrGfx     0x08    /* Character=1 / Graphics=0 */
 #define GCtrlControl    0x10    /* Control bit, sets direct drive mode */
-#define GCtrlFS     0x20    /* labeled F/S, not yet sure of function Fast or Slow scan ? */
+#define GCtrlFS         0x20    /* labeled F/S, not yet sure of function Fast or Slow scan ? */
 #define GCtrlAddrLines  0xC0    /* Top two address lines for text mode */
 
 #define IsTextMode  (m_GCtrl & GCtrlChrGfx) ? 1 : 0                  // Is this text mode ?
@@ -113,7 +113,7 @@ MC6845_UPDATE_ROW( dgn_beta_state::crtc_update_row )
 			uint8_t chr = videoram[ offset ];
 			uint8_t attr = videoram[ offset +1 ];
 
-			/* Extract non-colour attributes, in character set 1, undeline is used */
+			/* Extract non-colour attributes, in character set 1, underline is used */
 			/* We will extract the colours below, when we have decoded inverse */
 			/* to indicate a double height character */
 			int UnderLine=(attr & 0x40) >> 6; // Underline active
@@ -122,7 +122,7 @@ MC6845_UPDATE_ROW( dgn_beta_state::crtc_update_row )
 			// underline is active for character set 0, on character row 9
 			int ULActive=(UnderLine && (ra==9) && ~SWChar);
 
-			/* Invert forground and background if flashing char and flash acive */
+			/* Invert foreground and background if flashing char and flash active */
 			int Invert=(FlashChar & m_FlashBit);
 
 			/* Underline inverts flash */
@@ -187,7 +187,7 @@ MC6845_UPDATE_ROW( dgn_beta_state::crtc_update_row )
 			int Colour;
 			int Dot;
 
-			/* If contol is low then we are plotting 4 bit per pixel, 16 colour mode */
+			/* If control is low then we are plotting 4 bit per pixel, 16 colour mode */
 			/* This directly drives the colour output lines, from the pixel value */
 			/* If Control is high, then we lookup the colour from the LS670 4x4 bit */
 			/* palate register */
@@ -265,7 +265,7 @@ WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_vsync_changed)
 /*  1   Character set select, drives A12 of character rom in text mode     */
 /*  2   High (1) or Low(0) resolution if in graphics mode.         */
 /*  3   Text (1) or Graphics(0) mode                       */
-/*  4   Control bit, Selects between colour palate and drirect drive       */
+/*  4   Control bit, Selects between colour palette and direct drive       */
 /*  5   F/S bit, 1=80 bytes/line, 0=40bytes/line               */
 /*  6   Effective A14, to ram, in text mode                    */
 /*  7   Effective A15, to ram, in text mode                */
@@ -279,7 +279,7 @@ void dgn_beta_state::dgnbeta_vid_set_gctrl(int data)
 }
 
 
-/* Write handler for colour, pallate ram */
+/* Write handler for colour, palette ram */
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_colour_ram_w)
 {
 	m_ColourRAM[offset]=data&0x0f;          /* Colour ram 4 bit and write only to CPU */

@@ -87,14 +87,14 @@ Stephh's additional notes (based on the games M68000 code and some tests) :
 
   - The "Unused" Dip Switch is sort of "Debug Mode" Dip Switch and has an
     effect ONLY if 0x008fff.b is writable (as Bryan mentioned it).
-    Its role seems only to be limited to display some coordonates.
+    Its role seems only to be limited to display some coordinates.
 
  5)  'skysoldr'
 
   - As in "Time Soldiers / Battle Field" there is a something that is sort
     of "Debug Mode" Dip Switch : this is the "Manufacturer" Dip Switch when
     it is set to "Romstar". Again, it has an effect only if 0x000074.w is
-    writable and its role seems only to be limited to display some coordonates.
+    writable and its role seems only to be limited to display some coordinates.
 
  7)  'skyadvnt', 'skyadvntu' and 'skyadvntj'
 
@@ -103,7 +103,7 @@ Stephh's additional notes (based on the games M68000 code and some tests) :
 
       * bit 4 (when "Unused" Dip Switch is set to "On") determines invulnerability
       * bit 6 (when "Difficulty" Dip Switch is set to DEF_STR( Hard ) or DEF_STR( Hardest ))
-        determines if some coordonates are displayed.
+        determines if some coordinates are displayed.
 
  8)  'gangwars'
 
@@ -124,7 +124,7 @@ Stephh's log (2002.06.19) :
   - Add READ16_HANDLER( *_cycle_r ) for the following games :
       * timesold1  (based on the one from 'timesold')
       * btlfield  (based on the one from 'timesold')
-      * gangwars  (I splitted the one from 'gangwarsu')
+      * gangwars  (I split the one from 'gangwarsu')
       * skyadvnt, skyadvntu and skyadvntj
   - Change manufacturer for the following games :
       * timesold
@@ -1861,6 +1861,8 @@ MACHINE_START_MEMBER(alpha68k_state,alpha68k_V)
 
 	save_item(NAME(m_bank_base));
 	save_item(NAME(m_last_bank));
+	save_item(NAME(m_sound_nmi_mask));
+	save_item(NAME(m_sound_pa_latch));
 }
 
 MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_V)
@@ -1895,17 +1897,10 @@ MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
 	save_item(NAME(m_buffer_28));
 	save_item(NAME(m_buffer_60));
 	save_item(NAME(m_buffer_68));
-
+	save_item(NAME(m_sound_nmi_mask));
+	save_item(NAME(m_sound_pa_latch));
 }
 
-
-static ADDRESS_MAP_START( i8748_portmap, AS_IO, 8, alpha68k_state )
-//  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(saiyugoub1_mcu_command_r)
-//  AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVWRITE_LEGACY("adpcm", saiyugoub1_m5205_clk_w)     /* Drives the clock on the m5205 at 1/8 of this frequency */
-//  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(saiyugoub1_m5205_irq_r)
-//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(saiyugoub1_adpcm_rom_addr_w)
-//  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE_LEGACY("adpcm", saiyugoub1_adpcm_control_w)
-ADDRESS_MAP_END
 
 // Pixel clock, assuming that it can't be 4 MHz because 4 MHz / 15,20 KHz = 263 HTOTAL (VERY unlikely).
 #define ALPHA68K_PIXEL_CLOCK XTAL_24MHz/4
@@ -1932,7 +1927,11 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 
 	MCFG_CPU_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
 //  MCFG_CPU_PROGRAM_MAP(i8748_map)
-	MCFG_CPU_IO_MAP(i8748_portmap)
+//  MCFG_MCS48_PORT_BUS_IN_CB(READ8(alpha68k_state, saiyugoub1_mcu_command_r))
+//  MCFG_MCS48_PORT_T0_CLK_CUSTOM(alpha68k_state, saiyugoub1_m5205_clk_w)     /* Drives the clock on the m5205 at 1/8 of this frequency */
+//  MCFG_MCS48_PORT_T1_IN_CB(READLINE(alpha68k_state, saiyugoub1_m5205_irq_r))
+//  MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(alpha68k_state, saiyugoub1_adpcm_rom_addr_w))
+//  MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(alpha68k_state, saiyugoub1_adpcm_control_w))
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)

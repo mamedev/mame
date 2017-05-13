@@ -228,6 +228,7 @@ tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag,
 	, m_dr_in(*this)
 	, m_dx_out(*this)
 {
+	m_fixed_STR1 = 0x0180;
 }
 
 
@@ -247,12 +248,14 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 	, m_dr_in(*this)
 	, m_dx_out(*this)
 {
+	m_fixed_STR1 = 0x0180;
 }
 
 
 tms32026_device::tms32026_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms32025_device(mconfig, TMS32026, "TMS32026", tag, owner, clock, "tms32026", __FILE__, ADDRESS_MAP_NAME(tms32026_data))
 {
+	m_fixed_STR1 = 0x0100;
 }
 
 
@@ -332,8 +335,8 @@ WRITE16_MEMBER(tms32025_device::greg_w)
 
 void tms32025_device::CLR0(uint16_t flag) { m_STR0 &= ~flag; m_STR0 |= 0x0400; }
 void tms32025_device::SET0(uint16_t flag) { m_STR0 |=  flag; m_STR0 |= 0x0400; }
-void tms32025_device::CLR1(uint16_t flag) { m_STR1 &= ~flag; m_STR1 |= 0x0180; }
-void tms32025_device::SET1(uint16_t flag) { m_STR1 |=  flag; m_STR1 |= 0x0180; }
+void tms32025_device::CLR1(uint16_t flag) { m_STR1 &= ~flag; m_STR1 |= m_fixed_STR1; }
+void tms32025_device::SET1(uint16_t flag) { m_STR1 |=  flag; m_STR1 |= m_fixed_STR1; }
 
 void tms32025_device::MODIFY_DP(int data)
 {
@@ -345,13 +348,13 @@ void tms32025_device::MODIFY_PM(int data)
 {
 	m_STR1 &= ~PM_REG;
 	m_STR1 |= (data & PM_REG);
-	m_STR1 |= 0x0180;
+	m_STR1 |= m_fixed_STR1;
 }
 void tms32025_device::MODIFY_ARP(int data)
 {
 	m_STR1 &= ~ARB_REG;
 	m_STR1 |= (m_STR0 & ARP_REG);
-	m_STR1 |= 0x0180;
+	m_STR1 |= m_fixed_STR1;
 	m_STR0 &= ~ARP_REG;
 	m_STR0 |= ((data << 13) & ARP_REG);
 	m_STR0 |= 0x0400;
@@ -890,7 +893,7 @@ void tms32026_device::conf()  /** Need to reconfigure the memory blocks */
 	if(next < 1 && prev >= 1) {
 		m_program->unmap_readwrite(0xfa00, 0xfbff);
 		m_data->install_ram(0x0200, 0x03ff, m_b0);
-	} else if(next < 1 && prev >= 1) {
+	} else if(next >= 1 && prev < 1) {
 		m_program->install_ram(0xfa00, 0xfbff, m_b0);
 		m_data->unmap_readwrite(0x0200, 0x03ff);
 	}
@@ -898,7 +901,7 @@ void tms32026_device::conf()  /** Need to reconfigure the memory blocks */
 	if(next < 2 && prev >= 2) {
 		m_program->unmap_readwrite(0xfc00, 0xfdff);
 		m_data->install_ram(0x0400, 0x05ff, m_b1);
-	} else if(next < 2 && prev >= 2) {
+	} else if(next >= 2 && prev < 2) {
 		m_program->install_ram(0xfc00, 0xfdff, m_b1);
 		m_data->unmap_readwrite(0x0400, 0x05ff);
 	}
@@ -906,7 +909,7 @@ void tms32026_device::conf()  /** Need to reconfigure the memory blocks */
 	if(next < 3 && prev >= 3) {
 		m_program->unmap_readwrite(0xfe00, 0xffff);
 		m_data->install_ram(0x0600, 0x07ff, m_b3);
-	} else if(next < 3 && prev >= 3) {
+	} else if(next >= 3 && prev < 3) {
 		m_program->install_ram(0xfe00, 0xffff, m_b3);
 		m_data->unmap_readwrite(0x0600, 0x07ff);
 	}
@@ -1014,8 +1017,7 @@ void tms32025_device::lst1()
 	GETDATA(0, 0);
 	m_mHackIgnoreARP = 0;
 
-	m_STR1 = m_ALU.w.l;
-	m_STR1 |= 0x0180;
+	m_STR1 = m_ALU.w.l | m_fixed_STR1;
 	m_STR0 &= (~ARP_REG);       /* ARB also gets copied to ARP */
 	m_STR0 |= (m_STR1 & ARB_REG);
 }
@@ -1637,7 +1639,7 @@ void tms32025_device::device_start()
 	m_PREVPC = 0;
 	m_PFC = 0;
 	m_STR0 = 0;
-	m_STR1 = 0;
+	m_STR1 = m_fixed_STR1;
 	m_ACC.d = 0;
 	m_Preg.d = 0;
 	m_Treg = 0;
@@ -1770,13 +1772,13 @@ void tms32025_device::state_string_export(const device_state_entry &entry, std::
  ****************************************************************************/
 void tms32025_device::common_reset()
 {
-	m_PC = 0;           /* Starting address on a reset */
-	m_STR0 |= 0x0600;   /* INTM and unused bit set to 1 */
-	m_STR0 &= 0xefff;   /* OV cleared to 0. Remaining bits undefined */
-	m_STR1 |= 0x07f0;   /* SXM, C, HM, FSM, XF and unused bits set to 1 */
-	m_STR1 &= 0xeff0;   /* CNF, FO, TXM, PM bits cleared to 0. Remaining bits undefined */
-	m_RPTC = 0;         /* Reset repeat counter to 0 */
-	m_IFR = 0;          /* IRQ pending flags */
+	m_PC = 0;                          /* Starting address on a reset */
+	m_STR0 |= 0x0600;                  /* INTM and unused bit set to 1 */
+	m_STR0 &= 0xefff;                  /* OV cleared to 0. Remaining bits undefined */
+	m_STR1 |= 0x0670 | m_fixed_STR1;   /* SXM, C, HM, FSM, XF and unused bits set to 1 */
+	m_STR1 &= 0xeff0;                  /* CNF, FO, TXM, PM bits cleared to 0. Remaining bits undefined */
+	m_RPTC = 0;                        /* Reset repeat counter to 0 */
+	m_IFR = 0;                         /* IRQ pending flags */
 
 	m_xf_out(ASSERT_LINE); /* XF flag is high. Must set the pin */
 

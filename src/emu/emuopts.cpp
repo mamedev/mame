@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    emuopts.c
+    emuopts.cpp
 
     Options file and command line management.
 
@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+
 
 //**************************************************************************
 //  CORE EMULATOR OPTIONS
@@ -231,33 +232,6 @@ emu_options::emu_options()
 }
 
 
-std::string emu_options::main_value(const char *name) const
-{
-	std::string buffer = value(name);
-	int pos = buffer.find_first_of(',');
-	if (pos != -1)
-		buffer = buffer.substr(0, pos);
-	return buffer;
-}
-
-std::string emu_options::sub_value(const char *name, const char *subname) const
-{
-	std::string tmp = std::string(",").append(subname).append("=");
-	std::string buffer = value(name);
-	int pos = buffer.find(tmp);
-	if (pos != -1)
-	{
-		int endpos = buffer.find_first_of(',', pos + 1);
-		if (endpos == -1)
-			endpos = buffer.length();
-		buffer = buffer.substr(pos + tmp.length(), endpos - pos - tmp.length());
-	}
-	else
-		buffer.clear();
-	return buffer;
-}
-
-
 //-------------------------------------------------
 //  value_changed - to prevent tagmap
 //    lookups keep copies of frequently requested
@@ -289,4 +263,168 @@ void emu_options::value_changed(const std::string &name, const std::string &valu
 		else
 			m_ui = UI_CABINET;
 	}
+}
+
+
+//-------------------------------------------------
+//  override_get_value - when saving to an INI, we
+//  need to hook into that process so we can write
+//  out image/slot options
+//-------------------------------------------------
+
+core_options::override_get_value_result emu_options::override_get_value(const char *name, std::string &value) const
+{
+	if (name)
+	{
+		auto slotiter = m_slot_options.find(name);
+		if (slotiter != m_slot_options.end())
+		{
+			value = slotiter->second.specified_value();
+			return slotiter->second.specified()
+				? override_get_value_result::OVERRIDE
+				: override_get_value_result::SKIP;
+		}
+
+		auto imageiter = m_image_options.find(name);
+		if (imageiter != m_image_options.end())
+		{
+			value = imageiter->second;
+			return override_get_value_result::OVERRIDE;
+		}
+	}
+
+	return override_get_value_result::NONE;
+}
+
+
+//-------------------------------------------------
+//  override_set_value - when parsing an INI, we
+//  need to hook into into it so we can do the same
+//  crazy slot logic done in mameopt
+//-------------------------------------------------
+
+bool emu_options::override_set_value(const char *name, const std::string &value)
+{
+	auto slotiter = m_slot_options.find(name);
+	if (slotiter != m_slot_options.end())
+	{
+		slotiter->second.specify(std::string(value));
+		return true;
+	}
+
+	auto imageiter = m_image_options.find(name);
+	if (imageiter != m_image_options.end())
+	{
+		// We've found a potential image slot for this value.  However, we're only going to specify it
+		// if the current image option is empty.  This is because if there is an image option already
+		// present, it is almost certain that this was because something was specified at the command
+		// line and we're parsing an INI.  Because INIs have less priority than the command line, this
+		// should be ignored
+		//
+		// Obviously, this ignores that INIs themselves have their own prioritization, so this should be
+		// considered to be a hack.  Instead of having image options being just a straight map of std::string
+		// it should really be a structure where the priority can be recorded
+		if (imageiter->second.empty())
+			imageiter->second = value;
+		return true;
+	}
+
+	return false;
+}
+
+
+//-------------------------------------------------
+//  slot_option ctor
+//-------------------------------------------------
+
+slot_option::slot_option(const char *default_value)
+	: m_specified(false)
+	, m_default_value(default_value ? default_value : "")
+{
+}
+
+
+//-------------------------------------------------
+//  slot_option::value
+//-------------------------------------------------
+
+const std::string &slot_option::value() const
+{
+	// There are a number of ways that the value can be determined; there
+	// is a specific order of precedence:
+	//
+	//  1.  Highest priority is whatever may have been specified by the user (whether it
+	//      was specified at the command line, an INI file, or in the UI).  We keep track
+	//      of whether these values were specified this way
+	//
+	//      Take note that slots have a notion of being "selectable".  Slots that are not
+	//      marked as selectable cannot be specified with this technique
+	//
+	//  2.  Next highest is what is returned from get_default_card_software()
+	//
+	//  3.  Last in priority is what was specified as the slot default.  This comes from
+	//      device setup
+	if (m_specified)
+		return m_specified_value;
+	else if (!m_default_card_software.empty())
+		return m_default_card_software;
+	else
+		return m_default_value;
+}
+
+
+//-------------------------------------------------
+//  slot_option::specified_value
+//-------------------------------------------------
+
+std::string slot_option::specified_value() const
+{
+	std::string result;
+	if (m_specified)
+	{
+		result = m_specified_bios.empty()
+			? m_specified_value
+			: util::string_format("%s,bios=%s", m_specified_value, m_specified_bios);
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
+//  slot_option::specify
+//-------------------------------------------------
+
+void slot_option::specify(std::string &&text)
+{
+	// we need to do some elementary parsing here
+	const char *bios_arg = ",bios=";
+
+	size_t pos = text.find(bios_arg);
+	if (pos != std::string::npos)
+	{
+		m_specified = true;
+		m_specified_value = text.substr(0, pos);
+		m_specified_bios = text.substr(pos + strlen(bios_arg));
+	}
+	else
+	{
+		m_specified = true;
+		m_specified_value = std::move(text);
+		m_specified_bios = "";
+	}
+}
+
+
+//-------------------------------------------------
+//  slot_option::set_bios
+//-------------------------------------------------
+
+void slot_option::set_bios(std::string &&text)
+{
+	if (!m_specified)
+	{
+		m_specified = true;
+		m_specified_value = value();
+	}
+	m_specified_bios = std::move(text);
 }

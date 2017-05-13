@@ -3,8 +3,14 @@
 /******************************************************************************
 *
 *  Fidelity Electronics chess machines base class
+*  main driver is fidelz80.cpp
 *
 ******************************************************************************/
+
+#pragma once
+
+#ifndef DRIVERS_FIDELBASE_H
+#define DRIVERS_FIDELBASE_H
 
 #include "sound/dac.h"
 #include "sound/s14001a.h"
@@ -67,3 +73,9 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
+
+
+INPUT_PORTS_EXTERN( fidel_cb_buttons );
+INPUT_PORTS_EXTERN( fidel_cb_magnets );
+
+#endif // DRIVERS_FIDELBASE_H

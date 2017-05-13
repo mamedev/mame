@@ -63,24 +63,16 @@ const tiny_rom_entry *ec_1841_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( kb_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( ec_1841_keyboard_io, AS_IO, 8, ec_1841_keyboard_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(bus_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( ec_1841_keyboard )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( ec_1841_keyboard )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5_46MHz)
-	MCFG_CPU_IO_MAP(ec_1841_keyboard_io)
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(ec_1841_keyboard_device, bus_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(ec_1841_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ec_1841_keyboard_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ec_1841_keyboard_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ec_1841_keyboard_device, t1_r))
 MACHINE_CONFIG_END
 
 
@@ -438,7 +430,7 @@ WRITE8_MEMBER( ec_1841_keyboard_device::p2_w )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ec_1841_keyboard_device::t1_r )
+READ_LINE_MEMBER( ec_1841_keyboard_device::t1_r )
 {
 	if (BIT(m_p2,0)) {
 		m_q = 1;

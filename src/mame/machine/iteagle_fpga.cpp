@@ -20,8 +20,8 @@ const device_type ITEAGLE_FPGA = device_creator<iteagle_fpga_device>;
 MACHINE_CONFIG_FRAGMENT(iteagle_fpga)
 	MCFG_NVRAM_ADD_0FILL("eagle2_rtc")
 	// RS232 serial ports
-	//MCFG_SCC85C30_ADD(AM85C30_TAG, XTAL_7_3728MHz, XTAL_1_8432MHz, 0, XTAL_1_8432MHz, 0)
-	MCFG_SCC85C30_ADD(AM85C30_TAG, XTAL_1_8432MHz, XTAL_1_8432MHz, 0, XTAL_1_8432MHz, 0)
+	// The console terminal (com1) operates at 38400 baud
+	MCFG_SCC85C30_ADD(AM85C30_TAG, XTAL_7_3728MHz, XTAL_7_3728MHz, 0, XTAL_7_3728MHz, 0)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(iteagle_fpga_device, serial_interrupt))
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(COM2_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(COM1_TAG, rs232_port_device, write_txd))
@@ -93,6 +93,16 @@ void iteagle_fpga_device::device_start()
 	m_ram[0x0c/4] = 0x00000001;
 	m_ram[0x10/4] = 0x00000018;
 
+	// Save states
+	save_item(NAME(m_fpga_regs));
+	save_item(NAME(m_rtc_regs));
+	save_item(NAME(m_ram));
+	save_item(NAME(m_prev_reg));
+	// m_version
+	save_item(NAME(m_seq_init));
+	save_item(NAME(m_seq));
+	save_item(NAME(m_seq_rem1));
+	save_item(NAME(m_seq_rem2));
 }
 
 void iteagle_fpga_device::device_reset()
@@ -241,6 +251,10 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 			break;
 		case 0x0c/4: //
 			result = 0;
+			// Need to eat some CPU cycles otherwise the CPU times out waiting for tx uart buffer empty
+			if (ACCESSING_BITS_0_15) {
+				m_cpu->eat_cycles(40);
+			}
 			if (ACCESSING_BITS_0_7) {
 				result |= m_scc1->cb_r(space, offset) << 0;
 				if (LOG_SERIAL) m_serial0_1.read_control(1);
@@ -752,6 +766,9 @@ void iteagle_periph_device::device_start()
 	m_rtc_regs[0xa] = 0x20; // 32.768 MHz
 	m_rtc_regs[0xb] = 0x02; // 24-hour format
 	m_rtc->set_base(m_rtc_regs, sizeof(m_rtc_regs));
+
+	// Save states
+	save_item(NAME(m_ctrl_regs));
 }
 
 void iteagle_periph_device::device_reset()

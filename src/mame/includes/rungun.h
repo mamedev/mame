@@ -7,10 +7,10 @@
 *************************************************************************/
 
 #include "sound/k054539.h"
-#include "machine/gen_latch.h"
 #include "machine/k053252.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k053936.h"
+#include "machine/k054321.h"
 #include "video/konami_helper.h"
 #include "screen.h"
 
@@ -30,8 +30,7 @@ public:
 		m_palette(*this, "palette"),
 		m_palette2(*this, "palette2"),
 		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2"),
+		m_k054321(*this, "k054321"),
 		m_sysreg(*this, "sysreg")
 	{ }
 
@@ -47,8 +46,7 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<palette_device> m_palette2;
 	required_device<screen_device> m_screen;
-	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device<k054321_device> m_k054321;
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_sysreg;

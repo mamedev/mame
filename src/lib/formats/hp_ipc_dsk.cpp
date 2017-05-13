@@ -2,9 +2,9 @@
 // copyright-holders:Sergey Svishchev
 /*********************************************************************
 
-	formats/hp_ipc_dsk.c
+    formats/hp_ipc_dsk.c
 
-	HP Integral PC format
+    HP Integral PC format
 
 *********************************************************************/
 

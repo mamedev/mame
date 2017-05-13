@@ -38,24 +38,28 @@ TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 	if (scanline >= 262)
 		scanline = 0;
 
-	timer_set(m_screen->time_until_pos(scanline), TIMER_PERIODIC, scanline);
+	m_periodic_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
+void wolfpack_state::machine_start()
+{
+	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
+}
 
 void wolfpack_state::machine_reset()
 {
-	timer_set(m_screen->time_until_pos(0), TIMER_PERIODIC);
+	m_periodic_timer->adjust(m_screen->time_until_pos(0));
 }
 
 
-CUSTOM_INPUT_MEMBER(wolfpack_state::wolfpack_dial_r)
+CUSTOM_INPUT_MEMBER(wolfpack_state::dial_r)
 {
 	int bit = (uintptr_t)param;
 	return ((ioport("DIAL")->read() + bit) / 2) & 0x01;
 }
 
 
-READ8_MEMBER(wolfpack_state::wolfpack_misc_r)
+READ8_MEMBER(wolfpack_state::misc_r)
 {
 	uint8_t val = 0;
 
@@ -81,43 +85,43 @@ READ8_MEMBER(wolfpack_state::wolfpack_misc_r)
 }
 
 
-WRITE8_MEMBER(wolfpack_state::wolfpack_high_explo_w){ }
-WRITE8_MEMBER(wolfpack_state::wolfpack_sonar_ping_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_sirlat_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_pt_sound_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_launch_torpedo_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_low_explo_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_screw_cont_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_lamp_flash_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_warning_light_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_audamp_w){}
+WRITE8_MEMBER(wolfpack_state::high_explo_w){ }
+WRITE8_MEMBER(wolfpack_state::sonar_ping_w){}
+WRITE8_MEMBER(wolfpack_state::sirlat_w){}
+WRITE8_MEMBER(wolfpack_state::pt_sound_w){}
+WRITE8_MEMBER(wolfpack_state::launch_torpedo_w){}
+WRITE8_MEMBER(wolfpack_state::low_explo_w){}
+WRITE8_MEMBER(wolfpack_state::screw_cont_w){}
+WRITE8_MEMBER(wolfpack_state::lamp_flash_w){}
+WRITE8_MEMBER(wolfpack_state::warning_light_w){}
+WRITE8_MEMBER(wolfpack_state::audamp_w){}
 
-WRITE8_MEMBER(wolfpack_state::wolfpack_word_w)
+WRITE8_MEMBER(wolfpack_state::word_w)
 {
 	/* latch word from bus into temp register, and place on s14001a input bus */
 	/* there is no real need for a temp register at all, since the bus 'register' acts as one */
 	m_s14001a->data_w(space, 0, data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
 }
 
-WRITE8_MEMBER(wolfpack_state::wolfpack_start_speech_w)
+WRITE8_MEMBER(wolfpack_state::start_speech_w)
 {
 	m_s14001a->start_w(data&1);
 }
 
 
-WRITE8_MEMBER(wolfpack_state::wolfpack_attract_w)
+WRITE8_MEMBER(wolfpack_state::attract_w)
 {
 	machine().bookkeeping().coin_lockout_global_w(!(data & 1));
 }
 
 
-WRITE8_MEMBER(wolfpack_state::wolfpack_credit_w)
+WRITE8_MEMBER(wolfpack_state::credit_w)
 {
 	output().set_led_value(0, !(data & 1));
 }
 
 
-WRITE8_MEMBER(wolfpack_state::wolfpack_coldetres_w)
+WRITE8_MEMBER(wolfpack_state::coldetres_w)
 {
 	m_collision = 0;
 }
@@ -127,35 +131,35 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wolfpack_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100)
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_SHARE("alpha_num_ram")
-	AM_RANGE(0x2000, 0x2000) AM_READ(wolfpack_misc_r)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(wolfpack_high_explo_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(wolfpack_sonar_ping_w)
-	AM_RANGE(0x2002, 0x2002) AM_WRITE(wolfpack_sirlat_w)
-	AM_RANGE(0x2003, 0x2003) AM_WRITE(wolfpack_pt_sound_w)
-	AM_RANGE(0x2004, 0x2004) AM_WRITE(wolfpack_start_speech_w)
-	AM_RANGE(0x2005, 0x2005) AM_WRITE(wolfpack_launch_torpedo_w)
-	AM_RANGE(0x2006, 0x2006) AM_WRITE(wolfpack_low_explo_w)
-	AM_RANGE(0x2007, 0x2007) AM_WRITE(wolfpack_screw_cont_w)
-	AM_RANGE(0x2008, 0x2008) AM_WRITE(wolfpack_video_invert_w)
-	AM_RANGE(0x2009, 0x2009) AM_WRITE(wolfpack_ship_reflect_w)
-	AM_RANGE(0x200a, 0x200a) AM_WRITE(wolfpack_lamp_flash_w)
-	AM_RANGE(0x200c, 0x200c) AM_WRITE(wolfpack_credit_w)
-	AM_RANGE(0x200d, 0x200d) AM_WRITE(wolfpack_attract_w)
-	AM_RANGE(0x200e, 0x200e) AM_WRITE(wolfpack_pt_pos_select_w)
-	AM_RANGE(0x200f, 0x200f) AM_WRITE(wolfpack_warning_light_w)
+	AM_RANGE(0x2000, 0x2000) AM_READ(misc_r)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(high_explo_w)
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(sonar_ping_w)
+	AM_RANGE(0x2002, 0x2002) AM_WRITE(sirlat_w)
+	AM_RANGE(0x2003, 0x2003) AM_WRITE(pt_sound_w)
+	AM_RANGE(0x2004, 0x2004) AM_WRITE(start_speech_w)
+	AM_RANGE(0x2005, 0x2005) AM_WRITE(launch_torpedo_w)
+	AM_RANGE(0x2006, 0x2006) AM_WRITE(low_explo_w)
+	AM_RANGE(0x2007, 0x2007) AM_WRITE(screw_cont_w)
+	AM_RANGE(0x2008, 0x2008) AM_WRITE(video_invert_w)
+	AM_RANGE(0x2009, 0x2009) AM_WRITE(ship_reflect_w)
+	AM_RANGE(0x200a, 0x200a) AM_WRITE(lamp_flash_w)
+	AM_RANGE(0x200c, 0x200c) AM_WRITE(credit_w)
+	AM_RANGE(0x200d, 0x200d) AM_WRITE(attract_w)
+	AM_RANGE(0x200e, 0x200e) AM_WRITE(pt_pos_select_w)
+	AM_RANGE(0x200f, 0x200f) AM_WRITE(warning_light_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW")
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(wolfpack_audamp_w)
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(wolfpack_pt_horz_w)
-	AM_RANGE(0x3003, 0x3003) AM_WRITE(wolfpack_pt_pic_w)
-	AM_RANGE(0x3004, 0x3004) AM_WRITE(wolfpack_word_w)
-	AM_RANGE(0x3007, 0x3007) AM_WRITE(wolfpack_coldetres_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(wolfpack_ship_h_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(wolfpack_torpedo_pic_w)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE(wolfpack_ship_size_w)
-	AM_RANGE(0x4003, 0x4003) AM_WRITE(wolfpack_ship_h_precess_w)
-	AM_RANGE(0x4004, 0x4004) AM_WRITE(wolfpack_ship_pic_w)
-	AM_RANGE(0x4005, 0x4005) AM_WRITE(wolfpack_torpedo_h_w)
-	AM_RANGE(0x4006, 0x4006) AM_WRITE(wolfpack_torpedo_v_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(audamp_w)
+	AM_RANGE(0x3001, 0x3001) AM_WRITE(pt_horz_w)
+	AM_RANGE(0x3003, 0x3003) AM_WRITE(pt_pic_w)
+	AM_RANGE(0x3004, 0x3004) AM_WRITE(word_w)
+	AM_RANGE(0x3007, 0x3007) AM_WRITE(coldetres_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(ship_h_w)
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(torpedo_pic_w)
+	AM_RANGE(0x4002, 0x4002) AM_WRITE(ship_size_w)
+	AM_RANGE(0x4003, 0x4003) AM_WRITE(ship_h_precess_w)
+	AM_RANGE(0x4004, 0x4004) AM_WRITE(ship_pic_w)
+	AM_RANGE(0x4005, 0x4005) AM_WRITE(torpedo_h_w)
+	AM_RANGE(0x4006, 0x4006) AM_WRITE(torpedo_v_w)
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0x9000) AM_READNOP /* debugger ROM location? */
@@ -165,8 +169,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wolfpack )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)0)    /* dial connects here */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)1)    /* dial connects here */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state, dial_r, (void *)0)    /* dial connects here */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state, dial_r, (void *)1)    /* dial connects here */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
@@ -313,8 +317,8 @@ static MACHINE_CONFIG_START( wolfpack, wolfpack_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(wolfpack_state, screen_update_wolfpack)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wolfpack_state, screen_vblank_wolfpack))
+	MCFG_SCREEN_UPDATE_DRIVER(wolfpack_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wolfpack_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wolfpack)
@@ -359,4 +363,4 @@ ROM_START( wolfpack )
 ROM_END
 
 
-GAME( 1978, wolfpack, 0, wolfpack, wolfpack, driver_device, 0, ORIENTATION_FLIP_Y, "Atari", "Wolf Pack (prototype)", MACHINE_IMPERFECT_SOUND )
+GAME( 1978, wolfpack, 0, wolfpack, wolfpack, driver_device, 0, ORIENTATION_FLIP_Y, "Atari", "Wolf Pack (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
