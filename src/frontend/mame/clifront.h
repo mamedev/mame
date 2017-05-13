@@ -57,7 +57,6 @@ private:
 	// internal helpers
 	void execute_commands(const char *exename);
 	void display_help(const char *exename);
-	void display_suggestions(const char *gamename);
 	void output_single_softlist(FILE *out, software_list_device &swlist);
 	void start_execution(mame_machine_manager *manager, std::vector<std::string> &args);
 	emu_options create_clean_options();
@@ -68,4 +67,4 @@ private:
 	int                 m_result;
 };
 
-#endif  /* MAME_FRONTEND_CLIFRONT_H */
+#endif  // MAME_FRONTEND_CLIFRONT_H

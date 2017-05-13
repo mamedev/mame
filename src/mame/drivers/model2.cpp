@@ -2450,7 +2450,7 @@ static ADDRESS_MAP_START( drive_io_map, AS_IO, 8, model2_state )
 	AM_RANGE(0x00, 0x00) AM_WRITENOP //watchdog
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("driveio1", sega_315_5296_device, read, write)
 	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("driveio2", sega_315_5296_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("driveadc", msm6253_device, d7_r, address_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("driveadc", msm6253_device, d0_r, address_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( sj25_0207_01 )

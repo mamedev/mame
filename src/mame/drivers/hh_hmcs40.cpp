@@ -75,7 +75,7 @@
   - gckong random lockups (tap the jump button repeatedly): mcu stack overflow,
     works ok if stack levels is increased, 38800 B rev. has more stack levels?
     Or it could be a race condition: irq happening too late/early.
-  - epacman booting the game in demo mode, pacman should go straight to the
+  - epacman2 booting the game in demo mode, pacman should go straight to the
     upper-left power pill: mcu cycle/interrupt timing related
   - Though very uncommon when compared to games with LED/lamp display, some
     games may manipulate VFD plate brightness by strobing it longer/shorter,
@@ -83,6 +83,7 @@
   - Related to the above issue: bultrman sometimes strobes D0/D1/D2 for a very
     short duration, causing (unwanted) dimly lit segments on the real machine.
     On MAME they will show with full brightness, see eg. building explosions.
+    Currently there's a workaround in place.
   - bzaxxon 3D effect is difficult to simulate
 
 ***************************************************************************/
@@ -1611,7 +1612,8 @@ WRITE16_MEMBER(bultrman_state::grid_w)
 	m_grid = data >> 8 & 0xff;
 
 	// D0-D2: plate 15-17 (update display there)
-	plate_w(space, 4, data & 7);
+	//plate_w(space, 4, data & 7);
+	plate_w(space, 4, data & (1 << offset) & 7);
 }
 
 
@@ -3375,8 +3377,8 @@ static MACHINE_CONFIG_START( gckong, gckong_state )
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(479, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 479-1, 0, 1080-1)
+	MCFG_SCREEN_SIZE(506, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 506-1, 0, 1080-1)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
@@ -4386,8 +4388,8 @@ ROM_START( gckong )
 	ROM_LOAD( "hd38800b01", 0x0000, 0x1000, CRC(d5a2cca3) SHA1(37bb5784383daab672ed1e0e2362c7a40d8d9b3f) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 349591, "svg", 0)
-	ROM_LOAD( "gckong.svg", 0, 349591, BAD_DUMP CRC(94b5fcdf) SHA1(a797feb71d18d0320e846eca72a0df92d111ee1e) ) // by kevtris, ver. 25 apr 2016 - BAD_DUMP: needs overlay
+	ROM_REGION( 356769, "svg", 0)
+	ROM_LOAD( "gckong.svg", 0, 356769, CRC(e2559b53) SHA1(519309c3a88b5d7f4c0ac5ae05dcdc1153377765) ) // by kevtris/hap, ver. 12 may 2017
 ROM_END
 
 

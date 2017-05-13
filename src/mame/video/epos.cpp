@@ -62,8 +62,10 @@ WRITE8_MEMBER(epos_state::dealer_pal_w)
 }
 
 WRITE8_MEMBER(epos_state::flip_screen_w)
-{
+{	
 	flip_screen_set(BIT(data, 7));
+
+	// bit 6: ay8910 port A/B multiplexer read? 
 }
 
 WRITE8_MEMBER(epos_state::port_1_w)
@@ -97,12 +99,14 @@ uint32_t epos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 		if (flip_screen())
 		{
-			x = 270 - x; // wrong
-			y = 240 - y; // wrong
+			bitmap.pix32(240 - y, 270 - x + 1) = m_palette->pen((m_palette_bank << 4) | (data & 0x0f));
+			bitmap.pix32(240 - y, 270 - x + 0) = m_palette->pen((m_palette_bank << 4) | (data >> 4));
 		}
-
-		bitmap.pix32(y, x + 0) = m_palette->pen((m_palette_bank << 4) | (data & 0x0f));
-		bitmap.pix32(y, x + 1) = m_palette->pen((m_palette_bank << 4) | (data >> 4));
+		else
+		{
+			bitmap.pix32(y, x + 0) = m_palette->pen((m_palette_bank << 4) | (data & 0x0f));
+			bitmap.pix32(y, x + 1) = m_palette->pen((m_palette_bank << 4) | (data >> 4));
+		}
 	}
 
 	return 0;

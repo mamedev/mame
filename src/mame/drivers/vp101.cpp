@@ -412,8 +412,28 @@ ROM_END
 
 ROM_START(specfrce)
 	ROM_REGION(0x400000, "maincpu", 0)  /* Boot ROM */
-	ROM_LOAD( "special_forces_boot_v3.4.u4", 0x000000, 0x100000, CRC(db4862ac) SHA1(a1e886d424cf7d26605e29d972d48e8d44ae2d58) )
-	ROM_LOAD( "special_forces_boot_v3.5.u4", 0x000000, 0x100000, CRC(ae8dfdf0) SHA1(d64130e710d0c70095ad8ebd4e2194b8c461be4a) ) /* Newer, but keep both in driver */
+	ROM_SYSTEM_BIOS(0, "default", "rev. 3.6")
+	ROMX_LOAD( "boot 3.6.u4.27c801", 0x000000, 0x100000, CRC(b1628dd9) SHA1(5970d31b0cf3d0c1ab4b10ee8e54d2696fafde24), ROM_BIOS(1) ) 
+	ROM_SYSTEM_BIOS(1, "r35", "rev. 3.5")
+	ROMX_LOAD( "special_forces_boot_v3.5.u4", 0x000000, 0x100000, CRC(ae8dfdf0) SHA1(d64130e710d0c70095ad8ebd4e2194b8c461be4a), ROM_BIOS(2) ) /* Newer, but keep both in driver */
+	ROM_SYSTEM_BIOS(2, "r34", "rev. 3.4")
+	ROMX_LOAD( "special_forces_boot_v3.4.u4", 0x000000, 0x100000, CRC(db4862ac) SHA1(a1e886d424cf7d26605e29d972d48e8d44ae2d58), ROM_BIOS(3) )
+
+	ROM_REGION(0x80000, "pic", 0)       /* PIC18c422 I/P program - read-protected, need dumped */
+	ROM_LOAD( "special_forces_et_u7_rev1.2.u7", 0x000000, 0x80000, NO_DUMP )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE_READONLY("sf010200", 0, SHA1(33c35fd5e110ff06330e0f0313fcd75d5c64a090) )
+ROM_END
+
+ROM_START(specfrceo)
+	ROM_REGION(0x400000, "maincpu", 0)  /* Boot ROM */
+	ROM_SYSTEM_BIOS(0, "default", "rev. 3.6")
+	ROMX_LOAD( "boot 3.6.u4.27c801", 0x000000, 0x100000, CRC(b1628dd9) SHA1(5970d31b0cf3d0c1ab4b10ee8e54d2696fafde24), ROM_BIOS(1) ) 
+	ROM_SYSTEM_BIOS(1, "r35", "rev. 3.5")
+	ROMX_LOAD( "special_forces_boot_v3.5.u4", 0x000000, 0x100000, CRC(ae8dfdf0) SHA1(d64130e710d0c70095ad8ebd4e2194b8c461be4a), ROM_BIOS(2) ) /* Newer, but keep both in driver */
+	ROM_SYSTEM_BIOS(2, "r34", "rev. 3.4")
+	ROMX_LOAD( "special_forces_boot_v3.4.u4", 0x000000, 0x100000, CRC(db4862ac) SHA1(a1e886d424cf7d26605e29d972d48e8d44ae2d58), ROM_BIOS(3) )
 
 	ROM_REGION(0x80000, "pic", 0)       /* PIC18c422 I/P program - read-protected, need dumped */
 	ROM_LOAD( "special_forces_et_u7_rev1.2.u7", 0x000000, 0x80000, NO_DUMP )
@@ -433,6 +453,7 @@ ROM_START(zoofari)
 	DISK_IMAGE_READONLY("zoofari", 0, SHA1(8fb9cfb1ab2660f40b643fcd772243903bd69a6c) )
 ROM_END
 
-GAME( 2002,  specfrce,  0,  vp101,  vp101, driver_device,  0,  ROT0,  "ICE/Play Mechanix",    "Special Forces Elite Training", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2004,  jnero,     0,  vp101,  vp101, driver_device,  0,  ROT0,  "ICE/Play Mechanix",    "Johnny Nero Action Hero", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002,  specfrce,  0,  vp101,  vp101, driver_device,  0,  ROT0,  "ICE/Play Mechanix",    "Special Forces Elite Training (v01.02.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002,  specfrceo, specfrce,   vp101, vp101,          driver_device,  0,  ROT0,  "ICE/Play Mechanix",    "Special Forces Elite Training (v01.01.01)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2004,  jnero,     0,  vp101,  vp101, driver_device,  0,  ROT0,  "ICE/Play Mechanix",    "Johnny Nero Action Hero (v01.01.08)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2006,  zoofari,   0,  vp50,   vp50,  driver_device,  0,  ROT0,  "ICE/Play Mechanix",    "Zoofari", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

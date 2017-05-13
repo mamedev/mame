@@ -1159,7 +1159,7 @@ void cli_frontend::listsoftware(const std::vector<std::string> &args)
 -------------------------------------------------*/
 void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : "*";
+	const char *gamename = args.empty() ? "*" : args[0].c_str();
 
 	std::unordered_set<std::string> list_map;
 
@@ -1235,7 +1235,7 @@ void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 
 void cli_frontend::getsoftlist(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : "*";
+	const char *gamename = args.empty() ? "*" : args[0].c_str();
 
 	FILE *out = stdout;
 	std::unordered_set<std::string> list_map;
@@ -1265,7 +1265,7 @@ void cli_frontend::getsoftlist(const std::vector<std::string> &args)
 -------------------------------------------------*/
 void cli_frontend::verifysoftlist(const std::vector<std::string> &args)
 {
-	const char *gamename = args.size() > 0 ? args[0].c_str() : "*";
+	const char *gamename = args.empty() ? "*" : args[0].c_str();
 
 	std::unordered_set<std::string> list_map;
 	unsigned correct = 0;
@@ -1465,7 +1465,7 @@ void cli_frontend::execute_commands(const char *exename)
 		{ CLICOMMAND_LISTMEDIA,			0, 1, &cli_frontend::listmedia,			"[system name]" },
 		{ CLICOMMAND_LISTSOFTWARE,		0, 1, &cli_frontend::listsoftware,		"[system name]" },
 		{ CLICOMMAND_VERIFYSOFTWARE,	0, 1, &cli_frontend::verifysoftware,	"[system name|*]" },
-		{ CLICOMMAND_ROMIDENT,			1, 1, &cli_frontend::romident,			"(system name)" },
+		{ CLICOMMAND_ROMIDENT,			1, 1, &cli_frontend::romident,			"(file or directory path)" },
 		{ CLICOMMAND_GETSOFTLIST,		0, 1, &cli_frontend::getsoftlist,		"[system name|*]" },
 		{ CLICOMMAND_VERIFYSOFTLIST,	0, 1, &cli_frontend::verifysoftlist,	"[system name|*]" },
 	};
@@ -1520,14 +1520,4 @@ void cli_frontend::display_help(const char *exename)
 			"        %s -createconfig to create a %s.ini\n\n"
 			"For usage instructions, please consult the files config.txt and windows.txt.\n",exename,
 			exename,exename,exename,emulator_info::get_configname());
-}
-
-
-//-------------------------------------------------
-//  display_suggestions - display 10 possible
-//  matches for a given invalid gamename
-//-------------------------------------------------
-
-void cli_frontend::display_suggestions(const char *gamename)
-{
 }
