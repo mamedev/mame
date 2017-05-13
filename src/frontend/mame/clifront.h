@@ -33,6 +33,8 @@ public:
 	// execute based on the incoming argc/argv
 	int execute(std::vector<std::string> &args);
 
+	// direct access to the command operations
+
 private:
 	// commands
 	void listxml(const std::vector<std::string> &args);
@@ -59,7 +61,6 @@ private:
 	void display_help(const char *exename);
 	void output_single_softlist(FILE *out, software_list_device &swlist);
 	void start_execution(mame_machine_manager *manager, std::vector<std::string> &args);
-	emu_options create_clean_options();
 
 	// internal state
 	emu_options &       m_options;
