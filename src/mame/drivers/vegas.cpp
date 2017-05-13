@@ -540,6 +540,8 @@ READ8_MEMBER(vegas_state::sio_r)
 	case 0:
 		// Reset Control:  Bit 0=>Reset IOASIC, Bit 1=>Reset NSS Connection, Bit 2=>Reset SMC, Bit 3=>Reset VSYNC, Bit 4=>VSYNC Polarity
 		result = m_sio_irq_clear;
+		// Hack for fpga programming finished
+		m_cpuio_data[3] |= 0x1;
 		break;
 	case 1:
 		// Interrupt Enable
@@ -589,7 +591,7 @@ READ8_MEMBER(vegas_state::sio_r)
 	}
 	}
 	if (LOG_SIO)
-		logerror("sio_r: offset: %08x index: %d result: %02X\n", offset, index, result);
+		logerror("%08X: sio_r: offset: %08x index: %d result: %02X\n", machine().device("maincpu")->safe_pc(), offset, index, result);
 	return result;
 }
 
@@ -661,7 +663,7 @@ WRITE8_MEMBER( vegas_state::cpu_io_w )
 	if (offset == 1) {
 		if (!(data & 0x1)) {
 			// Need to clear this register while programming SIO FPGA so that fpga config data doesn't register in sio_w
-			m_cpuio_data[3] = 0;
+			m_cpuio_data[3] &= ~0x1;
 		}
 	}
 }
