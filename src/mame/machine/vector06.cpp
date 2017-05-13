@@ -218,7 +218,8 @@ READ8_MEMBER(vector06_state::pit8253_r)
 
 void vector06_state::machine_start()
 {
-	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(vector06_state::reset_check_callback),this));
+	m_reset_check_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vector06_state::reset_check_callback), this));
+	m_reset_check_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
 void vector06_state::machine_reset()

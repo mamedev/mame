@@ -293,17 +293,6 @@ static ADDRESS_MAP_START( keyboard_mem, AS_PROGRAM, 8, cgc7900_state )
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
-/*-------------------------------------------------
-    ADDRESS_MAP( keyboard_io )
--------------------------------------------------*/
-
-static ADDRESS_MAP_START( keyboard_io, AS_IO, 8, cgc7900_state )
-/*  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
-    AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
-    AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
-    AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)*/
-ADDRESS_MAP_END
-
 /***************************************************************************
     INPUT PORTS
 ***************************************************************************/
@@ -373,7 +362,13 @@ static MACHINE_CONFIG_START( cgc7900, cgc7900_state )
 
 	MCFG_CPU_ADD(I8035_TAG, I8035, 1000000)
 	MCFG_CPU_PROGRAM_MAP(keyboard_mem)
-	MCFG_CPU_IO_MAP(keyboard_io)
+	//MCFG_MCS48_PORT_P1_IN_CB(READ8())
+	//MCFG_MCS48_PORT_P1_OUT_CB(WRITE8())
+	//MCFG_MCS48_PORT_P2_IN_CB(READ8())
+	//MCFG_MCS48_PORT_P2_OUT_CB(WRITE8())
+	//MCFG_MCS48_PORT_T1_IN_CB(READLINE())
+	//MCFG_MCS48_PORT_BUS_IN_CB(READ8())
+	//MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8())
 	MCFG_DEVICE_DISABLE()
 
 /*  MCFG_CPU_ADD(AM2910_TAG, AM2910, XTAL_17_36MHz)

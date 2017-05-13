@@ -4,7 +4,7 @@
 
   TMS1000 family - TMS1000, TMS1070, TMS1040, TMS1200, TMS1700, TMS1730,
   and second source Motorola MC141000, MC141200.
-  
+
   TODO:
   - add TMS1270 (10 O pins, how does that work?)
   - add TMS1000C, TMS1200C (CMOS, and 3-level stack)

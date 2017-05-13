@@ -62,10 +62,19 @@ void raiden2cop_device::execute_0904(int offset, uint16_t data)
 */
 
 // triggered with 130e, 138e
-void raiden2cop_device::execute_130e(int offset, uint16_t data)
+/*
+TAD games uses a variation of this:
+[:raiden2cop] COPDIS: 138e s=10 f1=0 l=8 f2=0e 5 bf7f 17 b9a 17.0.1a [:raiden2cop] addmem16 34(r0)
+instead of
+[:raiden2cop] COPDIS: 130e s=10 f1=0 l=7 f2=0e 5 bf7f 17 a9a 15.0.1a [:raiden2cop] sub32 34(r0)
+cop_angle is actually Y flipped when this is called
+
+TODO: it really needs actual opcode fetching from macro tables
+*/
+void raiden2cop_device::execute_130e(int offset, uint16_t data, bool is_yflip)
 {
 	// this can't be right, or bits 15-12 from mask have different meaning ...
-	execute_338e(offset, data);
+	execute_338e(offset, data, is_yflip);
 }
 
 void raiden2cop_device::LEGACY_execute_130e_cupsoc(int offset, uint16_t data)
@@ -148,11 +157,11 @@ void raiden2cop_device::execute_2a05(int offset, uint16_t data)
 06 - 338e ( 06) (  38e) :  (984, aa4, d82, aa2, 39c, b9c, b9c, a9a)  5     bf7f   (legionna, heatbrl, cupsoc, grainbow, godzilla, denjinmk, raiden2, raidendx)
 06 - 330e ( 06) (  30e) :  (984, aa4, d82, aa2, 39c, b9c, b9c, a9a)  5     bf7f   (zeroteam, xsedae)
 */
-void raiden2cop_device::execute_338e(int offset, uint16_t data)
+void raiden2cop_device::execute_338e(int offset, uint16_t data, bool is_yflip)
 {
 	int dx = m_host_space->read_dword(cop_regs[1] + 4) - m_host_space->read_dword(cop_regs[0] + 4);
 	int dy = m_host_space->read_dword(cop_regs[1] + 8) - m_host_space->read_dword(cop_regs[0] + 8);
-
+	
 	cop_status = 7;
 
 	if (!dy) {
@@ -173,7 +182,10 @@ void raiden2cop_device::execute_338e(int offset, uint16_t data)
 
 	if (data & 0x0080) {
 		// TODO: byte or word?
-		cop_write_byte(cop_regs[0] + 0x34, cop_angle);
+		if(is_yflip == true)
+			cop_write_byte(cop_regs[0] + 0x34, cop_angle ^ 0x80);
+		else
+			cop_write_byte(cop_regs[0] + 0x34, cop_angle);
 	}
 }
 

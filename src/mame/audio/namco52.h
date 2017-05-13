@@ -63,6 +63,7 @@ private:
 
 	int m_basenode;
 	attoseconds_t m_extclock;
+	emu_timer *m_extclock_pulse_timer;
 	devcb_read8 m_romread;
 	devcb_read8 m_si;
 

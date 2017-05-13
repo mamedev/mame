@@ -154,7 +154,7 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 					{
 						if (fgbln)
 						{
-							dd[x] = rand();
+							dd[x] = machine().rand();
 						}
 						else
 						{
@@ -171,7 +171,7 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 					{
 						if (m_sprbln)
 						{ // sprite is blended with bgpen?
-							dd[x] = rand();
+							dd[x] = machine().rand();
 						}
 						else
 						{
@@ -230,7 +230,7 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 							if (fgbln)
 							{
 								// blended sprite over blended fg pixel?
-								dd[x] =  rand();
+								dd[x] = machine().rand();
 							}
 							else
 							{
@@ -242,13 +242,13 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 						{
 							// blended sprite over solid bg pixel
 							dd[x] = sum_colors(paldata, bgpixel + m_bgblend_comp, sprpixel + m_spblend_source);
-							//  dd[x] =  rand();
+							//  dd[x] = machine().rand();
 						}
 					}
 					else
 					{
 						dd[x] = paldata[sprpixel + m_spregular_comp];
-						//dd[x] = rand();
+						//dd[x] = machine().rand();
 						// the bad tiles on the wildfang map (shown between levels) are drawn here.. why? looks like they should be transparent?
 						// most wildfang sprites use this and are fine, so what's going wrong?
 					}
@@ -259,7 +259,7 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 					if (m_sprbln)
 					{
 						// unusued by this game?
-						dd[x] = rand();
+						dd[x] = machine().rand();
 					}
 					else
 					{

@@ -23,25 +23,25 @@ namespace ui {
 
 menu_selector::menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> const &s_sel, uint16_t &s_actual, int category, int _hover)
 	: menu(mui, container)
+	, m_search()
 	, m_selector(s_actual)
 	, m_category(category)
 	, m_hover(_hover)
 	, m_first_pass(true)
 	, m_str_items(s_sel)
 {
-	m_search[0] = '\0';
 	m_searchlist[0] = nullptr;
 }
 
 menu_selector::menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> &&s_sel, uint16_t &s_actual, int category, int _hover)
 	: menu(mui, container)
+	, m_search()
 	, m_selector(s_actual)
 	, m_category(category)
 	, m_hover(_hover)
 	, m_first_pass(true)
 	, m_str_items(std::move(s_sel))
 {
-	m_search[0] = '\0';
 	m_searchlist[0] = nullptr;
 }
 
@@ -104,7 +104,7 @@ void menu_selector::handle()
 		}
 
 		// escape pressed with non-empty text clears the text
-		else if (menu_event->iptkey == IPT_UI_CANCEL && m_search[0] != 0)
+		else if (menu_event->iptkey == IPT_UI_CANCEL && !m_search.empty())
 		{
 			m_search.clear();
 			reset(reset_options::SELECT_FIRST);

@@ -22,15 +22,15 @@ READ8_MEMBER(spacefb_state::audio_p2_r)
 }
 
 
-READ8_MEMBER(spacefb_state::audio_t0_r)
+READ_LINE_MEMBER(spacefb_state::audio_t0_r)
 {
-	return m_sound_latch & 0x20;
+	return BIT(m_sound_latch, 6);
 }
 
 
-READ8_MEMBER(spacefb_state::audio_t1_r)
+READ_LINE_MEMBER(spacefb_state::audio_t1_r)
 {
-	return m_sound_latch & 0x04;
+	return BIT(m_sound_latch, 2);
 }
 
 

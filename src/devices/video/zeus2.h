@@ -42,18 +42,18 @@ struct zeus2_poly_extra_data
 	uint16_t          texwidth;
 	uint16_t          color;
 	uint32_t          srcAlpha;
-	uint32_t		  dstAlpha;
+	uint32_t          dstAlpha;
 	uint32_t          ctrl_word;
-	uint32_t		  ucode_src;
-	uint32_t		  tex_src;
-	bool			texture_alpha;
-	bool			texture_rgb555;
+	uint32_t          ucode_src;
+	uint32_t          tex_src;
+	bool            texture_alpha;
+	bool            texture_rgb555;
 	bool            blend_enable;
-	int32_t			zbuf_min;
+	int32_t         zbuf_min;
 	bool            depth_min_enable;
 	bool            depth_test_enable;
 	bool            depth_write_enable;
-	bool			depth_clear_enable;
+	bool            depth_clear_enable;
 
 	uint8_t(*get_texel)(const void *, int, int, int);
 	uint8_t(*get_alpha)(const void *, int, int, int);
@@ -245,7 +245,7 @@ public:
 			addr = m_zeusbase[0x38] >> (16 - 9 - 2 * m_yScale);
 		}
 		//uint32_t addr = render ? frame_addr_from_phys_addr(m_renderRegs[0x4] << (15 + m_yScale))
-		//	: frame_addr_from_phys_addr((m_zeusbase[0x38] >> 1) << (m_yScale << 1));
+		//  : frame_addr_from_phys_addr((m_zeusbase[0x38] >> 1) << (m_yScale << 1));
 		addr += (y << (9 + m_yScale)) + x;
 		return addr;
 	}
@@ -299,8 +299,6 @@ public:
 		if (m_zeusbase[0x5e] & 0x40)
 		{
 			m_zeusbase[0x51]++;
-			//m_zeusbase[0x51] += (m_zeusbase[0x51] & 0x200) << 7;
-			//m_zeusbase[0x51] &= ~0xfe00;
 			m_zeusbase[0x51] += (m_zeusbase[0x51] & 0x200) << 7;
 			m_zeusbase[0x51] &= ~0xfe00;
 		}

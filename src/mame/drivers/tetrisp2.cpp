@@ -1271,8 +1271,10 @@ TIMER_CALLBACK_MEMBER(tetrisp2_state::rockn_timer_sub_level1_callback)
 
 void tetrisp2_state::init_rockn_timer()
 {
-	machine().scheduler().timer_pulse(attotime::from_msec(32), timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_level1_callback),this));
+	m_rockn_timer_l1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_level1_callback),this));
 	m_rockn_timer_l4 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_level4_callback),this));
+
+	m_rockn_timer_l1->adjust(attotime::from_msec(32), 0, attotime::from_msec(32));
 
 	save_item(NAME(m_systemregs));
 	save_item(NAME(m_rocknms_sub_systemregs));
@@ -1305,8 +1307,10 @@ DRIVER_INIT_MEMBER(tetrisp2_state,rocknms)
 {
 	init_rockn_timer();
 
-	machine().scheduler().timer_pulse(attotime::from_msec(32), timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_sub_level1_callback),this));
+	m_rockn_timer_sub_l1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_sub_level1_callback),this));
 	m_rockn_timer_sub_l4 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_sub_level4_callback),this));
+
+	m_rockn_timer_sub_l1->adjust(attotime::from_msec(32), 0, attotime::from_msec(32));
 
 	m_rockn_protectdata = 3;
 

@@ -173,7 +173,7 @@ void taitob_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (color & 0x3fc0)
 		{
 			logerror("sprite color (taitob)=%4x ofs=%4x\n", color, offs);
-			color = rand() & 0x3f;
+			color = machine().rand() & 0x3f;
 		}
 #endif
 		color = (color & 0x3f) * 16;

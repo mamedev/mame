@@ -93,7 +93,7 @@ WRITE8_MEMBER(spcforce_state::SN76496_select_w)
 	if (~data & 0x10) m_sn3->write(space, 0, m_sn76496_latch);
 }
 
-READ8_MEMBER(spcforce_state::t0_r)
+READ_LINE_MEMBER(spcforce_state::t0_r)
 {
 	/* SN76496 status according to Al - not supported by MAME?? */
 	return machine().rand() & 1;
@@ -133,13 +133,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spcforce_sound_map, AS_PROGRAM, 8, spcforce_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( spcforce_sound_io_map, AS_IO, 8, spcforce_state )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(SN76496_latch_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(SN76496_select_r, SN76496_select_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
 ADDRESS_MAP_END
 
 
@@ -291,7 +284,11 @@ static MACHINE_CONFIG_START( spcforce, spcforce_state )
 
 	MCFG_CPU_ADD("audiocpu", I8035, 6144000)        /* divisor ??? */
 	MCFG_CPU_PROGRAM_MAP(spcforce_sound_map)
-	MCFG_CPU_IO_MAP(spcforce_sound_io_map)
+	MCFG_MCS48_PORT_BUS_IN_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(spcforce_state, SN76496_latch_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(spcforce_state, SN76496_select_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(spcforce_state, SN76496_select_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(spcforce_state, t0_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

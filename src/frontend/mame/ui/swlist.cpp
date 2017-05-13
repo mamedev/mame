@@ -26,7 +26,7 @@ namespace ui {
 #define ERROR_MESSAGE_TIME      5
 
 // item reference for "Switch Item Ordering"
-#define ITEMREF_SWITCH_ITEM_ORDERING	((void *)1)
+#define ITEMREF_SWITCH_ITEM_ORDERING    ((void *)1)
 
 
 /***************************************************************************

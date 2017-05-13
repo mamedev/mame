@@ -4617,6 +4617,30 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="arknoid2">
+		<description>Arkanoid 2: Revenge of Doh (newer, with CMS Sound support)</description>
+		<year>1989</year>
+		<publisher>Taito Corporation</publisher>
+		<info name="developer" value="Taito Corporation" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Arkanoid 2 [Taito Corporation] [1989] [5.25] (CMS Sound).img" size="368640" crc="3d914144" sha1="2a77f615835050540b30895f5baff5ab79b3f7eb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arknoid2a" cloneof="arknoid2">
+		<description>Arkanoid 2: Revenge of Doh (older)</description>
+		<year>1989</year>
+		<publisher>Taito Corporation</publisher>
+		<info name="developer" value="Taito Corporation" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Arkanoid 2 [Taito Corporation] [1989] [5.25].img" size="368640" crc="426a4568" sha1="05a16d118679ff265d0a812537431efee3b43bcf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bargames">
 		<description>Bar Games</description>
 		<year>1989</year>
@@ -4885,6 +4909,34 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Commander Keen in Keen Dreams (USA).img" size="737280" crc="a080a939" sha1="02d296965f32d84b5a180132062f11dc13005394" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crimewav">
+		<description>Crime Wave</description>
+		<year>1990</year>
+		<publisher>Access Software, Inc.</publisher>
+		<info name="version" value="2.0" />
+		<info name="developer" value="Access Software, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Crime Wave [Access Software Inc] [1990] [3.5HD] [disk 1 of 4].img" size="737280" crc="2e051a02" sha1="7856ca4b29a0fcd07d164fc7e28a926572384819" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Crime Wave [Access Software Inc] [1990] [3.5HD] [disk 2 of 4].img" size="737280" crc="e1565d97" sha1="e8ade2b4bbc5f79f638eb82103f16e42971a7264" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Crime Wave [Access Software Inc] [1990] [3.5HD] [disk 3 of 4].img" size="737280" crc="0878f47d" sha1="397e629b7491391c65fb207aca0f2d04a66f5688" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Crime Wave [Access Software Inc] [1990] [3.5HD] [disk 4 of 4].img" size="737280" crc="b0621879" sha1="0d1c8091dd95384f41d91709daa9b21ef5181e7b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5575,6 +5627,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Prince of Persia (World) (v1.3) (3.5'').img" size="737280" crc="62336557" sha1="adb0b10899baa7cb0e53b612e12e6ae7ac929400" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppersiaa" cloneof="ppersia">
+		<description>Prince of Persia (5.25", v1.1)</description>
+		<year>1990</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="version" value="V1.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Prince of Persia v1.1 [Broderbund] [1990] [5.25DD] [Disk 1 of 2].img" size="368640" crc="4c7c4a09" sha1="652db2abb739c548b7b61b16824f7748f272d510" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Prince of Persia v1.1 [Broderbund] [1990] [5.25DD] [Disk 2 of 2].img" size="368640" crc="52bef4d2" sha1="c5b44f5c8844eb53a9eec851aa8dc11c54db4a9f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

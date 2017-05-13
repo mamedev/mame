@@ -22,7 +22,7 @@ irem_audio_device::irem_audio_device(const machine_config &mconfig, device_type 
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_port1(0),
 	m_port2(0),
-	m_soundlatch(*this, "soundlatch")
+	m_soundlatch(0)
 	//m_ay_45L(*this, "ay_45l"),
 	//m_ay_45M(*this, "ay_45m")
 {
@@ -62,10 +62,25 @@ void irem_audio_device::device_start()
 
 	save_item(NAME(m_port1));
 	save_item(NAME(m_port2));
+	save_item(NAME(m_soundlatch));
 }
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+void irem_audio_device::device_reset()
+{
+	m_adpcm1->reset();
+	if (m_adpcm2) m_adpcm2->reset();
+	m_ay_45L->reset();
+	m_ay_45M->reset();
+	subdevice("iremsound")->reset();
 
-
+	m_port1 = 0; // ?
+	m_port2 = 0; // ?
+	m_soundlatch = 0;
+	subdevice("iremsound")->execute().set_input_line(0, ASSERT_LINE);
+}
 
 /*************************************
  *
@@ -76,13 +91,22 @@ void irem_audio_device::device_start()
 
 WRITE8_MEMBER( irem_audio_device::cmd_w )
 {
+	m_soundlatch = data;
 	if ((data & 0x80) == 0)
-		m_soundlatch->write(space, 0, data & 0x7f);
-	else
 		subdevice("iremsound")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
+/*************************************
+ *
+ *  Sound latch read
+ *
+ *************************************/
+
+READ8_MEMBER( irem_audio_device::soundlatch_r )
+{
+	return m_soundlatch;
+}
 
 /*************************************
  *
@@ -126,7 +150,7 @@ WRITE8_MEMBER( irem_audio_device::m6803_port2_w )
 
 /*************************************
  *
- *  6803 input ports ports
+ *  6803 input ports
  *
  *************************************/
 
@@ -201,7 +225,8 @@ WRITE8_MEMBER( irem_audio_device::ay8910_45L_porta_w )
 
 WRITE8_MEMBER( irem_audio_device::sound_irq_ack_w )
 {
-	subdevice("iremsound")->execute().set_input_line(0, CLEAR_LINE);
+	if ((m_soundlatch & 0x80) != 0)
+		subdevice("iremsound")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -413,12 +438,10 @@ static MACHINE_CONFIG_FRAGMENT( irem_audio_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
 	MCFG_SOUND_ADD("ay_45m", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
 	MCFG_AY8910_RES_LOADS(2000.0, 2000.0, 2000.0)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(irem_audio_device, soundlatch_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(irem_audio_device, ay8910_45M_portb_w))
 	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
@@ -484,12 +507,10 @@ MACHINE_CONFIG_FRAGMENT( m52_sound_c_audio )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
 	MCFG_SOUND_ADD("ay_45m", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(470, 0, 0)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(irem_audio_device, soundlatch_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(irem_audio_device, ay8910_45M_portb_w))
 	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 0)
 
@@ -520,12 +541,10 @@ MACHINE_CONFIG_FRAGMENT( m52_large_audio)  /* 10 yard fight */
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
 	MCFG_SOUND_ADD("ay_45m", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(470, 0, 0)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(irem_audio_device, soundlatch_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(irem_audio_device, ay8910_45M_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 

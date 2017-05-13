@@ -6,7 +6,38 @@
 
 ***************************************************************************/
 
-// this function assumes a fixed portion of ROM at 0000-7FFF, and
-// an arbitrary amount of banks at 8000-BFFF.
+#pragma once
 
-void mc8123_decode(u8 *rom, u8 *opcodes, u8 const *key, unsigned length);
+#ifndef MAME_MACHINE_MC8123
+#define MAME_MACHINE_MC8123 1
+
+#include "cpu/z80/z80.h"
+
+class mc8123_device : public z80_device
+{
+public:
+	// construction/destruction
+	mc8123_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	// this function assumes a fixed portion of ROM at 0000-7FFF, and
+	// an arbitrary amount of banks at 8000-BFFF.
+	void decode(u8 *rom, u8 *opcodes, unsigned length);
+
+private:
+	static u8 decrypt_type0(u8 val, u8 param, unsigned swap);
+	static u8 decrypt_type1a(u8 val, u8 param, unsigned swap);
+	static u8 decrypt_type1b(u8 val, u8 param, unsigned swap);
+	static u8 decrypt_type2a(u8 val, u8 param, unsigned swap);
+	static u8 decrypt_type2b(u8 val, u8 param, unsigned swap);
+	static u8 decrypt_type3a(u8 val, u8 param, unsigned swap);
+	static u8 decrypt_type3b(u8 val, u8 param, unsigned swap);
+	static u8 decrypt_internal(u8 val, u8 key, bool opcode);
+
+	u8 decrypt(offs_t addr, u8 val, bool opcode);
+
+	required_region_ptr<u8> m_key;
+};
+
+extern const device_type MC8123;
+
+#endif

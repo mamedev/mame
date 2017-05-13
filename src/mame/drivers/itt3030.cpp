@@ -255,7 +255,7 @@ public:
 	DECLARE_READ8_MEMBER(vsync_r);
 	DECLARE_WRITE8_MEMBER( beep_w );
 	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(kbd_matrix_r);
+	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
 	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
 	DECLARE_READ8_MEMBER(kbd_port2_r);
 	DECLARE_WRITE8_MEMBER(kbd_port2_w);
@@ -462,7 +462,7 @@ static ADDRESS_MAP_START( itt3030_io, AS_IO, 8, itt3030_state )
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(bank_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(itt3030_state::kbd_matrix_r)
+READ_LINE_MEMBER(itt3030_state::kbd_matrix_r)
 {
 	return m_kbdread;
 }
@@ -493,17 +493,6 @@ READ8_MEMBER(itt3030_state::kbd_port2_r)
 {
 	return m_kbdport2;
 }
-
-// Schematics + i8278 datasheet says:
-// Port 1 goes to the keyboard matrix.
-// bits 0-2 select bit to read back, bits 3-6 choose column to read from, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
-// T0 is the key matrix return
-// pin 23 is the UPI-41 host IRQ line, it's unknown how it's connected to the Z80
-static ADDRESS_MAP_START( kbdmcu_io, AS_IO, 8, itt3030_state )
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(kbd_matrix_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kbd_matrix_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(kbd_port2_r, kbd_port2_w)
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( itt3030 )
 	PORT_START("ROW.0")
@@ -673,8 +662,16 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_CPU_PROGRAM_MAP(itt3030_map)
 	MCFG_CPU_IO_MAP(itt3030_io)
 
+	// Schematics + i8278 datasheet says:
+	// Port 1 goes to the keyboard matrix.
+	// bits 0-2 select bit to read back, bits 3-6 choose column to read from, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
+	// T0 is the key matrix return
+	// pin 23 is the UPI-41 host IRQ line, it's unknown how it's connected to the Z80
 	MCFG_CPU_ADD("kbdmcu", I8741, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(kbdmcu_io)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(itt3030_state, kbd_matrix_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(itt3030_state, kbd_matrix_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(itt3030_state, kbd_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(itt3030_state, kbd_port2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

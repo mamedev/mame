@@ -458,7 +458,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_callback);
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bool update_interrupts();
-	void set_interrupt_device(pic8259_device *device);
+	void set_irq_callbaclk(std::function<void(int state)> callback) { irq_callback = callback; }
 
 	void render_texture_simple(int32_t scanline, const extent_t &extent, const nvidia_object_data &extradata, int threadid);
 	void render_color(int32_t scanline, const extent_t &extent, const nvidia_object_data &extradata, int threadid);
@@ -540,7 +540,7 @@ public:
 	uint32_t dma_size[2];
 	uint8_t *basemempointer;
 	uint8_t *topmempointer;
-	pic8259_device *interruptdevice;
+	std::function<void(int state)> irq_callback;
 	rectangle clippingwindows[8];
 	rectangle limits_rendertarget;
 	uint32_t pitch_rendertarget;

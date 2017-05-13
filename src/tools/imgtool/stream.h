@@ -50,7 +50,7 @@ namespace imgtool
 		static int file_crc(const char *fname, unsigned long *result);
 
 		// returns whether a stream is read only or not
-		int is_read_only();
+		bool is_read_only();
 
 	private:
 		enum imgtype_t

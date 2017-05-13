@@ -9,6 +9,7 @@
     This code is based on Daniel Coulom's implementation in DCVG5k
     and DCAlice released by Daniel Coulom under GPL license
 
+    TS9347 variant support added by Jean-François DEL NERO
 *********************************************************************/
 
 #include "emu.h"
@@ -29,6 +30,7 @@
 
 // devices
 const device_type EF9345 = device_creator<ef9345_device>;
+const device_type TS9347 = device_creator<ts9347_device>;
 
 // default address map
 static ADDRESS_MAP_START( ef9345, AS_0, 8, ef9345_device )
@@ -105,9 +107,24 @@ ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, dev
 	device_video_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(ef9345)),
 	m_charset(*this, DEVICE_SELF),
+	m_variant(EF9345_MODE::TYPE_EF9345),
 	m_palette(*this, finder_base::DUMMY_TAG)
 {
 }
+
+ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, EF9345_MODE variant, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	device_memory_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(ef9345)),
+	m_charset(*this, DEVICE_SELF),
+	m_variant(variant),
+	m_palette(*this, finder_base::DUMMY_TAG)
+{
+}
+
+ts9347_device::ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ef9345_device(mconfig, TS9347, "TS9347",tag, owner, clock, EF9345_MODE::TYPE_TS9347,"ts9347",__FILE__){ }
 
 //-------------------------------------------------
 //  static_set_palette_tag: Set the tag of the
@@ -212,26 +229,24 @@ void ef9345_device::set_busy_flag(int period)
 // draw a char in 40 char line mode
 void ef9345_device::draw_char_40(uint8_t *c, uint16_t x, uint16_t y)
 {
-	//verify size limit
-	if (y * 10 >= m_screen->height() || x * 8 >= m_screen->width())
-		return;
-
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	for(int i = 0; i < 10; i++)
-		for(int j = 0; j < 8; j++)
+	const int scan_xsize = std::min( m_screen->width() - (x * 8), 8);
+	const int scan_ysize = std::min( m_screen->height() - (y * 10), 10);
+
+	for(int i = 0; i < scan_ysize; i++)
+		for(int j = 0; j < scan_xsize; j++)
 				m_screen_out.pix32(y * 10 + i, x * 8 + j)  = palette[c[8 * i + j] & 0x07];
 }
 
 // draw a char in 80 char line mode
 void ef9345_device::draw_char_80(uint8_t *c, uint16_t x, uint16_t y)
 {
-	// verify size limit
-	if (y * 10 >= m_screen->height() || x * 6 >= m_screen->width())
-		return;
-
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	for(int i = 0; i < 10; i++)
-		for(int j = 0; j < 6; j++)
+	const int scan_xsize = std::min( m_screen->width() - (x * 6), 6);
+	const int scan_ysize = std::min( m_screen->height() - (y * 10), 10);
+
+	for(int i = 0; i < scan_ysize; i++)
+		for(int j = 0; j < scan_xsize; j++)
 				m_screen_out.pix32(y * 10 + i, x * 6 + j)  = palette[c[6 * i + j] & 0x07];
 }
 
@@ -239,7 +254,17 @@ void ef9345_device::draw_char_80(uint8_t *c, uint16_t x, uint16_t y)
 // set then ef9345 mode
 void ef9345_device::set_video_mode(void)
 {
-	m_char_mode = ((m_pat & 0x80) >> 5) | ((m_tgs & 0xc0) >> 6);
+	if (m_variant == EF9345_MODE::TYPE_TS9347)
+	{
+		// Only TGS 7 & 6 used for the char mode with the TS9347
+		m_char_mode = ((m_tgs & 0xc0) >> 6);
+	}
+	else
+	{
+		// PAT 7, TGS 7 & 6
+		m_char_mode = ((m_pat & 0x80) >> 5) | ((m_tgs & 0xc0) >> 6);
+	}
+
 	uint16_t new_width = (m_char_mode == MODE12x80 || m_char_mode == MODE8x80) ? 492 : 336;
 
 	if (m_screen->width() != new_width)
@@ -385,6 +410,11 @@ void ef9345_device::bichrome40(uint8_t type, uint16_t address, uint8_t dial, uin
 	uint16_t i;
 	uint8_t pix[80];
 
+	if (m_variant == EF9345_MODE::TYPE_TS9347)
+	{
+		c0 = 0;
+	}
+
 	if (flash && m_pat & 0x40 && m_blink)
 		c1 = c0;                    //flash
 	if (hided && m_pat & 0x08)
@@ -471,6 +501,12 @@ void ef9345_device::quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, 
 	uint8_t i, j, n, col[8], pix[80];
 	uint8_t lowresolution = (b & 0x02) >> 1, ramx, ramy, ramblock;
 	uint16_t ramindex;
+
+	if (m_variant == EF9345_MODE::TYPE_TS9347)
+	{
+		// No quadrichrome support into the TS9347
+		return;
+	}
 
 	//quadrichrome don't suppor double size
 	m_last_dial[x] = 0;
@@ -688,6 +724,11 @@ void ef9345_device::makechar(uint16_t x, uint16_t y)
 			makechar_24x40(x, y);
 			break;
 		case MODEVAR40:
+			if (m_variant == EF9345_MODE::TYPE_TS9347)
+			{ // TS9347 char mode definition is different.
+				makechar_16x40(x, y);
+				break;
+			}
 		case MODE8x80:
 			logerror("Unemulated EF9345 mode: %02x\n", m_char_mode);
 			break;
@@ -695,7 +736,14 @@ void ef9345_device::makechar(uint16_t x, uint16_t y)
 			makechar_12x80(x, y);
 			break;
 		case MODE16x40:
-			makechar_16x40(x, y);
+			if (m_variant == EF9345_MODE::TYPE_TS9347)
+			{
+				logerror("Unemulated EF9345 mode: %02x\n", m_char_mode);
+			}
+			else
+			{
+				makechar_16x40(x, y);
+			}
 			break;
 		default:
 			logerror("Unknown EF9345 mode: %02x\n", m_char_mode);
@@ -991,14 +1039,22 @@ void ef9345_device::update_scanline(uint16_t scanline)
 	}
 	else if (scanline < 250)
 	{
-		if (m_pat & 4)
+		if (m_variant == EF9345_MODE::TYPE_TS9347)
+		{
 			for(i = 0; i < 40; i++)
 				makechar(i, (scanline / 10));
+		}
 		else
-			draw_border(scanline / 10);
+		{
+			if (m_pat & 4) // Lower bulk enable
+				for(i = 0; i < 40; i++)
+					makechar(i, (scanline / 10));
+			else
+				draw_border(scanline / 10);
 
-		if (scanline == 240)
-			draw_border(26);
+			if (scanline == 240)
+				draw_border(26);
+		}
 	}
 }
 

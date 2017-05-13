@@ -61,7 +61,9 @@ void chain_manager::refresh_available_chains()
 	m_available_chains.clear();
 	m_available_chains.push_back(chain_desc("none", ""));
 
-	find_available_chains(std::string(m_options.bgfx_path()) + "/chains", "");
+	std::string chains_path;
+	osd_subst_env(chains_path, util::string_format("%s" PATH_SEPARATOR "chains", m_options.bgfx_path()));
+	find_available_chains(chains_path, "");
 
 	destroy_unloaded_chains();
 }
@@ -133,11 +135,13 @@ void chain_manager::find_available_chains(std::string root, std::string path)
 
 bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 {
-	if (name.length() < 5 || (name.compare(name.length() - 5, 5, ".json")!= 0))
+	if (name.length() < 5 || (name.compare(name.length() - 5, 5, ".json") != 0))
 	{
 		name = name + ".json";
 	}
-	std::string path = std::string(m_options.bgfx_path()) + "/chains/" + name;
+	std::string path;
+	osd_subst_env(path, util::string_format("%s" PATH_SEPARATOR "chains" PATH_SEPARATOR, m_options.bgfx_path()));
+	path += name;
 
 	bx::CrtFileReader reader;
 	if (!bx::open(&reader, path.c_str()))

@@ -529,7 +529,7 @@ ROM_END
 
 ROM_START( policet2 )
 	ROM_REGION( 0x40000, "bios", 0 )
-	ROM_LOAD( "pm29f002t.u22", 0x000000, 0x040000, CRC(eb32ace6) SHA1(1b1eeb07e20822c690d05959077c7ddcc22d1708) ) 
+	ROM_LOAD( "pm29f002t.u22", 0x000000, 0x040000, CRC(eb32ace6) SHA1(1b1eeb07e20822c690d05959077c7ddcc22d1708) )
 
 	ROM_REGION( 0x8000, "video_bios", 0 )   // incorrect, need GeForce 2MX BIOS for 32MB card
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) BAD_DUMP SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )

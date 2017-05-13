@@ -130,8 +130,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megazone_i8039_io_map, AS_IO, 8, megazone_state )
 	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( megazone )
@@ -252,6 +250,8 @@ static MACHINE_CONFIG_START( megazone, megazone_state )
 	MCFG_CPU_ADD("daccpu", I8039,14318000/2)    /* 1/2 14MHz crystal */
 	MCFG_CPU_PROGRAM_MAP(megazone_i8039_map)
 	MCFG_CPU_IO_MAP(megazone_i8039_io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(megazone_state, i8039_irqen_and_status_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(900))
 

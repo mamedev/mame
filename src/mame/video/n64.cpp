@@ -956,7 +956,7 @@ void n64_rdp::get_dither_values(int32_t x, int32_t y, int32_t* cdith, int32_t* a
 		break;
 	case 14:
 		*cdith = 0;
-		*adith = m_machine->rand() & 7;
+		*adith = machine().rand() & 7;
 		break;
 	case 15:
 		*adith = *cdith = 0;
@@ -3636,7 +3636,7 @@ void n64_rdp::span_draw_1cycle(int32_t scanline, const extent_t &extent, const r
 			uint32_t t0a = userdata->m_texel0_color.get_a();
 			userdata->m_texel0_alpha.set(t0a, t0a, t0a, t0a);
 
-			const uint8_t noise = rand() << 3; // Not accurate
+			const uint8_t noise = machine().rand() << 3; // Not accurate
 			userdata->m_noise_color.set(0, noise, noise, noise);
 
 			rgbaint_t rgbsub_a(*userdata->m_color_inputs.combiner_rgbsub_a[1]);
@@ -3863,7 +3863,7 @@ void n64_rdp::span_draw_2cycle(int32_t scanline, const extent_t &extent, const r
 			userdata->m_texel1_alpha.set(t1a, t1a, t1a, t1a);
 			userdata->m_next_texel_alpha.set(tna, tna, tna, tna);
 
-			const uint8_t noise = rand() << 3; // Not accurate
+			const uint8_t noise = machine().rand() << 3; // Not accurate
 			userdata->m_noise_color.set(0, noise, noise, noise);
 
 			rgbaint_t rgbsub_a(*userdata->m_color_inputs.combiner_rgbsub_a[0]);

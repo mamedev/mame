@@ -1254,12 +1254,8 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchind
 			throw CHDERR_METADATA_NOT_FOUND;
 
 		// read the metadata
-		// TODO: how to properly allocate a dynamic char buffer?
-		auto   metabuf = new char[metaentry.length+1];
-		memset(metabuf, 0x00, metaentry.length+1);
-		file_read(metaentry.offset + METADATA_HEADER_SIZE, metabuf, metaentry.length);
-		output.assign(metabuf);
-		delete[] metabuf;
+		output.assign(metaentry.length, '\0');
+		file_read(metaentry.offset + METADATA_HEADER_SIZE, &output[0], metaentry.length);
 		return CHDERR_NONE;
 	}
 

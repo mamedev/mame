@@ -30,17 +30,14 @@ const tiny_rom_entry *dw_fdc_device::device_rom_region() const
 	return ROM_NAME( dw_fdc );
 }
 
-static ADDRESS_MAP_START( dw_fdc_io, AS_IO, 8, dw_fdc_device )
-//  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READWRITE(bus_r, bus_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-//  AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
-ADDRESS_MAP_END
-
 static MACHINE_CONFIG_FRAGMENT( dw_fdc )
 	MCFG_CPU_ADD("mcu", I8048, XTAL_24MHz/4)    // divisor is unverified
-	MCFG_CPU_IO_MAP(dw_fdc_io)
+//  MCFG_MCS48_PORT_BUS_IN_CB(READ8(dw_fdc_device, bus_r))
+//  MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(dw_fdc_device, bus_w))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(dw_fdc_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dw_fdc_device, p2_w))
+//  MCFG_MCS48_PORT_T0_IN_CB(READLINE(dw_fdc_device, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(dw_fdc_device, t1_r))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
@@ -106,14 +103,14 @@ READ8_MEMBER( dw_fdc_device::p2_r )
 	return data;
 }
 
-READ8_MEMBER( dw_fdc_device::t0_r )
+READ_LINE_MEMBER( dw_fdc_device::t0_r )
 {
 	DBG_LOG(2,"t0",( "== %d\n", m_t0));
 
 	return m_t0;
 }
 
-READ8_MEMBER( dw_fdc_device::t1_r )
+READ_LINE_MEMBER( dw_fdc_device::t1_r )
 {
 	DBG_LOG(2,"t1",( "== %d\n", m_t1));
 

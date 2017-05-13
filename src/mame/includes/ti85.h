@@ -112,6 +112,9 @@ public:
 	int m_ti_number_of_frames;
 	std::unique_ptr<uint8_t[]> m_frames;
 	uint8_t * m_bios;
+	emu_timer *m_ti85_timer;
+	emu_timer *m_ti83_1st_timer;
+	emu_timer *m_ti83_2nd_timer;
 	DECLARE_READ8_MEMBER(ti85_port_0000_r);
 	DECLARE_READ8_MEMBER(ti8x_keypad_r);
 	DECLARE_READ8_MEMBER(ti85_port_0006_r);

@@ -28,7 +28,7 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_READ8_MEMBER(portt1_r);
+	DECLARE_READ_LINE_MEMBER(portt1_r);
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_WRITE8_MEMBER(port2_w);
 

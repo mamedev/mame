@@ -602,6 +602,7 @@ MACHINES["GENPC"] = true
 MACHINES["GEN_LATCH"] = true
 MACHINES["WATCHDOG"] = true
 MACHINES["INPUT_MERGER"] = true
+MACHINES["K054321"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -1251,6 +1252,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ohmygod.cpp",
 	MAME_DIR .. "src/mame/includes/ohmygod.h",
 	MAME_DIR .. "src/mame/video/ohmygod.cpp",
+	MAME_DIR .. "src/mame/drivers/patapata.cpp",
 	MAME_DIR .. "src/mame/drivers/powerins.cpp",
 	MAME_DIR .. "src/mame/includes/powerins.h",
 	MAME_DIR .. "src/mame/video/powerins.cpp",
@@ -2930,7 +2932,6 @@ files {
 
 createMAMEProjects(_target, _subtarget, "nmk")
 files {
-	MAME_DIR .. "src/mame/drivers/acchi.cpp",
 	MAME_DIR .. "src/mame/drivers/acommand.cpp",
 	MAME_DIR .. "src/mame/drivers/cultures.cpp",
 	MAME_DIR .. "src/mame/drivers/ddealer.cpp",
@@ -3110,7 +3111,6 @@ files {
 	MAME_DIR .. "src/mame/includes/drmicro.h",
 	MAME_DIR .. "src/mame/video/drmicro.cpp",
 	MAME_DIR .. "src/mame/drivers/jantotsu.cpp",
-	MAME_DIR .. "src/mame/drivers/mayumi.cpp",
 	MAME_DIR .. "src/mame/drivers/mermaid.cpp",
 	MAME_DIR .. "src/mame/includes/mermaid.h",
 	MAME_DIR .. "src/mame/video/mermaid.cpp",
@@ -3339,6 +3339,7 @@ files {
 	MAME_DIR .. "src/mame/machine/gdrom.h",
 	MAME_DIR .. "src/mame/machine/xbox.cpp",
 	MAME_DIR .. "src/mame/machine/xbox_usb.cpp",
+	MAME_DIR .. "src/mame/machine/xbox_pci.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "seibu")
@@ -3736,6 +3737,7 @@ files {
 	MAME_DIR .. "src/mame/includes/rollrace.h",
 	MAME_DIR .. "src/mame/video/rollrace.cpp",
 	MAME_DIR .. "src/mame/drivers/sbowling.cpp",
+	MAME_DIR .. "src/mame/drivers/scyclone.cpp",
 	MAME_DIR .. "src/mame/drivers/slapshot.cpp",
 	MAME_DIR .. "src/mame/includes/slapshot.h",
 	MAME_DIR .. "src/mame/video/slapshot.cpp",

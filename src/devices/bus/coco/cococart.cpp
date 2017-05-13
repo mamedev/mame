@@ -240,7 +240,7 @@ void cococart_slot_device::twiddle_line_if_q(coco_cartridge_line &line)
 
 //-------------------------------------------------
 //  twiddle_q_lines - hack to support twiddling the
-//	Q line
+//  Q line
 //-------------------------------------------------
 
 void cococart_slot_device::twiddle_q_lines()

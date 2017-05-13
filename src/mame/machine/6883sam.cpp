@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    6883sam.c
+    6883sam.cpp
 
     Motorola 6883 Synchronous Address Multiplexer
 
@@ -330,7 +330,7 @@ void sam6883_friend_device::update_cpu_clock(void)
 	int speed = (m_sam_state & (SAM_STATE_R1|SAM_STATE_R0)) / SAM_STATE_R0;
 
 	// the line below is weird because we are not strictly emulating the M6809E with emphasis on the 'E'
-	m_cpu->set_clock_scale(speed ? 2 : 1);
+	m_cpu->owner()->set_clock_scale(speed ? 2 : 1);
 }
 
 

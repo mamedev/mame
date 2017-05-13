@@ -12,6 +12,12 @@
 	MCFG_PCI_HOST_ADD(_tag, VRC4373, 0x005B1033, 0x00, 0x00000000) \
 	downcast<vrc4373_device *>(device)->set_cpu_tag(_cpu_tag);
 
+#define MCFG_VRC4373_SET_RAM(_size) \
+	downcast<vrc4373_device *>(device)->set_ram_size(_size);
+
+#define MCFG_VRC4373_SET_SIMM0(_size) \
+	downcast<vrc4373_device *>(device)->set_simm0_size(_size);
+
 #define VRC4373_PAGESHIFT 12
 
 /* NILE 3 registers 0x000-0x0ff */
@@ -71,8 +77,11 @@ public:
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+	void postload(void);
 
 	void set_cpu_tag(const char *tag);
+	void set_ram_size(const int size) { m_ram_size = size; };
+	void set_simm0_size(const int size) { m_simm0_size = size; };
 
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
@@ -110,6 +119,8 @@ private:
 	mips3_device *m_cpu;
 	const char *cpu_tag;
 	int m_irq_num;
+	int m_ram_size;
+	int m_simm0_size;
 
 	address_space_config m_mem_config, m_io_config;
 

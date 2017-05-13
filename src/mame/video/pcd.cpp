@@ -99,15 +99,11 @@ ioport_constructor pcd_video_device::device_input_ports() const
 	return INPUT_PORTS_NAME(pcd_mouse);
 }
 
-static ADDRESS_MAP_START( pcd_vid_io, AS_IO, 8, pcd_video_device )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(p1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
-ADDRESS_MAP_END
-
 static MACHINE_CONFIG_FRAGMENT( pcd_video )
 	MCFG_CPU_ADD("graphics", I8741, XTAL_16MHz/2)
-	MCFG_CPU_IO_MAP(pcd_vid_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(pcd_video_device, p1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pcd_video_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pcd_video_device, t1_r))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -294,7 +290,7 @@ WRITE8_MEMBER(pcd_video_device::vram_sw_w)
 	m_vram_sw = data & 1;
 }
 
-READ8_MEMBER(pcd_video_device::t1_r)
+READ_LINE_MEMBER(pcd_video_device::t1_r)
 {
 	return m_t1;
 }

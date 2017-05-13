@@ -48,18 +48,18 @@ bool compare_software(ui_software_info a, ui_software_info b)
 	ui_software_info *x = &a;
 	ui_software_info *y = &b;
 
-	bool clonex = (x->parentname[0] != '\0');
-	bool cloney = (y->parentname[0] != '\0');
+	bool clonex = !x->parentname.empty();
+	bool cloney = !y->parentname.empty();
 
 	if (!clonex && !cloney)
 		return (strmakelower(x->longname) < strmakelower(y->longname));
 
 	std::string cx(x->parentlongname), cy(y->parentlongname);
 
-	if (clonex && cx[0] == '\0')
+	if (cx.empty())
 		clonex = false;
 
-	if (cloney && cy[0] == '\0')
+	if (cy.empty())
 		cloney = false;
 
 	if (!clonex && !cloney)
@@ -262,10 +262,10 @@ void menu_select_software::handle()
 			// handle UI_RIGHT_PANEL
 			ui_globals::rpanel = RP_INFOS;
 		}
-		else if (menu_event->iptkey == IPT_UI_CANCEL && m_search[0] != 0)
+		else if (menu_event->iptkey == IPT_UI_CANCEL && !m_search.empty())
 		{
 			// escape pressed with non-empty text clears the text
-			m_search[0] = '\0';
+			m_search.clear();
 			reset(reset_options::SELECT_FIRST);
 		}
 		else if (menu_event->iptkey == IPT_UI_FAVORITES)
@@ -383,7 +383,7 @@ void menu_select_software::handle()
 	// handle filters selection from key shortcuts
 	if (check_filter)
 	{
-		m_search[0] = '\0';
+		m_search.clear();
 		switch (l_sw_hover)
 		{
 		case UI_SW_REGION:
@@ -432,7 +432,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 		}
 
 	// no active search
-	if (m_search[0] == 0)
+	if (m_search.empty())
 	{
 		// if the device can be loaded empty, add an item
 		if (m_has_empty_start)
@@ -1495,7 +1495,7 @@ void menu_select_software::get_selection(ui_software_info const *&software, game
 void menu_select_software::make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const
 {
 	// determine the text for the header
-	int vis_item = (m_search[0] != 0) ? visible_items : (m_has_empty_start ? visible_items - 1 : visible_items);
+	int vis_item = !m_search.empty() ? visible_items : (m_has_empty_start ? visible_items - 1 : visible_items);
 	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d software packages )"), emulator_info::get_appname(), bare_build_version, vis_item, m_swinfo.size() - 1);
 	line1 = string_format(_("Driver: \"%1$s\" software list "), m_driver->description);
 

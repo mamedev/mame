@@ -10,42 +10,46 @@
  Board 96598-P is an oscillator board that generates the game sounds.  It is activated by outputs from Board Assy A (96577X).
 
  Board Assy's A (96577X) and B (96578X) are the main guts of the gameplay and contain the roms (all sprites).
- Board Assy A accepts all of the game inputs (Coin, wheel, shift, accelerator pedal), sends the     signals for the sounds to the Oscillator board, outputs to the L.E.D. score display board, and  directly  interacts with Board Assy B
+ Board Assy A accepts all of the game inputs (Coin, wheel, shift, accelerator pedal), sends the
+   signals for the sounds to the Oscillator board, outputs to the L.E.D. score display board, and
+   directly interacts with Board Assy B
  Board Assy B outputs the video, outputs to the L.E.D. score display board. and directly interacts with Board Assy A.
 
- On the second set, boards A and B have different part numbers (97091X and 97092X) and two less roms.  These boards were made later then the first set.
- These boards  seem to be interchangable, the only difference seems to be the rom size, which only 2 of the roms utilize the full 1024 bytes (second set).
+ On the second set, boards A and B have different part numbers (97091X and 97092X) and two less roms.
+ These boards were made later then the first set.
+ These boards seem to be interchangable, the only difference seems to be the rom size, which only 2 of the roms
+   utilize the full 1024 bytes (second set).
 
- ROM SET A  <type 7461, 24 pin> ROM SET B   <type MB7132E, 24 pin>
- Board 96577X               Board 97091X
- ROM ID         IC#     ROM ID
- PRa125 (Light data)    IC59        PRb-01  (identical to PRa125)
- PRa126 (Explosion) IC65        PRb-02  (identical to PRa126)
- PRa131 (????)      IC71        PRb-04  (identical to PRa131)
- PRa127 (car(2))        IC77        PRb-13  (identical to PRa127)
- PRa128 (car(2)rotated) IC84        PRb-03  (identical to PRa128)
- PRa129 (car)       IC91        -----
- PRa130 (car(2) spinout)    IC98        PRb-14  (contains PRa130 and half of PRa129)
- PRa132 (car(2)(main))  IC111       PRb-15  (identical to PRa132)
+ ROM SET A        <type 7461, 24 pin>      ROM SET B     <type MB7132E, 24 pin>
+ Board 96577X                              Board 97091X
+ ROM ID                   IC#              ROM ID
+ PRa125 (Light data)      IC59             PRb-01 (identical to PRa125)
+ PRa126 (Explosion)       IC65             PRb-02 (identical to PRa126)
+ PRa131 (????)            IC71             PRb-04 (identical to PRa131)
+ PRa127 (car(2))          IC77             PRb-13 (identical to PRa127)
+ PRa128 (car(2)rotated)   IC84             PRb-03 (identical to PRa128)
+ PRa129 (car)             IC91             -----
+ PRa130 (car(2) spinout)  IC98             PRb-14 (contains PRa130 and half of PRa129)
+ PRa132 (car(2)(main))    IC111            PRb-15 (identical to PRa132)
 
- PRm-39         IC105       PRm-39          <both type 6331-1, 16 pin>
- PRm-38         IC115       PRm-38      <both type 6331-1, 16 pin>
+ PRm-39                   IC105            PRm-39        <both type 6331-1, 16 pin>
+ PRm-38                   IC115            PRm-38        <both type 6331-1, 16 pin>
 
- Board 96578X               Board 97092X
- ROM ID         IC#     ROM ID
- PRa140 (brdge-water)   IC12        -----
- PRa141 (brdge-pillar)  IC17        PRb-16  (contains both PRa140 and PRa141)
- PRa138 (firetruck) IC30        PRb-10  (identical to PRa138)
- PRa139 (car+bridge symb)IC51       PRb-11  (identical to PRa139)
- PRa133 (text(4)        IC64        PRb-05  (identical to PRa133)
- PRa136 (house)     IC99        PRb-08  (identical to PRa136)
- PRa135 (shrub)     IC106       PRb-07  (identical to PRa135)
- PRa134 (tree, grass)   IC113       PRb-06  (identical to PRa134)
- PRa137 (tunnel,oil slip)IC120      PRb-09  (identical to PRa137)
+ Board 96578X                              Board 97092X
+ ROM ID                   IC#              ROM ID
+ PRa140 (brdge-water)     IC12             -----
+ PRa141 (brdge-pillar)    IC17             PRb-16 (contains both PRa140 and PRa141)
+ PRa138 (firetruck)       IC30             PRb-10 (identical to PRa138)
+ PRa139 (car+bridge symb) IC51             PRb-11 (identical to PRa139)
+ PRa133 (text(4)          IC64             PRb-05 (identical to PRa133)
+ PRa136 (house)           IC99             PRb-08 (identical to PRa136)
+ PRa135 (shrub)           IC106            PRb-07 (identical to PRa135)
+ PRa134 (tree, grass)     IC113            PRb-06 (identical to PRa134)
+ PRa137 (tunnel,oil slip) IC120            PRb-09 (identical to PRa137)
 
  Oscillator Board 96598
- ROM ID     IC#
- PRm-40     IC21            PRm-40      <both type 6331-1, 16 pin>
+ ROM ID                   IC#
+ PRm-40                   IC21             PRm-40        <both type 6331-1, 16 pin>
 
  --------------------------------------------------------
 

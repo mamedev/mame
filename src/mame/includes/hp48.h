@@ -79,6 +79,9 @@ public:
 	uint8_t m_screens[ HP48_NB_SCREENS ][ 64 ][ 144 ];
 	int m_cur_screen;
 	uint8_t* m_rom;
+	emu_timer *m_1st_timer;
+	emu_timer *m_2nd_timer;
+	emu_timer *m_kbd_timer;
 
 	DECLARE_DRIVER_INIT(hp48);
 	virtual void machine_reset() override;

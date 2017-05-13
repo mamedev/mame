@@ -191,6 +191,26 @@ public:
 
 	required_device<cpu_device> m_cpu;
 
+	// some bootleg / clone hardware appears to ignore this
+	static void use_sprite_write_limitation_disable(device_t &device)
+	{
+		ppu2c0x_device &dev = downcast<ppu2c0x_device &>(device);
+		dev.m_use_sprite_write_limitation = false;
+	}
+	
+protected:
+	int                         m_scanlines_per_frame;  /* number of scanlines per frame */
+	int                         m_security_value;       /* 2C05 protection */
+	int                         m_vblank_first_scanline;  /* the very first scanline where VBLANK occurs */
+
+private:
+	static const device_timer_id TIMER_HBLANK = 0;
+	static const device_timer_id TIMER_NMI = 1;
+	static const device_timer_id TIMER_SCANLINE = 2;
+
+	inline uint8_t readbyte(offs_t address);
+	inline void writebyte(offs_t address, uint8_t data);
+
 	std::unique_ptr<bitmap_ind16>                m_bitmap;          /* target bitmap */
 	std::unique_ptr<uint8_t[]>  m_spriteram;           /* sprite ram */
 	std::unique_ptr<pen_t[]>    m_colortable;          /* color table modified at run time */
@@ -215,9 +235,6 @@ public:
 	int                         m_color_base;
 	uint8_t                     m_palette_ram[0x20];        /* shouldn't be in main memory! */
 	int                         m_scan_scale;           /* scan scale */
-	int                         m_scanlines_per_frame;  /* number of scanlines per frame */
-	int                         m_vblank_first_scanline;  /* the very first scanline where VBLANK occurs */
-	int                         m_security_value;       /* 2C05 protection */
 	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
 	int                         m_draw_phase;           /* MMC5 uses different regs for BG and OAM */
 	ppu2c0x_latch_delegate      m_latch;
@@ -226,23 +243,8 @@ public:
 	emu_timer                   *m_hblank_timer;        /* hblank period at end of each scanline */
 	emu_timer                   *m_nmi_timer;           /* NMI timer */
 	emu_timer                   *m_scanline_timer;      /* scanline timer */
-
-	// some bootleg / clone hardware appears to ignore this
-	static void use_sprite_write_limitation_disable(device_t &device)
-	{
-		ppu2c0x_device &dev = downcast<ppu2c0x_device &>(device);
-		dev.m_use_sprite_write_limitation = false;
-	}
-
+	
 	bool m_use_sprite_write_limitation;
-private:
-	static const device_timer_id TIMER_HBLANK = 0;
-	static const device_timer_id TIMER_NMI = 1;
-	static const device_timer_id TIMER_SCANLINE = 2;
-
-	inline uint8_t readbyte(offs_t address);
-	inline void writebyte(offs_t address, uint8_t data);
-
 };
 
 class ppu2c02_device : public ppu2c0x_device {

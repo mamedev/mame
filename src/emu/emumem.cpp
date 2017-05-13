@@ -4337,8 +4337,13 @@ void handler_entry::configure_subunits(u64 handlermask, int handlerbits, int &st
 		if ((scanmask & unitmask) != 0)
 			count++;
 	}
-	assert(count != 0);
-	assert(maxunits % count == 0);
+	if (count == 0 || count > maxunits)
+		throw emu_fatalerror("Invalid subunit mask %s for %d-bit space", core_i64_hex_format(handlermask, m_datawidth / 4), m_datawidth);
+
+	// make sure that the multiplier is a power of 2
+	int multiplier = count;
+	while (maxunits % multiplier != 0)
+		multiplier++;
 
 	// fill in the shifts
 	int cur_offset = 0;
@@ -4348,12 +4353,12 @@ void handler_entry::configure_subunits(u64 handlermask, int handlerbits, int &st
 		u32 shift = (unitnum^shift_xor_mask) * handlerbits;
 		if (((handlermask >> shift) & unitmask) != 0)
 		{
-			m_subunit_infos[m_subunits].m_bytemask = m_bytemask / (maxunits / count);
+			m_subunit_infos[m_subunits].m_bytemask = m_bytemask / (maxunits / multiplier);
 			m_subunit_infos[m_subunits].m_mask = unitmask;
 			m_subunit_infos[m_subunits].m_offset = cur_offset++;
 			m_subunit_infos[m_subunits].m_size = handlerbits;
 			m_subunit_infos[m_subunits].m_shift = shift;
-			m_subunit_infos[m_subunits].m_multiplier = count;
+			m_subunit_infos[m_subunits].m_multiplier = multiplier;
 
 			m_subunits++;
 		}

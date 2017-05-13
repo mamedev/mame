@@ -19,6 +19,7 @@
 #define OP_WORD(v) { v = rombase[(__pc - pcbase) >> 3] | (rombase[(__pc + 8 - pcbase) >> 3] << 8); _pc += 16; }
 #define PARAM_WORD(v) { v = rambase[(__pc + 16 - pcbase) >> 3] | (rambase[(__pc + 24 - pcbase) >> 3] << 8); _pc += 16; }
 #define PARAM_LONG(v) { v = rambase[(__pc + 16 - pcbase) >> 3] | (rambase[(__pc + 24 - pcbase) >> 3] << 8) | (rambase[(__pc + 32 - pcbase) >> 3] << 16) | (rambase[(__pc + 40 - pcbase) >> 3] << 24); _pc += 32; }
+#define PARM2_LONG(v) { v = rambase[(__pc + 48 - pcbase) >> 3] | (rambase[(__pc + 56 - pcbase) >> 3] << 8) | (rambase[(__pc + 64 - pcbase) >> 3] << 16) | (rambase[(__pc + 72 - pcbase) >> 3] << 24); _pc += 32; }
 #endif
 
 static uint8_t rf;
@@ -82,6 +83,14 @@ static void print_long_parm(std::ostream &stream)
 	uint32_t l;
 
 	PARAM_LONG(l);
+	util::stream_format(stream, "%Xh", l);
+}
+
+static void print_long_parm2(std::ostream &stream)
+{
+	uint32_t l;
+
+	PARM2_LONG(l);
 	util::stream_format(stream, "%Xh", l);
 }
 
@@ -387,7 +396,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			util::stream_format(stream, "MOVB   @");
 			print_long_parm(stream);
 			stream << ",@";
-			print_long_parm(stream);
+			print_long_parm2(stream);
 			break;
 
 		case 0x0160:
@@ -590,7 +599,7 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 			util::stream_format(stream, "MOVE   @");
 			print_long_parm(stream);
 			stream << ",@";
-			print_long_parm(stream);
+			print_long_parm2(stream);
 			stream << ",";
 			print_field(stream);
 			break;

@@ -1018,14 +1018,15 @@ READ32_MEMBER( midway_ioasic_device::read )
 	switch (offset)
 	{
 		case IOASIC_PORT0:
-			result = machine().root_device().ioport("DIPS")->read();
-			/* bit 0 seems to be a ready flag before shuffling happens */
+			// bit 0 is PIC ready flag before shuffling happens
+			// bits 15:13 == 001
 			if (!m_shuffle_active)
 			{
-				result |= 0x0001;
 				/* blitz99 wants bit bits 13-15 to be 1 */
-				result &= ~0xe000;
-				result |= 0x2000;
+				result = 0x2001;
+			}
+			else {
+				result = machine().root_device().ioport("DIPS")->read();
 			}
 			break;
 
@@ -1131,7 +1132,10 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 
 	offset = m_shuffle_active ? m_shuffle_map[offset & 15] : offset;
 	oldreg = m_reg[offset];
-	COMBINE_DATA(&m_reg[offset]);
+	// Block register updates until ioasic is unlocked
+	// mwskins and thegrid use this as test to see if the ioasic is unlocked
+	if (m_shuffle_active)
+		COMBINE_DATA(&m_reg[offset]);
 	newreg = m_reg[offset];
 
 	if (LOG_IOASIC && offset != IOASIC_SOUNDOUT)
@@ -1144,7 +1148,7 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 			if (data == 0xe2)
 			{
 				m_shuffle_active = 1;
-				logerror("*** I/O ASIC shuffling enabled!\n");
+				logerror("*** I/O ASIC unlocked!\n");
 				m_reg[IOASIC_INTCTL] = 0;
 				m_reg[IOASIC_UARTCONTROL] = 0; /* bug in 10th Degree assumes this */
 			}

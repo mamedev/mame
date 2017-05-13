@@ -156,6 +156,7 @@ INPUT_CHANGED_MEMBER(segag80r_state::service_switch)
 
 void segag80r_state::machine_start()
 {
+	m_vblank_latch_clear_timer = timer_alloc(TIMER_VBLANK_LATCH_CLEAR);
 	/* register for save states */
 }
 

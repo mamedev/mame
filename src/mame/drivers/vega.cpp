@@ -141,7 +141,7 @@ public:
 	DECLARE_WRITE8_MEMBER(extern_w);
 	DECLARE_WRITE8_MEMBER(p2_w);
 	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_READ8_MEMBER(t1_r);
+	DECLARE_READ_LINE_MEMBER(t1_r);
 	DECLARE_WRITE8_MEMBER(rombank_w);
 
 	DECLARE_READ8_MEMBER(txtram_r);
@@ -374,7 +374,7 @@ WRITE8_MEMBER(vega_state::p2_w)
 	m_p2_data=data;
 }
 
-READ8_MEMBER(vega_state::t1_r)
+READ_LINE_MEMBER(vega_state::t1_r)
 {
 	return machine().rand();
 }
@@ -390,21 +390,8 @@ static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 8, vega_state )
 	AM_RANGE(0x800, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
-/*
-MCS48_PORT_P0   = 0x100,
-    MCS48_PORT_P1   = 0x101,
-    MCS48_PORT_P2   = 0x102,
-    MCS48_PORT_T0   = 0x110,
-    MCS48_PORT_T1   = 0x111,
-    MCS48_PORT_BUS  = 0x120,
-    MCS48_PORT_PROG = 0x121      0/1
-    */
 static ADDRESS_MAP_START( vega_io_map, AS_IO, 8, vega_state )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(extern_r, extern_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ_PORT("DSW") AM_WRITE(rombank_w) //101
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)//102
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r) //111
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_WRITENOP /* prog - inputs CLK */
 ADDRESS_MAP_END
 
 
@@ -803,11 +790,15 @@ void vega_state::machine_start()
 
 
 static MACHINE_CONFIG_START( vega, vega_state )
-
-
 	MCFG_CPU_ADD("maincpu", I8035, 4000000)
 	MCFG_CPU_PROGRAM_MAP(vega_map)
 	MCFG_CPU_IO_MAP(vega_io_map)
+	MCFG_MCS48_PORT_P1_IN_CB(IOPORT("DSW"))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(vega_state, rombank_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(vega_state, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(vega_state, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(vega_state, t1_r))
+	MCFG_MCS48_PORT_PROG_OUT_CB(NOOP) /* prog - inputs CLK */
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vega_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)

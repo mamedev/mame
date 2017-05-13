@@ -6,8 +6,8 @@
 
 */
 
-#ifndef _KB1013VK12_H_
-#define _KB1013VK12_H_
+#ifndef MAME_CPU_SM510_KB1013VK12_H
+#define MAME_CPU_SM510_KB1013VK12_H
 
 #include "sm500.h"
 
@@ -38,4 +38,4 @@ protected:
 extern const device_type KB1013VK12;
 
 
-#endif /* _KB1013VK12_H_ */
+#endif /* MAME_CPU_SM510_KB1013VK12_H */

@@ -131,16 +131,15 @@ imgtoolerr_t imghd_open(imgtool::stream &stream, struct mess_hard_disk_file *har
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 
 	hard_disk->hard_disk = nullptr;
-	hard_disk->chd = nullptr;
 
-	chderr = hard_disk->chd->open(*stream.core_file(), stream.is_read_only());
+	chderr = hard_disk->chd.open(*stream.core_file(), !stream.is_read_only());
 	if (chderr)
 	{
 		err = map_chd_error(chderr);
 		goto done;
 	}
 
-	hard_disk->hard_disk = hard_disk_open(hard_disk->chd);
+	hard_disk->hard_disk = hard_disk_open(&hard_disk->chd);
 	if (!hard_disk->hard_disk)
 	{
 		err = IMGTOOLERR_UNEXPECTED;

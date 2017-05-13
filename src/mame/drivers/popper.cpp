@@ -33,7 +33,8 @@
     TODO:
     - According to the schematics the sub CPU ROM should be 0x2000
     - Verify screen raw parameters
-    - Finish driver
+    - Verify graphics with real hardware
+    - Watchdog
 
 ***************************************************************************/
 
@@ -59,16 +60,19 @@ public:
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_ay{ {*this, "ay1"}, {*this, "ay2"} },
-		m_ram(*this, "ram"),
+		m_video_ram(*this, "video_ram"),
+		m_attribute_ram(*this, "attribute_ram"),
+		m_sprite_ram(*this, "sprite_ram"),
 		m_inputs{ {*this, "in1"}, {*this, "in0"}, {*this, "dsw2"}, {*this, "dsw1"} },
 		m_scanline_timer(nullptr),
-		m_tilemap(nullptr),
-		m_nmi_enable(0), m_vram_page(0)
+		m_layer0_tilemap(nullptr), m_layer1_tilemap(nullptr),
+		m_nmi_enable(0), m_back_color(0), m_vram_page(0)
 	{ }
 
 	DECLARE_PALETTE_INIT(popper);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TILE_GET_INFO_MEMBER(tile_info);
+	TILE_GET_INFO_MEMBER(layer0_tile_info);
+	TILE_GET_INFO_MEMBER(layer1_tile_info);
 
 	DECLARE_WRITE8_MEMBER(nmi_control_w);
 	DECLARE_WRITE8_MEMBER(crt_direction_w);
@@ -92,13 +96,17 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ay8910_device> m_ay[2];
-	required_shared_ptr<uint8_t> m_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_attribute_ram;
+	required_shared_ptr<uint8_t> m_sprite_ram;
 	required_ioport m_inputs[4];
 
 	emu_timer *m_scanline_timer;
-	tilemap_t *m_tilemap;
+	tilemap_t *m_layer0_tilemap;
+	tilemap_t *m_layer1_tilemap;
 
 	int m_nmi_enable;
+	int m_back_color;
 	int m_vram_page;
 };
 
@@ -110,7 +118,13 @@ private:
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, popper_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM
+	AM_RANGE(0xc100, 0xc6ff) AM_RAM AM_SHARE("video_ram")
+	AM_RANGE(0xc700, 0xc8ff) AM_RAM
+	AM_RANGE(0xc900, 0xceff) AM_RAM AM_SHARE("attribute_ram")
+	AM_RANGE(0xcf00, 0xcfff) AM_RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("sprite_ram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("shared")
 	AM_RANGE(0xe000, 0xe003) AM_MIRROR(0x03fc) AM_READ(inputs_r)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_WRITE(nmi_control_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_WRITE(crt_direction_w)
@@ -128,7 +142,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, popper_state )
 	AM_RANGE(0x2000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_WRITE(ay1_w)
 	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_DEVWRITE("ay2", ay8910_device, write_bc1_bc2)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("shared")
 	AM_RANGE(0xe000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
@@ -288,7 +302,7 @@ WRITE8_MEMBER( popper_state::crt_direction_w )
 
 WRITE8_MEMBER( popper_state::back_color_select_w )
 {
-	logerror("back_color_select_w: %02x\n", data);
+	m_back_color = data & 1;
 }
 
 WRITE8_MEMBER( popper_state::vram_page_select_w )
@@ -301,10 +315,56 @@ uint32_t popper_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	bitmap.fill(0, cliprect);
 
 	// always draw all tiles
-	m_tilemap->mark_all_dirty();
+	m_layer0_tilemap->mark_all_dirty();
+	m_layer1_tilemap->mark_all_dirty();
 
-	// draw the character layer
-	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	// draw the layers with lower priority
+	m_layer0_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_layer1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// draw the sprites
+	for (int offs = 0; offs < 0x800; offs += 4)
+	{
+		// 0  76653210  Y coordinate
+		// 1  76543210  Code
+		// 2  7-------  Flip Y
+		// 2  -6------  Flip X
+		// 2  --54----  Not used
+		// 2  ----3210  Color
+		// 3  76653210  X coordinate
+
+		int sx = m_sprite_ram[offs + 3];
+		int sy = m_sprite_ram[offs + 0];
+
+		// only render sprite if it's in the current offset range
+		if (((sy + (flip_screen() ? 2 : 0)) >> 4) != ((~(offs >> 7)) & 0x0f))
+			continue;
+
+		sx += 64;
+		sy = 240 - sy;
+
+		int flipx = BIT(m_sprite_ram[offs + 2], 6);
+		int flipy = BIT(m_sprite_ram[offs + 2], 7);
+
+		if (flip_screen())
+		{
+			flipx = !flipx;
+			flipy = !flipy;
+
+			sx = 232 - sx;
+			sx += 128;
+			sy = (240 + 2) - sy;
+		}
+
+		int code = m_sprite_ram[offs + 1];
+		int color = m_sprite_ram[offs + 2] & 0x0f;
+
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
+	}
+
+	// draw the tiles with priority over the sprites
+	m_layer0_tilemap->draw(screen, bitmap, cliprect, 1, 0);
+	m_layer1_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 
 	return 0;
 }
@@ -314,7 +374,18 @@ uint32_t popper_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 //  DRAWGFX LAYOUTS
 //**************************************************************************
 
-static const gfx_layout charlayout =
+static const gfx_layout layer0_charlayout =
+{
+	8,8,
+	RGN_FRAC(2,2),
+	1,
+	{ 0, 4 },
+	{ STEP4(8,1), STEP4(0,1) },
+	{ STEP8(0,16) },
+	16*8
+};
+
+static const gfx_layout layer1_charlayout =
 {
 	8,8,
 	RGN_FRAC(2,2),
@@ -337,17 +408,38 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( popper )
-	GFXDECODE_ENTRY("tiles",   0, charlayout,   0, 16)
-	GFXDECODE_ENTRY("sprites", 0, spritelayout, 0, 16)
+	GFXDECODE_ENTRY("tiles",   0, layer0_charlayout, 0, 32)
+	GFXDECODE_ENTRY("tiles",   0, layer1_charlayout, 0, 16)
+	GFXDECODE_ENTRY("sprites", 0, spritelayout,      0, 16)
 GFXDECODE_END
 
-TILE_GET_INFO_MEMBER( popper_state::tile_info )
+// attribute ram layout
+// 7------- high priority
+// -654---- layer0 color
+// ----3210 layer1 color
+
+TILE_GET_INFO_MEMBER( popper_state::layer0_tile_info )
 {
-	int code = (m_vram_page << 8) | m_ram[0x100 + tile_index];
-	int attr = m_ram[0x900 + tile_index];
-	int color = attr >> 4;
+	int code = (m_vram_page << 8) | m_video_ram[tile_index];
+	int attr = m_attribute_ram[tile_index];
+	int color = (~m_back_color & 1) << 3 | ((attr >> 4) & 7);
+	color <<= 1;
+
+	// high priority only applies if a color is set
+	tileinfo.category = BIT(attr, 7) && (attr & 0x70);
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
+}
+
+TILE_GET_INFO_MEMBER( popper_state::layer1_tile_info )
+{
+	int code = (m_vram_page << 8) | m_video_ram[tile_index];
+	int attr = m_attribute_ram[tile_index];
+	int color = attr & 0x0f;
+
+	tileinfo.category = BIT(attr, 7);
+
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 
@@ -389,26 +481,28 @@ WRITE8_MEMBER( popper_state::ay1_w )
 
 WRITE8_MEMBER( popper_state::nmi_control_w )
 {
-//  logerror("nmi_control_w: %02x\n", data);
 	m_nmi_enable = data & 1;
 }
 
 WRITE8_MEMBER( popper_state::intcycle_w )
 {
+	// set to 0 and apparently not used by the game
 	logerror("intcycle_w: %d = %02x\n", offset, data);
 }
 
 READ8_MEMBER( popper_state::watchdog_clear_r )
 {
-	logerror("watchdog_clear_r\n");
 	return 0;
 }
 
 void popper_state::machine_start()
 {
-	// create tilemap
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popper_state::tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
-	m_tilemap->set_transparent_pen(3);
+	// create tilemaps
+	m_layer0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popper_state::layer0_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
+	m_layer0_tilemap->set_transparent_pen(1);
+
+	m_layer1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popper_state::layer1_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
+	m_layer1_tilemap->set_transparent_pen(0);
 
 	// allocate and start scanline timer
 	m_scanline_timer = timer_alloc(0);
@@ -416,12 +510,14 @@ void popper_state::machine_start()
 
 	// register for save states
 	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_back_color));
 	save_item(NAME(m_vram_page));
 }
 
 void popper_state::machine_reset()
 {
 	m_nmi_enable = 0;
+	m_back_color = 0;
 	m_vram_page = 0;
 }
 
@@ -492,4 +588,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS          INIT  ROTATION  COMPANY  FULLNAME  FLAGS
-GAME( 1983, popper, 0,      popper,  popper, driver_device, 0,    ROT90,    "Omori", "Popper", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, popper, 0,      popper,  popper, driver_device, 0,    ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )

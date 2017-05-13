@@ -242,8 +242,8 @@ WRITE8_MEMBER(discoboy_state::port_01_w)
 
 WRITE8_MEMBER(discoboy_state::port_06_w)
 {
-    //printf("unk discoboy_port_06_w %02x\n",data);
-    if (data != 0) logerror("port 06!!!! %02x\n",data);
+	//printf("unk discoboy_port_06_w %02x\n",data);
+	if (data != 0) logerror("port 06!!!! %02x\n",data);
 }
 
 READ8_MEMBER(discoboy_state::rambank2_r)

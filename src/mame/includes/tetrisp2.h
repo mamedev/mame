@@ -69,6 +69,8 @@ public:
 	uint16_t m_rockn_soundvolume;
 	emu_timer *m_rockn_timer_l4;
 	emu_timer *m_rockn_timer_sub_l4;
+	emu_timer *m_rockn_timer_l1;
+	emu_timer *m_rockn_timer_sub_l1;
 	int m_bank_lo;
 	int m_bank_hi;
 	uint16_t m_rocknms_main2sub;

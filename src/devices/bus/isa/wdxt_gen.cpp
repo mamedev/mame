@@ -94,10 +94,6 @@ const tiny_rom_entry *wdxt_gen_device::device_rom_region() const
 
 static ADDRESS_MAP_START( wd1015_io, AS_IO, 8, wdxt_gen_device )
 	AM_RANGE(0x00, 0xff) AM_DEVREADWRITE(WD11C00_17_TAG, wd11c00_17_device, read, write)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(wd1015_t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(wd1015_t1_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(wd1015_p1_r, wd1015_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(wd1015_p2_r, wd1015_p2_w)
 ADDRESS_MAP_END
 
 
@@ -145,6 +141,12 @@ WRITE8_MEMBER( wdxt_gen_device::ram_w )
 static MACHINE_CONFIG_FRAGMENT( wdxt_gen )
 	MCFG_CPU_ADD(WD1015_TAG, I8049, 5000000)
 	MCFG_CPU_IO_MAP(wd1015_io)
+	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE(WD11C00_17_TAG, wd11c00_17_device, busy_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(wdxt_gen_device, wd1015_t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(wdxt_gen_device, wd1015_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(wdxt_gen_device, wd1015_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(wdxt_gen_device, wd1015_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(wdxt_gen_device, wd1015_p2_w))
 
 	MCFG_DEVICE_ADD(WD11C00_17_TAG, WD11C00_17, 5000000)
 	MCFG_WD11C00_17_OUT_IRQ5_CB(WRITELINE(wdxt_gen_device, irq5_w))
@@ -243,21 +245,12 @@ void wdxt_gen_device::dack_w(int line, uint8_t data)
 	m_host->dack_w(data);
 }
 
-//-------------------------------------------------
-//  wd1015_t0_r -
-//-------------------------------------------------
-
-READ8_MEMBER( wdxt_gen_device::wd1015_t0_r )
-{
-	return m_host->busy_r();
-}
-
 
 //-------------------------------------------------
 //  wd1015_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wdxt_gen_device::wd1015_t1_r )
+READ_LINE_MEMBER( wdxt_gen_device::wd1015_t1_r )
 {
 	return 0; // TODO
 }

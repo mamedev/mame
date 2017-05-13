@@ -84,11 +84,7 @@ static ADDRESS_MAP_START( mackbd_map, AS_PROGRAM, 8, mackbd_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mackbd_io_map, AS_IO, 8, mackbd_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(p0_r)
 	AM_RANGE(0x2f, 0x36) AM_WRITE(p0_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -99,6 +95,12 @@ static MACHINE_CONFIG_FRAGMENT( mackbd )
 	MCFG_CPU_ADD(MACKBD_CPU_TAG, I8021, 3000000)    // "the approximate clock rate of the MPU is 3 MHz"
 	MCFG_CPU_PROGRAM_MAP(mackbd_map)
 	MCFG_CPU_IO_MAP(mackbd_io_map)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(mackbd_device, p0_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(mackbd_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(mackbd_device, p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(mackbd_device, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(mackbd_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("MODS")) MCFG_DEVCB_RSHIFT(1) // option
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( mackbd )
@@ -316,11 +318,6 @@ WRITE8_MEMBER(mackbd_device::p2_w)
 		data_to_mac = data_from_mac = (data & 1);
 //      printf("data to/from mac = %d (PC=%x)\n", data_to_mac, m_maincpu->pc());
 	}
-}
-
-READ8_MEMBER(mackbd_device::t1_r)
-{
-	return (ioport("MODS")->read() & 0x2) ? 0xff : 0x00;
 }
 
 WRITE_LINE_MEMBER(mackbd_device::data_w)

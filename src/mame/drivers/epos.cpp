@@ -27,8 +27,9 @@
       between the two palettes.  This effect is not emulated, but since both
       halfs of the palette are identical, this is not an issue.  See $039c.
       The other games have a different color test, not using the busy loop.
-
-    - Fix flip screen support for The Dealer and Beastie Feastie.
+	
+	- dealer/beastf/revngr84: "PSG registers not OK" in service mode thru 
+	  sound menu, internal ay8910 not right?
 
 ***************************************************************************/
 
@@ -38,6 +39,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/watchdog.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
@@ -74,7 +76,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dealer_map, AS_PROGRAM, 8, epos_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -95,10 +97,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dealer_io_map, AS_IO, 8, epos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x0f) AM_WRITE(dealer_pal_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x20, 0x24) AM_WRITE(dealer_decrypt_rom)
 	AM_RANGE(0x34, 0x34) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x38, 0x38) AM_READ_PORT("DSW")
+	AM_RANGE(0x38, 0x38) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x3c, 0x3c) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
@@ -358,11 +361,11 @@ static INPUT_PORTS_START( dealer )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -408,14 +411,14 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(epos_state,epos)
 {
-	save_item(NAME(m_palette));
+	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_input_multiplex));
 }
 
 void epos_state::machine_reset()
 {
-	m_palette = 0;
+	m_palette_bank = 0;
 	m_counter = 0;
 	m_input_multiplex = 3;
 }
@@ -433,10 +436,10 @@ MACHINE_START_MEMBER(epos_state,dealer)
 	MACHINE_START_CALL_MEMBER(epos);
 }
 
-static MACHINE_CONFIG_START( epos, epos_state )
+static MACHINE_CONFIG_START( epos, epos_state ) /* EPOS TRISTAR 8000 PCB */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 11000000/4)    /* 2.75 MHz (see notes) */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_11MHz/4)    /* 2.75 MHz schematics confirm 11MHz XTAL (see notes) */
 	MCFG_CPU_PROGRAM_MAP(epos_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
@@ -451,17 +454,20 @@ static MACHINE_CONFIG_START( epos, epos_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 271, 0, 235)
 	MCFG_SCREEN_UPDATE_DRIVER(epos_state, screen_update)
 
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(epos_state, epos)
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 11000000/4)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_11MHz/4) /* should be a divisor of 16? - clock not confirmed - schematics show 8912 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dealer, epos_state )
+static MACHINE_CONFIG_START( dealer, epos_state ) /* EPOS TRISTAR 9000 PCB */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 11000000/4)    /* 2.75 MHz (see notes) */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_22_1184MHz/8)    /* 2.7648 MHz (measured) */
 	MCFG_CPU_PROGRAM_MAP(dealer_map)
 	MCFG_CPU_IO_MAP(dealer_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
@@ -470,8 +476,14 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 	MCFG_I8255_IN_PORTA_CB(READ8(epos_state, read_prta))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(epos_state, write_prtc))
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	
 	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
-
+	
+	// RAM-based palette instead of prom
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 32)
+//	MCFG_PALETTE_INIT_OWNER(epos_state, epos)
+	
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
@@ -484,8 +496,9 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 11000000/4)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_22_1184MHz/32)    /* 0.6912 MHz (measured) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	// port a writes?
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(epos_state, flip_screen_w))
 MACHINE_CONFIG_END
@@ -615,41 +628,81 @@ ROM_START( dealer )
 	ROM_LOAD( "u2.bin",         0x2000, 0x2000, CRC(726bbbd6) SHA1(3538f3d655899c2a0f984c43fb7545ea4be1b231) )
 	ROM_LOAD( "u3.bin",         0x4000, 0x2000, CRC(ab721455) SHA1(a477da0590e0431172baae972e765473e19dcbff) )
 	ROM_LOAD( "u4.bin",         0x6000, 0x2000, CRC(ddb903e4) SHA1(4c06a2048b1c6989c363b110a17c33180025b9c8) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, NO_DUMP )   /* missing */
+	
+	ROM_REGION( 0x1000, "nvram", 0)
+	ROM_LOAD( "dealer.nv", 0, 0x1000, CRC(a6f88459) SHA1(1deda2a71433c97fe3e5cb39defc285f4fa9c9b8) )
 ROM_END
 
 /*
 
-Revenger EPOS 1984
+Revenger 84 - EPOS
 
 EPOS TRISTAR 9000
++--------------------------------+
+|                                |
+|  DSW                           |
+|             4116 4116          |
+| 8910  Z80A  4116 4116          |
+|             4116 4116          |
+|  6116  BAT  4116 4116          |
+|  6116       4116 4116          |
+|  U4         4116 4116   74S189 |
+|  U3         4116 4116   4S189  |
+|  U2 PAL.U13 4116 4116          |
+|  U1 PAL10L8 8255  DM74S288N    |
+|                      22.1184MHz|
+|                                |
+|                       LM384N   |
+|                         VOL    |
++-|28 pin Connector|-------------+
 
+  CPU: Z80A        2.764800 MHz [22.1184MHz/8]
+Sound: AY-3-8910   0.691200 MHz [22.1184MHz/32]
+ XTAL: 22.1184MHz
+  DSW: 8 position dipswitch bank
+  BAT: Battery (battery backed up RAM for high scores)
+  VOL: Volume Pot
 
+28 Pin non-JAMMA connector
 
-   8910   Z80A    4116  4116
-                  4116  4116
-                  4116  4116
-    6116          4116  4116
-    6116          4116  4116
-    U4            4116  4116     74S189
-    U3            4116  4116     74S189
-    U2            4116  4116
-    U1        8255
-                             22.1184MHz
+ 4 ROMs at U1 through U4 are 2764 type
+ BPROM at U60 is a DM74S288N
+ 2 pals, U12 is a PAL10L8, U13 PAL type is unknown (markings scrubbed off)
+
+4116 RAS is = 2.764800 MHz [22.1184MHz/8]
+4116 CAS is = 1.382400 MHz [22.1184MHz/16]
+
 */
+
+ROM_START( revngr84 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+    ROM_LOAD( "u1_revenger_r06254.u1",  0x0000, 0x2000, CRC(308f231f) SHA1(cf06695601bd0387e4fcb64d9b34143323e98b07) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
+    ROM_LOAD( "u2_revenger_r06254.u2",  0x2000, 0x2000, CRC(e80bbfb4) SHA1(9302beaef8bbb7376b6a20e9ee5adbcf60d66dd8) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
+    ROM_LOAD( "u3_revenger_r06254.u3",  0x4000, 0x2000, CRC(d9270929) SHA1(a95034b5387a40e02f04bdfa79e1d8e65dad30fe) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
+    ROM_LOAD( "u4_revenger_r06254.u4",  0x6000, 0x2000, CRC(d6e6cfa8) SHA1(f10131bb2e9d088c7b6d6a5d5520073d78ad69cc) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "dm74s288n.u60", 0x0000, 0x0020, CRC(be2b0641) SHA1(26982903b6d942af8e0a526412d8e01978d76420) ) // unknown purpose
+
+	ROM_REGION( 0x1000, "nvram", 0)
+	ROM_LOAD( "revngr84.nv", 0, 0x1000, CRC(a4417770) SHA1(92eded82db0810e7818d2f52a0497032f390fcc1) )
+ROM_END
 
 ROM_START( revenger )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "r06124.u1",    0x0000, 0x2000, CRC(fad1a2a5) BAD_DUMP SHA1(a31052c91fe67e2e90441abc40b6483f921ecfe3) )
-	ROM_LOAD( "r06124.u2",    0x2000, 0x2000, CRC(a8e0ee7b) BAD_DUMP SHA1(f6f78e8ce40eab07de461b364876c1eb4a78d96e) )
-	ROM_LOAD( "r06124.u3",    0x4000, 0x2000, CRC(cca414a5) BAD_DUMP SHA1(1c9dd3ff63d57e9452e63083cdbd7f5d693bb686) )
-	ROM_LOAD( "r06124.u4",    0x6000, 0x2000, CRC(0b81c303) BAD_DUMP SHA1(9022d18dec11312eb4bb471c22b563f5f897b4f7) )
+	ROM_LOAD( "r06124.u1",    0x0000, 0x2000, BAD_DUMP CRC(fad1a2a5) SHA1(a31052c91fe67e2e90441abc40b6483f921ecfe3) )
+	ROM_LOAD( "r06124.u2",    0x2000, 0x2000, BAD_DUMP CRC(a8e0ee7b) SHA1(f6f78e8ce40eab07de461b364876c1eb4a78d96e) )
+	ROM_LOAD( "r06124.u3",    0x4000, 0x2000, BAD_DUMP CRC(cca414a5) SHA1(1c9dd3ff63d57e9452e63083cdbd7f5d693bb686) )
+	ROM_LOAD( "r06124.u4",    0x6000, 0x2000, BAD_DUMP CRC(0b81c303) SHA1(9022d18dec11312eb4bb471c22b563f5f897b4f7) )
 
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, NO_DUMP )   /* missing */
+	ROM_REGION( 0x0020, "proms", 0 ) /* this PROM not included in dump, but assumed to be the same */
+	ROM_LOAD( "dm74s288n.u60", 0x0000, 0x0020, CRC(be2b0641) SHA1(26982903b6d942af8e0a526412d8e01978d76420) ) // unknown purpose
+	
+	ROM_REGION( 0x1000, "nvram", 0)
+	ROM_LOAD( "revngr84.nv", 0, 0x1000, CRC(a4417770) SHA1(92eded82db0810e7818d2f52a0497032f390fcc1) )
 ROM_END
+
+
 
 ROM_START( beastf )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -657,9 +710,9 @@ ROM_START( beastf )
 	ROM_LOAD( "bf-b09084.u2",    0x2000, 0x2000, CRC(967405d8) SHA1(dd763be909e6966521b01ee878df9cef865c3b30) )
 	ROM_LOAD( "bf-b09084.u3",    0x4000, 0x2000, CRC(3edb5381) SHA1(14c236045e6df7a475c32222652860689d4f68ce) )
 	ROM_LOAD( "bf-b09084.u4",    0x6000, 0x2000, CRC(c8cd9640) SHA1(72da881b903ead873cc3f4df27646d1ffdd63c1c) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, CRC(f4f6ddc5) BAD_DUMP SHA1(cab915acbefb5f451f538dd538bf9b3dd14bb1f5) ) // not dumped, taken from suprglob
+	
+	ROM_REGION( 0x1000, "nvram", 0)
+	ROM_LOAD( "beastf.nv", 0, 0x1000, CRC(98017b09) SHA1(0e2b2071bb47fc179d5bc36ef9431a9d2727d36a) )
 ROM_END
 
 DRIVER_INIT_MEMBER(epos_state,dealer)
@@ -709,13 +762,17 @@ DRIVER_INIT_MEMBER(epos_state,dealer)
  *
  *************************************/
 
-GAME( 1982, megadon,  0,        epos,   megadon, driver_device,  0,       ROT270, "Epos Corporation (Photar Industries license)", "Megadon", MACHINE_SUPPORTS_SAVE )
+/* EPOS TRISTAR 8000 PCB based */
+GAME( 1982, megadon,  0,        epos,   megadon,  driver_device, 0,       ROT270, "Epos Corporation (Photar Industries license)", "Megadon", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, catapult, 0,        epos,   catapult, driver_device, 0,       ROT270, "Epos Corporation", "Catapult", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* bad rom, hold f2 for test mode */
 GAME( 1983, suprglob, 0,        epos,   suprglob, driver_device, 0,       ROT270, "Epos Corporation", "Super Glob", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglob,  suprglob, epos,   suprglob, driver_device, 0,       ROT270, "Epos Corporation", "The Glob", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglob2, suprglob, epos,   suprglob, driver_device, 0,       ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglob3, suprglob, epos,   suprglob, driver_device, 0,       ROT270, "Epos Corporation", "The Glob (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, igmo,     0,        epos,   igmo, driver_device,     0,       ROT270, "Epos Corporation", "IGMO", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dealer,   0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "The Dealer", MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, revenger, 0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "Revenger", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, beastf,   suprglob, dealer, beastf, epos_state,   dealer,   ROT270, "Epos Corporation", "Beaste Feastie", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, igmo,     0,        epos,   igmo,     driver_device, 0,       ROT270, "Epos Corporation", "IGMO", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+
+/* EPOS TRISTAR 9000 PCB based */
+GAME( 1984, dealer,   0,        dealer, dealer,   epos_state,    dealer,  ROT270, "Epos Corporation", "The Dealer", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, revngr84, 0,        dealer, beastf,   epos_state,    dealer,  ROT270, "Epos Corporation", "Revenger '84 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, revenger, revngr84, dealer, beastf,   epos_state,    dealer,  ROT270, "Epos Corporation", "Revenger '84 (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, beastf,   suprglob, dealer, beastf,   epos_state,    dealer,  ROT270, "Epos Corporation", "Beastie Feastie", MACHINE_SUPPORTS_SAVE )

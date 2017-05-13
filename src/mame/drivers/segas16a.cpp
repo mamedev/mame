@@ -405,7 +405,7 @@ READ8_MEMBER( segas16a_state::n7751_p2_r )
 {
 	// read from P2 - 8255's PC0-2 connects to 7751's S0-2 (P24-P26 on an 8048)
 	// bit 0x80 is an alternate way to control the sample on/off; doesn't appear to be used
-	return 0x80 | ((m_n7751_command & 0x07) << 4) | (m_n7751_i8243->i8243_p2_r(space, offset) & 0x0f);
+	return 0x80 | ((m_n7751_command & 0x07) << 4) | (m_n7751_i8243->p2_r(space, offset) & 0x0f);
 }
 
 
@@ -416,21 +416,10 @@ READ8_MEMBER( segas16a_state::n7751_p2_r )
 WRITE8_MEMBER( segas16a_state::n7751_p2_w )
 {
 	// write to P2; low 4 bits go to 8243
-	m_n7751_i8243->i8243_p2_w(space, offset, data & 0x0f);
+	m_n7751_i8243->p2_w(space, offset, data & 0x0f);
 
 	// output of bit $80 indicates we are ready (1) or busy (0)
 	// no other outputs are used
-}
-
-
-//-------------------------------------------------
-//  n7751_t1_r - MCU reads from the T1 line
-//-------------------------------------------------
-
-READ8_MEMBER( segas16a_state::n7751_t1_r )
-{
-	// T1 - labelled as "TEST", connected to ground
-	return 0;
 }
 
 
@@ -996,19 +985,6 @@ static ADDRESS_MAP_START( sound_no7751_portmap, AS_IO, 8, segas16a_state )
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_NOP
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-ADDRESS_MAP_END
-
-
-//**************************************************************************
-//  N7751 SOUND GENERATOR CPU ADDRESS MAPS
-//**************************************************************************
-
-static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8, segas16a_state )
-	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS)  AM_READ(n7751_rom_r)
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ(n7751_t1_r)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2)   AM_READWRITE(n7751_p2_r, n7751_p2_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("n7751_8243", i8243_device, i8243_prog_w)
 ADDRESS_MAP_END
 
 
@@ -1904,7 +1880,12 @@ static MACHINE_CONFIG_START( system16a, segas16a_state )
 	MCFG_CPU_IO_MAP(sound_portmap)
 
 	MCFG_CPU_ADD("n7751", N7751, 6000000)
-	MCFG_CPU_IO_MAP(n7751_portmap)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(segas16a_state, n7751_rom_r))
+	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(segas16a_state, n7751_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(segas16a_state, n7751_p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("n7751_8243", i8243_device, prog_w))
 
 	MCFG_I8243_ADD("n7751_8243", NOOP, WRITE8(segas16a_state,n7751_rom_offset_w))
 

@@ -85,6 +85,8 @@ private:
 	int m_videomode;
 	int m_old_videomode;
 
+	emu_timer *m_static_vblank_timer;
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<ram_device> m_messram;

@@ -113,19 +113,6 @@ const tiny_rom_entry *victor_9000_fdc_t::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( floppy_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( floppy_io, AS_IO, 8, victor_9000_fdc_t )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(floppy_p1_r, floppy_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(floppy_p2_r, floppy_p2_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(tach0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(tach1_r)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(da_w)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
 //  SLOT_INTERFACE( victor9k_floppies )
 //-------------------------------------------------
 
@@ -173,7 +160,13 @@ FLOPPY_FORMATS_END
 
 static MACHINE_CONFIG_FRAGMENT( victor_9000_fdc )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_30MHz/6)
-	MCFG_CPU_IO_MAP(floppy_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(victor_9000_fdc_t, floppy_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(victor_9000_fdc_t, floppy_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(victor_9000_fdc_t, floppy_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(victor_9000_fdc_t, floppy_p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(victor_9000_fdc_t, tach0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(victor_9000_fdc_t, tach1_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(victor_9000_fdc_t, da_w))
 
 	MCFG_DEVICE_ADD(M6522_4_TAG, VIA6522, XTAL_30MHz/30)
 	MCFG_VIA6522_READPA_HANDLER(READ8(victor_9000_fdc_t, via4_pa_r))
@@ -543,7 +536,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::floppy_p2_w )
 //  tach0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( victor_9000_fdc_t::tach0_r )
+READ_LINE_MEMBER( victor_9000_fdc_t::tach0_r )
 {
 	if (LOG_SCP) logerror("%s %s Read TACH0 %u\n", machine().time().as_string(), machine().describe_context(), m_tach0);
 	return m_tach0;
@@ -554,7 +547,7 @@ READ8_MEMBER( victor_9000_fdc_t::tach0_r )
 //  tach1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( victor_9000_fdc_t::tach1_r )
+READ_LINE_MEMBER( victor_9000_fdc_t::tach1_r )
 {
 	if (LOG_SCP) logerror("%s %s Read TACH1 %u\n", machine().time().as_string(), machine().describe_context(), m_tach1);
 	return m_tach1;

@@ -11,8 +11,8 @@
     such as Arena(in editmode).
 
     TODO:
-    - is presto led handling correct? led data needs to be auto cleared
-      similar to novag6502 sforte/sexpert
+    - is presto led handling correct? mux data needs to be auto cleared
+      similar to diablo/sexpert
 
 ******************************************************************************
 
@@ -49,6 +49,9 @@ public:
 	DECLARE_WRITE8_MEMBER(presto_mux_w);
 	DECLARE_WRITE8_MEMBER(presto_control_w);
 	DECLARE_READ8_MEMBER(presto_input_r);
+	DECLARE_MACHINE_RESET(octo);
+	DECLARE_INPUT_CHANGED_MEMBER(octo_cpu_freq);
+	void octo_set_cpu_freq();
 };
 
 
@@ -59,27 +62,26 @@ public:
     Presto/Octo
 ******************************************************************************/
 
-// MCU ports
+// MCU ports/generic
 
 WRITE8_MEMBER(novagmcs48_state::presto_mux_w)
 {
 	// D0-D7: input mux low, led data
 	m_inp_mux = (m_inp_mux & ~0xff) | (~data & 0xff);
-	m_led_data = ~data & 0xff;
+	display_matrix(8, 3, m_inp_mux, m_led_select);
 }
 
 WRITE8_MEMBER(novagmcs48_state::presto_control_w)
 {
 	// P21: input mux high
 	m_inp_mux = (m_inp_mux & 0xff) | (~data << 7 & 0x100);
-	
+
 	// P22,P23: speaker lead 1,2
 	m_dac->write(BIT(data, 2) & BIT(~data, 3));
-	
+
 	// P24-P26: led select
 	m_led_select = ~data >> 4 & 7;
-	display_matrix(8, 3, m_led_data, m_led_select);
-	m_led_data = 0; // ?
+	m_inp_mux &= ~0xff; // ?
 }
 
 READ8_MEMBER(novagmcs48_state::presto_input_r)
@@ -88,20 +90,17 @@ READ8_MEMBER(novagmcs48_state::presto_input_r)
 	return ~read_inputs(9) & 0xff;
 }
 
+void novagmcs48_state::octo_set_cpu_freq()
+{
+	// Octo was released with either 12MHz or 15MHz CPU
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (15000000) : (12000000));
+}
 
-
-/******************************************************************************
-    Address Maps
-******************************************************************************/
-
-// Presto/Octo
-
-static ADDRESS_MAP_START( presto_map, AS_IO, 8, novagmcs48_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(presto_input_r) AM_WRITENOP
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(presto_control_w)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(presto_mux_w)
-ADDRESS_MAP_END
+MACHINE_RESET_MEMBER(novagmcs48_state, octo)
+{
+	novagbase_state::machine_reset();
+	octo_set_cpu_freq();
+}
 
 
 
@@ -113,15 +112,29 @@ static INPUT_PORTS_START( presto )
 	PORT_INCLUDE( novag_cb_buttons )
 
 	PORT_START("IN.8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Black/White") // Octo calls it "Change Color"
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Verify / Pawn")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Set Up / Rook")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Knight")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Set Level / Bishop")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Queen")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Take Back / King")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Go")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Black/White") // Octo calls it "Change Color"
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Verify / Pawn")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Set Up / Rook")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Knight")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Set Level / Bishop")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Queen")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Take Back / King")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Go")
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( octo )
+	PORT_INCLUDE( presto )
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, novagmcs48_state, octo_cpu_freq, nullptr) // factory set
+	PORT_CONFSETTING(    0x00, "12MHz" )
+	PORT_CONFSETTING(    0x01, "15MHz" )
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(novagmcs48_state::octo_cpu_freq)
+{
+	octo_set_cpu_freq();
+}
 
 
 
@@ -133,7 +146,9 @@ static MACHINE_CONFIG_START( presto, novagmcs48_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8049, 6000000) // LC circuit, measured
-	MCFG_CPU_IO_MAP(presto_map)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(novagmcs48_state, presto_input_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(novagmcs48_state, presto_control_w))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(novagmcs48_state, presto_mux_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_novag_presto)
@@ -149,7 +164,9 @@ static MACHINE_CONFIG_DERIVED( octo, presto )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(12000000) // LC circuit, measured
+	MCFG_DEVICE_CLOCK(12000000) // LC circuit, measured, see octo_set_cpu_freq
+
+	MCFG_MACHINE_RESET_OVERRIDE(novagmcs48_state, octo)
 MACHINE_CONFIG_END
 
 
@@ -176,4 +193,4 @@ ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1984, npresto,  0,       0,      presto,    presto,    driver_device, 0, "Novag", "Presto (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, nocto,    npresto, 0,      octo,      presto,    driver_device, 0, "Novag", "Octo (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, nocto,    npresto, 0,      octo,      octo,      driver_device, 0, "Novag", "Octo (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

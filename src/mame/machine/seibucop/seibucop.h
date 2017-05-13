@@ -229,11 +229,11 @@ private:
 	void execute_4aa0(int offset, uint16_t data);
 	void execute_6200(int offset, uint16_t data);
 
-	void execute_338e(int offset, uint16_t data);
+	void execute_338e(int offset, uint16_t data, bool is_yflip);
 	void execute_2288(int offset, uint16_t data);
 	void execute_0205(int offset, uint16_t data);
 	void execute_3b30(int offset, uint16_t data);
-	void execute_130e(int offset, uint16_t data);
+	void execute_130e(int offset, uint16_t data, bool is_yflip);
 	void execute_0904(int offset, uint16_t data);
 	void execute_2a05(int offset, uint16_t data);
 	void execute_7e05(int offset, uint16_t data);

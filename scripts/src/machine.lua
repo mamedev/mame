@@ -1993,6 +1993,8 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/lpc-pit.h",
 		MAME_DIR .. "src/devices/machine/vrc4373.cpp",
 		MAME_DIR .. "src/devices/machine/vrc4373.h",
+		MAME_DIR .. "src/devices/machine/vrc5074.cpp",
+		MAME_DIR .. "src/devices/machine/vrc5074.h",
 		MAME_DIR .. "src/devices/machine/gt64xxx.cpp",
 		MAME_DIR .. "src/devices/machine/gt64xxx.h",
 	}
@@ -3145,5 +3147,16 @@ if (MACHINES["INPUT_MERGER"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/input_merger.cpp",
 		MAME_DIR .. "src/devices/machine/input_merger.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/k054321.h,MACHINES["K054321"] = true
+---------------------------------------------------
+if (MACHINES["K054321"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/k054321.cpp",
+		MAME_DIR .. "src/devices/machine/k054321.h",
 	}
 end

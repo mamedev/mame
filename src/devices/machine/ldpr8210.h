@@ -106,8 +106,8 @@ public:
 	DECLARE_READ8_MEMBER( i8049_bus_r );
 	DECLARE_WRITE8_MEMBER( i8049_port1_w );
 	DECLARE_WRITE8_MEMBER( i8049_port2_w );
-	DECLARE_READ8_MEMBER( i8049_t0_r );
-	DECLARE_READ8_MEMBER( i8049_t1_r );
+	DECLARE_READ_LINE_MEMBER( i8049_t0_r );
+	DECLARE_READ_LINE_MEMBER( i8049_t1_r );
 
 protected:
 	// internal overlay helpers
@@ -176,7 +176,7 @@ public:
 	DECLARE_READ8_MEMBER( i8748_port2_r );
 	DECLARE_WRITE8_MEMBER( i8748_port2_w );
 	DECLARE_READ8_MEMBER( i8748_data_r );
-	DECLARE_READ8_MEMBER( i8748_t0_r );
+	DECLARE_READ_LINE_MEMBER( i8748_t0_r );
 
 protected:
 	// internal state

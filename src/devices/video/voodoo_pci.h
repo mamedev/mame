@@ -29,6 +29,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
+	void postload(void);
 	void set_cpu_tag(const char *tag);
 	static void set_type(const int type) {m_type = type;}
 	void set_fbmem(const int fbmem) {m_fbmem = fbmem;}
@@ -50,7 +51,7 @@ private:
 	int m_fbmem, m_tmumem0, m_tmumem1;
 	const char *m_cpu_tag;
 
-	uint32_t m_pcictrl_reg[0x10];
+	uint32_t m_pcictrl_reg[0x20];
 	DECLARE_ADDRESS_MAP(voodoo_reg_map, 32);
 	DECLARE_ADDRESS_MAP(banshee_reg_map, 32);
 	DECLARE_ADDRESS_MAP(lfb_map, 32);

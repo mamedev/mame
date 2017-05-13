@@ -251,10 +251,6 @@ static INPUT_PORTS_START( cham24 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-void cham24_state::machine_reset()
-{
-}
-
 PALETTE_INIT_MEMBER(cham24_state, cham24)
 {
 	m_ppu->init_palette(palette, 0);
@@ -279,6 +275,12 @@ uint32_t cham24_state::screen_update_cham24(screen_device &screen, bitmap_ind16 
 
 void cham24_state::machine_start()
 {
+	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
+	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
+}
+
+void cham24_state::machine_reset()
+{
 	/* switch PRG rom */
 	uint8_t* dst = memregion("maincpu")->base();
 	uint8_t* src = memregion("user1")->base();
@@ -289,9 +291,7 @@ void cham24_state::machine_start()
 	/* uses 8K swapping, all ROM!*/
 	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank1");
 	membank("bank1")->set_base(memregion("gfx1")->base());
-
-	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
-	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
+	
 	m_nt_page[0] = m_nt_ram.get();
 	m_nt_page[1] = m_nt_ram.get() + 0x400;
 	m_nt_page[2] = m_nt_ram.get() + 0x800;

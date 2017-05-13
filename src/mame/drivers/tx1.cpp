@@ -454,6 +454,7 @@ static uint8_t bit_reverse8(uint8_t val)
 	return val;
 }
 
+// Tazmi TZ2103 custom 4-channel A/D converter @ 7.5 MHz
 READ8_MEMBER(tx1_state::bb_analog_r)
 {
 	if (offset == 0)

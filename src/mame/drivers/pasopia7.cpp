@@ -114,6 +114,7 @@ private:
 	int m_addr_latch;
 	void pasopia_nmi_trap();
 	uint8_t m_mux_data;
+	emu_timer *m_pio_timer;
 	virtual void machine_reset() override;
 	void fdc_irq(bool state);
 	void draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
@@ -1048,13 +1049,15 @@ ROM_END
 DRIVER_INIT_MEMBER(pasopia7_state,p7_raster)
 {
 	m_screen_type = 1;
-	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(pasopia7_state::pio_timer),this));
+	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
+	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
 DRIVER_INIT_MEMBER(pasopia7_state,p7_lcd)
 {
 	m_screen_type = 0;
-	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(pasopia7_state::pio_timer),this));
+	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
+	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
 

@@ -700,7 +700,7 @@ WRITE_LINE_MEMBER(segaybd_state::mb8421_intr)
 
 READ16_MEMBER(segaybd_state::link_r)
 {
-	return rand();
+	return machine().rand();
 }
 
 READ16_MEMBER(segaybd_state::link2_r)

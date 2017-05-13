@@ -621,6 +621,15 @@ static ADDRESS_MAP_START( suzume_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x81, 0x81 ) AM_WRITE(suzume_bank_w )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( mjyarou_iomap, AS_IO, 8, royalmah_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(royalmah_palbank_w )
+	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
+	AM_RANGE( 0x12, 0x12 ) AM_READ_PORT("DSW2")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( dondenmj_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -1645,6 +1654,33 @@ static INPUT_PORTS_START( suzume )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW4")  /* DSW4 */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mjyarou )
+	PORT_INCLUDE( royalmah )
+
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3398,6 +3434,11 @@ static MACHINE_CONFIG_DERIVED( mjclub, royalmah )
 	MCFG_CPU_IO_MAP(mjclub_iomap)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( mjyarou, royalmah )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(mjyarou_iomap)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( ippatsu, dondenmj )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(ippatsu_iomap)
@@ -4733,7 +4774,7 @@ Mahjong Yarou
 
 FRM-00 (modified royal mahjong hardware)
 
-CPU: Z80 (on subboard) <- wrong,they are 2 z80 CPUs -AS
+CPU: Z80 (on subboard)
 Sound: AY-3-8910
 OSC: 18.432MHz
 
@@ -4748,13 +4789,13 @@ ROMs:
                 pin9 is not inserted to the socket
 
 Subboard:
-7(2732)
+7(2764)
 8(2764)
 N82S129N.IC4
 N82S123N.IC7
 N82S129N.IC15
 
-Connetor between mainboard and subboard
+Connector between mainboard and subboard
 sub - main
  CK - LS368 (1K) pin12
  HD - LS08  (2E) pin1
@@ -4808,25 +4849,44 @@ http://japump.i.am/
 
 ROM_START( mjyarou )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1",       0x0000, 0x1000, CRC(312c3b29) SHA1(ec2e14b392cf761f0a7079376994418fd463a06c) )
-	ROM_LOAD( "2",       0x1000, 0x1000, CRC(98f14097) SHA1(cd1f72d6effa50f95386dfc5fa9b5056d83e554f) )
-	ROM_LOAD( "3",       0x2000, 0x1000, CRC(295dbf40) SHA1(d6ac7bd88da849e418e750e2c91a594f65bdff39) )
-	ROM_LOAD( "4",       0x3000, 0x1000, CRC(a6a078c8) SHA1(936be36c7c938c705e7054a42c1908bb5a5ee1bb) )
-	ROM_LOAD( "5",       0x4000, 0x1000, CRC(3179657e) SHA1(703fc57ae71554345754267c31809cf7af7f1639) )
-	ROM_LOAD( "6",       0x5000, 0x1000, CRC(6ccc05b4) SHA1(6eefba6023673edd86e82a0ad861a4d8f7f6652b) )
-	ROM_LOAD( "8",       0x6000, 0x2000, CRC(1adef246) SHA1(b5f5598daf71694effffbfb486b03fcda5a593ee) ) //might be a rom for the sub cpu.
-
-	/*encrypted z80*/
-	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "7",       0x0000, 0x1000, CRC(dd144b90) SHA1(56b2c4472aaec49d9fddc99d8aa718b17655812c) )
+	ROM_LOAD( "1.p1",       0x0000, 0x1000, CRC(312c3b29) SHA1(ec2e14b392cf761f0a7079376994418fd463a06c) ) // on main board
+	ROM_LOAD( "2.p2",       0x1000, 0x1000, CRC(98f14097) SHA1(cd1f72d6effa50f95386dfc5fa9b5056d83e554f) ) // "
+	ROM_LOAD( "3.p3",       0x2000, 0x1000, CRC(295dbf40) SHA1(d6ac7bd88da849e418e750e2c91a594f65bdff39) ) // "
+	ROM_LOAD( "4.p4",       0x3000, 0x1000, CRC(a6a078c8) SHA1(936be36c7c938c705e7054a42c1908bb5a5ee1bb) ) // "
+	ROM_LOAD( "5.p5",       0x4000, 0x1000, CRC(3179657e) SHA1(703fc57ae71554345754267c31809cf7af7f1639) ) // "
+	ROM_LOAD( "6.p6",       0x5000, 0x1000, CRC(6ccc05b4) SHA1(6eefba6023673edd86e82a0ad861a4d8f7f6652b) ) // "
+	ROM_LOAD( "7.ic2",      0x6000, 0x2000, CRC(de6bfdd8) SHA1(dd9727d4d7de4add48cde229b8aa194f0492af7e) ) // on sub board
+	ROM_LOAD( "8.ic3",      0x8000, 0x2000, CRC(1adef246) SHA1(b5f5598daf71694effffbfb486b03fcda5a593ee) ) // "
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "4.6k",         0x0000, 0x0020, CRC(41bd4d69) SHA1(4d2da761b338b62b2ea151c201063a24d6e4cc97) )
-	ROM_LOAD( "82s123n.ic7",  0x0020, 0x0020, CRC(46014727) SHA1(eec451f292ee319fa6bfbbf223aaa12b231692c1) )
+	ROM_LOAD( "82s123n.ic7",  0x0000, 0x0020, CRC(46014727) SHA1(eec451f292ee319fa6bfbbf223aaa12b231692c1) ) // on sub board
+	ROM_LOAD( "4.6k",         0x0020, 0x0010, CRC(41bd4d69) SHA1(4d2da761b338b62b2ea151c201063a24d6e4cc97) ) // on main board
+	ROM_CONTINUE(0x0000, 0x0010)
 
 	ROM_REGION( 0x0200, "user1", 0 ) //?
-	ROM_LOAD( "82s129n.ic15",  0x0000, 0x0100, CRC(86aeafd1) SHA1(c4e5c56ce5baf2be3962675ae333e28bd8108a00) )
-	ROM_LOAD( "82s129n.ic4",   0x0100, 0x0100, CRC(f09d3c4c) SHA1(a9e752d75e7f3ebd05add4ccf2f9f15d8f9a8d15) )
+	ROM_LOAD( "82s129n.ic15",  0x0000, 0x0100, CRC(86aeafd1) SHA1(c4e5c56ce5baf2be3962675ae333e28bd8108a00) ) // on sub board
+	ROM_LOAD( "82s129n.ic4",   0x0100, 0x0100, CRC(f09d3c4c) SHA1(a9e752d75e7f3ebd05add4ccf2f9f15d8f9a8d15) ) // "
+ROM_END
+
+ROM_START( mjyarou2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "my_1",    0x0000, 0x1000, CRC(c303a013) SHA1(1360aa8657740036f017eba864eed2cbc3c9ad62) )
+	ROM_LOAD( "my_2",    0x1000, 0x1000, CRC(0c7f87cc) SHA1(2e56656b2dd860471eab9dfcb1dfd4e0b23a8df9) )
+	ROM_LOAD( "my_3",    0x2000, 0x1000, CRC(e94d5f9a) SHA1(c8365991aecf0b1d22c7ce38dd15f6d4a5f70cac) )
+	ROM_LOAD( "my_4",    0x3000, 0x1000, CRC(a6a078c8) SHA1(936be36c7c938c705e7054a42c1908bb5a5ee1bb) )
+	ROM_LOAD( "my_5",    0x4000, 0x1000, CRC(3179657e) SHA1(703fc57ae71554345754267c31809cf7af7f1639) )
+	ROM_LOAD( "my_6",    0x5000, 0x1000, CRC(0ca1cedc) SHA1(bd5d54b185e6ff5633d59df4c06a2094fca9cbf2) )
+	ROM_LOAD( "7",       0x6000, 0x2000, CRC(de6bfdd8) SHA1(dd9727d4d7de4add48cde229b8aa194f0492af7e) )
+	ROM_LOAD( "8",       0x8000, 0x2000, CRC(1adef246) SHA1(b5f5598daf71694effffbfb486b03fcda5a593ee) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "82s123n.ic7",  0x0000, 0x0020, CRC(46014727) SHA1(eec451f292ee319fa6bfbbf223aaa12b231692c1) ) // not dumped for this board
+	ROM_LOAD( "82s123",       0x0020, 0x0010, CRC(41bd4d69) SHA1(4d2da761b338b62b2ea151c201063a24d6e4cc97) )
+	ROM_CONTINUE(0x0000, 0x0010)
+
+	ROM_REGION( 0x0200, "user1", 0 ) //?
+	ROM_LOAD( "82s129n.ic15",  0x0000, 0x0100, CRC(86aeafd1) SHA1(c4e5c56ce5baf2be3962675ae333e28bd8108a00) )  // not dumped for this board
+	ROM_LOAD( "82s129n.ic4",   0x0100, 0x0100, CRC(f09d3c4c) SHA1(a9e752d75e7f3ebd05add4ccf2f9f15d8f9a8d15) )  // not dumped for this board
 ROM_END
 
 /*
@@ -4903,6 +4963,24 @@ ROM_START( jansoua )
 	ROM_LOAD( "n82s123an", 0x0000, 0x0020, CRC(e9598146) SHA1(619e7eb76cc3e882b5b3e55cdd23fe00b0a1fe45) )
 ROM_END
 
+ROM_START( rkjanoh2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+    ROM_LOAD( "pf_1",         0x000000, 0x001000, CRC(582e7eda) SHA1(96578b6142051d9452f23c8c1b674e2d8a4c3b62) )
+    ROM_LOAD( "pf_2",         0x001000, 0x001000, CRC(49e7dc40) SHA1(d6232a82b6927c79dd47884e5e2a6589c5524424) )
+	ROM_LOAD( "pf_3_1",       0x002000, 0x001000, CRC(a1fdc929) SHA1(27cab4da2365bcf311d7f00d75e8db150183b108) )
+	ROM_LOAD( "pf_4l",        0x003000, 0x001000, CRC(c9ccdfa0) SHA1(ce6f2df7fb6739ddf0529bcae0596e4593ecc3e0) )
+	//ROM_LOAD( "pf_4_fewest",  0x003000, 0x001000, CRC(9a1650a0) SHA1(2da5957879d9f207721fc2f0d63dccc32850cbe2) )
+	//ROM_LOAD( "pf_4_middle",  0x003000, 0x001000, CRC(b1a721d8) SHA1(de24ec4bac7ec761c7b25a7ba62b850006444bbc) )
+	ROM_LOAD( "pf_5",         0x004000, 0x001000, CRC(8a858464) SHA1(55c71ce1c30e908dfc8c21237256dfbb75c55363) )
+	ROM_LOAD( "pf_6",         0x005000, 0x001000, CRC(5b649918) SHA1(191a221a515c261d90d7432443a7fbc8da71e7ac) )
+	ROM_LOAD( "pf_7",         0x006000, 0x001000, CRC(c4fdd2ac) SHA1(76c5645534b87dde87acfb4140d0f3ba18c95cd2) )
+	
+	ROM_REGION( 0x002000, "gfx", 0 )
+	ROM_LOAD( "pf_8",         0x000000, 0x002000, CRC(c789e2b3) SHA1(33b5c8f22a1e337816a61fd2c91bc175a412d10e) )
+	
+	ROM_REGION( 0x0020, "proms", 0 )
+    ROM_LOAD( "82s123",       0x000, 0x020, CRC(74a53e94) SHA1(ca9114bd9b2b07f5abe82616b41ae9fdb9537a4f) )
+ROM_END
 
 DRIVER_INIT_MEMBER(royalmah_state,ippatsu)
 {
@@ -4916,6 +4994,8 @@ DRIVER_INIT_MEMBER(royalmah_state,janptr96)
 	machine().device<nvram_device>("nvram")->set_base(m_janptr96_nvram.get(), 0x1000 * 9);
 }
 
+
+
 // the original Janputer (Sanritsu) is not yet dumped, basically Royal Mahjong but non-BET type
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, driver_device,  0,        ROT0,   "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
@@ -4923,6 +5003,7 @@ GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, driver_device,  0,        R
 GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, driver_device,  0,        ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1985,  tahjong,  royalmj,  tahjong,  tahjong,  driver_device,  0,        ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17
 GAME( 1981,  janputer, 0,        royalmah, royalmah, driver_device,  0,        ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong) [BET]", 0 ) // MT #05392
+GAME( 1984,  rkjanoh2, 0,		 royalmah, royalmah, driver_device,  0,        ROT0,   "SNK / Dyna",                 "Royal King Jang Oh 2 (v4.00 1984 Jun 10th)", MACHINE_NOT_WORKING )
 GAME( 1984,  janoh,    0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        MACHINE_NOT_WORKING )
 GAME( 1984,  janoha,   janoh,    janoh,    royalmah, driver_device,  0,        ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        MACHINE_NOT_WORKING ) // this one is complete?
 GAME( 1985,  jansou,   0,        jansou,   jansou,   driver_device,  0,        ROT0,   "Dyna",                       "Jansou (set 1)",                        MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
@@ -4932,10 +5013,11 @@ GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  royalmah_state, ippatsu,  R
 GAME( 1986,  suzume,   0,        suzume,   suzume,   driver_device,  0,        ROT0,   "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
 GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                MACHINE_NOT_WORKING )
 GAME( 1986,  mjsenka,  0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 MACHINE_NOT_WORKING )
-GAME( 1986,  mjyarou,  0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan)",           MACHINE_NOT_WORKING )
+GAME( 1986,  mjyarou,  0,        mjyarou,  mjyarou,  driver_device,  0,        ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 1)",    MACHINE_IMPERFECT_GRAPHICS ) // girls aren't shown
+GAME( 1986,  mjyarou2, mjyarou,  mjyarou,  mjyarou,  driver_device,  0,        ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 2)",    MACHINE_IMPERFECT_GRAPHICS ) // girls aren't shown 
 GAME( 1986?, mjclub,   0,        mjclub,   mjclub,   driver_device,  0,        ROT0,   "Xex",                        "Mahjong Club [BET] (Japan)",            0 )
 GAME( 1987,  mjdiplob, 0,        mjdiplob, mjdiplob, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Diplomat [BET] (Japan)",        0 )
-GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  driver_device,  0,        ROT0,   "Dynax",                      "Tonton [BET] (Japan set 1)",            0 )
+GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  driver_device,  0,        ROT0,   "Dynax",                      "Tonton [BET] (Japan, set 1)",           0 )
 GAME( 1987,  makaijan, 0,        makaijan, makaijan, driver_device,  0,        ROT0,   "Dynax",                      "Makaijan [BET] (Japan)",                0 )
 GAME( 1988,  majs101b, 0,        majs101b, majs101b, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Studio 101 [BET] (Japan)",      0 )
 GAME( 1988,  mjapinky, 0,        mjapinky, mjapinky, driver_device,  0,        ROT0,   "Dynax",                      "Almond Pinky [BET] (Japan)",            0 )
