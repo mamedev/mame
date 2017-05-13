@@ -28566,7 +28566,7 @@ gram2000                        // 2000.09 Giant Gram 2000
 gundmct                         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (cartridge)
 gundmgd                         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (GD-ROM)
 gundmxgd                        // 2001.09 Mobile Suit Gundam: Federation Vs. Zeon DX
-gunsur2                         // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (Asia, BHF2 Ver.E)
+gunsur2                         // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (World, BHF2 Ver.E)
 gunsur2j                        // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (Japan, BHF1 Ver.E)
 gwing2                          // 2000.?? Giga Wing 2
 hmgeo                           // 2001.06 Heavy Metal Geomatrix (Rev B)
@@ -28607,8 +28607,8 @@ mamonoro                        // 2008.07 Mamoru-kun wa Norowarete Shimatta!
 manicpnc                        // 2007.07 Manic Panic Ghosts! (USA)
 marstv                          // 1999.12 Mars TV
 maxspeed                        // 2002.12 Maximum Speed
-mazan                           // 2002.07 Mazan: Flash of the Blade (US, MAZ3 Ver.A)
-mazana                          // 2002.07 Mazan: Flash of the Blade (Asia, MAZ2 Ver.A)
+mazan                           // 2002.07 Mazan: Flash of the Blade (World, MAZ2 Ver.A)
+mazanu                          // 2002.07 Mazan: Flash of the Blade (US, MAZ3 Ver.A)
 mbaa                            // 2008.12 Melty Blood Actress Again Version A (Rev A)
 mbaao                           // 2008.09 Melty Blood Actress Again
 meltyb                          // 2007.03 Melty Blood Act Cadenza Version B2 (Rev A)        // Last GD-ROM game?
@@ -28634,8 +28634,8 @@ ngbcj                           // 2005.07 NeoGeo Battle Colloseum (Japan)
 ngdup23a                        // DIMM Firmware Updater (Rev A)
 ngdup23c                        // DIMM Firmware Updater (Rev C)
 ngdup23e                        // DIMM Firmware Updater (Rev E)
-ninjaslt                        // 2000.11 Ninja Assault (World, NJA4 Ver.A)
-ninjaslta                       // 2000.11 Ninja Assault (Asia, NJA2 Ver.A)
+ninjaslt                        // 2000.11 Ninja Assault (World, NJA2 Ver.A)
+ninjaslta                       // 2000.11 Ninja Assault (Asia, NJA4 Ver.A)
 ninjasltj                       // 2000.11 Ninja Assault (Japan, NJA1 Ver.A)
 ninjasltu                       // 2000.11 Ninja Assault (US, NJA3 Ver.A)
 oinori                          // 2003.08 Oinori-daimyoujin Matsuri
@@ -28751,9 +28751,9 @@ wccf310j                        // 2005.06 World Club Champion Football European
 wccf322e                        // 2005.11 World Club Champion Football European Clubs 2004-2005 Ver.3.22
 wccf331e                        // 2005.06 World Club Champion Football European Clubs 2004-2005 Ver.1.1
 wccf420e                        // 2006.08 World Club Champion Football European Clubs 2005-2006
-wldkicks                        // 2000.03 World Kicks (US, WK3 Ver.A)
-wldkicksa                       // 2000.03 World Kicks (Asia, WK2 Ver.A)
+wldkicks                        // 2000.03 World Kicks (World, WK2 Ver.A)
 wldkicksj                       // 2000.03 World Kicks (Japan, WK1 Ver.A)
+wldkicksu                       // 2000.03 World Kicks (US, WK3 Ver.A)
 wldkickspj                      // 2000.03 World Kicks PCB (Japan, WKC1 Ver.A)
 wldrider                        // 2001.05 Wild Riders
 wrungp                          // 2001.08 Wave Runner GP
