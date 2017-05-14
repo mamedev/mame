@@ -559,7 +559,7 @@ void vrc5074_device::update_nile_irqs()
 	int i;
 
 	/* check for UART transmit IRQ enable and synthsize one */
-	if (m_cpu_regs[NREG_UARTIER] & 2)
+	if (m_serial_regs[NREG_UARTIER] & 2)
 		m_nile_irq_state |= 0x0010;
 	else
 		m_nile_irq_state &= ~0x0010;
@@ -906,7 +906,7 @@ READ32_MEMBER(vrc5074_device::serial_r)
 	uint32_t result = m_serial_regs[offset];
 	bool logit = true;
 
-	switch (offset + 0x300 / 4)
+	switch (offset)
 	{
 
 	case NREG_UARTIIR:          /* serial port interrupt ID */
@@ -934,7 +934,7 @@ WRITE32_MEMBER(vrc5074_device::serial_w)
 	bool logit = true;
 	COMBINE_DATA(&m_serial_regs[offset]);
 
-	switch (offset + 0x300 / 4)
+	switch (offset)
 	{
 
 	case NREG_UARTTHR:      /* serial port output */
