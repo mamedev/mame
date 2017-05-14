@@ -113,6 +113,7 @@ public:
 	DECLARE_WRITE8_MEMBER(jrpacman_scroll_w);
 	DECLARE_WRITE8_MEMBER(jrpacman_bgpriority_w);
 	DECLARE_WRITE8_MEMBER(superabc_bank_w);
+	DECLARE_WRITE8_MEMBER(pac4n1_bank_w);
 	DECLARE_DRIVER_INIT(maketrax);
 	DECLARE_DRIVER_INIT(drivfrcp);
 	DECLARE_DRIVER_INIT(mspacmbe);
@@ -130,6 +131,7 @@ public:
 	DECLARE_DRIVER_INIT(porky);
 	DECLARE_DRIVER_INIT(mspacman);
 	DECLARE_DRIVER_INIT(mschamp);
+	DECLARE_DRIVER_INIT(pac4n1);
 	TILEMAP_MAPPER_MEMBER(pacman_scan_rows);
 	TILE_GET_INFO_MEMBER(pacman_get_tile_info);
 	TILE_GET_INFO_MEMBER(s2650_get_tile_info);
@@ -141,6 +143,7 @@ public:
 	DECLARE_VIDEO_START(s2650games);
 	DECLARE_MACHINE_RESET(mschamp);
 	DECLARE_MACHINE_RESET(superabc);
+	DECLARE_MACHINE_RESET(pac4n1);
 	DECLARE_VIDEO_START(pengo);
 	DECLARE_VIDEO_START(jrpacman);
 	uint32_t screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
