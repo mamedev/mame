@@ -107,7 +107,7 @@ protected:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(HP9845_IO_SLOT, hp9845_io_slot_devices)
+DECLARE_DEVICE_TYPE(HP9845_IO_SLOT, hp9845_io_slot_device)
 
 SLOT_INTERFACE_EXTERN(hp9845_io_slot_devices);
 
