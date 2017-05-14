@@ -287,6 +287,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(ISA8_CGA_M24, isa8_cga_m24)
+DECLARE_DEVICE_TYPE(ISA8_CGA_M24, isa8_cga_m24_device)
 
 #endif  // MAME_BUS_ISA_CGA_H

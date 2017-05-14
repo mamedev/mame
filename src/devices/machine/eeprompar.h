@@ -88,7 +88,7 @@ class eeprom_parallel_##_lowercase##_device : public eeprom_parallel_##_baseclas
 public: \
 	eeprom_parallel_##_lowercase##_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); \
 }; \
-DECLARE_DEVICE_TYPE(EEPROM_PARALLEL_##_uppercase, eeprom_parallel_##_lowercase_device)
+DECLARE_DEVICE_TYPE(EEPROM_PARALLEL_##_uppercase, eeprom_parallel_##_lowercase##_device)
 
 // standard 28XX class of 8-bit EEPROMs
 DECLARE_PARALLEL_EEPROM_DEVICE(28xx, 2804, 2804)

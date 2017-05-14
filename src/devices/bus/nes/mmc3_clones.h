@@ -737,7 +737,9 @@ DECLARE_DEVICE_TYPE(NES_SF3,           nes_sf3_device)
 DECLARE_DEVICE_TYPE(NES_GOUDER,        nes_gouder_device)
 DECLARE_DEVICE_TYPE(NES_SA9602B,       nes_sa9602b_device)
 DECLARE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device)
+#ifdef UNUSED_FUNCTION
 DECLARE_DEVICE_TYPE(NES_A9746,         nes_a9746_device)
+#endif
 
 DECLARE_DEVICE_TYPE(NES_FK23C,         nes_fk23c_device)
 DECLARE_DEVICE_TYPE(NES_FK23CA,        nes_fk23ca_device)
