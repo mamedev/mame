@@ -1,11 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Karl Stenerud
+#ifndef MAME_CPU_M68000_M68000_H
+#define MAME_CPU_M68000_M68000_H
+
 #pragma once
-
-#ifndef __M68000_H__
-#define __M68000_H__
-
-
 
 // SoftFloat 2 lacks an include guard
 #ifndef softfloat_h
@@ -124,12 +122,6 @@ class m68000_base_device : public cpu_device
 public:
 
 	// construction/destruction
-	m68000_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, uint32_t clock,
-						const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits, const char *shortname, const char *source);
-
-	m68000_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, uint32_t clock,
-						const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);
-
 	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void presave();
@@ -174,6 +166,13 @@ public:
 	int get_fpu_enable();
 	void set_instruction_hook(read32_delegate ihook);
 	void set_buserror_details(uint32_t fault_addr, uint8_t rw, uint8_t fc);
+
+protected:
+	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+						const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits);
+
+	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+						const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits, address_map_constructor internal_map);
 
 private:
 	int    has_fpu;      /* Indicates if a FPU is available (yes on 030, 040, may be on 020) */
@@ -406,12 +405,6 @@ class m68000_device : public m68000_base_device
 public:
 	// construction/destruction
 	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	m68000_device(const machine_config &mconfig, const device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
-	m68000_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, uint32_t clock,
-						const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);
-
 
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
@@ -425,6 +418,12 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
+
+protected:
+	m68000_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+						const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits, address_map_constructor internal_map);
 };
 
 class m68301_device : public m68000_base_device
@@ -726,9 +725,6 @@ public:
 	// construction/destruction
 	fscpu32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	fscpu32_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, uint32_t clock,
-						const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);
-
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
@@ -740,6 +736,10 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
+
+protected:
+	fscpu32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+						const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits, address_map_constructor internal_map);
 };
 
 
@@ -765,24 +765,24 @@ public:
 };
 
 
-extern const device_type M68000;
-extern const device_type M68301;
-extern const device_type M68008;
-extern const device_type M68008PLCC;
-extern const device_type M68010;
-extern const device_type M68EC020;
-extern const device_type M68020;
-extern const device_type M68020FPU;
-extern const device_type M68020PMMU;
-extern const device_type M68020HMMU;
-extern const device_type M68EC030;
-extern const device_type M68030;
-extern const device_type M68EC040;
-extern const device_type M68LC040;
-extern const device_type M68040;
-extern const device_type SCC68070;
-extern const device_type FSCPU32;
-extern const device_type MCF5206E;
+DECLARE_DEVICE_TYPE(M68000, m68000_device)
+DECLARE_DEVICE_TYPE(M68301, m68301_device)
+DECLARE_DEVICE_TYPE(M68008, m68008_device)
+DECLARE_DEVICE_TYPE(M68008PLCC, m68008plcc_device)
+DECLARE_DEVICE_TYPE(M68010, m68010_device)
+DECLARE_DEVICE_TYPE(M68EC020, m68ec020_device)
+DECLARE_DEVICE_TYPE(M68020, m68020_device)
+DECLARE_DEVICE_TYPE(M68020FPU, m68020fpu_device)
+DECLARE_DEVICE_TYPE(M68020PMMU, m68020pmmu_device)
+DECLARE_DEVICE_TYPE(M68020HMMU, m68020hmmu_device)
+DECLARE_DEVICE_TYPE(M68EC030, m68ec030_device)
+DECLARE_DEVICE_TYPE(M68030, m68030_device)
+DECLARE_DEVICE_TYPE(M68EC040, m68ec040_device)
+DECLARE_DEVICE_TYPE(M68LC040, m68lc040_device)
+DECLARE_DEVICE_TYPE(M68040, m68040_device)
+DECLARE_DEVICE_TYPE(SCC68070, scc68070_device)
+DECLARE_DEVICE_TYPE(FSCPU32, fscpu32_device)
+DECLARE_DEVICE_TYPE(MCF5206E, mcf5206e_device)
 
 
-#endif /* __M68000_H__ */
+#endif // MAME_CPU_M68000_M68000_H

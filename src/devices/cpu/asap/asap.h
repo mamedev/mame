@@ -9,10 +9,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_ASAP_ASAP_H
+#define MAME_CPU_ASAP_ASAP_H
 
-#ifndef __ASAP_H__
-#define __ASAP_H__
+#pragma once
 
 
 //**************************************************************************
@@ -31,6 +31,44 @@ public:
 	// public interfaces
 
 protected:
+	enum
+	{
+		ASAP_PC = 1,
+		ASAP_PS,
+		ASAP_R0,
+		ASAP_R1,
+		ASAP_R2,
+		ASAP_R3,
+		ASAP_R4,
+		ASAP_R5,
+		ASAP_R6,
+		ASAP_R7,
+		ASAP_R8,
+		ASAP_R9,
+		ASAP_R10,
+		ASAP_R11,
+		ASAP_R12,
+		ASAP_R13,
+		ASAP_R14,
+		ASAP_R15,
+		ASAP_R16,
+		ASAP_R17,
+		ASAP_R18,
+		ASAP_R19,
+		ASAP_R20,
+		ASAP_R21,
+		ASAP_R22,
+		ASAP_R23,
+		ASAP_R24,
+		ASAP_R25,
+		ASAP_R26,
+		ASAP_R27,
+		ASAP_R28,
+		ASAP_R29,
+		ASAP_R30,
+		ASAP_R31
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -222,45 +260,6 @@ protected:
 //  ENUMERATIONS
 //**************************************************************************
 
-// registers
-enum
-{
-	ASAP_PC = 1,
-	ASAP_PS,
-	ASAP_R0,
-	ASAP_R1,
-	ASAP_R2,
-	ASAP_R3,
-	ASAP_R4,
-	ASAP_R5,
-	ASAP_R6,
-	ASAP_R7,
-	ASAP_R8,
-	ASAP_R9,
-	ASAP_R10,
-	ASAP_R11,
-	ASAP_R12,
-	ASAP_R13,
-	ASAP_R14,
-	ASAP_R15,
-	ASAP_R16,
-	ASAP_R17,
-	ASAP_R18,
-	ASAP_R19,
-	ASAP_R20,
-	ASAP_R21,
-	ASAP_R22,
-	ASAP_R23,
-	ASAP_R24,
-	ASAP_R25,
-	ASAP_R26,
-	ASAP_R27,
-	ASAP_R28,
-	ASAP_R29,
-	ASAP_R30,
-	ASAP_R31
-};
-
 // input lines
 enum
 {
@@ -270,7 +269,6 @@ enum
 
 
 // device type definition
-extern const device_type ASAP;
+DECLARE_DEVICE_TYPE(ASAP, asap_device)
 
-
-#endif /* __ASAP_H__ */
+#endif // MAME_CPU_ASAP_ASAP_H

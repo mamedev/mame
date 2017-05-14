@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "ym2151.h"
 
-const device_type YM2151 = device_creator<ym2151_device>;
+DEFINE_DEVICE_TYPE(YM2151, ym2151_device, "ym2151", "Yamaha YM2151 OPM")
 
 
 #define FREQ_SH         16  /* 16.16 fixed point (frequency calculations) */
@@ -1650,7 +1650,7 @@ void ym2151_device::advance()
 //-------------------------------------------------
 
 ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, YM2151, "YM2151", tag, owner, clock, "ym2151", __FILE__),
+	: device_t(mconfig, YM2151, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_lastreg(0),

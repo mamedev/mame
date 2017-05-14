@@ -329,7 +329,7 @@ void sitcom_timer_state::update_dac(uint8_t value)
 }
 
 
-MACHINE_CONFIG_START( sitcom, sitcom_state )
+MACHINE_CONFIG_START( sitcom )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz) // 3.072MHz can be used for an old slow 8085
 	MCFG_CPU_PROGRAM_MAP(sitcom_mem)
@@ -367,7 +367,7 @@ MACHINE_CONFIG_START( sitcom, sitcom_state )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED_CLASS( sitcomtmr, sitcom, sitcom_timer_state )
+MACHINE_CONFIG_DERIVED( sitcomtmr, sitcom )
 	MCFG_DEVICE_ADD("ds2", DL1414T, 0) // remote display
 	MCFG_DL1414_UPDATE_HANDLER(WRITE16(sitcom_state, update_ds<2>))
 
@@ -390,6 +390,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT  COMPAT  MACHINE     INPUT      STATE          INIT  COMPANY                            FULLNAME        FLAGS */
-COMP( 2002, sitcom,    0,      0,      sitcom,     sitcom,    driver_device, 0,    "San Bergmans & Izabella Malcolm", "Sitcom",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
-COMP( 2002, sitcomtmr, sitcom, 0,      sitcomtmr,  sitcomtmr, driver_device, 0,    "San Bergmans & Izabella Malcolm", "Sitcom Timer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME       PARENT  COMPAT  MACHINE     INPUT      STATE               INIT  COMPANY                            FULLNAME        FLAGS */
+COMP( 2002, sitcom,    0,      0,      sitcom,     sitcom,    sitcom_state,       0,    "San Bergmans & Izabella Malcolm", "SITCOM",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+COMP( 2002, sitcomtmr, sitcom, 0,      sitcomtmr,  sitcomtmr, sitcom_timer_state, 0,    "San Bergmans & Izabella Malcolm", "SITCOM Timer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

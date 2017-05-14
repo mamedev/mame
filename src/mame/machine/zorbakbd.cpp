@@ -260,7 +260,7 @@ ROM_END
 } // anonymous namespace
 
 
-device_type const ZORBA_KEYBOARD = device_creator<zorba_keyboard_device>;
+DEFINE_DEVICE_TYPE(ZORBA_KEYBOARD, zorba_keyboard_device, "zorba_kbd", "Zorba Keyboard")
 
 
 zorba_keyboard_device::zorba_keyboard_device(
@@ -268,15 +268,7 @@ zorba_keyboard_device::zorba_keyboard_device(
 		char const *tag,
 		device_t *owner,
 		uint32_t clock)
-	: device_t(
-			mconfig,
-			ZORBA_KEYBOARD,
-			"Zorba Keyboard",
-			tag,
-			owner,
-			clock,
-			"zorba_kbd",
-			__FILE__)
+	: device_t(mconfig, ZORBA_KEYBOARD, tag, owner, clock)
 	, m_rows(*this, "ROW%u", 0)
 	, m_beeper(*this, "beeper")
 	, m_rxd_cb(*this)

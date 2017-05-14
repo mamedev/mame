@@ -7,10 +7,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VIC20_VIDEOPAK_H
+#define MAME_BUS_VIC20_VIDEOPAK_H
 
-#ifndef __VIC20_VIDEO_PAK__
-#define __VIC20_VIDEO_PAK__
+#pragma once
 
 
 #include "exp.h"
@@ -22,14 +22,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vic20_video_pak_t
+// ======================> vic20_video_pak_device
 
-class vic20_video_pak_t : public device_t,
+class vic20_video_pak_device : public device_t,
 						  public device_vic20_expansion_card_interface
 {
 public:
 	// construction/destruction
-	vic20_video_pak_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vic20_video_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -64,7 +64,6 @@ private:
 
 
 // device type definition
-extern const device_type VIC20_VIDEO_PAK;
+DECLARE_DEVICE_TYPE(VIC20_VIDEO_PAK, vic20_video_pak_device)
 
-
-#endif
+#endif // MAME_BUS_VIC20_VIDEOPAK_H

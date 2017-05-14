@@ -864,7 +864,7 @@ INTERRUPT_GEN_MEMBER(maygayv1_state::vsync_interrupt)
 }
 
 
-static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
+static MACHINE_CONFIG_START( maygayv1 )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", maygayv1_state,  vsync_interrupt)

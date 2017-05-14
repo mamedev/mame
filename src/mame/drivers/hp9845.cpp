@@ -486,7 +486,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::gv_timer)
 		advance_gv_fsm(false , false);
 }
 
-attotime hp9845_base_state::time_to_gv_mem_availability(void) const
+attotime hp9845_base_state::time_to_gv_mem_availability() const
 {
 		if (m_graphic_sel) {
 				int hpos = m_screen->hpos();
@@ -514,7 +514,7 @@ IRQ_CALLBACK_MEMBER(hp9845_base_state::irq_callback)
 		}
 }
 
-void hp9845_base_state::update_irq(void)
+void hp9845_base_state::update_irq()
 {
 		m_ppu->set_input_line(HPHYBRID_IRL , m_irl_pending != 0);
 		m_ppu->set_input_line(HPHYBRID_IRH , m_irh_pending != 0);
@@ -545,7 +545,7 @@ void hp9845_base_state::irq_w(uint8_t sc , int state)
 	update_irq();
 }
 
-void hp9845_base_state::update_flg_sts(void)
+void hp9845_base_state::update_flg_sts()
 {
 	bool sts = BIT(m_sts_status , m_pa);
 	bool flg = BIT(m_flg_status , m_pa);
@@ -750,7 +750,7 @@ protected:
 	void graphic_video_render(unsigned video_scanline);
 
 	virtual void advance_gv_fsm(bool ds , bool trigger) override;
-	void update_graphic_bits(void);
+	void update_graphic_bits();
 
 	// Optional character generator
 	required_region_ptr<uint8_t> m_optional_chargen;
@@ -1235,7 +1235,7 @@ void hp9845b_state::advance_gv_fsm(bool ds , bool trigger)
 	update_graphic_bits();
 }
 
-void hp9845b_state::update_graphic_bits(void)
+void hp9845b_state::update_graphic_bits()
 {
 		bool gv_ready = m_gv_fsm_state == GV_STAT_WAIT_DS_0 ||
 			m_gv_fsm_state == GV_STAT_WAIT_DS_1 ||
@@ -1253,13 +1253,13 @@ void hp9845b_state::update_graphic_bits(void)
 }
 
 // ***************
-//  hp9845ct_state
+//  hp9845ct_base_state
 // ***************
 
-class hp9845ct_state : public hp9845_base_state
+class hp9845ct_base_state : public hp9845_base_state
 {
 public:
-	hp9845ct_state(const machine_config &mconfig, device_type type, const char *tag);
+	hp9845ct_base_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -1280,7 +1280,7 @@ protected:
 	void video_fill_buff(bool buff_idx);
 	virtual void plot(uint16_t x, uint16_t y, bool draw_erase) = 0;
 	void draw_line(unsigned x0 , unsigned y0 , unsigned x1 , unsigned y1);
-	void update_line_pattern(void);
+	void update_line_pattern();
 	void pattern_fill(uint16_t x0 , uint16_t y0 , uint16_t x1 , uint16_t y1 , unsigned fill_idx);
 	static uint16_t get_gv_mem_addr(unsigned x , unsigned y);
 	virtual void update_graphic_bits(void) = 0;
@@ -1288,10 +1288,10 @@ protected:
 	void render_lp_cursor(unsigned video_scanline , unsigned pen_idx);
 
 	void lp_r4_w(uint16_t data);
-	uint16_t lp_r4_r(void);
+	uint16_t lp_r4_r();
 	void lp_r5_w(uint16_t data);
 	bool lp_segment_intersect(unsigned yline) const;
-	void compute_lp_data(void);
+	void compute_lp_data();
 	void lp_scanline_update(unsigned video_scanline);
 
 	virtual void update_gcursor(void) = 0;
@@ -1351,14 +1351,14 @@ protected:
 static INPUT_PORTS_START(hp9845ct)
 	PORT_INCLUDE(hp9845_base)
 	PORT_START("SOFTKEYS")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey0") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey1") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey2") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey3") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey4") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey5") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey6") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey7") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_state, softkey_changed, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey0") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey1") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey2") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey3") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey4") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey5") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey6") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey7") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
 
 	PORT_START("LIGHTPENX")
 	PORT_BIT( 0x3ff, 0x000, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(20) PORT_MINMAX(0, VIDEO_TOT_HPIXELS - 1) PORT_CROSSHAIR(X, 1.0, 0.0, 0)
@@ -1370,7 +1370,7 @@ static INPUT_PORTS_START(hp9845ct)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Gkey")
 INPUT_PORTS_END
 
-hp9845ct_state::hp9845ct_state(const machine_config &mconfig, device_type type, const char *tag)
+hp9845ct_base_state::hp9845ct_base_state(const machine_config &mconfig, device_type type, const char *tag)
 	: hp9845_base_state(mconfig , type , tag),
       m_io_softkeys(*this, "SOFTKEYS"),
 	  m_lightpen_x(*this, "LIGHTPENX"),
@@ -1379,13 +1379,13 @@ hp9845ct_state::hp9845ct_state(const machine_config &mconfig, device_type type, 
 {
 }
 
-void hp9845ct_state::machine_start()
+void hp9845ct_base_state::machine_start()
 {
 	// Common part first
 	hp9845_base_state::machine_start();
 }
 
-void hp9845ct_state::machine_reset()
+void hp9845ct_base_state::machine_reset()
 {
 	// Common part first
 	hp9845_base_state::machine_reset();
@@ -1427,14 +1427,14 @@ void hp9845ct_state::machine_reset()
 	update_graphic_bits();
 }
 
-uint32_t hp9845ct_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hp9845ct_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }
 
-WRITE_LINE_MEMBER(hp9845ct_state::vblank_w)
+WRITE_LINE_MEMBER(hp9845ct_base_state::vblank_w)
 {
 	// VBlank signal is fed into HALT flag of PPU
 	m_ppu->halt_w(state);
@@ -1465,7 +1465,7 @@ WRITE_LINE_MEMBER(hp9845ct_state::vblank_w)
 	}
 }
 
-INPUT_CHANGED_MEMBER(hp9845ct_state::softkey_changed)
+INPUT_CHANGED_MEMBER(hp9845ct_base_state::softkey_changed)
 {
 	if (!m_gv_sk_status) {
 		uint8_t softkey_data = m_io_softkeys->read();
@@ -1486,12 +1486,12 @@ INPUT_CHANGED_MEMBER(hp9845ct_state::softkey_changed)
 	}
 }
 
-void hp9845ct_state::set_video_mar(uint16_t mar)
+void hp9845ct_base_state::set_video_mar(uint16_t mar)
 {
 	m_video_mar = (mar & 0x1fff) | VIDEO_BUFFER_BASE_LOW;
 }
 
-void hp9845ct_state::video_fill_buff(bool buff_idx)
+void hp9845ct_base_state::video_fill_buff(bool buff_idx)
 {
 	unsigned char_idx = 0;
 	unsigned iters = 0;
@@ -1549,7 +1549,7 @@ void hp9845ct_state::video_fill_buff(bool buff_idx)
 	}
 }
 
-void hp9845ct_state::draw_line(unsigned x0 , unsigned y0 , unsigned x1 , unsigned y1)
+void hp9845ct_base_state::draw_line(unsigned x0 , unsigned y0 , unsigned x1 , unsigned y1)
 {
 	int dx, dy, sx, sy, x, y, err, e2;
 
@@ -1580,7 +1580,7 @@ void hp9845ct_state::draw_line(unsigned x0 , unsigned y0 , unsigned x1 , unsigne
 	}
 }
 
-void hp9845ct_state::update_line_pattern(void)
+void hp9845ct_base_state::update_line_pattern()
 {
 	// update line pattern
 	m_gv_repeat_count++;
@@ -1592,7 +1592,7 @@ void hp9845ct_state::update_line_pattern(void)
 	}
 }
 
-void hp9845ct_state::pattern_fill(uint16_t x0 , uint16_t y0 , uint16_t x1 , uint16_t y1 , unsigned fill_idx)
+void hp9845ct_base_state::pattern_fill(uint16_t x0 , uint16_t y0 , uint16_t x1 , uint16_t y1 , unsigned fill_idx)
 {
 	uint16_t x,y,xmax,ymax;
 	uint16_t pixel_mask, fill_mask;
@@ -1612,12 +1612,12 @@ void hp9845ct_state::pattern_fill(uint16_t x0 , uint16_t y0 , uint16_t x1 , uint
 	}
 }
 
-uint16_t hp9845ct_state::get_gv_mem_addr(unsigned x , unsigned y)
+uint16_t hp9845ct_base_state::get_gv_mem_addr(unsigned x , unsigned y)
 {
 	return (uint16_t)((x + y * 35) & GVIDEO_ADDR_MASK);
 }
 
-int hp9845ct_state::get_wrapped_scanline(unsigned scanline)
+int hp9845ct_base_state::get_wrapped_scanline(unsigned scanline)
 {
 	// The 770's VTOTAL applies to 780, too.
 	// The 780 hw generates a line clock (GVclk in Duell's schematics) that's suppressed
@@ -1631,7 +1631,7 @@ int hp9845ct_state::get_wrapped_scanline(unsigned scanline)
 	return wrapped_cursor_y;
 }
 
-void hp9845ct_state::render_lp_cursor(unsigned video_scanline , unsigned pen_idx)
+void hp9845ct_base_state::render_lp_cursor(unsigned video_scanline , unsigned pen_idx)
 {
 	int cursor_y_top = get_wrapped_scanline(m_gv_lp_cursor_y);
 
@@ -1668,7 +1668,7 @@ void hp9845ct_state::render_lp_cursor(unsigned video_scanline , unsigned pen_idx
 	}
 }
 
-void hp9845ct_state::lp_r4_w(uint16_t data)
+void hp9845ct_base_state::lp_r4_w(uint16_t data)
 {
 	if (m_gv_lp_en) {
 		switch (m_gv_lp_reg_cnt) {
@@ -1698,7 +1698,7 @@ void hp9845ct_state::lp_r4_w(uint16_t data)
 	}
 }
 
-uint16_t hp9845ct_state::lp_r4_r(void)
+uint16_t hp9845ct_base_state::lp_r4_r()
 {
 	uint16_t res = 0;
 
@@ -1741,7 +1741,7 @@ uint16_t hp9845ct_state::lp_r4_r(void)
 	return res;
 }
 
-void hp9845ct_state::lp_r5_w(uint16_t data)
+void hp9845ct_base_state::lp_r5_w(uint16_t data)
 {
 	m_gv_lp_reg_cnt = data & 7;
 	m_gv_lp_en = (data & 0x700) == 0x400;   // enables writes on R4 to set LP data (actually FB bit), also enables LP command processing and LP IRQs
@@ -1750,7 +1750,7 @@ void hp9845ct_state::lp_r5_w(uint16_t data)
 	update_graphic_bits();
 }
 
-bool hp9845ct_state::lp_segment_intersect(unsigned yline) const
+bool hp9845ct_base_state::lp_segment_intersect(unsigned yline) const
 {
 	int xp = m_gv_lp_x;
 	int yp = m_gv_lp_y;
@@ -1770,7 +1770,7 @@ bool hp9845ct_state::lp_segment_intersect(unsigned yline) const
 	return fx >= xc && ex <= (xc + 24);
 }
 
-void hp9845ct_state::compute_lp_data(void)
+void hp9845ct_base_state::compute_lp_data()
 {
 	// get LP hit data, returns three words for cmd=6 and one word for cmd=4
 	// actually simulating the 9845 lightpen is a bit more complex, since YHI, XLEFT and YLO
@@ -1889,7 +1889,7 @@ void hp9845ct_state::compute_lp_data(void)
 	LOG("LP data %d %d %d %d (%u;%d) (%u;%u) %u %u %u %04x %04x %04x\n" , m_gv_lp_selftest , m_gv_lp_interlace , m_gv_lp_sw , m_gv_lp_hit_lt192 , m_gv_lp_cursor_x , yc , m_gv_lp_x , m_gv_lp_y , yhi , xleft , ylo , m_gv_next_lp_data[ 0 ] , m_gv_next_lp_data[ 1 ] , m_gv_next_lp_data[ 2 ]);
 }
 
-void hp9845ct_state::lp_scanline_update(unsigned video_scanline)
+void hp9845ct_base_state::lp_scanline_update(unsigned video_scanline)
 {
 	if (video_scanline == 0) {
 		compute_lp_data();
@@ -1922,11 +1922,11 @@ void hp9845ct_state::lp_scanline_update(unsigned video_scanline)
 	}
 }
 
-const uint16_t hp9845ct_state::m_line_type[] = {
+const uint16_t hp9845ct_base_state::m_line_type[] = {
 	0xffff, 0xaaaa, 0xff00, 0xfff0, 0xfffa, 0xfff6, 0xffb6, 0x0000
 };
 
-const uint16_t hp9845ct_state::m_area_fill[] = {
+const uint16_t hp9845ct_base_state::m_area_fill[] = {
 	0xffff, 0xefff, 0xefbf, 0xefaf, 0xafaf, 0xadaf, 0xada7, 0xada5,
 	0xa5a5, 0xa4a5, 0xa4a1, 0xa4a0, 0xa0a0, 0x80a0, 0x8020, 0x8000
 };
@@ -1934,7 +1934,7 @@ const uint16_t hp9845ct_state::m_area_fill[] = {
 // ***************
 //  hp9845c_state
 // ***************
-class hp9845c_state : public hp9845ct_state
+class hp9845c_state : public hp9845ct_base_state
 {
 public:
 	hp9845c_state(const machine_config &mconfig, device_type type, const char *tag);
@@ -1953,10 +1953,10 @@ protected:
 	void graphic_video_render(unsigned video_scanline);
 	virtual void plot(uint16_t x, uint16_t y, bool draw_erase) override;
 
-	void check_io_counter_restore(void);
-	void advance_io_counter(void);
+	void check_io_counter_restore();
+	void advance_io_counter();
 	virtual void advance_gv_fsm(bool ds , bool trigger) override;
-	virtual void update_graphic_bits(void) override;
+	virtual void update_graphic_bits() override;
 
 	virtual void update_gcursor(void) override;
 
@@ -1978,7 +1978,7 @@ protected:
 };
 
 hp9845c_state::hp9845c_state(const machine_config &mconfig, device_type type, const char *tag)
-	: hp9845ct_state(mconfig , type , tag),
+	: hp9845ct_base_state(mconfig , type , tag),
 	  m_optional_chargen(*this , "optional_chargen")
 {
 }
@@ -1986,7 +1986,7 @@ hp9845c_state::hp9845c_state(const machine_config &mconfig, device_type type, co
 void hp9845c_state::machine_start()
 {
 	// Common part first
-	hp9845ct_state::machine_start();
+	hp9845ct_base_state::machine_start();
 
 	m_graphic_mem[ 0 ].resize(GVIDEO_MEM_SIZE);
 	m_graphic_mem[ 1 ].resize(GVIDEO_MEM_SIZE);
@@ -2027,7 +2027,7 @@ void hp9845c_state::machine_start()
 void hp9845c_state::machine_reset()
 {
 	// Common part first
-	hp9845ct_state::machine_reset();
+	hp9845ct_base_state::machine_reset();
 
 	set_video_mar(0);
 
@@ -2362,7 +2362,7 @@ void hp9845c_state::plot(uint16_t x, uint16_t y, bool draw_erase)
 	}
 }
 
-void hp9845c_state::check_io_counter_restore(void)
+void hp9845c_state::check_io_counter_restore()
 {
 	if (m_gv_last_cmd != m_gv_cmd) {
 		// restore memory counter
@@ -2377,7 +2377,7 @@ void hp9845c_state::check_io_counter_restore(void)
 	}
 }
 
-void hp9845c_state::advance_io_counter(void)
+void hp9845c_state::advance_io_counter()
 {
 	m_gv_plane++;
 	if (m_gv_plane > 2) {
@@ -2623,7 +2623,7 @@ void hp9845c_state::advance_gv_fsm(bool ds , bool trigger)
 	update_graphic_bits();
 }
 
-void hp9845c_state::update_graphic_bits(void)
+void hp9845c_state::update_graphic_bits()
 {
 	bool lp_int = m_gv_lp_int_en && m_gv_lp_status;
 	bool sk_int = m_gv_sk_status && m_gv_sk_en;
@@ -2670,7 +2670,7 @@ void hp9845c_state::update_gcursor(void)
 // ***************
 //  hp9845t_state
 // ***************
-class hp9845t_state : public hp9845ct_state
+class hp9845t_state : public hp9845ct_base_state
 {
 public:
 	hp9845t_state(const machine_config &mconfig, device_type type, const char *tag);
@@ -2692,7 +2692,7 @@ protected:
 	void draw_full_arc(int x0 , int y0 , int dx , int dy , int draw_counter);
 
 	virtual void advance_gv_fsm(bool ds , bool trigger) override;
-	virtual void update_graphic_bits(void) override;
+	virtual void update_graphic_bits() override;
 
 	virtual void update_gcursor(void) override;
 
@@ -2714,14 +2714,14 @@ protected:
 };
 
 hp9845t_state::hp9845t_state(const machine_config &mconfig, device_type type, const char *tag)
-	: hp9845ct_state(mconfig , type , tag)
+	: hp9845ct_base_state(mconfig , type , tag)
 {
 }
 
 void hp9845t_state::machine_start()
 {
 	// Common part first
-	hp9845ct_state::machine_start();
+	hp9845ct_base_state::machine_start();
 
 	m_graphic_mem.resize(GVIDEO_MEM_SIZE);
 
@@ -2736,7 +2736,7 @@ void hp9845t_state::machine_start()
 void hp9845t_state::machine_reset()
 {
 	// Common part first
-	hp9845ct_state::machine_reset();
+	hp9845ct_base_state::machine_reset();
 
 	m_gv_stat = false;
 	m_gv_increment_to_next_row = false;
@@ -3470,7 +3470,7 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 	update_graphic_bits();
 }
 
-void hp9845t_state::update_graphic_bits(void)
+void hp9845t_state::update_graphic_bits()
 {
 	bool gv_ready = (m_gv_lp_int_en && m_gv_lp_status) || (m_gv_sk_en && m_gv_sk_status);
 
@@ -3515,7 +3515,7 @@ const uint8_t hp9845t_state::m_back_arrow_shape[] = {
 	0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00, 0x00
 };
 
-static MACHINE_CONFIG_START( hp9845a, hp9845_state )
+static MACHINE_CONFIG_START( hp9845a )
 	//MCFG_CPU_ADD("lpu", HP_5061_3010, XTAL_11_4MHz)
 	//MCFG_CPU_ADD("ppu", HP_5061_3011, XTAL_11_4MHz)
 
@@ -3530,7 +3530,7 @@ static MACHINE_CONFIG_START( hp9845a, hp9845_state )
 	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845a_rom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp9835a, hp9845_state )
+static MACHINE_CONFIG_START( hp9835a )
 	//MCFG_CPU_ADD("lpu", HP_5061_3001, XTAL_11_4MHz)
 	//MCFG_CPU_ADD("ppu", HP_5061_3001, XTAL_11_4MHz)
 
@@ -3682,7 +3682,7 @@ static MACHINE_CONFIG_FRAGMENT(hp9845_base)
 	MCFG_RAM_EXTRA_OPTIONS("64K, 320K, 448K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(hp9845b, hp9845b_state)
+static MACHINE_CONFIG_START(hp9845b)
 	MCFG_FRAGMENT_ADD(hp9845_base)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -3700,7 +3700,7 @@ static MACHINE_CONFIG_START(hp9845b, hp9845b_state)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(hp9845c, hp9845c_state)
+static MACHINE_CONFIG_START(hp9845c)
 	MCFG_FRAGMENT_ADD(hp9845_base)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -3714,7 +3714,7 @@ static MACHINE_CONFIG_START(hp9845c, hp9845c_state)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(hp9845t, hp9845t_state)
+static MACHINE_CONFIG_START(hp9845t)
 	MCFG_FRAGMENT_ADD(hp9845_base)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -3854,11 +3854,11 @@ ROM_START( hp9845t )
 	ROM_LOAD("9845-PPU-Color-Enhanced-Graphics.bin", 0, 0x10000, CRC(96e11edc) SHA1(3f1da50edb35dfc57ec2ecfd816a8c8230e110bd))
 ROM_END
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE        INPUT   INIT                   COMPANY             FULLNAME  FLAGS
-COMP( 1977, hp9845a,   0,       0,      hp9845a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9845A",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1977, hp9845s,   hp9845a, 0,      hp9845a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9845S",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1979, hp9835a,   0,       0,      hp9835a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9835A",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1979, hp9835b,   hp9835a, 0,      hp9835a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9835B",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1979, hp9845b,   0,       0,      hp9845b,       hp9845_base,driver_device, 0,  "Hewlett-Packard",  "9845B",  0 )
-COMP( 1982, hp9845t,   0,       0,      hp9845t,       hp9845ct,driver_device, 0,     "Hewlett-Packard",  "9845T",  0 )
-COMP( 1980, hp9845c,   0,       0,      hp9845c,       hp9845ct,driver_device, 0,     "Hewlett-Packard",  "9845C",  0 )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE        INPUT        STATE          INIT  COMPANY             FULLNAME  FLAGS
+COMP( 1977, hp9845a,   0,       0,      hp9845a,       hp9845,      hp9845_state,  0,    "Hewlett-Packard",  "9845A",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1977, hp9845s,   hp9845a, 0,      hp9845a,       hp9845,      hp9845_state,  0,    "Hewlett-Packard",  "9845S",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1979, hp9835a,   0,       0,      hp9835a,       hp9845,      hp9845_state,  0,    "Hewlett-Packard",  "9835A",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1979, hp9835b,   hp9835a, 0,      hp9835a,       hp9845,      hp9845_state,  0,    "Hewlett-Packard",  "9835B",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1979, hp9845b,   0,       0,      hp9845b,       hp9845_base, hp9845b_state, 0,    "Hewlett-Packard",  "9845B",  0 )
+COMP( 1982, hp9845t,   0,       0,      hp9845t,       hp9845ct,    hp9845t_state, 0,    "Hewlett-Packard",  "9845T",  0 )
+COMP( 1980, hp9845c,   0,       0,      hp9845c,       hp9845ct,    hp9845c_state, 0,    "Hewlett-Packard",  "9845C",  0 )

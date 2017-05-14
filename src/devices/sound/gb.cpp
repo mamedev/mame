@@ -71,10 +71,10 @@ const int gameboy_sound_device::wave_duty_table[4][8] =
 };
 
 // device type definitions
-const device_type DMG_APU = device_creator<dmg_apu_device>;
-//const device_type CGB02_APU = device_creator<cgb02_apu_device>;
-const device_type CGB04_APU = device_creator<cgb04_apu_device>;
-//const device_type CGB05_APU = device_creator<cgb05_apu_device>;
+DEFINE_DEVICE_TYPE(DMG_APU, dmg_apu_device, "dmg_apu", "LR35902 APU")
+//DEFINE_DEVICE_TYPE(CGB02_APU, cgb02_apu_device, "cgb02_apu", fullname)
+DEFINE_DEVICE_TYPE(CGB04_APU, cgb04_apu_device, "cgb04_apu", "CGB04 APU")
+//DEFINE_DEVICE_TYPE(CGB05_APU, cgb05_apu_device, "cgb05_apu", fullname)
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -84,21 +84,21 @@ const device_type CGB04_APU = device_creator<cgb04_apu_device>;
 //  gameboy_sound_device - constructor
 //-------------------------------------------------
 
-gameboy_sound_device::gameboy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+gameboy_sound_device::gameboy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {
 }
 
 
 dmg_apu_device::dmg_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gameboy_sound_device(mconfig, DMG_APU, "LR35902 APU", tag, owner, clock, "dmg_apu", __FILE__)
+	: gameboy_sound_device(mconfig, DMG_APU, tag, owner, clock)
 {
 }
 
 
 cgb04_apu_device::cgb04_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gameboy_sound_device(mconfig, CGB04_APU, "CGB04 APU", tag, owner, clock, "cgb04_apu", __FILE__)
+	: gameboy_sound_device(mconfig, CGB04_APU, tag, owner, clock)
 {
 }
 

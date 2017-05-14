@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_IDE64_H
+#define MAME_BUS_C64_IDE64_H
 
-#ifndef __IDE64__
-#define __IDE64__
+#pragma once
 
 
 #include "exp.h"
@@ -63,7 +63,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_IDE64;
+DECLARE_DEVICE_TYPE(C64_IDE64, c64_ide64_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_IDE64_H

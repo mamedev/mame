@@ -23,7 +23,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type CXD1095 = device_creator<cxd1095_device>;
+DEFINE_DEVICE_TYPE(CXD1095, cxd1095_device, "cxd1095", "CXD1095 I/O Expander")
 
 //**************************************************************************
 //  DEVICE DEFINITION
@@ -34,9 +34,9 @@ const device_type CXD1095 = device_creator<cxd1095_device>;
 //-------------------------------------------------
 
 cxd1095_device::cxd1095_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, CXD1095, "CXD1095 I/O Expander", tag, owner, clock, "cxd1095", __FILE__),
-		m_input_cb{{*this}, {*this}, {*this}, {*this}, {*this}},
-		m_output_cb{{*this}, {*this}, {*this}, {*this}, {*this}}
+	: device_t(mconfig, CXD1095, tag, owner, clock)
+	, m_input_cb{{*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_output_cb{{*this}, {*this}, {*this}, {*this}, {*this}}
 {
 }
 

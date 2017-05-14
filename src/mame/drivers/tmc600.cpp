@@ -243,7 +243,7 @@ void tmc600_state::machine_start()
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( tmc600, tmc600_state )
+static MACHINE_CONFIG_START( tmc600 )
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, 3579545)  // ???
 	MCFG_CPU_PROGRAM_MAP(tmc600_map)
@@ -300,6 +300,6 @@ ROM_START( tmc600s2 )
 ROM_END
 
 /* System Drivers */
-//    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     INIT    COMPANY        FULLNAME
-//COMP( 1982, tmc600s1, 0,  0,       tmc600,   tmc600, driver_device,   0,        "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_NOT_WORKING )
-COMP( 1982, tmc600s2, 0,    0,       tmc600,   tmc600, driver_device,   0,     "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY        FULLNAME                     FLAGS
+//COMP( 1982, tmc600s1, 0,    0,      tmc600,   tmc600, tmc600_state, 0,    "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_NOT_WORKING )
+COMP( 1982, tmc600s2, 0,      0,      tmc600,   tmc600, tmc600_state, 0,    "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

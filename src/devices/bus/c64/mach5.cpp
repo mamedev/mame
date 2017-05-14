@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MACH5 = device_creator<c64_mach5_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_MACH5, c64_mach5_cartridge_device, "c64_mach5", "C64 MACH5 cartridge")
 
 
 //-------------------------------------------------
@@ -53,7 +53,7 @@ ioport_constructor c64_mach5_cartridge_device::device_input_ports() const
 //-------------------------------------------------
 
 c64_mach5_cartridge_device::c64_mach5_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_MACH5, "C64 MACH5 cartridge", tag, owner, clock, "c64_mach5", __FILE__),
+	device_t(mconfig, C64_MACH5, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_s1(*this, "S1"), m_c128(false)
 {

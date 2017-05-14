@@ -483,7 +483,7 @@ static GFXDECODE_START( monzagp )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,   0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( monzagp, monzagp_state )
+static MACHINE_CONFIG_START( monzagp )
 	MCFG_CPU_ADD("maincpu", I8035, 12000000/4) /* 400KHz ??? - Main board Crystal is 12MHz */
 	MCFG_CPU_PROGRAM_MAP(monzagp_map)
 	MCFG_CPU_IO_MAP(monzagp_io)
@@ -585,5 +585,5 @@ ROM_START( monzagpb )
 ROM_END
 
 
-GAMEL( 1981, monzagp,  0,       monzagp, monzagp, driver_device, 0, ROT270, "Olympia", "Monza GP", MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
-GAMEL( 1981, monzagpb, monzagp, monzagp, monzagp, driver_device, 0, ROT270, "bootleg", "Monza GP (bootleg)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
+GAMEL( 1981, monzagp,  0,       monzagp, monzagp, monzagp_state, 0, ROT270, "Olympia", "Monza GP",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
+GAMEL( 1981, monzagpb, monzagp, monzagp, monzagp, monzagp_state, 0, ROT270, "bootleg", "Monza GP (bootleg)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )

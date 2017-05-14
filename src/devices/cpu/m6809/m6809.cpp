@@ -103,16 +103,16 @@ March 2013 NPW:
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type M6809 = device_creator<m6809_device>;
-const device_type M6809E = device_creator<m6809e_device>;
+DEFINE_DEVICE_TYPE(M6809, m6809_device, "m6809", "M6809")
+DEFINE_DEVICE_TYPE(M6809E, m6809e_device, "m6809e", "M6809E")
 
 
 //-------------------------------------------------
 //  m6809_base_device - constructor
 //-------------------------------------------------
 
-m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, uint32_t clock, const device_type type, int divider, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, int divider)
+	: cpu_device(mconfig, type, tag, owner, clock),
 	m_lic_func(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16),
 	m_sprogram_config("decrypted_opcodes", ENDIANNESS_BIG, 8, 16),
@@ -601,7 +601,7 @@ void m6809_base_device::mi_default::write(uint16_t adr, uint8_t val)
 //-------------------------------------------------
 
 m6809_device::m6809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6809_base_device(mconfig, "M6809", tag, owner, clock, M6809, 1, "m6809", __FILE__)
+	: m6809_base_device(mconfig, tag, owner, clock, M6809, 1)
 {
 }
 
@@ -612,6 +612,6 @@ m6809_device::m6809_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 m6809e_device::m6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: m6809_base_device(mconfig, "M6809E", tag, owner, clock, M6809E, 4, "m6809e", __FILE__)
+		: m6809_base_device(mconfig, tag, owner, clock, M6809E, 4)
 {
 }

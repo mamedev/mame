@@ -37,10 +37,10 @@
  *  0x3X6: Data port (write only)
  */
 
-#pragma once
+#ifndef MAME_BUS_ISA_GUS_H
+#define MAME_BUS_ISA_GUS_H
 
-#ifndef __ISA_GUS_H__
-#define __ISA_GUS_H__
+#pragma once
 
 #include "isa.h"
 #include "machine/6850acia.h"
@@ -86,53 +86,43 @@
 
 #define GF1_CLOCK 9878400
 
-#define IRQ_2XF           0x00
-#define IRQ_MIDI_TRANSMIT 0x01
-#define IRQ_MIDI_RECEIVE  0x02
-#define IRQ_TIMER1        0x04
-#define IRQ_TIMER2        0x08
-#define IRQ_SB            0x10
-#define IRQ_WAVETABLE     0x20
-#define IRQ_VOLUME_RAMP   0x40
-#define IRQ_DRAM_TC_DMA   0x80
-
-struct gus_voice
-{
-	uint8_t voice_ctrl;
-	uint16_t freq_ctrl;
-	uint32_t start_addr;
-	uint32_t end_addr;
-	uint8_t vol_ramp_rate;
-	uint8_t vol_ramp_start;
-	uint8_t vol_ramp_end;
-	uint16_t current_vol;
-	uint32_t current_addr;
-	uint8_t pan_position;
-	uint8_t vol_ramp_ctrl;
-	uint32_t vol_count;
-	bool rollover;
-	int16_t sample;  // current sample data
-};
-
 class gf1_device :
 	public acia6850_device,
 	public device_sound_interface
 {
 public:
+	struct gus_voice
+	{
+		uint8_t voice_ctrl;
+		uint16_t freq_ctrl;
+		uint32_t start_addr;
+		uint32_t end_addr;
+		uint8_t vol_ramp_rate;
+		uint8_t vol_ramp_start;
+		uint8_t vol_ramp_end;
+		uint16_t current_vol;
+		uint32_t current_addr;
+		uint8_t pan_position;
+		uint8_t vol_ramp_ctrl;
+		uint32_t vol_count;
+		bool rollover;
+		int16_t sample;  // current sample data
+	};
+
 	// construction/destruction
 	gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_txirq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_txirq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_rxirq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_rxirq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_wave_irq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_wave_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_ramp_irq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_ramp_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_timer1_irq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_timer1_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_timer2_irq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_timer2_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_sb_irq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_sb_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_dma_irq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_dma_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_drq1_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_drq1_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_drq2_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_drq2_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_nmi_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_nmi_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_txirq_handler(device_t &device, Object &&cb) { return downcast<gf1_device &>(device).m_txirq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rxirq_handler(device_t &device, Object &&cb) { return downcast<gf1_device &>(device).m_rxirq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_wave_irq_handler(device_t &device, Object &&cb) { return downcast<gf1_device &>(device).m_wave_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ramp_irq_handler(device_t &device, Object &&cb) { return downcast<gf1_device &>(device).m_ramp_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_timer1_irq_handler(device_t &device, Object &&cb) { return downcast<gf1_device &>(device).m_timer1_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_timer2_irq_handler(device_t &device, Object &&cb) { return downcast<gf1_device &>(device).m_timer2_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sb_irq_handler(device_t &device, Object &&cb) { return downcast<gf1_device &>(device).m_sb_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dma_irq_handler(device_t &device, Object &&cb) { return downcast<gf1_device &>(device).m_dma_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_drq1_handler(device_t &device, Object &&cb) { return downcast<gf1_device &>(device).m_drq1_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_drq2_handler(device_t &device, Object &&cb) { return downcast<gf1_device &>(device).m_drq2_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb) { return downcast<gf1_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
 	// current IRQ/DMA channel getters
 	uint8_t gf1_irq() { if(m_gf1_irq != 0) return m_gf1_irq; else return m_midi_irq; }  // workaround for win95 loading dumb values
@@ -167,6 +157,7 @@ public:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
+protected:
 	// voice-specific registers
 	gus_voice m_voice[32];
 
@@ -192,7 +183,6 @@ public:
 
 	std::vector<uint8_t> m_wave_ram;
 
-protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -316,7 +306,7 @@ private:
 };
 
 // device type definition
-extern const device_type GGF1;
-extern const device_type ISA16_GUS;
+DECLARE_DEVICE_TYPE(GF1,       gf1_device)
+DECLARE_DEVICE_TYPE(ISA16_GUS, isa16_gus_device)
 
-#endif  /* __ISA_GUS_H__ */
+#endif // MAME_BUS_ISA_GUS_H

@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( d110_io, AS_IO, 16, d110_state )
 	AM_RANGE(i8x9x_device::P0,     i8x9x_device::P0)     AM_READ(port0_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( d110, d110_state )
+static MACHINE_CONFIG_START( d110 )
 	MCFG_CPU_ADD( "maincpu", P8098, XTAL_12MHz )
 	MCFG_CPU_PROGRAM_MAP( d110_map )
 	MCFG_CPU_IO_MAP( d110_io )
@@ -284,4 +284,4 @@ ROM_START( d110 )
 	ROM_LOAD(  "r15179879.ic6.bin",            0,   0x8000, CRC(5d34174e) SHA1(17bd2887711c5c5458aba6d3be5972b2096eb450) )
 ROM_END
 
-CONS( 1988, d110,  0, 0, d110, d110, driver_device, 0, "Roland", "D110",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 1988, d110,  0, 0, d110, d110, d110_state, 0, "Roland", "D110",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -31,7 +31,7 @@ public:
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER( qtsbc_06_r );
 	DECLARE_READ8_MEMBER( qtsbc_43_r );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	void kbd_put(u8 data);
 	required_shared_ptr<uint8_t> m_p_ram;
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -73,12 +73,12 @@ void qtsbc_state::machine_reset()
 	memcpy(m_p_ram, bios, 0x800);
 }
 
-WRITE8_MEMBER( qtsbc_state::kbd_put )
+void qtsbc_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( qtsbc, qtsbc_state )
+static MACHINE_CONFIG_START( qtsbc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) // Mostek MK3880
 	MCFG_CPU_PROGRAM_MAP(qtsbc_mem)
@@ -86,7 +86,7 @@ static MACHINE_CONFIG_START( qtsbc, qtsbc_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(qtsbc_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(qtsbc_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -97,5 +97,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                FULLNAME       FLAGS */
-COMP( 19??, qtsbc,  0,       0,      qtsbc,     qtsbc, driver_device,    0,  "Computer Systems Inc.", "QT SBC +2/4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY                  FULLNAME       FLAGS
+COMP( 19??, qtsbc,  0,      0,      qtsbc,   qtsbc, qtsbc_state, 0,    "Computer Systems Inc.", "QT SBC +2/4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

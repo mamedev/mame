@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_MOUSE = device_creator<saturn_mouse_device>;
+DEFINE_DEVICE_TYPE(SATURN_MOUSE, saturn_mouse_device, "saturn_mouse", "Sega Saturn Mouse")
 
 
 static INPUT_PORTS_START( saturn_mouse )
@@ -52,11 +52,11 @@ ioport_constructor saturn_mouse_device::device_input_ports() const
 //-------------------------------------------------
 
 saturn_mouse_device::saturn_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, SATURN_MOUSE, "Sega Saturn Mouse", tag, owner, clock, "saturn_mouse", __FILE__),
-					device_saturn_control_port_interface(mconfig, *this),
-					m_pointx(*this, "MOUSE_X"),
-					m_pointy(*this, "MOUSE_Y"),
-					m_buttons(*this, "BUTTONS")
+	device_t(mconfig, SATURN_MOUSE, tag, owner, clock),
+	device_saturn_control_port_interface(mconfig, *this),
+	m_pointx(*this, "MOUSE_X"),
+	m_pointy(*this, "MOUSE_Y"),
+	m_buttons(*this, "BUTTONS")
 {
 	m_ctrl_id = 0xe3;
 }

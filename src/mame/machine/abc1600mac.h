@@ -5,11 +5,11 @@
     Luxor ABC 1600 Memory Access Controller emulation
 
 **********************************************************************/
+#ifndef MAME_MACHINE_ABC1600MAC_H
+#define MAME_MACHINE_ABC1600MAC_H
 
 #pragma once
 
-#ifndef __ABC1600_MAC__
-#define __ABC1600_MAC__
 
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
@@ -132,8 +132,7 @@ private:
 
 
 // device type definition
-extern const device_type ABC1600_MAC;
+DECLARE_DEVICE_TYPE(ABC1600_MAC, abc1600_mac_device)
 
 
-
-#endif
+#endif // MAME_MACHINE_ABC1600MAC_H

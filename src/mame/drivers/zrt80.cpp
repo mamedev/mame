@@ -48,7 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(zrt80_10_r);
 	DECLARE_WRITE8_MEMBER(zrt80_30_w);
 	DECLARE_WRITE8_MEMBER(zrt80_38_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 private:
@@ -243,7 +243,7 @@ MC6845_UPDATE_ROW( zrt80_state::crtc_update_row )
 	}
 }
 
-WRITE8_MEMBER( zrt80_state::kbd_put )
+void zrt80_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -267,7 +267,7 @@ static GFXDECODE_START( zrt80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, zrt80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( zrt80, zrt80_state )
+static MACHINE_CONFIG_START( zrt80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
 	MCFG_CPU_PROGRAM_MAP(zrt80_mem)
@@ -297,7 +297,7 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 	MCFG_DEVICE_ADD( "ins8250", INS8250, 2457600 )
 	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(zrt80_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(zrt80_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -312,5 +312,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY                   FULLNAME       FLAGS */
-COMP( 1982, zrt80,  0,       0,      zrt80,     zrt80, driver_device,    0, "Digital Research Computers", "ZRT-80", 0)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT  COMPANY                       FULLNAME   FLAGS */
+COMP( 1982, zrt80,  0,       0,      zrt80,     zrt80, zrt80_state, 0,    "Digital Research Computers", "ZRT-80",  0)

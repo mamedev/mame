@@ -385,7 +385,7 @@ void chanbara_state::machine_reset()
 	m_scrollhi = 0;
 }
 
-static MACHINE_CONFIG_START( chanbara, chanbara_state )
+static MACHINE_CONFIG_START( chanbara )
 
 	MCFG_CPU_ADD("maincpu", M6809, 12000000/8)
 	MCFG_CPU_PROGRAM_MAP(chanbara_map)

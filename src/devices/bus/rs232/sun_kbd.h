@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_DEVICES_RS232_SUN_KBD_H
-#define MAME_DEVICES_RS232_SUN_KBD_H
+#ifndef MAME_BUS_RS232_SUN_KBD_H
+#define MAME_BUS_RS232_SUN_KBD_H
 
 #pragma once
 
@@ -9,7 +9,7 @@
 #include "bus/sunkbd/sunkbd.h"
 
 
-extern device_type const SUN_KBD_ADAPTOR;
+DECLARE_DEVICE_TYPE(SUN_KBD_ADAPTOR, sun_keyboard_adaptor_device)
 
 
 class sun_keyboard_adaptor_device : public device_t, public device_rs232_port_interface
@@ -30,4 +30,4 @@ private:
 	required_device<sun_keyboard_port_device> m_keyboard_port;
 };
 
-#endif // MAME_DEVICES_RS232_SUN_KBD_H
+#endif // MAME_BUS_RS232_SUN_KBD_H

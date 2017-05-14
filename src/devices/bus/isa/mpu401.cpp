@@ -45,7 +45,7 @@ WRITE_LINE_MEMBER( isa8_mpu401_device::mpu_irq_out )
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_MPU401 = device_creator<isa8_mpu401_device>;
+DEFINE_DEVICE_TYPE(ISA8_MPU401, isa8_mpu401_device, "isa_mpu401", "Roland MPU-401 MIDI Interface (ISA)")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -67,9 +67,9 @@ machine_config_constructor isa8_mpu401_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 isa8_mpu401_device::isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, ISA8_MPU401, "Roland MPU-401 MIDI Interface", tag, owner, clock, "isa_mpu401", __FILE__),
-		device_isa8_card_interface( mconfig, *this ),
-		m_mpu401(*this, MPU_CORE_TAG)
+	: device_t(mconfig, ISA8_MPU401, tag, owner, clock)
+	, device_isa8_card_interface(mconfig, *this)
+	, m_mpu401(*this, MPU_CORE_TAG)
 {
 }
 

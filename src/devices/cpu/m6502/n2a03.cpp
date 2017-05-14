@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "n2a03.h"
 
-const device_type N2A03 = device_creator<n2a03_device>;
+DEFINE_DEVICE_TYPE(N2A03, n2a03_device, "n2a03", "N2A03")
 
 READ8_MEMBER(n2a03_device::psg1_4014_r)
 {
@@ -50,7 +50,7 @@ ADDRESS_MAP_END
 
 
 n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, N2A03, "N2A03", tag, owner, clock, "n2a03", __FILE__),
+	m6502_device(mconfig, N2A03, tag, owner, clock),
 	m_apu(*this, "nesapu"),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(n2a03_map))
 {

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ISA_P1_ROM_H
+#define MAME_BUS_ISA_P1_ROM_H
 
-#ifndef __P1_ROM__
-#define __P1_ROM__
+#pragma once
 
 #include "isa.h"
 
@@ -38,4 +38,4 @@ protected:
 extern const device_type P1_ROM;
 
 
-#endif
+#endif // MAME_BUS_ISA_P1_ROM_H

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_IEEE488_D9060_H
+#define MAME_BUS_IEEE488_D9060_H
 
-#ifndef __D9060__
-#define __D9060__
+#pragma once
 
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
@@ -24,21 +24,11 @@
 //**************************************************************************
 
 
-// ======================> d9060_base_t
+// ======================> d9060_device_base
 
-class d9060_base_t :  public device_t,
-						public device_ieee488_interface
+class d9060_device_base : public device_t, public device_ieee488_interface
 {
 public:
-	enum
-	{
-		TYPE_9060,
-		TYPE_9090
-	};
-
-	// construction/destruction
-	d9060_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
-
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -57,6 +47,15 @@ public:
 	DECLARE_WRITE8_MEMBER( scsi_data_w );
 
 protected:
+	enum
+	{
+		TYPE_9060,
+		TYPE_9090
+	};
+
+	// construction/destruction
+	d9060_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -70,10 +69,10 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_hdccpu;
-	required_device<mos6532_t> m_riot0;
-	required_device<mos6532_t> m_riot1;
+	required_device<mos6532_new_device> m_riot0;
+	required_device<mos6532_new_device> m_riot1;
 	required_device<via6522_device> m_via;
-	required_device<SCSI_PORT_DEVICE> m_sasibus;
+	required_device<scsi_port_device> m_sasibus;
 	required_device<output_latch_device> m_sasi_data_out;
 	required_ioport m_address;
 
@@ -91,30 +90,28 @@ private:
 };
 
 
-// ======================> d9060_t
+// ======================> d9060_device
 
-class d9060_t :  public d9060_base_t
+class d9060_device : public d9060_device_base
 {
 public:
 	// construction/destruction
-	d9060_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	d9060_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
-// ======================> d9090_t
+// ======================> d9090_device
 
-class d9090_t :  public d9060_base_t
+class d9090_device : public d9060_device_base
 {
 public:
 	// construction/destruction
-	d9090_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	d9090_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 // device type definition
-extern const device_type D9060;
-extern const device_type D9090;
+DECLARE_DEVICE_TYPE(D9060, d9060_device)
+DECLARE_DEVICE_TYPE(D9090, d9090_device)
 
-
-
-#endif
+#endif // MAME_BUS_IEEE488_D9060_H

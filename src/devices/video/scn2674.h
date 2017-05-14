@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef SCN2674_H
-#define SCN2674_H
+#ifndef MAME_VIDEO_SCN2674_H
+#define MAME_VIDEO_SCN2674_H
+
+#pragma once
 
 
 #define MCFG_SCN2674_VIDEO_ADD(_tag, _clock, _irq) \
@@ -29,10 +31,10 @@ public:
 	typedef device_delegate<void (bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint16_t address, uint8_t cursor, uint8_t dw, uint8_t lg, uint8_t ul, uint8_t blink)> draw_character_delegate;
 
 	// static configuration
-	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<scn2674_device &>(device).m_irq_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<scn2674_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
 	static void static_set_character_width(device_t &device, int value) { downcast<scn2674_device &>(device).m_text_hpixels_per_column = value; }
 	static void static_set_gfx_character_width(device_t &device, int value) { downcast<scn2674_device &>(device).m_gfx_hpixels_per_column = value; }
-	static void static_set_display_callback(device_t &device, draw_character_delegate callback) { downcast<scn2674_device &>(device).m_display_cb = callback; }
+	static void static_set_display_callback(device_t &device, draw_character_delegate &&cb) { downcast<scn2674_device &>(device).m_display_cb = std::move(cb); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -40,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER( buffer_w ) { m_buffer = data; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_0) ? &m_space_config : nullptr; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_0) ? &m_space_config : nullptr; }
 
 protected:
 	virtual void device_start() override;
@@ -127,6 +129,6 @@ private:
 };
 
 
-extern const device_type SCN2674_VIDEO;
+DECLARE_DEVICE_TYPE(SCN2674_VIDEO, scn2674_device)
 
-#endif
+#endif // MAME_VIDEO_SCN2674_H

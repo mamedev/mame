@@ -62,7 +62,7 @@ This PCB plugs into the external expansion connector on the right side of the ma
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EP64_EXDOS = device_creator<ep64_exdos_device>;
+DEFINE_DEVICE_TYPE(EP64_EXDOS, ep64_exdos_device, "ep64_exdos", "EP64 EXDOS")
 
 
 //-------------------------------------------------
@@ -133,7 +133,7 @@ machine_config_constructor ep64_exdos_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 ep64_exdos_device::ep64_exdos_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, EP64_EXDOS, "EXDOS", tag, owner, clock, "ep64_exdos", __FILE__),
+	device_t(mconfig, EP64_EXDOS, tag, owner, clock),
 	device_ep64_expansion_bus_card_interface(mconfig, *this),
 	m_fdc(*this, WD1770_TAG),
 	m_floppy0(*this, WD1770_TAG":0"),
@@ -154,7 +154,7 @@ void ep64_exdos_device::device_start()
 {
 	m_slot->program().install_rom(0x080000, 0x087fff, m_rom->base());
 
-	m_slot->io().install_readwrite_handler(0x10, 0x13, 0, 0x04, 0, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_t, write));
+	m_slot->io().install_readwrite_handler(0x10, 0x13, 0, 0x04, 0, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, write));
 	m_slot->io().install_readwrite_handler(0x18, 0x18, 0, 0x04, 0, READ8_DELEGATE(ep64_exdos_device, read), WRITE8_DELEGATE(ep64_exdos_device, write));
 }
 

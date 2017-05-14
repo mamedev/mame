@@ -568,7 +568,7 @@ static MACHINE_CONFIG_FRAGMENT( bg_ppu )
 MACHINE_CONFIG_END
 #endif
 
-static MACHINE_CONFIG_START( bitgrpha, bitgraph_state )
+static MACHINE_CONFIG_START( bitgrpha )
 	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_6_9MHz)
 	MCFG_CPU_PROGRAM_MAP(bitgrapha_mem)
 
@@ -591,7 +591,7 @@ static MACHINE_CONFIG_START( bitgrpha, bitgraph_state )
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bitgrphb, bitgraph_state )
+static MACHINE_CONFIG_START( bitgrphb )
 	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_6_9MHz)
 	MCFG_CPU_PROGRAM_MAP(bitgraphb_mem)
 
@@ -637,6 +637,6 @@ ROM_START( bitgrphb )
 ROM_END
 
 /* Driver */
-/*       YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY          FULLNAME       FLAGS */
-COMP( 1981, bitgrpha, 0, 0, bitgrpha, bitgraph, driver_device, 0, "BBN", "BitGraph rev A", ROT90 | MACHINE_IMPERFECT_KEYBOARD)
-COMP( 1982, bitgrphb, 0, 0, bitgrphb, bitgraph, driver_device, 0, "BBN", "BitGraph rev B", ROT270 | MACHINE_NOT_WORKING|MACHINE_IMPERFECT_KEYBOARD)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY  FULLNAME          FLAGS
+COMP( 1981, bitgrpha, 0,      0,      bitgrpha, bitgraph, bitgraph_state, 0,    "BBN",   "BitGraph rev A", ROT90 | MACHINE_IMPERFECT_KEYBOARD )
+COMP( 1982, bitgrphb, 0,      0,      bitgrphb, bitgraph, bitgraph_state, 0,    "BBN",   "BitGraph rev B", ROT270 | MACHINE_NOT_WORKING|MACHINE_IMPERFECT_KEYBOARD )

@@ -183,7 +183,7 @@ static INPUT_PORTS_START( ut88mini )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( ut88, ut88_state )
+static MACHINE_CONFIG_START( ut88 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(ut88_mem)
@@ -226,7 +226,7 @@ static MACHINE_CONFIG_START( ut88, ut88_state )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ut88mini, ut88_state )
+static MACHINE_CONFIG_START( ut88mini )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(ut88mini_mem)
@@ -268,6 +268,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME       FLAGS */
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT     STATE         INIT      COMPANY      FULLNAME      FLAGS */
 COMP( 1989, ut88mini,  0,        0,      ut88mini,   ut88mini, ut88_state,   ut88mini, "<unknown>", "UT-88 mini", 0)
-COMP( 1989, ut88,      ut88mini, 0,      ut88,       ut88, ut88_state,       ut88,     "<unknown>", "UT-88", 0)
+COMP( 1989, ut88,      ut88mini, 0,      ut88,       ut88,     ut88_state,   ut88,     "<unknown>", "UT-88",      0)

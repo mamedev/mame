@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Mariusz Wojcieszek, R. Belmont
-#ifndef _MC68681_H
-#define _MC68681_H
+#ifndef MAME_MACHINE_MC68681_H
+#define MAME_MACHINE_MC68681_H
+
+#pragma once
 
 
 #define MCFG_MC68681_ADD(_tag, _clock) \
@@ -109,8 +111,6 @@ class mc68681_base_device : public device_t
 	friend class mc68681_channel;
 
 public:
-	mc68681_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	required_device<mc68681_channel> m_chanA;
 	required_device<mc68681_channel> m_chanB;
 	optional_device<mc68681_channel> m_chanC;
@@ -127,16 +127,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rx_a_w ) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }
 	DECLARE_WRITE_LINE_MEMBER( rx_b_w ) { m_chanB->device_serial_interface::rx_w((uint8_t)state); }
 
-	template<class _Object> static devcb_base &set_irq_cb(device_t &device, _Object object) { return downcast<mc68681_base_device &>(device).write_irq.set_callback(object); }
-	template<class _Object> static devcb_base &set_a_tx_cb(device_t &device, _Object object) { return downcast<mc68681_base_device &>(device).write_a_tx.set_callback(object); }
-	template<class _Object> static devcb_base &set_b_tx_cb(device_t &device, _Object object) { return downcast<mc68681_base_device &>(device).write_b_tx.set_callback(object); }
-	template<class _Object> static devcb_base &set_inport_cb(device_t &device, _Object object) { return downcast<mc68681_base_device &>(device).read_inport.set_callback(object); }
-	template<class _Object> static devcb_base &set_outport_cb(device_t &device, _Object object) { return downcast<mc68681_base_device &>(device).write_outport.set_callback(object); }
-
-	devcb_write_line write_irq, write_a_tx, write_b_tx, write_c_tx, write_d_tx;
-	devcb_read8 read_inport;
-	devcb_write8 write_outport;
-	int32_t ip3clk, ip4clk, ip5clk, ip6clk;
+	template <class Object> static devcb_base &set_irq_cb(device_t &device, Object &&cb) { return downcast<mc68681_base_device &>(device).write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_a_tx_cb(device_t &device, Object &&cb) { return downcast<mc68681_base_device &>(device).write_a_tx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_b_tx_cb(device_t &device, Object &&cb) { return downcast<mc68681_base_device &>(device).write_b_tx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_inport_cb(device_t &device, Object &&cb) { return downcast<mc68681_base_device &>(device).read_inport.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_outport_cb(device_t &device, Object &&cb) { return downcast<mc68681_base_device &>(device).write_outport.set_callback(std::forward<Object>(cb)); }
 
 	// new-style push handlers for input port bits
 	DECLARE_WRITE_LINE_MEMBER( ip0_w );
@@ -147,10 +142,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ip5_w );
 
 protected:
+	mc68681_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
+
+	devcb_write_line write_irq, write_a_tx, write_b_tx, write_c_tx, write_d_tx;
+	devcb_read8 read_inport;
+	devcb_write8 write_outport;
+	int32_t ip3clk, ip4clk, ip5clk, ip6clk;
 
 private:
 	TIMER_CALLBACK_MEMBER( duart_timer_callback );
@@ -214,8 +216,8 @@ class sc28c94_device : public mc68681_base_device
 public:
 	sc28c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_c_tx_cb(device_t &device, _Object object) { return downcast<mc68681_base_device &>(device).write_c_tx.set_callback(object); }
-	template<class _Object> static devcb_base &set_d_tx_cb(device_t &device, _Object object) { return downcast<mc68681_base_device &>(device).write_d_tx.set_callback(object); }
+	template <class Object> static devcb_base &set_c_tx_cb(device_t &device, Object &&cb) { return downcast<sc28c94_device &>(device).write_c_tx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_d_tx_cb(device_t &device, Object &&cb) { return downcast<sc28c94_device &>(device).write_d_tx.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( rx_c_w ) { m_chanC->device_serial_interface::rx_w((uint8_t)state); }
 	DECLARE_WRITE_LINE_MEMBER( rx_d_w ) { m_chanD->device_serial_interface::rx_w((uint8_t)state); }
@@ -229,8 +231,8 @@ protected:
 private:
 };
 
-extern const device_type MC68681;
-extern const device_type SC28C94;
-extern const device_type MC68681_CHANNEL;
+DECLARE_DEVICE_TYPE(MC68681, mc68681_device)
+DECLARE_DEVICE_TYPE(SC28C94, sc28c94_device)
+DECLARE_DEVICE_TYPE(MC68681_CHANNEL, mc68681_channel)
 
-#endif //_N68681_H
+#endif // MAME_MACHINE_MC68681_H

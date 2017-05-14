@@ -4,10 +4,10 @@
 #include "emu.h"
 #include "wpc_out.h"
 
-const device_type WPC_OUT = device_creator<wpc_out_device>;
+DEFINE_DEVICE_TYPE(WPC_OUT, wpc_out_device, "wpc_out", "Williams Pinball Controller Output Control")
 
 wpc_out_device::wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WPC_OUT, "Williams Pinball Controller Output Control", tag, owner, clock, "wpc_out", __FILE__)
+	device_t(mconfig, WPC_OUT, tag, owner, clock)
 {
 	names = nullptr;
 }

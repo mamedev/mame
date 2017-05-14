@@ -34,8 +34,7 @@ typedef device_delegate<void (int *code, int *color, int *priority, int *shadow)
 	devcb = &k051960_device::set_nmi_handler(*device, DEVCB_##_devcb);
 
 
-class k051960_device : public device_t,
-							public device_gfx_interface
+class k051960_device : public device_t, public device_gfx_interface
 {
 	static const gfx_layout spritelayout;
 	static const gfx_layout spritelayout_reverse;
@@ -46,13 +45,12 @@ class k051960_device : public device_t,
 
 public:
 	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~k051960_device() {}
 
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object)
-		{ return downcast<k051960_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
+	{ return downcast<k051960_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_nmi_handler(device_t &device, _Object object)
-		{ return downcast<k051960_device &>(device).m_nmi_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
+	{ return downcast<k051960_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
 	// static configuration
 	static void set_k051960_callback(device_t &device, k051960_cb_delegate callback) { downcast<k051960_device &>(device).m_k051960_cb = callback; }
@@ -111,6 +109,6 @@ private:
 	int k051960_fetchromdata( int byte );
 };
 
-extern const device_type K051960;
+DECLARE_DEVICE_TYPE(K051960, k051960_device)
 
 #endif // MAME_VIDEO_K051960_H

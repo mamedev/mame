@@ -7,8 +7,8 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "tms32051.h"
+#include "debugger.h"
 
 enum
 {
@@ -46,8 +46,8 @@ enum
 };
 
 
-const device_type TMS32051 = device_creator<tms32051_device>;
-const device_type TMS32053 = device_creator<tms32053_device>;
+DEFINE_DEVICE_TYPE(TMS32051, tms32051_device, "tms32051", "TMS32051")
+DEFINE_DEVICE_TYPE(TMS32053, tms32053_device, "tms32053", "TMS32053")
 
 
 /**************************************************************************
@@ -69,8 +69,8 @@ static ADDRESS_MAP_START( tms32051_internal_data, AS_DATA, 16, tms32051_device )
 ADDRESS_MAP_END
 
 
-tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor internal_pgm, address_map_constructor internal_data)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_pgm, address_map_constructor internal_data)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, internal_pgm)
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, internal_data)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, -1)
@@ -78,9 +78,7 @@ tms32051_device::tms32051_device(const machine_config &mconfig, device_type type
 }
 
 tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32051_device(mconfig, TMS32051, "TMS32051", tag, owner, clock, "tms32051", __FILE__,
-		ADDRESS_MAP_NAME(tms32051_internal_pgm),
-		ADDRESS_MAP_NAME(tms32051_internal_data))
+	: tms32051_device(mconfig, TMS32051, tag, owner, clock, ADDRESS_MAP_NAME(tms32051_internal_pgm), ADDRESS_MAP_NAME(tms32051_internal_data))
 {
 }
 
@@ -105,9 +103,7 @@ ADDRESS_MAP_END
 
 
 tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32051_device(mconfig, TMS32053, "TMS32053", tag, owner, clock, "tms32053", __FILE__,
-		ADDRESS_MAP_NAME(tms32053_internal_pgm),
-		ADDRESS_MAP_NAME(tms32053_internal_data))
+	: tms32051_device(mconfig, TMS32053, tag, owner, clock, ADDRESS_MAP_NAME(tms32053_internal_pgm), ADDRESS_MAP_NAME(tms32053_internal_data))
 {
 }
 

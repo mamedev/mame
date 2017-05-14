@@ -290,7 +290,7 @@ WRITE_LINE_MEMBER(kron180_state::keyb_interrupt)
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (kron180, kron180_state)
+static MACHINE_CONFIG_START (kron180)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", Z180, XTAL_12_288MHz)
 	MCFG_CPU_PROGRAM_MAP (kron180_mem)
@@ -321,5 +321,5 @@ ROM_START (kron180)
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT COMPANY                  FULLNAME          FLAGS */
-COMP (1995, kron180,      0,      0,       kron180,        kron180, driver_device, 0,   "Kron Ltd",             "Kron K-180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//     YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS         INIT  COMPANY        FULLNAME      FLAGS
+COMP ( 1995, kron180,      0,      0,       kron180,        kron180, kron180_state, 0,    "Kron Ltd",    "Kron K-180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

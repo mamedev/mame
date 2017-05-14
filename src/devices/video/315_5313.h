@@ -1,149 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* Sega Megadrive / Genesis VDP */
+#ifndef MAME_VIDEO_315_5313_H
+#define MAME_VIDEO_315_5313_H
 
 #pragma once
 
 #include "video/315_5124.h"
 #include "cpu/m68000/m68000.h"
-
-
-/*  The VDP occupies addresses C00000h to C0001Fh.
-
- C00000h    -   Data port (8=r/w, 16=r/w)
- C00002h    -   Data port (mirror)
- C00004h    -   Control port (8=r/w, 16=r/w)
- C00006h    -   Control port (mirror)
- C00008h    -   HV counter (8/16=r/o)
- C0000Ah    -   HV counter (mirror)
- C0000Ch    -   HV counter (mirror)
- C0000Eh    -   HV counter (mirror)
- C00011h    -   SN76489 PSG (8=w/o)
- C00013h    -   SN76489 PSG (mirror)
- C00015h    -   SN76489 PSG (mirror)
- C00017h    -   SN76489 PSG (mirror)
-*/
-
-#define MEGADRIV_VDP_VRAM(address) m_vram[(address)&0x7fff]
-
-
-
-/*
-
- $00 - Mode Set Register No. 1
- -----------------------------
-
- d7 - No effect
- d6 - No effect
- d5 - No effect
- d4 - IE1 (Horizontal interrupt enable)
- d3 - 1= Invalid display setting
- d2 - Palette select
- d1 - M3 (HV counter latch enable)
- d0 - Display disable
-
- */
-
-#define MEGADRIVE_REG0_UNUSED          ((m_regs[0x00]&0xc0)>>6)
-#define MEGADRIVE_REG0_BLANK_LEFT      ((m_regs[0x00]&0x20)>>5) // like SMS, not used by any commercial games?
-#define MEGADRIVE_REG0_IRQ4_ENABLE     ((m_regs[0x00]&0x10)>>4)
-#define MEGADRIVE_REG0_INVALID_MODE    ((m_regs[0x00]&0x08)>>3) // invalid display mode, unhandled
-#define MEGADRIVE_REG0_SPECIAL_PAL     ((m_regs[0x00]&0x04)>>2) // strange palette mode, unhandled
-#define MEGADRIVE_REG0_HVLATCH_ENABLE  ((m_regs[0x00]&0x02)>>1) // HV Latch, used by lightgun games
-#define MEGADRIVE_REG0_DISPLAY_DISABLE ((m_regs[0x00]&0x01)>>0)
-
-/*
-
- $01 - Mode Set Register No. 2
- -----------------------------
-
- d7 - TMS9918 / Genesis display select
- d6 - DISP (Display Enable)
- d5 - IE0 (Vertical Interrupt Enable)
- d4 - M1 (DMA Enable)
- d3 - M2 (PAL / NTSC)
- d2 - SMS / Genesis display select
- d1 - 0 (No effect)
- d0 - 0 (See notes)
-
-*/
-
-#define MEGADRIVE_REG01_TMS9918_SELECT  ((m_regs[0x01]&0x80)>>7)
-#define MEGADRIVE_REG01_DISP_ENABLE     ((m_regs[0x01]&0x40)>>6)
-#define MEGADRIVE_REG01_IRQ6_ENABLE     ((m_regs[0x01]&0x20)>>5)
-#define MEGADRIVE_REG01_DMA_ENABLE      ((m_regs[0x01]&0x10)>>4)
-#define MEGADRIVE_REG01_240_LINE        ((m_regs[0x01]&0x08)>>3)
-#define MEGADRIVE_REG01_SMS_SELECT      ((m_regs[0x01]&0x04)>>2)
-#define MEGADRIVE_REG01_UNUSED          ((m_regs[0x01]&0x02)>>1)
-#define MEGADRIVE_REG01_STRANGE_VIDEO   ((m_regs[0x01]&0x01)>>0) // unhandled, does strange things to the display
-
-#define MEGADRIVE_REG02_UNUSED1         ((m_regs[0x02]&0xc0)>>6)
-#define MEGADRIVE_REG02_PATTERN_ADDR_A  ((m_regs[0x02]&0x38)>>3)
-#define MEGADRIVE_REG02_UNUSED2         ((m_regs[0x02]&0x07)>>0)
-
-#define MEGADRIVE_REG03_UNUSED1         ((m_regs[0x03]&0xc0)>>6)
-#define MEGADRIVE_REG03_PATTERN_ADDR_W  ((m_regs[0x03]&0x3e)>>1)
-#define MEGADRIVE_REG03_UNUSED2         ((m_regs[0x03]&0x01)>>0)
-
-#define MEGADRIVE_REG04_UNUSED          ((m_regs[0x04]&0xf8)>>3)
-#define MEGADRIVE_REG04_PATTERN_ADDR_B  ((m_regs[0x04]&0x07)>>0)
-
-#define MEGADRIVE_REG05_UNUSED          ((m_regs[0x05]&0x80)>>7)
-#define MEGADRIVE_REG05_SPRITE_ADDR     ((m_regs[0x05]&0x7f)>>0)
-
-/* 6? */
-
-#define MEGADRIVE_REG07_UNUSED          ((m_regs[0x07]&0xc0)>>6)
-#define MEGADRIVE_REG07_BGCOLOUR        ((m_regs[0x07]&0x3f)>>0)
-
-/* 8? */
-/* 9? */
-
-#define MEGADRIVE_REG0A_HINT_VALUE      ((m_regs[0x0a]&0xff)>>0)
-
-#define MEGADRIVE_REG0B_UNUSED          ((m_regs[0x0b]&0xf0)>>4)
-#define MEGADRIVE_REG0B_IRQ2_ENABLE     ((m_regs[0x0b]&0x08)>>3)
-#define MEGADRIVE_REG0B_VSCROLL_MODE    ((m_regs[0x0b]&0x04)>>2)
-#define MEGADRIVE_REG0B_HSCROLL_MODE    ((m_regs[0x0b]&0x03)>>0)
-
-#define MEGADRIVE_REG0C_RS0             ((m_regs[0x0c]&0x80)>>7)
-#define MEGADRIVE_REG0C_UNUSED1         ((m_regs[0x0c]&0x40)>>6)
-#define MEGADRIVE_REG0C_SPECIAL         ((m_regs[0x0c]&0x20)>>5)
-#define MEGADRIVE_REG0C_UNUSED2         ((m_regs[0x0c]&0x10)>>4)
-#define MEGADRIVE_REG0C_SHADOW_HIGLIGHT ((m_regs[0x0c]&0x08)>>3)
-#define MEGADRIVE_REG0C_INTERLEAVE      ((m_regs[0x0c]&0x06)>>1)
-#define MEGADRIVE_REG0C_RS1             ((m_regs[0x0c]&0x01)>>0)
-
-#define MEGADRIVE_REG0D_UNUSED          ((m_regs[0x0d]&0xc0)>>6)
-#define MEGADRIVE_REG0D_HSCROLL_ADDR    ((m_regs[0x0d]&0x3f)>>0)
-
-/* e? */
-
-#define MEGADRIVE_REG0F_AUTO_INC        ((m_regs[0x0f]&0xff)>>0)
-
-#define MEGADRIVE_REG10_UNUSED1        ((m_regs[0x10]&0xc0)>>6)
-#define MEGADRIVE_REG10_VSCROLL_SIZE   ((m_regs[0x10]&0x30)>>4)
-#define MEGADRIVE_REG10_UNUSED2        ((m_regs[0x10]&0x0c)>>2)
-#define MEGADRIVE_REG10_HSCROLL_SIZE   ((m_regs[0x10]&0x03)>>0)
-
-#define MEGADRIVE_REG11_WINDOW_RIGHT   ((m_regs[0x11]&0x80)>>7)
-#define MEGADRIVE_REG11_UNUSED         ((m_regs[0x11]&0x60)>>5)
-#define MEGADRIVE_REG11_WINDOW_HPOS      ((m_regs[0x11]&0x1f)>>0)
-
-#define MEGADRIVE_REG12_WINDOW_DOWN    ((m_regs[0x12]&0x80)>>7)
-#define MEGADRIVE_REG12_UNUSED         ((m_regs[0x12]&0x60)>>5)
-#define MEGADRIVE_REG12_WINDOW_VPOS      ((m_regs[0x12]&0x1f)>>0)
-
-#define MEGADRIVE_REG13_DMALENGTH1     ((m_regs[0x13]&0xff)>>0)
-
-#define MEGADRIVE_REG14_DMALENGTH2      ((m_regs[0x14]&0xff)>>0)
-
-#define MEGADRIVE_REG15_DMASOURCE1      ((m_regs[0x15]&0xff)>>0)
-#define MEGADRIVE_REG16_DMASOURCE2      ((m_regs[0x16]&0xff)>>0)
-
-#define MEGADRIVE_REG17_DMASOURCE3      ((m_regs[0x17]&0xff)>>0)
-#define MEGADRIVE_REG17_DMATYPE         ((m_regs[0x17]&0xc0)>>6)
-#define MEGADRIVE_REG17_UNUSED          ((m_regs[0x17]&0x3f)>>0)
 
 
 #define MCFG_SEGA315_5313_IS_PAL(_bool) \
@@ -175,35 +39,35 @@
 
 
 // Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
-typedef device_delegate<void (int x, uint32_t priority, uint16_t &lineptr)> md_32x_scanline_delegate;
-typedef device_delegate<void (int scanline, int irq6)> md_32x_interrupt_delegate;
-typedef device_delegate<void (int scanline)> md_32x_scanline_helper_delegate;
-
 #define MCFG_SEGA315_5313_32X_SCANLINE_CB(_class, _method) \
-	sega315_5313_device::set_md_32x_scanline(*device, md_32x_scanline_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	sega315_5313_device::set_md_32x_scanline(*device, sega315_5313_device::md_32x_scanline_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_SEGA315_5313_32X_INTERRUPT_CB(_class, _method) \
-	sega315_5313_device::set_md_32x_interrupt(*device, md_32x_interrupt_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	sega315_5313_device::set_md_32x_interrupt(*device, sega315_5313_device::md_32x_interrupt_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(_class, _method) \
-	sega315_5313_device::set_md_32x_scanline_helper(*device, md_32x_scanline_helper_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	sega315_5313_device::set_md_32x_scanline_helper(*device, sega315_5313_device::md_32x_scanline_helper_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 
 class sega315_5313_device : public sega315_5124_device
 {
 public:
+	typedef device_delegate<void (int x, uint32_t priority, uint16_t &lineptr)> md_32x_scanline_delegate;
+	typedef device_delegate<void (int scanline, int irq6)> md_32x_interrupt_delegate;
+	typedef device_delegate<void (int scanline)> md_32x_scanline_helper_delegate;
+
 	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_sndirqline_callback(device_t &device, _Object object) { return downcast<sega315_5313_device &>(device).m_sndirqline_callback.set_callback(object); }
-	template<class _Object> static devcb_base &set_lv6irqline_callback(device_t &device, _Object object) { return downcast<sega315_5313_device &>(device).m_lv6irqline_callback.set_callback(object); }
-	template<class _Object> static devcb_base &set_lv4irqline_callback(device_t &device, _Object object) { return downcast<sega315_5313_device &>(device).m_lv4irqline_callback.set_callback(object); }
+	template <class Object> static devcb_base &set_sndirqline_callback(device_t &device, Object &&cb) { return downcast<sega315_5313_device &>(device).m_sndirqline_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_lv6irqline_callback(device_t &device, Object &&cb) { return downcast<sega315_5313_device &>(device).m_lv6irqline_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_lv4irqline_callback(device_t &device, Object &&cb) { return downcast<sega315_5313_device &>(device).m_lv4irqline_callback.set_callback(std::forward<Object>(cb)); }
 	static void set_alt_timing(device_t &device, int use_alt_timing);
 	static void set_palwrite_base(device_t &device, int palwrite_base);
 	static void static_set_palette_tag(device_t &device, const char *tag);
 
-	static void set_md_32x_scanline(device_t &device, md_32x_scanline_delegate callback) { downcast<sega315_5313_device &>(device).m_32x_scanline_func = callback; }
-	static void set_md_32x_interrupt(device_t &device, md_32x_interrupt_delegate callback) { downcast<sega315_5313_device &>(device).m_32x_interrupt_func = callback; }
-	static void set_md_32x_scanline_helper(device_t &device, md_32x_scanline_helper_delegate callback) { downcast<sega315_5313_device &>(device).m_32x_scanline_helper_func = callback; }
+	static void set_md_32x_scanline(device_t &device, md_32x_scanline_delegate &&cb) { downcast<sega315_5313_device &>(device).m_32x_scanline_func = std::move(cb); }
+	static void set_md_32x_interrupt(device_t &device, md_32x_interrupt_delegate &&cb) { downcast<sega315_5313_device &>(device).m_32x_interrupt_func = std::move(cb); }
+	static void set_md_32x_scanline_helper(device_t &device, md_32x_scanline_helper_delegate &&cb) { downcast<sega315_5313_device &>(device).m_32x_scanline_helper_func = std::move(cb); }
 
 	int m_use_alt_timing; // use MAME scanline timer instead, render only one scanline to a single line buffer, to be rendered by a partial update call.. experimental
 
@@ -220,8 +84,8 @@ public:
 	TIMER_CALLBACK_MEMBER(irq4_on_timer_callback);
 	void vdp_handle_eof();
 	void device_reset_old();
-	void vdp_clear_irq6_pending(void) { m_irq6_pending = 0; };
-	void vdp_clear_irq4_pending(void) { m_irq4_pending = 0; };
+	void vdp_clear_irq6_pending() { m_irq6_pending = 0; };
+	void vdp_clear_irq4_pending() { m_irq4_pending = 0; };
 
 	// set some VDP variables at start (shall be moved to a device interface?)
 	void set_scanline_counter(int scanline) { m_scanline_counter = scanline; }
@@ -234,7 +98,7 @@ public:
 	int get_imode() { return m_imode; }
 
 
-	void vdp_clear_bitmap(void)
+	void vdp_clear_bitmap()
 	{
 		if (m_render_bitmap)
 			m_render_bitmap->fill(0);
@@ -265,7 +129,6 @@ protected:
 	md_32x_scanline_helper_delegate m_32x_scanline_helper_func;
 
 private:
-
 	int m_command_pending; // 2nd half of command pending..
 	uint16_t m_command_part1;
 	uint16_t m_command_part2;
@@ -355,4 +218,6 @@ private:
 };
 
 
-extern const device_type SEGA315_5313;
+DECLARE_DEVICE_TYPE(SEGA315_5313, sega315_5313_device)
+
+#endif // MAME_VIDEO_315_5313_H

@@ -75,7 +75,7 @@
     Constructor
 */
 ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DATAMUX, "Databus multiplexer", tag, owner, clock, "ti99_datamux", __FILE__),
+	: device_t(mconfig, TI99_DATAMUX, tag, owner, clock),
 	m_video(*owner, VDP_TAG),
 	m_sound(*owner, TISOUNDCHIP_TAG),
 	m_peb(*owner, PERIBOX_TAG),
@@ -94,7 +94,8 @@ ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const ch
 	m_base32k(0),
 	m_console_groms_present(false),
 	m_grom_idle(true)
-	{ }
+{
+}
 
 #define TRACE_READY 0
 #define TRACE_ACCESS 0
@@ -636,4 +637,4 @@ ioport_constructor ti99_datamux_device::device_input_ports() const
 	return INPUT_PORTS_NAME(datamux);
 }
 
-const device_type DATAMUX = device_creator<ti99_datamux_device>;
+DEFINE_DEVICE_TYPE(TI99_DATAMUX, ti99_datamux_device, "ti99_datamux", "TI-99 Databus multiplexer")

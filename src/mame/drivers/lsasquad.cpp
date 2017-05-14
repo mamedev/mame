@@ -560,7 +560,7 @@ MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
 }
 
 /* Note: lsasquad clock values are not verified */
-static MACHINE_CONFIG_START( lsasquad, lsasquad_state )
+static MACHINE_CONFIG_START( lsasquad )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
@@ -616,7 +616,7 @@ static MACHINE_CONFIG_DERIVED( storming, lsasquad )
 	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( daikaiju, lsasquad_state )
+static MACHINE_CONFIG_START( daikaiju )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
@@ -786,6 +786,6 @@ ROM_START( daikaiju )
 ROM_END
 
 
-GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, driver_device, 0, ROT270, "Taito", "Land Sea Air Squad / Riku Kai Kuu Saizensen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, storming, lsasquad, storming, storming, driver_device, 0, ROT270, "bootleg", "Storming Party / Riku Kai Kuu Saizensen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, daikaiju, 0,        daikaiju, daikaiju, driver_device, 0, ROT270, "Taito", "Daikaiju no Gyakushu", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, lsasquad_state, 0, ROT270, "Taito",   "Land Sea Air Squad / Riku Kai Kuu Saizensen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, storming, lsasquad, storming, storming, lsasquad_state, 0, ROT270, "bootleg", "Storming Party / Riku Kai Kuu Saizensen",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, daikaiju, 0,        daikaiju, daikaiju, lsasquad_state, 0, ROT270, "Taito",   "Daikaiju no Gyakushu",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

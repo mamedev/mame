@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef PC_T1T_H
-#define PC_T1T_H
+#ifndef MAME_VIDEO_PC_T1T_H
+#define MAME_VIDEO_PC_T1T_H
 
 #include "video/mc6845.h"
 #include "machine/ram.h"
@@ -10,34 +10,9 @@
 #define T1000_SCREEN_NAME   "screen"
 #define T1000_MC6845_NAME   "mc6845_t1000"
 
-// used in tandy1000hx; used in pcjr???
-struct reg
-{
-		reg()
-		{
-			index = 0;
-			memset(&data, 0, sizeof(data));
-		}
-
-	uint8_t index;
-	uint8_t data[0x20];
-	/* see vgadoc
-	   0 mode control 1
-	   1 palette mask
-	   2 border color
-	   3 mode control 2
-	   4 reset
-	   0x10-0x1f palette registers
-	*/
-};
-
-class pc_t1t_device :  public device_t,
-								public device_video_interface
+class pc_t1t_device :  public device_t, public device_video_interface
 {
 public:
-	// construction/destruction
-	pc_t1t_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	DECLARE_PALETTE_INIT( pcjr );
 
 	DECLARE_WRITE_LINE_MEMBER( t1000_de_changed );
@@ -52,6 +27,30 @@ public:
 	MC6845_UPDATE_ROW( t1000_gfx_1bpp_update_row );
 
 protected:
+	// used in tandy1000hx; used in pcjr???
+	struct reg
+	{
+		reg()
+		{
+			index = 0;
+			memset(&data, 0, sizeof(data));
+		}
+
+		uint8_t index;
+		uint8_t data[0x20];
+		/* see vgadoc
+		   0 mode control 1
+		   1 palette mask
+		   2 border color
+		   3 mode control 2
+		   4 reset
+		   0x10-0x1f palette registers
+		*/
+	};
+
+	// construction/destruction
+	pc_t1t_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	required_device<mc6845_device> m_mc6845;
 	uint8_t m_mode_control, m_color_select;
 	uint8_t m_status;
@@ -111,7 +110,7 @@ private:
 	bool m_disable;
 };
 
-extern const device_type PCVIDEO_T1000;
+DECLARE_DEVICE_TYPE(PCVIDEO_T1000, pcvideo_t1000_device)
 
 #define MCFG_PCVIDEO_T1000_ADD(_tag) \
 		MCFG_DEVICE_ADD(_tag, PCVIDEO_T1000, 0)
@@ -125,8 +124,6 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( pcjr_vsync_changed );
 
-	uint8_t   *m_jxkanji;
-
 	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( pcjx_text_update_row );
 	MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row );
@@ -135,6 +132,8 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
 
+	uint8_t   *m_jxkanji;
+
 private:
 	void pc_pcjr_mode_switch();
 	void pc_pcjr_vga_data_w(int data);
@@ -142,10 +141,10 @@ private:
 	void pc_pcjx_bank_w(int data);
 };
 
-extern const device_type PCVIDEO_PCJR;
+DECLARE_DEVICE_TYPE(PCVIDEO_PCJR, pcvideo_pcjr_device)
 
 #define MCFG_PCVIDEO_PCJR_ADD(_tag) \
 		MCFG_DEVICE_ADD(_tag, PCVIDEO_PCJR, 0)
 
 
-#endif /* PC_T1T_H */
+#endif // MAME_VIDEO_PC_T1T_H

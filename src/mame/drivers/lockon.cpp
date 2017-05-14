@@ -480,7 +480,7 @@ void lockon_state::machine_reset()
 	m_main_inten = 0;
 }
 
-static MACHINE_CONFIG_START( lockon, lockon_state )
+static MACHINE_CONFIG_START( lockon )
 
 	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(main_v30)
@@ -778,5 +778,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, lockon,  0,      lockon,  lockon, driver_device,  0, ROT0, "Tatsumi", "Lock-On (rev. E)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lockonc, lockon, lockon,  lockone, driver_device, 0, ROT0, "Tatsumi", "Lock-On (rev. C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lockon,  0,      lockon,  lockon,  lockon_state, 0, ROT0, "Tatsumi", "Lock-On (rev. E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lockonc, lockon, lockon,  lockone, lockon_state, 0, ROT0, "Tatsumi", "Lock-On (rev. C)", MACHINE_SUPPORTS_SAVE )

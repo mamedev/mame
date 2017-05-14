@@ -121,6 +121,6 @@ private:
 
 
 // device type definition
-extern const device_type RIOT6532;
+DECLARE_DEVICE_TYPE(RIOT6532, riot6532_device)
 
 #endif

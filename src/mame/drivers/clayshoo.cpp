@@ -310,7 +310,7 @@ void clayshoo_state::machine_reset()
 	m_analog_port_val = 0;
 }
 
-static MACHINE_CONFIG_START( clayshoo, clayshoo_state )
+static MACHINE_CONFIG_START( clayshoo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,5068000/4)      /* 5.068/4 Mhz (divider is a guess) */
@@ -360,4 +360,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, clayshoo, 0, clayshoo, clayshoo, driver_device, 0, ROT0, "Allied Leisure", "Clay Shoot", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, clayshoo, 0, clayshoo, clayshoo, clayshoo_state, 0, ROT0, "Allied Leisure", "Clay Shoot", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

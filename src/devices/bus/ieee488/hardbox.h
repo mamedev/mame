@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_IEEE488_HARDBOX_H
+#define MAME_BUS_IEEE488_HARDBOX_H
 
-#ifndef __PET_HARDBOX__
-#define __PET_HARDBOX__
+#pragma once
 
 #include "ieee488.h"
 #include "cpu/z80/z80.h"
@@ -64,14 +64,13 @@ private:
 	};
 
 	required_device<cpu_device> m_maincpu;
-	required_device<corvus_hdc_t> m_hdc;
+	required_device<corvus_hdc_device> m_hdc;
 
 	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
 };
 
 // device type definition
-extern const device_type HARDBOX;
+DECLARE_DEVICE_TYPE(HARDBOX, hardbox_device)
 
 
-
-#endif
+#endif // MAME_BUS_IEEE488_HARDBOX_H

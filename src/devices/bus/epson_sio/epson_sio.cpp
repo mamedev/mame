@@ -18,7 +18,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type EPSON_SIO = device_creator<epson_sio_device>;
+DEFINE_DEVICE_TYPE(EPSON_SIO, epson_sio_device, "epson_sio", "EPSON SIO port")
 
 
 //**************************************************************************
@@ -54,10 +54,11 @@ device_epson_sio_interface::~device_epson_sio_interface()
 //-------------------------------------------------
 
 epson_sio_device::epson_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, EPSON_SIO, "EPSON SIO port", tag, owner, clock, "epson_sio", __FILE__),
-		device_slot_interface(mconfig, *this), m_cart(nullptr),
-		m_write_rx(*this),
-		m_write_pin(*this)
+	device_t(mconfig, EPSON_SIO, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_cart(nullptr),
+	m_write_rx(*this),
+	m_write_pin(*this)
 {
 }
 

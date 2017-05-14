@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_AUDIO_ATARI_JSA_H
+#define MAME_AUDIO_ATARI_JSA_H
 
-#ifndef __ATARI_JSA__
-#define __ATARI_JSA__
+#pragma once
 
 #include "cpu/m6502/m6502.h"
 #include "sound/tms5220.h"
@@ -25,10 +25,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern const device_type ATARI_JSA_I;
-extern const device_type ATARI_JSA_II;
-extern const device_type ATARI_JSA_III;
-extern const device_type ATARI_JSA_IIIS;
+DECLARE_DEVICE_TYPE(ATARI_JSA_I,    atari_jsa_i_device)
+DECLARE_DEVICE_TYPE(ATARI_JSA_II,   atari_jsa_ii_device)
+DECLARE_DEVICE_TYPE(ATARI_JSA_III,  atari_jsa_iii_device)
+DECLARE_DEVICE_TYPE(ATARI_JSA_IIIS, atari_jsa_iiis_device)
 
 
 
@@ -80,12 +80,12 @@ class atari_jsa_base_device :   public device_t,
 {
 protected:
 	// construction/destruction
-	atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int channels);
+	atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels);
 
 public:
 	// static configuration
-	template<class _Object> static devcb_base &static_set_test_read_cb(device_t &device, _Object object) { return downcast<atari_jsa_base_device &>(device).m_test_read_cb.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_main_int_cb(device_t &device, _Object object) { return downcast<atari_jsa_base_device &>(device).m_main_int_cb.set_callback(object); }
+	template <class Object> static devcb_base &static_set_test_read_cb(device_t &device, Object &&cb) { return downcast<atari_jsa_base_device &>(device).m_test_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_main_int_cb(device_t &device, Object &&cb) { return downcast<atari_jsa_base_device &>(device).m_main_int_cb.set_callback(std::forward<Object>(cb)); }
 
 	// getters
 	m6502_device &soundcpu() const { return *m_jsacpu; }
@@ -140,7 +140,7 @@ class atari_jsa_oki_base_device : public atari_jsa_base_device
 {
 protected:
 	// derived construction/destruction
-	atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int channels);
+	atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels);
 
 public:
 	// read/write handlers
@@ -245,7 +245,7 @@ public:
 
 protected:
 	// derived construction/destruction
-	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int channels);
+	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels);
 
 public:
 	// read/write handlers
@@ -274,4 +274,4 @@ protected:
 };
 
 
-#endif
+#endif // MAME_AUDIO_ATARI_JSA_H

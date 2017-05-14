@@ -7,10 +7,10 @@
 #include "speaker.h"
 
 
-const device_type ISA8_DECTALK = device_creator<dectalk_isa_device>;
+DEFINE_DEVICE_TYPE(ISA8_DECTALK, dectalk_isa_device, "dectalk_isa", "DECTalk-PC")
 
 dectalk_isa_device::dectalk_isa_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
-	device_t(mconfig, ISA8_DECTALK, "DECTalk-PC", tag, owner, clock, "dectalk_isa", __FILE__),
+	device_t(mconfig, ISA8_DECTALK, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_cmd(0),
 	m_stat(0),

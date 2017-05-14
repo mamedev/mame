@@ -14,24 +14,25 @@
 #include "emu.h"
 #include "sbp.h"
 
-const device_type NEOGEO_SBP_CART = device_creator<neogeo_sbp_cart>;
+DEFINE_DEVICE_TYPE(NEOGEO_SBP_CART, neogeo_sbp_cart_device, "neocart_sbp", "Neo Geo Super Bubble Pop Cart")
 
-neogeo_sbp_cart::neogeo_sbp_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	neogeo_rom_device(mconfig, NEOGEO_SBP_CART, "Neo Geo Super Bubble Pop Cart", tag, owner, clock, "neocart_sbp", __FILE__)
-{}
-
-
-void neogeo_sbp_cart::device_start()
-{
-}
-
-void neogeo_sbp_cart::device_reset()
+neogeo_sbp_cart_device::neogeo_sbp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	neogeo_rom_device(mconfig, NEOGEO_SBP_CART, tag, owner, clock)
 {
 }
 
 
+void neogeo_sbp_cart_device::device_start()
+{
+}
 
-READ16_MEMBER( neogeo_sbp_cart::protection_r )
+void neogeo_sbp_cart_device::device_reset()
+{
+}
+
+
+
+READ16_MEMBER( neogeo_sbp_cart_device::protection_r )
 {
 	uint16_t* rom = (get_rom_size()) ? get_rom_base() : get_region_rom_base();
 	uint16_t origdata = rom[offset + (0x200/2)];
@@ -48,7 +49,7 @@ READ16_MEMBER( neogeo_sbp_cart::protection_r )
 }
 
 
-WRITE16_MEMBER( neogeo_sbp_cart::protection_w )
+WRITE16_MEMBER( neogeo_sbp_cart_device::protection_w )
 {
 	int realoffset = 0x200 + (offset * 2);
 
@@ -71,7 +72,7 @@ WRITE16_MEMBER( neogeo_sbp_cart::protection_w )
 }
 
 
-void neogeo_sbp_cart::patch(uint8_t* cpurom, uint32_t cpurom_size)
+void neogeo_sbp_cart_device::patch(uint8_t* cpurom, uint32_t cpurom_size)
 {
 	/* the game code clears the text overlay used ingame immediately after writing it.. why? protection? sloppy code that the hw ignores? imperfect emulation? */
 	uint16_t* rom = (uint16_t*)cpurom;
@@ -81,7 +82,7 @@ void neogeo_sbp_cart::patch(uint8_t* cpurom, uint32_t cpurom_size)
 	rom[0x2a6fc/2] = 0x4e71;
 }
 
-void neogeo_sbp_cart::decrypt_all(DECRYPT_ALL_PARAMS)
+void neogeo_sbp_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	patch(cpuregion, cpuregion_size);
 }

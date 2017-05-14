@@ -29,7 +29,9 @@ public:
 
 	DECLARE_READ8_MEMBER(rs232_r);
 	DECLARE_WRITE8_MEMBER(rs232_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
+
+protected:
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
 	uint8_t m_term_out;
@@ -80,7 +82,7 @@ WRITE8_MEMBER( evmbug_state::rs232_w )
 		m_terminal->write(space, 0, m_term_out & 0x7f);
 }
 
-WRITE8_MEMBER( evmbug_state::kbd_put )
+void evmbug_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -92,7 +94,7 @@ void evmbug_state::machine_reset()
 	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( evmbug, evmbug_state )
+static MACHINE_CONFIG_START( evmbug )
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	// We have no lines connected yet
@@ -100,7 +102,7 @@ static MACHINE_CONFIG_START( evmbug, evmbug_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(evmbug_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(evmbug_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -113,5 +115,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                  FULLNAME       FLAGS */
-COMP( 19??, evmbug, 0,      0,       evmbug,    evmbug, driver_device,  0,    "Texas Instruments",   "TMAM6095", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT  COMPANY                FULLNAME    FLAGS
+COMP( 19??, evmbug, 0,      0,       evmbug,    evmbug, evmbug_state,  0,    "Texas Instruments",   "TMAM6095", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

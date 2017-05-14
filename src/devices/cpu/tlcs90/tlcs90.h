@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#pragma once
+#ifndef MAME_CPU_TLCS90_TLCS90_H
+#define MAME_CPU_TLCS90_TLCS90_H
 
-#ifndef __TLCS90_H__
-#define __TLCS90_H__
+#pragma once
 
 
 #define T90_IOBASE  0xffc0
@@ -24,9 +24,6 @@ DECLARE_ENUM_OPERATORS(tlcs90_e_irq)
 class tlcs90_device : public cpu_device
 {
 public:
-	// construction/destruction
-	tlcs90_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor program_map);
-
 	DECLARE_READ8_MEMBER( t90_internal_registers_r );
 	DECLARE_WRITE8_MEMBER( t90_internal_registers_w );
 
@@ -35,6 +32,9 @@ public:
 
 protected:
 	enum _e_op {    UNKNOWN,    NOP,    EX,     EXX,    LD,     LDW,    LDA,    LDI,    LDIR,   LDD,    LDDR,   CPI,    CPIR,   CPD,    CPDR,   PUSH,   POP,    JP,     JR,     CALL,   CALLR,      RET,    RETI,   HALT,   DI,     EI,     SWI,    DAA,    CPL,    NEG,    LDAR,   RCF,    SCF,    CCF,    TSET,   BIT,    SET,    RES,    INC,    DEC,    INCX,   DECX,   INCW,   DECW,   ADD,    ADC,    SUB,    SBC,    AND,    XOR,    OR,     CP,     RLC,    RRC,    RL,     RR,     SLA,    SRA,    SLL,    SRL,    RLD,    RRD,    DJNZ,   MUL,    DIV     };
+
+	// construction/destruction
+	tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -191,11 +191,11 @@ public:
 };
 
 
-extern const device_type TMP90840;
-extern const device_type TMP90841;
-extern const device_type TMP90845;
-extern const device_type TMP91640;
-extern const device_type TMP91641;
-extern const device_type TMP90PH44;
+DECLARE_DEVICE_TYPE(TMP90840,  tmp90840_device)
+DECLARE_DEVICE_TYPE(TMP90841,  tmp90841_device)
+DECLARE_DEVICE_TYPE(TMP90845,  tmp90845_device)
+DECLARE_DEVICE_TYPE(TMP91640,  tmp91640_device)
+DECLARE_DEVICE_TYPE(TMP91641,  tmp91641_device)
+DECLARE_DEVICE_TYPE(TMP90PH44, tmp90ph44_device)
 
-#endif /* __TLCS90_H__ */
+#endif // MAME_CPU_TLCS90_TLCS90_H

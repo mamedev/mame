@@ -207,7 +207,7 @@ void flkatck_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( flkatck, flkatck_state )
+static MACHINE_CONFIG_START( flkatck )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
@@ -310,6 +310,6 @@ ROM_START( flkatcka )
 	ROM_LOAD( "mask2m.11a",  0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) )
 ROM_END
 
-GAME( 1987, mx5000,  0,      flkatck, flkatck, driver_device, 0, ROT90, "Konami", "MX5000", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, flkatck, mx5000, flkatck, flkatck, driver_device, 0, ROT90, "Konami", "Flak Attack (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, flkatcka,mx5000, flkatck, flkatck, driver_device, 0, ROT90, "Konami", "Flak Attack (Japan, PWB 450593 sub-board)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mx5000,  0,      flkatck, flkatck, flkatck_state, 0, ROT90, "Konami", "MX5000", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, flkatck, mx5000, flkatck, flkatck, flkatck_state, 0, ROT90, "Konami", "Flak Attack (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, flkatcka,mx5000, flkatck, flkatck, flkatck_state, 0, ROT90, "Konami", "Flak Attack (Japan, PWB 450593 sub-board)", MACHINE_SUPPORTS_SAVE )

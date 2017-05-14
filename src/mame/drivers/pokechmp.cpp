@@ -216,7 +216,7 @@ OKI M6295 (an AD65 on this board, note pin 7 is low): 1.5mhz
 
 */
 
-static MACHINE_CONFIG_START( pokechmp, pokechmp_state )
+static MACHINE_CONFIG_START( pokechmp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_4MHz/4)
@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( pokechmp, pokechmp_state )
 	MCFG_SOUND_ADD("ym2", YM3812, XTAL_24MHz/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/16, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/16, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) /* sound fx */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, pokechmp_oki_map)

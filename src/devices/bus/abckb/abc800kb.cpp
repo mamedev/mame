@@ -85,7 +85,7 @@ XR22-050-3B Pinout
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC800_KEYBOARD = device_creator<abc800_keyboard_device>;
+DEFINE_DEVICE_TYPE(ABC800_KEYBOARD, abc800_keyboard_device, "abc800kb", "ABC-800 Keyboard")
 
 
 //-------------------------------------------------
@@ -325,7 +325,8 @@ inline void abc800_keyboard_device::key_down(int state)
 //  abc800_keyboard_device - constructor
 //-------------------------------------------------
 
-abc800_keyboard_device::abc800_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : device_t(mconfig, ABC800_KEYBOARD, "ABC-800 Keyboard", tag, owner, clock, "abc800kb", __FILE__),
+abc800_keyboard_device::abc800_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ABC800_KEYBOARD, tag, owner, clock),
 	abc_keyboard_interface(mconfig, *this),
 	m_maincpu(*this, I8048_TAG),
 	m_x(*this, "X%u", 0),

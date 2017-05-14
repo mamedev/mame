@@ -25,10 +25,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type GOTTLIEB_SOUND_REV0 = device_creator<gottlieb_sound_r0_device>;
-const device_type GOTTLIEB_SOUND_REV1 = device_creator<gottlieb_sound_r1_device>;
-const device_type GOTTLIEB_SOUND_REV1_WITH_VOTRAX = device_creator<gottlieb_sound_r1_with_votrax_device>;
-const device_type GOTTLIEB_SOUND_REV2 = device_creator<gottlieb_sound_r2_device>;
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV0,        gottlieb_sound_r0_device,             "gotsndr0",   "Gottlieb Sound rev. 0")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,        gottlieb_sound_r1_device,             "gotsndr1",   "Gottlieb Sound rev. 1")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_device, "gotsndr1vt", "Gottlieb Sound rev. 1 with Votrax")
+DEFINE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device,             "gotsndr2",   "Gottlieb Sound rev. 2")
 
 
 //**************************************************************************
@@ -40,7 +40,7 @@ const device_type GOTTLIEB_SOUND_REV2 = device_creator<gottlieb_sound_r2_device>
 //-------------------------------------------------
 
 gottlieb_sound_r0_device::gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GOTTLIEB_SOUND_REV0, "Gottlieb Sound rev. 0", tag, owner, clock, "gotsndr0", __FILE__)
+	: device_t(mconfig, GOTTLIEB_SOUND_REV0, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this)
 	, m_audiocpu(*this, "audiocpu")
 	, m_r6530(*this, "r6530")
@@ -165,20 +165,17 @@ void gottlieb_sound_r0_device::device_start()
 //-------------------------------------------------
 
 gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gottlieb_sound_r1_device(mconfig, GOTTLIEB_SOUND_REV1, "Gottlieb Sound rev. 1", tag, owner, clock, "gotsndr1", __FILE__)
+	: gottlieb_sound_r1_device(mconfig, GOTTLIEB_SOUND_REV1, tag, owner, clock)
 {
 }
 
 gottlieb_sound_r1_device::gottlieb_sound_r1_device(
 		const machine_config &mconfig,
 		device_type type,
-		const char *name,
 		const char *tag,
 		device_t *owner,
-		uint32_t clock,
-		const char *shortname,
-		const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this)
 	, m_audiocpu(*this, "audiocpu")
 	, m_riot(*this, "riot")
@@ -389,7 +386,7 @@ void gottlieb_sound_r1_device::device_start()
 //-------------------------------------------------
 
 gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gottlieb_sound_r1_device(mconfig, GOTTLIEB_SOUND_REV1_WITH_VOTRAX, "Gottlieb Sound rev. 1 with Votrax", tag, owner, clock, "gotsndr1vt", __FILE__)
+	: gottlieb_sound_r1_device(mconfig, GOTTLIEB_SOUND_REV1_VOTRAX, tag, owner, clock)
 {
 }
 
@@ -426,7 +423,7 @@ ioport_constructor gottlieb_sound_r1_with_votrax_device::device_input_ports() co
 //-------------------------------------------------
 
 gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GOTTLIEB_SOUND_REV2, "Gottlieb Sound rev. 2", tag, owner, clock, "gotsndr2", __FILE__),
+	: device_t(mconfig, GOTTLIEB_SOUND_REV2, tag, owner, clock),
 		device_mixer_interface(mconfig, *this),
 		m_audiocpu(*this, "audiocpu"),
 		m_speechcpu(*this, "speechcpu"),

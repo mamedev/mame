@@ -19,9 +19,11 @@
 */
 
 #include "emu.h"
-#include <time.h>
-#include "machine/microdrv.h"
 #include "zx8302.h"
+
+#include "machine/microdrv.h"
+
+#include <time.h>
 
 
 
@@ -41,7 +43,7 @@ static const int RTC_BASE_ADJUST = 283996800;
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ZX8302 = device_creator<zx8302_device>;
+DEFINE_DEVICE_TYPE(ZX8302, zx8302_device, "zx8302", "Sinclair ZX8302")
 
 //**************************************************************************
 //  INLINE HELPERS
@@ -128,7 +130,7 @@ inline void zx8302_device::transmit_ipc_data()
 //-------------------------------------------------
 
 zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ZX8302, "Sinclair ZX8302", tag, owner, clock, "zx8302", __FILE__),
+	: device_t(mconfig, ZX8302, tag, owner, clock),
 		device_serial_interface(mconfig, *this),
 		m_rtc_clock(0),
 		m_out_ipl1l_cb(*this),

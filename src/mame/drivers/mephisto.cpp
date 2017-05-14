@@ -354,7 +354,7 @@ void mephisto_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( mephisto, mephisto_state )
+static MACHINE_CONFIG_START( mephisto )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M65C02,4915200)  /* 65C02 */
 	MCFG_CPU_PROGRAM_MAP(mephisto_mem)
@@ -456,7 +456,7 @@ DRIVER_INIT_MEMBER(mephisto_state,mephisto)
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME                            FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     CLASS             INIT        COMPANY             FULLNAME                            FLAGS */
 
 CONS( 1984, mm2,        mm4,    0,      mm2,        mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto MM2 Schachcomputer",     MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, rebel5,     mm4,    0,      rebel5,     mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto Rebell 5,0 Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )

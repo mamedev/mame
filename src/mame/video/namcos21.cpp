@@ -25,8 +25,10 @@ Namco System 21 Video Hardware
     */
 
 #include "emu.h"
-#include "includes/namcoic.h"
 #include "includes/namcos21.h"
+
+#include "machine/namcoic.h"
+
 
 #define FRAMEBUFFER_SIZE_IN_BYTES (sizeof(uint16_t)*NAMCOS21_POLY_FRAME_WIDTH*NAMCOS21_POLY_FRAME_HEIGHT)
 

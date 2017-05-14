@@ -6,14 +6,14 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ISA_MC1502_FDC_H
+#define MAME_BUS_ISA_MC1502_FDC_H
+
 #pragma once
 
-#ifndef __MC1502_FDC__
-#define __MC1502_FDC__
 
-
-#include "imagedev/flopdrv.h"
 #include "isa.h"
+#include "imagedev/flopdrv.h"
 #include "machine/wd_fdc.h"
 
 //**************************************************************************
@@ -44,7 +44,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	required_device<fd1793_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	int motor_on;
 	emu_timer *motor_timer;
 
@@ -57,7 +57,6 @@ public:
 
 
 // device type definition
-extern const device_type MC1502_FDC;
+DECLARE_DEVICE_TYPE(MC1502_FDC, mc1502_fdc_device)
 
-
-#endif
+#endif // MAME_BUS_ISA_MC1502_FDC_H

@@ -183,7 +183,7 @@ void validity_checker::check_shared_source(const game_driver &driver)
 	// then iterate over all drivers and check the ones that share the same source file
 	m_drivlist.reset();
 	while (m_drivlist.next())
-		if (strcmp(driver.source_file, m_drivlist.driver().source_file) == 0)
+		if (strcmp(driver.type.source(), m_drivlist.driver().type.source()) == 0)
 			validate_one(m_drivlist.driver());
 
 	// cleanup
@@ -279,7 +279,7 @@ void validity_checker::validate_one(const game_driver &driver)
 {
 	// help verbose validation detect configuration-related crashes
 	if (m_print_verbose)
-		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating driver %s (%s)...\n", driver.name, core_filename_extract_base(driver.source_file).c_str());
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating driver %s (%s)...\n", driver.name, core_filename_extract_base(driver.type.source()).c_str());
 
 	// set the current driver
 	m_current_driver = &driver;
@@ -315,7 +315,7 @@ void validity_checker::validate_one(const game_driver &driver)
 	if (m_errors > start_errors || m_warnings > start_warnings || !m_verbose_text.empty())
 	{
 		if (!m_print_verbose)
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): ", driver.name, core_filename_extract_base(driver.source_file).c_str());
+			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): ", driver.name, core_filename_extract_base(driver.type.source()).c_str());
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%d errors, %d warnings\n", m_errors - start_errors, m_warnings - start_warnings);
 		if (m_errors > start_errors)
 			output_indented_errors(m_error_text, "Errors");
@@ -1350,14 +1350,14 @@ void validity_checker::validate_driver()
 	if (!m_names_map.insert(std::make_pair(m_current_driver->name, m_current_driver)).second)
 	{
 		const game_driver *match = m_names_map.find(m_current_driver->name)->second;
-		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(match->source_file).c_str(), match->name);
+		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(match->type.source()).c_str(), match->name);
 	}
 
 	// check for duplicate descriptions
-	if (!m_descriptions_map.insert(std::make_pair(m_current_driver->description, m_current_driver)).second)
+	if (!m_descriptions_map.insert(std::make_pair(m_current_driver->type.fullname(), m_current_driver)).second)
 	{
-		const game_driver *match = m_descriptions_map.find(m_current_driver->description)->second;
-		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(match->source_file).c_str(), match->name);
+		const game_driver *match = m_descriptions_map.find(m_current_driver->type.fullname())->second;
+		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(match->type.source()).c_str(), match->name);
 	}
 
 	// determine if we are a clone
@@ -1913,7 +1913,7 @@ void validity_checker::validate_device_types()
 				if (m_names_map.end() != drvname)
 				{
 					game_driver const &dup(*drvname->second);
-					osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup.source_file).c_str(), dup.name);
+					osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
 				}
 				else if (!devname.second)
 				{
@@ -1936,12 +1936,12 @@ void validity_checker::validate_device_types()
 				if (m_names_map.end() != drvdesc)
 				{
 					game_driver const &dup(*drvdesc->second);
-					osd_printf_error("Device %s name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup.source_file).c_str(), dup.name);
+					osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
 				}
 				else if (!devdesc.second)
 				{
 					device_t *const dup = config.device_add(&config.root_device(), "_dup", *devdesc.first->second, 0);
-					osd_printf_error("Device %s name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
+					osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
 					config.device_remove(&config.root_device(), "_dup");
 				}
 			}

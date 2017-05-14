@@ -1967,7 +1967,7 @@ static INPUT_PORTS_START( tfs )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wpc_s, wpc_s_state )
+static MACHINE_CONFIG_START( wpc_s )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_8MHz/4)
 	MCFG_CPU_PROGRAM_MAP(wpc_s_map)

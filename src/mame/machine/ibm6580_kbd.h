@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
-#ifndef DWKBD_H_
-#define DWKBD_H_
+#ifndef MAME_MACHINE_IBM6580_KBD_H
+#define MAME_MACHINE_IBM6580_KBD_H
 
-#include "cpu/mcs48/mcs48.h"
+#pragma once
+
 
 #define MCFG_DW_KEYBOARD_OUT_DATA_HANDLER(_devcb) \
 	devcb = &dw_keyboard_device::set_out_data_handler(*device, DEVCB_##_devcb);
@@ -19,9 +20,9 @@ class dw_keyboard_device :  public device_t
 public:
 	dw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_data_handler(device_t &device, _Object object) { return downcast<dw_keyboard_device &>(device).m_out_data.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_clock_handler(device_t &device, _Object object) { return downcast<dw_keyboard_device &>(device).m_out_clock.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_strobe_handler(device_t &device, _Object object) { return downcast<dw_keyboard_device &>(device).m_out_strobe.set_callback(object); }
+	template <class Object> static devcb_base &set_out_data_handler(device_t &device, Object &&cb) { return downcast<dw_keyboard_device &>(device).m_out_data.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_clock_handler(device_t &device, Object &&cb) { return downcast<dw_keyboard_device &>(device).m_out_clock.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_strobe_handler(device_t &device, Object &&cb) { return downcast<dw_keyboard_device &>(device).m_out_strobe.set_callback(std::forward<Object>(cb)); }
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -54,6 +55,6 @@ private:
 	required_device<cpu_device> m_mcu;
 };
 
-extern const device_type DW_KEYBOARD;
+DECLARE_DEVICE_TYPE(DW_KEYBOARD, dw_keyboard_device)
 
-#endif /* DWKBD_H_ */
+#endif // MAME_MACHINE_IBM6580_KBD_H

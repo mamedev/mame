@@ -200,7 +200,7 @@ TIMER_CALLBACK_MEMBER(rm380z_state::static_vblank_timer)
 	}
 }
 
-WRITE8_MEMBER( rm380z_state::keyboard_put )
+void rm380z_state::keyboard_put(u8 data)
 {
 	if (data)
 	{

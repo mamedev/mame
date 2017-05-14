@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_RX01_H
+#define MAME_MACHINE_RX01_H
 
-#ifndef __RX01__
-#define __RX01__
+#pragma once
 
 #include "imagedev/flopdrv.h"
 
@@ -79,6 +79,6 @@ private:
 };
 
 // device type definition
-extern const device_type RX01;
+DECLARE_DEVICE_TYPE(RX01, rx01_device)
 
-#endif
+#endif // MAME_MACHINE_RX01_H

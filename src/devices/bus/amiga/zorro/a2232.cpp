@@ -24,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type A2232 = device_creator<a2232_device>;
+DEFINE_DEVICE_TYPE(A2232, a2232_device, "a2232", "CBM A2232 Serial Card")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -153,7 +153,7 @@ machine_config_constructor a2232_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 a2232_device::a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2232, "CBM A2232 Serial Card", tag, owner, clock, "a2232", __FILE__),
+	device_t(mconfig, A2232, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_iocpu(*this, "iocpu"),
 	m_acia_0(*this, "acia_0"),

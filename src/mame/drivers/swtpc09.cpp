@@ -97,7 +97,7 @@ WRITE_LINE_MEMBER(swtpc09_state::write_acia_clock)
 
 /* Machine driver */
 /* MPU09, MPID, MPS2 DMF2 */
-static MACHINE_CONFIG_START( swtpc09, swtpc09_state )
+static MACHINE_CONFIG_START( swtpc09 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1000000)
 	MCFG_CPU_PROGRAM_MAP(swtpc09_mem)
@@ -137,7 +137,7 @@ static MACHINE_CONFIG_START( swtpc09, swtpc09_state )
 MACHINE_CONFIG_END
 
 /* MPU09, MPID, MPS2 DC4 PIAIDE*/
-static MACHINE_CONFIG_START( swtpc09i, swtpc09_state )
+static MACHINE_CONFIG_START( swtpc09i )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1000000)
 	MCFG_CPU_PROGRAM_MAP(swtpc09_mem)
@@ -185,7 +185,7 @@ MACHINE_CONFIG_END
 
 
 /* MPU09, MPID, MPS2 DMF3 */
-static MACHINE_CONFIG_START( swtpc09d3, swtpc09_state )
+static MACHINE_CONFIG_START( swtpc09d3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(swtpc09_mem)
@@ -255,8 +255,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT  COMPAT    MACHINE   INPUT   INIT     COMPANY  FULLNAME   FLAGS */
-COMP( 1980, swtpc09,         0,      0,   swtpc09,   swtpc09, swtpc09_state,   swtpc09, "SWTPC", "swtpc S/09 Sbug", MACHINE_NO_SOUND_HW)
-COMP( 1980, swtpc09i,   swtpc09,      0,  swtpc09i,   swtpc09, swtpc09_state,  swtpc09i, "SWTPC", "swtpc S/09 Sbug + piaide", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1980, swtpc09u,   swtpc09,      0,   swtpc09,   swtpc09, swtpc09_state,  swtpc09u, "SWTPC", "swtpc S/09 UNIBug + DMF2", MACHINE_NO_SOUND_HW)
-COMP( 1980, swtpc09d3,  swtpc09,      0, swtpc09d3,   swtpc09, swtpc09_state, swtpc09d3, "SWTPC", "swtpc S/09 UNIBug + DMF3", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT    STATE          INIT       COMPANY  FULLNAME                    FLAGS
+COMP( 1980, swtpc09,   0,        0,      swtpc09,   swtpc09, swtpc09_state, swtpc09,   "SWTPC", "swtpc S/09 Sbug",          MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09i,  swtpc09,  0,      swtpc09i,  swtpc09, swtpc09_state, swtpc09i,  "SWTPC", "swtpc S/09 Sbug + piaide", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09u,  swtpc09,  0,      swtpc09,   swtpc09, swtpc09_state, swtpc09u,  "SWTPC", "swtpc S/09 UNIBug + DMF2", MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09d3, swtpc09,  0,      swtpc09d3, swtpc09, swtpc09_state, swtpc09d3, "SWTPC", "swtpc S/09 UNIBug + DMF3", MACHINE_NO_SOUND_HW )

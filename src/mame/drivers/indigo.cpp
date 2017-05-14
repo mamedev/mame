@@ -573,7 +573,7 @@ static MACHINE_CONFIG_FRAGMENT( cdrom_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^^mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( indigo3k, indigo_state )
+static MACHINE_CONFIG_START( indigo3k )
 	MCFG_CPU_ADD("maincpu", R3041, 33000000)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_CPU_PROGRAM_MAP(indigo3k_map)
@@ -626,6 +626,6 @@ ROM_START( indigo4k )
 	ROM_LOAD( "ip20prom.070-8116-004.bin", 0x000000, 0x080000, CRC(940d960e) SHA1(596aba530b53a147985ff3f6f853471ce48c866c) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS         INIT    COMPANY   FULLNAME */
-COMP( 1991, indigo3k, 0,        0,        indigo3k, indigo,   driver_device, 0,     "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1993, indigo4k, 0,        0,        indigo4k, indigo,   driver_device, 0,         "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS         INIT   COMPANY                 FULLNAME                                          FLAGS
+COMP( 1991, indigo3k, 0,        0,        indigo3k, indigo,   indigo_state, 0,     "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1993, indigo4k, 0,        0,        indigo4k, indigo,   indigo_state, 0,     "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

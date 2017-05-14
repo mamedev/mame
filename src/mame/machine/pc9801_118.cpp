@@ -27,7 +27,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type PC9801_118 = device_creator<pc9801_118_device>;
+DEFINE_DEVICE_TYPE(PC9801_118, pc9801_118_device, "pc9801_118", "pc9801_118")
 
 
 READ8_MEMBER(pc9801_118_device::opn_porta_r)
@@ -121,7 +121,7 @@ const tiny_rom_entry *pc9801_118_device::device_rom_region() const
 //-------------------------------------------------
 
 pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC9801_118, "pc9801_118", tag, owner, clock, "pc9801_118", __FILE__),
+	: device_t(mconfig, PC9801_118, tag, owner, clock),
 //      m_maincpu(*this, "^maincpu"),
 		m_opn3(*this, "opn3")
 {

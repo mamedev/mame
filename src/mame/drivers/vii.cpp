@@ -1179,7 +1179,7 @@ INTERRUPT_GEN_MEMBER(vii_state::vii_vblank)
 
 }
 
-static MACHINE_CONFIG_START( vii, vii_state )
+static MACHINE_CONFIG_START( vii )
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
@@ -1200,7 +1200,7 @@ static MACHINE_CONFIG_START( vii, vii_state )
 	MCFG_SOFTWARE_LIST_ADD("vii_cart","vii")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vsmile, vii_state )
+static MACHINE_CONFIG_START( vsmile )
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
@@ -1221,7 +1221,7 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vsmile_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( batman, vii_state )
+static MACHINE_CONFIG_START( batman )
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
@@ -1239,7 +1239,7 @@ static MACHINE_CONFIG_START( batman, vii_state )
 	MCFG_PALETTE_ADD("palette", 32768)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wirels60, vii_state )
+static MACHINE_CONFIG_START( wirels60 )
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
@@ -1327,7 +1327,7 @@ ROM_START( wirels60 )
 	ROM_LOAD( "wirels60.bin", 0x0000, 0x4000000, CRC(b4df8b28) SHA1(00e3da542e4bc14baf4724ad436f66d4c0f65c84))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT                INIT      COMPANY                                              FULLNAME             FLAGS */
+//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     STATE      INIT      COMPANY                                              FULLNAME             FLAGS
 CONS( 2004, batmantv, vii,      0,        batman,   batman,   vii_state, batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman",        MACHINE_NO_SOUND )
 CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2005, vsmilef,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (France)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

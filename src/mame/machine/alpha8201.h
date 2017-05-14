@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef _ALPHA8201_H_
-#define _ALPHA8201_H_
+#ifndef MAME_MACHINE_ALPHA8201_H
+#define MAME_MACHINE_ALPHA8201_H
 
 
 class alpha_8201_device : public device_t
@@ -48,7 +48,7 @@ private:
 };
 
 
-extern const device_type ALPHA_8201;
+DECLARE_DEVICE_TYPE(ALPHA_8201, alpha_8201_device)
 
 
-#endif /* _ALPHA8201_H_ */
+#endif // MAME_MACHINE_ALPHA8201_H

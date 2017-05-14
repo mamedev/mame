@@ -22,7 +22,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_CORVFDC01 = device_creator<a2bus_corvfdc01_device>;
+DEFINE_DEVICE_TYPE(A2BUS_CORVFDC01, a2bus_corvfdc01_device, "crvfdc01", "Corvus Systems Floppy Controller")
 
 #define FDC01_ROM_REGION    "fdc01_rom"
 #define FDC01_FDC_TAG       "fdc01_fdc"
@@ -111,25 +111,20 @@ const tiny_rom_entry *a2bus_corvfdc01_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_wdfdc(*this, FDC01_FDC_TAG),
 	m_con1(*this, FDC01_FDC_TAG":0"),
 	m_con2(*this, FDC01_FDC_TAG":1"),
 	m_con3(*this, FDC01_FDC_TAG":2"),
-	m_con4(*this, FDC01_FDC_TAG":3"), m_rom(nullptr), m_fdc_local_status(0), m_fdc_local_command(0), m_curfloppy(nullptr)
+	m_con4(*this, FDC01_FDC_TAG":3"),
+	m_rom(nullptr), m_fdc_local_status(0), m_fdc_local_command(0), m_curfloppy(nullptr)
 {
 }
 
 a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_CORVFDC01, "Corvus Systems Floppy Controller", tag, owner, clock, "crvfdc01", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_wdfdc(*this, FDC01_FDC_TAG),
-	m_con1(*this, FDC01_FDC_TAG":0"),
-	m_con2(*this, FDC01_FDC_TAG":1"),
-	m_con3(*this, FDC01_FDC_TAG":2"),
-	m_con4(*this, FDC01_FDC_TAG":3"), m_rom(nullptr), m_fdc_local_status(0), m_fdc_local_command(0), m_curfloppy(nullptr)
+	a2bus_corvfdc01_device(mconfig, A2BUS_CORVFDC01, tag, owner, clock)
 {
 }
 

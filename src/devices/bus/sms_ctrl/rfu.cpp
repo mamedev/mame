@@ -28,7 +28,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_RAPID_FIRE = device_creator<sms_rapid_fire_device>;
+DEFINE_DEVICE_TYPE(SMS_RAPID_FIRE, sms_rapid_fire_device, "sms_rapid_fire", "Sega SMS Rapid Fire Unit")
 
 // time interval not verified
 #define RAPID_FIRE_INTERVAL attotime::from_hz(10)
@@ -64,7 +64,7 @@ ioport_constructor sms_rapid_fire_device::device_input_ports() const
 //-------------------------------------------------
 
 sms_rapid_fire_device::sms_rapid_fire_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SMS_RAPID_FIRE, "Sega SMS Rapid Fire", tag, owner, clock, "sms_rapid_fire", __FILE__),
+	device_t(mconfig, SMS_RAPID_FIRE, tag, owner, clock),
 	device_sms_control_port_interface(mconfig, *this),
 	m_rfire_sw(*this, "rfu_sw"),
 	m_subctrl_port(*this, "ctrl"),
@@ -84,8 +84,6 @@ void sms_rapid_fire_device::device_start()
 
 	save_item(NAME(m_start_time));
 	save_item(NAME(m_read_state));
-
-	m_subctrl_port->device_start();
 }
 
 

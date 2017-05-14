@@ -93,7 +93,7 @@ void ibm3153_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( ibm3153, ibm3153_state )
+static MACHINE_CONFIG_START( ibm3153 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32, XTAL_16MHz) // no idea of clock
 	MCFG_CPU_PROGRAM_MAP(ibm3153_mem)
@@ -123,5 +123,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE   INPUT    CLASS          INIT  COMPANY            FULLNAME       FLAGS */
-COMP( 1999?, ibm3153, 0,      0,       ibm3153,  ibm3153, driver_device,  0,  "IBM", "IBM 3153 Terminal", MACHINE_IS_SKELETON)
+//    YEAR   NAME     PARENT  COMPAT   MACHINE   INPUT    CLASS          INIT  COMPANY  FULLNAME             FLAGS
+COMP( 1999?, ibm3153, 0,      0,       ibm3153,  ibm3153, ibm3153_state, 0,    "IBM",   "IBM 3153 Terminal", MACHINE_IS_SKELETON)

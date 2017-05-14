@@ -17,7 +17,7 @@ for the time being this is a simple sample player based on the work by MASH.
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type S97271P = device_creator<s97271p_device>;
+DEFINE_DEVICE_TYPE(S97271P, s97271p_device, "s97271p", "N-Sub Oscillator 97271-P")
 
 /* bit definitions - sound effect drive outputs */
 #define S97271P_WARNING      0x01
@@ -91,7 +91,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 s97271p_device::s97271p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, S97271P, "N-Sub Oscillator 97271-P", tag, owner, clock, "s97271p", __FILE__),
+	device_t(mconfig, S97271P, tag, owner, clock),
 	m_samples(*this, "samples")
 {
 }

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_REU_H
+#define MAME_BUS_C64_REU_H
 
-#ifndef __REU__
-#define __REU__
+#pragma once
 
 
 #include "bus/generic/slot.h"
@@ -29,9 +29,6 @@ class c64_reu_cartridge_device : public device_t,
 									public device_c64_expansion_card_interface
 {
 public:
-	// construction/destruction
-	c64_reu_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, int jp1, size_t ram_size, const char *shortname, const char *source);
-
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
@@ -42,6 +39,9 @@ protected:
 		TYPE_1750,
 		TYPE_1764
 	};
+
+	// construction/destruction
+	c64_reu_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, int jp1, size_t ram_size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -91,10 +91,9 @@ public:
 
 
 // device type definition
-extern const device_type C64_REU1700;
-extern const device_type C64_REU1750;
-extern const device_type C64_REU1764;
+DECLARE_DEVICE_TYPE(C64_REU1700, c64_reu1700_cartridge_device)
+DECLARE_DEVICE_TYPE(C64_REU1750, c64_reu1750_cartridge_device)
+DECLARE_DEVICE_TYPE(C64_REU1764, c64_reu1764_cartridge_device)
 
 
-
-#endif
+#endif // MAME_BUS_C64_REU_H

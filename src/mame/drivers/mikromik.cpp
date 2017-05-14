@@ -455,18 +455,18 @@ void mm1_state::machine_reset()
 //  MACHINE_CONFIG( mm1 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( mm1, mm1_state )
+static MACHINE_CONFIG_START( mm1 )
 	// basic system hardware
 	MCFG_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
 	MCFG_CPU_PROGRAM_MAP(mm1_map)
 	MCFG_I8085A_SID(READLINE(mm1_state, dsra_r))
-	MCFG_I8085A_SOD(DEVWRITELINE(KB_TAG, mm1_keyboard_t, bell_w))
+	MCFG_I8085A_SOD(DEVWRITELINE(KB_TAG, mm1_keyoard_device, bell_w))
 	MCFG_QUANTUM_PERFECT_CPU(I8085A_TAG)
 
 	// peripheral hardware
 	MCFG_DEVICE_ADD(I8212_TAG, I8212, 0)
 	MCFG_I8212_IRQ_CALLBACK(INPUTLINE(I8085A_TAG, I8085_RST65_LINE))
-	MCFG_I8212_DI_CALLBACK(DEVREAD8(KB_TAG, mm1_keyboard_t, read))
+	MCFG_I8212_DI_CALLBACK(DEVREAD8(KB_TAG, mm1_keyoard_device, read))
 
 	MCFG_DEVICE_ADD(I8237_TAG, AM9517A, XTAL_6_144MHz/2)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(mm1_state, dma_hrq_w))
@@ -576,6 +576,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY           FULLNAME                FLAGS
-COMP( 1981, mm1m6,      0,      0,      mm1m6,      mm1, driver_device,     0,      "Nokia Data",       "MikroMikko 1 M6",      MACHINE_SUPPORTS_SAVE )
-COMP( 1981, mm1m7,      mm1m6,  0,      mm1m7,      mm1, driver_device,     0,      "Nokia Data",       "MikroMikko 1 M7",      MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE       INIT    COMPANY           FULLNAME                FLAGS
+COMP( 1981, mm1m6,      0,      0,      mm1m6,      mm1,   mm1_state,  0,      "Nokia Data",     "MikroMikko 1 M6",      MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mm1m7,      mm1m6,  0,      mm1m7,      mm1,   mm1_state,  0,      "Nokia Data",     "MikroMikko 1 M7",      MACHINE_SUPPORTS_SAVE )

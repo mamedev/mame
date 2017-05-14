@@ -2565,7 +2565,7 @@ WRITE_LINE_MEMBER( pc8801_state::rxrdy_w )
 	// ...
 }
 
-static MACHINE_CONFIG_START( pc8801, pc8801_state )
+static MACHINE_CONFIG_START( pc8801 )
 	/* main CPU */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc8801_mem)
@@ -2946,21 +2946,21 @@ ROM_END
 
 /*    YEAR  NAME            PARENT  COMPAT  MACHINE   INPUT   INIT  COMPANY FULLNAME */
 
-COMP( 1981, pc8801,         0,      0,     pc8801,      pc88sr, driver_device,  0,    "NEC",  "PC-8801", MACHINE_NOT_WORKING )
-COMP( 1983, pc8801mk2,      pc8801, 0,     pc8801,      pc88sr, driver_device,  0,    "NEC",  "PC-8801mkII", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2sr,    pc8801, 0,     pc8801,      pc88sr, driver_device,  0,    "NEC",  "PC-8801mkIISR", MACHINE_NOT_WORKING )
-//COMP( 1985, pc8801mk2tr,  pc8801, 0,     pc8801,      pc88sr, driver_device,  0,    "NEC",  "PC-8801mkIITR", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2fr,    pc8801, 0,     pc8801,      pc88sr, driver_device,  0,    "NEC",  "PC-8801mkIIFR", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2mr,    pc8801, 0,     pc8801,      pc88sr, driver_device,  0,    "NEC",  "PC-8801mkIIMR", MACHINE_NOT_WORKING )
+COMP( 1981, pc8801,         0,      0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801", MACHINE_NOT_WORKING )
+COMP( 1983, pc8801mk2,      pc8801, 0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801mkII", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2sr,    pc8801, 0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801mkIISR", MACHINE_NOT_WORKING )
+//COMP( 1985, pc8801mk2tr,  pc8801, 0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801mkIITR", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2fr,    pc8801, 0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801mkIIFR", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2mr,    pc8801, 0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801mkIIMR", MACHINE_NOT_WORKING )
 
-//COMP( 1986, pc8801fh,     0,      0,     pc8801,      pc88sr, driver_device,  0,    "NEC",  "PC-8801FH", MACHINE_NOT_WORKING )
-COMP( 1986, pc8801mh,       pc8801, 0,     pc8801fh,    pc88sr, driver_device,  0,    "NEC",  "PC-8801MH", MACHINE_NOT_WORKING )
-COMP( 1987, pc8801fa,       pc8801, 0,     pc8801fh,    pc88sr, driver_device,  0,    "NEC",  "PC-8801FA", MACHINE_NOT_WORKING )
-COMP( 1987, pc8801ma,       pc8801, 0,     pc8801ma,    pc88sr, driver_device,  0,    "NEC",  "PC-8801MA", MACHINE_NOT_WORKING )
-//COMP( 1988, pc8801fe,     pc8801, 0,     pc8801,      pc88sr, driver_device,  0,    "NEC",  "PC-8801FE", MACHINE_NOT_WORKING )
-COMP( 1988, pc8801ma2,      pc8801, 0,     pc8801ma,    pc88sr, driver_device,  0,    "NEC",  "PC-8801MA2", MACHINE_NOT_WORKING )
-//COMP( 1989, pc8801fe2,    pc8801, 0,     pc8801,      pc88sr, driver_device,  0,    "NEC",  "PC-8801FE2", MACHINE_NOT_WORKING )
-COMP( 1989, pc8801mc,       pc8801, 0,     pc8801mc,    pc88sr, driver_device,  0,    "NEC",  "PC-8801MC", MACHINE_NOT_WORKING )
+//COMP( 1986, pc8801fh,     0,      0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801FH", MACHINE_NOT_WORKING )
+COMP( 1986, pc8801mh,       pc8801, 0,     pc8801fh,    pc88sr, pc8801_state,  0,    "NEC",  "PC-8801MH", MACHINE_NOT_WORKING )
+COMP( 1987, pc8801fa,       pc8801, 0,     pc8801fh,    pc88sr, pc8801_state,  0,    "NEC",  "PC-8801FA", MACHINE_NOT_WORKING )
+COMP( 1987, pc8801ma,       pc8801, 0,     pc8801ma,    pc88sr, pc8801_state,  0,    "NEC",  "PC-8801MA", MACHINE_NOT_WORKING )
+//COMP( 1988, pc8801fe,     pc8801, 0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801FE", MACHINE_NOT_WORKING )
+COMP( 1988, pc8801ma2,      pc8801, 0,     pc8801ma,    pc88sr, pc8801_state,  0,    "NEC",  "PC-8801MA2", MACHINE_NOT_WORKING )
+//COMP( 1989, pc8801fe2,    pc8801, 0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801FE2", MACHINE_NOT_WORKING )
+COMP( 1989, pc8801mc,       pc8801, 0,     pc8801mc,    pc88sr, pc8801_state,  0,    "NEC",  "PC-8801MC", MACHINE_NOT_WORKING )
 
-//COMP( 1989, pc98do,       0,      0,     pc88va,   pc88sr, driver_device,  0,    "NEC",  "PC-98DO", MACHINE_NOT_WORKING )
-//COMP( 1990, pc98dop,      0,      0,     pc88va,   pc88sr, driver_device,  0,    "NEC",  "PC-98DO+", MACHINE_NOT_WORKING )
+//COMP( 1989, pc98do,       0,      0,     pc88va,   pc88sr, pc8801_state,  0,    "NEC",  "PC-98DO", MACHINE_NOT_WORKING )
+//COMP( 1990, pc98dop,      0,      0,     pc88va,   pc88sr, pc8801_state,  0,    "NEC",  "PC-98DO+", MACHINE_NOT_WORKING )

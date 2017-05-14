@@ -19,17 +19,17 @@ static MACHINE_CONFIG_FRAGMENT( kof2k3bl_cart )
 	MCFG_KOF2K3BL_PROT_ADD("kof2k3bl_prot")
 MACHINE_CONFIG_END
 
-machine_config_constructor neogeo_kf2k3bl_cart::device_mconfig_additions() const
+machine_config_constructor neogeo_kf2k3bl_cart_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( kof2k3bl_cart );
 }
 
-machine_config_constructor neogeo_kf2k3pl_cart::device_mconfig_additions() const
+machine_config_constructor neogeo_kf2k3pl_cart_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( kof2k3bl_cart );
 }
 
-machine_config_constructor neogeo_kf2k3upl_cart::device_mconfig_additions() const
+machine_config_constructor neogeo_kf2k3upl_cart_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( kof2k3bl_cart );
 }
@@ -38,16 +38,17 @@ machine_config_constructor neogeo_kf2k3upl_cart::device_mconfig_additions() cons
  kf2k3bl
  **************************************************/
 
-const device_type NEOGEO_KF2K3BL_CART = device_creator<neogeo_kf2k3bl_cart>;
+DEFINE_DEVICE_TYPE(NEOGEO_KF2K3BL_CART, neogeo_kf2k3bl_cart_device, "neocart_kf2k3bl", "Neo Geo KoF 2003 Bootleg Cart")
 
-neogeo_kf2k3bl_cart::neogeo_kf2k3bl_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	neogeo_bootleg_cart(mconfig, NEOGEO_KF2K3BL_CART, "Neo Geo KOF 2003 Bootleg Cart", tag, owner, clock, "neocart_kf2k3bl", __FILE__),
+neogeo_kf2k3bl_cart_device::neogeo_kf2k3bl_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	neogeo_bootleg_cart_device(mconfig, NEOGEO_KF2K3BL_CART, tag, owner, clock),
 	m_cmc_prot(*this, "cmc_prot"),
 	m_pcm2_prot(*this, "pcm2_prot"),
 	m_kof2k3bl_prot(*this, "kof2k3bl_prot")
-{}
+{
+}
 
-void neogeo_kf2k3bl_cart::decrypt_all(DECRYPT_ALL_PARAMS)
+void neogeo_kf2k3bl_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, KOF2003_GFX_KEY);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 5);
@@ -59,16 +60,17 @@ void neogeo_kf2k3bl_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  kf2k3pl
  **************************************************/
 
-const device_type NEOGEO_KF2K3PL_CART = device_creator<neogeo_kf2k3pl_cart>;
+DEFINE_DEVICE_TYPE(NEOGEO_KF2K3PL_CART, neogeo_kf2k3pl_cart_device, "neocart_kf2k3pl", "Neo Geo KoF 2003 PL Cart")
 
-neogeo_kf2k3pl_cart::neogeo_kf2k3pl_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	neogeo_bootleg_cart(mconfig, NEOGEO_KF2K3PL_CART, "Neo Geo KOF 2003 PL Cart", tag, owner, clock, "neocart_kf2k3pl", __FILE__),
+neogeo_kf2k3pl_cart_device::neogeo_kf2k3pl_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	neogeo_bootleg_cart_device(mconfig, NEOGEO_KF2K3PL_CART, tag, owner, clock),
 	m_cmc_prot(*this, "cmc_prot"),
 	m_pcm2_prot(*this, "pcm2_prot"),
 	m_kof2k3bl_prot(*this, "kof2k3bl_prot")
-{}
+{
+}
 
-void neogeo_kf2k3pl_cart::decrypt_all(DECRYPT_ALL_PARAMS)
+void neogeo_kf2k3pl_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, KOF2003_GFX_KEY);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 5);
@@ -81,16 +83,17 @@ void neogeo_kf2k3pl_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  kf2k3upl
  **************************************************/
 
-const device_type NEOGEO_KF2K3UPL_CART = device_creator<neogeo_kf2k3upl_cart>;
+DEFINE_DEVICE_TYPE(NEOGEO_KF2K3UPL_CART, neogeo_kf2k3upl_cart_device, "neocart_kf2k3upl", "Neo Geo KoF 2003 UPL Cart")
 
-neogeo_kf2k3upl_cart::neogeo_kf2k3upl_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	neogeo_bootleg_cart(mconfig, NEOGEO_KF2K3UPL_CART, "Neo Geo KOF 2003 UPL Cart", tag, owner, clock, "neocart_kf2k3upl", __FILE__),
+neogeo_kf2k3upl_cart_device::neogeo_kf2k3upl_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	neogeo_bootleg_cart_device(mconfig, NEOGEO_KF2K3UPL_CART, tag, owner, clock),
 	m_cmc_prot(*this, "cmc_prot"),
 	m_pcm2_prot(*this, "pcm2_prot"),
 	m_kof2k3bl_prot(*this, "kof2k3bl_prot")
-{}
+{
+}
 
-void neogeo_kf2k3upl_cart::decrypt_all(DECRYPT_ALL_PARAMS)
+void neogeo_kf2k3upl_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, KOF2003_GFX_KEY);
 	m_pcm2_prot->swap(ym_region, ym_region_size, 5);

@@ -16,12 +16,12 @@ TODO:
 #include "speaker.h"
 
 
-const device_type MSX_CART_SFG01 = device_creator<msx_cart_sfg01>;
-const device_type MSX_CART_SFG05 = device_creator<msx_cart_sfg05>;
+DEFINE_DEVICE_TYPE(MSX_CART_SFG01, msx_cart_sfg01_device, "msx_cart_sfg01", "MSX Cartridge - SFG01")
+DEFINE_DEVICE_TYPE(MSX_CART_SFG05, msx_cart_sfg05_device, "msx_cart_sfg05", "MSX Cartridge - SFG05")
 
 
-msx_cart_sfg::msx_cart_sfg(const machine_config &mconfig, const device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+msx_cart_sfg_device::msx_cart_sfg_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_region_sfg(*this, "sfg")
 	, m_ym2151(*this, "ym2151")
@@ -34,14 +34,14 @@ msx_cart_sfg::msx_cart_sfg(const machine_config &mconfig, const device_type type
 }
 
 
-msx_cart_sfg01::msx_cart_sfg01(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_cart_sfg(mconfig, MSX_CART_SFG01, "MSX Cartridge - SFG01", tag, owner, clock, "msx_cart_sfg01")
+msx_cart_sfg01_device::msx_cart_sfg01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: msx_cart_sfg_device(mconfig, MSX_CART_SFG01, tag, owner, clock)
 {
 }
 
 
-msx_cart_sfg05::msx_cart_sfg05(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_cart_sfg(mconfig, MSX_CART_SFG05, "MSX Cartridge - SFG05", tag, owner, clock, "msx_cart_sfg05")
+msx_cart_sfg05_device::msx_cart_sfg05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: msx_cart_sfg_device(mconfig, MSX_CART_SFG05, tag, owner, clock)
 {
 }
 
@@ -53,7 +53,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_sfg )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_YM2151_ADD("ym2151", XTAL_3_579545MHz)  // The SFG01 uses a YM2151, the SFG05 uses a YM2164, input clock comes from the main cpu frequency
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(msx_cart_sfg, ym2151_irq_w))
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(msx_cart_sfg_device, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
@@ -61,7 +61,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_sfg )
 	MCFG_YM2148_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
 	MCFG_YM2148_PORT_WRITE_HANDLER(DEVWRITE8("kbdc", msx_audio_kbdc_port_device, write))
 	MCFG_YM2148_PORT_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
-	MCFG_YM2148_IRQ_HANDLER(WRITELINE(msx_cart_sfg,ym2148_irq_w))
+	MCFG_YM2148_IRQ_HANDLER(WRITELINE(msx_cart_sfg_device,ym2148_irq_w))
 
 	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
 
@@ -72,7 +72,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_sfg )
 MACHINE_CONFIG_END
 
 
-machine_config_constructor msx_cart_sfg::device_mconfig_additions() const
+machine_config_constructor msx_cart_sfg_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( msx_sfg );
 }
@@ -84,7 +84,7 @@ ROM_START( msx_sfg01 )
 ROM_END
 
 
-const tiny_rom_entry *msx_cart_sfg01::device_rom_region() const
+const tiny_rom_entry *msx_cart_sfg01_device::device_rom_region() const
 {
 	return ROM_NAME( msx_sfg01 );
 }
@@ -96,44 +96,44 @@ ROM_START( msx_sfg05 )
 ROM_END
 
 
-const tiny_rom_entry *msx_cart_sfg05::device_rom_region() const
+const tiny_rom_entry *msx_cart_sfg05_device::device_rom_region() const
 {
 	return ROM_NAME( msx_sfg05 );
 }
 
 
-void msx_cart_sfg::device_start()
+void msx_cart_sfg_device::device_start()
 {
 	// Set rom mask
 	m_rom_mask = m_region_sfg->bytes() - 1;
 
 	// This should probably moved up in the bus/slot hierarchy for the msx driver
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
-	device_execute_interface::static_set_irq_acknowledge_callback(*maincpu, device_irq_acknowledge_delegate(FUNC(msx_cart_sfg::irq_callback),this));
+	device_execute_interface::static_set_irq_acknowledge_callback(*maincpu, device_irq_acknowledge_delegate(FUNC(msx_cart_sfg_device::irq_callback),this));
 }
 
 
-IRQ_CALLBACK_MEMBER(msx_cart_sfg::irq_callback)
+IRQ_CALLBACK_MEMBER(msx_cart_sfg_device::irq_callback)
 {
 	return m_ym2148->get_irq_vector();
 }
 
 
-WRITE_LINE_MEMBER(msx_cart_sfg::ym2151_irq_w)
+WRITE_LINE_MEMBER(msx_cart_sfg_device::ym2151_irq_w)
 {
 	m_ym2151_irq_state = state ? ASSERT_LINE : CLEAR_LINE;
 	check_irq();
 }
 
 
-WRITE_LINE_MEMBER(msx_cart_sfg::ym2148_irq_w)
+WRITE_LINE_MEMBER(msx_cart_sfg_device::ym2148_irq_w)
 {
 	m_ym2148_irq_state = state ? ASSERT_LINE : CLEAR_LINE;
 	check_irq();
 }
 
 
-void msx_cart_sfg::check_irq()
+void msx_cart_sfg_device::check_irq()
 {
 	if (m_ym2151_irq_state != CLEAR_LINE || m_ym2148_irq_state != CLEAR_LINE)
 	{
@@ -146,7 +146,7 @@ void msx_cart_sfg::check_irq()
 }
 
 
-READ8_MEMBER(msx_cart_sfg::read_cart)
+READ8_MEMBER(msx_cart_sfg_device::read_cart)
 {
 	switch (offset & 0x3fff)
 	{
@@ -173,7 +173,7 @@ READ8_MEMBER(msx_cart_sfg::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_sfg::write_cart)
+WRITE8_MEMBER(msx_cart_sfg_device::write_cart)
 {
 	switch (offset & 0x3fff)
 	{
@@ -201,7 +201,7 @@ WRITE8_MEMBER(msx_cart_sfg::write_cart)
 			break;
 
 		default:
-			logerror("msx_cart_sfg::write_cart: write %02x to %04x\n", data, offset);
+			logerror("msx_cart_sfg_device::write_cart: write %02x to %04x\n", data, offset);
 			break;
 	}
 }

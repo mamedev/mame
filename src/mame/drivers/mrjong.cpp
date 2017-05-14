@@ -183,7 +183,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mrjong, mrjong_state )
+static MACHINE_CONFIG_START( mrjong )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,15468000/6) /* 2.578 MHz?? */
@@ -276,6 +276,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mrjong,   0,      mrjong, mrjong, driver_device, 0, ROT90, "Kiwako", "Mr. Jong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, crazyblk, mrjong, mrjong, mrjong, driver_device, 0, ROT90, "Kiwako (ECI license)", "Crazy Blocks", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, blkbustr, mrjong, mrjong, mrjong, driver_device, 0, ROT90, "Kiwako (ECI license)", "BlockBuster", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mrjong,   0,      mrjong, mrjong, mrjong_state, 0, ROT90, "Kiwako",               "Mr. Jong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, crazyblk, mrjong, mrjong, mrjong, mrjong_state, 0, ROT90, "Kiwako (ECI license)", "Crazy Blocks",     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, blkbustr, mrjong, mrjong, mrjong, mrjong_state, 0, ROT90, "Kiwako (ECI license)", "BlockBuster",      MACHINE_SUPPORTS_SAVE )

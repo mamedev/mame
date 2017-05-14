@@ -3,10 +3,10 @@
 /* */
 
 
-#pragma once
+#ifndef MAME_MACHINE_INDER_SB_H
+#define MAME_MACHINE_INDER_SB_H
 
-#ifndef __INDER_AUDIO__
-#define __INDER_AUDIO__
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
@@ -14,7 +14,7 @@
 #include "sound/dac.h"
 
 
-extern const device_type INDER_AUDIO;
+DECLARE_DEVICE_TYPE(INDER_AUDIO, inder_sb_device)
 
 #define MCFG_INDER_AUDIO_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, INDER_AUDIO, 0)
@@ -53,12 +53,6 @@ public:
 	DECLARE_READ16_MEMBER(megaphx_0x050002_r);
 	DECLARE_WRITE16_MEMBER(megaphx_0x050000_w);
 
-	uint8_t m_soundbank[4];
-
-	int m_soundsent;
-	uint8_t m_sounddata;
-	uint8_t m_soundback;
-
 	void install_sound_hacks(void);
 	void update_sound_irqs(void);
 
@@ -68,12 +62,15 @@ protected:
 	virtual void device_reset() override;
 
 
-	int m_soundirq;
-
 
 private:
+	uint8_t m_soundbank[4];
 
+	int m_soundsent;
+	uint8_t m_sounddata;
+	uint8_t m_soundback;
 
+	int m_soundirq;
 };
 
-#endif
+#endif // MAME_MACHINE_INDER_SB_H

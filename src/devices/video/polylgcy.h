@@ -32,23 +32,23 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_VIDEO_POLYLGCY_H
+#define MAME_VIDEO_POLYLGCY_H
 
-#ifndef __POLYLGCY_H__
-#define __POLYLGCY_H__
+#pragma once
 
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-#define MAX_VERTEX_PARAMS                   6
-#define MAX_POLYGON_VERTS                   32
+static constexpr unsigned POLYLGCY_MAX_VERTEX_PARAMS = 6;
+static constexpr unsigned POLYLGCY_MAX_POLYGON_VERTS = 32;
 
-#define POLYFLAG_INCLUDE_BOTTOM_EDGE        0x01
-#define POLYFLAG_INCLUDE_RIGHT_EDGE         0x02
-#define POLYFLAG_NO_WORK_QUEUE              0x04
-#define POLYFLAG_ALLOW_QUADS                0x08
+static constexpr uint8_t POLYLGCY_FLAG_INCLUDE_BOTTOM_EDGE = 0x01;
+static constexpr uint8_t POLYLGCY_FLAG_INCLUDE_RIGHT_EDGE  = 0x02;
+static constexpr uint8_t POLYLGCY_FLAG_NO_WORK_QUEUE       = 0x04;
+static constexpr uint8_t POLYLGCY_FLAG_ALLOW_QUADS         = 0x08;
 
 
 
@@ -65,7 +65,7 @@ struct poly_vertex
 {
 	float       x;                          /* X coordinate */
 	float       y;                          /* Y coordinate */
-	float       p[MAX_VERTEX_PARAMS];       /* interpolated parameter values */
+	float       p[POLYLGCY_MAX_VERTEX_PARAMS];       /* interpolated parameter values */
 };
 
 
@@ -82,7 +82,7 @@ struct poly_extent
 {
 	int16_t       startx;                     /* starting X coordinate (inclusive) */
 	int16_t       stopx;                      /* ending X coordinate (exclusive) */
-	poly_param_extent param[MAX_VERTEX_PARAMS]; /* starting and dx values for each parameter */
+	poly_param_extent param[POLYLGCY_MAX_VERTEX_PARAMS]; /* starting and dx values for each parameter */
 };
 
 
@@ -152,4 +152,4 @@ uint32_t poly_render_polygon(legacy_poly_manager *poly, void *dest, const rectan
 int poly_zclip_if_less(int numverts, const poly_vertex *v, poly_vertex *outv, int paramcount, float clipval);
 
 
-#endif  /* __POLYLGCY_H__ */
+#endif // MAME_VIDEO_POLYLGCY_H

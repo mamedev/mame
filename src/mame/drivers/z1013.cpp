@@ -362,7 +362,7 @@ static GFXDECODE_START( z1013 )
 GFXDECODE_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( z1013, z1013_state )
+static MACHINE_CONFIG_START( z1013 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_1MHz )
 	MCFG_CPU_PROGRAM_MAP(z1013_mem)
@@ -460,9 +460,9 @@ ROM_START( z1013k69 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME       PARENT  COMPAT  MACHINE      INPUT       INIT             COMPANY                       FULLNAME        FLAGS */
-COMP( 1985, z1013,     0,      0,      z1013,       z1013_8x4, driver_device,  0, "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x4)", 0 )
-COMP( 1985, z1013a2,   z1013,  0,      z1013,       z1013_8x8, driver_device,  0, "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x8)", 0 )
-COMP( 1985, z1013k76,  z1013,  0,      z1013k76,    z1013, driver_device,      0, "VEB Robotron Electronics Riesa", "Z1013 (K7659)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1985, z1013s60,  z1013,  0,      z1013k76,    z1013_8x8, driver_device,  0, "VEB Robotron Electronics Riesa", "Z1013 (K7652/S6009)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1985, z1013k69,  z1013,  0,      z1013k76,    z1013, driver_device,      0, "VEB Robotron Electronics Riesa", "Z1013 (K7669)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME       PARENT  COMPAT  MACHINE      INPUT      STATE        INIT  COMPANY                           FULLNAME               FLAGS
+COMP( 1985, z1013,     0,      0,      z1013,       z1013_8x4, z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x4)",  0 )
+COMP( 1985, z1013a2,   z1013,  0,      z1013,       z1013_8x8, z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x8)",  0 )
+COMP( 1985, z1013k76,  z1013,  0,      z1013k76,    z1013,     z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (K7659)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1985, z1013s60,  z1013,  0,      z1013k76,    z1013_8x8, z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (K7652/S6009)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1985, z1013k69,  z1013,  0,      z1013k76,    z1013,     z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (K7669)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

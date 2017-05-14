@@ -104,10 +104,10 @@
 #define CB_MANUAL_LEVEL ((m_cr & 0x40) ? 1 : 0)
 
 
-const device_type TPI6525 = device_creator<tpi6525_device>;
+DEFINE_DEVICE_TYPE(TPI6525, tpi6525_device, "tpi6525", "6525 TPI")
 
 tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TPI6525, "6525 TPI", tag, owner, clock, "tpi6525", __FILE__),
+	: device_t(mconfig, TPI6525, tag, owner, clock),
 	m_out_irq_cb(*this),
 	m_in_pa_cb(*this),
 	m_out_pa_cb(*this),

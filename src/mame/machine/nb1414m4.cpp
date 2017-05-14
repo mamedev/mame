@@ -31,10 +31,10 @@ Notes:
 #include "includes/nb1414m4.h"
 #include "screen.h"
 
-const device_type NB1414M4 = device_creator<nb1414m4_device>;
+DEFINE_DEVICE_TYPE(NB1414M4, nb1414m4_device, "nb1414m4", "NB1414M4 Mahjong Custom")
 
 nb1414m4_device::nb1414m4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NB1414M4, "NB1414M4 Mahjong Custom", tag, owner, clock, "nb1414m4", __FILE__)
+	: device_t(mconfig, NB1414M4, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_data(*this, DEVICE_SELF)
 {

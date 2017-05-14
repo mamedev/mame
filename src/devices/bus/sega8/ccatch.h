@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __SEGA8_CCATCH_H
-#define __SEGA8_CCATCH_H
+#ifndef MAME_BUS_SEGA8_CCATCH_H
+#define MAME_BUS_SEGA8_CCATCH_H
+
+#pragma once
 
 #include "sega8_slot.h"
 #include "rom.h"
@@ -26,10 +28,7 @@ protected:
 };
 
 
-
-
-
 // device type definition
-extern const device_type SEGA8_ROM_CARDCATCH;
+DECLARE_DEVICE_TYPE(SEGA8_ROM_CARDCATCH, sega8_cardcatch_device)
 
-#endif
+#endif // MAME_BUS_SEGA8_CCATCH_H

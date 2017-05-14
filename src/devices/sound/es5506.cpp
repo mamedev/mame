@@ -85,6 +85,10 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 #include "emu.h"
 #include "es5506.h"
 
+#if ES5506_MAKE_WAVS
+#include "sound/wavwrite.h"
+#endif
+
 
 /**********************************************************************************************
 
@@ -94,10 +98,6 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 
 #define LOG_COMMANDS            0
 #define RAINE_CHECK             0
-
-#if MAKE_WAVS
-#include "sound/wavwrite.h"
-#endif
 
 
 #define MAX_SAMPLE_CHUNK        10000
@@ -127,8 +127,8 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 #define CONTROL_STOPMASK        (CONTROL_STOP1 | CONTROL_STOP0)
 
 
-es550x_device::es550x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+es550x_device::es550x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_sample_rate(0),
@@ -145,9 +145,9 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 		m_scratch(nullptr),
 		m_ulaw_lookup(nullptr),
 		m_volume_lookup(nullptr),
-		#if MAKE_WAVS
+#if ES5506_MAKE_WAVS
 		m_wavraw(nullptr),
-		#endif
+#endif
 		m_eslog(nullptr),
 		m_region0(nullptr),
 		m_region1(nullptr),
@@ -163,10 +163,10 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 	}
 }
 
-const device_type ES5506 = device_creator<es5506_device>;
+DEFINE_DEVICE_TYPE(ES5506, es5506_device, "es5506", "Ensoniq ES5506")
 
 es5506_device::es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: es550x_device(mconfig, ES5506, "ES5506", tag, owner, clock, "es5506", __FILE__)
+	: es550x_device(mconfig, ES5506, tag, owner, clock)
 {
 }
 
@@ -324,7 +324,7 @@ void es550x_device::device_stop()
 		m_eslog = nullptr;
 	}
 
-	#if MAKE_WAVS
+#if ES5506_MAKE_WAVS
 	{
 		int i;
 
@@ -334,13 +334,13 @@ void es550x_device::device_stop()
 				wav_close(es5506[i].m_wavraw);
 		}
 	}
-	#endif
+#endif
 }
 
-const device_type ES5505 = device_creator<es5505_device>;
+DEFINE_DEVICE_TYPE(ES5505, es5505_device, "es5505", "Ensoniq ES5505")
 
 es5505_device::es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: es550x_device(mconfig, ES5505, "ES5505", tag, owner, clock, "es5505", __FILE__)
+	: es550x_device(mconfig, ES5505, tag, owner, clock)
 {
 }
 
@@ -2236,7 +2236,7 @@ void es550x_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 void es5506_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-#if MAKE_WAVS
+#if ES5506_MAKE_WAVS
 	/* start the logging once we have a sample rate */
 	if (m_sample_rate)
 	{
@@ -2253,7 +2253,7 @@ void es5506_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		generate_samples(outputs, offset, length);
 
-#if MAKE_WAVS
+#if ES5506_MAKE_WAVS
 		/* log the raw data */
 		if (m_wavraw) {
 			/* determine left/right source data */
@@ -2282,7 +2282,7 @@ void es5506_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 void es5505_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-#if MAKE_WAVS
+#if ES5506_MAKE_WAVS
 	/* start the logging once we have a sample rate */
 	if (m_sample_rate)
 	{
@@ -2299,7 +2299,7 @@ void es5505_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		generate_samples(outputs, offset, length);
 
-#if MAKE_WAVS
+#if ES5506_MAKE_WAVS
 		/* log the raw data */
 		if (m_wavraw) {
 			/* determine left/right source data */

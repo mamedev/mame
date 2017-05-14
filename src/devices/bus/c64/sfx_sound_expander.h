@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_SFX_SOUND_EXPANDER_H
+#define MAME_BUS_C64_SFX_SOUND_EXPANDER_H
 
-#ifndef __SFX_SOUND_EXPANDER__
-#define __SFX_SOUND_EXPANDER__
+#pragma once
 
 #include "exp.h"
 #include "sound/3526intf.h"
@@ -56,8 +56,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_SFX_SOUND_EXPANDER;
+DECLARE_DEVICE_TYPE(C64_SFX_SOUND_EXPANDER, c64_sfx_sound_expander_cartridge_device)
 
 
-
-#endif
+#endif // MAME_BUS_C64_SFX_SOUND_EXPANDER_H

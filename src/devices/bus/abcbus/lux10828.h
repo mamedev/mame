@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ABCBUS_LUXOR10828_H
+#define MAME_BUS_ABCBUS_LUXOR10828_H
 
-#ifndef __LUXOR_55_10828__
-#define __LUXOR_55_10828__
+#pragma once
 
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
@@ -91,7 +91,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
-	required_device<mb8876_t> m_fdc;
+	required_device<mb8876_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_ioport m_sw1;
@@ -109,6 +109,6 @@ private:
 
 
 // device type definition
-extern const device_type LUXOR_55_10828;
+DECLARE_DEVICE_TYPE(LUXOR_55_10828, luxor_55_10828_device)
 
-#endif
+#endif // MAME_BUS_ABCBUS_LUXOR10828_H

@@ -191,14 +191,14 @@
 #define LOG_KEYBOARD    0
 #define LOG_ACCESSES    0
 
-const device_type KBDC8042 = device_creator<kbdc8042_device>;
+DEFINE_DEVICE_TYPE(KBDC8042, kbdc8042_device, "kbdc8042", "8042 Keyboard Controller")
 
 //-------------------------------------------------
 //  kbdc8042_device - constructor
 //-------------------------------------------------
 
 kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, KBDC8042, "8042 Keyboard Controller", tag, owner, clock, "kbdc8042", __FILE__)
+	: device_t(mconfig, KBDC8042, tag, owner, clock)
 	, m_keyboard_dev(*this, "at_keyboard")
 	, m_system_reset_cb(*this)
 	, m_gate_a20_cb(*this)

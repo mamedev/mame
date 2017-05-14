@@ -377,7 +377,7 @@ INPUT_PORTS_END
 *      Machine Driver      *
 ***************************/
 
-static MACHINE_CONFIG_START( re900, re900_state )
+static MACHINE_CONFIG_START( re900 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, MAIN_CLOCK)
@@ -452,6 +452,6 @@ DRIVER_INIT_MEMBER(re900_state,re900)
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME   PARENT MACHINE INPUT  INIT   ROT     COMPANY                    FULLNAME            FLAGS LAYOUT */
-GAMEL( 1993, re900, 0,     re900,  re900, re900_state,   re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    MACHINE_SUPPORTS_SAVE,    layout_re900)
-GAME ( 1994, bs94 , 0,     bs94,   bs94 , driver_device, 0,     ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", MACHINE_SUPPORTS_SAVE )
+//     YEAR  NAME   PARENT MACHINE INPUT  STATE        INIT   ROT    COMPANY                     FULLNAME            FLAGS                  LAYOUT
+GAMEL( 1993, re900, 0,     re900,  re900, re900_state, re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    MACHINE_SUPPORTS_SAVE, layout_re900 )
+GAME ( 1994, bs94 , 0,     bs94,   bs94 , re900_state, 0,     ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", MACHINE_SUPPORTS_SAVE )

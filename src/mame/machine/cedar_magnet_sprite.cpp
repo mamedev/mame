@@ -10,11 +10,11 @@
 #include "cedar_magnet_sprite.h"
 
 
-const device_type CEDAR_MAGNET_SPRITE = device_creator<cedar_magnet_sprite_device>;
+DEFINE_DEVICE_TYPE(CEDAR_MAGNET_SPRITE, cedar_magnet_sprite_device, "cedmag_sprite", "Cedar Sprite")
 
 
 cedar_magnet_sprite_device::cedar_magnet_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CEDAR_MAGNET_SPRITE, "Cedar Sprite", tag, owner, clock, "cedmag_sprite", __FILE__),
+	: device_t(mconfig, CEDAR_MAGNET_SPRITE, tag, owner, clock),
 	cedar_magnet_board_interface(mconfig, *this, "spritecpu", "ram"),
 	m_sprite_ram_bankdev(*this, "sp_sub_ram"),
 	m_pio0(*this, "z80pio0"),

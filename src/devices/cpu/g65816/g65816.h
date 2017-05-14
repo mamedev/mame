@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Karl Stenerud
-#pragma once
+#ifndef MAME_CPU_G65816_G65816_H
+#define MAME_CPU_G65816_G65816_H
 
-#ifndef __G65816_H__
-#define __G65816_H__
+#pragma once
 
 #include "g65816cm.h"
 
@@ -45,26 +45,26 @@ enum
 #define G65816_INT_NMI G65816_LINE_NMI
 
 
-/* Registers - used by g65816_set_reg() and g65816_get_reg() */
-enum
-{
-	G65816_PC=1, G65816_S, G65816_P, G65816_A, G65816_X, G65816_Y,
-	G65816_PB, G65816_DB, G65816_D, G65816_E,
-	G65816_NMI_STATE, G65816_IRQ_STATE,
-	_5A22_FASTROM
-};
-
-
 class g65816_device : public cpu_device
 {
 public:
 	// construction/destruction
 	g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	g65816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal = nullptr);
 
 	void set_read_vector_callback(read8_delegate read_vector);
 
 protected:
+	/* Registers - used by g65816_set_reg() and g65816_get_reg() */
+	enum
+	{
+		G65816_PC=1, G65816_S, G65816_P, G65816_A, G65816_X, G65816_Y,
+		G65816_PB, G65816_DB, G65816_D, G65816_E,
+		G65816_NMI_STATE, G65816_IRQ_STATE,
+		_5A22_FASTROM
+	};
+
+	g65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -1555,12 +1555,8 @@ protected:
 };
 
 
-extern const device_type G65816;
-extern const device_type _5A22;
-
-
-#define CPU_TYPE_G65816 0
-#define CPU_TYPE_5A22 1
+DECLARE_DEVICE_TYPE(G65816, g65816_device)
+DECLARE_DEVICE_TYPE(_5A22,  _5a22_device)
 
 
 /* ======================================================================== */

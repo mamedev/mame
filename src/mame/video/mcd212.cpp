@@ -30,7 +30,7 @@ TODO:
 
 
 // device type definition
-const device_type MACHINE_MCD212 = device_creator<mcd212_device>;
+DEFINE_DEVICE_TYPE(MACHINE_MCD212, mcd212_device, "mcd212", "MCD212 Video")
 
 #if ENABLE_VERBOSE_LOG
 static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
@@ -1518,8 +1518,8 @@ void mcd212_device::device_reset()
 //-------------------------------------------------
 
 mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MACHINE_MCD212, "MCD212 Video", tag, owner, clock, "mcd212", __FILE__),
-		device_video_interface(mconfig, *this)
+	: device_t(mconfig, MACHINE_MCD212, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
 {
 }
 

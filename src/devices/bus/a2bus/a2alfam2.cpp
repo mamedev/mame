@@ -22,8 +22,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_ALFAM2 = device_creator<a2bus_alfam2_device>;
-const device_type A2BUS_AESMS = device_creator<a2bus_aesms_device>;
+DEFINE_DEVICE_TYPE(A2BUS_ALFAM2, a2bus_alfam2_device, "a2alfam2", "ALF MC1 / Apple Music II")
+DEFINE_DEVICE_TYPE(A2BUS_AESMS,  a2bus_aesms_device,  "a2aesms",  "Applied Engineering Super Music Synthesizer")
 
 #define SN1_TAG         "sn76489_1" // left
 #define SN2_TAG         "sn76489_2" // center
@@ -83,8 +83,8 @@ machine_config_constructor a2bus_aesms_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_sn76489_device::a2bus_sn76489_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_sn76489_device::a2bus_sn76489_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_sn1(*this, SN1_TAG),
 	m_sn2(*this, SN2_TAG),
@@ -94,13 +94,13 @@ a2bus_sn76489_device::a2bus_sn76489_device(const machine_config &mconfig, device
 }
 
 a2bus_alfam2_device::a2bus_alfam2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_sn76489_device(mconfig, A2BUS_ALFAM2, "ALF MC1 / Apple Music II", tag, owner, clock, "a2alfam2", __FILE__)
+	a2bus_sn76489_device(mconfig, A2BUS_ALFAM2, tag, owner, clock)
 {
 	m_has4thsn = false;
 }
 
 a2bus_aesms_device::a2bus_aesms_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_sn76489_device(mconfig, A2BUS_AESMS, "Applied Engineering Super Music Synthesizer", tag, owner, clock, "a2aesms", __FILE__)
+	a2bus_sn76489_device(mconfig, A2BUS_AESMS, tag, owner, clock)
 {
 	m_has4thsn = true;
 }

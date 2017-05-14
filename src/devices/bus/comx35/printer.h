@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_COMX35_PRINTER_H
+#define MAME_BUS_COMX35_PRINTER_H
 
-#ifndef __COMX_PRN__
-#define __COMX_PRN__
+#pragma once
 
 #include "exp.h"
 #include "machine/buffer.h"
@@ -23,8 +23,7 @@
 
 // ======================> comx_prn_device
 
-class comx_prn_device : public device_t,
-	public device_comx_expansion_card_interface
+class comx_prn_device : public device_t, public device_comx_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -53,7 +52,7 @@ private:
 
 
 // device type definition
-extern const device_type COMX_PRN;
+DECLARE_DEVICE_TYPE(COMX_PRN, comx_prn_device)
 
 
-#endif
+#endif // MAME_BUS_COMX35_PRINTER_H

@@ -39,7 +39,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_IDE64 = device_creator<c64_ide64_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_IDE64, c64_ide64_cartridge_device, "c64_ide64", "C64 IDE64 cartridge")
 
 
 //-------------------------------------------------
@@ -96,7 +96,7 @@ ioport_constructor c64_ide64_cartridge_device::device_input_ports() const
 //-------------------------------------------------
 
 c64_ide64_cartridge_device::c64_ide64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_IDE64, "C64 IDE64 cartridge", tag, owner, clock, "c64_ide64", __FILE__),
+	device_t(mconfig, C64_IDE64, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_flash_rom(*this, AT29C010A_TAG),
 	m_rtc(*this, DS1302_TAG),

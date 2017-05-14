@@ -11,7 +11,7 @@
 
 
 // device type definition
-const device_type CPS3 = device_creator<cps3_sound_device>;
+DEFINE_DEVICE_TYPE(CPS3, cps3_sound_device, "cps3_custom", "CPS3 Audio Custom")
 
 
 //**************************************************************************
@@ -23,11 +23,11 @@ const device_type CPS3 = device_creator<cps3_sound_device>;
 //-------------------------------------------------
 
 cps3_sound_device::cps3_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CPS3, "CPS3 Audio Custom", tag, owner, clock, "cps3_custom", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_key(0),
-		m_base(nullptr)
+	: device_t(mconfig, CPS3, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_stream(nullptr)
+	, m_key(0)
+	, m_base(nullptr)
 {
 }
 

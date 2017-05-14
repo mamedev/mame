@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CENTRONICS_EPSON_LX800_H
+#define MAME_BUS_CENTRONICS_EPSON_LX800_H
 
-#ifndef __EPSON_LX800__
-#define __EPSON_LX800__
+#pragma once
 
 #include "ctronics.h"
 #include "cpu/upd7810/upd7810.h"
@@ -22,15 +22,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> epson_lx800_t
+// ======================> epson_lx800_device
 
-class epson_lx800_t :  public device_t,
+class epson_lx800_device :  public device_t,
 						public device_centronics_peripheral_interface
 {
 public:
 	// construction/destruction
-	epson_lx800_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	epson_lx800_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	epson_lx800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -53,6 +52,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(an5_r);
 
 protected:
+	epson_lx800_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -65,8 +66,8 @@ private:
 
 
 // device type definition
-extern const device_type EPSON_LX800;
+DECLARE_DEVICE_TYPE(EPSON_LX800, epson_lx800_device)
 
 
 
-#endif
+#endif // MAME_BUS_CENTRONICS_EPSON_LX800_H

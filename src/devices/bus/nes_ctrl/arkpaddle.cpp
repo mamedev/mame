@@ -14,8 +14,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_ARKPADDLE = device_creator<nes_vaus_device>;
-const device_type NES_ARKPADDLE_FC = device_creator<nes_vausfc_device>;
+DEFINE_DEVICE_TYPE(NES_ARKPADDLE,    nes_vaus_device,   "nes_vaus",   "NES Arkanoid Vaus Controller")
+DEFINE_DEVICE_TYPE(NES_ARKPADDLE_FC, nes_vausfc_device, "nes_vausfc", "FC Arkanoid Vaus Controller")
 
 
 static INPUT_PORTS_START( arkanoid_paddle )
@@ -45,24 +45,22 @@ ioport_constructor nes_vaus_device::device_input_ports() const
 //  nes_vaus_device - constructor
 //-------------------------------------------------
 
-nes_vaus_device::nes_vaus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_nes_control_port_interface(mconfig, *this),
-						m_paddle(*this, "PADDLE"),
-						m_button(*this, "BUTTON"), m_start_conv(0), m_latch(0)
-				{
-}
-
-nes_vaus_device::nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, NES_ARKPADDLE, "NES Arkanoid Vaus Controller", tag, owner, clock, "nes_vaus", __FILE__),
-					device_nes_control_port_interface(mconfig, *this),
-					m_paddle(*this, "PADDLE"),
-					m_button(*this, "BUTTON"), m_start_conv(0), m_latch(0)
+nes_vaus_device::nes_vaus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_nes_control_port_interface(mconfig, *this)
+	, m_paddle(*this, "PADDLE")
+	, m_button(*this, "BUTTON")
+	, m_start_conv(0), m_latch(0)
 {
 }
 
-nes_vausfc_device::nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					nes_vaus_device(mconfig, NES_ARKPADDLE_FC, "FC Arkanoid Vaus Controller", tag, owner, clock, "nes_vausfc", __FILE__)
+nes_vaus_device::nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nes_vaus_device(mconfig, NES_ARKPADDLE, tag, owner, clock)
+{
+}
+
+nes_vausfc_device::nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nes_vaus_device(mconfig, NES_ARKPADDLE_FC, tag, owner, clock)
 {
 }
 

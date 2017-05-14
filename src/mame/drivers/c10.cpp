@@ -149,7 +149,7 @@ static GFXDECODE_START( c10 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( c10, c10_state )
+static MACHINE_CONFIG_START( c10 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(c10_mem)
@@ -184,5 +184,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1982, c10,    0,      0,       c10,     c10, c10_state,    c10,     "Cromemco", "C-10", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  STATE        INIT    COMPANY     FULLNAME  FLAGS */
+COMP( 1982, c10,    0,      0,       c10,     c10,   c10_state,   c10,    "Cromemco", "C-10",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

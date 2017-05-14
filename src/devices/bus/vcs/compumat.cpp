@@ -13,11 +13,11 @@
 #include "emu.h"
 #include "compumat.h"
 
-const device_type A26_ROM_COMPUMATE = device_creator<a26_rom_cm_device>;
+DEFINE_DEVICE_TYPE(A26_ROM_COMPUMATE, a26_rom_cm_device, "a2600_cm", "Atari 2600 ROM Cart Compumate")
 
 
 a26_rom_cm_device::a26_rom_cm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-						: a26_rom_f6_device(mconfig, A26_ROM_COMPUMATE, "Atari 2600 ROM Cart Compumate", tag, owner, clock, "a2600_cm", __FILE__)
+	: a26_rom_f6_device(mconfig, A26_ROM_COMPUMATE, tag, owner, clock)
 {
 }
 

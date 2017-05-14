@@ -13,12 +13,12 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type VT82C496 = device_creator<vt82c496_device>;
+DEFINE_DEVICE_TYPE(VT82C496, vt82c496_device, "vt82c496", "VIA VT82C496 system chipset")
 
 
 vt82c496_device::vt82c496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, VT82C496, "VIA VT82C496G system chipset", tag, owner, clock, "vt82c496", __FILE__), m_cpu_tag(nullptr), m_region_tag(nullptr), m_space(nullptr), m_ram(nullptr), m_rom(nullptr), m_reg_select(0)
-	{
+	: device_t(mconfig, VT82C496, tag, owner, clock), m_cpu_tag(nullptr), m_region_tag(nullptr), m_space(nullptr), m_ram(nullptr), m_rom(nullptr), m_reg_select(0)
+{
 }
 
 void vt82c496_device::device_start()

@@ -10,8 +10,8 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_MCMS__
-#define __A2BUS_MCMS__
+#ifndef MAME_BUS_A2BUS_A2MCMS_H
+#define MAME_BUS_A2BUS_A2MCMS_H
 
 #include "a2bus.h"
 
@@ -64,7 +64,6 @@ class a2bus_mcms1_device:
 {
 public:
 	// construction/destruction
-	a2bus_mcms1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a2bus_mcms1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
@@ -78,6 +77,8 @@ public:
 	required_device<mcms_device> m_mcms;
 
 protected:
+	a2bus_mcms1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -95,10 +96,11 @@ class a2bus_mcms2_device:
 {
 public:
 	// construction/destruction
-	a2bus_mcms2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a2bus_mcms2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	a2bus_mcms2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -114,7 +116,7 @@ private:
 };
 
 // device type definition
-extern const device_type A2BUS_MCMS1;
-extern const device_type A2BUS_MCMS2;
+DECLARE_DEVICE_TYPE(A2BUS_MCMS1, a2bus_mcms1_device)
+DECLARE_DEVICE_TYPE(A2BUS_MCMS2, a2bus_mcms2_device)
 
-#endif /* __A2BUS_MCMS__ */
+#endif // MAME_BUS_A2BUS_A2MCMS_H

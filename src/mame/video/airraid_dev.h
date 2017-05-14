@@ -9,7 +9,7 @@
 #include "screen.h"
 
 
-extern const device_type AIRRAID_VIDEO;
+DECLARE_DEVICE_TYPE(AIRRAID_VIDEO, airraid_video_device)
 
 #define MCFG_AIRRAID_VIDEO_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AIRRAID_VIDEO, 0)

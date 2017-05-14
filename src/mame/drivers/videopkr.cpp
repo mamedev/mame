@@ -1223,7 +1223,7 @@ void videopkr_state::machine_start()
 *    Machine Drivers    *
 ************************/
 
-static MACHINE_CONFIG_START( videopkr, videopkr_state )
+static MACHINE_CONFIG_START( videopkr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8039, CPU_CLOCK)
@@ -1553,12 +1553,12 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT  ROT    COMPANY                                 FULLNAME                              FLAGS             LAYOUT      */
-GAMEL( 1984, videopkr, 0,        videopkr, videopkr, driver_device, 0,    ROT0, "InterFlip",                             "Video Poker",                        0,                layout_videopkr )
-GAMEL( 1984, fortune1, videopkr, fortune1, videopkr, driver_device, 0,    ROT0, "IGT - International Game Technology",   "Fortune I (PK485-S) Draw Poker",     0,                layout_videopkr )
-GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, driver_device, 0,    ROT0, "InterFlip",                             "Black Jack",                         0,                layout_blckjack )
-GAMEL( 1987, videodad, videopkr, videodad, videodad, driver_device, 0,    ROT0, "InterFlip",                             "Video Dado",                         0,                layout_videodad )
-GAMEL( 1987, videocba, videopkr, videodad, videocba, driver_device, 0,    ROT0, "InterFlip",                             "Video Cordoba",                      0,                layout_videocba )
-GAMEL( 1987, babypkr , videopkr, babypkr,  babypkr, driver_device,  0,    ROT0, "Recreativos Franco",                    "Baby Poker",                         0,                layout_babypkr  )
-GAMEL( 1987, babydad , videopkr, babypkr,  babydad, driver_device,  0,    ROT0, "Recreativos Franco",                    "Baby Dado",                          0,                layout_babydad  )
-GAMEL( 198?, bpoker ,  videopkr, babypkr,  babypkr, driver_device,  0,    ROT0, "Recreativos Franco",                    "Video Poker (v1403)",                MACHINE_NOT_WORKING, layout_babypkr  )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT  ROT   COMPANY                                  FULLNAME                              FLAGS                LAYOUT
+GAMEL( 1984, videopkr, 0,        videopkr, videopkr, videopkr_state, 0,    ROT0, "InterFlip",                             "Video Poker",                        0,                   layout_videopkr )
+GAMEL( 1984, fortune1, videopkr, fortune1, videopkr, videopkr_state, 0,    ROT0, "IGT - International Game Technology",   "Fortune I (PK485-S) Draw Poker",     0,                   layout_videopkr )
+GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, videopkr_state, 0,    ROT0, "InterFlip",                             "Black Jack",                         0,                   layout_blckjack )
+GAMEL( 1987, videodad, videopkr, videodad, videodad, videopkr_state, 0,    ROT0, "InterFlip",                             "Video Dado",                         0,                   layout_videodad )
+GAMEL( 1987, videocba, videopkr, videodad, videocba, videopkr_state, 0,    ROT0, "InterFlip",                             "Video Cordoba",                      0,                   layout_videocba )
+GAMEL( 1987, babypkr,  videopkr, babypkr,  babypkr,  videopkr_state, 0,    ROT0, "Recreativos Franco",                    "Baby Poker",                         0,                   layout_babypkr  )
+GAMEL( 1987, babydad,  videopkr, babypkr,  babydad,  videopkr_state, 0,    ROT0, "Recreativos Franco",                    "Baby Dado",                          0,                   layout_babydad  )
+GAMEL( 198?, bpoker,   videopkr, babypkr,  babypkr,  videopkr_state, 0,    ROT0, "Recreativos Franco",                    "Video Poker (v1403)",                MACHINE_NOT_WORKING, layout_babypkr  )

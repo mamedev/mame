@@ -8,14 +8,14 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_EPSON_SIO_PF10_H
+#define MAME_BUS_EPSON_SIO_PF10_H
+
 #pragma once
 
-#ifndef __PF10_H__
-#define __PF10_H__
-
+#include "epson_sio.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/upd765.h"
-#include "epson_sio.h"
 
 
 //**************************************************************************
@@ -94,7 +94,7 @@ private:
 
 
 // device type definition
-extern const device_type EPSON_PF10;
+DECLARE_DEVICE_TYPE(EPSON_PF10, epson_pf10_device)
 
 
-#endif // __PF10_H__
+#endif // MAME_BUS_EPSON_SIO_PF10_H

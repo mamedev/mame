@@ -964,7 +964,7 @@ static SLOT_INTERFACE_START(bml3_cards)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( bml3_common, bml3_state )
+static MACHINE_CONFIG_START( bml3_common )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809, CPU_CLOCK)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
@@ -1113,7 +1113,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY    FULLNAME                        FLAGS */
-COMP( 1980, bml3,   0,      0,       bml3,      bml3,    driver_device,    0,      "Hitachi", "MB-6890 Basic Master Level 3", MACHINE_NOT_WORKING)
-COMP( 1982, bml3mk2,bml3,   0,       bml3mk2,   bml3,    driver_device,    0,      "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", MACHINE_NOT_WORKING)
-COMP( 1983, bml3mk5,bml3,   0,       bml3mk5,   bml3,    driver_device,    0,      "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", MACHINE_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY    FULLNAME                               FLAGS */
+COMP( 1980, bml3,   0,      0,       bml3,      bml3,  bml3_state, 0,    "Hitachi", "MB-6890 Basic Master Level 3",        MACHINE_NOT_WORKING)
+COMP( 1982, bml3mk2,bml3,   0,       bml3mk2,   bml3,  bml3_state, 0,    "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", MACHINE_NOT_WORKING)
+COMP( 1983, bml3mk5,bml3,   0,       bml3mk5,   bml3,  bml3_state, 0,    "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", MACHINE_NOT_WORKING)

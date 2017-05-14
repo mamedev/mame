@@ -1,9 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Dag Lem
-#pragma once
+#ifndef MAME_SOUND_SIDW8580_H
+#define MAME_SOUND_SIDW8580_H
 
-#ifndef __SIDW8580_H__
-#define __SIDW8580_H__
+#pragma once
 
 
 /* MOS-8580 R5 waveforms $30,$50,$60,$70
@@ -1395,5 +1395,4 @@ static const uint8_t waveform70_8580[4096+4096] =
 	0xff,0xff,0xff,0xff
 };
 
-
-#endif /* __SIDW8580_H__ */
+#endif // MAME_SOUND_SIDW8580_H

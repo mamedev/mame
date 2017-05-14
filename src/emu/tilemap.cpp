@@ -1604,14 +1604,14 @@ void tilemap_manager::mark_all_dirty()
 //**************************************************************************
 
 // device type definition
-const device_type TILEMAP = device_creator<tilemap_device>;
+DEFINE_DEVICE_TYPE(TILEMAP, tilemap_device, "tilemap", "Tilemap")
 
 //-------------------------------------------------
 //  tilemap_device - constructor
 //-------------------------------------------------
 
 tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, TILEMAP, "Tilemap", tag, owner, clock, "tilemap", __FILE__),
+	: device_t(mconfig, TILEMAP, tag, owner, clock),
 		m_gfxdecode(*this, finder_base::DUMMY_TAG),
 		m_standard_mapper(TILEMAP_STANDARD_COUNT),
 		m_bytes_per_entry(0),

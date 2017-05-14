@@ -496,7 +496,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( omegrace, omegrace_state )
+static MACHINE_CONFIG_START( omegrace )
 
 	/* basic machine hardware */
 

@@ -299,7 +299,7 @@ void pkscram_state::machine_reset()
 	scanline_timer->adjust(m_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 }
 
-static MACHINE_CONFIG_START( pkscramble, pkscram_state )
+static MACHINE_CONFIG_START( pkscramble )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000 )
 	MCFG_CPU_PROGRAM_MAP(pkscramble_map)

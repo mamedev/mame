@@ -36,10 +36,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_IM6402_H
+#define MAME_MACHINE_IM6402_H
 
-#ifndef __IM6402__
-#define __IM6402__
+#pragma once
 
 
 
@@ -73,8 +73,7 @@
 
 // ======================> im6402_device
 
-class im6402_device :  public device_t,
-						public device_serial_interface
+class im6402_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
@@ -82,10 +81,10 @@ public:
 
 	static void set_rrc(device_t &device, int rrc) { downcast<im6402_device &>(device).m_rrc = rrc; }
 	static void set_trc(device_t &device, int trc) { downcast<im6402_device &>(device).m_trc = trc; }
-	template<class _Object> static devcb_base &set_tro_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_tro.set_callback(object); }
-	template<class _Object> static devcb_base &set_dr_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_dr.set_callback(object); }
-	template<class _Object> static devcb_base &set_tbre_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_tbre.set_callback(object); }
-	template<class _Object> static devcb_base &set_tre_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_tre.set_callback(object); }
+	template <class Object> static devcb_base &set_tro_wr_callback(device_t &device, Object &&cb) { return downcast<im6402_device &>(device).m_write_tro.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dr_wr_callback(device_t &device, Object &&cb) { return downcast<im6402_device &>(device).m_write_dr.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_tbre_wr_callback(device_t &device, Object &&cb) { return downcast<im6402_device &>(device).m_write_tbre.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_tre_wr_callback(device_t &device, Object &&cb) { return downcast<im6402_device &>(device).m_write_tre.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read ) { return m_rbr; }
 	DECLARE_WRITE8_MEMBER( write );
@@ -162,8 +161,6 @@ private:
 
 
 // device type definition
-extern const device_type IM6402;
+DECLARE_DEVICE_TYPE(IM6402, im6402_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_IM6402_H

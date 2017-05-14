@@ -34,7 +34,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC_KBD_ISKR_1030 = device_creator<iskr_1030_keyboard_device>;
+DEFINE_DEVICE_TYPE(PC_KBD_ISKR_1030, iskr_1030_keyboard_device, "kb_iskr1030", "Iskra-1030 Keyboard")
 
 
 //-------------------------------------------------
@@ -262,7 +262,7 @@ ioport_constructor iskr_1030_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 iskr_1030_keyboard_device::iskr_1030_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC_KBD_ISKR_1030, "Iskra-1030 Keyboard", tag, owner, clock, "kb_iskr1030", __FILE__),
+	: device_t(mconfig, PC_KBD_ISKR_1030, tag, owner, clock),
 		device_pc_kbd_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),
 		m_md00(*this, "MD00"),

@@ -29,10 +29,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_SOUND_MOS7360_H
+#define MAME_SOUND_MOS7360_H
 
-#ifndef __MOS7360__
-#define __MOS7360__
+#pragma once
 
 
 
@@ -43,7 +43,7 @@
 
 #define MCFG_MOS7360_ADD(_tag, _screen_tag, _cpu_tag, _clock, _videoram_map, _irq, _k) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_REFRESH_RATE(TED7360PAL_VRETRACERATE) \
+	MCFG_SCREEN_REFRESH_RATE(mos7360_device::PAL_VRETRACERATE) \
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
 	MCFG_SCREEN_SIZE(336, 216) \
 	MCFG_SCREEN_VISIBLE_AREA(0, 336 - 1, 0, 216 - 1) \
@@ -59,24 +59,10 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define TED7360NTSC_VRETRACERATE 60
-#define TED7360PAL_VRETRACERATE 50
-#define TED7360_HRETRACERATE 15625
-
-/* the following values depend on the VIC clock,
- * but to achieve TV-frequency the clock must have a fix frequency */
-#define TED7360_HSIZE   320
-#define TED7360_VSIZE   200
-
 /* of course you clock select an other clock, but for accurate */
 /* video timing (these are used in c16/c116/plus4) */
 #define TED7360NTSC_CLOCK   (14318180/4)
 #define TED7360PAL_CLOCK    (17734470/5)
-
-/* pal 50 Hz vertical screen refresh, screen consists of 312 lines
- * ntsc 60 Hz vertical screen refresh, screen consists of 262 lines */
-#define TED7360NTSC_LINES 261
-#define TED7360PAL_LINES 312
 
 
 
@@ -92,14 +78,28 @@ class mos7360_device :  public device_t,
 						public device_video_interface
 {
 public:
+	static constexpr unsigned NTSC_VRETRACERATE = 60;
+	static constexpr unsigned PAL_VRETRACERATE = 50;
+	static constexpr unsigned HRETRACERATE = 15625;
+
+	/* the following values depend on the VIC clock,
+	 * but to achieve TV-frequency the clock must have a fix frequency */
+	static constexpr unsigned HSIZE   = 320;
+	static constexpr unsigned VSIZE   = 200;
+
+	/* pal 50 Hz vertical screen refresh, screen consists of 312 lines
+	 * ntsc 60 Hz vertical screen refresh, screen consists of 262 lines */
+	static constexpr unsigned NTSC_LINES = 261;
+	static constexpr unsigned PAL_LINES = 312;
+
 	// construction/destruction
 	//mos7360_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock);
 	mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _irq, class _k> void set_callbacks(const char *cpu_tag, _irq irq, _k k) {
+	template <class Irq, class K> void set_callbacks(const char *cpu_tag, Irq &&irq, K &&k) {
 		m_cpu_tag = cpu_tag;
-		m_write_irq.set_callback(irq);
-		m_read_k.set_callback(k);
+		m_write_irq.set_callback(std::forward<Irq>(irq));
+		m_read_k.set_callback(std::forward<K>(k));
 	}
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
@@ -197,8 +197,6 @@ protected:
 
 
 // device type definition
-extern const device_type MOS7360;
+DECLARE_DEVICE_TYPE(MOS7360, mos7360_device)
 
-
-
-#endif
+#endif // MAME_SOUND_MOS7360_H

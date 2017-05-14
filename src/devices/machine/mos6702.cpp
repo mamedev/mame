@@ -9,13 +9,8 @@
 #include "emu.h"
 #include "mos6702.h"
 
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LOG 0
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 
@@ -23,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MOS6702 = device_creator<mos6702_device>;
+DEFINE_DEVICE_TYPE(MOS6702, mos6702_device, "mos6702", "MOS 6702")
 
 
 
@@ -36,7 +31,7 @@ const device_type MOS6702 = device_creator<mos6702_device>;
 //-------------------------------------------------
 
 mos6702_device::mos6702_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MOS6702, "MOS6702", tag, owner, clock, "mos6702", __FILE__)
+	: device_t(mconfig, MOS6702, tag, owner, clock)
 {
 }
 

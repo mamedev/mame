@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_REX_EP256 = device_creator<c64_rex_ep256_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_REX_EP256, c64_rex_ep256_cartridge_device, "rexexp256", "C64 Rex 256KB EPROM cartridge")
 
 
 //-------------------------------------------------
@@ -63,7 +63,7 @@ machine_config_constructor c64_rex_ep256_cartridge_device::device_mconfig_additi
 //-------------------------------------------------
 
 c64_rex_ep256_cartridge_device::c64_rex_ep256_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_REX_EP256, "C64 Rex 256KB EPROM cartridge", tag, owner, clock, "rexep256", __FILE__),
+	device_t(mconfig, C64_REX_EP256, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {
 	for (int i = 0; i < 8; i++)

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SAT_CTRL_KEYBD_H
+#define MAME_BUS_SAT_CTRL_KEYBD_H
 
-#ifndef __SATURN_KEYBD__
-#define __SATURN_KEYBD__
+#pragma once
 
 
 #include "ctrl.h"
@@ -55,7 +55,6 @@ private:
 };
 
 // device type definition
-extern const device_type SATURN_KEYBD;
+DECLARE_DEVICE_TYPE(SATURN_KEYBD, saturn_keybd_device)
 
-
-#endif
+#endif // MAME_BUS_SAT_CTRL_KEYBD_H

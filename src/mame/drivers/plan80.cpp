@@ -224,7 +224,7 @@ static GFXDECODE_START( plan80 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( plan80, plan80_state )
+static MACHINE_CONFIG_START( plan80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 2048000)
 	MCFG_CPU_PROGRAM_MAP(plan80_mem)
@@ -257,5 +257,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY          FULLNAME       FLAGS */
-COMP( 1988, plan80,  0,       0,     plan80,    plan80, plan80_state, plan80,   "Tesla Eltos",   "Plan-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   STATE         INIT     COMPANY         FULLNAME   FLAGS
+COMP( 1988, plan80, 0,       0,     plan80,    plan80, plan80_state, plan80,  "Tesla Eltos",  "Plan-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

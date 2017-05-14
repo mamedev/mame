@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert,Andreas Naive
-#ifndef _AWBOARD_H_
-#define _AWBOARD_H_
+#ifndef MAME_MACHINE_AWBOARD_H
+#define MAME_MACHINE_AWBOARD_H
+
+#pragma once
 
 #include "naomig1.h"
 
@@ -63,6 +65,6 @@ private:
 	void recalc_dma_offset(int mode);
 };
 
-extern const device_type AW_ROM_BOARD;
+DECLARE_DEVICE_TYPE(AW_ROM_BOARD, aw_rom_board)
 
-#endif
+#endif // MAME_MACHINE_AWBOARD_H

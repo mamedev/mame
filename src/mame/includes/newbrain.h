@@ -97,7 +97,7 @@ protected:
 	required_device<z80_device> m_maincpu;
 	required_device<cop400_cpu_device> m_cop;
 	required_device<palette_device> m_palette;
-	required_device<newbrain_expansion_slot_t> m_exp;
+	required_device<newbrain_expansion_slot_device> m_exp;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
 	required_device<rs232_port_device> m_rs232_v24;

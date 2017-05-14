@@ -599,7 +599,7 @@ static GFXDECODE_START( replicator )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, hd44780_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( replicator, replicator_state )
+static MACHINE_CONFIG_START( replicator )
 
 	MCFG_CPU_ADD("maincpu", ATMEGA1280, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(replicator_prg_map)
@@ -720,5 +720,5 @@ ROM_START( replica1 )
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
 
-/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY          FULLNAME */
-COMP(2012, replica1,    0,        0,        replicator,    replicator, replicator_state,    replicator,    "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)
+/*   YEAR  NAME        PARENT    COMPAT    MACHINE        INPUT       STATE                INIT           COMPANY     FULLNAME */
+COMP(2012, replica1,   0,        0,        replicator,    replicator, replicator_state,    replicator,    "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)

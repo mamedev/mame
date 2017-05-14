@@ -8,16 +8,16 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_EPSON_SIO_TF20_H
+#define MAME_BUS_EPSON_SIO_TF20_H
+
 #pragma once
 
-#ifndef __TF20_H__
-#define __TF20_H__
-
+#include "epson_sio.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80dart.h"
-#include "epson_sio.h"
 
 
 //**************************************************************************
@@ -84,7 +84,7 @@ private:
 
 
 // device type definition
-extern const device_type EPSON_TF20;
+DECLARE_DEVICE_TYPE(EPSON_TF20, epson_tf20_device)
 
 
-#endif // __TF20_H__
+#endif // MAME_BUS_EPSON_SIO_TF20_H

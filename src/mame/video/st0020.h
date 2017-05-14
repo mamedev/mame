@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia,David Haywood
+#ifndef MAME_VIDEO_ST0020_H
+#define MAME_VIDEO_ST0020_H
+
+#pragma once
+
 
 class st0020_device : public device_t, public device_gfx_interface
 {
@@ -67,7 +72,9 @@ private:
 	void draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 };
 
-extern const device_type ST0020_SPRITES;
+DECLARE_DEVICE_TYPE(ST0020_SPRITES, st0020_device)
 
 #define MCFG_ST0020_SPRITES_PALETTE(_palette_tag) \
 	MCFG_GFX_PALETTE(_palette_tag)
+
+#endif // MAME_VIDEO_ST0020_H

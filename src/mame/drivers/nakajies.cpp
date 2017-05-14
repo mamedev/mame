@@ -736,7 +736,7 @@ static GFXDECODE_START( drwrt400 )
 	GFXDECODE_ENTRY( "bios", 0x580b6, nakajies_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( nakajies210, nakajies_state )
+static MACHINE_CONFIG_START( nakajies210 )
 	MCFG_CPU_ADD( "v20hl", V20, X301 / 2 )
 	MCFG_CPU_PROGRAM_MAP( nakajies_map)
 	MCFG_CPU_IO_MAP( nakajies_io_map)
@@ -827,11 +827,11 @@ ROM_START( es210_es )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     INIT    COMPANY    FULLNAME            FLAGS */
-COMP( 199?, wales210,        0, 0,      nakajies210, nakajies, driver_device, 0,      "Walther", "ES-210",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* German, 128KB RAM */
-COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, driver_device, 0,      "Dator",   "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* Spanish, 128KB RAM */
-COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies, driver_device, 0,      "Nakajima","ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* Spanish, 128KB RAM */
-COMP( 199?, drwrt100, wales210, 0,      nakajies220, nakajies, driver_device, 0,      "NTS",     "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* English, 128KB RAM */
-COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, driver_device, 0,      "NTS",     "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* English, 256KB RAM */
-COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies, driver_device, 0,      "NTS",     "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* English, 128KB RAM */
-COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, driver_device, 0,      "NTS",     "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* English, 256KB? RAM */
+//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     STATE           INIT    COMPANY     FULLNAME            FLAGS
+COMP( 199?, wales210,        0, 0,      nakajies210, nakajies, nakajies_state, 0,      "Walther",  "ES-210",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // German, 128KB RAM
+COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, nakajies_state, 0,      "Dator",    "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
+COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies, nakajies_state, 0,      "Nakajima", "ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
+COMP( 199?, drwrt100, wales210, 0,      nakajies220, nakajies, nakajies_state, 0,      "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
+COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, nakajies_state, 0,      "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
+COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies, nakajies_state, 0,      "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
+COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, nakajies_state, 0,      "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB? RAM

@@ -73,10 +73,10 @@ MACHINE_CONFIG_END
 } // anonymous namespace
 
 
-device_type const TAITO68705_MCU = device_creator<taito68705_mcu_device>;
-device_type const TAITO68705_MCU_TIGER = device_creator<taito68705_mcu_tiger_device>;
-device_type const ARKANOID_68705P3 = device_creator<arkanoid_68705p3_device>;
-device_type const ARKANOID_68705P5 = device_creator<arkanoid_68705p5_device>;
+DEFINE_DEVICE_TYPE(TAITO68705_MCU,       taito68705_mcu_device,       "taito68705",      "Taito MC68705 MCU Interface")
+DEFINE_DEVICE_TYPE(TAITO68705_MCU_TIGER, taito68705_mcu_tiger_device, "taito68705tiger", "Taito MC68705 MCU Interface (Tiger Heli)")
+DEFINE_DEVICE_TYPE(ARKANOID_68705P3,     arkanoid_68705p3_device,     "arkanoid68705p3", "Arkanoid MC68705P3 Interface")
+DEFINE_DEVICE_TYPE(ARKANOID_68705P5,     arkanoid_68705p5_device,     "arkanoid68705p5", "Arkanoid MC68705P5 Interface")
 
 
 READ8_MEMBER(taito68705_mcu_device_base::data_r)
@@ -122,13 +122,10 @@ WRITE8_MEMBER(taito68705_mcu_device_base::mcu_pa_w)
 taito68705_mcu_device_base::taito68705_mcu_device_base(
 		machine_config const &mconfig,
 		device_type type,
-		char const *name,
 		char const *tag,
 		device_t *owner,
-		u32 clock,
-		char const *shortname,
-		char const *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_mcu(*this, "mcu")
 	, m_semaphore_cb(*this)
 	, m_latch_driven(false)
@@ -209,12 +206,12 @@ void taito68705_mcu_device_base::latch_control(u8 data, u8 &value, unsigned host
 
 
 taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: taito68705_mcu_device(mconfig, TAITO68705_MCU, "Taito MC68705 MCU Interface", tag, owner, clock, "taito68705", __FILE__)
+	: taito68705_mcu_device(mconfig, TAITO68705_MCU, tag, owner, clock)
 {
 }
 
-taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
-	: taito68705_mcu_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
+taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: taito68705_mcu_device_base(mconfig, type, tag, owner, clock)
 	, m_aux_strobe_cb(*this)
 	, m_pb_output(0xff)
 {
@@ -285,7 +282,7 @@ WRITE8_MEMBER(taito68705_mcu_device::mcu_portb_w)
 /* The Tiger Heli interface has some extensions, handle them here */
 
 taito68705_mcu_tiger_device::taito68705_mcu_tiger_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: taito68705_mcu_device(mconfig, TAITO68705_MCU_TIGER, "Taito MC68705 MCU Interface (Tiger Heli)", tag, owner, clock, "taito68705tiger", __FILE__)
+	: taito68705_mcu_device(mconfig, TAITO68705_MCU_TIGER, tag, owner, clock)
 {
 }
 
@@ -320,13 +317,10 @@ WRITE8_MEMBER(arkanoid_mcu_device_base::mcu_pc_w)
 arkanoid_mcu_device_base::arkanoid_mcu_device_base(
 		machine_config const &mconfig,
 		device_type type,
-		char const *name,
 		char const *tag,
 		device_t *owner,
-		u32 clock,
-		char const *shortname,
-		char const *source)
-	: taito68705_mcu_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
+		u32 clock)
+	: taito68705_mcu_device_base(mconfig, type, tag, owner, clock)
 	, m_portb_r_cb(*this)
 	, m_pc_output(0xff)
 {
@@ -349,7 +343,7 @@ arkanoid_68705p3_device::arkanoid_68705p3_device(
 		char const *tag,
 		device_t *owner,
 		u32 clock)
-	: arkanoid_mcu_device_base(mconfig, ARKANOID_68705P3, "Arkanoid MC68705P3 Interface", tag, owner, clock, "arkanoid68705p3", __FILE__)
+	: arkanoid_mcu_device_base(mconfig, ARKANOID_68705P3, tag, owner, clock)
 {
 }
 
@@ -364,7 +358,7 @@ arkanoid_68705p5_device::arkanoid_68705p5_device(
 		char const *tag,
 		device_t *owner,
 		u32 clock)
-	: arkanoid_mcu_device_base(mconfig, ARKANOID_68705P5, "Arkanoid MC68705P5 Interface", tag, owner, clock, "arkanoid68705p5", __FILE__)
+	: arkanoid_mcu_device_base(mconfig, ARKANOID_68705P5, tag, owner, clock)
 {
 }
 

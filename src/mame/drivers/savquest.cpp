@@ -802,7 +802,7 @@ SLOT_INTERFACE_START( savquest_isa16_cards )
 	SLOT_INTERFACE("sb16", ISA16_SOUND_BLASTER_16)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( savquest, savquest_state )
+static MACHINE_CONFIG_START( savquest )
 	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000) // actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(savquest_map)
 	MCFG_CPU_IO_MAP(savquest_io)
@@ -855,4 +855,4 @@ ROM_START( savquest )
 ROM_END
 
 
-GAME(1999, savquest, 0, savquest, savquest, driver_device, 0, ROT0, "Interactive Light", "Savage Quest", MACHINE_IS_SKELETON)
+GAME(1999, savquest, 0, savquest, savquest, savquest_state, 0, ROT0, "Interactive Light", "Savage Quest", MACHINE_IS_SKELETON)

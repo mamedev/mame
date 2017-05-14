@@ -810,7 +810,7 @@ void ojankohs_state::machine_reset()
 	m_screen_refresh = 0;
 }
 
-static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
+static MACHINE_CONFIG_START( ojankohs )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
@@ -847,11 +847,11 @@ static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)          /* 8 KHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ojankoy, ojankohs_state )
+static MACHINE_CONFIG_START( ojankoy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
@@ -887,11 +887,11 @@ static MACHINE_CONFIG_START( ojankoy, ojankohs_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)          /* 8 KHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ccasino, ojankohs_state )
+static MACHINE_CONFIG_START( ccasino )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
@@ -928,11 +928,11 @@ static MACHINE_CONFIG_START( ccasino, ojankohs_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)          /* 8 KHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ojankoc, ojankohs_state )
+static MACHINE_CONFIG_START( ojankoc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)          /* 4.00 MHz */
@@ -966,7 +966,7 @@ static MACHINE_CONFIG_START( ojankoc, ojankohs_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 8000000/22)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)          /* 8 KHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1080,9 +1080,9 @@ ROM_START( ojankoca )
 ROM_END
 
 
-GAME( 1986, ojankoc,  0,       ojankoc,  ojankoc, driver_device,  0, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ojankoca, ojankoc, ojankoc,  ojankoc, driver_device,  0, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ojankoy,  0,       ojankoy,  ojankoy, driver_device,  0, ROT0, "V-System Co.", "Ojanko Yakata (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ojanko2,  0,       ojankoy,  ojankoy, driver_device,  0, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ccasino,  0,       ccasino,  ccasino, driver_device,  0, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ojankohs, 0,       ojankohs, ojankohs, driver_device, 0, ROT0, "V-System Co.", "Ojanko High School (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoc,  0,       ojankoc,  ojankoc,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoca, ojankoc, ojankoc,  ojankoc,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoy,  0,       ojankoy,  ojankoy,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Yakata (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ojanko2,  0,       ojankoy,  ojankoy,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ccasino,  0,       ccasino,  ccasino,  ojankohs_state, 0, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ojankohs, 0,       ojankohs, ojankohs, ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko High School (Japan)",            MACHINE_SUPPORTS_SAVE )

@@ -11,8 +11,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_VIDEO_FIXFREQ_H
-#define MAME_DEVICES_VIDEO_FIXFREQ_H
+#ifndef MAME_VIDEO_FIXFREQ_H
+#define MAME_VIDEO_FIXFREQ_H
 
 #include "machine/netlist.h"
 #include "screen.h"
@@ -67,13 +67,11 @@
 
 // ======================> vga_device
 
-class fixedfreq_device :  public device_t,
-							public device_video_interface
+class fixedfreq_device : public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
 	fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	fixedfreq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// inline configuration helpers
 	static void set_minitor_clock(device_t &device, uint32_t clock) { downcast<fixedfreq_device &>(device).m_monitor_clock = clock; }
@@ -102,6 +100,8 @@ public:
 	NETDEV_ANALOG_CALLBACK_MEMBER(update_vid);
 
 protected:
+	fixedfreq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -156,6 +156,6 @@ private:
 
 
 // device type definition
-extern const device_type FIXFREQ;
+DECLARE_DEVICE_TYPE(FIXFREQ, fixedfreq_device)
 
-#endif // MAME_DEVICES_VIDEO_FIXFREQ_H
+#endif // MAME_VIDEO_FIXFREQ_H

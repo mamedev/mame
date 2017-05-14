@@ -589,7 +589,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(fresh_state::fake_scanline)
 }
 
 
-static MACHINE_CONFIG_START( fresh, fresh_state )
+static MACHINE_CONFIG_START( fresh )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )
@@ -634,4 +634,4 @@ ROM_END
 
 
 // title shows Fruit Fresh but on resetting you get text strings of 'Dream World V2.41SI 97. 1.28'
-GAME( 1996, fresh, 0, fresh, fresh, driver_device, 0, ROT0, "Chain Leisure", "Fruit Fresh (Italy)", MACHINE_NOT_WORKING )
+GAME( 1996, fresh, 0, fresh, fresh, fresh_state, 0, ROT0, "Chain Leisure", "Fruit Fresh (Italy)", MACHINE_NOT_WORKING )

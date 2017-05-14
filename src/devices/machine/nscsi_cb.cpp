@@ -3,10 +3,10 @@
 #include "emu.h"
 #include "nscsi_cb.h"
 
-const device_type NSCSI_CB = device_creator<nscsi_callback_device>;
+DEFINE_DEVICE_TYPE(NSCSI_CB, nscsi_callback_device, "nscsi_cb", "SCSI callback (new)")
 
 nscsi_callback_device::nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nscsi_device(mconfig, NSCSI_CB, "SCSI callback (new)", tag, owner, clock, "nscsi_cb", __FILE__),
+	: nscsi_device(mconfig, NSCSI_CB, tag, owner, clock),
 		m_write_rst(*this),
 		m_write_atn(*this),
 		m_write_ack(*this),

@@ -23,12 +23,13 @@
 #include "prot_misc.h"
 
 
-const device_type NEOBOOT_PROT = device_creator<neoboot_prot_device>;
+DEFINE_DEVICE_TYPE(NEOBOOT_PROT, neoboot_prot_device, "ngboot_prot", "Neo Geo Bootleg Protection(s)")
 
 
 neoboot_prot_device::neoboot_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NEOBOOT_PROT, "Neo Geo Bootleg Protection(s)", tag, owner, clock, "ngboot_prot", __FILE__)
-{}
+	device_t(mconfig, NEOBOOT_PROT, tag, owner, clock)
+{
+}
 
 
 void neoboot_prot_device::device_start()

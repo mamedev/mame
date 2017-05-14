@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
-#ifndef DWFDC_H_
-#define DWFDC_H_
+#ifndef MAME_MACHINE_IBM6580_FDC_H
+#define MAME_MACHINE_IBM6580_FDC_H
 
-#include "cpu/mcs48/mcs48.h"
+#pragma once
+
 #include "machine/i8255.h"
 #include "machine/upd765.h"
 
@@ -23,9 +24,9 @@ class dw_fdc_device :  public device_t
 public:
 	dw_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_data_handler(device_t &device, _Object object) { return downcast<dw_fdc_device &>(device).m_out_data.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_clock_handler(device_t &device, _Object object) { return downcast<dw_fdc_device &>(device).m_out_clock.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_strobe_handler(device_t &device, _Object object) { return downcast<dw_fdc_device &>(device).m_out_strobe.set_callback(object); }
+	template <class Object> static devcb_base &set_out_data_handler(device_t &device, Object &&cb) { return downcast<dw_fdc_device &>(device).m_out_data.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_clock_handler(device_t &device, Object &&cb) { return downcast<dw_fdc_device &>(device).m_out_clock.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_strobe_handler(device_t &device, Object &&cb) { return downcast<dw_fdc_device &>(device).m_out_strobe.set_callback(std::forward<Object>(cb)); }
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -54,6 +55,6 @@ private:
 	required_device<cpu_device> m_mcu;
 };
 
-extern const device_type DW_FDC;
+DECLARE_DEVICE_TYPE(DW_FDC, dw_fdc_device)
 
-#endif /* DWFDC_H_ */
+#endif // MAME_MACHINE_IBM6580_FDC_H

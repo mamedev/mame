@@ -248,7 +248,7 @@ WRITE8_MEMBER( tk80_state::mikrolab_serial_w )
 	m_ppi_portc = data;
 }
 
-static MACHINE_CONFIG_START( tk80, tk80_state )
+static MACHINE_CONFIG_START( tk80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz) // 18.432 / 9
 	MCFG_CPU_PROGRAM_MAP(tk80_mem)
@@ -277,7 +277,7 @@ static MACHINE_CONFIG_DERIVED( mikrolab, tk80 )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(tk80_state, mikrolab_serial_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nd80z, tk80_state )
+static MACHINE_CONFIG_START( nd80z )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_1MHz) // Sharp LH0080A, can't see writing on xtal
 	MCFG_CPU_PROGRAM_MAP(tk85_mem)
 	MCFG_CPU_IO_MAP(nd80z_io)
@@ -339,9 +339,9 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS        INIT     COMPANY                   FULLNAME       FLAGS */
-COMP( 1976, tk80,     0,      0,       tk80,      tk80,     driver_device, 0, "NEC", "TK-80", MACHINE_NO_SOUND_HW)
-COMP( 1980, nectk85,  tk80,   0,       tk85,      tk80,     driver_device, 0, "NEC", "TK-85", MACHINE_NO_SOUND_HW)
-COMP( 19??, nd80z,    tk80,   0,       nd80z,     tk80,     driver_device, 0, "Chunichi", "ND-80Z", MACHINE_NO_SOUND_HW)
-COMP( 19??, mikrolab, tk80,   0,       mikrolab,  mikrolab, driver_device, 0, "<unknown>", "Mikrolab KR580IK80", MACHINE_NO_SOUND_HW)
-COMP( 19??, ics8080,  tk80,   0,       ics8080,   ics8080,  driver_device, 0, "<unknown>", "ICS8080", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS       INIT  COMPANY      FULLNAME              FLAGS
+COMP( 1976, tk80,     0,      0,      tk80,     tk80,     tk80_state, 0,    "NEC",       "TK-80",              MACHINE_NO_SOUND_HW )
+COMP( 1980, nectk85,  tk80,   0,      tk85,     tk80,     tk80_state, 0,    "NEC",       "TK-85",              MACHINE_NO_SOUND_HW )
+COMP( 19??, nd80z,    tk80,   0,      nd80z,    tk80,     tk80_state, 0,    "Chunichi",  "ND-80Z",             MACHINE_NO_SOUND_HW )
+COMP( 19??, mikrolab, tk80,   0,      mikrolab, mikrolab, tk80_state, 0,    "<unknown>", "Mikrolab KR580IK80", MACHINE_NO_SOUND_HW )
+COMP( 19??, ics8080,  tk80,   0,      ics8080,  ics8080,  tk80_state, 0,    "<unknown>", "ICS8080",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -488,7 +488,7 @@ static GFXDECODE_START( gpworld )
 GFXDECODE_END
 
 /* DRIVER */
-static MACHINE_CONFIG_START( gpworld, gpworld_state )
+static MACHINE_CONFIG_START( gpworld )
 
 	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
@@ -561,5 +561,5 @@ DRIVER_INIT_MEMBER(gpworld_state,gpworld)
 }
 
 
-/*    YEAR  NAME      PARENT   MACHINE  INPUT    INIT     MONITOR  COMPANY  FULLNAME    FLAGS) */
+/*    YEAR  NAME      PARENT   MACHINE  INPUT    STATE          INIT     MONITOR  COMPANY  FULLNAME     FLAGS) */
 GAME( 1984, gpworld,  0,       gpworld, gpworld, gpworld_state, gpworld, ROT0,    "Sega",  "GP World",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PLUS4_EXPANSION_SLOT = device_creator<plus4_expansion_slot_device>;
+DEFINE_DEVICE_TYPE(PLUS4_EXPANSION_SLOT, plus4_expansion_slot_device, "plus4_expansion_slot", "Plus/4 Expansion Port")
 
 
 
@@ -35,16 +35,16 @@ const device_type PLUS4_EXPANSION_SLOT = device_creator<plus4_expansion_slot_dev
 //  device_plus4_expansion_card_interface - constructor
 //-------------------------------------------------
 
-device_plus4_expansion_card_interface::device_plus4_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_c1l(*this, "c1l"),
-		m_c1h(*this, "c1h"),
-		m_c2l(*this, "c2l"),
-		m_c2h(*this, "c2h"),
-		m_c1l_mask(0),
-		m_c1h_mask(0),
-		m_c2l_mask(0),
-		m_c2h_mask(0)
+device_plus4_expansion_card_interface::device_plus4_expansion_card_interface(const machine_config &mconfig, device_t &device) :
+	device_slot_card_interface(mconfig, device),
+	m_c1l(*this, "c1l"),
+	m_c1h(*this, "c1h"),
+	m_c2l(*this, "c2l"),
+	m_c2h(*this, "c2h"),
+	m_c1l_mask(0),
+	m_c1h_mask(0),
+	m_c2l_mask(0),
+	m_c2h_mask(0)
 {
 	m_slot = dynamic_cast<plus4_expansion_slot_device *>(device.owner());
 }
@@ -69,13 +69,13 @@ device_plus4_expansion_card_interface::~device_plus4_expansion_card_interface()
 //-------------------------------------------------
 
 plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, PLUS4_EXPANSION_SLOT, "Expansion Port", tag, owner, clock, "plus4_expansion_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this),
-		m_write_irq(*this),
-		m_read_dma_cd(*this),
-		m_write_dma_cd(*this),
-		m_write_aec(*this), m_card(nullptr)
+	device_t(mconfig, PLUS4_EXPANSION_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	device_image_interface(mconfig, *this),
+	m_write_irq(*this),
+	m_read_dma_cd(*this),
+	m_write_dma_cd(*this),
+	m_write_aec(*this), m_card(nullptr)
 {
 }
 

@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __MIDIIN_H__
-#define __MIDIIN_H__
+#ifndef MAME_DEVICES_IMAGEDEV_MIDIIN_H
+#define MAME_DEVICES_IMAGEDEV_MIDIIN_H
+
+#pragma once
 
 
 #define MCFG_MIDIIN_INPUT_CB(_devcb) \
@@ -69,9 +71,9 @@ private:
 };
 
 // device type definition
-extern const device_type MIDIIN;
+DECLARE_DEVICE_TYPE(MIDIIN, midiin_device)
 
 // device iterator
 typedef device_type_iterator<midiin_device> midiin_device_iterator;
 
-#endif /* __MIDIIN_H__ */
+#endif // MAME_DEVICES_IMAGEDEV_MIDIIN_H

@@ -86,7 +86,7 @@ public:
 	DECLARE_WRITE8_MEMBER(main_hd63701_internal_registers_w);
 	DECLARE_DRIVER_INIT(rvoicepc);
 	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(null_kbd_put);
+	void null_kbd_put(u8 data);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -354,11 +354,11 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-WRITE8_MEMBER(rvoice_state::null_kbd_put)
+void rvoice_state::null_kbd_put(u8 data)
 {
 }
 
-static MACHINE_CONFIG_START( rvoicepc, rvoice_state )
+static MACHINE_CONFIG_START( rvoicepc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD63701, XTAL_7_3728MHz)
 	MCFG_CPU_PROGRAM_MAP(hd63701_main_mem)
@@ -377,7 +377,7 @@ static MACHINE_CONFIG_START( rvoicepc, rvoice_state )
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(rvoice_state, null_kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(rvoice_state, null_kbd_put))
 
 MACHINE_CONFIG_END
 
@@ -401,5 +401,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1988?, rvoicepc,   0,          0,      rvoicepc,   rvoicepc, rvoice_state, rvoicepc,      "Adaptive Communication Systems",        "Realvoice PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     STATE         INIT      COMPANY                           FULLNAME        FLAGS
+COMP( 1988?, rvoicepc, 0,      0,      rvoicepc, rvoicepc, rvoice_state, rvoicepc, "Adaptive Communication Systems", "Realvoice PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

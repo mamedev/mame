@@ -122,7 +122,7 @@ static MACHINE_CONFIG_FRAGMENT( fruitpc_sb_conf )
 	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fruitpc, fruitpc_state )
+static MACHINE_CONFIG_START( fruitpc )
 	MCFG_CPU_ADD("maincpu", I486, 66000000) // ST STPCD0166BTC3 66 MHz 486 CPU
 	MCFG_CPU_PROGRAM_MAP(fruitpc_map)
 	MCFG_CPU_IO_MAP(fruitpc_io)
@@ -176,4 +176,4 @@ ROM_START( gogostrk )
 	DISK_IMAGE( "ggs-5-2-07", 0,SHA1(f214fd39ec8ac02f008823f4b179ea6c6835e1b8) )
 ROM_END
 
-GAME( 2007, gogostrk, 0, fruitpc, fruitpc, driver_device,  0, ROT0, "American Alpha / Paokai", "Go Go Strike", MACHINE_NOT_WORKING ) // motherboard is dated 2006, if the CF card string is a date it's 2007
+GAME( 2007, gogostrk, 0, fruitpc, fruitpc, fruitpc_state, 0, ROT0, "American Alpha / Paokai", "Go Go Strike", MACHINE_NOT_WORKING ) // motherboard is dated 2006, if the CF card string is a date it's 2007

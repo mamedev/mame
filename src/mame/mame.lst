@@ -12767,6 +12767,7 @@ touchgok                        // (c) 1995 - Ref 950510-1
 wrally2                         // (c) 1995 - Ref 950510
 
 @source:gaelco3d.cpp
+footbpow                        // (c) 2000 - Ref 000208
 radikalb                        // (c) 1998 - Ref ???
 radikalba                       // (c) 1998 - Ref ???
 speedup                         // (c) 1996 - Ref ???
@@ -28282,19 +28283,19 @@ tekkenjb                        // 1994.12 Tekken (Japan, TE1/VER.B)
 xevi3dg                         // 1996.05 Xevious 3D/G (Japan, XV31/VER.A)
 
 @source:namcos12.cpp
-aplarail                        // 1998.12 Attack Pla Rail
-aquarush                        // 2000.02 Aqua Rush (AQ1/VER.A1, Japan)
-ehrgeiz                         // 1998.?? Ehrgeiz (US, EG3/VER.A)
-ehrgeizaa                       // 1998.?? Ehrgeiz (Asia, EG2/VER.A)
+aplarail                        // 1998.12 Attack Pla Rail (Japan, AP1/VER.A)
+aquarush                        // 2000.02 Aqua Rush (Japan, AQ1/VER.A1)
+ehrgeiz                         // 1998.?? Ehrgeiz (World, EG2/VER.A)
 ehrgeizja                       // 1998.05 Ehrgeiz (Japan, EG1/VER.A)
+ehrgeizua                       // 1998.?? Ehrgeiz (US, EG3/VER.A)
 fgtlayer                        // 1998.12 Fighting Layer (Japan, FTL0/VER.A)
-g13knd                          // 2000.10 Golgo 13 Kiseki no Dandou (GLS1/VER.A, Japan)
-ghlpanic                        // 1999.?? Ghoul Panic (Asia, OB2/VER.A)
-golgo13                         // 2000.03 Golgo 13 (GLG1/VER.A, Japan)
+g13knd                          // 2000.10 Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)
+ghlpanic                        // 1999.?? Ghoul Panic (World, OB2/VER.A)
+golgo13                         // 2000.03 Golgo 13 (Japan, GLG1/VER.A)
 gunbarl                         // 1999.?? Gunbarl (Japan, GNB4/VER.A)
-kaiunqz                         // 1999.12 Kaiun Quiz (KW1/VER.A, Japan)
-kartduel                        // 2000.07 Kart Duel
-lbgrande                        // 1997.?? Libero Grande (Asia, LG2/VER.A)
+kaiunqz                         // 1999.12 Kaiun Quiz (Japan, KW1/VER.A)
+kartduel                        // 2000.07 Kart Duel (Japan, KTD1/VER.A)
+lbgrande                        // 1997.?? Libero Grande (World, LG2/VER.A)
 lbgrandeja                      // 1997.12 Libero Grande (Japan, LG1/VER.A)
 mdhorse                         // 1998.11 Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)
 mrdrillr                        // 1999.11 Mr Driller (US, DRI3/VER.A2)
@@ -28302,7 +28303,7 @@ mrdrillrj                       // 1999.11 Mr Driller (Japan, DRI1/VER.A2, Japan
 ohbakyuun                       // 1999.07 Oh! Bakyuuun (Japan, OB1/VER.A)
 pacapp                          // 1998.12 Paca Paca Passion (Japan, PPP1/VER.A2)
 pacapp2                         // 1999.07 Paca Paca Passion 2 (Japan, PKS1/VER.A)
-pacappsp                        // 1999.12 Paca Paca Passion Special (PSP1/VER.A, Japan)
+pacappsp                        // 1999.12 Paca Paca Passion Special (Japan, PSP1/VER.A)
 ptblank2                        // 1999.?? Point Blank 2 (GNB5/VER.A)
 soulclbr                        // 1998.?? Soul Calibur (World, SOC14/VER.C)
 soulclbrja                      // 1998.?? Soul Calibur (Japan, SOC11/VER.A2)
@@ -28311,29 +28312,29 @@ soulclbrjc                      // 1998.07 Soul Calibur (Japan, SOC11/VER.C)
 soulclbrub                      // 1998.?? Soul Calibur (US, SOC13/VER.B)
 soulclbruc                      // 1998.?? Soul Calibur (US, SOC13/VER.C)
 soulclbrwb                      // 1998.?? Soul Calibur (World, SOC14/VER.B)
-sws2000                         // 2000.03 Super World Stadium 2000 (SS01/VER.A, Japan)
-sws2001                         // 2001.04 Super World Stadium 2001 (SS11/VER.A, Japan)
-sws98                           // 1998.06 Super World Stadium '98 (SS81/VER.A, Japan)
+sws2000                         // 2000.03 Super World Stadium 2000 (Japan, SS01/VER.A)
+sws2001                         // 2001.04 Super World Stadium 2001 (Japan, SS11/VER.A)
+sws98                           // 1998.06 Super World Stadium '98 (Japan, SS81/VER.A)
 sws99                           // 1999.05 Super World Stadium '99 (Japan, SS91/VER.A3)
-technodr                        // 1998.07 Techno Drive
-tekken3                         // 1997.03 Tekken 3 (Japan, TET1/VER.E1)
-tekken3aa                       // 1997.?? Tekken 3 (Asia, TET2/VER.A)
-tekken3ab                       // 1997.?? Tekken 3 (Asia, TET2/VER.B)
-tekken3ae                       // 1997.03 Tekken 3 (Asia, TET2/VER.E1)
+technodr                        // 1998.07 Techno Drive (Japan, TD2/VER.B)
+tekken3                         // 1997.03 Tekken 3 (World, TET2/VER.E1)
+tekken3a                        // 1997.?? Tekken 3 (World, TET2/VER.A)
+tekken3b                        // 1997.?? Tekken 3 (World, TET2/VER.B)
 tekken3ja                       // 1997.?? Tekken 3 (Japan, TET1/VER.A)
+tekken3je1                      // 1997.03 Tekken 3 (Japan, TET1/VER.E1)
 tekken3ua                       // 1997.?? Tekken 3 (US, TET3/VER.A)
 tekken3ud                       // 1997.?? Tekken 3 (US, TET3/VER.D)
-tektagt                         // 1999.?? Tekken Tag Tournament (US, TEG3/VER.C1)
-tektagtac                       // 1999.?? Tekken Tag Tournament (Asia, TEG2/VER.C1)
-tektagtac1                      // 1999.?? Tekken Tag Tournament (Asia, TEG2/VER.C1) - alt mainboard & rom board
+tektagt                         // 1999.?? Tekken Tag Tournament (World, TEG2/VER.C1)
+tektagtc1                       // 1999.?? Tekken Tag Tournament (World, TEG2/VER.C1) - alt mainboard & rom board
 tektagtja                       // 1999.07 Tekken Tag Tournament (Japan, TEG1/VER.A)
 tektagtjb                       // 1999.07 Tekken Tag Tournament (Japan, TEG1/VER.B)
 tektagtjc1                      // 1999.?? Tekken Tag Tournament (Japan, TEG1/VER.C1)
 tektagtub                       // 1999.?? Tekken Tag Tournament (US, TEG3/VER.B)
-tenkomor                        // 1998.?? Tenkomori Shooting (Asia, TKM2/VER.A1)
+tektagtuc1                      // 1999.?? Tekken Tag Tournament (US, TEG3/VER.C1)
+tenkomor                        // 1998.?? Tenkomori Shooting (World, TKM2/VER.A1)
 tenkomorja                      // 1998.12 Tenkomori Shooting (Japan, TKM1/VER.A1)
 toukon3                         // 1997.12 Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)
-truckk                          // 2000.06 Truck Kyousoukyoku (Metro)
+truckk                          // 2000.06 Truck Kyousoukyoku (Metro) (Japan, TKK2/VER.A)
 
 @source:namcos2.cpp
 assault                         // (c) 1988
@@ -28565,7 +28566,7 @@ gram2000                        // 2000.09 Giant Gram 2000
 gundmct                         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (cartridge)
 gundmgd                         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (GD-ROM)
 gundmxgd                        // 2001.09 Mobile Suit Gundam: Federation Vs. Zeon DX
-gunsur2                         // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (Asia, BHF2 Ver.E)
+gunsur2                         // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (World, BHF2 Ver.E)
 gunsur2j                        // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (Japan, BHF1 Ver.E)
 gwing2                          // 2000.?? Giga Wing 2
 hmgeo                           // 2001.06 Heavy Metal Geomatrix (Rev B)
@@ -28606,8 +28607,8 @@ mamonoro                        // 2008.07 Mamoru-kun wa Norowarete Shimatta!
 manicpnc                        // 2007.07 Manic Panic Ghosts! (USA)
 marstv                          // 1999.12 Mars TV
 maxspeed                        // 2002.12 Maximum Speed
-mazan                           // 2002.07 Mazan: Flash of the Blade (US, MAZ3 Ver.A)
-mazana                          // 2002.07 Mazan: Flash of the Blade (Asia, MAZ2 Ver.A)
+mazan                           // 2002.07 Mazan: Flash of the Blade (World, MAZ2 Ver.A)
+mazanu                          // 2002.07 Mazan: Flash of the Blade (US, MAZ3 Ver.A)
 mbaa                            // 2008.12 Melty Blood Actress Again Version A (Rev A)
 mbaao                           // 2008.09 Melty Blood Actress Again
 meltyb                          // 2007.03 Melty Blood Act Cadenza Version B2 (Rev A)        // Last GD-ROM game?
@@ -28633,8 +28634,8 @@ ngbcj                           // 2005.07 NeoGeo Battle Colloseum (Japan)
 ngdup23a                        // DIMM Firmware Updater (Rev A)
 ngdup23c                        // DIMM Firmware Updater (Rev C)
 ngdup23e                        // DIMM Firmware Updater (Rev E)
-ninjaslt                        // 2000.11 Ninja Assault (World, NJA4 Ver.A)
-ninjaslta                       // 2000.11 Ninja Assault (Asia, NJA2 Ver.A)
+ninjaslt                        // 2000.11 Ninja Assault (World, NJA2 Ver.A)
+ninjaslta                       // 2000.11 Ninja Assault (Asia, NJA4 Ver.A)
 ninjasltj                       // 2000.11 Ninja Assault (Japan, NJA1 Ver.A)
 ninjasltu                       // 2000.11 Ninja Assault (US, NJA3 Ver.A)
 oinori                          // 2003.08 Oinori-daimyoujin Matsuri
@@ -28750,9 +28751,9 @@ wccf310j                        // 2005.06 World Club Champion Football European
 wccf322e                        // 2005.11 World Club Champion Football European Clubs 2004-2005 Ver.3.22
 wccf331e                        // 2005.06 World Club Champion Football European Clubs 2004-2005 Ver.1.1
 wccf420e                        // 2006.08 World Club Champion Football European Clubs 2005-2006
-wldkicks                        // 2000.03 World Kicks (US, WK3 Ver.A)
-wldkicksa                       // 2000.03 World Kicks (Asia, WK2 Ver.A)
+wldkicks                        // 2000.03 World Kicks (World, WK2 Ver.A)
 wldkicksj                       // 2000.03 World Kicks (Japan, WK1 Ver.A)
+wldkicksu                       // 2000.03 World Kicks (US, WK3 Ver.A)
 wldkickspj                      // 2000.03 World Kicks PCB (Japan, WKC1 Ver.A)
 wldrider                        // 2001.05 Wild Riders
 wrungp                          // 2001.08 Wave Runner GP
@@ -33430,7 +33431,8 @@ sengokmj                        // (c) 1991 Sigma
 
 @source:senjyo.cpp
 baluba                          // (c) 1986 Able Corp.
-megaforc                        // (c) 1985 Tehkan + Video Ware license
+megaforc                        // (c) 1984 Tehkan
+megaforcu                       // (c) 1985 Tehkan + Video Ware license
 senjyo                          // (c) 1983 Tehkan
 starforc                        // (c) 1984 Tehkan
 starforca                       // (c) 1984 Tehkan
@@ -38300,7 +38302,8 @@ glpracrj                        // Gallop Racer (Japanese Ver 9.01.12)
 hvnsgate                        // Heaven's Gate (JAPAN)
 jdredd                          // Judge Dredd (Rev C)
 jdreddb                         // Judge Dredd (Rev B)
-jgakuen                         // Justice Gakuen (JAPAN 971117)
+jgakuen                         // Justice Gakuen (JAPAN 971216)
+jgakuen1                        // Justice Gakuen (JAPAN 971117)
 kikaioh                         // Kikaioh (JAPAN 980914)
 lpadv                           // Logic Pro Adventure (JAPAN)
 mfjump                          // Monster Farm Jump (JAPAN)

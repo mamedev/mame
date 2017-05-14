@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VIDBRAIN_TIMESHARE_H
+#define MAME_BUS_VIDBRAIN_TIMESHARE_H
 
-#ifndef __VIDEOBRAIN_TIMESHARE_CARTRIDGE__
-#define __VIDEOBRAIN_TIMESHARE_CARTRIDGE__
+#pragma once
 
 #include "exp.h"
 
@@ -39,7 +39,6 @@ protected:
 
 
 // device type definition
-extern const device_type VB_TIMESHARE;
+DECLARE_DEVICE_TYPE(VB_TIMESHARE, videobrain_timeshare_cartridge_device)
 
-
-#endif
+#endif // MAME_BUS_VIDBRAIN_TIMESHARE_H

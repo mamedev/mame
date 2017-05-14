@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ADAMNET_DDP_H
+#define MAME_BUS_ADAMNET_DDP_H
 
-#ifndef __ADAM_DDP__
-#define __ADAM_DDP__
+#pragma once
 
 #include "adamnet.h"
 #include "cpu/m6800/m6800.h"
@@ -59,8 +59,6 @@ protected:
 
 
 // device type definition
-extern const device_type ADAM_DDP;
+DECLARE_DEVICE_TYPE(ADAM_DDP, adam_digital_data_pack_device)
 
-
-
-#endif
+#endif // MAME_BUS_ADAMNET_DDP_H

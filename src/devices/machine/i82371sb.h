@@ -2,8 +2,10 @@
 // copyright-holders:Olivier Galibert
 // Intel i82371sb southbridge (PIIX3)
 
-#ifndef I82371SB_H
-#define I82371SB_H
+#ifndef MAME_MACHINE_I82371SB_H
+#define MAME_MACHINE_I82371SB_H
+
+#pragma once
 
 #include "pci.h"
 
@@ -35,7 +37,7 @@ class i82371sb_isa_device : public pci_device {
 public:
 	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_boot_state_hook(device_t &device, _Object object) { return downcast<i82371sb_isa_device &>(device).m_boot_state_hook.set_callback(object); }
+	template <class Object> static devcb_base &set_boot_state_hook(device_t &device, Object &&cb) { return downcast<i82371sb_isa_device &>(device).m_boot_state_hook.set_callback(std::forward<Object>(cb)); }
 
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -178,6 +180,6 @@ private:
 	optional_memory_region m_vga_region;
 };
 
-extern const device_type I82371SB_ISA;
+DECLARE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device)
 
-#endif
+#endif // MAME_MACHINE_I82371SB_H

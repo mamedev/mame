@@ -8,10 +8,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MICRODRV_H
+#define MAME_MACHINE_MICRODRV_H
 
-#ifndef __MICRODRV__
-#define __MICRODRV__
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -46,7 +46,7 @@ public:
 	microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~microdrive_image_device();
 
-	template<class _Object> static devcb_base &set_comms_out_wr_callback(device_t &device, _Object object) { return downcast<microdrive_image_device &>(device).m_write_comms_out.set_callback(object); }
+	template <class Object> static devcb_base &set_comms_out_wr_callback(device_t &device, Object &&cb) { return downcast<microdrive_image_device &>(device).m_write_comms_out.set_callback(std::forward<Object>(cb)); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -97,8 +97,6 @@ private:
 
 
 // device type definition
-extern const device_type MICRODRIVE;
+DECLARE_DEVICE_TYPE(MICRODRIVE, microdrive_image_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_MICRODRV_H

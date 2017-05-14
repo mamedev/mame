@@ -63,7 +63,7 @@ enum
 //  Globals
 //-------------------------------------------------
 
-const device_type ISA8_IBM_MFC = device_creator<isa8_ibm_mfc_device>;
+DEFINE_DEVICE_TYPE(ISA8_IBM_MFC, isa8_ibm_mfc_device, "ibm_mfc", "IBM PC Music Feature Card")
 
 
 //-------------------------------------------------
@@ -450,14 +450,15 @@ const tiny_rom_entry *isa8_ibm_mfc_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_ibm_mfc_device::isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA8_IBM_MFC, "IBM PC Music Feature Card", tag, owner, clock, "ibm_mfc", __FILE__),
-		device_isa8_card_interface(mconfig, *this), m_tcr(0), m_pc_ppi_c(0), m_z80_ppi_c(0), m_pc_irq_state(0), m_z80_irq_state(0),
-		m_cpu(*this, "ibm_mfc"),
-		m_ym2151(*this, "ym2151"),
-		m_d8253(*this, "d8253"),
-		m_d71051(*this, "d71051"),
-		m_d71055c_0(*this, "d71055c_0"),
-		m_d71055c_1(*this, "d71055c_1")
+	device_t(mconfig, ISA8_IBM_MFC, tag, owner, clock),
+	device_isa8_card_interface(mconfig, *this),
+	m_tcr(0), m_pc_ppi_c(0), m_z80_ppi_c(0), m_pc_irq_state(0), m_z80_irq_state(0),
+	m_cpu(*this, "ibm_mfc"),
+	m_ym2151(*this, "ym2151"),
+	m_d8253(*this, "d8253"),
+	m_d71051(*this, "d71051"),
+	m_d71055c_0(*this, "d71055c_0"),
+	m_d71055c_1(*this, "d71055c_1")
 {
 }
 

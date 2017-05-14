@@ -177,7 +177,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( et3400, et3400_state )
+static MACHINE_CONFIG_START( et3400 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_4MHz / 4 ) // 1MHz with memory i/o accessory, or 500khz without it
 	MCFG_CPU_PROGRAM_MAP(et3400_mem)
@@ -213,4 +213,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY       FULLNAME       FLAGS */
-COMP( 1976, et3400,  0,     0,       et3400,    et3400, driver_device,  0,    "Heath Inc", "Heathkit ET-3400", 0 )
+COMP( 1976, et3400,  0,     0,       et3400,    et3400, et3400_state,  0,    "Heath Inc", "Heathkit ET-3400", 0 )

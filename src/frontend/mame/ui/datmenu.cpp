@@ -287,7 +287,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 {
 	float maxwidth = origx2 - origx1;
 	float width;
-	std::string driver = (m_issoft == true) ? m_swinfo->longname : m_driver->description;
+	std::string driver = (m_issoft == true) ? m_swinfo->longname : m_driver->type.fullname();
 
 	ui().draw_text_full(container(), driver.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 		mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);

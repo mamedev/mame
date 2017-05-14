@@ -1735,7 +1735,7 @@ INPUT_PORTS_END
 #define PCI_ID_VIDEO    ":pci:08.0"
 #define PCI_ID_IDE      ":pci:09.0"
 
-static MACHINE_CONFIG_START( seattle_common, seattle_state )
+static MACHINE_CONFIG_START( seattle_common )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)

@@ -45,7 +45,7 @@ K056832_CB_MEMBER(asterix_state::tile_callback)
 
 uint32_t asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static const int K053251_CI[4] = { K053251_CI0, K053251_CI2, K053251_CI3, K053251_CI4 };
+	static const int K053251_CI[4] = { k053251_device::CI0, k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
 	int layer[3], plane, new_colorbase;
 
 	/* Layer offsets are different if horizontally flipped */
@@ -71,7 +71,7 @@ uint32_t asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind1
 	m_tilebanks[3] = (m_k056832->get_lookup(3) << 10);
 
 	// update color info and refresh tilemaps
-	m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI1);
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
 
 	for (plane = 0; plane < 4; plane++)
 	{
@@ -84,11 +84,11 @@ uint32_t asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind1
 	}
 
 	layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(K053251_CI0);
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI0);
 	layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(K053251_CI2);
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI2);
 	layer[2] = 3;
-	m_layerpri[2] = m_k053251->get_priority(K053251_CI4);
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI4);
 
 	konami_sortlayers3(layer, m_layerpri);
 

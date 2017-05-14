@@ -36,16 +36,19 @@
  ************************************************************************/
 
 #include "emu.h"
-#include "wavwrite.h"
 #include "discrete.h"
+
+#include "wavwrite.h"
+
 #include <atomic>
 #include <iostream>
+
 
 /* for_each collides with c++ standard libraries - include it here */
 #define for_each(_T, _e, _l) for (_T _e = (_l)->begin_ptr() ;  _e <= (_l)->end_ptr(); _e++)
 
 // device type definition
-const device_type DISCRETE = device_creator<discrete_sound_device>;
+DEFINE_DEVICE_TYPE(DISCRETE, discrete_sound_device, "discrete", "Discrete Sound")
 
 /*************************************
  *
@@ -835,8 +838,8 @@ void discrete_device::static_set_intf(device_t &device, const discrete_block *in
 //  discrete_device - constructor
 //-------------------------------------------------
 
-discrete_device::discrete_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, name, tag, owner, clock, "discrete", __FILE__),
+discrete_device::discrete_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		m_intf(nullptr),
 		m_sample_rate(0),
 		m_sample_time(0),
@@ -851,7 +854,7 @@ discrete_device::discrete_device(const machine_config &mconfig, device_type type
 }
 
 discrete_sound_device::discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: discrete_device(mconfig, DISCRETE, "DISCRETE", tag, owner, clock),
+	: discrete_device(mconfig, DISCRETE, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr)
 {

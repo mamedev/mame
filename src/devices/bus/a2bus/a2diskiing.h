@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_DISKIING__
-#define __A2BUS_DISKIING__
+#ifndef MAME_BUS_A2BUS_A2DISKIING_H
+#define MAME_BUS_A2BUS_A2DISKIING_H
+
+#pragma once
 
 #include "a2bus.h"
 #include "imagedev/floppy.h"
@@ -45,7 +47,7 @@ protected:
 	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
 
 private:
-	required_device<diskii_fdc> m_wozfdc;
+	required_device<diskii_fdc_device> m_wozfdc;
 	required_device<floppy_connector> floppy0;
 	required_device<floppy_connector> floppy1;
 
@@ -53,6 +55,6 @@ private:
 };
 
 // device type definition
-extern const device_type A2BUS_DISKIING;
+DECLARE_DEVICE_TYPE(A2BUS_DISKIING, a2bus_diskiing_device)
 
-#endif  /* __A2BUS_DISKIING__ */
+#endif  // MAME_BUS_A2BUS_A2DISKIING_H

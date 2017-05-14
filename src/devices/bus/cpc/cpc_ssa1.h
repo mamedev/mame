@@ -40,8 +40,10 @@
  *
  */
 
-#ifndef CPC_SSA1_H_
-#define CPC_SSA1_H_
+#ifndef MAME_BUS_CPC_CPC_SSA1_H
+#define MAME_BUS_CPC_CPC_SSA1_H
+
+#pragma once
 
 
 #include "cpcexp.h"
@@ -120,8 +122,8 @@ private:
 };
 
 // device type definition
-extern const device_type CPC_SSA1;
-extern const device_type CPC_DKSPEECH;
+DECLARE_DEVICE_TYPE(CPC_SSA1,     cpc_ssa1_device)
+DECLARE_DEVICE_TYPE(CPC_DKSPEECH, cpc_dkspeech_device)
 
 
-#endif /* CPC_SSA1_H_ */
+#endif // MAME_BUS_CPC_CPC_SSA1_H

@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert, Vas Crabb
+#ifndef MAME_INCLUDES_ZORBA_H
+#define MAME_INCLUDES_ZORBA_H
+
+#pragma once
 
 #include "sound/beep.h"
 
@@ -95,7 +99,7 @@ private:
 
 	required_device<beep_device>        m_beep;
 
-	required_device<fd1793_t>           m_fdc;
+	required_device<fd1793_device>      m_fdc;
 	required_device<floppy_connector>   m_floppy0;
 	required_device<floppy_connector>   m_floppy1;
 
@@ -111,3 +115,5 @@ private:
 
 	uint8_t m_term_data;
 };
+
+#endif // MAME_INCLUDES_ZORBA_H

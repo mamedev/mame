@@ -645,7 +645,7 @@ INTERRUPT_GEN_MEMBER(playch10_state::playch10_interrupt){
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( playch10, playch10_state )
+static MACHINE_CONFIG_START( playch10 )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 8000000/2) // 4 MHz
 	MCFG_CPU_PROGRAM_MAP(bios_map)
@@ -1690,7 +1690,7 @@ DRIVER_INIT_MEMBER(playch10_state,ttoon)
 	DRIVER_INIT_CALL(pcgboard);
 }
 
-/*     YEAR  NAME      PARENT    BIOS      MACHINE   INPUT     INIT      MONITOR  */
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      MONITOR  */
 
 /* Standard Games */
 GAME( 1983, pc_tenis, playch10, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo",                                 "Tennis (PlayChoice-10)", 0 )

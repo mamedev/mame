@@ -6,13 +6,13 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_C64_CPM_H
+#define MAME_BUS_C64_CPM_H
+
 #pragma once
 
-#ifndef __CPM__
-#define __CPM__
-
-#include "cpu/z80/z80.h"
 #include "exp.h"
+#include "cpu/z80/z80.h"
 
 
 
@@ -58,7 +58,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_CPM;
+DECLARE_DEVICE_TYPE(C64_CPM, c64_cpm_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_CPM_H

@@ -22,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NASCOM_FDC = device_creator<nascom_fdc_device>;
+DEFINE_DEVICE_TYPE(NASCOM_FDC, nascom_fdc_device, "nascom_fdc", "Nascom Floppy Disc Controller")
 
 FLOPPY_FORMATS_MEMBER( nascom_fdc_device::floppy_formats )
 	FLOPPY_NASCOM_FORMAT
@@ -62,7 +62,7 @@ machine_config_constructor nascom_fdc_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 nascom_fdc_device::nascom_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NASCOM_FDC, "Nascom Floppy Disc Controller", tag, owner, clock, "nascom_fdc", __FILE__),
+	device_t(mconfig, NASCOM_FDC, tag, owner, clock),
 	device_nasbus_card_interface(mconfig, *this),
 	m_fdc(*this, "fd1793"),
 	m_floppy0(*this, "fd1793:0"),
@@ -93,9 +93,9 @@ void nascom_fdc_device::device_start()
 
 void nascom_fdc_device::device_reset()
 {
-	m_nasbus->m_io->install_readwrite_handler(0xe0, 0xe3, read8_delegate(FUNC(fd1793_t::read), m_fdc.target()), write8_delegate(FUNC(fd1793_t::write), m_fdc.target()));
-	m_nasbus->m_io->install_readwrite_handler(0xe4, 0xe4, read8_delegate(FUNC(nascom_fdc_device::select_r), this), write8_delegate(FUNC(nascom_fdc_device::select_w), this));
-	m_nasbus->m_io->install_read_handler(0xe5, 0xe5, read8_delegate(FUNC(nascom_fdc_device::status_r), this));
+	io_space().install_readwrite_handler(0xe0, 0xe3, read8_delegate(FUNC(fd1793_device::read), m_fdc.target()), write8_delegate(FUNC(fd1793_device::write), m_fdc.target()));
+	io_space().install_readwrite_handler(0xe4, 0xe4, read8_delegate(FUNC(nascom_fdc_device::select_r), this), write8_delegate(FUNC(nascom_fdc_device::select_w), this));
+	io_space().install_read_handler(0xe5, 0xe5, read8_delegate(FUNC(nascom_fdc_device::status_r), this));
 }
 
 //-------------------------------------------------

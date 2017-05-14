@@ -413,7 +413,7 @@ static const floppy_interface vtech2_floppy_interface =
 	nullptr
 };
 
-static MACHINE_CONFIG_START( laser350, vtech2_state )
+static MACHINE_CONFIG_START( laser350 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
 	MCFG_CPU_PROGRAM_MAP(vtech2_mem)
@@ -504,7 +504,7 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR   NAME      PARENT    COMPAT MACHINE   INPUT     INIT      COMPANY              FULLNAME */
-COMP( 1984?, laser350, 0,        0,     laser350, laser350, vtech2_state, laser,    "Video Technology",  "Laser 350" , 0)
-COMP( 1984?, laser500, laser350, 0,     laser500, laser500, vtech2_state, laser,    "Video Technology",  "Laser 500" , 0)
-COMP( 1984?, laser700, laser350, 0,     laser700, laser500, vtech2_state, laser,    "Video Technology",  "Laser 700" , 0)
+//    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     STATE         INIT   COMPANY             FULLNAME      FLAGS
+COMP( 1984?, laser350, 0,        0,      laser350, laser350, vtech2_state, laser, "Video Technology", "Laser 350" , 0)
+COMP( 1984?, laser500, laser350, 0,      laser500, laser500, vtech2_state, laser, "Video Technology", "Laser 500" , 0)
+COMP( 1984?, laser700, laser350, 0,      laser700, laser500, vtech2_state, laser, "Video Technology", "Laser 700" , 0)

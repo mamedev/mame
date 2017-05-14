@@ -9,6 +9,9 @@
 #ifndef MAME_INCLUDES_LLC_H
 #define MAME_INCLUDES_LLC_H
 
+#pragma once
+
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/k7659kb.h"
@@ -31,7 +34,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(llc2_rom_disable_w);
 	DECLARE_WRITE8_MEMBER(llc2_basic_enable_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(llc1_port1_a_r);
 	DECLARE_READ8_MEMBER(llc1_port2_a_r);
 	DECLARE_READ8_MEMBER(llc1_port2_b_r);

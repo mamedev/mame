@@ -10,8 +10,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_EZCGI__
-#define __A2BUS_EZCGI__
+#ifndef MAME_BUS_A2BUS_A2EZCGI_H
+#define MAME_BUS_A2BUS_A2EZCGI_H
+
+#pragma once
 
 #include "a2bus.h"
 #include "video/tms9928a.h"
@@ -28,7 +30,6 @@ class a2bus_ezcgi_device:
 public:
 	// construction/destruction
 	a2bus_ezcgi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -36,6 +37,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
 
 protected:
+	a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -53,7 +56,6 @@ class a2bus_ezcgi_9938_device:
 public:
 	// construction/destruction
 	a2bus_ezcgi_9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -61,6 +63,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
 
 protected:
+	a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -78,7 +82,6 @@ class a2bus_ezcgi_9958_device:
 public:
 	// construction/destruction
 	a2bus_ezcgi_9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -86,6 +89,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
 
 protected:
+	a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -97,8 +102,8 @@ protected:
 };
 
 // device type definition
-extern const device_type A2BUS_EZCGI;
-extern const device_type A2BUS_EZCGI_9938;
-extern const device_type A2BUS_EZCGI_9958;
+DECLARE_DEVICE_TYPE(A2BUS_EZCGI,      a2bus_ezcgi_device)
+DECLARE_DEVICE_TYPE(A2BUS_EZCGI_9938, a2bus_ezcgi_9938_device)
+DECLARE_DEVICE_TYPE(A2BUS_EZCGI_9958, a2bus_ezcgi_9958_device)
 
-#endif  /* __A2BUS_EZCGI__ */
+#endif  // MAME_BUS_A2BUS_A2EZCGI_H

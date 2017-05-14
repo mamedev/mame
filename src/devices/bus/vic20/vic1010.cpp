@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC1010 = device_creator<vic1010_device>;
+DEFINE_DEVICE_TYPE(VIC1010, vic1010_device, "vic1010", "VIC-1010 Expansion Module")
 
 
 //-------------------------------------------------
@@ -53,14 +53,9 @@ machine_config_constructor vic1010_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 vic1010_device::vic1010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VIC1010, "VIC1010", tag, owner, clock, "vic1010", __FILE__),
-		device_vic20_expansion_card_interface(mconfig, *this),
-		m_slot1(*this, "slot1"),
-		m_slot2(*this, "slot2"),
-		m_slot3(*this, "slot3"),
-		m_slot4(*this, "slot4"),
-		m_slot5(*this, "slot5"),
-		m_slot6(*this, "slot6")
+	: device_t(mconfig, VIC1010, tag, owner, clock)
+	, device_vic20_expansion_card_interface(mconfig, *this)
+	, m_expansion_slot(*this, "slot%u", 1)
 {
 }
 
@@ -71,13 +66,6 @@ vic1010_device::vic1010_device(const machine_config &mconfig, const char *tag, d
 
 void vic1010_device::device_start()
 {
-	// find devices
-	m_expansion_slot[0] = m_slot1;
-	m_expansion_slot[1] = m_slot2;
-	m_expansion_slot[2] = m_slot3;
-	m_expansion_slot[3] = m_slot4;
-	m_expansion_slot[4] = m_slot5;
-	m_expansion_slot[5] = m_slot6;
 }
 
 

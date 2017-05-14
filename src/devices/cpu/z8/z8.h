@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_Z8_Z8_H
+#define MAME_CPU_Z8_Z8_H
 
-#ifndef __Z8_H__
-#define __Z8_H__
+#pragma once
 
 
 enum
@@ -20,13 +20,12 @@ enum
 };
 
 
-class z8_device :  public cpu_device
+class z8_device : public cpu_device
 {
-public:
-	// construction/destruction
-	z8_device(const machine_config &mconfig, device_type type, const char *name, const char *_tag, device_t *_owner, uint32_t _clock, const char *shortname, const char *source, int size);
-
 protected:
+	// construction/destruction
+	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -41,7 +40,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
 	{
 		switch ( spacenum )
 		{
@@ -292,32 +291,31 @@ private:
 class z8601_device : public z8_device
 {
 public:
-	z8601_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	z8601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 class ub8830d_device : public z8_device
 {
 public:
-	ub8830d_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	ub8830d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 class z8611_device : public z8_device
 {
 public:
-	z8611_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	z8611_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
-/* Zilog Z8601 */
-extern const device_type Z8601;
+// Zilog Z8601
+DECLARE_DEVICE_TYPE(Z8601, z8601_device)
 
-/* VEB Mikroelektronik Erfurt UB8830D MME */
-extern const device_type UB8830D;
+// VEB Mikroelektronik Erfurt UB8830D MME
+DECLARE_DEVICE_TYPE(UB8830D, ub8830d_device)
 
-/* Zilog Z8611 */
-extern const device_type Z8611;
+// Zilog Z8611
+DECLARE_DEVICE_TYPE(Z8611, z8611_device)
 
-
-#endif
+#endif // MAME_CPU_Z8_Z8_H

@@ -269,7 +269,7 @@ WRITE8_MEMBER(b16_state::memory_write_byte)
 }
 
 
-static MACHINE_CONFIG_START( b16, b16_state )
+static MACHINE_CONFIG_START( b16 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8086, XTAL_14_31818MHz/2) //unknown xtal
 	MCFG_CPU_PROGRAM_MAP(b16_map)
@@ -309,5 +309,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE     INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1983, b16,  0,      0,       b16,      b16, driver_device,   0,      "Hitachi",   "B16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT   MACHINE   INPUT  STATE      INIT  COMPANY    FULLNAME  FLAGS */
+COMP( 1983, b16,  0,      0,       b16,      b16,   b16_state, 0,    "Hitachi", "B16",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

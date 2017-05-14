@@ -738,7 +738,7 @@ void renegade_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( renegade, renegade_state )
+static MACHINE_CONFIG_START( renegade )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12000000/8)  /* 1.5 MHz (measured) */
@@ -774,7 +774,7 @@ static MACHINE_CONFIG_START( renegade, renegade_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 12000000/32)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(renegade_state, adpcm_int))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

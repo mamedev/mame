@@ -6,9 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ELECTRON_M2105_M
+#define MAME_BUS_ELECTRON_M2105_M
 
-#ifndef __ELECTRON_M2105__
-#define __ELECTRON_M2105__
+#pragma once
 
 #include "exp.h"
 #include "machine/6522via.h"
@@ -53,7 +54,7 @@ private:
 
 
 // device type definition
-extern const device_type ELECTRON_M2105;
+DECLARE_DEVICE_TYPE(ELECTRON_M2105, electron_m2105_device)
 
 
-#endif /* __ELECTRON_M2105__ */
+#endif // MAME_BUS_ELECTRON_M2105_M

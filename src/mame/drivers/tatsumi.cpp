@@ -842,7 +842,7 @@ MACHINE_RESET_MEMBER(tatsumi_state,apache3)
 }
 
 
-static MACHINE_CONFIG_START( apache3, tatsumi_state )
+static MACHINE_CONFIG_START( apache3 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
@@ -893,12 +893,12 @@ static MACHINE_CONFIG_START( apache3, tatsumi_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 4 / 2, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 4 / 2, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( roundup5, tatsumi_state )
+static MACHINE_CONFIG_START( roundup5 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
@@ -941,12 +941,12 @@ static MACHINE_CONFIG_START( roundup5, tatsumi_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 4 / 2, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 4 / 2, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cyclwarr, tatsumi_state )
+static MACHINE_CONFIG_START( cyclwarr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
@@ -999,12 +999,12 @@ static MACHINE_CONFIG_START( cyclwarr, tatsumi_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bigfight, tatsumi_state )
+static MACHINE_CONFIG_START( bigfight )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
@@ -1057,7 +1057,7 @@ static MACHINE_CONFIG_START( bigfight, tatsumi_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 8 / 2, OKIM6295_PIN7_HIGH) /* 2MHz was too fast. Can the clock be software controlled? */
+	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 8 / 2, PIN7_HIGH) /* 2MHz was too fast. Can the clock be software controlled? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END

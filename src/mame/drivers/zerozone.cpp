@@ -168,7 +168,7 @@ void zerozone_state::machine_reset()
 	m_tilebank = 0;
 }
 
-static MACHINE_CONFIG_START( zerozone, zerozone_state )
+static MACHINE_CONFIG_START( zerozone )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
@@ -199,7 +199,7 @@ static MACHINE_CONFIG_START( zerozone, zerozone_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -245,5 +245,5 @@ ROM_START( lvgirl94 )
 ROM_END
 
 
-GAME( 1993, zerozone, 0, zerozone, zerozone, driver_device, 0, ROT0, "Comad", "Zero Zone", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lvgirl94, 0, zerozone, zerozone, driver_device, 0, ROT0, "Comad", "Las Vegas Girl (Girl '94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, zerozone, 0, zerozone, zerozone, zerozone_state, 0, ROT0, "Comad", "Zero Zone", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lvgirl94, 0, zerozone, zerozone, zerozone_state, 0, ROT0, "Comad", "Las Vegas Girl (Girl '94)", MACHINE_SUPPORTS_SAVE )

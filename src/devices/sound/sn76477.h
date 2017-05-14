@@ -35,10 +35,10 @@
 
  *****************************************************************************/
 
-#pragma once
+#ifndef MAME_SOUND_SN76477_H
+#define MAME_SOUND_SN76477_H
 
-#ifndef __SN76477_H__
-#define __SN76477_H__
+#pragma once
 
 #include "machine/rescap.h"
 
@@ -94,7 +94,6 @@ class sn76477_device : public device_t,
 {
 public:
 	sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~sn76477_device() {}
 
 	static void set_noise_params(device_t &device, double clock_res, double filter_res, double filter_cap)
 	{
@@ -171,7 +170,7 @@ public:
 	void feedback_res_w(double data);
 
 	/* these functions take a capacitor value in Farads or the voltage on it in Volts */
-	#define SN76477_EXTERNAL_VOLTAGE_DISCONNECT   (-1.0)    /* indicates that the voltage is internally computed,
+	static constexpr double EXTERNAL_VOLTAGE_DISCONNECT = -1.0;  /* indicates that the voltage is internally computed,
 	                                                           can be used in all the functions that take a
 	                                                           voltage on a capacitor */
 	void one_shot_cap_w(double data);
@@ -306,7 +305,6 @@ private:
 	void state_save_register();
 };
 
-extern const device_type SN76477;
+DECLARE_DEVICE_TYPE(SN76477, sn76477_device)
 
-
-#endif/* __SN76477_H__ */
+#endif // MAME_SOUND_SN76477_H

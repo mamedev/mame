@@ -48,7 +48,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC_SIO = device_creator<abc_sio_device>;
+DEFINE_DEVICE_TYPE(ABC_SIO, abc_sio_device, "abcsio", "ABC SIO")
 
 
 //-------------------------------------------------
@@ -103,7 +103,7 @@ machine_config_constructor abc_sio_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 abc_sio_device::abc_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ABC_SIO, "ABC SIO", tag, owner, clock, "abcsio", __FILE__),
+	: device_t(mconfig, ABC_SIO, tag, owner, clock),
 		device_abcbus_card_interface(mconfig, *this),
 		m_ctc(*this, Z80CTC_TAG),
 		m_sio(*this, Z80SIO_TAG),

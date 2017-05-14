@@ -9,10 +9,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_COLECO_CTRL_H
+#define MAME_BUS_COLECO_CTRL_H
 
-#ifndef __COLECOVISION_CONTROL_PORT__
-#define __COLECOVISION_CONTROL_PORT__
+#pragma once
 
 
 
@@ -43,15 +43,14 @@ class colecovision_control_port_device;
 class device_colecovision_control_port_interface : public device_slot_card_interface
 {
 public:
-	// construction/destruction
-	device_colecovision_control_port_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_colecovision_control_port_interface() { }
-
-	virtual uint8_t joy_r() { return 0xff; };
-	virtual void common0_w(int state) { m_common0 = state; };
-	virtual void common1_w(int state) { m_common1 = state; };
+	virtual uint8_t joy_r() { return 0xff; }
+	virtual void common0_w(int state) { m_common0 = state; }
+	virtual void common1_w(int state) { m_common1 = state; }
 
 protected:
+	// construction/destruction
+	device_colecovision_control_port_interface(const machine_config &mconfig, device_t &device);
+
 	colecovision_control_port_device *m_port;
 
 	int m_common0;
@@ -67,10 +66,9 @@ class colecovision_control_port_device : public device_t,
 public:
 	// construction/destruction
 	colecovision_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~colecovision_control_port_device() { }
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<colecovision_control_port_device &>(device).m_write_irq.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<colecovision_control_port_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	uint8_t read() { uint8_t data = 0xff; if (exists()) data = m_device->joy_r(); return data; }
@@ -95,10 +93,9 @@ private:
 
 
 // device type definition
-extern const device_type COLECOVISION_CONTROL_PORT;
+DECLARE_DEVICE_TYPE(COLECOVISION_CONTROL_PORT, colecovision_control_port_device)
 
 SLOT_INTERFACE_EXTERN( colecovision_control_port_devices );
 
 
-
-#endif
+#endif // MAME_BUS_COLECO_CTRL_H

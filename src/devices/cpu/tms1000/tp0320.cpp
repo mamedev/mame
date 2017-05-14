@@ -22,7 +22,7 @@
 // - 64-term microinstructions PLA between the RAM and ROM, similar to TMS0980,
 //   plus separate lines for custom opcode handling like TMS0270, used for SETR and RSTR
 // - 24-term output PLA above LCD RAM
-const device_type TP0320 = device_creator<tp0320_cpu_device>; // 28-pin SDIP, ..
+DEFINE_DEVICE_TYPE(TP0320, tp0320_cpu_device, "tp0320", "TP0320") // 28-pin SDIP, ..
 
 
 // internal memory maps
@@ -38,8 +38,9 @@ ADDRESS_MAP_END
 
 // device definitions
 tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TP0320, "TP0320", tag, owner, clock, 7 /* o pins */, 10 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_192x4), "tp0320", __FILE__)
-{ }
+	: tms0980_cpu_device(mconfig, TP0320, tag, owner, clock, 7 /* o pins */, 10 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_192x4))
+{
+}
 
 
 // machine configs
@@ -47,9 +48,9 @@ static MACHINE_CONFIG_FRAGMENT(tp0320)
 
 	// main opcodes PLA(partial), microinstructions PLA
 	MCFG_PLA_ADD("ipla", 9, 6, 8)
-	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
 	MCFG_PLA_ADD("mpla", 6, 22, 64)
-	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
 MACHINE_CONFIG_END
 
 machine_config_constructor tp0320_cpu_device::device_mconfig_additions() const

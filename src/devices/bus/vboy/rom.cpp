@@ -17,24 +17,22 @@
 //  vboy_rom_device - constructor
 //-------------------------------------------------
 
-const device_type VBOY_ROM_STD = device_creator<vboy_rom_device>;
-const device_type VBOY_ROM_EEPROM = device_creator<vboy_eeprom_device>;
+DEFINE_DEVICE_TYPE(VBOY_ROM_STD,    vboy_rom_device,    "vboy_rom",    "Nintendo Virtual Boy Carts")
+DEFINE_DEVICE_TYPE(VBOY_ROM_EEPROM, vboy_eeprom_device, "vboy_eeprom", "Nintendo Virtual Boy Carts + EEPROM")
 
 
-vboy_rom_device::vboy_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_vboy_cart_interface( mconfig, *this )
+vboy_rom_device::vboy_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock), device_vboy_cart_interface(mconfig, *this)
 {
 }
 
 vboy_rom_device::vboy_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, VBOY_ROM_STD, "Nintendo Virtual Boy Carts", tag, owner, clock, "vboy_rom", __FILE__),
-						device_vboy_cart_interface( mconfig, *this )
+	: vboy_rom_device(mconfig, VBOY_ROM_STD, tag, owner, clock)
 {
 }
 
 vboy_eeprom_device::vboy_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: vboy_rom_device(mconfig, VBOY_ROM_EEPROM, "Nintendo Virtual Boy Carts + EEPROM", tag, owner, clock, "vboy_eeprom", __FILE__)
+	: vboy_rom_device(mconfig, VBOY_ROM_EEPROM, tag, owner, clock)
 {
 }
 

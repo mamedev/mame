@@ -6,13 +6,15 @@
  *  Created on: 2/08/2014
  */
 
-#ifndef SYMBFAC2_H_
-#define SYMBFAC2_H_
+#ifndef MAME_BUS_CPC_SYMBFAC2_H
+#define MAME_BUS_CPC_SYMBFAC2_H
 
+#pragma once
+
+#include "cpcexp.h"
 #include "machine/ataintf.h"
 #include "machine/ds128x.h"
 #include "machine/nvram.h"
-#include "cpcexp.h"
 
 class cpc_symbiface2_device  : public device_t,
 								public device_cpc_expansion_card_interface
@@ -46,6 +48,7 @@ public:
 		PS2_MOUSE_BUTTONS,
 		PS2_MOUSE_SCROLL
 	};
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -78,7 +81,7 @@ private:
 };
 
 // device type definition
-extern const device_type CPC_SYMBIFACE2;
+DECLARE_DEVICE_TYPE(CPC_SYMBIFACE2, cpc_symbiface2_device)
 
 
-#endif /* SYMBFAC2_H_ */
+#endif // MAME_BUS_CPC_SYMBFAC2_H

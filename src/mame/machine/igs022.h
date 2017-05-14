@@ -4,6 +4,8 @@
 #ifndef MAME_MACHINE_IGS022_H
 #define MAME_MACHINE_IGS022_H
 
+#pragma once
+
 
 class igs022_device : public device_t
 {
@@ -25,6 +27,6 @@ protected:
 };
 
 
-extern const device_type IGS022;
+DECLARE_DEVICE_TYPE(IGS022, igs022_device)
 
 #endif // MAME_MACHINE_IGS022_H

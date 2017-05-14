@@ -11,10 +11,10 @@
 #include "debugger.h"
 
 // TMS1100 is nearly the same as TMS1000, some different opcodes, and with double the RAM and ROM
-const device_type TMS1100 = device_creator<tms1100_cpu_device>; // 28-pin DIP, 11 R pins
-const device_type TMS1170 = device_creator<tms1170_cpu_device>; // high voltage version
-const device_type TMS1300 = device_creator<tms1300_cpu_device>; // 40-pin DIP, 16 R pins
-const device_type TMS1370 = device_creator<tms1370_cpu_device>; // high voltage version
+DEFINE_DEVICE_TYPE(TMS1100, tms1100_cpu_device, "tms1100", "TMS1100") // 28-pin DIP, 11 R pins
+DEFINE_DEVICE_TYPE(TMS1170, tms1170_cpu_device, "tms1170", "TMS1170") // high voltage version
+DEFINE_DEVICE_TYPE(TMS1300, tms1300_cpu_device, "tms1300", "TMS1300") // 40-pin DIP, 16 R pins
+DEFINE_DEVICE_TYPE(TMS1370, tms1370_cpu_device, "tms1370", "TMS1370") // high voltage version
 
 
 // internal memory maps
@@ -29,24 +29,29 @@ ADDRESS_MAP_END
 
 // device definitions
 tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1000_cpu_device(mconfig, TMS1100, "TMS1100", tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 3 /* x width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_11bit_8), 7 /* data width */, ADDRESS_MAP_NAME(data_128x4), "tms1100", __FILE__)
-{ }
+	: tms1100_cpu_device(mconfig, TMS1100, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 3 /* x width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_11bit_8), 7 /* data width */, ADDRESS_MAP_NAME(data_128x4))
+{
+}
 
-tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-	: tms1000_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
-{ }
+tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
+	: tms1000_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data)
+{
+}
 
 tms1170_cpu_device::tms1170_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1100_cpu_device(mconfig, TMS1170, "TMS1170", tag, owner, clock, 8, 11, 6, 8, 3, 11, ADDRESS_MAP_NAME(program_11bit_8), 7, ADDRESS_MAP_NAME(data_128x4), "tms1170", __FILE__)
-{ }
+	: tms1100_cpu_device(mconfig, TMS1170, tag, owner, clock, 8, 11, 6, 8, 3, 11, ADDRESS_MAP_NAME(program_11bit_8), 7, ADDRESS_MAP_NAME(data_128x4))
+{
+}
 
 tms1300_cpu_device::tms1300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1100_cpu_device(mconfig, TMS1300, "TMS1300", tag, owner, clock, 8, 16, 6, 8, 3, 11, ADDRESS_MAP_NAME(program_11bit_8), 7, ADDRESS_MAP_NAME(data_128x4), "tms1300", __FILE__)
-{ }
+	: tms1100_cpu_device(mconfig, TMS1300, tag, owner, clock, 8, 16, 6, 8, 3, 11, ADDRESS_MAP_NAME(program_11bit_8), 7, ADDRESS_MAP_NAME(data_128x4))
+{
+}
 
 tms1370_cpu_device::tms1370_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1100_cpu_device(mconfig, TMS1370, "TMS1370", tag, owner, clock, 8, 16, 6, 8, 3, 11, ADDRESS_MAP_NAME(program_11bit_8), 7, ADDRESS_MAP_NAME(data_128x4), "tms1370", __FILE__)
-{ }
+	: tms1100_cpu_device(mconfig, TMS1370, tag, owner, clock, 8, 16, 6, 8, 3, 11, ADDRESS_MAP_NAME(program_11bit_8), 7, ADDRESS_MAP_NAME(data_128x4))
+{
+}
 
 
 // disasm

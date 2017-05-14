@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VP575 = device_creator<vp575_device>;
+DEFINE_DEVICE_TYPE(VP575, vp575_device, "vp575", "VP-575 System Expansion")
 
 
 //-------------------------------------------------
@@ -94,8 +94,9 @@ machine_config_constructor vp575_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 vp575_device::vp575_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VP575, "VP575", tag, owner, clock, "vp575", __FILE__),
-	device_vip_expansion_card_interface(mconfig, *this)
+	device_t(mconfig, VP575, tag, owner, clock),
+	device_vip_expansion_card_interface(mconfig, *this),
+	m_expansion_slot(*this, "exp%u", 1)
 {
 	for (int i = 0; i < MAX_SLOTS; i++)
 	{
@@ -112,12 +113,6 @@ vp575_device::vp575_device(const machine_config &mconfig, const char *tag, devic
 
 void vp575_device::device_start()
 {
-	// find devices
-	m_expansion_slot[0] = dynamic_cast<vip_expansion_slot_device *>(subdevice("exp1"));
-	m_expansion_slot[1] = dynamic_cast<vip_expansion_slot_device *>(subdevice("exp2"));
-	m_expansion_slot[2] = dynamic_cast<vip_expansion_slot_device *>(subdevice("exp3"));
-	m_expansion_slot[3] = dynamic_cast<vip_expansion_slot_device *>(subdevice("exp4"));
-	m_expansion_slot[4] = dynamic_cast<vip_expansion_slot_device *>(subdevice("exp5"));
 }
 
 

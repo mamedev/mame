@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CBMIEC_FD2000_H
+#define MAME_BUS_CBMIEC_FD2000_H
 
-#ifndef __FD2000__
-#define __FD2000__
+#pragma once
 
 #include "cbmiec.h"
 #include "cpu/m6502/m65c02.h"
@@ -39,13 +39,6 @@ class fd2000_device :  public device_t,
 public:
 	// construction/destruction
 	fd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	fd2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
-
-	enum
-	{
-		TYPE_FD2000,
-		TYPE_FD4000
-	};
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -59,6 +52,14 @@ public:
 	//DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
+	enum
+	{
+		TYPE_FD2000,
+		TYPE_FD4000
+	};
+
+	fd2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -88,9 +89,8 @@ public:
 
 
 // device type definition
-extern const device_type FD2000;
-extern const device_type FD4000;
+DECLARE_DEVICE_TYPE(FD2000, fd2000_device)
+DECLARE_DEVICE_TYPE(FD4000, fd4000_device)
 
 
-
-#endif
+#endif // MAME_BUS_CBMIEC_FD2000_H

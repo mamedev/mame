@@ -25,21 +25,21 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 	}
 }
 
-const device_type PSX_SIO0 = device_creator<psxsio0_device>;
-const device_type PSX_SIO1 = device_creator<psxsio1_device>;
+DEFINE_DEVICE_TYPE(PSX_SIO0, psxsio0_device, "psxsio0", "Sony PSX SIO-0")
+DEFINE_DEVICE_TYPE(PSX_SIO1, psxsio1_device, "psxsio1", "Sony PSX SIO-1")
 
 psxsio0_device::psxsio0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	psxsio_device(mconfig, PSX_SIO0, "Sony PSX SIO-0", tag, owner, clock, "psxsio0", __FILE__)
+	psxsio_device(mconfig, PSX_SIO0, tag, owner, clock)
 {
 }
 
 psxsio1_device::psxsio1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	psxsio_device(mconfig, PSX_SIO1, "Sony PSX SIO-1", tag, owner, clock, "psxsio1", __FILE__)
+	psxsio_device(mconfig, PSX_SIO1, tag, owner, clock)
 {
 }
 
-psxsio_device::psxsio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+psxsio_device::psxsio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_status(SIO_STATUS_TX_EMPTY | SIO_STATUS_TX_RDY), m_mode(0), m_control(0), m_baud(0),
 	m_rxd(1), m_tx_data(0), m_rx_data(0), m_tx_shift(0), m_rx_shift(0), m_tx_bits(0), m_rx_bits(0), m_timer(nullptr),
 	m_irq_handler(*this),

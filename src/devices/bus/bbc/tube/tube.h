@@ -31,10 +31,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_BBC_TUBE_TUBE_H
+#define MAME_BUS_BBC_TUBE_TUBE_H
 
-#ifndef __BBC_TUBE_SLOT__
-#define __BBC_TUBE_SLOT__
+#pragma once
 
 
 
@@ -66,20 +66,16 @@
 
 class device_bbc_tube_interface;
 
-class bbc_tube_slot_device : public device_t,
-												public device_slot_interface
+class bbc_tube_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
 	bbc_tube_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~bbc_tube_slot_device() {}
-
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
 
 	device_bbc_tube_interface *m_card;
 };
@@ -91,19 +87,20 @@ class device_bbc_tube_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_bbc_tube_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_bbc_tube_interface();
 
 protected:
+	device_bbc_tube_interface(const machine_config &mconfig, device_t &device);
+
 	bbc_tube_slot_device *m_slot;
 };
 
 
 // device type definition
-extern const device_type BBC_TUBE_SLOT;
+DECLARE_DEVICE_TYPE(BBC_TUBE_SLOT, bbc_tube_slot_device)
 
 SLOT_INTERFACE_EXTERN( bbc_tube_ext_devices );
 SLOT_INTERFACE_EXTERN( bbc_tube_int_devices );
 
 
-#endif
+#endif // MAME_BUS_BBC_TUBE_TUBE_H

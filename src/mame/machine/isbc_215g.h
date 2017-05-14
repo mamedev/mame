@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
-#ifndef ISBC_215G_H_
-#define ISBC_215G_H_
+#ifndef MAME_MACHINE_ISBC_215G_H
+#define MAME_MACHINE_ISBC_215G_H
+
+#pragma once
 
 #include "cpu/i8089/i8089.h"
 #include "bus/isbx/isbx.h"
@@ -71,6 +73,6 @@ private:
 #define MCFG_ISBC_215_IRQ(_irq_line) \
 	devcb = &isbc_215g_device::static_set_irq_callback(*device, DEVCB_##_irq_line);
 
-extern const device_type ISBC_215G;
+DECLARE_DEVICE_TYPE(ISBC_215G, isbc_215g_device)
 
-#endif /* ISBC_215G_H_ */
+#endif // MAME_MACHINE_ISBC_215G_H

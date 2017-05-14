@@ -447,7 +447,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( stfight_base, stfight_state )
+static MACHINE_CONFIG_START( stfight_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
@@ -487,7 +487,7 @@ static MACHINE_CONFIG_START( stfight_base, stfight_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(stfight_state, stfight_adpcm_int)) // Interrupt function
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  // 8KHz, 4-bit
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  // 8KHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

@@ -131,7 +131,7 @@ private:
 	required_device<z80sio0_device> m_sio2;
 	required_device<centronics_device> m_centronics;
 	required_device<rs232_port_device> m_rs232;
-	required_device<wd2797_t> m_fdc;
+	required_device<wd2797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	required_device<mc6845_device> m_crtc;

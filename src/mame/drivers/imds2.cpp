@@ -753,7 +753,7 @@ static SLOT_INTERFACE_START( imds2_floppies )
 	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(imds2 , imds2_state)
+static MACHINE_CONFIG_START(imds2)
 		MCFG_CPU_ADD("ipccpu" , I8085A , IPC_XTAL_Y2 / 2)  // 4 MHz
 		MCFG_CPU_PROGRAM_MAP(ipc_mem_map)
 		MCFG_CPU_IO_MAP(ipc_io_map)
@@ -913,5 +913,5 @@ ROM_START(imds2)
 		ROM_LOAD ("ioc_a19.bin" , 0x0000 , 0x0400 , CRC(47487d0f) SHA1(0ed98f9f06622949ee3cc2ffc572fb9702db0f81))
 ROM_END
 
-/*    YEAR  NAME       PARENT    COMPAT MACHINE INPUT     INIT              COMPANY       FULLNAME */
-COMP( 1979, imds2,     0,        0,     imds2,  imds2,    driver_device, 0, "Intel",      "Intellec MDS-II" , 0)
+/*    YEAR  NAME       PARENT    COMPAT MACHINE INPUT   STATE        INIT  COMPANY       FULLNAME */
+COMP( 1979, imds2,     0,        0,     imds2,  imds2,  imds2_state, 0,    "Intel",      "Intellec MDS-II" , 0)

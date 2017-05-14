@@ -37,7 +37,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151_MINIGRAF = device_creator<iq151_minigraf_device>;
+DEFINE_DEVICE_TYPE(IQ151_MINIGRAF, iq151_minigraf_device, "iq151_minigraf", "IQ151 Minigraf")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -48,9 +48,10 @@ const device_type IQ151_MINIGRAF = device_creator<iq151_minigraf_device>;
 //-------------------------------------------------
 
 iq151_minigraf_device::iq151_minigraf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, IQ151_MINIGRAF, "IQ151 Minigraf", tag, owner, clock, "iq151_minigraf", __FILE__),
-		device_iq151cart_interface( mconfig, *this ), m_rom(nullptr), m_posx(0), m_posy(0), m_pen(0), m_control(0), m_paper(nullptr)
-	{
+	: device_t(mconfig, IQ151_MINIGRAF, tag, owner, clock)
+	, device_iq151cart_interface(mconfig, *this)
+	, m_rom(nullptr), m_posx(0), m_posy(0), m_pen(0), m_control(0), m_paper(nullptr)
+{
 }
 
 //-------------------------------------------------

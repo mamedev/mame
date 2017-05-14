@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Luca Elia
+#ifndef MAME_VIDEO_JALBLEND_H
+#define MAME_VIDEO_JALBLEND_H
+
+#pragma once
+
 class jaleco_blend_device : public device_t
 {
 public:
@@ -30,4 +35,6 @@ private:
 							int transparent_color);
 };
 
-extern const device_type JALECO_BLEND;
+DECLARE_DEVICE_TYPE(JALECO_BLEND, jaleco_blend_device)
+
+#endif // MAME_VIDEO_JALBLEND_H

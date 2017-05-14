@@ -104,7 +104,7 @@
     Constructor.
 */
 tmc0430_device::tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TMC0430, "TMC0430 device (GROM)", tag, owner, clock, "grom", __FILE__),
+	: device_t(mconfig, TMC0430, tag, owner, clock),
 	m_gromready(*this),
 	m_current_clock_level(CLEAR_LINE),
 	m_current_ident(0),
@@ -334,7 +334,7 @@ WRITE8_MEMBER( tmc0430_device::write )
     DEVICE FUNCTIONS
 ***************************************************************************/
 
-void tmc0430_device::device_start(void)
+void tmc0430_device::device_start()
 {
 	m_gromready.resolve_safe();
 	save_item(NAME(m_current_clock_level));
@@ -348,7 +348,7 @@ void tmc0430_device::device_start(void)
 	save_item(NAME(m_buffer));
 }
 
-void tmc0430_device::device_reset(void)
+void tmc0430_device::device_reset()
 {
 	// The memory region must be defined in the owning component
 	m_memptr = owner()->memregion(m_regionname)->base() + m_offset;
@@ -363,4 +363,4 @@ int tmc0430_device::debug_get_address()
 	return m_address;
 }
 
-const device_type TMC0430 = device_creator<tmc0430_device>;
+DEFINE_DEVICE_TYPE(TMC0430, tmc0430_device, "grom", "TMC0430 GROM")

@@ -15,6 +15,16 @@
 #include "speaker.h"
 
 
+#define IRQ_2XF           0x00
+#define IRQ_MIDI_TRANSMIT 0x01
+#define IRQ_MIDI_RECEIVE  0x02
+#define IRQ_TIMER1        0x04
+#define IRQ_TIMER2        0x08
+#define IRQ_SB            0x10
+#define IRQ_WAVETABLE     0x20
+#define IRQ_VOLUME_RAMP   0x40
+#define IRQ_DRAM_TC_DMA   0x80
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -36,8 +46,8 @@ static const uint16_t volume_ramp_table[4] =
 	1, 8, 64, 512
 };
 
-const device_type GGF1 = device_creator<gf1_device>;
-const device_type ISA16_GUS = device_creator<isa16_gus_device>;
+DEFINE_DEVICE_TYPE(GGF1,      gf1_device,       "gf1",     "Gravis GF1")
+DEFINE_DEVICE_TYPE(ISA16_GUS, isa16_gus_device, "isa_gus", "Gravis Ultrasound")
 
 #ifdef LOG_SOUND
 FILE* f;
@@ -354,8 +364,12 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 //-------------------------------------------------
 
 gf1_device::gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	acia6850_device(mconfig, GGF1, "Gravis GF1", tag, owner, clock, "gf1", __FILE__),
-	device_sound_interface( mconfig, *this ), m_dma_dram_ctrl(0), m_dma_start_addr(0), m_dram_addr(0), m_timer_ctrl(0), m_timer1_count(0), m_timer2_count(0), m_timer1_value(0), m_timer2_value(0), m_sampling_freq(0), m_sampling_ctrl(0), m_joy_trim_dac(0), m_reset(0), m_active_voices(0), m_irq_source(0), m_stream(nullptr), m_timer1(nullptr), m_timer2(nullptr), m_dmatimer(nullptr), m_voltimer(nullptr), m_current_voice(0), m_current_reg(0), m_adlib_cmd(0), m_mix_ctrl(0), m_gf1_irq(0), m_midi_irq(0), m_dma_channel1(0), m_dma_channel2(0), m_irq_combine(0), m_dma_combine(0), m_adlib_timer_cmd(0), m_adlib_timer1_enable(0), m_adlib_timer2_enable(0), m_adlib_status(0), m_adlib_data(0), m_voice_irq_ptr(0), m_voice_irq_current(0), m_dma_16bit(0), m_statread(0), m_sb_data_2xc(0), m_sb_data_2xe(0), m_reg_ctrl(0), m_fake_adlib_status(0), m_dma_current(0), m_txirq(0), m_rxirq(0),
+	acia6850_device(mconfig, GGF1, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_dma_dram_ctrl(0), m_dma_start_addr(0), m_dram_addr(0), m_timer_ctrl(0), m_timer1_count(0), m_timer2_count(0), m_timer1_value(0), m_timer2_value(0), m_sampling_freq(0), m_sampling_ctrl(0), m_joy_trim_dac(0), m_reset(0), m_active_voices(0), m_irq_source(0),
+	m_stream(nullptr),
+	m_timer1(nullptr), m_timer2(nullptr), m_dmatimer(nullptr), m_voltimer(nullptr),
+	m_current_voice(0), m_current_reg(0), m_adlib_cmd(0), m_mix_ctrl(0), m_gf1_irq(0), m_midi_irq(0), m_dma_channel1(0), m_dma_channel2(0), m_irq_combine(0), m_dma_combine(0), m_adlib_timer_cmd(0), m_adlib_timer1_enable(0), m_adlib_timer2_enable(0), m_adlib_status(0), m_adlib_data(0), m_voice_irq_ptr(0), m_voice_irq_current(0), m_dma_16bit(0), m_statread(0), m_sb_data_2xc(0), m_sb_data_2xe(0), m_reg_ctrl(0), m_fake_adlib_status(0), m_dma_current(0), m_txirq(0), m_rxirq(0),
 	m_txirq_handler(*this),
 	m_rxirq_handler(*this),
 	m_wave_irq_handler(*this),
@@ -1277,9 +1291,10 @@ ioport_constructor isa16_gus_device::device_input_ports() const
 
 
 isa16_gus_device::isa16_gus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISA16_GUS, "Gravis Ultrasound", tag, owner, clock, "isa_gus", __FILE__),
-	device_isa16_card_interface( mconfig, *this ),
-	m_gf1(*this, "gf1"), m_irq_status(0)
+	device_t(mconfig, ISA16_GUS, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this),
+	m_gf1(*this, "gf1"),
+	m_irq_status(0)
 {
 }
 

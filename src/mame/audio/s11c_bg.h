@@ -6,13 +6,15 @@
  *  Created on: 2/10/2013
  */
 
-#ifndef S11C_BG_H_
-#define S11C_BG_H_
+#ifndef MAME_AUDIO_S11C_BG_H
+#define MAME_AUDIO_S11C_BG_H
+
+#pragma once
 
 #include "cpu/m6809/m6809.h"
-#include "sound/ym2151.h"
-#include "sound/hc55516.h"
 #include "machine/6821pia.h"
+#include "sound/hc55516.h"
+#include "sound/ym2151.h"
 
 
 #define MCFG_S11C_BG_ROM_REGION(_region) \
@@ -55,6 +57,6 @@ private:
 	const char* m_regiontag;
 };
 
-extern const device_type S11C_BG;
+DECLARE_DEVICE_TYPE(S11C_BG, s11c_bg_device)
 
-#endif /* S11C_BG_H_ */
+#endif // MAME_AUDIO_S11C_BG_H

@@ -6,9 +6,8 @@
 
 **********************************************************************/
 
-
-#ifndef __BBC_OPUSFDC__
-#define __BBC_OPUSFDC__
+#ifndef MAME_BUS_BBC_FDC_OPUS_H
+#define MAME_BUS_BBC_FDC_OPUS_H
 
 #include "fdc.h"
 #include "machine/wd_fdc.h"
@@ -25,9 +24,6 @@ class bbc_opusfdc_device:
 
 {
 public:
-	// construction/destruction
-	bbc_opusfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
@@ -37,13 +33,16 @@ public:
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 
 protected:
+	// construction/destruction
+	bbc_opusfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
 	required_memory_region m_dfs_rom;
-	required_device<wd_fdc_t> m_fdc;
+	required_device<wd_fdc_device_base> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 
@@ -78,8 +77,8 @@ public:
 };
 
 // device type definition
-extern const device_type BBC_OPUS2791;
-extern const device_type BBC_OPUS2793;
-extern const device_type BBC_OPUS1770;
+DECLARE_DEVICE_TYPE(BBC_OPUS2791, bbc_opus2791_device)
+DECLARE_DEVICE_TYPE(BBC_OPUS2793, bbc_opus2793_device)
+DECLARE_DEVICE_TYPE(BBC_OPUS1770, bbc_opus1770_device)
 
-#endif /* __BBC_OPUSFDC_ */
+#endif // MAME_BUS_BBC_FDC_OPUS_H

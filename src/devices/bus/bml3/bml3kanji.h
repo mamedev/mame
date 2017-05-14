@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __BML3BUS_KANJI__
-#define __BML3BUS_KANJI__
+#ifndef MAME_BUS_BML3_BML3KANJI_H
+#define MAME_BUS_BML3_BML3KANJI_H
+
+#pragma once
 
 #include "bml3bus.h"
 
@@ -43,6 +45,6 @@ private:
 };
 
 // device type definition
-extern const device_type BML3BUS_KANJI;
+DECLARE_DEVICE_TYPE(BML3BUS_KANJI, bml3bus_kanji_device)
 
-#endif /* __BML3BUS_KANJI__ */
+#endif // MAME_BUS_BML3_BML3KANJI_H

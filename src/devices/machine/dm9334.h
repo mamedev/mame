@@ -65,10 +65,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_DM9334_H
+#define MAME_MACHINE_DM9334_H
 
-#ifndef DM9334_H
-#define DM9334_H
+#pragma once
 
 
 #define MCFG_DM9334_OUTPUT_CB(_devcb) \
@@ -108,15 +108,15 @@ public:
 	dm9334_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_out_cb(device_t &device, _Object object) { return downcast<dm9334_device &>(device).m_out_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_q0_cb(device_t &device, _Object object) { return downcast<dm9334_device &>(device).m_q0_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_q1_cb(device_t &device, _Object object) { return downcast<dm9334_device &>(device).m_q1_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_q2_cb(device_t &device, _Object object) { return downcast<dm9334_device &>(device).m_q2_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_q3_cb(device_t &device, _Object object) { return downcast<dm9334_device &>(device).m_q3_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_q4_cb(device_t &device, _Object object) { return downcast<dm9334_device &>(device).m_q4_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_q5_cb(device_t &device, _Object object) { return downcast<dm9334_device &>(device).m_q5_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_q6_cb(device_t &device, _Object object) { return downcast<dm9334_device &>(device).m_q6_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_q7_cb(device_t &device, _Object object) { return downcast<dm9334_device &>(device).m_q7_func.set_callback(object); }
+	template <class Object> static devcb_base &set_out_cb(device_t &device, Object &&cb) { return downcast<dm9334_device &>(device).m_out_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_q0_cb(device_t &device, Object &&cb) { return downcast<dm9334_device &>(device).m_q0_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_q1_cb(device_t &device, Object &&cb) { return downcast<dm9334_device &>(device).m_q1_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_q2_cb(device_t &device, Object &&cb) { return downcast<dm9334_device &>(device).m_q2_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_q3_cb(device_t &device, Object &&cb) { return downcast<dm9334_device &>(device).m_q3_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_q4_cb(device_t &device, Object &&cb) { return downcast<dm9334_device &>(device).m_q4_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_q5_cb(device_t &device, Object &&cb) { return downcast<dm9334_device &>(device).m_q5_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_q6_cb(device_t &device, Object &&cb) { return downcast<dm9334_device &>(device).m_q6_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_q7_cb(device_t &device, Object &&cb) { return downcast<dm9334_device &>(device).m_q7_func.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( e_w );
 	DECLARE_WRITE_LINE_MEMBER( c_w );
@@ -177,7 +177,6 @@ private:
 };
 
 // device type definition
-extern const device_type DM9334;
+DECLARE_DEVICE_TYPE(DM9334, dm9334_device)
 
-
-#endif /* DM9334_H */
+#endif // MAME_MACHINE_DM9334_H

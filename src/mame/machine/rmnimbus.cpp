@@ -1487,7 +1487,7 @@ void rmnimbus_state::rmni_sound_reset()
 {
 	m_msm->reset_w(1);
 
-	m_last_playmode = MSM5205_S48_4B;
+	m_last_playmode = msm5205_device::S48_4B;
 	m_msm->playmode_w(m_last_playmode);
 
 	m_ay8910_a=0;

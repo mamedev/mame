@@ -10,7 +10,11 @@
 
 #include "emu.h"
 #include "polylgcy.h"
+
 #include <atomic>
+
+
+namespace {
 
 /***************************************************************************
     DEBUGGING
@@ -71,7 +75,7 @@ struct poly_edge
 	const poly_vertex * v1;                     /* pointer to first vertex */
 	const poly_vertex * v2;                     /* pointer to second vertex */
 	float               dxdy;                   /* dx/dy along the edge */
-	float               dpdy[MAX_VERTEX_PARAMS];/* per-parameter dp/dy values */
+	float               dpdy[POLYLGCY_MAX_VERTEX_PARAMS];/* per-parameter dp/dy values */
 };
 
 
@@ -133,8 +137,10 @@ struct polygon_info
 	poly_draw_scanline_func     callback;               /* callback to handle a scanline's worth of work */
 	int32_t               xorigin;                /* X origin for all parameters */
 	int32_t               yorigin;                /* Y origin for all parameters */
-	poly_param          param[MAX_VERTEX_PARAMS];/* array of parameter data */
+	poly_param          param[POLYLGCY_MAX_VERTEX_PARAMS];/* array of parameter data */
 };
+
+} // anonymous namespace
 
 
 /* full poly manager description */
@@ -331,13 +337,13 @@ legacy_poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t 
 	poly->extra = allocate_array(machine, &poly->extra_size, poly->extra_count);
 
 	/* allocate triangle work units */
-	poly->unit_size = (flags & POLYFLAG_ALLOW_QUADS) ? sizeof(quad_work_unit) : sizeof(tri_work_unit);
+	poly->unit_size = (flags & POLYLGCY_FLAG_ALLOW_QUADS) ? sizeof(quad_work_unit) : sizeof(tri_work_unit);
 	poly->unit_count = std::min(poly->polygon_count * UNITS_PER_POLY, 65535U);
 	poly->unit_next = 0;
 	poly->unit = (work_unit **)allocate_array(machine, &poly->unit_size, poly->unit_count);
 
 	/* create the work queue */
-	if (!(flags & POLYFLAG_NO_WORK_QUEUE))
+	if (!(flags & POLYLGCY_FLAG_NO_WORK_QUEUE))
 		poly->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
 
 	/* request a pre-save callback for synchronization */
@@ -500,7 +506,7 @@ uint32_t poly_render_triangle(legacy_poly_manager *poly, void *dest, const recta
 
 	/* clip coordinates */
 	v1yclip = v1y;
-	v3yclip = v3y + ((poly->flags & POLYFLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
+	v3yclip = v3y + ((poly->flags & POLYLGCY_FLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
 	v1yclip = std::max(v1yclip, cliprect.min_y);
 	v3yclip = std::min(v3yclip, cliprect.max_y + 1);
 	if (v3yclip - v1yclip <= 0)
@@ -572,7 +578,7 @@ uint32_t poly_render_triangle(legacy_poly_manager *poly, void *dest, const recta
 			}
 
 			/* include the right edge if requested */
-			if (poly->flags & POLYFLAG_INCLUDE_RIGHT_EDGE)
+			if (poly->flags & POLYLGCY_FLAG_INCLUDE_RIGHT_EDGE)
 				istopx++;
 
 			/* apply left/right clipping */
@@ -772,7 +778,7 @@ uint32_t poly_render_quad(legacy_poly_manager *poly, void *dest, const rectangle
 	int32_t pixels = 0;
 	uint32_t startunit;
 
-	assert(poly->flags & POLYFLAG_ALLOW_QUADS);
+	assert(poly->flags & POLYLGCY_FLAG_ALLOW_QUADS);
 
 	/* arrays make things easier */
 	v[0] = v1;
@@ -800,7 +806,7 @@ uint32_t poly_render_quad(legacy_poly_manager *poly, void *dest, const rectangle
 
 	/* clip coordinates */
 	minyclip = miny;
-	maxyclip = maxy + ((poly->flags & POLYFLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
+	maxyclip = maxy + ((poly->flags & POLYLGCY_FLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
 	minyclip = std::max(minyclip, cliprect.min_y);
 	maxyclip = std::min(maxyclip, cliprect.max_y + 1);
 	if (maxyclip - minyclip <= 0)
@@ -937,7 +943,7 @@ uint32_t poly_render_quad(legacy_poly_manager *poly, void *dest, const rectangle
 			}
 
 			/* include the right edge if requested */
-			if (poly->flags & POLYFLAG_INCLUDE_RIGHT_EDGE)
+			if (poly->flags & POLYLGCY_FLAG_INCLUDE_RIGHT_EDGE)
 				istopx++;
 
 			/* apply left/right clipping */
@@ -1002,7 +1008,7 @@ uint32_t poly_render_quad_fan(legacy_poly_manager *poly, void *dest, const recta
 
 uint32_t poly_render_polygon(legacy_poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v)
 {
-	poly_edge fedgelist[MAX_POLYGON_VERTS - 1], bedgelist[MAX_POLYGON_VERTS - 1];
+	poly_edge fedgelist[POLYLGCY_MAX_POLYGON_VERTS - 1], bedgelist[POLYLGCY_MAX_POLYGON_VERTS - 1];
 	const poly_edge *ledge, *redge;
 	poly_edge *edgeptr;
 	int minv, maxv, curv;
@@ -1014,7 +1020,7 @@ uint32_t poly_render_polygon(legacy_poly_manager *poly, void *dest, const rectan
 	uint32_t startunit;
 	int vertnum;
 
-	assert(poly->flags & POLYFLAG_ALLOW_QUADS);
+	assert(poly->flags & POLYLGCY_FLAG_ALLOW_QUADS);
 
 	/* determine min/max Y vertices */
 	minv = maxv = 0;
@@ -1032,7 +1038,7 @@ uint32_t poly_render_polygon(legacy_poly_manager *poly, void *dest, const rectan
 
 	/* clip coordinates */
 	minyclip = miny;
-	maxyclip = maxy + ((poly->flags & POLYFLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
+	maxyclip = maxy + ((poly->flags & POLYLGCY_FLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
 	minyclip = std::max(minyclip, cliprect.min_y);
 	maxyclip = std::min(maxyclip, cliprect.max_y + 1);
 	if (maxyclip - minyclip <= 0)
@@ -1169,7 +1175,7 @@ uint32_t poly_render_polygon(legacy_poly_manager *poly, void *dest, const rectan
 			}
 
 			/* include the right edge if requested */
-			if (poly->flags & POLYFLAG_INCLUDE_RIGHT_EDGE)
+			if (poly->flags & POLYLGCY_FLAG_INCLUDE_RIGHT_EDGE)
 				istopx++;
 
 			/* apply left/right clipping */

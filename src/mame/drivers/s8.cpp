@@ -304,7 +304,7 @@ DRIVER_INIT_MEMBER( s8_state, s8 )
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
 }
 
-static MACHINE_CONFIG_START( s8, s8_state )
+static MACHINE_CONFIG_START( s8 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s8_main_map)
@@ -388,5 +388,5 @@ ROM_START(pfevr_p3)
 ROM_END
 
 
-GAME(1984,pfevr_l2, 0,        s8, s8, s8_state, s8, ROT0, "Williams", "Pennant Fever (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1984,pfevr_p3, pfevr_l2, s8, s8, s8_state, s8, ROT0, "Williams", "Pennant Fever (P-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1984, pfevr_l2, 0,        s8, s8, s8_state, s8, ROT0, "Williams", "Pennant Fever (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1984, pfevr_p3, pfevr_l2, s8, s8, s8_state, s8, ROT0, "Williams", "Pennant Fever (P-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

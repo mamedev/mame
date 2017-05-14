@@ -113,7 +113,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PDC = device_creator<pdc_device>;
+DEFINE_DEVICE_TYPE(PDC, pdc_device, "rolm_pdc", "ROLM PDC")
 
 //-------------------------------------------------
 //  ROM( PDC )
@@ -308,7 +308,7 @@ ioport_constructor pdc_device::device_input_ports() const
 //-------------------------------------------------
 
 pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PDC, "ROLM PDC", tag, owner, clock, "pdc", __FILE__),
+	device_t(mconfig, PDC, tag, owner, clock),
 	m_pdccpu(*this, Z80_TAG),
 	m_dma8237(*this, FDCDMA_TAG),
 	m_fdc(*this, FDC_TAG),

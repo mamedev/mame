@@ -1,12 +1,15 @@
 // license:LGPL-2.1+
 // copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
+#ifndef MAME_MACHINE_SEICOP_H
+#define MAME_MACHINE_SEICOP_H
+
+#pragma once
 
 #include "seibucop/seibucop.h"
 
 
 
-class seibu_cop_bootleg_device : public device_t,
-								public device_memory_interface
+class seibu_cop_bootleg_device : public device_t, public device_memory_interface
 {
 public:
 	seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -46,6 +49,9 @@ private:
 };
 
 extern const device_type SEIBU_COP_BOOTLEG;
+DECLARE_DEVICE_TYPE(SEIBU_COP_BOOTLEG, seibu_cop_bootleg_device)
 
 #define MCFG_DEVICE_SEIBUCOP_BOOTLEG_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEIBU_COP_BOOTLEG, 0)
+
+#endif // MAME_MACHINE_SEICOP_H

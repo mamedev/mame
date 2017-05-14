@@ -913,11 +913,10 @@ private:
 	int tape_get_id();
 };
 
-const device_type TI990_TAPE = device_creator<ti990_tape_image_device>;
+DEFINE_DEVICE_TYPE(TI990_TAPE, ti990_tape_image_device, "ti990_tape_image", "TI-990 Magnetic Tape")
 
 ti990_tape_image_device::ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TI990_TAPE, "TI-990 Magnetic Tape", tag, owner, clock, "ti990_tape_image", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, TI990_TAPE, tag, owner, clock), device_image_interface(mconfig, *this)
 {
 }
 
@@ -968,11 +967,10 @@ static MACHINE_CONFIG_FRAGMENT( tap_990 )
 	MCFG_TI990_TAPE_ADD("tape3")
 MACHINE_CONFIG_END
 
-const device_type TI990_TAPE_CTRL = device_creator<tap_990_device>;
+DEFINE_DEVICE_TYPE(TI990_TAPE_CTRL, tap_990_device, "ti990_tap", "Generic TI-900 Tape Controller")
 
 tap_990_device::tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TI990_TAPE_CTRL, "Generic TI-990 Tape Controller", tag, owner, clock, "tap_990", __FILE__),
-	m_int_line(*this)
+	: device_t(mconfig, TI990_TAPE_CTRL, tag, owner, clock), m_int_line(*this)
 {
 }
 
@@ -999,5 +997,5 @@ void tap_990_device::device_start()
 
 machine_config_constructor tap_990_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( tap_990  );
+	return MACHINE_CONFIG_NAME( tap_990 );
 }

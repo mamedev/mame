@@ -8,10 +8,10 @@
 
 *************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_LDV1000_H
+#define MAME_MACHINE_LDV1000_H
 
-#ifndef __LDV1000_H__
-#define __LDV1000_H__
+#pragma once
 
 #include "laserdsc.h"
 #include "cpu/z80/z80.h"
@@ -36,7 +36,7 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type PIONEER_LDV1000;
+DECLARE_DEVICE_TYPE(PIONEER_LDV1000, pioneer_ldv1000_device)
 
 
 
@@ -53,7 +53,7 @@ public:
 	// construction/destruction
 	pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _cmd_strobe_cb> devcb_base &set_command_strobe_callback(_cmd_strobe_cb latch) { return m_command_strobe_cb.set_callback(latch); }
+	template <class cmd_strobe_cb> devcb_base &set_command_strobe_callback(cmd_strobe_cb &&latch) { return m_command_strobe_cb.set_callback(std::forward<cmd_strobe_cb>(latch)); }
 
 	// input and output
 	void data_w(uint8_t data);
@@ -132,5 +132,4 @@ protected:
 
 };
 
-
-#endif
+#endif // MAME_MACHINE_LDV1000_H

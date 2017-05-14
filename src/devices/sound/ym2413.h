@@ -1,13 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski,Ernesto Corvi
+#ifndef MAME_SOUND_YM2413_H
+#define MAME_SOUND_YM2413_H
+
 #pragma once
 
-#ifndef __YM2413_H__
-#define __YM2413_H__
 
-
-class ym2413_device : public device_t,
-						public device_sound_interface
+class ym2413_device : public device_t, public device_sound_interface
 {
 public:
 	ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -16,8 +15,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER( register_port_w );
 	DECLARE_WRITE8_MEMBER( data_port_w );
-
-	void _ym2413_update_request();
 
 protected:
 	// device-level overrides
@@ -185,6 +182,6 @@ private:
 
 };
 
-extern const device_type YM2413;
+DECLARE_DEVICE_TYPE(YM2413, ym2413_device)
 
-#endif /*__YM2413_H__*/
+#endif // MAME_SOUND_YM2413_H

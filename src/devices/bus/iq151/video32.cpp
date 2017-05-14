@@ -41,7 +41,7 @@ static const gfx_layout iq151_video32_charlayout =
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151_VIDEO32 = device_creator<iq151_video32_device>;
+DEFINE_DEVICE_TYPE(IQ151_VIDEO32, iq151_video32_device, "iq151_video32", "IQ151 video32")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -52,9 +52,11 @@ const device_type IQ151_VIDEO32 = device_creator<iq151_video32_device>;
 //-------------------------------------------------
 
 iq151_video32_device::iq151_video32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, IQ151_VIDEO32, "IQ151 video32", tag, owner, clock, "iq151_video32", __FILE__),
-		device_gfx_interface(mconfig, *this, nullptr, "^^palette"),
-		device_iq151cart_interface( mconfig, *this ), m_videoram(nullptr), m_chargen(nullptr)
+	: device_t(mconfig, IQ151_VIDEO32, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, nullptr, "^^palette")
+	, device_iq151cart_interface(mconfig, *this)
+	, m_videoram(*this, "videoram")
+	, m_chargen(*this, "chargen")
 {
 }
 
@@ -65,9 +67,6 @@ iq151_video32_device::iq151_video32_device(const machine_config &mconfig, const 
 
 void iq151_video32_device::device_start()
 {
-	m_videoram = (uint8_t*)memregion("videoram")->base();
-	m_chargen = (uint8_t*)memregion("chargen")->base();
-
 	set_gfx(0, std::make_unique<gfx_element>(palette(), iq151_video32_charlayout, m_chargen, 0, 1, 0));
 }
 

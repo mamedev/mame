@@ -233,7 +233,7 @@ void zac_proto_state::machine_reset()
 	output().set_digit_value(10, 0x3f); // units shows zero all the time
 }
 
-static MACHINE_CONFIG_START( zac_proto, zac_proto_state )
+static MACHINE_CONFIG_START( zac_proto )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", INS8060, XTAL_4MHz / 2) // Using SC/MP II chip which has an internal /2 circuit.
 	MCFG_CPU_PROGRAM_MAP(zac_proto_map)
@@ -279,6 +279,6 @@ ROM_START(spacecty)
 	ROM_LOAD("zsc4.dat", 0x1400, 0x0400, CRC(69e0bb95) SHA1(d9a1d0159bf49445b0ece0f9d7806ed80657c2b2))
 ROM_END
 
-GAME(1978,  skijump,   0,  zac_proto,  zac_proto, driver_device,  0,  ROT0, "Zaccaria", "Ski Jump", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, driver_device,  0,  ROT0, "Zaccaria", "Space City", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1978,  strike,    0,  zac_proto,  zac_proto, driver_device,  0,  ROT0, "Zaccaria", "Strike", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1978,  skijump,   0,  zac_proto,  zac_proto, zac_proto_state,  0,  ROT0, "Zaccaria", "Ski Jump",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, zac_proto_state,  0,  ROT0, "Zaccaria", "Space City", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1978,  strike,    0,  zac_proto,  zac_proto, zac_proto_state,  0,  ROT0, "Zaccaria", "Strike",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

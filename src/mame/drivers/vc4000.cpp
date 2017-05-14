@@ -527,7 +527,7 @@ static SLOT_INTERFACE_START(vc4000_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( vc4000, vc4000_state )
+static MACHINE_CONFIG_START( vc4000 )
 	/* basic machine hardware */
 //  MCFG_CPU_ADD("maincpu", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
 	MCFG_CPU_ADD("maincpu", S2650, 3546875/4)
@@ -701,29 +701,29 @@ ROM_END
 
 
 
-/*   YEAR  NAME      PARENT     COMPAT    MACHINE    INPUT        INIT      COMPANY             FULLNAME */
-CONS(1978, vc4000,   0,         0,        vc4000,    vc4000, driver_device,      0,        "Interton",         "Interton Electronic VC 4000", MACHINE_IMPERFECT_GRAPHICS )          /* Germany, Austria, UK, Australia */
-CONS(1979, spc4000,  vc4000,    0,        vc4000,    vc4000, driver_device,      0,        "Grundig",          "Super Play Computer 4000", MACHINE_IMPERFECT_GRAPHICS )  /* Germany, Austria */
-CONS(1979, cx3000tc, vc4000,    0,        cx3000tc,  vc4000, driver_device,      0,        "Palson",           "CX 3000 Tele Computer", MACHINE_IMPERFECT_GRAPHICS )     /* Spain */
-CONS(1979, tvc4000,  vc4000,    0,        vc4000,    vc4000, driver_device,      0,        "Koerting",         "TVC-4000",         MACHINE_IMPERFECT_GRAPHICS )          /* Argentina */
-CONS(1976, 1292apvs, 0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "Radofin",          "1292 Advanced Programmable Video System", MACHINE_IMPERFECT_GRAPHICS )/* Europe */
-CONS(1976, 1392apvs, 1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Radofin",          "1392 Advanced Programmable Video System", MACHINE_IMPERFECT_GRAPHICS )/* Europe */
-CONS(1979, mpu1000,  1292apvs,  0,        mpu1000,   vc4000, driver_device,      0,        "Acetronic",        "MPU-1000",         MACHINE_IMPERFECT_GRAPHICS )          /* Europe */
-CONS(1979, mpu2000,  1292apvs,  0,        mpu1000,   vc4000, driver_device,      0,        "Acetronic",        "MPU-2000",         MACHINE_IMPERFECT_GRAPHICS )          /* Europe */
-CONS(1978, pp1292,   1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Audio Sonic",      "PP-1292 Advanced Programmable Video System", MACHINE_IMPERFECT_GRAPHICS )/* Europe */
-CONS(1978, pp1392,   1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Audio Sonic",      "PP-1392 Advanced Programmable Video System", MACHINE_IMPERFECT_GRAPHICS )/* Europe */
-CONS(1979, f1392,    1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Fountain",         "Fountain 1392",    MACHINE_IMPERFECT_GRAPHICS )          /* New Zealand */
-CONS(1979, fforce2,  1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Fountain",         "Fountain Force 2", MACHINE_IMPERFECT_GRAPHICS )          /* New Zealand, Australia */
-CONS(1979, hmg1292,  1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Hanimex",          "HMG 1292",         MACHINE_IMPERFECT_GRAPHICS )          /* Europe */
-CONS(1979, hmg1392,  1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Hanimex",          "HMG 1392",         MACHINE_IMPERFECT_GRAPHICS )          /* Europe */
-CONS(1979, lnsy1392, 1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Lansay",           "Lansay 1392",      MACHINE_IMPERFECT_GRAPHICS )          /* Europe */
-CONS(1979, vc6000,   1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Prinztronic",      "VC 6000",          MACHINE_IMPERFECT_GRAPHICS )          /* UK */
-CONS(1979, database, 0,         vc4000,   database,  vc4000, driver_device,      0,        "Voltmace",         "Voltmace Database", MACHINE_IMPERFECT_GRAPHICS )         /* UK */
-CONS(1979, vmdtbase, database,  0,        database,  vc4000, driver_device,      0,        "Videomaster",      "Videomaster Database Games-Computer", MACHINE_IMPERFECT_GRAPHICS )/* UK */
-CONS(1979, rwtrntcs, 0,         vc4000,   rwtrntcs,  vc4000, driver_device,      0,        "Rowtron",          "Rowtron Television Computer System", MACHINE_IMPERFECT_GRAPHICS )/* UK */
-CONS(1979, telngtcs, rwtrntcs,  0,        rwtrntcs,  vc4000, driver_device,      0,        "Teleng",           "Teleng Television Computer System", MACHINE_IMPERFECT_GRAPHICS )/* UK */
-CONS(1979, krvnjvtv, 0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "SOE",              "OC Jeu Video TV Karvan", MACHINE_IMPERFECT_GRAPHICS )    /* France */
-CONS(1979, oc2000,   krvnjvtv,  0,        vc4000,    vc4000, driver_device,      0,        "SOE",              "OC-2000",          MACHINE_IMPERFECT_GRAPHICS )          /* France */
-CONS(1980, mpt05,    0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "ITMC",             "MPT-05",           MACHINE_IMPERFECT_GRAPHICS )          /* France */
-CONS(1982, h21,      0,         vc4000,   h21,       vc4000, driver_device,      0,        "TRQ",              "Video Computer H-21", MACHINE_IMPERFECT_GRAPHICS) // Spain
-CONS(1979, elektor,  0,         0,        elektor,   elektor, driver_device,     0,        "Elektor",          "Elektor TV Games Computer", MACHINE_IMPERFECT_GRAPHICS )
+//   YEAR  NAME      PARENT     COMPAT    MACHINE    INPUT    STATE          INIT  COMPANY        FULLNAME                                      FLAGS
+CONS(1978, vc4000,   0,         0,        vc4000,    vc4000,  vc4000_state,  0,    "Interton",    "Interton Electronic VC 4000",                MACHINE_IMPERFECT_GRAPHICS) // Germany, Austria, UK, Australia
+CONS(1979, spc4000,  vc4000,    0,        vc4000,    vc4000,  vc4000_state,  0,    "Grundig",     "Super Play Computer 4000",                   MACHINE_IMPERFECT_GRAPHICS) // Germany, Austria
+CONS(1979, cx3000tc, vc4000,    0,        cx3000tc,  vc4000,  vc4000_state,  0,    "Palson",      "CX 3000 Tele Computer",                      MACHINE_IMPERFECT_GRAPHICS) // Spain
+CONS(1979, tvc4000,  vc4000,    0,        vc4000,    vc4000,  vc4000_state,  0,    "Koerting",    "TVC-4000",                                   MACHINE_IMPERFECT_GRAPHICS) // Argentina
+CONS(1976, 1292apvs, 0,         vc4000,   vc4000,    vc4000,  vc4000_state,  0,    "Radofin",     "1292 Advanced Programmable Video System",    MACHINE_IMPERFECT_GRAPHICS) // Europe
+CONS(1976, 1392apvs, 1292apvs,  0,        vc4000,    vc4000,  vc4000_state,  0,    "Radofin",     "1392 Advanced Programmable Video System",    MACHINE_IMPERFECT_GRAPHICS) // Europe
+CONS(1979, mpu1000,  1292apvs,  0,        mpu1000,   vc4000,  vc4000_state,  0,    "Acetronic",   "MPU-1000",                                   MACHINE_IMPERFECT_GRAPHICS) // Europe
+CONS(1979, mpu2000,  1292apvs,  0,        mpu1000,   vc4000,  vc4000_state,  0,    "Acetronic",   "MPU-2000",                                   MACHINE_IMPERFECT_GRAPHICS) // Europe
+CONS(1978, pp1292,   1292apvs,  0,        vc4000,    vc4000,  vc4000_state,  0,    "Audio Sonic", "PP-1292 Advanced Programmable Video System", MACHINE_IMPERFECT_GRAPHICS) // Europe
+CONS(1978, pp1392,   1292apvs,  0,        vc4000,    vc4000,  vc4000_state,  0,    "Audio Sonic", "PP-1392 Advanced Programmable Video System", MACHINE_IMPERFECT_GRAPHICS) // Europe
+CONS(1979, f1392,    1292apvs,  0,        vc4000,    vc4000,  vc4000_state,  0,    "Fountain",    "Fountain 1392",                              MACHINE_IMPERFECT_GRAPHICS) // New Zealand
+CONS(1979, fforce2,  1292apvs,  0,        vc4000,    vc4000,  vc4000_state,  0,    "Fountain",    "Fountain Force 2",                           MACHINE_IMPERFECT_GRAPHICS) // New Zealand, Australia
+CONS(1979, hmg1292,  1292apvs,  0,        vc4000,    vc4000,  vc4000_state,  0,    "Hanimex",     "HMG 1292",                                   MACHINE_IMPERFECT_GRAPHICS) // Europe
+CONS(1979, hmg1392,  1292apvs,  0,        vc4000,    vc4000,  vc4000_state,  0,    "Hanimex",     "HMG 1392",                                   MACHINE_IMPERFECT_GRAPHICS) // Europe
+CONS(1979, lnsy1392, 1292apvs,  0,        vc4000,    vc4000,  vc4000_state,  0,    "Lansay",      "Lansay 1392",                                MACHINE_IMPERFECT_GRAPHICS) // Europe
+CONS(1979, vc6000,   1292apvs,  0,        vc4000,    vc4000,  vc4000_state,  0,    "Prinztronic", "VC 6000",                                    MACHINE_IMPERFECT_GRAPHICS) // UK
+CONS(1979, database, 0,         vc4000,   database,  vc4000,  vc4000_state,  0,    "Voltmace",    "Voltmace Database",                          MACHINE_IMPERFECT_GRAPHICS) // UK
+CONS(1979, vmdtbase, database,  0,        database,  vc4000,  vc4000_state,  0,    "Videomaster", "Videomaster Database Games-Computer",        MACHINE_IMPERFECT_GRAPHICS) // UK
+CONS(1979, rwtrntcs, 0,         vc4000,   rwtrntcs,  vc4000,  vc4000_state,  0,    "Rowtron",     "Rowtron Television Computer System",         MACHINE_IMPERFECT_GRAPHICS) // UK
+CONS(1979, telngtcs, rwtrntcs,  0,        rwtrntcs,  vc4000,  vc4000_state,  0,    "Teleng",      "Teleng Television Computer System",          MACHINE_IMPERFECT_GRAPHICS) // UK
+CONS(1979, krvnjvtv, 0,         vc4000,   vc4000,    vc4000,  vc4000_state,  0,    "SOE",         "OC Jeu Video TV Karvan",                     MACHINE_IMPERFECT_GRAPHICS) // France
+CONS(1979, oc2000,   krvnjvtv,  0,        vc4000,    vc4000,  vc4000_state,  0,    "SOE",         "OC-2000",                                    MACHINE_IMPERFECT_GRAPHICS) // France
+CONS(1980, mpt05,    0,         vc4000,   vc4000,    vc4000,  vc4000_state,  0,    "ITMC",        "MPT-05",                                     MACHINE_IMPERFECT_GRAPHICS) // France
+CONS(1982, h21,      0,         vc4000,   h21,       vc4000,  vc4000_state,  0,    "TRQ",         "Video Computer H-21",                        MACHINE_IMPERFECT_GRAPHICS) // Spain
+CONS(1979, elektor,  0,         0,        elektor,   elektor, vc4000_state,  0,    "Elektor",     "Elektor TV Games Computer",                  MACHINE_IMPERFECT_GRAPHICS)

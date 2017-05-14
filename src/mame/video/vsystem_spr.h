@@ -4,6 +4,8 @@
 #ifndef MAME_VIDEO_VSYSTEM_SPR_H
 #define MAME_VIDEO_VSYSTEM_SPR_H
 
+#pragma once
+
 
 typedef device_delegate<uint32_t (uint32_t)> vsystem_tile_indirection_delegate;
 
@@ -25,19 +27,47 @@ typedef device_delegate<uint32_t (uint32_t)> vsystem_tile_indirection_delegate;
 class vsystem_spr_device : public device_t
 {
 public:
-	vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void set_offsets(device_t &device, int xoffs, int yoffs);
 	static void set_pdraw(device_t &device, bool pdraw);
-	static void set_tile_indirect_cb(device_t &device,vsystem_tile_indirection_delegate newtilecb);
+	static void set_tile_indirect_cb(device_t &device, vsystem_tile_indirection_delegate newtilecb);
 	static void set_gfx_region(device_t &device, int gfx_region);
 	static void CG10103_set_pal_base(device_t &device, int pal_base);
 	static void set_pal_mask(device_t &device, int pal_mask);
 	static void CG10103_set_transpen(device_t &device, int transpen);
 
+	vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void draw_sprites(uint16_t const *spriteram, int spriteram_bytes, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int prihack_mask = -1, int prihack_val = -1 );
+	void set_pal_base(int pal_base) { m_pal_base = pal_base; }
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	struct sprite_attributes
+	{
+		sprite_attributes() { }
+		void get(uint16_t const *ram);
+
+		int ox = 0;
+		int xsize = 0;
+		int zoomx = 0;
+		int oy = 0;
+		int ysize = 0;
+		int zoomy = 0;
+		int flipx = 0;
+		int flipy = 0;
+		int color = 0;
+		int pri = 0;
+		uint32_t map = 0;
+	};
+
 	uint32_t tile_callback_noindirect(uint32_t tile);
+	void common_sprite_drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
+
 	vsystem_tile_indirection_delegate m_newtilecb;
 
 	// inline config
@@ -49,37 +79,12 @@ public:
 
 	uint16_t m_pal_base;
 
-	struct vsystem_sprite_attributes
-	{
-		int ox;
-		int xsize;
-		int zoomx;
-		int oy;
-		int ysize;
-		int zoomy;
-		int flipx;
-		int flipy;
-		int color;
-		int pri;
-		uint32_t map;
-	} m_curr_sprite;
+	sprite_attributes m_curr_sprite;
 
-	void get_sprite_attributes(uint16_t* ram);
-	void common_sprite_drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
-
-	void draw_sprites(  uint16_t* spriteram, int spriteram_bytes, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int prihack_mask = -1, int prihack_val = -1 );
-	void set_pal_base(int pal_base);
-
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-private:
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
-extern const device_type VSYSTEM_SPR;
+DECLARE_DEVICE_TYPE(VSYSTEM_SPR, vsystem_spr_device)
 
 #endif // MAME_VIDEO_VSYSTEM_SPR_H

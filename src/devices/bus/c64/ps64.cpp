@@ -57,7 +57,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_PS64 = device_creator<c64_ps64_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_PS64, c64_ps64_cartridge_device, "c64_ps64", "C64 PS-64")
 
 
 //-------------------------------------------------
@@ -102,7 +102,7 @@ machine_config_constructor c64_ps64_cartridge_device::device_mconfig_additions()
 //-------------------------------------------------
 
 c64_ps64_cartridge_device::c64_ps64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_PS64, "C64 PS-64", tag, owner, clock, "c64_ps64", __FILE__),
+	device_t(mconfig, C64_PS64, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {
 }

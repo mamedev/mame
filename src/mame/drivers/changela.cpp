@@ -407,7 +407,7 @@ void changela_state::machine_reset()
 	m_dir_31 = 0;
 }
 
-static MACHINE_CONFIG_START( changela, changela_state )
+static MACHINE_CONFIG_START( changela )
 
 	MCFG_CPU_ADD("maincpu", Z80,5000000)
 	MCFG_CPU_PROGRAM_MAP(changela_map)
@@ -480,4 +480,4 @@ ROM_START( changela )
 	ROM_LOAD( "cl88",   0x0000, 0x0020, CRC(da4d6625) SHA1(2d9a268973518252eb36f479ab650af8c16c885c) ) /* math train state machine */
 ROM_END
 
-GAMEL( 1983, changela, 0, changela, changela, driver_device, 0,   ROT180, "Taito Corporation", "Change Lanes", MACHINE_SUPPORTS_SAVE, layout_changela )
+GAMEL( 1983, changela, 0, changela, changela, changela_state, 0,   ROT180, "Taito Corporation", "Change Lanes", MACHINE_SUPPORTS_SAVE, layout_changela )

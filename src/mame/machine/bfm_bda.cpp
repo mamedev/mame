@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "bfm_bda.h"
 
-const device_type BFM_BDA = device_creator<bfm_bda_t>;
+DEFINE_DEVICE_TYPE(BFM_BDA, bfm_bda_device, "bfm_bda", "BFM BDA VFD controller")
 
 
 //I currently use the BDA character set, until a suitable image can be programmed
@@ -83,19 +83,19 @@ static const uint16_t BDAcharset[]=
 	0x4406, // 0100 0100 0000 0110 ?
 };
 
-bfm_bda_t::bfm_bda_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BFM_BDA, "BFM BDA VFD controller", tag, owner, clock, "bfm_bda", __FILE__),
+bfm_bda_device::bfm_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, BFM_BDA, tag, owner, clock),
 	m_port_val(0)
 {
 }
 
-void bfm_bda_t::static_set_value(device_t &device, int val)
+void bfm_bda_device::static_set_value(device_t &device, int val)
 {
-	bfm_bda_t &BDA = downcast<bfm_bda_t &>(device);
+	bfm_bda_device &BDA = downcast<bfm_bda_device &>(device);
 	BDA.m_port_val = val;
 }
 
-void bfm_bda_t::device_start()
+void bfm_bda_device::device_start()
 {
 	save_item(NAME(m_cursor));
 	save_item(NAME(m_cursor_pos));
@@ -120,7 +120,7 @@ void bfm_bda_t::device_start()
 	device_reset();
 }
 
-void bfm_bda_t::device_reset()
+void bfm_bda_device::device_reset()
 {
 	m_cursor = 0;
 	m_cursor_pos = 0;
@@ -144,12 +144,12 @@ void bfm_bda_t::device_reset()
 	memset(m_attrs, 0, sizeof(m_attrs));
 }
 
-uint16_t bfm_bda_t::set_display(uint16_t segin)
+uint16_t bfm_bda_device::set_display(uint16_t segin)
 {
 	return BITSWAP16(segin,8,12,11,7,6,4,10,3,14,15,0,13,9,5,1,2);
 }
 
-void bfm_bda_t::device_post_load()
+void bfm_bda_device::device_post_load()
 {
 	for (int i =0; i<16; i++)
 	{
@@ -157,7 +157,7 @@ void bfm_bda_t::device_post_load()
 	}
 }
 
-void bfm_bda_t::update_display()
+void bfm_bda_device::update_display()
 {
 	for (int i =0; i<16; i++)
 	{
@@ -173,7 +173,7 @@ void bfm_bda_t::update_display()
 	}
 }
 ///////////////////////////////////////////////////////////////////////////
-void bfm_bda_t::blank(int data)
+void bfm_bda_device::blank(int data)
 {
 	switch ( data & 0x03 ) // TODO: wrong case values???
 	{
@@ -226,7 +226,7 @@ void bfm_bda_t::blank(int data)
 	}
 }
 
-int bfm_bda_t::write_char(int data)
+int bfm_bda_device::write_char(int data)
 {
 	int change = 0;
 	if ( m_user_def )
@@ -381,7 +381,7 @@ int bfm_bda_t::write_char(int data)
 }
 ///////////////////////////////////////////////////////////////////////////
 
-void bfm_bda_t::setdata(int segdata, int data)
+void bfm_bda_device::setdata(int segdata, int data)
 {
 	int move = 0;
 	int change =0;
@@ -545,7 +545,7 @@ void bfm_bda_t::setdata(int segdata, int data)
 	}
 }
 
-void bfm_bda_t::shift_data(int data)
+void bfm_bda_device::shift_data(int data)
 {
 	m_shift_data <<= 1;
 

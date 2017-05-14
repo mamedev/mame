@@ -1,94 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Miodrag Milanovic
+#ifndef MAME_BUS_ISA_SBLASTER_H
+#define MAME_BUS_ISA_SBLASTER_H
+
 #pragma once
 
-#ifndef __ISA_SOUND_BLASTER_H__
-#define __ISA_SOUND_BLASTER_H__
-
-#include "bus/midi/midi.h"
 #include "isa.h"
-#include "sound/dac.h"
+#include "bus/midi/midi.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "sound/3812intf.h"
+#include "sound/dac.h"
 #include "sound/saa1099.h"
-
-#define SIXTEENBIT  0x01
-#define STEREO      0x02
-#define SIGNED      0x04
-#define ADPCM2      0x08
-#define ADPCM3      0x10
-#define ADPCM4      0x20
-
-#define IRQ_DMA8    0x01
-#define IRQ_DMA16   0x02
-#define IRQ_MPU     0x04
-#define IRQ_ALL     0xff
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-struct sb8_dsp_state
-{
-	uint8_t reset_latch;
-	uint8_t rbuf_status;
-	uint8_t wbuf_status;
-	uint8_t fifo[16],fifo_ptr;
-	uint8_t fifo_r[52],fifo_r_ptr;
-	uint16_t version;
-	uint8_t test_reg;
-	uint8_t speaker_on;
-	bool dma_no_irq;
-	uint32_t prot_count;
-	int32_t prot_value;
-	uint32_t frequency;
-	uint32_t adc_freq;
-	uint32_t dma_length, dma_transferred;
-	uint32_t adc_length, adc_transferred;
-	uint8_t dma_autoinit;
-	uint8_t data[128], d_wptr, d_rptr;
-	bool dma_timer_started;
-	bool dma_throttled;
-	uint8_t flags;
-	uint8_t irq_active;
-	bool adpcm_new_ref;
-	uint8_t adpcm_ref;
-	uint8_t adpcm_step;
-	uint8_t adpcm_count;
-};
-
-struct sb8_mixer
-{
-	uint8_t status;
-	uint8_t main_vol;
-	uint8_t dac_vol;
-	uint8_t fm_vol;
-	uint8_t mic_vol;
-	uint8_t in_filter;
-	uint8_t stereo_sel;
-	uint8_t cd_vol;
-	uint8_t line_vol;
-};
-
-struct sb16_mixer
-{
-	uint8_t data;
-	uint8_t status;
-	uint8_t main_vol[2];
-	uint8_t dac_vol[2];
-	uint8_t fm_vol[2];
-	uint8_t cd_vol[2];
-	uint8_t line_vol[2];
-	uint8_t mic_vol;
-	uint8_t pc_speaker_vol;
-	uint8_t output_ctl;
-	uint8_t input_ctl[2];
-	uint8_t input_gain[2];
-	uint8_t output_gain[2];
-	uint8_t agc;
-	uint8_t treble[2];
-	uint8_t bass[2];
-};
 
 // ======================> sb_device (parent)
 
@@ -96,163 +22,224 @@ class sb_device :
 		public device_t, public device_serial_interface
 {
 public:
-		// construction/destruction
-		sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *name, const char *shortname, const char *source);
+	void process_fifo(uint8_t cmd);
+	void queue(uint8_t data);
+	void queue_r(uint8_t data);
+	uint8_t dequeue_r();
 
-		required_device<dac_16bit_r2r_device> m_ldac;
-		required_device<dac_16bit_r2r_device> m_rdac;
-		required_device<pc_joy_device> m_joy;
-		required_device<midi_port_device> m_mdout;
-		required_ioport m_config;
+	DECLARE_READ8_MEMBER(dsp_reset_r);
+	DECLARE_WRITE8_MEMBER(dsp_reset_w);
+	DECLARE_READ8_MEMBER(dsp_data_r);
+	DECLARE_WRITE8_MEMBER(dsp_data_w);
+	DECLARE_READ8_MEMBER(dsp_rbuf_status_r);
+	DECLARE_READ8_MEMBER(dsp_wbuf_status_r);
+	DECLARE_WRITE8_MEMBER(dsp_rbuf_status_w);
+	DECLARE_WRITE8_MEMBER(dsp_cmd_w);
 
-		void process_fifo(uint8_t cmd);
-		void queue(uint8_t data);
-		void queue_r(uint8_t data);
-		uint8_t dequeue_r();
-
-		DECLARE_READ8_MEMBER(dsp_reset_r);
-		DECLARE_WRITE8_MEMBER(dsp_reset_w);
-		DECLARE_READ8_MEMBER(dsp_data_r);
-		DECLARE_WRITE8_MEMBER(dsp_data_w);
-		DECLARE_READ8_MEMBER(dsp_rbuf_status_r);
-		DECLARE_READ8_MEMBER(dsp_wbuf_status_r);
-		DECLARE_WRITE8_MEMBER(dsp_rbuf_status_w);
-		DECLARE_WRITE8_MEMBER(dsp_cmd_w);
-
-		DECLARE_WRITE_LINE_MEMBER( midi_rx_w ) { device_serial_interface::rx_w((uint8_t)state); }
+	DECLARE_WRITE_LINE_MEMBER( midi_rx_w ) { device_serial_interface::rx_w((uint8_t)state); }
 
 protected:
-		// device-level overrides
-		virtual void device_start() override;
-		virtual void device_reset() override;
-		uint8_t dack_r(int line);
-		void dack_w(int line, uint8_t data);
-		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-		virtual void drq16_w(int state) { }
-		virtual void drq_w(int state) { }
-		virtual void irq_w(int state, int source) { }
-		virtual void mixer_reset() {}
-		void adpcm_decode(uint8_t sample, int size);
+	struct sb8_dsp_state
+	{
+		uint8_t reset_latch;
+		uint8_t rbuf_status;
+		uint8_t wbuf_status;
+		uint8_t fifo[16],fifo_ptr;
+		uint8_t fifo_r[52],fifo_r_ptr;
+		uint16_t version;
+		uint8_t test_reg;
+		uint8_t speaker_on;
+		bool dma_no_irq;
+		uint32_t prot_count;
+		int32_t prot_value;
+		uint32_t frequency;
+		uint32_t adc_freq;
+		uint32_t dma_length, dma_transferred;
+		uint32_t adc_length, adc_transferred;
+		uint8_t dma_autoinit;
+		uint8_t data[128], d_wptr, d_rptr;
+		bool dma_timer_started;
+		bool dma_throttled;
+		uint8_t flags;
+		uint8_t irq_active;
+		bool adpcm_new_ref;
+		uint8_t adpcm_ref;
+		uint8_t adpcm_step;
+		uint8_t adpcm_count;
+	};
 
-		// serial overrides
-		virtual void rcv_complete() override;    // Rx completed receiving byte
-		virtual void tra_complete() override;    // Tx completed sending byte
-		virtual void tra_callback() override;    // Tx send bit
+	struct sb8_mixer
+	{
+		uint8_t status;
+		uint8_t main_vol;
+		uint8_t dac_vol;
+		uint8_t fm_vol;
+		uint8_t mic_vol;
+		uint8_t in_filter;
+		uint8_t stereo_sel;
+		uint8_t cd_vol;
+		uint8_t line_vol;
+	};
 
-		static const int MIDI_RING_SIZE = 2048;
+	struct sb16_mixer
+	{
+		uint8_t data;
+		uint8_t status;
+		uint8_t main_vol[2];
+		uint8_t dac_vol[2];
+		uint8_t fm_vol[2];
+		uint8_t cd_vol[2];
+		uint8_t line_vol[2];
+		uint8_t mic_vol;
+		uint8_t pc_speaker_vol;
+		uint8_t output_ctl;
+		uint8_t input_ctl[2];
+		uint8_t input_gain[2];
+		uint8_t output_gain[2];
+		uint8_t agc;
+		uint8_t treble[2];
+		uint8_t bass[2];
+	};
 
-		struct sb8_dsp_state m_dsp;
-		uint8_t m_dack_out;
-		void xmit_char(uint8_t data);
-		bool m_onebyte_midi, m_uart_midi, m_uart_irq, m_mpu_midi;
-		int m_rx_waiting, m_tx_waiting;
-		uint8_t m_recvring[MIDI_RING_SIZE];
-		uint8_t m_xmitring[MIDI_RING_SIZE];
-		int m_xmit_read, m_xmit_write;
-		int m_recv_read, m_recv_write;
-		bool m_tx_busy;
+	// construction/destruction
+	sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-		emu_timer *m_timer;
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	uint8_t dack_r(int line);
+	void dack_w(int line, uint8_t data);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void drq16_w(int state) { }
+	virtual void drq_w(int state) { }
+	virtual void irq_w(int state, int source) { }
+	virtual void mixer_reset() {}
+	void adpcm_decode(uint8_t sample, int size);
+
+	// serial overrides
+	virtual void rcv_complete() override;    // Rx completed receiving byte
+	virtual void tra_complete() override;    // Tx completed sending byte
+	virtual void tra_callback() override;    // Tx send bit
+
+	static constexpr unsigned MIDI_RING_SIZE = 2048;
+
+	required_device<dac_16bit_r2r_device> m_ldac;
+	required_device<dac_16bit_r2r_device> m_rdac;
+	required_device<pc_joy_device> m_joy;
+	required_device<midi_port_device> m_mdout;
+	required_ioport m_config;
+
+	struct sb8_dsp_state m_dsp;
+	uint8_t m_dack_out;
+	void xmit_char(uint8_t data);
+	bool m_onebyte_midi, m_uart_midi, m_uart_irq, m_mpu_midi;
+	int m_rx_waiting, m_tx_waiting;
+	uint8_t m_recvring[MIDI_RING_SIZE];
+	uint8_t m_xmitring[MIDI_RING_SIZE];
+	int m_xmit_read, m_xmit_write;
+	int m_recv_read, m_recv_write;
+	bool m_tx_busy;
+
+	emu_timer *m_timer;
 };
 
 class sb8_device : public sb_device,
 					public device_isa8_card_interface
 {
 public:
-		// construction/destruction
-		sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *name, const char *shortname, const char *source);
-
-		DECLARE_READ8_MEMBER(ym3812_16_r);
-		DECLARE_WRITE8_MEMBER(ym3812_16_w);
-		virtual ioport_constructor device_input_ports() const override;
+	DECLARE_READ8_MEMBER(ym3812_16_r);
+	DECLARE_WRITE8_MEMBER(ym3812_16_w);
+	virtual ioport_constructor device_input_ports() const override;
 protected:
-		virtual void device_start() override;
-		virtual void drq_w(int state) override;
-		virtual void irq_w(int state, int source) override;
-		virtual uint8_t dack_r(int line) override { return sb_device::dack_r(line); }
-		virtual void dack_w(int line, uint8_t data) override { sb_device::dack_w(line, data); }
+	// construction/destruction
+	sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void drq_w(int state) override;
+	virtual void irq_w(int state, int source) override;
+	virtual uint8_t dack_r(int line) override { return sb_device::dack_r(line); }
+	virtual void dack_w(int line, uint8_t data) override { sb_device::dack_w(line, data); }
 private:
-		required_device<ym3812_device> m_ym3812;
+	required_device<ym3812_device> m_ym3812;
 };
 
 class isa8_sblaster1_0_device : public sb8_device
 {
 public:
-		// construction/destruction
-		isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// construction/destruction
+	isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override;
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-		DECLARE_READ8_MEMBER(saa1099_16_r);
-		DECLARE_WRITE8_MEMBER(saa1099_1_16_w);
-		DECLARE_WRITE8_MEMBER(saa1099_2_16_w);
+	DECLARE_READ8_MEMBER(saa1099_16_r);
+	DECLARE_WRITE8_MEMBER(saa1099_1_16_w);
+	DECLARE_WRITE8_MEMBER(saa1099_2_16_w);
 protected:
-		// device-level overrides
-		virtual void device_start() override;
+	// device-level overrides
+	virtual void device_start() override;
 private:
-		// internal state
-		required_device<saa1099_device> m_saa1099_1;
-		required_device<saa1099_device> m_saa1099_2;
-
+	// internal state
+	required_device<saa1099_device> m_saa1099_1;
+	required_device<saa1099_device> m_saa1099_2;
 };
 
 class isa8_sblaster1_5_device : public sb8_device
 {
 public:
-		// construction/destruction
-		isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// construction/destruction
+	isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override;
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
 protected:
-		// device-level overrides
-		virtual void device_start() override;
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 class sb16_device : public sb_device,
 					public device_isa16_card_interface
 {
 public:
-		// construction/destruction
-		sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *name, const char *shortname, const char *source);
-		DECLARE_READ8_MEMBER(mpu401_r);
-		DECLARE_WRITE8_MEMBER(mpu401_w);
-		DECLARE_READ8_MEMBER(mixer_r);
-		DECLARE_WRITE8_MEMBER(mixer_w);
-		virtual ioport_constructor device_input_ports() const override;
+	DECLARE_READ8_MEMBER(mpu401_r);
+	DECLARE_WRITE8_MEMBER(mpu401_w);
+	DECLARE_READ8_MEMBER(mixer_r);
+	DECLARE_WRITE8_MEMBER(mixer_w);
+	virtual ioport_constructor device_input_ports() const override;
 protected:
-		virtual void device_start() override;
-		virtual uint16_t dack16_r(int line) override;
-		virtual uint8_t dack_r(int line) override { return sb_device::dack_r(line); }
-		virtual void dack_w(int line, uint8_t data) override { sb_device::dack_w(line, data); }
-		virtual void dack16_w(int line, uint16_t data) override;
-		virtual void drq16_w(int state) override;
-		virtual void drq_w(int state) override;
-		virtual void irq_w(int state, int source) override;
-		virtual void mixer_reset() override;
-		void mixer_set();
-		virtual void rcv_complete() override;    // Rx completed receiving byte
+	// construction/destruction
+	sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	virtual void device_start() override;
+	virtual uint16_t dack16_r(int line) override;
+	virtual uint8_t dack_r(int line) override { return sb_device::dack_r(line); }
+	virtual void dack_w(int line, uint8_t data) override { sb_device::dack_w(line, data); }
+	virtual void dack16_w(int line, uint16_t data) override;
+	virtual void drq16_w(int state) override;
+	virtual void drq_w(int state) override;
+	virtual void irq_w(int state, int source) override;
+	virtual void mixer_reset() override;
+	void mixer_set();
+	virtual void rcv_complete() override;    // Rx completed receiving byte
 private:
-		struct sb16_mixer m_mixer;
+	struct sb16_mixer m_mixer;
 };
 
 class isa16_sblaster16_device : public sb16_device
 {
 public:
-		// construction/destruction
-		isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// construction/destruction
+	isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override;
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
 protected:
-		// device-level overrides
-		virtual void device_start() override;
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 // device type definition
-extern const device_type ISA8_SOUND_BLASTER_1_0;
-extern const device_type ISA8_SOUND_BLASTER_1_5;
-extern const device_type ISA16_SOUND_BLASTER_16;
+DECLARE_DEVICE_TYPE(ISA8_SOUND_BLASTER_1_0, isa8_sblaster1_0_device)
+DECLARE_DEVICE_TYPE(ISA8_SOUND_BLASTER_1_5, isa8_sblaster1_5_device)
+DECLARE_DEVICE_TYPE(ISA16_SOUND_BLASTER_16, isa16_sblaster16_device)
 
-#endif  /* __ISA_SOUND_BLASTER_H__ */
+#endif // MAME_BUS_ISA_SBLASTER_H

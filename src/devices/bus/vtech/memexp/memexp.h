@@ -31,10 +31,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VTECH_MEMEXP_MEMEXP_H
+#define MAME_BUS_VTECH_MEMEXP_MEMEXP_H
 
-#ifndef __VTECH_MEMEXP_H__
-#define __VTECH_MEMEXP_H__
+#pragma once
 
 
 
@@ -43,59 +43,60 @@
 //**************************************************************************
 
 #define MCFG_MEMEXP_SLOT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MEMEXP_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(memexp_slot_carts, nullptr, false)
+	MCFG_DEVICE_ADD(_tag, VTECH_MEMEXP_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(vtech_memexp_carts, nullptr, false)
 
 #define MCFG_MEMEXP_SLOT_INT_HANDLER(_devcb) \
-	devcb = &memexp_device::set_int_handler(*device, DEVCB_##_devcb);
+	devcb = &vtech_memexp_device::set_int_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_MEMEXP_SLOT_NMI_HANDLER(_devcb) \
-	devcb = &memexp_device::set_nmi_handler(*device, DEVCB_##_devcb);
+	devcb = &vtech_memexp_device::set_nmi_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_MEMEXP_SLOT_RESET_HANDLER(_devcb) \
-	devcb = &memexp_device::set_reset_handler(*device, DEVCB_##_devcb);
+	devcb = &vtech_memexp_device::set_reset_handler(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class device_memexp_interface;
+class device_vtech_memexp_interface;
 
-class memexp_slot_device : public device_t, public device_slot_interface
+class vtech_memexp_slot_device : public device_t, public device_slot_interface
 {
+	friend class device_vtech_memexp_interface;
 public:
 	// construction/destruction
-	memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~memexp_slot_device();
+	vtech_memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~vtech_memexp_slot_device();
 
 	void set_program_space(address_space *program);
 	void set_io_space(address_space *io);
 
 	// callbacks
-	template<class _Object> static devcb_base &set_int_handler(device_t &device, _Object object)
-		{ return downcast<memexp_slot_device &>(device).m_int_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_int_handler(device_t &device, Object &&cb)
+	{ return downcast<vtech_memexp_slot_device &>(device).m_int_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_nmi_handler(device_t &device, _Object object)
-		{ return downcast<memexp_slot_device &>(device).m_nmi_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
+	{ return downcast<vtech_memexp_slot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_reset_handler(device_t &device, _Object object)
-		{ return downcast<memexp_slot_device &>(device).m_reset_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_reset_handler(device_t &device, Object &&cb)
+	{ return downcast<vtech_memexp_slot_device &>(device).m_reset_handler.set_callback(std::forward<Object>(cb)); }
 
 	// called from cart device
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( reset_w ) { m_reset_handler(state); }
 
-	address_space *m_program;
-	address_space *m_io;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	device_memexp_interface *m_cart;
+	address_space *m_program;
+	address_space *m_io;
+
+	device_vtech_memexp_interface *m_cart;
 
 private:
 	devcb_write_line m_int_handler;
@@ -104,21 +105,24 @@ private:
 };
 
 // class representing interface-specific live memexp device
-class device_memexp_interface : public device_slot_card_interface
+class device_vtech_memexp_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_memexp_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_memexp_interface();
+	device_vtech_memexp_interface(const machine_config &mconfig, device_t &device);
+	virtual ~device_vtech_memexp_interface();
 
 protected:
-	memexp_slot_device *m_slot;
+	address_space &program_space() { return *m_slot->m_program; }
+	address_space &io_space() { return *m_slot->m_io; }
+
+	vtech_memexp_slot_device *m_slot;
 };
 
 // device type definition
-extern const device_type MEMEXP_SLOT;
+DECLARE_DEVICE_TYPE(VTECH_MEMEXP_SLOT, vtech_memexp_slot_device)
 
 // include here so drivers don't need to
 #include "carts.h"
 
-#endif // __VTECH_MEMEXP_H__
+#endif // MAME_BUS_VTECH_MEMEXP_MEMEXP_H

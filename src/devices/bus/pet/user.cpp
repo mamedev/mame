@@ -11,10 +11,10 @@
 
 // class pet_user_port_device
 
-const device_type PET_USER_PORT = device_creator<pet_user_port_device>;
+DEFINE_DEVICE_TYPE(PET_USER_PORT, pet_user_port_device, "pet_user_port", "PET user port")
 
 pet_user_port_device::pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PET_USER_PORT, "PET user port", tag, owner, clock, "pet_user_port", __FILE__),
+	device_t(mconfig, PET_USER_PORT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_2_handler(*this),
 	m_3_handler(*this),

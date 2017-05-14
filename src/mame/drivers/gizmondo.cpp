@@ -183,7 +183,7 @@ DRIVER_INIT_MEMBER(gizmondo_state,gizmondo)
 	// do nothing
 }
 
-static MACHINE_CONFIG_START( gizmondo, gizmondo_state )
+static MACHINE_CONFIG_START( gizmondo )
 	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
 	MCFG_CPU_PROGRAM_MAP(gizmondo_map)
 

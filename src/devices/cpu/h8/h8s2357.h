@@ -20,8 +20,10 @@
 
 ***************************************************************************/
 
-#ifndef __H8S2357_H__
-#define __H8S2357_H__
+#ifndef MAME_CPU_H8_H8S2357_H
+#define MAME_CPU_H8_H8S2357_H
+
+#pragma once
 
 #include "h8s2000.h"
 #include "h8_intc.h"
@@ -34,7 +36,6 @@
 
 class h8s2357_device : public h8s2000_device {
 public:
-	h8s2357_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	h8s2357_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(syscr_r);
@@ -72,6 +73,8 @@ protected:
 
 	uint32_t ram_start;
 	unsigned char syscr;
+
+	h8s2357_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start);
 
 	virtual bool exr_in_stack() const override;
 	virtual void update_irq_filter() override;
@@ -113,12 +116,11 @@ public:
 	h8s2390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type H8S2357;
-extern const device_type H8S2352;
-extern const device_type H8S2398;
-extern const device_type H8S2394;
-extern const device_type H8S2392;
-extern const device_type H8S2390;
+DECLARE_DEVICE_TYPE(H8S2357, h8s2357_device)
+DECLARE_DEVICE_TYPE(H8S2352, h8s2352_device)
+DECLARE_DEVICE_TYPE(H8S2398, h8s2398_device)
+DECLARE_DEVICE_TYPE(H8S2394, h8s2394_device)
+DECLARE_DEVICE_TYPE(H8S2392, h8s2392_device)
+DECLARE_DEVICE_TYPE(H8S2390, h8s2390_device)
 
-
-#endif
+#endif // MAME_CPU_H8_H8S2357_H

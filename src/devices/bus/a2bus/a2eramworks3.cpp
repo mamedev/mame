@@ -21,22 +21,21 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2EAUX_RAMWORKS3 = device_creator<a2eaux_ramworks3_device>;
+DEFINE_DEVICE_TYPE(A2EAUX_RAMWORKS3, a2eaux_ramworks3_device, "a2erwks3", "Applied Engineering RamWorks III")
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, A2EAUX_RAMWORKS3, "Applied Engineering RamWorks III", tag, owner, clock, "a2erwks3", __FILE__),
-		device_a2eauxslot_card_interface(mconfig, *this),
-	m_bank(0)
+		a2eaux_ramworks3_device(mconfig, A2EAUX_RAMWORKS3, tag, owner, clock)
 {
 }
 
-a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_a2eauxslot_card_interface(mconfig, *this), m_bank(0)
+a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, type, tag, owner, clock),
+		device_a2eauxslot_card_interface(mconfig, *this),
+		m_bank(0)
 {
 }
 

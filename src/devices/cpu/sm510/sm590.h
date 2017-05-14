@@ -96,9 +96,10 @@ class sm590_device : public sm510_base_device
 {
 public:
 	sm590_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	sm590_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
+	sm590_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
 	virtual void device_reset() override;
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void init_divider() override;
@@ -184,7 +185,6 @@ protected:
 };
 
 
-extern const device_type SM590;
+DECLARE_DEVICE_TYPE(SM590, sm590_device)
 
-
-#endif /* MAME_CPU_SM510_SM590_H */
+#endif // MAME_CPU_SM510_SM590_H

@@ -8,8 +8,10 @@
 
 ****************************************************************************/
 
-#ifndef __PRINTER_H__
-#define __PRINTER_H__
+#ifndef MAME_DEVICES_IMAGEDEV_PRINTER_H
+#define MAME_DEVICES_IMAGEDEV_PRINTER_H
+
+#pragma once
 
 #define MCFG_PRINTER_ONLINE_CB(_devcb) \
 	devcb = &printer_image_device::set_online_callback(*device, DEVCB_##_devcb);
@@ -58,6 +60,6 @@ protected:
 
 
 // device type definition
-extern const device_type PRINTER;
+DECLARE_DEVICE_TYPE(PRINTER, printer_image_device)
 
-#endif /* __PRINTER_H__ */
+#endif // MAME_DEVICES_IMAGEDEV_PRINTER_H

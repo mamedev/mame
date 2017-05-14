@@ -16,22 +16,19 @@
 //  NASBUS SLOT DEVICE
 //**************************************************************************
 
-const device_type NASBUS_SLOT = device_creator<nasbus_slot_device>;
+DEFINE_DEVICE_TYPE(NASBUS_SLOT, nasbus_slot_device, "nasbus_slot", "NASBUS Slot")
 
 //-------------------------------------------------
 //  nasbus_slot_device - constructor
 //-------------------------------------------------
 
 nasbus_slot_device::nasbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NASBUS_SLOT, "NASBUS Slot", tag, owner, clock, "nasbus_slot", __FILE__),
-	device_slot_interface(mconfig, *this),
-	m_nasbus_tag(nullptr)
+	nasbus_slot_device(mconfig, NASBUS_SLOT, tag, owner, clock)
 {
 }
 
-nasbus_slot_device::nasbus_slot_device(const machine_config &mconfig, device_type type, const char *name,
-	const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+nasbus_slot_device::nasbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_nasbus_tag(nullptr)
 {
@@ -64,14 +61,14 @@ void nasbus_slot_device::device_start()
 //  NASBUS DEVICE
 //**************************************************************************
 
-const device_type NASBUS = device_creator<nasbus_device>;
+DEFINE_DEVICE_TYPE(NASBUS, nasbus_device, "nasbus", "NASBUS Backplane")
 
 //-------------------------------------------------
 //  nasbus_device - constructor
 //-------------------------------------------------
 
 nasbus_device::nasbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NASBUS, "NASBUS Backplane", tag, owner, clock, "nasbus", __FILE__),
+	device_t(mconfig, NASBUS, tag, owner, clock),
 	m_program(nullptr),
 	m_io(nullptr),
 	m_ram_disable_handler(*this)
@@ -147,8 +144,8 @@ WRITE_LINE_MEMBER( nasbus_device::ram_disable_w ) { m_ram_disable_handler(state)
 
 device_nasbus_card_interface::device_nasbus_card_interface(const machine_config &mconfig, device_t &device) :
 	device_slot_card_interface(mconfig, device),
-	m_next(nullptr),
-	m_nasbus(nullptr)
+	m_nasbus(nullptr),
+	m_next(nullptr)
 {
 }
 

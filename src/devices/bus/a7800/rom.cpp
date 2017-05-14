@@ -27,131 +27,131 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type A78_ROM = device_creator<a78_rom_device>;
-const device_type A78_ROM_SG = device_creator<a78_rom_sg_device>;
-const device_type A78_ROM_POKEY = device_creator<a78_rom_pokey_device>;
-const device_type A78_ROM_SG_POKEY = device_creator<a78_rom_sg_pokey_device>;
-const device_type A78_ROM_SG_RAM = device_creator<a78_rom_sg_ram_device>;
-const device_type A78_ROM_SG9 = device_creator<a78_rom_sg9_device>;
-const device_type A78_ROM_MRAM = device_creator<a78_rom_mram_device>;
-const device_type A78_ROM_ABSOLUTE = device_creator<a78_rom_abs_device>;
-const device_type A78_ROM_ACTIVISION = device_creator<a78_rom_act_device>;
+DEFINE_DEVICE_TYPE(A78_ROM,             a78_rom_device,             "a78_rom",      "Atari 7800 ROM Carts w/no Bankswitch")
+DEFINE_DEVICE_TYPE(A78_ROM_SG,          a78_rom_sg_device,          "a78_rom_sg",   "Atari 7800 ROM Carts w/SuperGame Bankswitch")
+DEFINE_DEVICE_TYPE(A78_ROM_POKEY,       a78_rom_pokey_device,       "a78_rom_pok",  "Atari 7800 ROM Carts w/no Bankswitch + POKEY")
+DEFINE_DEVICE_TYPE(A78_ROM_SG_POKEY,    a78_rom_sg_pokey_device,    "a78_rom_sgp",  "Atari 7800 ROM Carts w/SuperGame Bankswitch + POKEY")
+DEFINE_DEVICE_TYPE(A78_ROM_SG_RAM,      a78_rom_sg_ram_device,      "a78_rom_sgr",  "Atari 7800 ROM Carts w/SuperGame Bankswitch + RAM")
+DEFINE_DEVICE_TYPE(A78_ROM_MRAM,        a78_rom_mram_device,        "a78_rom_mram", "Atari 7800 ROM Carts + Mirror RAM")
+DEFINE_DEVICE_TYPE(A78_ROM_SG9,         a78_rom_sg9_device,         "a78_rom_sg9",  "Atari 7800 ROM Carts w/SuperGame 9Banks")
+DEFINE_DEVICE_TYPE(A78_ROM_ABSOLUTE,    a78_rom_abs_device,         "a78_rom_abs",  "Atari 7800 ROM Carts w/Absolute Bankswitch")
+DEFINE_DEVICE_TYPE(A78_ROM_ACTIVISION,  a78_rom_act_device,         "a78_rom_act",  "Atari 7800 ROM Carts w/Activision Bankswitch")
+
+DEFINE_DEVICE_TYPE(A78_ROM_P450,        a78_rom_p450_device,        "a78_p450_t0",  "Atari 7800 ROM Carts w/POKEY @ 0x0450")
+DEFINE_DEVICE_TYPE(A78_ROM_P450_POKEY,  a78_rom_p450_pokey_device,  "a78_p450_t1",  "Atari 7800 ROM Carts w/no Bankswitch + POKEY + POKEY @ 0x0450")
+DEFINE_DEVICE_TYPE(A78_ROM_P450_SG_RAM, a78_rom_p450_sg_ram_device, "a78_p450_t6",  "Atari 7800 ROM Carts w/SuperGame Bankswitch + RAM + POKEY @ 0x0450")
+DEFINE_DEVICE_TYPE(A78_ROM_P450_SG9,    a78_rom_p450_sg9_device,    "a78_p450_ta",  "Atari 7800 ROM Carts w/SuperGame 9Banks + POKEY @ 0x0450")
 
 
-const device_type A78_ROM_P450 = device_creator<a78_rom_p450_device>;
-const device_type A78_ROM_P450_POKEY = device_creator<a78_rom_p450_pokey_device>;
-const device_type A78_ROM_P450_SG_RAM = device_creator<a78_rom_p450_sg_ram_device>;
-const device_type A78_ROM_P450_SG9 = device_creator<a78_rom_p450_sg9_device>;
-
-
-a78_rom_device::a78_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_a78_cart_interface( mconfig, *this )
+a78_rom_device::a78_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_a78_cart_interface( mconfig, *this )
 {
 }
 
 a78_rom_device::a78_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, A78_ROM, "Atari 7800 ROM Carts w/no Bankswitch", tag, owner, clock, "a78_rom", __FILE__),
-						device_a78_cart_interface( mconfig, *this )
+	: a78_rom_device(mconfig, A78_ROM, tag, owner, clock)
 {
 }
 
-a78_rom_pokey_device::a78_rom_pokey_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: a78_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
-						m_pokey(*this, "pokey")
+a78_rom_pokey_device::a78_rom_pokey_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: a78_rom_device(mconfig, type, tag, owner, clock)
+	, m_pokey(*this, "pokey")
 {
 }
 
 a78_rom_pokey_device::a78_rom_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_rom_device(mconfig, A78_ROM_POKEY, "Atari 7800 ROM Carts w/no Bankswitch + POKEY", tag, owner, clock, "a78_rom_pok", __FILE__),
-						m_pokey(*this, "pokey")
+	: a78_rom_pokey_device(mconfig, A78_ROM_POKEY, tag, owner, clock)
 {
 }
 
 
-a78_rom_mram_device::a78_rom_mram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: a78_rom_device(mconfig, type, name, tag, owner, clock, shortname, source)
+a78_rom_mram_device::a78_rom_mram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: a78_rom_device(mconfig, type, tag, owner, clock)
 {
 }
 
 a78_rom_mram_device::a78_rom_mram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_rom_device(mconfig, A78_ROM_MRAM, "Atari 7800 ROM Carts + Mirror RAM", tag, owner, clock, "a78_rom_mram", __FILE__)
+	: a78_rom_mram_device(mconfig, A78_ROM_MRAM, tag, owner, clock)
 {
 }
 
-a78_rom_sg_device::a78_rom_sg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: a78_rom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_bank(0)
-				{
+a78_rom_sg_device::a78_rom_sg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: a78_rom_device(mconfig, type, tag, owner, clock)
+	, m_bank(0)
+{
 }
 
 a78_rom_sg_device::a78_rom_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_rom_device(mconfig, A78_ROM_SG, "Atari 7800 ROM Carts w/SuperGame Bankswitch", tag, owner, clock, "a78_rom_sg", __FILE__), m_bank(0)
-				{
+	: a78_rom_sg_device(mconfig, A78_ROM_SG, tag, owner, clock)
+{
 }
 
 a78_rom_sg_pokey_device::a78_rom_sg_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_rom_sg_device(mconfig, A78_ROM_SG_POKEY, "Atari 7800 ROM Carts w/SuperGame Bankswitch + POKEY", tag, owner, clock, "a78_rom_sgp", __FILE__),
-						m_pokey(*this, "pokey")
+	: a78_rom_sg_device(mconfig, A78_ROM_SG_POKEY, tag, owner, clock)
+	, m_pokey(*this, "pokey")
 {
 }
 
 
-a78_rom_sg_ram_device::a78_rom_sg_ram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: a78_rom_sg_device(mconfig, type, name, tag, owner, clock, shortname, source)
+a78_rom_sg_ram_device::a78_rom_sg_ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: a78_rom_sg_device(mconfig, type, tag, owner, clock)
 {
 }
 
 a78_rom_sg_ram_device::a78_rom_sg_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_rom_sg_device(mconfig, A78_ROM_SG_RAM, "Atari 7800 ROM Carts w/SuperGame Bankswitch + RAM", tag, owner, clock, "a78_rom_sgr", __FILE__)
+	: a78_rom_sg_ram_device(mconfig, A78_ROM_SG_RAM, tag, owner, clock)
 {
 }
 
 
-a78_rom_sg9_device::a78_rom_sg9_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: a78_rom_sg_device(mconfig, type, name, tag, owner, clock, shortname, source)
+a78_rom_sg9_device::a78_rom_sg9_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: a78_rom_sg_device(mconfig, type, tag, owner, clock)
 {
 }
 
 a78_rom_sg9_device::a78_rom_sg9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_rom_sg_device(mconfig, A78_ROM_SG9, "Atari 7800 ROM Carts w/SuperGame 9Banks", tag, owner, clock, "a78_rom_sg9", __FILE__)
+	: a78_rom_sg9_device(mconfig, A78_ROM_SG9, tag, owner, clock)
 {
 }
 
 
 a78_rom_abs_device::a78_rom_abs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_rom_device(mconfig, A78_ROM_ABSOLUTE, "Atari 7800 ROM Carts w/Absolute Bankswitch", tag, owner, clock, "a78_rom_abs", __FILE__), m_bank(0)
-				{
+	: a78_rom_device(mconfig, A78_ROM_ABSOLUTE, tag, owner, clock)
+	, m_bank(0)
+{
 }
 
 
 a78_rom_act_device::a78_rom_act_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_rom_device(mconfig, A78_ROM_ACTIVISION, "Atari 7800 ROM Carts w/Activision Bankswitch", tag, owner, clock, "a78_rom_act", __FILE__), m_bank(0)
-				{
+	: a78_rom_device(mconfig, A78_ROM_ACTIVISION, tag, owner, clock)
+	, m_bank(0)
+{
 }
 
 
 
 a78_rom_p450_device::a78_rom_p450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_rom_device(mconfig, A78_ROM_P450, "Atari 7800 ROM Carts w/POKEY @ 0x0450", tag, owner, clock, "a78_p450_t0", __FILE__),
-						m_pokey450(*this, "pokey450")
+	: a78_rom_device(mconfig, A78_ROM_P450, tag, owner, clock)
+	, m_pokey450(*this, "pokey450")
 {
 }
 
 a78_rom_p450_pokey_device::a78_rom_p450_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_rom_pokey_device(mconfig, A78_ROM_P450_POKEY, "Atari 7800 ROM Carts w/no Bankswitch + POKEY + POKEY @ 0x0450", tag, owner, clock, "a78_p450_t1", __FILE__),
-						m_pokey450(*this, "pokey450")
+	: a78_rom_pokey_device(mconfig, A78_ROM_P450_POKEY, tag, owner, clock)
+	, m_pokey450(*this, "pokey450")
 {
 }
 
 a78_rom_p450_sg_ram_device::a78_rom_p450_sg_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_rom_sg_ram_device(mconfig, A78_ROM_P450_SG_RAM, "Atari 7800 ROM Carts w/SuperGame Bankswitch + RAM + POKEY @ 0x0450", tag, owner, clock, "a78_p450_t6", __FILE__),
-						m_pokey450(*this, "pokey450")
+	: a78_rom_sg_ram_device(mconfig, A78_ROM_P450_SG_RAM, tag, owner, clock)
+	, m_pokey450(*this, "pokey450")
 {
 }
 
 a78_rom_p450_sg9_device::a78_rom_p450_sg9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_rom_sg9_device(mconfig, A78_ROM_P450_SG9, "Atari 7800 ROM Carts w/SuperGame 9Banks + POKEY @ 0x0450", tag, owner, clock, "a78_p450_ta", __FILE__),
-						m_pokey450(*this, "pokey450")
+	: a78_rom_sg9_device(mconfig, A78_ROM_P450_SG9, tag, owner, clock)
+	, m_pokey450(*this, "pokey450")
 {
 }
 

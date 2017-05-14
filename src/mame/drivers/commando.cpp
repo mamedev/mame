@@ -248,7 +248,7 @@ void commando_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( commando, commando_state )
+static MACHINE_CONFIG_START( commando )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PHI_MAIN)  // ???

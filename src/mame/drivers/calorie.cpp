@@ -452,7 +452,7 @@ void calorie_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( calorie, calorie_state )
+static MACHINE_CONFIG_START( calorie )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* 4 MHz */
@@ -588,5 +588,5 @@ DRIVER_INIT_MEMBER(calorie_state,calorieb)
  *************************************/
 
 /* Note: the bootleg is identical to the original once decrypted */
-GAME( 1986, calorie,  0,       caloriee,calorie, driver_device, 0,        ROT0, "Sega",    "Calorie Kun vs Moguranian", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, calorie,  0,       caloriee,calorie, calorie_state, 0,        ROT0, "Sega",    "Calorie Kun vs Moguranian",           MACHINE_SUPPORTS_SAVE )
 GAME( 1986, calorieb, calorie, calorie, calorie, calorie_state, calorieb, ROT0, "bootleg", "Calorie Kun vs Moguranian (bootleg)", MACHINE_SUPPORTS_SAVE )

@@ -49,7 +49,7 @@ debugger_console::debugger_console(running_machine &machine)
 
 	/* print the opening lines */
 	printf("%s debugger version %s\n", emulator_info::get_appname(), emulator_info::get_build_version());
-	printf("Currently targeting %s (%s)\n", m_machine.system().name, m_machine.system().description);
+	printf("Currently targeting %s (%s)\n", m_machine.system().name, m_machine.system().type.fullname());
 
 	/* request callback upon exiting */
 	m_machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&debugger_console::exit, this));

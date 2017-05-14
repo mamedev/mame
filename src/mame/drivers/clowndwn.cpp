@@ -41,7 +41,7 @@ void clowndwn_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( clowndwn, clowndwn_state )
+static MACHINE_CONFIG_START( clowndwn )
 
 	/* basic machine hardware */
 //  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown (vectors at end? 6xxx ?)
@@ -63,4 +63,4 @@ ROM_START( clowndwn )
 	ROM_LOAD( "CLWNROLL.Z9", 0x1000, 0x1000, CRC(aeef885e) SHA1(bc6805b638625a347e1288a927ce30e030afe9e3) )
 ROM_END
 
-GAME( 1987, clowndwn,  0,    clowndwn, clowndwn, driver_device,  0, ROT0, "Elwood Electronics", "Clown Roll Down (Elwood)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, clowndwn,  0,    clowndwn, clowndwn, clowndwn_state,  0, ROT0, "Elwood Electronics", "Clown Roll Down (Elwood)", MACHINE_IS_SKELETON_MECHANICAL )

@@ -2,10 +2,10 @@
 // copyright-holders:Ville Linde
 /* Ricoh RF5C400 emulator */
 
-#pragma once
+#ifndef MAME_SOUND_RF5C400_H
+#define MAME_SOUND_RF5C400_H
 
-#ifndef __RF5C400_H__
-#define __RF5C400_H__
+#pragma once
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -21,57 +21,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-struct rf5c400_channel
-{
-	rf5c400_channel() :
-		startH(0),
-		startL(0),
-		freq(0),
-		endL(0),
-		endHloopH(0),
-		loopL(0),
-		pan(0),
-		effect(0),
-		volume(0),
-		attack(0),
-		decay(0),
-		release(0),
-		cutoff(0),
-		pos(0),
-		step(0),
-		keyon(0),
-		env_phase(0),
-		env_level(0.0),
-		env_step(0.0),
-		env_scale(0.0)
-	{ }
-
-	uint16_t  startH;
-	uint16_t  startL;
-	uint16_t  freq;
-	uint16_t  endL;
-	uint16_t  endHloopH;
-	uint16_t  loopL;
-	uint16_t  pan;
-	uint16_t  effect;
-	uint16_t  volume;
-
-	uint16_t  attack;
-	uint16_t  decay;
-	uint16_t  release;
-
-	uint16_t  cutoff;
-
-	uint64_t pos;
-	uint64_t step;
-	uint16_t keyon;
-
-	uint8_t env_phase;
-	double env_level;
-	double env_step;
-	double env_scale;
-};
-
 
 // ======================> rf5c400_device
 
@@ -80,7 +29,9 @@ class rf5c400_device : public device_t,
 {
 public:
 	rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~rf5c400_device() { }
+
+	DECLARE_READ16_MEMBER( rf5c400_r );
+	DECLARE_WRITE16_MEMBER( rf5c400_w );
 
 protected:
 	// device-level overrides
@@ -89,24 +40,61 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-public:
-	DECLARE_READ16_MEMBER( rf5c400_r );
-	DECLARE_WRITE16_MEMBER( rf5c400_w );
-
 private:
-	void rf5c400_init_chip();
+	struct rf5c400_channel
+	{
+		rf5c400_channel() { }
+
+		uint16_t startH = 0;
+		uint16_t startL = 0;
+		uint16_t freq = 0;
+		uint16_t endL = 0;
+		uint16_t endHloopH = 0;
+		uint16_t loopL = 0;
+		uint16_t pan = 0;
+		uint16_t effect = 0;
+		uint16_t volume = 0;
+
+		uint16_t attack = 0;
+		uint16_t decay = 0;
+		uint16_t release = 0;
+
+		uint16_t cutoff = 0;
+
+		uint64_t pos = 0;
+		uint64_t step = 0;
+		uint16_t keyon = 0;
+
+		uint8_t env_phase = 0;
+		double env_level = 0.0;
+		double env_step = 0.0;
+		double env_scale = 0.0;
+	};
+
+	class envelope_tables
+	{
+	public:
+		envelope_tables();
+		void init(uint32_t clock);
+		double ar(rf5c400_channel const &chan) const { return m_ar[decode80(chan.attack >> 8)]; }
+		double dr(rf5c400_channel const &chan) const { return m_dr[decode80(chan.decay >> 8)]; }
+		double rr(rf5c400_channel const &chan) const { return m_rr[decode80(chan.release >> 8)]; }
+	private:
+		static constexpr uint8_t decode80(uint8_t val) { return (val & 0x80) ? ((val & 0x7f) + 0x1f) : val; }
+		double m_ar[0x9f];
+		double m_dr[0x9f];
+		double m_rr[0x9f];
+	};
+
 	uint8_t decode80(uint8_t val);
 
-private:
 	required_region_ptr<int16_t> m_rom;
 
 	uint32_t m_rommask;
 
 	sound_stream *m_stream;
 
-	double m_env_ar_table[0x9f];
-	double m_env_dr_table[0x9f];
-	double m_env_rr_table[0x9f];
+	envelope_tables m_env_tables;
 
 	rf5c400_channel m_channels[32];
 
@@ -114,7 +102,6 @@ private:
 	uint16_t m_ext_mem_data;
 };
 
-extern const device_type RF5C400;
+DECLARE_DEVICE_TYPE(RF5C400, rf5c400_device)
 
-
-#endif /* __RF5C400_H__ */
+#endif // MAME_SOUND_RF5C400_H

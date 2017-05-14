@@ -24,7 +24,9 @@
 #include "emu.h"
 #include "ncr5380.h"
 
-#define VERBOSE (0)
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 static const char *const rnames[] =
 {
@@ -72,14 +74,14 @@ static int get_cmd_len(int cbyte)
 //  LIVE DEVICE
 //**************************************************************************
 
-const device_type NCR5380 = device_creator<ncr5380_device>;
+DEFINE_DEVICE_TYPE(NCR5380, ncr5380_device, "ncr5380", "NCR 5380 SCSI")
 
 //-------------------------------------------------
 //  ncr5380_device - constructor/destructor
 //-------------------------------------------------
 
 ncr5380_device::ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	legacy_scsi_host_adapter(mconfig, NCR5380, "5380 SCSI", tag, owner, clock, "ncr5380", __FILE__),
+	legacy_scsi_host_adapter(mconfig, NCR5380, tag, owner, clock),
 	m_irq_cb(*this)
 {
 }
@@ -212,8 +214,7 @@ uint8_t ncr5380_device::ncr5380_read_reg(uint32_t offset)
 			break;
 	}
 
-	if (VERBOSE)
-		logerror("%s NCR5380: read %s (reg %d) = %02x\n", machine().describe_context(), rnames[reg], reg, rv);
+	LOG("%s NCR5380: read %s (reg %d) = %02x\n", machine().describe_context(), rnames[reg], reg, rv);
 
 	return rv;
 }
@@ -222,8 +223,7 @@ void ncr5380_device::ncr5380_write_reg(uint32_t offset, uint8_t data)
 {
 	int reg = offset & 7;
 
-	if (VERBOSE)
-		logerror("%s NCR5380: %02x to %s (reg %d)\n", machine().describe_context(), data, wnames[reg], reg);
+	LOG("%s NCR5380: %02x to %s (reg %d)\n", machine().describe_context(), data, wnames[reg], reg);
 
 	switch( reg )
 	{
@@ -309,14 +309,12 @@ void ncr5380_device::ncr5380_write_reg(uint32_t offset, uint8_t data)
 					// is the current command complete?
 					if (get_cmd_len(m_5380_Command[0]) == m_cmd_ptr)
 					{
-						if (VERBOSE)
-							logerror("%s NCR5380: Command (to ID %d): %x %x %x %x %x %x %x %x %x %x\n", machine().describe_context(), m_last_id, m_5380_Command[0], m_5380_Command[1], m_5380_Command[2], m_5380_Command[3], m_5380_Command[4], m_5380_Command[5], m_5380_Command[6], m_5380_Command[7], m_5380_Command[8], m_5380_Command[9]);
+						LOG("%s NCR5380: Command (to ID %d): %x %x %x %x %x %x %x %x %x %x\n", machine().describe_context(), m_last_id, m_5380_Command[0], m_5380_Command[1], m_5380_Command[2], m_5380_Command[3], m_5380_Command[4], m_5380_Command[5], m_5380_Command[6], m_5380_Command[7], m_5380_Command[8], m_5380_Command[9]);
 
 						send_command(&m_5380_Command[0], 16);
 						m_d_limit = get_length();
 
-						if (VERBOSE)
-							logerror("NCR5380: Command returned %d bytes\n",  m_d_limit);
+						LOG("NCR5380: Command returned %d bytes\n",  m_d_limit);
 
 						m_d_ptr = 0;
 
@@ -347,14 +345,12 @@ void ncr5380_device::ncr5380_write_reg(uint32_t offset, uint8_t data)
 
 				if (select(m_last_id))
 				{
-					if (VERBOSE)
-						logerror("NCR5380: Giving the bus for ID %d\n", m_last_id);
+					LOG("NCR5380: Giving the bus for ID %d\n", m_last_id);
 					m_5380_Registers[R5380_BUSSTATUS] |= 0x40;
 				}
 				else
 				{
-					if (VERBOSE)
-						logerror("NCR5380: Rejecting the bus for ID %d\n", m_last_id);
+					LOG("NCR5380: Rejecting the bus for ID %d\n", m_last_id);
 					m_5380_Registers[R5380_BUSSTATUS] &= ~0x40;
 				}
 			}

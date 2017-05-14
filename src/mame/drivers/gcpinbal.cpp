@@ -447,7 +447,7 @@ void gcpinbal_state::machine_reset()
 	m_msm_bank = 0;
 }
 
-static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
+static MACHINE_CONFIG_START( gcpinbal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /* 16 MHz */
@@ -475,7 +475,7 @@ static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_DEVICE_ADD("adpcm_select", HCT157, 0)
@@ -483,7 +483,7 @@ static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 
 	MCFG_SOUND_ADD("msm", MSM6585, XTAL_640kHz)
 	MCFG_MSM6585_VCLK_CB(WRITELINE(gcpinbal_state, gcp_adpcm_int))      /* VCK function */
-	MCFG_MSM6585_PRESCALER_SELECTOR(MSM6585_S40)         /* 16 kHz */
+	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* 16 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -542,5 +542,5 @@ ROM_START( gcpinbal )
 ROM_END
 
 
-GAME( 1994, pwrflip,  0, gcpinbal, gcpinbal, driver_device, 0, ROT270, "Excellent System", "Power Flipper Pinball Shooting v1.33", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gcpinbal, 0, gcpinbal, gcpinbal, driver_device, 0, ROT270, "Excellent System", "Grand Cross v1.02F", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrflip,  0, gcpinbal, gcpinbal, gcpinbal_state, 0, ROT270, "Excellent System", "Power Flipper Pinball Shooting v1.33", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gcpinbal, 0, gcpinbal, gcpinbal, gcpinbal_state, 0, ROT270, "Excellent System", "Grand Cross v1.02F",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

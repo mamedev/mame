@@ -347,7 +347,7 @@ static SLOT_INTERFACE_START(pwrview_floppies)
 	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pwrview, pwrview_state )
+static MACHINE_CONFIG_START( pwrview )
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(pwrview_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(pwrview_fetch_map)
@@ -390,4 +390,4 @@ ROM_START(pwrview)
 	ROMX_LOAD("215856-004.bin", 0x0001, 0x4000, CRC(4fd01e0a) SHA1(c4d1d40d4e8e529c03857f4a3c8428ccf6b8ff99), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
-COMP(1984, pwrview, 0, 0, pwrview, 0, driver_device, 0, "Compugraphic", "MCS PowerView 10", MACHINE_NOT_WORKING)
+COMP(1984, pwrview, 0, 0, pwrview, 0, pwrview_state, 0, "Compugraphic", "MCS PowerView 10", MACHINE_NOT_WORKING)

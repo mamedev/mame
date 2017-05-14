@@ -22,10 +22,10 @@
 
 
 // device type definition
-const device_type TC8830F = device_creator<tc8830f_device>;
+DEFINE_DEVICE_TYPE(TC8830F, tc8830f_device, "tc8830f", "Toshiba TC8830F")
 
 tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC8830F, "TC8830F", tag, owner, clock, "tc8830f", __FILE__),
+	: device_t(mconfig, TC8830F, tag, owner, clock),
 		device_sound_interface(mconfig, *this), m_stream(nullptr),
 		m_playing(false),
 		m_address(0),

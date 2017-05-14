@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -62,20 +64,40 @@ constexpr u32 MACHINE_BTANB_FLAGS               = MACHINE_IS_INCOMPLETE | MACHIN
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// static driver initialization callback
-typedef void (*driver_init_func)(running_machine &machine);
-
 // static POD structure describing each game driver entry
-struct game_driver
+class game_driver
 {
-	const char *                source_file;        // set this to __FILE__
+public:
+	class driver_init_helper
+	{
+	public:
+		void operator()(running_machine &machine) const { m_function(*this, machine); }
+	protected:
+		constexpr driver_init_helper(void (*function)(driver_init_helper const &, running_machine &)) : m_function(function) { }
+		constexpr driver_init_helper(driver_init_helper const &) = default;
+	private:
+		void (* const m_function)(driver_init_helper const &, running_machine &);
+	};
+
+	template <class DriverClass> class driver_init_helper_impl : public driver_init_helper
+	{
+	public:
+		constexpr driver_init_helper_impl(void (DriverClass::*method)()) : driver_init_helper(&driver_init_helper_impl<DriverClass>::invoke), m_method(method) { }
+		constexpr driver_init_helper_impl(driver_init_helper_impl<DriverClass> const &) = default;
+	private:
+		static void invoke(driver_init_helper const &helper, running_machine &machine);
+		void (DriverClass::*const m_method)();
+	};
+
+	template <class DriverClass> static constexpr auto make_driver_init(void (DriverClass::*method)()) { return driver_init_helper_impl<DriverClass>(method); }
+
+	device_type                 type;               // static type info for driver class
 	const char *                parent;             // if this is a clone, the name of the parent
-	const char *                description;        // full name of the game
 	const char *                year;               // year the game was released
 	const char *                manufacturer;       // manufacturer of the game
 	machine_config_constructor  machine_config;     // machine driver tokens
 	ioport_constructor          ipt;                // pointer to constructor for input ports
-	driver_init_func            driver_init;        // DRIVER_INIT callback
+	driver_init_helper const &  driver_init;        // DRIVER_INIT callback
 	const tiny_rom_entry *      rom;                // pointer to list of ROMs for the game
 	const char *                compatible_with;
 	const internal_layout *     default_layout;     // default internally defined layout
@@ -96,20 +118,29 @@ struct game_driver
 
 // wrappers for declaring and defining game drivers
 #define GAME_NAME(name)         driver_##name
+#define GAME_TRAITS_NAME(name)  driver_##name##traits
 #define GAME_EXTERN(name)       extern game_driver const GAME_NAME(name)
+
+// static game traits
+#define GAME_DRIVER_TRAITS(NAME, FULLNAME) \
+namespace { \
+	struct GAME_TRAITS_NAME(NAME) { static constexpr char const shortname[] = #NAME, fullname[] = FULLNAME, source[] = __FILE__; }; \
+	constexpr char const GAME_TRAITS_NAME(NAME)::shortname[], GAME_TRAITS_NAME(NAME)::fullname[], GAME_TRAITS_NAME(NAME)::source[]; \
+}
+#define GAME_DRIVER_TYPE(NAME, CLASS) driver_device_creator<CLASS, (GAME_TRAITS_NAME(NAME)::shortname), (GAME_TRAITS_NAME(NAME)::fullname), (GAME_TRAITS_NAME(NAME)::source)>
 
 // standard GAME() macro
 #define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS) \
+GAME_DRIVER_TRAITS(NAME,FULLNAME)                                       \
 extern game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
-	__FILE__,                                                           \
+	GAME_DRIVER_TYPE(NAME, CLASS),                                      \
 	#PARENT,                                                            \
-	FULLNAME,                                                           \
 	#YEAR,                                                              \
 	COMPANY,                                                            \
 	MACHINE_CONFIG_NAME(MACHINE),                                       \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	&driver_device::driver_init_wrapper<CLASS, &CLASS::init_##INIT>,    \
+	game_driver::make_driver_init(&CLASS::init_##INIT),                 \
 	ROM_NAME(NAME),                                                     \
 	nullptr,                                                            \
 	nullptr,                                                            \
@@ -119,16 +150,16 @@ extern game_driver const GAME_NAME(NAME)                                \
 
 // standard macro with additional layout
 #define GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,LAYOUT) \
+GAME_DRIVER_TRAITS(NAME,FULLNAME)                                       \
 extern game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
-	__FILE__,                                                           \
+	GAME_DRIVER_TYPE(NAME, CLASS),                                      \
 	#PARENT,                                                            \
-	FULLNAME,                                                           \
 	#YEAR,                                                              \
 	COMPANY,                                                            \
 	MACHINE_CONFIG_NAME(MACHINE),                                       \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	&driver_device::driver_init_wrapper<CLASS, &CLASS::init_##INIT>,    \
+	game_driver::make_driver_init(&CLASS::init_##INIT),                 \
 	ROM_NAME(NAME),                                                     \
 	nullptr,                                                            \
 	&LAYOUT,                                                            \
@@ -139,16 +170,16 @@ extern game_driver const GAME_NAME(NAME)                                \
 
 // standard console definition macro
 #define CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS) \
+GAME_DRIVER_TRAITS(NAME,FULLNAME)                                       \
 extern game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
-	__FILE__,                                                           \
+	GAME_DRIVER_TYPE(NAME, CLASS),                                      \
 	#PARENT,                                                            \
-	FULLNAME,                                                           \
 	#YEAR,                                                              \
 	COMPANY,                                                            \
 	MACHINE_CONFIG_NAME(MACHINE),                                       \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	&driver_device::driver_init_wrapper<CLASS, &CLASS::init_##INIT>,    \
+	game_driver::make_driver_init(&CLASS::init_##INIT),                 \
 	ROM_NAME(NAME),                                                     \
 	#COMPAT,                                                            \
 	nullptr,                                                            \
@@ -158,16 +189,16 @@ extern game_driver const GAME_NAME(NAME)                                \
 
 // standard computer definition macro
 #define COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS) \
+GAME_DRIVER_TRAITS(NAME,FULLNAME)                                       \
 extern game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
-	__FILE__,                                                           \
+	GAME_DRIVER_TYPE(NAME, CLASS),                                      \
 	#PARENT,                                                            \
-	FULLNAME,                                                           \
 	#YEAR,                                                              \
 	COMPANY,                                                            \
 	MACHINE_CONFIG_NAME(MACHINE),                                       \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	&driver_device::driver_init_wrapper<CLASS, &CLASS::init_##INIT>,    \
+	game_driver::make_driver_init(&CLASS::init_##INIT),                 \
 	ROM_NAME(NAME),                                                     \
 	#COMPAT,                                                            \
 	nullptr,                                                            \
@@ -177,16 +208,16 @@ extern game_driver const GAME_NAME(NAME)                                \
 
 // standard system definition macro
 #define SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS) \
+GAME_DRIVER_TRAITS(NAME,FULLNAME)                                       \
 extern game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
-	__FILE__,                                                           \
+	GAME_DRIVER_TYPE(NAME, CLASS),                                      \
 	#PARENT,                                                            \
-	FULLNAME,                                                           \
 	#YEAR,                                                              \
 	COMPANY,                                                            \
 	MACHINE_CONFIG_NAME(MACHINE),                                       \
 	INPUT_PORTS_NAME(INPUT),                                            \
-	&driver_device::driver_init_wrapper<CLASS, &CLASS::init_##INIT>,    \
+	game_driver::make_driver_init(&CLASS::init_##INIT),                 \
 	ROM_NAME(NAME),                                                     \
 	#COMPAT,                                                            \
 	nullptr,                                                            \

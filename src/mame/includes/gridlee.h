@@ -76,8 +76,7 @@ public:
 
 /*----------- defined in audio/gridlee.c -----------*/
 
-class gridlee_sound_device : public device_t,
-								public device_sound_interface
+class gridlee_sound_device : public device_t, public device_sound_interface
 {
 public:
 	gridlee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -106,4 +105,4 @@ private:
 	uint8_t m_sound_data[24];
 };
 
-extern const device_type GRIDLEE;
+DECLARE_DEVICE_TYPE(GRIDLEE, gridlee_sound_device)

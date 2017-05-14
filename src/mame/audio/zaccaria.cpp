@@ -2,6 +2,7 @@
 // copyright-holders:Vas Crabb
 #include "emu.h"
 #include "audio/zaccaria.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/clock.h"
 #include "machine/rescap.h"
@@ -13,8 +14,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-device_type const ZACCARIA_1B11107 = device_creator<zac1b11107_audio_device>;
-device_type const ZACCARIA_1B11142 = device_creator<zac1b11142_audio_device>;
+DEFINE_DEVICE_TYPE(ZACCARIA_1B11107, zac1b11107_audio_device, "zac1b11107", "Zaccaria 1B11107 Sound Board")
+DEFINE_DEVICE_TYPE(ZACCARIA_1B11142, zac1b11142_audio_device, "zac1b11142", "Zaccaria 1B11142 Sound Board")
 
 
 
@@ -239,13 +240,10 @@ INPUT_PORTS_END
 zac1b111xx_melody_base::zac1b111xx_melody_base(
 		machine_config const &mconfig,
 		device_type devtype,
-		char const *name,
 		char const *tag,
 		device_t *owner,
-		uint32_t clock,
-		char const *shortname,
-		char const *source)
-	: device_t(mconfig, devtype, name, tag, owner, clock, shortname, source)
+		u32 clock)
+	: device_t(mconfig, devtype, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 1)
 	, m_melodycpu(*this, "melodycpu")
 	, m_melodypia(*this, "melodypia")
@@ -257,8 +255,8 @@ zac1b111xx_melody_base::zac1b111xx_melody_base(
 
 READ8_MEMBER(zac1b111xx_melody_base::melodypia_porta_r)
 {
-	uint8_t const control = m_melodypia->b_output();
-	uint8_t data = 0xff;
+	u8 const control = m_melodypia->b_output();
+	u8 data = 0xff;
 
 	if (0x01 == (control & 0x03))
 		data &= m_melodypsg1->data_r(space, 0);
@@ -271,7 +269,7 @@ READ8_MEMBER(zac1b111xx_melody_base::melodypia_porta_r)
 
 WRITE8_MEMBER(zac1b111xx_melody_base::melodypia_porta_w)
 {
-	uint8_t const control = m_melodypia->b_output();
+	u8 const control = m_melodypia->b_output();
 
 	if (control & 0x02)
 		m_melodypsg1->data_address_w(space, (control >> 0) & 0x01, data);
@@ -310,8 +308,8 @@ void zac1b111xx_melody_base::device_reset()
 //  1B11107-SPECIFIC IMPLEMENTATION
 //**************************************************************************
 
-zac1b11107_audio_device::zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: zac1b111xx_melody_base(mconfig, ZACCARIA_1B11107, "Zaccaria 1B11107 Sound Board", tag, owner, clock, "zac1b11107", __FILE__)
+zac1b11107_audio_device::zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: zac1b111xx_melody_base(mconfig, ZACCARIA_1B11107, tag, owner, clock)
 {
 }
 
@@ -364,8 +362,8 @@ machine_config_constructor zac1b11107_audio_device::device_mconfig_additions() c
 //  1B11142-SPECIFIC IMPLEMENTATION
 //**************************************************************************
 
-zac1b11142_audio_device::zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: zac1b111xx_melody_base(mconfig, ZACCARIA_1B11142, "Zaccaria 1B11142 Sound Board", tag, owner, clock, "zac1b11142", __FILE__)
+zac1b11142_audio_device::zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: zac1b111xx_melody_base(mconfig, ZACCARIA_1B11142, tag, owner, clock)
 	, m_acs_cb(*this)
 	, m_audiocpu(*this, "audiocpu")
 	, m_pia_1i(*this, "pia_1i")

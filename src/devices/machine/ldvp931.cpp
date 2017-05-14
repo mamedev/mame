@@ -45,7 +45,7 @@
 //**************************************************************************
 
 // devices
-const device_type PHILLIPS_22VP931 = device_creator<phillips_22vp931_device>;
+DEFINE_DEVICE_TYPE(PHILLIPS_22VP931, phillips_22vp931_device, "22vp931", "Phillips 22VP931")
 
 
 
@@ -89,7 +89,7 @@ ROM_END
 //-------------------------------------------------
 
 phillips_22vp931_device::phillips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: laserdisc_device(mconfig, PHILLIPS_22VP931, "Phillips 22VP931", tag, owner, clock, "22vp931", __FILE__),
+	: laserdisc_device(mconfig, PHILLIPS_22VP931, tag, owner, clock),
 		m_i8049_cpu(*this, "vp931"),
 		m_tracktimer(nullptr),
 		m_i8049_out0(0),

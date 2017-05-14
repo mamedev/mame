@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC1011 = device_creator<vic1011_device>;
+DEFINE_DEVICE_TYPE(VIC1011, vic1011_device, "vic1011", "VIC-1011 RS-232C")
 
 
 //-------------------------------------------------
@@ -60,9 +60,9 @@ machine_config_constructor vic1011_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 vic1011_device::vic1011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VIC1011, "VIC1011", tag, owner, clock, "vic1011", __FILE__),
-		device_pet_user_port_interface(mconfig, *this),
-		m_rs232(*this, RS232_TAG)
+	: device_t(mconfig, VIC1011, tag, owner, clock)
+	, device_pet_user_port_interface(mconfig, *this)
+	, m_rs232(*this, RS232_TAG)
 {
 }
 

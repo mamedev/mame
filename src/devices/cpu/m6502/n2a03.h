@@ -7,9 +7,10 @@
     6502, NES variant
 
 ***************************************************************************/
+#ifndef MAME_CPU_M6502_N2A03_H
+#define MAME_CPU_M6502_N2A03_H
 
-#ifndef __N2A03_H__
-#define __N2A03_H__
+#pragma once
 
 #include "m6502.h"
 #include "sound/nes_apu.h"
@@ -89,6 +90,6 @@ enum {
 	N2A03_SET_OVERFLOW = m6502_device::V_LINE
 };
 
-extern const device_type N2A03;
+DECLARE_DEVICE_TYPE(N2A03, n2a03_device)
 
-#endif
+#endif // MAME_CPU_M6502_N2A03_H

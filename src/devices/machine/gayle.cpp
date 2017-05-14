@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type GAYLE = device_creator<gayle_device>;
+DEFINE_DEVICE_TYPE(GAYLE, gayle_device, "gayle", "Amiga GAYLE")
 
 
 //**************************************************************************
@@ -35,7 +35,7 @@ const device_type GAYLE = device_creator<gayle_device>;
 //-------------------------------------------------
 
 gayle_device::gayle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, GAYLE, "GAYLE", tag, owner, clock, "gayle", __FILE__),
+	device_t(mconfig, GAYLE, tag, owner, clock),
 	m_int2_w(*this),
 	m_cs0_read(*this),
 	m_cs0_write(*this),

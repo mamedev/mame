@@ -643,7 +643,7 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (cpu30, cpu30_state)
+static MACHINE_CONFIG_START (cpu30)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68030, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP (cpu30_mem)
@@ -883,7 +883,7 @@ ROM_END
 /*
  * System ROM information
  *
- * FGA-002 Bootprom version 3.1 is released May 28, 1990, coprighted by FORCE Computers Gmbh
+ * FGA-002 Bootprom version 3.1 is released May 28, 1990, coprighted by FORCE Computers GmbH
  *
  * Bootprom PIT setup sequence - To start VMEPROM, the rotary switches must both be set to 'F' (PI/T #1 port A)
  * --------------------------------------------------------------------------------------------------------------
@@ -1021,30 +1021,30 @@ void fga002_device::check_interrupts()()
  */
 
 /* Driver */
-/*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT         COMPANY                   FULLNAME                FLAGS */
-COMP (1988, fccpu30,      0,       0,      cpu30,          cpu30,    driver_device,      0,      "Force Computers Gmbh",   "SYS68K/CPU-30",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1988, fccpu30x,     fccpu30,   0,      cpu30x,         cpu30,    cpu30_state,   cpu30x,      "Force Computers Gmbh",   "SYS68K/CPU-30X",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1988, fccpu30xa,    fccpu30,   0,      cpu30xa,        cpu30,    cpu30_state,   cpu30xa,     "Force Computers Gmbh",   "SYS68K/CPU-30XA",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1988, fccpu30za,    fccpu30,   0,      cpu30za,        cpu30,    cpu30_state,   cpu30za,     "Force Computers Gmbh",   "SYS68K/CPU-30ZA",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1996, fccpu30zbe,   fccpu30,   0,      cpu30zbe,       cpu30,    cpu30_state,   cpu30zbe,    "Force Computers Gmbh",   "SYS68K/CPU-30ZBE",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1996, fccpu30be8,   fccpu30,   0,      cpu30be8,       cpu30,    cpu30_state,   cpu30be8,    "Force Computers Gmbh",   "SYS68K/CPU-30BE/8",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1996, fccpu30be16,  fccpu30,   0,      cpu30be16,      cpu30,    cpu30_state,   cpu30be16,   "Force Computers Gmbh",   "SYS68K/CPU-30BE/16",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1996, fccpu30lite4, fccpu30,   0,      cpu30lite4,     cpu30,    cpu30_state,   cpu30lite4,  "Force Computers Gmbh",   "SYS68K/CPU-30Lite/4",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1996, fccpu30lite8, fccpu30,   0,      cpu30lite8,     cpu30,    cpu30_state,   cpu30lite8,  "Force Computers Gmbh",   "SYS68K/CPU-30Lite/8",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (199?, fccpu33,      fccpu30,   0,      cpu33,          cpu30,    cpu30_state,   cpu33,       "Force Computers Gmbh",   "SYS68K/CPU-33",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+/*    YEAR  NAME          PARENT     COMPAT  MACHINE         INPUT     CLASS          INIT         COMPANY                   FULLNAME                FLAGS */
+COMP (1988, fccpu30,      0,         0,      cpu30,          cpu30,    cpu30_state,   0,           "Force Computers GmbH",   "SYS68K/CPU-30",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1988, fccpu30x,     fccpu30,   0,      cpu30x,         cpu30,    cpu30_state,   cpu30x,      "Force Computers GmbH",   "SYS68K/CPU-30X",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1988, fccpu30xa,    fccpu30,   0,      cpu30xa,        cpu30,    cpu30_state,   cpu30xa,     "Force Computers GmbH",   "SYS68K/CPU-30XA",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1988, fccpu30za,    fccpu30,   0,      cpu30za,        cpu30,    cpu30_state,   cpu30za,     "Force Computers GmbH",   "SYS68K/CPU-30ZA",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1996, fccpu30zbe,   fccpu30,   0,      cpu30zbe,       cpu30,    cpu30_state,   cpu30zbe,    "Force Computers GmbH",   "SYS68K/CPU-30ZBE",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1996, fccpu30be8,   fccpu30,   0,      cpu30be8,       cpu30,    cpu30_state,   cpu30be8,    "Force Computers GmbH",   "SYS68K/CPU-30BE/8",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1996, fccpu30be16,  fccpu30,   0,      cpu30be16,      cpu30,    cpu30_state,   cpu30be16,   "Force Computers GmbH",   "SYS68K/CPU-30BE/16",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1996, fccpu30lite4, fccpu30,   0,      cpu30lite4,     cpu30,    cpu30_state,   cpu30lite4,  "Force Computers GmbH",   "SYS68K/CPU-30Lite/4",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1996, fccpu30lite8, fccpu30,   0,      cpu30lite8,     cpu30,    cpu30_state,   cpu30lite8,  "Force Computers GmbH",   "SYS68K/CPU-30Lite/8",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (199?, fccpu33,      fccpu30,   0,      cpu33,          cpu30,    cpu30_state,   cpu33,       "Force Computers GmbH",   "SYS68K/CPU-33",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
 
 /* Below are not fully configured variants defaulting to generic cpu30 */
 
 /* The following boards were manufactured for Ericsson to be used in their fixed network switches. They support hot swap and the Ericsson APNbus */
 /* SYS68K/CPU-30SEN-R/32 assumed as generic until spec is found. 25 MHz 68030 based CPU board with DMAC, 32 MByte Shared RAM capacity and VMEPROM.
    4 MByte System Flash memory, SCSI via on-board EAGLE Controller FC68165 with DMA, 2 serial I/O ports, APNbus interface, VMEPROM firmware */
-COMP (1997, fccpu30senr,    0,      0,       cpu30,        cpu30, driver_device, 0,   "Force Computers Gmbh",   "SYS68K/CPU-30SEN-R", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1997, fccpu30senr,    0,      0,       cpu30,        cpu30, cpu30_state, 0,   "Force Computers GmbH",   "SYS68K/CPU-30SEN-R", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
 /* SYS68K/CPU-30SEN-R-501/4 assumed as generic until spec is found. 25 MHz 68030 based CPU board with DMAC, 4 MByte Shared RAM capacity and VMEPROM.
    48V DC/DC onboard, metric backplane connectors, BYB501 PCB formfactor (TVJ807). 4 MByte System Flash memory, SCSI via onboard EAGLEController
    FC68165 with DMA, 2 serial I/O ports, APNbus interface, VMEPROM firmware*/
-COMP (1997, fccpu30senr501, 0,      0,       cpu30,        cpu30, driver_device, 0,   "Force Computers Gmbh",   "SYS68K/CPU-30SEN-R-501", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1997, fccpu30senr501, 0,      0,       cpu30,        cpu30, cpu30_state, 0,   "Force Computers GmbH",   "SYS68K/CPU-30SEN-R-501", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
 
 /*CPU-33XB MC68030 25MHz CPU, 68882 FPC, 1MB, 2 SERIAL, RS-232, VME BOARD*/
-//COMP (1990, cpu33xb,      0,      0,       cpu30,        cpu30, driver_device, 0,   "Force Computers Gmbh",   "SYS68K/CPU-33XB",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+//COMP (1990, cpu33xb,      0,      0,       cpu30,        cpu30, cpu30_state, 0,   "Force Computers GmbH",   "SYS68K/CPU-33XB",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
 /*CPU-33B/4 MC68030 25MHz CPU, 68882 FPC, 1MB, 2 SERIAL, RS-232, VME BOARD*/
-//COMP (1990, cpu30b4,      0,      0,       cpu30,        cpu30, driver_device, 0,   "Force Computers Gmbh",   "SYS68K/CPU-33B/4",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+//COMP (1990, cpu30b4,      0,      0,       cpu30,        cpu30, cpu30_state, 0,   "Force Computers GmbH",   "SYS68K/CPU-33B/4",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )

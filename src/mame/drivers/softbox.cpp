@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( softbox_io, AS_IO, 8, softbox_state )
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(dbrg_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(I8255_0_TAG, i8255_device, read, write)
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(I8255_1_TAG, i8255_device, read, write)
-	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE(CORVUS_HDC_TAG, corvus_hdc_t, read, write)
+	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE(CORVUS_HDC_TAG, corvus_hdc_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -270,8 +270,8 @@ READ8_MEMBER( softbox_state::ppi1_pc_r )
 	uint8_t status = m_hdc->status_r(space, 0);
 	uint8_t data = 0;
 
-	data |= (status & CONTROLLER_BUSY) ? 0 : 0x10;
-	data |= (status & CONTROLLER_DIRECTION) ? 0 : 0x20;
+	data |= (status & corvus_hdc_device::CONTROLLER_BUSY) ? 0 : 0x10;
+	data |= (status & corvus_hdc_device::CONTROLLER_DIRECTION) ? 0 : 0x20;
 
 	return data;
 }
@@ -368,7 +368,7 @@ void softbox_state::ieee488_ifc(int state)
 //  MACHINE_CONFIG( softbox )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( softbox, softbox_state )
+static MACHINE_CONFIG_START( softbox )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(softbox_mem)
@@ -449,5 +449,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1981, softbox,    0,      0,      softbox,        softbox, driver_device, 0,      "Small Systems Engineering",  "SoftBox",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY                      FULLNAME   FLAGS
+COMP( 1981, softbox, 0,      0,      softbox, softbox, softbox_state, 0,    "Small Systems Engineering", "SoftBox", MACHINE_NO_SOUND_HW )

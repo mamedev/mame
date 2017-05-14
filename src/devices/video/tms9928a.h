@@ -23,25 +23,13 @@
 
 */
 
-#ifndef MAME_DEVICES_VIDEO_TMS9928A_H
-#define MAME_DEVICES_VIDEO_TMS9928A_H
+#ifndef MAME_VIDEO_TMS9928A_H
+#define MAME_VIDEO_TMS9928A_H
 
 #pragma once
 
 #include "screen.h"
 
-
-#define TMS9928A_PALETTE_SIZE               16
-
-
-/* Some defines used in defining the screens */
-#define TMS9928A_TOTAL_HORZ                 342
-#define TMS9928A_TOTAL_VERT_NTSC            262
-#define TMS9928A_TOTAL_VERT_PAL             313
-
-#define TMS9928A_HORZ_DISPLAY_START         (2 + 14 + 8 + 13)
-#define TMS9928A_VERT_DISPLAY_START_PAL     (13 + 51)
-#define TMS9928A_VERT_DISPLAY_START_NTSC    (13 + 27)
 
 //  MCFG_DEVICE_ADD(_tag, _variant, XTAL_10_738635MHz / 2 )
 
@@ -60,25 +48,25 @@
 #define MCFG_TMS9928A_SCREEN_ADD_NTSC(_screen_tag) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	MCFG_SCREEN_ADD( _screen_tag, RASTER ) \
-	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, TMS9928A_TOTAL_HORZ, TMS9928A_HORZ_DISPLAY_START-12, TMS9928A_HORZ_DISPLAY_START + 256 + 12, \
-			TMS9928A_TOTAL_VERT_NTSC, TMS9928A_VERT_DISPLAY_START_NTSC - 12, TMS9928A_VERT_DISPLAY_START_NTSC + 192 + 12 )
+	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
+			tms9928a_device::TOTAL_VERT_NTSC, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12 )
 
 
 #define MCFG_TMS9928A_SCREEN_ADD_PAL(_screen_tag) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER ) \
-	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, TMS9928A_TOTAL_HORZ, TMS9928A_HORZ_DISPLAY_START-12, TMS9928A_HORZ_DISPLAY_START + 256 + 12, \
-			TMS9928A_TOTAL_VERT_PAL, TMS9928A_VERT_DISPLAY_START_PAL - 12, TMS9928A_VERT_DISPLAY_START_PAL + 192 + 12 )
+	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
+			tms9928a_device::TOTAL_VERT_PAL, tms9928a_device::VERT_DISPLAY_START_PAL - 12, tms9928a_device::VERT_DISPLAY_START_PAL + 192 + 12 )
 
 
-extern const device_type TMS9918;
-extern const device_type TMS9918A;
-extern const device_type TMS9118;
-extern const device_type TMS9928A;
-extern const device_type TMS9128;
-extern const device_type TMS9929;
-extern const device_type TMS9929A;
-extern const device_type TMS9129;
+DECLARE_DEVICE_TYPE(TMS9918,  tms9918_device)
+DECLARE_DEVICE_TYPE(TMS9918A, tms9918a_device)
+DECLARE_DEVICE_TYPE(TMS9118,  tms9118_device)
+DECLARE_DEVICE_TYPE(TMS9928A, tms9928a_device)
+DECLARE_DEVICE_TYPE(TMS9128,  tms9128_device)
+DECLARE_DEVICE_TYPE(TMS9929,  tms9929_device)
+DECLARE_DEVICE_TYPE(TMS9929A, tms9929a_device)
+DECLARE_DEVICE_TYPE(TMS9129,  tms9129_device)
 
 
 class tms9928a_device : public device_t,
@@ -86,13 +74,23 @@ class tms9928a_device : public device_t,
 						public device_video_interface
 {
 public:
+	static constexpr unsigned PALETTE_SIZE               = 16;
+
+	/* Some defines used in defining the screens */
+	static constexpr unsigned TOTAL_HORZ                 = 342;
+	static constexpr unsigned TOTAL_VERT_NTSC            = 262;
+	static constexpr unsigned TOTAL_VERT_PAL             = 313;
+
+	static constexpr unsigned HORZ_DISPLAY_START         = 2 + 14 + 8 + 13;
+	static constexpr unsigned VERT_DISPLAY_START_PAL     = 13 + 51;
+	static constexpr unsigned VERT_DISPLAY_START_NTSC    = 13 + 27;
+
 	// construction/destruction
 	tms9928a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms9928a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, bool is_50hz, bool is_reva, bool is_99, const char *shortname, const char *source);
 
 	static void set_vram_size(device_t &device, int vram_size) { downcast<tms9928a_device &>(device).m_vram_size = vram_size; }
-	template<class _Object> static devcb_base &set_out_int_line_callback(device_t &device, _Object object) { return downcast<tms9928a_device &>(device).m_out_int_line_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_gromclk_callback(device_t &device, _Object object) { return downcast<tms9928a_device &>(device).m_out_gromclk_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_int_line_callback(device_t &device, Object &&cb) { return downcast<tms9928a_device &>(device).m_out_int_line_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_gromclk_callback(device_t &device, Object &&cb) { return downcast<tms9928a_device &>(device).m_out_gromclk_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -110,6 +108,8 @@ public:
 	void reset_line(int state) { if (state==ASSERT_LINE) device_reset(); }
 
 protected:
+	tms9928a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_50hz, bool is_reva, bool is_99);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -147,9 +147,9 @@ private:
 	uint16_t  m_spritepattern;
 	int     m_colourmask;
 	int     m_patternmask;
-	bool    m_50hz;
-	bool    m_reva;
-	bool    m_99;
+	const bool    m_50hz;
+	const bool    m_reva;
+	const bool    m_99;
 	rgb_t   m_palette[16];
 
 	/* memory */
@@ -216,4 +216,4 @@ public:
 };
 
 
-#endif // MAME_DEVICES_VIDEO_TMS9928A_H
+#endif // MAME_VIDEO_TMS9928A_H

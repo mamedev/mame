@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl,Miodrag Milanovic
-#pragma once
+#ifndef MAME_BUS_ISA_COM_H
+#define MAME_BUS_ISA_COM_H
 
-#ifndef __ISA_COM_H__
-#define __ISA_COM_H__
+#pragma once
 
 #include "isa.h"
 
@@ -19,23 +19,25 @@ class isa8_com_device :
 		public device_isa8_card_interface
 {
 public:
-		// construction/destruction
-		isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	isa8_com_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	// construction/destruction
+	isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_1) { m_isa->irq4_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_2) { m_isa->irq3_w(state); }
+
 protected:
-		// device-level overrides
-		virtual void device_start() override;
-		virtual void device_reset() override;
+	isa8_com_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 
 // device type definition
-extern const device_type ISA8_COM;
+DECLARE_DEVICE_TYPE(ISA8_COM, isa8_com_device)
 
 // ======================> isa8_com_at_device
 
@@ -43,8 +45,8 @@ class isa8_com_at_device :
 		public isa8_com_device
 {
 public:
-		// construction/destruction
-		isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// construction/destruction
+	isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -52,6 +54,6 @@ public:
 
 
 // device type definition
-extern const device_type ISA8_COM_AT;
+DECLARE_DEVICE_TYPE(ISA8_COM_AT, isa8_com_at_device)
 
-#endif  /* __ISA_COM_H__ */
+#endif  // MAME_BUS_ISA_COM_H

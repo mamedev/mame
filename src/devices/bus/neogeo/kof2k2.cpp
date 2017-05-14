@@ -13,36 +13,35 @@
 
 
 //-------------------------------------------------
-//  neogeo_kof2002_cart - constructor
+//  neogeo_kof2002_cart_device - constructor
 //-------------------------------------------------
 
-const device_type NEOGEO_K2K2_CART = device_creator<neogeo_kof2k2type_cart>;
+DEFINE_DEVICE_TYPE(NEOGEO_K2K2_CART, neogeo_kof2k2type_cart_device, "neocart_k2k2", "Neo Geo KOF2002-Type Cart")
 
 
-neogeo_kof2k2type_cart::neogeo_kof2k2type_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint16_t clock, const char *shortname, const char *source) :
-	neogeo_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
+neogeo_kof2k2type_cart_device::neogeo_kof2k2type_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint16_t clock) :
+	neogeo_rom_device(mconfig, type, tag, owner, clock),
 	m_cmc_prot(*this, "cmc_prot"),
 	m_pcm2_prot(*this, "pcm2_prot"),
 	m_kof2k2_prot(*this, "kof2002_prot")
-{}
+{
+}
 
-neogeo_kof2k2type_cart::neogeo_kof2k2type_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
-	neogeo_rom_device(mconfig, NEOGEO_K2K2_CART, "Neo Geo KOF2002-Type Cart", tag, owner, clock, "neocart_k2k2", __FILE__),
-	m_cmc_prot(*this, "cmc_prot"),
-	m_pcm2_prot(*this, "pcm2_prot"),
-	m_kof2k2_prot(*this, "kof2002_prot")
-{}
+neogeo_kof2k2type_cart_device::neogeo_kof2k2type_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
+	neogeo_kof2k2type_cart_device(mconfig, NEOGEO_K2K2_CART, tag, owner, clock)
+{
+}
 
 
 //-------------------------------------------------
 //  mapper specific start/reset
 //-------------------------------------------------
 
-void neogeo_kof2k2type_cart::device_start()
+void neogeo_kof2k2type_cart_device::device_start()
 {
 }
 
-void neogeo_kof2k2type_cart::device_reset()
+void neogeo_kof2k2type_cart_device::device_reset()
 {
 }
 
@@ -57,7 +56,7 @@ static MACHINE_CONFIG_FRAGMENT( kof2002_cart )
 	MCFG_KOF2002_PROT_ADD("kof2002_prot")
 MACHINE_CONFIG_END
 
-machine_config_constructor neogeo_kof2k2type_cart::device_mconfig_additions() const
+machine_config_constructor neogeo_kof2k2type_cart_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( kof2002_cart );
 }
@@ -67,14 +66,14 @@ machine_config_constructor neogeo_kof2k2type_cart::device_mconfig_additions() co
  kof2002
 **************************************************/
 
-const device_type NEOGEO_K2K2_KOF2002_CART = device_creator<neogeo_kof2002_cart>;
+DEFINE_DEVICE_TYPE(NEOGEO_K2K2_KOF2002_CART, neogeo_kof2002_cart_device, "neocart_kof2002", "Neo Geo KoF 2002 Cart")
 
-neogeo_kof2002_cart::neogeo_kof2002_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	neogeo_kof2k2type_cart(mconfig, NEOGEO_K2K2_KOF2002_CART, "Neo Geo KOF2002 Cart", tag, owner, clock, "neocart_kof2002", __FILE__)
-{}
+neogeo_kof2002_cart_device::neogeo_kof2002_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	neogeo_kof2k2type_cart_device(mconfig, NEOGEO_K2K2_KOF2002_CART, tag, owner, clock)
+{
+}
 
-
-void neogeo_kof2002_cart::decrypt_all(DECRYPT_ALL_PARAMS)
+void neogeo_kof2002_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_kof2k2_prot->kof2002_decrypt_68k(cpuregion, cpuregion_size);
 	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
@@ -83,17 +82,18 @@ void neogeo_kof2002_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_pcm2_prot->swap(ym_region, ym_region_size, 0);
 }
 
-const device_type NEOGEO_K2K2_KF2K2PLS_CART = device_creator<neogeo_kf2k2pls_cart>;
-
 /*************************************************
  kf2k2pls
  **************************************************/
 
-neogeo_kf2k2pls_cart::neogeo_kf2k2pls_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	neogeo_kof2k2type_cart(mconfig, NEOGEO_K2K2_KF2K2PLS_CART, "Neo Geo KOF2002 Plus Cart", tag, owner, clock, "neocart_kf2k2pls", __FILE__)
-{}
+DEFINE_DEVICE_TYPE(NEOGEO_K2K2_KF2K2PLS_CART, neogeo_kf2k2pls_cart_device, "neocart_kf2k2pls", "Neo Geo KoF 2002 Plus Cart")
 
-void neogeo_kf2k2pls_cart::decrypt_all(DECRYPT_ALL_PARAMS)
+neogeo_kf2k2pls_cart_device::neogeo_kf2k2pls_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	neogeo_kof2k2type_cart_device(mconfig, NEOGEO_K2K2_KF2K2PLS_CART, tag, owner, clock)
+{
+}
+
+void neogeo_kf2k2pls_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_kof2k2_prot->kof2002_decrypt_68k(cpuregion, cpuregion_size);
 	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
@@ -106,13 +106,14 @@ void neogeo_kf2k2pls_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  matrim
 **************************************************/
 
-const device_type NEOGEO_K2K2_MATRIM_CART = device_creator<neogeo_matrim_cart>;
+DEFINE_DEVICE_TYPE(NEOGEO_K2K2_MATRIM_CART, neogeo_matrim_cart_device, "neocart_matrim", "Neo Geo Matrimelee Cart")
 
-neogeo_matrim_cart::neogeo_matrim_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	neogeo_kof2k2type_cart(mconfig, NEOGEO_K2K2_MATRIM_CART, "Neo Geo Matrimelee Cart", tag, owner, clock, "neocart_matrim", __FILE__)
-{}
+neogeo_matrim_cart_device::neogeo_matrim_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	neogeo_kof2k2type_cart_device(mconfig, NEOGEO_K2K2_MATRIM_CART, tag, owner, clock)
+{
+}
 
-void neogeo_matrim_cart::decrypt_all(DECRYPT_ALL_PARAMS)
+void neogeo_matrim_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_kof2k2_prot->matrim_decrypt_68k(cpuregion, cpuregion_size);
 	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
@@ -125,13 +126,14 @@ void neogeo_matrim_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  samsho5
 **************************************************/
 
-const device_type NEOGEO_K2K2_SAMSHO5_CART = device_creator<neogeo_samsho5_cart>;
+DEFINE_DEVICE_TYPE(NEOGEO_K2K2_SAMSHO5_CART, neogeo_samsho5_cart_device, "neocart_samsho5", "Neo Geo Samurai Shodown 5 Cart")
 
-neogeo_samsho5_cart::neogeo_samsho5_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	neogeo_kof2k2type_cart(mconfig, NEOGEO_K2K2_SAMSHO5_CART, "Neo Geo Samurai Shodown 5 Cart", tag, owner, clock, "neocart_samsho5", __FILE__)
-{}
+neogeo_samsho5_cart_device::neogeo_samsho5_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	neogeo_kof2k2type_cart_device(mconfig, NEOGEO_K2K2_SAMSHO5_CART, tag, owner, clock)
+{
+}
 
-void neogeo_samsho5_cart::decrypt_all(DECRYPT_ALL_PARAMS)
+void neogeo_samsho5_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_kof2k2_prot->samsho5_decrypt_68k(cpuregion, cpuregion_size);
 	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);
@@ -144,13 +146,14 @@ void neogeo_samsho5_cart::decrypt_all(DECRYPT_ALL_PARAMS)
  samsh5sp
 **************************************************/
 
-const device_type NEOGEO_K2K2_SAMSHO5SP_CART = device_creator<neogeo_samsho5sp_cart>;
+DEFINE_DEVICE_TYPE(NEOGEO_K2K2_SAMSHO5SP_CART, neogeo_samsho5sp_cart_device, "neocart_samsh5sp", "Neo Geo Samurai Shodown 5 Special Cart")
 
-neogeo_samsho5sp_cart::neogeo_samsho5sp_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	neogeo_kof2k2type_cart(mconfig, NEOGEO_K2K2_SAMSHO5SP_CART, "Neo Geo Samurai Shodown 5 Special Cart", tag, owner, clock, "neocart_samsh5sp", __FILE__)
-{}
+neogeo_samsho5sp_cart_device::neogeo_samsho5sp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	neogeo_kof2k2type_cart_device(mconfig, NEOGEO_K2K2_SAMSHO5SP_CART, tag, owner, clock)
+{
+}
 
-void neogeo_samsho5sp_cart::decrypt_all(DECRYPT_ALL_PARAMS)
+void neogeo_samsho5sp_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_kof2k2_prot->samsh5sp_decrypt_68k(cpuregion, cpuregion_size);
 	m_cmc_prot->cmc50_m1_decrypt(audiocrypt_region, audiocrypt_region_size, audiocpu_region, audio_region_size);

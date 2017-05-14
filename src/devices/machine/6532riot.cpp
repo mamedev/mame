@@ -22,7 +22,7 @@ The timer seems to follow these rules:
 //**************************************************************************
 
 // device type definition
-const device_type RIOT6532 = device_creator<riot6532_device>;
+DEFINE_DEVICE_TYPE(RIOT6532, riot6532_device, "riot6532", "6532 RIOT")
 
 enum
 {
@@ -387,7 +387,7 @@ uint8_t riot6532_device::portb_out_get()
 //-------------------------------------------------
 
 riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RIOT6532, "6532 RIOT", tag, owner, clock, "riot6532", __FILE__),
+	: device_t(mconfig, RIOT6532, tag, owner, clock),
 		m_in_pa_cb(*this),
 		m_out_pa_cb(*this),
 		m_in_pb_cb(*this),
