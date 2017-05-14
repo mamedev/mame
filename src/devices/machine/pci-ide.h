@@ -73,6 +73,7 @@ private:
 	DECLARE_WRITE8_MEMBER(prog_if_w);
 	DECLARE_READ32_MEMBER(pcictrl_r);
 	DECLARE_WRITE32_MEMBER(pcictrl_w);
+	DECLARE_READ32_MEMBER(address_base_r);
 	DECLARE_WRITE32_MEMBER(address_base_w);
 };
 
