@@ -3265,6 +3265,36 @@ ROM_START( jgakuen )
 	CPZN2_BIOS
 
 	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
+	ROM_LOAD( "jstj_04a.2h", 0x0000000, 0x080000, CRC(91b36f38) SHA1(423dbf0f9f08458a866e9acb2a5b657c736b179f) )
+
+	ROM_REGION32_LE( 0x3000000, "maskroms", 0 )
+	ROM_LOAD( "jst-05m.3h", 0x0000000, 0x400000, CRC(723372b8) SHA1(2a7c95d1f9a3f58c469dfc28ead1fd192eaaebd1) )
+	ROM_LOAD( "jst-06m.4h", 0x0400000, 0x400000, CRC(4248988e) SHA1(4bdf7cac17d70ea85aa2002fc6b21a64d05e6e5a) )
+	ROM_LOAD( "jst-07m.5h", 0x0800000, 0x400000, CRC(c84c5a16) SHA1(5c0ca7454189c766f1ca7305504ff1867007c8e6) )
+	ROM_LOAD( "jst-08m.2k", 0x0c00000, 0x400000, CRC(791b57f3) SHA1(4ea12a0f7a7110d7dcbc55b3f02aa9a92dea4b12) )
+	ROM_LOAD( "jst-09m.3k", 0x1000000, 0x400000, CRC(6df42048) SHA1(9e2b4a424de3918e5e54bc87fd9dcceff8d162be) )
+	ROM_LOAD( "jst-10m.4k", 0x1400000, 0x400000, CRC(d7e22769) SHA1(733f96dce2586fc0a8af3cec18153085750c9a4d) )
+	ROM_LOAD( "jst-11m.5k", 0x1800000, 0x400000, CRC(0a033ac5) SHA1(218b33cb51db99d3e9ee180da6a74460f4444fc6) )
+	ROM_LOAD( "jst-12m.6k", 0x1c00000, 0x400000, CRC(43bd2ddd) SHA1(7f2976e394362cb648f620e430b3bf11b71485a6) )
+	ROM_LOAD( "jst-13m.7k", 0x2000000, 0x400000, CRC(6b443235) SHA1(c764d8b742aa1c46bc8d37f36e864ef50a1ff4e4) )
+
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "jst_02.2e",  0x00000, 0x08000, CRC(7809e2c3) SHA1(0216a665f7978bc8db3f7fdab038e1c7aa120844) )
+	ROM_CONTINUE(           0x10000, 0x18000 )
+	ROM_LOAD( "jst_03.3e",  0x28000, 0x20000, CRC(860ff24d) SHA1(eea72fa5eaf407a112a5b3daf60f7ac8ad191cc7) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* Q Sound Samples */
+	ROM_LOAD16_WORD_SWAP( "jst-01m.3b", 0x0000000, 0x400000, CRC(9a7c98f9) SHA1(764c6c4f41047e1f36d2dceac4aa9b943a9d529a) )
+
+	ROM_REGION( 0x8, "cat702_2", 0 )
+	ROM_LOAD( "cp06", 0x000000, 0x000008, CRC(99b22128) SHA1(9a773927ead72ed4ded44d53d89ecb123e1d3f17) )
+ROM_END
+
+/* 95681-2 */
+ROM_START( jgakuen1 )
+	CPZN2_BIOS
+
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "jstj_04.2h", 0x0000000, 0x080000, CRC(28b8000a) SHA1(9ebf74b453d775cadca9c2d7d8e2c7eb57bb9a38) )
 
 	ROM_REGION32_LE( 0x3000000, "maskroms", 0 )
@@ -5132,7 +5162,8 @@ GAME( 1997, coh3002c,  0,        coh3002c,    zn,       driver_device, 0, ROT0, 
 GAME( 1997, rvschool,  coh3002c, coh3002c,    zn6b,     driver_device, 0, ROT0, "Capcom", "Rival Schools: United By Fate (Euro 971117)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rvschoolu, rvschool, coh3002c,    zn6b,     driver_device, 0, ROT0, "Capcom", "Rival Schools: United By Fate (USA 971117)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rvschoola, rvschool, coh3002c,    zn6b,     driver_device, 0, ROT0, "Capcom", "Rival Schools: United By Fate (Asia 971117)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, jgakuen,   rvschool, coh3002c,    zn6b,     driver_device, 0, ROT0, "Capcom", "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971117)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, jgakuen,   rvschool, coh3002c,    zn6b,     driver_device, 0, ROT0, "Capcom", "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971216)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, jgakuen1,  rvschool, coh3002c,    zn6b,     driver_device, 0, ROT0, "Capcom", "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971117)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2,     coh3002c, coh3002c,    zn6b,     driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980526)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2u1,   sfex2,    coh3002c,    zn6b,     driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980312)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2a,    sfex2,    coh3002c,    zn6b,     driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (Asia 980312)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
