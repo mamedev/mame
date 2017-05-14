@@ -401,10 +401,10 @@ protected:
 	void rolc(uint32_t op);
 	void ror(uint32_t op);
 	void rorc(uint32_t op);
-	void rtps_reg(uint32_t op);
-	void rtps_dir(uint32_t op);
-	void rtps_ind(uint32_t op);
-	void rtps_imm(uint32_t op);
+	void rpts_reg(uint32_t op);
+	void rpts_dir(uint32_t op);
+	void rpts_ind(uint32_t op);
+	void rpts_imm(uint32_t op);
 	void stf_dir(uint32_t op);
 	void stf_ind(uint32_t op);
 	void stfi_dir(uint32_t op);
