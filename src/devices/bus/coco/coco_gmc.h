@@ -27,5 +27,7 @@ private:
 
 
 // device type definition
-extern const device_type COCO_PAK_GMC;
+//extern const device_type COCO_PAK_GMC;
+DECLARE_DEVICE_TYPE(COCO_PAK_GMC, coco_pak_gmc_device)
+
 #endif  /* __COCO_GMC_H__ */

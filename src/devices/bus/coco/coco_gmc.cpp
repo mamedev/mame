@@ -32,7 +32,9 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_PAK_GMC = device_creator<coco_pak_gmc_device>;
+//const device_type COCO_PAK_GMC = device_creator<coco_pak_gmc_device>;
+
+DEFINE_DEVICE_TYPE(COCO_PAK_GMC, coco_pak_gmc_device, "cocopakgmc", "CoCo Games Master Cartridge")
 
 //-------------------------------------------------
 //  coco_pak_device - constructor
