@@ -8,7 +8,10 @@
 
 ***************************************************************************/
 
+#include "unicode.h"
+
 #ifdef _WIN32
+#include "strconv.h"
 #define UTF8PROC_DLLEXPORT
 #endif
 
@@ -16,12 +19,6 @@
 
 #include <codecvt>
 #include <locale>
-
-#include "unicode.h"
-
-#ifdef _WIN32
-#include "strconv.h"
-#endif
 
 
 //-------------------------------------------------

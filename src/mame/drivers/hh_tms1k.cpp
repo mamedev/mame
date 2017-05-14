@@ -9244,7 +9244,7 @@ CONS( 1979, starwbcp,   starwbc,   0,      starwbc,   starwbc,   starwbc_state, 
 
 COMP( 1979, astro,      0,         0,      astro,     astro,     astro_state,     0, "Kosmos", "Astro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1978, elecbowl,   0,         0,      elecbowl,  elecbowl,  driver_device,   0, "Marx", "Electronic Bowling (Marx)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // ***
+CONS( 1978, elecbowl,   0,         0,      elecbowl,  elecbowl,  elecbowl_state,  0, "Marx", "Electronic Bowling (Marx)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // ***
 
 COMP( 1979, horseran,   0,         0,      horseran,  horseran,  horseran_state,  0, "Mattel", "Thoroughbred Horse Race Analyzer",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 CONS( 1980, mdndclab,   0,         0,      mdndclab,  mdndclab,  mdndclab_state,  0, "Mattel", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***

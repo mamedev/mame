@@ -5,11 +5,6 @@
 //  osdsync.c - OSD core work item functions
 //
 //============================================================
-#include <mutex>
-#include <atomic>
-#include <thread>
-#include <vector>
-#include <algorithm>
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 // standard windows headers
 #include <windows.h>
@@ -21,6 +16,11 @@
 #include <stdint.h>
 #endif
 #endif
+#include <mutex>
+#include <atomic>
+#include <thread>
+#include <vector>
+#include <algorithm>
 // MAME headers
 #include "osdcore.h"
 #include "osdsync.h"
