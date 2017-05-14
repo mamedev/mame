@@ -3341,7 +3341,7 @@ ROM_START( vs215 )  /* Step 1.5 */
 	ROM_FILL( 0x000000, 0x80000, 0x0000 )
 ROM_END
 
-ROM_START( vs215o ) /* Step 1.5, original release.. might even be for Step 1.0??? */
+ROM_START( vs215o ) /* Step 1.5, original release.. might even be for Step 1.0???, Sega ID# 833-13089, ROM board ID# 834-13090 V.STRIKER 2 */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-19806.17",  0x600006, 0x080000, CRC(95e1b970) SHA1(bcc914088cd08cb0032349b71904757760d947f3) )
