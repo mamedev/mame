@@ -638,23 +638,23 @@ ROM_END
 Revenger 84 - EPOS
 
 EPOS TRISTAR 9000
-+--------------------------------+
-|                                |
-|  DSW                           |
-|             4116 4116          |
-| 8910  Z80A  4116 4116          |
-|             4116 4116          |
-|  6116  BAT  4116 4116          |
-|  6116       4116 4116          |
-|  U4         4116 4116   74S189 |
-|  U3         4116 4116   4S189  |
-|  U2 PAL.U13 4116 4116          |
-|  U1 PAL10L8 8255  DM74S288N    |
-|                      22.1184MHz|
-|                                |
-|                       LM384N   |
-|                         VOL    |
-+-|28 pin Connector|-------------+
++-------------------------------+
+|                               |
+|  DSW                          |
+|             4116 4116         |
+| 8910  Z80A  4116 4116         |
+|             4116 4116         |
+|  6116  BAT  4116 4116         |
+|  6116       4116 4116         |
+|  U4         4116 4116  74S189 |
+|  U3         4116 4116  74S189 |
+|  U2 PAL.U13 4116 4116         |
+|  U1 PAL10L8 8255  DM74S288N   |
+|                     22.1184MHz|
+|                               |
+|                      LM384N   |
+|                        VOL    |
++--|28 pin Connector|-----------+
 
   CPU: Z80A        2.764800 MHz [22.1184MHz/8]
 Sound: AY-3-8910   0.691200 MHz [22.1184MHz/32]
@@ -676,10 +676,10 @@ Sound: AY-3-8910   0.691200 MHz [22.1184MHz/32]
 
 ROM_START( revngr84 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-    ROM_LOAD( "u1_revenger_r06254.u1",  0x0000, 0x2000, CRC(308f231f) SHA1(cf06695601bd0387e4fcb64d9b34143323e98b07) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
-    ROM_LOAD( "u2_revenger_r06254.u2",  0x2000, 0x2000, CRC(e80bbfb4) SHA1(9302beaef8bbb7376b6a20e9ee5adbcf60d66dd8) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
-    ROM_LOAD( "u3_revenger_r06254.u3",  0x4000, 0x2000, CRC(d9270929) SHA1(a95034b5387a40e02f04bdfa79e1d8e65dad30fe) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
-    ROM_LOAD( "u4_revenger_r06254.u4",  0x6000, 0x2000, CRC(d6e6cfa8) SHA1(f10131bb2e9d088c7b6d6a5d5520073d78ad69cc) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
+	ROM_LOAD( "u1_revenger_r06254.u1",  0x0000, 0x2000, CRC(308f231f) SHA1(cf06695601bd0387e4fcb64d9b34143323e98b07) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
+	ROM_LOAD( "u2_revenger_r06254.u2",  0x2000, 0x2000, CRC(e80bbfb4) SHA1(9302beaef8bbb7376b6a20e9ee5adbcf60d66dd8) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
+	ROM_LOAD( "u3_revenger_r06254.u3",  0x4000, 0x2000, CRC(d9270929) SHA1(a95034b5387a40e02f04bdfa79e1d8e65dad30fe) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
+	ROM_LOAD( "u4_revenger_r06254.u4",  0x6000, 0x2000, CRC(d6e6cfa8) SHA1(f10131bb2e9d088c7b6d6a5d5520073d78ad69cc) ) /* labeled as  U1 REVENGER R06254 @ EPOS CORP  (hand written 25 over??) */
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "dm74s288n.u60", 0x0000, 0x0020, CRC(be2b0641) SHA1(26982903b6d942af8e0a526412d8e01978d76420) ) // unknown purpose
