@@ -568,7 +568,7 @@ WRITE8_MEMBER( pc8401a_state::ppi_pc_w )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( pc8401a, pc8401a_state )
+static MACHINE_CONFIG_START( pc8401a )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
 	MCFG_CPU_PROGRAM_MAP(pc8401a_mem)
@@ -610,7 +610,7 @@ static MACHINE_CONFIG_START( pc8401a, pc8401a_state )
 	MCFG_RAM_EXTRA_OPTIONS("96K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc8500, pc8500_state )
+static MACHINE_CONFIG_START( pc8500 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
 	MCFG_CPU_PROGRAM_MAP(pc8401a_mem)
@@ -673,6 +673,6 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY FULLNAME */
-COMP( 1984, pc8401a,    0,      0,      pc8401a,    pc8401a, driver_device, 0,      "NEC",    "PC-8401A-LS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-//COMP( 1984, pc8401bd,   pc8401a,0,      pc8401a,    pc8401a, driver_device, 0,      "NEC",    "PC-8401BD", MACHINE_NOT_WORKING)
-COMP( 1985, pc8500,     0,      0,      pc8500,     pc8401a, driver_device, 0,      "NEC",    "PC-8500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1984, pc8401a,    0,      0,      pc8401a,    pc8401a, pc8401a_state, 0,      "NEC",    "PC-8401A-LS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//COMP( 1984, pc8401bd,   pc8401a,0,      pc8401a,    pc8401a, pc8401a_state, 0,      "NEC",    "PC-8401BD", MACHINE_NOT_WORKING)
+COMP( 1985, pc8500,     0,      0,      pc8500,     pc8401a, pc8500_state,  0,      "NEC",    "PC-8500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -774,7 +774,7 @@ DEVICE_INPUT_DEFAULTS_END
 #define PCI_ID_9050     ":pci:0b.0"
 #define PCI_ID_IDE      ":pci:0c.0"
 
-static MACHINE_CONFIG_START( mwskins, atlantis_state )
+static MACHINE_CONFIG_START( mwskins )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)    // clock is TRUSTED
@@ -822,7 +822,7 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	if DEBUG_CONSOLE {
 		MCFG_MIDWAY_IOASIC_OUT_TX_CB(DEVWRITE8("uart0", generic_terminal_device, write))
 		MCFG_DEVICE_ADD("uart0", GENERIC_TERMINAL, 0)
-		MCFG_GENERIC_TERMINAL_KEYBOARD_CB(DEVWRITE8("ioasic", midway_ioasic_device, serial_rx_w))
+		MCFG_GENERIC_TERMINAL_KEYBOARD_CB(DEVPUT("ioasic", midway_ioasic_device, serial_rx_w))
 	}
 
 	// TL16C552 UART

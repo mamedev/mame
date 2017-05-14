@@ -34,31 +34,11 @@
 #endif
 
 // device type definition
-const device_type SPU = device_creator<spu_device>;
+DEFINE_DEVICE_TYPE(SPU, spu_device, "psxspu", "PlayStation SPU")
 
 //
 //
 //
-static inline unsigned int min(unsigned int a, unsigned int b)
-{
-	return (a > b) ? b : a;
-}
-
-static inline unsigned int max(unsigned int a, unsigned int b)
-{
-	return (a > b) ? a : b;
-}
-
-static inline double mindb(double a, double b)
-{
-	return (a > b) ? b : a;
-}
-
-static inline double maxdb(double a, double b)
-{
-	return (a > b) ? a : b;
-}
-
 enum spu_registers
 {
 	spureg_voice=0,
@@ -240,7 +220,7 @@ static const int filter_coef[5][2]=
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-reverb_params *spu_reverb_cfg=nullptr;
+spu_device::reverb_params *spu_device::spu_reverb_cfg=nullptr;
 
 float spu_device::freq_multiplier=1.0f;
 
@@ -955,7 +935,7 @@ static int shift_register15(int &shift)
 //-------------------------------------------------
 
 spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SPU, "SPU", tag, owner, clock, "spu", __FILE__),
+	device_t(mconfig, SPU, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_irq_handler(*this),
 	dirty_flags(-1),
@@ -1316,8 +1296,8 @@ void spu_device::flush_cache(sample_cache *sc,
                                          sc->start,
                                          sc->end);*/
 
-	sc->invalid_start=min(sc->invalid_start,istart);
-	sc->invalid_end=max(sc->invalid_end,iend);
+	sc->invalid_start=(std::min)(sc->invalid_start,istart);
+	sc->invalid_end=(std::max)(sc->invalid_end,iend);
 	sc->valid=false;
 	sc->remove_ref();
 }
@@ -1364,7 +1344,7 @@ spu_device::sample_cache *spu_device::get_sample_cache(const unsigned int addr)
 
 	if ((a < 0x80000) && (ap->flags&adpcmflag_loop)) sc->is_loop=true;
 
-	sc->end=min(spu_ram_size,a+16);
+	sc->end=(std::min)(spu_ram_size,a+16);
 
 	unsigned int sz=((sc->end-sc->start)>>4)*28;
 	sc->data=new signed short [sz];
@@ -1461,7 +1441,7 @@ void spu_device::update_voice_events(voiceinfo *vi)
 			// Voice is inside loop cache, return time until end of that if lower
 
 			assert(vi->lcptr<vi->loop_cache->len);
-			vi->samplestoend=min(vi->samplestoend,
+			vi->samplestoend=(std::min)(vi->samplestoend,
 														(unsigned int)((((int64_t)(vi->loop_cache->len-vi->lcptr)<<12)-vi->dptr)+(vi->pitch-1))/vi->pitch);
 		}
 
@@ -1675,9 +1655,9 @@ bool spu_device::process_voice(const unsigned int v,
 		// Play up to end of sample, envelope event, or IRQ, whichever comes first
 
 		unsigned int ntoplay=fm?1:num,
-									nextevent=min(vi->samplestoend,
-																min(vi->samplestoirq,vi->envsamples));
-		ntoplay=min(ntoplay,nextevent);
+									nextevent=(std::min)(vi->samplestoend,
+																(std::min)(vi->samplestoirq,vi->envsamples));
+		ntoplay=(std::min)(ntoplay,nextevent);
 
 		if (ntoplay)
 		{
@@ -1968,7 +1948,7 @@ void spu_device::generate_voice(const unsigned int v,
 
 			if (((sp+end)>=ep) && (vi->pitch))
 			{
-				num_stitch=min(n,max(0x1fff/vi->pitch,1));
+				num_stitch=(std::min)(n,(std::max)(0x1fffU/vi->pitch,1U));
 				n-=num_stitch;
 			}
 
@@ -2214,7 +2194,7 @@ bool spu_device::update_envelope(const int v)
 				break;
 
 			case 4: // release
-				voice[v].env_level=mindb(1.0f,maxdb(0.0f,voice[v].env_level));
+				voice[v].env_level=(std::min)(1.0f,(std::max)(0.0f,voice[v].env_level));
 				voice[v].env_delta=voice[v].env_rr;
 				if (voice[v].env_rr == -0.0f)   // 0.0 release means infinite time
 				{
@@ -2421,7 +2401,7 @@ void spu_device::generate_xa(void *ptr, const unsigned int sz)
 			if (ss)
 			{
 				ss<<=xa_channels;
-				ss=min(ss,(int)xa_buffer->get_bytes_in());
+				ss=(std::min)(ss,(int)xa_buffer->get_bytes_in());
 
 				xa_buffer->increment_tail(ss);
 				sp=(signed short *)xa_buffer->get_tail_ptr();
@@ -2583,7 +2563,7 @@ void spu_device::generate(void *ptr, const unsigned int sz)
 
 	while ((left) && (output_size))
 	{
-		unsigned int n=min(min(left,output_buffer_size-output_head),output_size);
+		unsigned int n=(std::min)((std::min)(left,output_buffer_size-output_head),output_size);
 		memcpy(dp,output_buf[0]+output_head,n);
 
 		rev->process((signed short *)dp,
@@ -2629,7 +2609,7 @@ void spu_device::update_irq_event()
 					voice[i].hitirq=true;
 				} else
 				{
-					samplestoirq=min(samplestoirq,voice[i].samplestoirq);
+					samplestoirq=(std::min)(samplestoirq,voice[i].samplestoirq);
 				}
 			}
 	}
@@ -2675,7 +2655,7 @@ void spu_device::process_until(const unsigned int tsample)
 
 		// Drop samples from the head of the queue if its full
 
-		process_samples=min(process_samples,output_buffer_size>>2);
+		process_samples=(std::min)(process_samples,output_buffer_size>>2);
 		unsigned int nsz=output_size+(process_samples<<2);
 		if (nsz>output_buffer_size)
 		{
@@ -2689,7 +2669,7 @@ void spu_device::process_until(const unsigned int tsample)
 		// Decide how many samples to process taking into account buffer
 		// wrap in output queue.  Get pointers to the queues.
 
-		process_samples=min(process_samples,
+		process_samples=(std::min)(process_samples,
 												(output_buffer_size-output_tail)>>2);
 
 		unsigned char *outptr=output_buf[0]+output_tail,

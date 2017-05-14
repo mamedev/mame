@@ -465,7 +465,7 @@ void xexex_state::machine_reset()
 	m_k054539->init_flags(k054539_device::REVERSE_STEREO);
 }
 
-static MACHINE_CONFIG_START( xexex, xexex_state )
+static MACHINE_CONFIG_START( xexex )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // 16MHz

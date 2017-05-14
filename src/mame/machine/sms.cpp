@@ -68,7 +68,7 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 
 WRITE_LINE_MEMBER(sms_state::gg_ext_th_input)
 {
-	if (!(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
+	if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
 		return;
 
 	// The EXT port act as the controller port 2 on SMS compatibility mode.
@@ -128,7 +128,7 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 	uint8_t ctrl1_port_data = 0xff;
 	uint8_t ctrl2_port_data = 0xff;
 
-	if (m_is_gamegear && !(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
+	if (m_is_gamegear && !(m_cartslot->exists() && m_cartslot->get_sms_mode()))
 	{
 		m_io_ctrl_reg = data;
 		return;
@@ -226,7 +226,7 @@ WRITE_LINE_MEMBER(sms_state::sms_pause_callback)
 
 	if (m_is_gamegear)
 	{
-		if (!(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
+		if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
 			return;
 
 		if (!(m_port_start->read() & 0x80))
@@ -325,7 +325,7 @@ READ8_MEMBER(sms_state::sms_input_port_dc_r)
 	{
 		// If SMS mode is disabled, just return the data read from the
 		// input port. Its mapped port bits match the bits of register $dc.
-		if (!(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
+		if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
 			return m_port_gg_dc->read();
 	}
 	else
@@ -370,7 +370,7 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 
 	if (m_is_gamegear)
 	{
-		if (!(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
+		if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
 			return 0xff;
 	}
 	else
@@ -539,7 +539,7 @@ WRITE8_MEMBER(sms_state::gg_psg_w)
 
 WRITE8_MEMBER(sms_state::gg_psg_stereo_w)
 {
-	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return;
 
 	m_psg_gg->stereo_w(space, offset, data, mem_mask);
@@ -548,7 +548,7 @@ WRITE8_MEMBER(sms_state::gg_psg_stereo_w)
 
 READ8_MEMBER(sms_state::gg_input_port_00_r)
 {
-	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return 0xff;
 	else
 	{
@@ -840,7 +840,7 @@ WRITE8_MEMBER(sms_state::sg1000m3_peripheral_w)
 
 WRITE8_MEMBER(sms_state::gg_sio_w)
 {
-	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return;
 
 	logerror("*** write %02X to SIO register #%d\n", data, offset);
@@ -868,7 +868,7 @@ WRITE8_MEMBER(sms_state::gg_sio_w)
 
 READ8_MEMBER(sms_state::gg_sio_r)
 {
-	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return 0xff;
 
 	logerror("*** read SIO register #%d\n", offset);
@@ -918,7 +918,7 @@ void sms_state::setup_enabled_slots()
 		return;
 	}
 
-	if (!(m_mem_ctrl_reg & IO_EXPANSION) && m_smsexpslot && m_smsexpslot->m_device)
+	if (!(m_mem_ctrl_reg & IO_EXPANSION) && m_smsexpslot && m_smsexpslot->device_present())
 	{
 		m_mem_device_enabled |= ENABLE_EXPANSION;
 		logerror("Expansion port enabled.\n");
@@ -976,11 +976,11 @@ void sms_state::setup_media_slots()
 		m_lphaser_x_offs = -1; // same value returned for ROMs without custom offset.
 
 		if (m_mem_device_enabled & ENABLE_CART)
-			m_lphaser_x_offs = m_cartslot->m_cart->get_lphaser_xoffs();
+			m_lphaser_x_offs = m_cartslot->get_lphaser_xoffs();
 		else if (m_mem_device_enabled & ENABLE_CARD)
-			m_lphaser_x_offs = m_cardslot->m_cart->get_lphaser_xoffs();
+			m_lphaser_x_offs = m_cardslot->get_lphaser_xoffs();
 		else if (m_mem_device_enabled & ENABLE_EXPANSION)
-			m_lphaser_x_offs = m_smsexpslot->m_device->get_lphaser_xoffs();
+			m_lphaser_x_offs = m_smsexpslot->get_lphaser_xoffs();
 
 		if (m_lphaser_x_offs == -1)
 			m_lphaser_x_offs = 36;
@@ -1146,7 +1146,7 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 
 	if (m_is_gamegear)
 	{
-		if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+		if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 			m_vdp->set_sega315_5124_compatibility_mode(true);
 
 		/* Initialize SIO stuff for GG */
@@ -1491,7 +1491,7 @@ VIDEO_RESET_MEMBER(sms_state,gamegear)
 		m_prev_bitmap.fill(rgb_t::black());
 		m_prev_bitmap_copied = false;
 	}
-	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 	{
 		m_gg_sms_mode_bitmap.fill(rgb_t::black());
 		memset(m_line_buffer.get(), 0, 160 * 4 * sizeof(int));
@@ -1640,7 +1640,7 @@ uint32_t sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &
 {
 	bitmap_rgb32 *source_bitmap;
 
-	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 	{
 		screen_gg_sms_mode_scaling(screen, m_gg_sms_mode_bitmap, cliprect);
 		source_bitmap = &m_gg_sms_mode_bitmap;

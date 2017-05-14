@@ -339,7 +339,7 @@ DECOSPR_PRIORITY_CB_MEMBER(deco156_state::pri_callback)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( hvysmsh, deco156_state )
+static MACHINE_CONFIG_START( hvysmsh )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
@@ -381,16 +381,16 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", 28000000/28, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 28000000/28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 28000000/14, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 28000000/14, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wcvol95, deco156_state )
+static MACHINE_CONFIG_START( wcvol95 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000) /* Unconfirmed */

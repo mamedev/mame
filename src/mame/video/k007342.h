@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
+#ifndef MAME_VIDEO_K007342_H
+#define MAME_VIDEO_K007342_H
+
 #pragma once
-#ifndef __K007342_H__
-#define __K007342_H__
+
 
 typedef device_delegate<void (int layer, int bank, int *code, int *color, int *flags)> k007342_delegate;
 
@@ -10,7 +12,6 @@ class k007342_device : public device_t
 {
 public:
 	k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~k007342_device() {}
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -55,7 +56,7 @@ private:
 	void get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram );
 };
 
-extern const device_type K007342;
+DECLARE_DEVICE_TYPE(K007342, k007342_device)
 
 #define MCFG_K007342_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, K007342, 0)
@@ -74,4 +75,4 @@ extern const device_type K007342;
 // function definition for a callback
 #define K007342_CALLBACK_MEMBER(_name)     void _name(int layer, int bank, int *code, int *color, int *flags)
 
-#endif
+#endif // MAME_VIDEO_K007342_H

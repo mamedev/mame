@@ -13,7 +13,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type MSM6253 = device_creator<msm6253_device>;
+DEFINE_DEVICE_TYPE(MSM6253, msm6253_device, "msm6253", "OKI MSM6253 A/D Converter")
 
 //**************************************************************************
 //  DEVICE DEFINITION
@@ -24,14 +24,14 @@ const device_type MSM6253 = device_creator<msm6253_device>;
 //-------------------------------------------------
 
 msm6253_device::msm6253_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, MSM6253, "MSM6253 A/D Converter", tag, owner, clock, "msm6253", __FILE__),
-		m_analog_ports(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG}),
-		m_shift_register(0)
+	: device_t(mconfig, MSM6253, tag, owner, clock)
+	, m_analog_ports(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+	, m_shift_register(0)
 {
-	m_analog_input_cb[0] = analog_port_read_delegate(FUNC(msm6253_device::port_read<0>), this);
-	m_analog_input_cb[1] = analog_port_read_delegate(FUNC(msm6253_device::port_read<1>), this);
-	m_analog_input_cb[2] = analog_port_read_delegate(FUNC(msm6253_device::port_read<2>), this);
-	m_analog_input_cb[3] = analog_port_read_delegate(FUNC(msm6253_device::port_read<3>), this);
+	m_analog_input_cb[0] = port_read_delegate(FUNC(msm6253_device::port_read<0>), this);
+	m_analog_input_cb[1] = port_read_delegate(FUNC(msm6253_device::port_read<1>), this);
+	m_analog_input_cb[2] = port_read_delegate(FUNC(msm6253_device::port_read<2>), this);
+	m_analog_input_cb[3] = port_read_delegate(FUNC(msm6253_device::port_read<3>), this);
 }
 
 //-------------------------------------------------

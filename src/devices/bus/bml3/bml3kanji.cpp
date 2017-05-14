@@ -20,7 +20,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type BML3BUS_KANJI = device_creator<bml3bus_kanji_device>;
+DEFINE_DEVICE_TYPE(BML3BUS_KANJI, bml3bus_kanji_device, "bml3kanji", "Hitachi MP-9740 Kanji Character ROM Card")
 
 #define KANJI_ROM_REGION  "kanji_rom"
 
@@ -73,7 +73,7 @@ WRITE8_MEMBER( bml3bus_kanji_device::bml3_kanji_w )
 //**************************************************************************
 
 bml3bus_kanji_device::bml3bus_kanji_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, BML3BUS_KANJI, "Hitachi MP-9740 Kanji Character ROM Card", tag, owner, clock, "bml3kanji", __FILE__),
+	device_t(mconfig, BML3BUS_KANJI, tag, owner, clock),
 	device_bml3bus_card_interface(mconfig, *this), m_kanji_addr(0), m_rom(nullptr)
 {
 }

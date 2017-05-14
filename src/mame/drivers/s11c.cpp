@@ -150,7 +150,7 @@ DRIVER_INIT_MEMBER(s11c_state,s11c)
 	timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
 }
 
-static MACHINE_CONFIG_START( s11c, s11c_state )
+static MACHINE_CONFIG_START( s11c )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s11c_main_map)

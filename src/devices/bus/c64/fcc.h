@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_FCC_H
+#define MAME_BUS_C64_FCC_H
 
-#ifndef __FCC__
-#define __FCC__
+#pragma once
 
 #include "exp.h"
 #include "cpu/m6502/m65sc02.h"
@@ -61,8 +61,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_FCC;
+DECLARE_DEVICE_TYPE(C64_FCC, c64_final_chesscard_device)
 
 
-
-#endif
+#endif // MAME_BUS_C64_FCC_H

@@ -628,7 +628,7 @@ void kickgoal_state::machine_reset()
 	m_m6295_key_delay = 0;
 }
 
-static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
+static MACHINE_CONFIG_START( kickgoal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -663,11 +663,11 @@ static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 
 	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 12000000/8, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 12000000/8, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( actionhw, kickgoal_state )
+static MACHINE_CONFIG_START( actionhw )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
@@ -701,7 +701,7 @@ static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 
 	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -778,5 +778,5 @@ DRIVER_INIT_MEMBER(kickgoal_state,kickgoal)
 }
 
 
-GAME( 1995, kickgoal,0, kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, actionhw,0, actionhw, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kickgoal, 0, kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, actionhw, 0, actionhw, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -339,7 +339,7 @@ INTERRUPT_GEN_MEMBER(istellar_state::vblank_callback_istellar)
 
 
 /* DRIVER */
-static MACHINE_CONFIG_START( istellar, istellar_state )
+static MACHINE_CONFIG_START( istellar )
 	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(z80_0_mem)
@@ -434,5 +434,5 @@ DRIVER_INIT_MEMBER(istellar_state,istellar)
 	#endif
 }
 
-/*    YEAR  NAME    PARENT   MACHINE  INPUT    INIT    MONITOR  COMPANY          FULLNAME                       FLAGS) */
-GAME( 1983, istellar, 0,       istellar,  istellar, istellar_state,  istellar, ROT0,    "Funai/Gakken",  "Interstellar Laser Fantasy",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT   MACHINE    INPUT     STATE            INIT      MONITOR  COMPANY          FULLNAME                       FLAGS)
+GAME( 1983, istellar, 0,       istellar,  istellar, istellar_state,  istellar, ROT0,    "Funai/Gakken",  "Interstellar Laser Fantasy",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

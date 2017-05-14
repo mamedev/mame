@@ -7,21 +7,21 @@
 
 \*********************************/
 
-#pragma once
+#ifndef MAME_CPU_ARC_ARC_H
+#define MAME_CPU_ARC_ARC_H
 
-#ifndef __ARC_H__
-#define __ARC_H__
+#pragma once
 
 enum
 {
 	ARC_PC = STATE_GENPC
 };
 
-class arc_device : public cpu_device
+class arc_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	arc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -74,7 +74,6 @@ private:
 };
 
 
-extern const device_type ARC;
+DECLARE_DEVICE_TYPE(ARC, arc_cpu_device)
 
-
-#endif /* __ARC_H__ */
+#endif // MAME_CPU_ARC_ARC_H

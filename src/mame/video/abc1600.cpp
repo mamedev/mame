@@ -44,7 +44,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC1600_MOVER = device_creator<abc1600_mover_device>;
+DEFINE_DEVICE_TYPE(ABC1600_MOVER, abc1600_mover_device, "abc1600mover", "ABC 1600 Mover")
 
 
 DEVICE_ADDRESS_MAP_START( vram_map, 8, abc1600_mover_device )
@@ -229,7 +229,7 @@ machine_config_constructor abc1600_mover_device::device_mconfig_additions() cons
 //-------------------------------------------------
 
 abc1600_mover_device::abc1600_mover_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ABC1600_MOVER, "ABC 1600 Mover", tag, owner, clock, "abc1600mover", __FILE__),
+	device_t(mconfig, ABC1600_MOVER, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("vram", ENDIANNESS_BIG, 16, 18, -1, *ADDRESS_MAP_NAME(mover_map)),
 	m_crtc(*this, SY6845E_TAG),

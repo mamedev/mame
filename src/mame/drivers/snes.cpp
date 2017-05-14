@@ -1167,8 +1167,8 @@ SNESCTRL_GUNLATCH_CB(snes_console_state::gun_latch_cb)
 
 	if (y < 0)
 		y = 0;
-	if (y > (m_ppu->m_beam.last_visible_line - 1))
-		y = m_ppu->m_beam.last_visible_line - 1;
+	if (y > (m_ppu->last_visible_line() - 1))
+		y = m_ppu->last_visible_line() - 1;
 
 //  m_ppu->set_latch_hv(x, y);  // it would be more accurate to write twice to WRIO register, first with bit7 = 0 and then with bit7 = 1
 	m_ppu->set_latch_hv(m_ppu->current_x(), m_ppu->current_y());
@@ -1178,7 +1178,7 @@ SNESCTRL_ONSCREEN_CB(snes_console_state::onscreen_cb)
 {
 	// these are the theoretical boundaries, but we currently are always onscreen due to the
 	// way IPT_LIGHTGUNs work... investigate more on this!
-	if (x < 0 || x >= SNES_SCR_WIDTH || y < 0 || y >= m_ppu->m_beam.last_visible_line)
+	if (x < 0 || x >= SNES_SCR_WIDTH || y < 0 || y >= m_ppu->last_visible_line())
 		return false;
 	else
 		return true;
@@ -1325,7 +1325,7 @@ void snes_console_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( snes, snes_console_state )
+static MACHINE_CONFIG_START( snes )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68 MHz, also 3.58 MHz */
@@ -1395,6 +1395,6 @@ ROM_END
  *
  *************************************/
 
-/*    YEAR  NAME       PARENT  COMPAT MACHINE    INPUT                 INIT  COMPANY     FULLNAME                                      FLAGS */
-CONS( 1989, snes,      0,      0,     snes,      snes, driver_device,  0,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1991, snespal,   snes,   0,     snespal,   snes, driver_device,  0,    "Nintendo", "Super Nintendo Entertainment System (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME       PARENT  COMPAT MACHINE    INPUT STATE                INIT  COMPANY     FULLNAME                                      FLAGS */
+CONS( 1989, snes,      0,      0,     snes,      snes, snes_console_state,  0,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1991, snespal,   snes,   0,     snespal,   snes, snes_console_state,  0,    "Nintendo", "Super Nintendo Entertainment System (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

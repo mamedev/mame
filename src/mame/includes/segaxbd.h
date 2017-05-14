@@ -5,16 +5,22 @@
     Sega X-Board hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_SEGAXBD_H
+#define MAME_INCLUDES_SEGAXBD_H
+
+#pragma once
+
+#include "machine/segaic16.h"
+#include "video/segaic16.h"
+#include "video/segaic16_road.h"
+#include "video/sega16sp.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/mb3773.h"
-#include "machine/segaic16.h"
-#include "video/segaic16.h"
-#include "video/segaic16_road.h"
-#include "video/sega16sp.h"
+#include "machine/watchdog.h"
 #include "video/resnet.h"
 #include "screen.h"
 
@@ -26,7 +32,6 @@ class segaxbd_state : public device_t
 public:
 	// construction/destruction
 	segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	segaxbd_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// compare/timer chip callbacks
 	void timer_ack_callback();
@@ -76,6 +81,8 @@ protected:
 		TID_IRQ2_GEN,
 		TID_SOUND_WRITE
 	};
+
+	segaxbd_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device overrides
 //  virtual void machine_reset();
@@ -146,8 +153,6 @@ public:
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
-//  virtual void device_start();
-//  virtual void device_reset();
 };
 
 
@@ -159,8 +164,6 @@ public:
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
-//  virtual void device_start();
-//  virtual void device_reset();
 };
 
 class segaxbd_aburner2_state :  public segaxbd_state
@@ -181,8 +184,6 @@ public:
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
-//  virtual void device_start();
-//  virtual void device_reset();
 };
 
 class segaxbd_lastsurv_state :  public segaxbd_state
@@ -192,8 +193,6 @@ public:
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
-//  virtual void device_start();
-//  virtual void device_reset();
 };
 
 
@@ -204,8 +203,6 @@ public:
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
-//  virtual void device_start();
-//  virtual void device_reset();
 };
 
 
@@ -216,8 +213,6 @@ public:
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
-//  virtual void device_start();
-//  virtual void device_reset();
 };
 
 
@@ -228,6 +223,6 @@ public:
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
-//  virtual void device_start();
-//  virtual void device_reset();
 };
+
+#endif // MAME_INCLUDES_SEGAXBD_H

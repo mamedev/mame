@@ -5,8 +5,8 @@
 
 // A 128x32 plasma display with 16 pages and refreshed at 240Hz (for PWM luminosity control)
 
-#ifndef WPC_DMD_H
-#define WPC_DMD_H
+#ifndef MAME_VIDEO_WPC_DMD_H
+#define MAME_VIDEO_WPC_DMD_H
 
 #define MCFG_WPC_DMD_ADD( _tag, _scanline_cb ) \
 	MCFG_DEVICE_ADD( _tag, WPC_DMD, 0 ) \
@@ -32,7 +32,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	template<class _Object> static devcb_base &set_scanline_cb(device_t &device, _Object object) { return downcast<wpc_dmd_device &>(device).scanline_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_scanline_cb(device_t &device, Object &&cb) { return downcast<wpc_dmd_device &>(device).scanline_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	devcb_write_line scanline_cb;
@@ -46,6 +46,6 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
-extern const device_type WPC_DMD;
+DECLARE_DEVICE_TYPE(WPC_DMD, wpc_dmd_device)
 
-#endif
+#endif // MAME_VIDEO_WPC_DMD_H

@@ -56,7 +56,7 @@ public:
 	DECLARE_READ8_MEMBER(phunsy_data_r);
 	DECLARE_WRITE8_MEMBER(phunsy_ctrl_w);
 	DECLARE_WRITE8_MEMBER(phunsy_data_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(phunsy);
@@ -180,7 +180,7 @@ static INPUT_PORTS_START( phunsy )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( phunsy_state::kbd_put )
+void phunsy_state::kbd_put(u8 data)
 {
 	if (data)
 		m_keyboard_input = data;
@@ -327,7 +327,7 @@ DRIVER_INIT_MEMBER( phunsy_state, phunsy )
 	membank("bankq")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( phunsy, phunsy_state )
+static MACHINE_CONFIG_START( phunsy )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(phunsy_mem)
@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(phunsy_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(phunsy_state, kbd_put))
 	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* quickload */
@@ -389,5 +389,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT         COMPANY        FULLNAME       FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY            FULLNAME  FLAGS */
 COMP( 1980, phunsy, 0,      0,       phunsy,    phunsy, phunsy_state,  phunsy, "J.F.P. Philipse", "PHUNSY", MACHINE_NOT_WORKING )

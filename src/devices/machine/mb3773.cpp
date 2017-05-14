@@ -23,14 +23,14 @@
 //**************************************************************************
 
 // device type definition
-const device_type MB3773 = device_creator<mb3773_device>;
+DEFINE_DEVICE_TYPE(MB3773, mb3773_device, "mb3773", "MB3773 Power Supply Monitor")
 
 //-------------------------------------------------
 //  mb3773_device - constructor
 //-------------------------------------------------
 
 mb3773_device::mb3773_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: device_t(mconfig, MB3773, "MB3773 Power Supply Monitor", tag, owner, clock, "mb3773", __FILE__), m_watchdog_timer(nullptr), m_ck(0)
+	: device_t(mconfig, MB3773, tag, owner, clock), m_watchdog_timer(nullptr), m_ck(0)
 {
 }
 

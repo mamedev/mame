@@ -246,7 +246,7 @@ static INPUT_PORTS_START( rotaryf )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( rotaryf, rotaryf_state )
+static MACHINE_CONFIG_START( rotaryf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A,4000000) /* ?? MHz */
@@ -297,4 +297,4 @@ ROM_START( rotaryf )
 ROM_END
 
 
-GAME( 1979, rotaryf, 0, rotaryf, rotaryf, driver_device, 0, ROT270, "Kasco", "Rotary Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, rotaryf, 0, rotaryf, rotaryf, rotaryf_state, 0, ROT270, "Kasco", "Rotary Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

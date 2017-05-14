@@ -281,7 +281,7 @@ INTERRUPT_GEN_MEMBER(pbaction_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( pbaction, pbaction_state )
+static MACHINE_CONFIG_START( pbaction )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
@@ -504,8 +504,8 @@ DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
 
 
 
-GAME( 1985, pbaction,  0,        pbaction,  pbaction, driver_device,  0,        ROT90, "Tehkan", "Pinball Action (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction2, pbaction, pbaction,  pbaction, driver_device,  0,        ROT90, "Tehkan", "Pinball Action (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction2, pbaction, pbaction,  pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 2)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, driver_device,  0, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, driver_device,  0, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", MACHINE_SUPPORTS_SAVE )

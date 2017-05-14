@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef SONYDRIV_H
-#define SONYDRIV_H
+#ifndef MAME_MACHINE_SONYDRIV_H
+#define MAME_MACHINE_SONYDRIV_H
+
+#pragma once
 
 #include "imagedev/flopdrv.h"
 
@@ -24,29 +26,30 @@ enum
 };
 #endif
 
-void sony_set_lines(device_t *device,uint8_t lines);
-void sony_set_enable_lines(device_t *device,int enable_mask);
-void sony_set_sel_line(device_t *device,int sel);
+void sony_set_lines(device_t *device, uint8_t lines);
+void sony_set_enable_lines(device_t *device, int enable_mask);
+void sony_set_sel_line(device_t *device, int sel);
 
 void sony_set_speed(int speed);
 
 uint8_t sony_read_data(device_t *device);
-void sony_write_data(device_t *device,uint8_t data);
+void sony_write_data(device_t *device, uint8_t data);
 int sony_read_status(device_t *device);
 
-class sonydriv_floppy_image_device :    public legacy_floppy_image_device
+class sonydriv_floppy_image_device : public legacy_floppy_image_device
 {
 public:
 	// construction/destruction
 	sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void call_unload() override;
+
 protected:
 	virtual void device_start() override;
 };
 
 // device type definition
-extern const device_type FLOPPY_SONY;
+DECLARE_DEVICE_TYPE(FLOPPY_SONY, sonydriv_floppy_image_device)
 
 #define MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(_config)   \
 	MCFG_DEVICE_ADD(FLOPPY_0, FLOPPY_SONY, 0)       \
@@ -66,6 +69,4 @@ extern const device_type FLOPPY_SONY;
 	MCFG_DEVICE_MODIFY(FLOPPY_1)        \
 	MCFG_LEGACY_FLOPPY_CONFIG(_config)
 
-
-
-#endif /* SONYDRIV_H */
+#endif // MAME_MACHINE_SONYDRIV_H

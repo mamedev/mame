@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_EXOS = device_creator<c64_exos_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_EXOS, c64_exos_cartridge_device, "c64_exos", "C64 ExOS cartridge")
 
 
 
@@ -28,7 +28,7 @@ const device_type C64_EXOS = device_creator<c64_exos_cartridge_device>;
 //-------------------------------------------------
 
 c64_exos_cartridge_device::c64_exos_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_EXOS, "C64 ExOS cartridge", tag, owner, clock, "c64_exos", __FILE__),
+	device_t(mconfig, C64_EXOS, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {
 }

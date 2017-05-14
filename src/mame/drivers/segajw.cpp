@@ -356,7 +356,7 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8, segajw_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( segajw, segajw_state )
+static MACHINE_CONFIG_START( segajw )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,8000000) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(segajw_map)
@@ -428,4 +428,4 @@ ROM_START( segajw )
 ROM_END
 
 
-GAMEL( 1991, segajw,  0,   segajw,  segajw, driver_device,  0, ROT0, "Sega", "Joker's Wild (Rev. B)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_segajw )
+GAMEL( 1991, segajw,  0,   segajw,  segajw, segajw_state,  0, ROT0, "Sega", "Joker's Wild (Rev. B)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_segajw )

@@ -325,7 +325,7 @@ void superslave_state::machine_reset()
 //  MACHINE_CONFIG( superslave )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( superslave, superslave_state )
+static MACHINE_CONFIG_START( superslave )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(superslave_mem)
@@ -408,5 +408,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS          INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1983, superslv, 0,      0,      superslave, superslave, driver_device, 0, "Advanced Digital Corporation", "Super Slave",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT  COMPANY                         FULLNAME        FLAGS
+COMP( 1983, superslv, 0,      0,      superslave, superslave, superslave_state, 0,    "Advanced Digital Corporation", "Super Slave",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

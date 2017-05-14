@@ -294,7 +294,7 @@ MACHINE_RESET_MEMBER(quasar_state,quasar)
 	m_io_page = 8;
 }
 
-static MACHINE_CONFIG_START( quasar, quasar_state )
+static MACHINE_CONFIG_START( quasar )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 14318000/4)  /* 14 mhz crystal divide by 4 on board */
@@ -408,5 +408,5 @@ ROM_START( quasara )
 ROM_END
 
 
-GAME( 1980, quasar,   0,      quasar,   quasar, driver_device,   0, ROT90, "Zaccaria / Zelco", "Quasar (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, quasara,  quasar, quasar,   quasar, driver_device,   0, ROT90, "Zaccaria / Zelco", "Quasar (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, quasar,   0,      quasar,   quasar, quasar_state,   0, ROT90, "Zaccaria / Zelco", "Quasar (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, quasara,  quasar, quasar,   quasar, quasar_state,   0, ROT90, "Zaccaria / Zelco", "Quasar (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

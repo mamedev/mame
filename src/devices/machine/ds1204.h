@@ -7,17 +7,16 @@
  *
  */
 
-#pragma once
+#ifndef MAME_MACHINE_DS1204_H
+#define MAME_MACHINE_DS1204_H
 
-#ifndef __DS1204_H__
-#define __DS1204_H__
+#pragma once
 
 
 #define MCFG_DS1204_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, DS1204, 0 )
 
-class ds1204_device : public device_t,
-	public device_nvram_interface
+class ds1204_device : public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
@@ -89,6 +88,6 @@ private:
 
 
 // device type definition
-extern const device_type DS1204;
+DECLARE_DEVICE_TYPE(DS1204, ds1204_device)
 
-#endif
+#endif // MAME_MACHINE_DS1204_H

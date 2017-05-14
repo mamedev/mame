@@ -16,10 +16,10 @@
 #include "emu.h"
 #include "decopincpu.h"
 
-const device_type DECOCPU1 = device_creator<decocpu_type1_device>;
-const device_type DECOCPU2 = device_creator<decocpu_type2_device>;
-const device_type DECOCPU3 = device_creator<decocpu_type3_device>;
-const device_type DECOCPU3B = device_creator<decocpu_type3b_device>;
+DEFINE_DEVICE_TYPE(DECOCPU1,  decocpu_type1_device,  "decocpu1",  "Data East Pinball CPU Board Type 1")
+DEFINE_DEVICE_TYPE(DECOCPU2,  decocpu_type2_device,  "decocpu2",  "Data East Pinball CPU Board Type 2")
+DEFINE_DEVICE_TYPE(DECOCPU3,  decocpu_type3_device,  "decocpu3",  "Data East Pinball CPU Board Type 3")
+DEFINE_DEVICE_TYPE(DECOCPU3B, decocpu_type3b_device, "decocpu3b", "Data East Pinball CPU Board Type 3B")
 
 static ADDRESS_MAP_START( decocpu1_map, AS_PROGRAM, 8, decocpu_type1_device )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
@@ -264,26 +264,11 @@ ioport_constructor decocpu_type1_device::device_input_ports() const
 }
 
 decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECOCPU1, "Data East Pinball CPU Board Type 1", tag, owner, clock, "decocpu1", __FILE__),
-		m_cpu(*this,"maincpu"),
-		m_pia21(*this, "pia21"),
-		m_pia24(*this, "pia24"),
-		m_pia28(*this, "pia28"),
-		m_pia2c(*this, "pia2c"),
-		m_pia30(*this, "pia30"),
-		m_pia34(*this, "pia34"),
-		m_read_display(*this),
-		m_write_display(*this),
-		m_read_dmdstatus(*this),
-		m_write_soundlatch(*this),
-		m_read_switch(*this),
-		m_write_switch(*this),
-		m_write_lamp(*this),
-		m_write_solenoid(*this)
+	: decocpu_type1_device(mconfig, DECOCPU1, tag, owner, clock)
 {}
 
-decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+decocpu_type1_device::decocpu_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		m_cpu(*this,"maincpu"),
 		m_pia21(*this, "pia21"),
 		m_pia24(*this, "pia24"),
@@ -329,11 +314,11 @@ void decocpu_type1_device::static_set_cpuregion(device_t &device, const char *ta
 }
 
 decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: decocpu_type1_device(mconfig, DECOCPU2, "Data East Pinball CPU Board Type 2", tag, owner, clock, "decocpu2", __FILE__)
+	: decocpu_type2_device(mconfig, DECOCPU2, tag, owner, clock)
 {}
 
-decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: decocpu_type1_device(mconfig, type, name, tag, owner, clock, shortname, source)
+decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: decocpu_type1_device(mconfig, type, tag, owner, clock)
 {}
 
 machine_config_constructor decocpu_type2_device::device_mconfig_additions() const
@@ -347,11 +332,11 @@ void decocpu_type2_device::device_start()
 }
 
 decocpu_type3_device::decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: decocpu_type2_device(mconfig, DECOCPU3, "Data East Pinball CPU Board Type 3", tag, owner, clock, "decocpu3", __FILE__)
+	: decocpu_type3_device(mconfig, DECOCPU3, tag, owner, clock)
 {}
 
-decocpu_type3_device::decocpu_type3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: decocpu_type2_device(mconfig, type, name, tag, owner, clock, shortname, source)
+decocpu_type3_device::decocpu_type3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: decocpu_type2_device(mconfig, type, tag, owner, clock)
 {}
 
 void decocpu_type3_device::device_start()
@@ -360,7 +345,7 @@ void decocpu_type3_device::device_start()
 }
 
 decocpu_type3b_device::decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: decocpu_type3_device(mconfig, DECOCPU3B, "Data East Pinball CPU Board Type 3B", tag, owner, clock, "decocpu3b", __FILE__)
+	: decocpu_type3_device(mconfig, DECOCPU3B, tag, owner, clock)
 {}
 
 void decocpu_type3b_device::device_start()

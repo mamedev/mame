@@ -286,10 +286,10 @@ static ADDRESS_MAP_START(risc2500_mem, AS_PROGRAM, 32, risc2500_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( risc2500, risc2500_state )
+static MACHINE_CONFIG_START( risc2500 )
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_28_322MHz / 2)      // VY86C010
 	MCFG_CPU_PROGRAM_MAP(risc2500_mem)
-	MCFG_ARM_COPRO(ARM_COPRO_TYPE_VL86C020)
+	MCFG_ARM_COPRO(VL86C020)
 	MCFG_CPU_PERIODIC_INT_DRIVER(risc2500_state, irq1_line_hold, 250)
 
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -335,6 +335,6 @@ ROM_START( montreux )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     INIT                COMPANY   FULLNAME     FLAGS */
-CONS( 1992, risc,     0,       0,      risc2500,  risc2500, driver_device,  0,  "Saitek", "RISC 2500", MACHINE_CLICKABLE_ARTWORK )
-CONS( 1995, montreux, 0,       0,      risc2500,  risc2500, driver_device,  0,  "Saitek / Hegener & Glaser", "Mephisto Montreux", MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     STATE            INIT  COMPANY                      FULLNAME             FLAGS */
+CONS( 1992, risc,     0,       0,      risc2500,  risc2500, risc2500_state,  0,    "Saitek",                    "RISC 2500",         MACHINE_CLICKABLE_ARTWORK )
+CONS( 1995, montreux, 0,       0,      risc2500,  risc2500, risc2500_state,  0,    "Saitek / Hegener & Glaser", "Mephisto Montreux", MACHINE_CLICKABLE_ARTWORK )

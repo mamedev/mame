@@ -167,11 +167,10 @@ class running_machine
 {
 	DISABLE_COPYING(running_machine);
 
-	struct side_effect_disabler;
+	class side_effect_disabler;
 
 	friend class sound_manager;
 	friend class memory_manager;
-	friend struct side_effect_disabler;
 
 	typedef std::function<void(const char*)> logerror_callback;
 
@@ -290,10 +289,11 @@ public:
 	u32                     debug_flags;        // the current debug flags
 
 private:
-	struct side_effect_disabler {
+	class side_effect_disabler {
 		running_machine *m_machine;
 		bool m_disable_se;
 
+	public:
 		side_effect_disabler(running_machine *m, bool disable_se) : m_machine(m), m_disable_se(disable_se) {
 			if(m_disable_se)
 				m_machine->disable_side_effect_count();

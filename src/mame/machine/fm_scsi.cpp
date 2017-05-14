@@ -28,18 +28,38 @@
 #include "fm_scsi.h"
 #include "debugger.h"
 
+// SCSI input lines (from target)
+#define FMSCSI_LINE_REQ   0x80
+#define FMSCSI_LINE_IO    0x40
+#define FMSCSI_LINE_MSG   0x20
+#define FMSCSI_LINE_CD    0x10
+#define FMSCSI_LINE_BSY   0x08
+#define FMSCSI_LINE_EX    0x04
+#define FMSCSI_LINE_INT   0x02
+#define FMSCSI_LINE_PERR  0x01
+
+// SCSI output lines (to target)
+#define FMSCSI_LINE_WEN   0x80
+#define FMSCSI_LINE_IMSK  0x40
+#define FMSCSI_LINE_RMSK  0x20
+#define FMSCSI_LINE_ATN   0x10
+#define FMSCSI_LINE_WRD   0x08
+#define FMSCSI_LINE_SEL   0x04
+#define FMSCSI_LINE_DMAE  0x02
+#define FMSCSI_LINE_RST   0x01
+
 /*
  *  Device config
  */
 
-const device_type FMSCSI = device_creator<fmscsi_device>;
+DEFINE_DEVICE_TYPE(FMSCSI, fmscsi_device, "fmscsi", "FM-SCSI")
 
 /*
  * Device
  */
 
 fmscsi_device::fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: legacy_scsi_host_adapter(mconfig, FMSCSI, "FM-SCSI", tag, owner, clock, "fmscsi", __FILE__),
+	: legacy_scsi_host_adapter(mconfig, FMSCSI, tag, owner, clock),
 	m_irq_handler(*this),
 	m_drq_handler(*this)
 {

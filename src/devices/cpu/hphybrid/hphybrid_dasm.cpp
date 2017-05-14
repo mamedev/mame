@@ -5,8 +5,11 @@
 // ********************************************************************************
 
 #include "emu.h"
-#include "debugger.h"
 #include "hphybrid.h"
+#include "debugger.h"
+
+#include "hphybrid_defs.h"
+
 
 typedef void (*fn_dis_param)(std::ostream &stream , offs_t pc , uint16_t opcode , bool is_3001);
 

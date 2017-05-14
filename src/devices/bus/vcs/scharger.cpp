@@ -37,12 +37,12 @@
 #include "sound/wave.h"
 #include "formats/a26_cas.h"
 
-const device_type A26_ROM_SUPERCHARGER = device_creator<a26_rom_ss_device>;
+DEFINE_DEVICE_TYPE(A26_ROM_SUPERCHARGER, a26_rom_ss_device, "a2600_ss", "Atari 2600 ROM Cart Supercharger")
 
 
 a26_rom_ss_device::a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-						: a26_rom_f6_device(mconfig, A26_ROM_SUPERCHARGER, "Atari 2600 ROM Cart Supercharger", tag, owner, clock, "a2600_ss", __FILE__),
-							m_cassette(*this, "cassette"),
+	: a26_rom_f6_device(mconfig, A26_ROM_SUPERCHARGER, tag, owner, clock),
+	m_cassette(*this, "cassette"),
 	m_maincpu(nullptr),
 	m_reg(0),
 	m_write_delay(0),
@@ -51,7 +51,7 @@ a26_rom_ss_device::a26_rom_ss_device(const machine_config &mconfig, const char *
 	m_byte_started(0),
 	m_last_address(0),
 	m_diff_adjust(0)
-					{
+{
 }
 
 //-------------------------------------------------

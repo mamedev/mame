@@ -7,10 +7,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_Z80_TMPZ84C015_H
+#define MAME_CPU_Z80_TMPZ84C015_H
 
-#ifndef __TMPZ84C015__
-#define __TMPZ84C015__
+#pragma once
 
 #include "z80.h"
 #include "machine/z80dart.h"
@@ -263,7 +263,7 @@ private:
 
 
 // device type definition
-extern const device_type TMPZ84C015;
+DECLARE_DEVICE_TYPE(TMPZ84C015, tmpz84c015_device)
 
 
-#endif // __TMPZ84C015__
+#endif // MAME_CPU_Z80_TMPZ84C015_H

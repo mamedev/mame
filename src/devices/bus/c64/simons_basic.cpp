@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SIMONS_BASIC = device_creator<c64_simons_basic_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_SIMONS_BASIC, c64_simons_basic_cartridge_device, "c64_simons_basic", "C64 Simons' BASIC")
 
 
 
@@ -28,7 +28,7 @@ const device_type C64_SIMONS_BASIC = device_creator<c64_simons_basic_cartridge_d
 //-------------------------------------------------
 
 c64_simons_basic_cartridge_device::c64_simons_basic_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_SIMONS_BASIC, "Simons' BASIC", tag, owner, clock, "c64_simons_basic", __FILE__),
+	device_t(mconfig, C64_SIMONS_BASIC, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {
 }

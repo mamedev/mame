@@ -3,6 +3,8 @@
 #ifndef MAME_INCLUDES_PCD_KBD_H
 #define MAME_INCLUDES_PCD_KBD_H
 
+#pragma once
+
 #define MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(_devcb) \
 	devcb = &pcd_keyboard_device::set_out_tx_handler(*device, DEVCB_##_devcb);
 
@@ -24,6 +26,7 @@ public:
 	DECLARE_WRITE8_MEMBER( p1_w );
 	DECLARE_READ_LINE_MEMBER( t0_r );
 	DECLARE_WRITE_LINE_MEMBER( t0_w );
+
 private:
 	required_ioport_array<17> m_rows;
 	uint8_t m_p1;
@@ -32,5 +35,6 @@ private:
 };
 
 extern const device_type PCD_KEYBOARD;
+DECLARE_DEVICE_TYPE(PCD_KEYBOARD, pcd_keyboard_device)
 
 #endif // MAME_INCLUDES_PCD_KBD_H

@@ -70,9 +70,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C2040 = device_creator<c2040_t>;
-const device_type C3040 = device_creator<c3040_t>;
-const device_type C4040 = device_creator<c4040_t>;
+DEFINE_DEVICE_TYPE(C2040, c2040_device, "c2040", "Commodore 2040")
+DEFINE_DEVICE_TYPE(C3040, c3040_device, "c3040", "Commodore 3040")
+DEFINE_DEVICE_TYPE(C4040, c4040_device, "c4040", "Commodore 4040")
 
 
 //-------------------------------------------------
@@ -97,7 +97,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *c2040_t::device_rom_region() const
+const tiny_rom_entry *c2040_device::device_rom_region() const
 {
 	return ROM_NAME( c2040 );
 }
@@ -124,7 +124,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *c3040_t::device_rom_region() const
+const tiny_rom_entry *c3040_device::device_rom_region() const
 {
 	return ROM_NAME( c3040 );
 }
@@ -159,7 +159,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *c4040_t::device_rom_region() const
+const tiny_rom_entry *c4040_device::device_rom_region() const
 {
 	return ROM_NAME( c4040 );
 }
@@ -169,12 +169,12 @@ const tiny_rom_entry *c4040_t::device_rom_region() const
 //  ADDRESS_MAP( c2040_main_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c2040_main_mem, AS_PROGRAM, 8, c2040_t )
+static ADDRESS_MAP_START( c2040_main_mem, AS_PROGRAM, 8, c2040_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_DEVICE(M6532_0_TAG, mos6532_t, ram_map)
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_DEVICE(M6532_1_TAG, mos6532_t, ram_map)
-	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVICE(M6532_0_TAG, mos6532_t, io_map)
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d60) AM_DEVICE(M6532_1_TAG, mos6532_t, io_map)
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_DEVICE(M6532_0_TAG, mos6532_new_device, ram_map)
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_DEVICE(M6532_1_TAG, mos6532_new_device, ram_map)
+	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVICE(M6532_0_TAG, mos6532_new_device, io_map)
+	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d60) AM_DEVICE(M6532_1_TAG, mos6532_new_device, io_map)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share3")
@@ -187,11 +187,11 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( c2040_fdc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c2040_fdc_mem, AS_PROGRAM, 8, c2040_t )
+static ADDRESS_MAP_START( c2040_fdc_mem, AS_PROGRAM, 8, c2040_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_DEVICE(M6530_TAG, mos6530_t, ram_map)
+	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_DEVICE(M6530_TAG, mos6530_new_device, ram_map)
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVICE(M6522_TAG, via6522_device, map)
-	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVICE(M6530_TAG, mos6530_t, io_map)
+	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVICE(M6530_TAG, mos6530_new_device, io_map)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
@@ -204,7 +204,7 @@ ADDRESS_MAP_END
 //  riot6532 uc1
 //-------------------------------------------------
 
-READ8_MEMBER( c2040_t::dio_r )
+READ8_MEMBER( c2040_device::dio_r )
 {
 	/*
 
@@ -224,7 +224,7 @@ READ8_MEMBER( c2040_t::dio_r )
 	return m_bus->dio_r();
 }
 
-WRITE8_MEMBER( c2040_t::dio_w )
+WRITE8_MEMBER( c2040_device::dio_w )
 {
 	/*
 
@@ -249,7 +249,7 @@ WRITE8_MEMBER( c2040_t::dio_w )
 //  riot6532 ue1
 //-------------------------------------------------
 
-READ8_MEMBER( c2040_t::riot1_pa_r )
+READ8_MEMBER( c2040_device::riot1_pa_r )
 {
 	/*
 
@@ -280,7 +280,7 @@ READ8_MEMBER( c2040_t::riot1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c2040_t::riot1_pa_w )
+WRITE8_MEMBER( c2040_device::riot1_pa_w )
 {
 	/*
 
@@ -315,7 +315,7 @@ WRITE8_MEMBER( c2040_t::riot1_pa_w )
 	update_ieee_signals();
 }
 
-READ8_MEMBER( c2040_t::riot1_pb_r )
+READ8_MEMBER( c2040_device::riot1_pb_r )
 {
 	/*
 
@@ -346,7 +346,7 @@ READ8_MEMBER( c2040_t::riot1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c2040_t::riot1_pb_w )
+WRITE8_MEMBER( c2040_device::riot1_pb_w )
 {
 	/*
 
@@ -374,7 +374,7 @@ WRITE8_MEMBER( c2040_t::riot1_pb_w )
 }
 
 
-WRITE8_MEMBER( c2040_t::via_pb_w )
+WRITE8_MEMBER( c2040_device::via_pb_w )
 {
 	/*
 
@@ -418,7 +418,7 @@ SLOT_INTERFACE_END
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c2040_t::floppy_formats )
+FLOPPY_FORMATS_MEMBER( c2040_device::floppy_formats )
 	FLOPPY_C3040_FORMAT,
 	FLOPPY_G64_FORMAT
 FLOPPY_FORMATS_END
@@ -428,7 +428,7 @@ FLOPPY_FORMATS_END
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c3040_t::floppy_formats )
+FLOPPY_FORMATS_MEMBER( c3040_device::floppy_formats )
 	FLOPPY_C3040_FORMAT,
 	FLOPPY_G64_FORMAT
 FLOPPY_FORMATS_END
@@ -438,7 +438,7 @@ FLOPPY_FORMATS_END
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c4040_t::floppy_formats )
+FLOPPY_FORMATS_MEMBER( c4040_device::floppy_formats )
 	FLOPPY_C4040_FORMAT,
 	FLOPPY_G64_FORMAT
 FLOPPY_FORMATS_END
@@ -453,15 +453,15 @@ static MACHINE_CONFIG_FRAGMENT( c2040 )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c2040_main_mem)
 
-	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532n, XTAL_16MHz/16)
-	MCFG_MOS6530n_IN_PA_CB(READ8(c2040_t, dio_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(c2040_t, dio_w))
+	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532_NEW, XTAL_16MHz/16)
+	MCFG_MOS6530n_IN_PA_CB(READ8(c2040_device, dio_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(c2040_device, dio_w))
 
-	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532n, XTAL_16MHz/16)
-	MCFG_MOS6530n_IN_PA_CB(READ8(c2040_t, riot1_pa_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(c2040_t, riot1_pa_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(c2040_t, riot1_pb_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(c2040_t, riot1_pb_w))
+	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532_NEW, XTAL_16MHz/16)
+	MCFG_MOS6530n_IN_PA_CB(READ8(c2040_device, riot1_pa_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(c2040_device, riot1_pa_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(c2040_device, riot1_pb_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(c2040_device, riot1_pb_w))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
 
 	// controller
@@ -469,25 +469,25 @@ static MACHINE_CONFIG_FRAGMENT( c2040 )
 	MCFG_CPU_PROGRAM_MAP(c2040_fdc_mem)
 
 	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL_16MHz/16)
-	MCFG_VIA6522_READPA_HANDLER(DEVREAD8(FDC_TAG, c2040_fdc_t, read))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(c2040_t, via_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_t, mode_sel_w))
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_t, rw_sel_w))
+	MCFG_VIA6522_READPA_HANDLER(DEVREAD8(FDC_TAG, c2040_fdc_device, read))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(c2040_device, via_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_device, mode_sel_w))
+	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_device, rw_sel_w))
 
-	MCFG_DEVICE_ADD(M6530_TAG, MOS6530n, XTAL_16MHz/16)
-	MCFG_MOS6530n_OUT_PA_CB(DEVWRITE8(FDC_TAG, c2040_fdc_t, write))
-	MCFG_MOS6530n_OUT_PB0_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, drv_sel_w))
-	MCFG_MOS6530n_OUT_PB1_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, ds0_w))
-	MCFG_MOS6530n_OUT_PB2_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, ds1_w))
+	MCFG_DEVICE_ADD(M6530_TAG, MOS6530_NEW, XTAL_16MHz/16)
+	MCFG_MOS6530n_OUT_PA_CB(DEVWRITE8(FDC_TAG, c2040_fdc_device, write))
+	MCFG_MOS6530n_OUT_PB0_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_device, drv_sel_w))
+	MCFG_MOS6530n_OUT_PB1_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_device, ds0_w))
+	MCFG_MOS6530n_OUT_PB2_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_device, ds1_w))
 	MCFG_MOS6530n_OUT_PB7_CB(INPUTLINE(M6504_TAG, M6502_IRQ_LINE))
-	MCFG_MOS6530n_IN_PB3_CB(DEVREADLINE(FDC_TAG, c2040_fdc_t, wps_r))
+	MCFG_MOS6530n_IN_PB3_CB(DEVREADLINE(FDC_TAG, c2040_fdc_device, wps_r))
 
 	MCFG_DEVICE_ADD(FDC_TAG, C2040_FDC, XTAL_16MHz)
-	MCFG_C2040_SYNC_CALLBACK(DEVWRITELINE(M6530_TAG, mos6530_t, pb6_w))
+	MCFG_C2040_SYNC_CALLBACK(DEVWRITELINE(M6530_TAG, mos6530_new_device, pb6_w))
 	MCFG_C2040_READY_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_C2040_ERROR_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c2040_t::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", c2040_floppies, "525ssqd", c2040_t::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c2040_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", c2040_floppies, "525ssqd", c2040_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -496,7 +496,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor c2040_t::device_mconfig_additions() const
+machine_config_constructor c2040_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( c2040 );
 }
@@ -511,15 +511,15 @@ static MACHINE_CONFIG_FRAGMENT( c3040 )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c2040_main_mem)
 
-	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532n, XTAL_16MHz/16)
-	MCFG_MOS6530n_IN_PA_CB(READ8(c2040_t, dio_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(c2040_t, dio_w))
+	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532_NEW, XTAL_16MHz/16)
+	MCFG_MOS6530n_IN_PA_CB(READ8(c2040_device, dio_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(c2040_device, dio_w))
 
-	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532n, XTAL_16MHz/16)
-	MCFG_MOS6530n_IN_PA_CB(READ8(c2040_t, riot1_pa_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(c2040_t, riot1_pa_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(c2040_t, riot1_pb_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(c2040_t, riot1_pb_w))
+	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532_NEW, XTAL_16MHz/16)
+	MCFG_MOS6530n_IN_PA_CB(READ8(c2040_device, riot1_pa_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(c2040_device, riot1_pa_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(c2040_device, riot1_pb_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(c2040_device, riot1_pb_w))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
 
 	// controller
@@ -527,25 +527,25 @@ static MACHINE_CONFIG_FRAGMENT( c3040 )
 	MCFG_CPU_PROGRAM_MAP(c2040_fdc_mem)
 
 	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL_16MHz/16)
-	MCFG_VIA6522_READPA_HANDLER(DEVREAD8(FDC_TAG, c2040_fdc_t, read))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(c2040_t, via_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_t, mode_sel_w))
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_t, rw_sel_w))
+	MCFG_VIA6522_READPA_HANDLER(DEVREAD8(FDC_TAG, c2040_fdc_device, read))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(c2040_device, via_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_device, mode_sel_w))
+	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_device, rw_sel_w))
 
-	MCFG_DEVICE_ADD(M6530_TAG, MOS6530n, XTAL_16MHz/16)
-	MCFG_MOS6530n_OUT_PA_CB(DEVWRITE8(FDC_TAG, c2040_fdc_t, write))
-	MCFG_MOS6530n_OUT_PB0_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, drv_sel_w))
-	MCFG_MOS6530n_OUT_PB1_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, ds0_w))
-	MCFG_MOS6530n_OUT_PB2_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, ds1_w))
-	MCFG_MOS6530n_IN_PB3_CB(DEVREADLINE(FDC_TAG, c2040_fdc_t, wps_r))
+	MCFG_DEVICE_ADD(M6530_TAG, MOS6530_NEW, XTAL_16MHz/16)
+	MCFG_MOS6530n_OUT_PA_CB(DEVWRITE8(FDC_TAG, c2040_fdc_device, write))
+	MCFG_MOS6530n_OUT_PB0_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_device, drv_sel_w))
+	MCFG_MOS6530n_OUT_PB1_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_device, ds0_w))
+	MCFG_MOS6530n_OUT_PB2_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_device, ds1_w))
+	MCFG_MOS6530n_IN_PB3_CB(DEVREADLINE(FDC_TAG, c2040_fdc_device, wps_r))
 	MCFG_MOS6530n_OUT_PB7_CB(INPUTLINE(M6504_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(FDC_TAG, C2040_FDC, XTAL_16MHz)
-	MCFG_C2040_SYNC_CALLBACK(DEVWRITELINE(M6530_TAG, mos6530_t, pb6_w))
+	MCFG_C2040_SYNC_CALLBACK(DEVWRITELINE(M6530_TAG, mos6530_new_device, pb6_w))
 	MCFG_C2040_READY_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_C2040_ERROR_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c3040_t::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", c2040_floppies, "525ssqd", c3040_t::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c3040_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", c2040_floppies, "525ssqd", c3040_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -554,7 +554,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor c3040_t::device_mconfig_additions() const
+machine_config_constructor c3040_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( c3040 );
 }
@@ -569,15 +569,15 @@ static MACHINE_CONFIG_FRAGMENT( c4040 )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c2040_main_mem)
 
-	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532n, XTAL_16MHz/16)
-	MCFG_MOS6530n_IN_PA_CB(READ8(c2040_t, dio_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(c2040_t, dio_w))
+	MCFG_DEVICE_ADD(M6532_0_TAG, MOS6532_NEW, XTAL_16MHz/16)
+	MCFG_MOS6530n_IN_PA_CB(READ8(c2040_device, dio_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(c2040_device, dio_w))
 
-	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532n, XTAL_16MHz/16)
-	MCFG_MOS6530n_IN_PA_CB(READ8(c2040_t, riot1_pa_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(c2040_t, riot1_pa_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(c2040_t, riot1_pb_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(c2040_t, riot1_pb_w))
+	MCFG_DEVICE_ADD(M6532_1_TAG, MOS6532_NEW, XTAL_16MHz/16)
+	MCFG_MOS6530n_IN_PA_CB(READ8(c2040_device, riot1_pa_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(c2040_device, riot1_pa_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(c2040_device, riot1_pb_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(c2040_device, riot1_pb_w))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
 
 	// controller
@@ -585,25 +585,25 @@ static MACHINE_CONFIG_FRAGMENT( c4040 )
 	MCFG_CPU_PROGRAM_MAP(c2040_fdc_mem)
 
 	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL_16MHz/16)
-	MCFG_VIA6522_READPA_HANDLER(DEVREAD8(FDC_TAG, c2040_fdc_t, read))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(c2040_t, via_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_t, mode_sel_w))
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_t, rw_sel_w))
+	MCFG_VIA6522_READPA_HANDLER(DEVREAD8(FDC_TAG, c2040_fdc_device, read))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(c2040_device, via_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_device, mode_sel_w))
+	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_device, rw_sel_w))
 
-	MCFG_DEVICE_ADD(M6530_TAG, MOS6530n, XTAL_16MHz/16)
-	MCFG_MOS6530n_OUT_PA_CB(DEVWRITE8(FDC_TAG, c2040_fdc_t, write))
-	MCFG_MOS6530n_OUT_PB0_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, drv_sel_w))
-	MCFG_MOS6530n_OUT_PB1_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, ds0_w))
-	MCFG_MOS6530n_OUT_PB2_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, ds1_w))
-	MCFG_MOS6530n_IN_PB3_CB(DEVREADLINE(FDC_TAG, c2040_fdc_t, wps_r))
+	MCFG_DEVICE_ADD(M6530_TAG, MOS6530_NEW, XTAL_16MHz/16)
+	MCFG_MOS6530n_OUT_PA_CB(DEVWRITE8(FDC_TAG, c2040_fdc_device, write))
+	MCFG_MOS6530n_OUT_PB0_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_device, drv_sel_w))
+	MCFG_MOS6530n_OUT_PB1_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_device, ds0_w))
+	MCFG_MOS6530n_OUT_PB2_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_device, ds1_w))
+	MCFG_MOS6530n_IN_PB3_CB(DEVREADLINE(FDC_TAG, c2040_fdc_device, wps_r))
 	MCFG_MOS6530n_OUT_PB7_CB(INPUTLINE(M6504_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(FDC_TAG, C2040_FDC, XTAL_16MHz)
-	MCFG_C2040_SYNC_CALLBACK(DEVWRITELINE(M6530_TAG, mos6530_t, pb6_w))
+	MCFG_C2040_SYNC_CALLBACK(DEVWRITELINE(M6530_TAG, mos6530_new_device, pb6_w))
 	MCFG_C2040_READY_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_C2040_ERROR_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c4040_t::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", c2040_floppies, "525ssqd", c4040_t::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c4040_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", c2040_floppies, "525ssqd", c4040_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -612,7 +612,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor c4040_t::device_mconfig_additions() const
+machine_config_constructor c4040_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( c4040 );
 }
@@ -640,7 +640,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor c2040_t::device_input_ports() const
+ioport_constructor c2040_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( c2040 );
 }
@@ -655,7 +655,7 @@ ioport_constructor c2040_t::device_input_ports() const
 //  update_ieee_signals -
 //-------------------------------------------------
 
-inline void c2040_t::update_ieee_signals()
+inline void c2040_device::update_ieee_signals()
 {
 	int atn = m_bus->atn_r();
 	int nrfd = !(!(!(atn && m_atna) && m_rfdo) || !(atn || m_atna));
@@ -672,11 +672,11 @@ inline void c2040_t::update_ieee_signals()
 //**************************************************************************
 
 //-------------------------------------------------
-//  c2040_t - constructor
+//  c2040_device - constructor
 //-------------------------------------------------
 
-c2040_t::c2040_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+c2040_device::c2040_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_ieee488_interface(mconfig, *this),
 	m_maincpu(*this, M6502_TAG),
 	m_fdccpu(*this, M6504_TAG),
@@ -691,52 +691,42 @@ c2040_t::c2040_t(const machine_config &mconfig, device_type type, const char *na
 	m_address(*this, "ADDRESS"),
 	m_rfdo(1),
 	m_daco(1),
-	m_atna(1), m_ifc(0)
+	m_atna(1),
+	m_ifc(0)
 {
 }
 
-c2040_t::c2040_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C2040, "C2040", tag, owner, clock, "c2040", __FILE__),
-	device_ieee488_interface(mconfig, *this),
-	m_maincpu(*this, M6502_TAG),
-	m_fdccpu(*this, M6504_TAG),
-	m_riot0(*this, M6532_0_TAG),
-	m_riot1(*this, M6532_1_TAG),
-	m_miot(*this, M6530_TAG),
-	m_via(*this, M6522_TAG),
-	m_floppy0(*this, FDC_TAG":0:525ssqd"),
-	m_floppy1(*this, FDC_TAG":1:525ssqd"),
-	m_fdc(*this, FDC_TAG),
-	m_gcr(*this, "gcr"),
-	m_address(*this, "ADDRESS"),
-	m_rfdo(1),
-	m_daco(1),
-	m_atna(1), m_ifc(0)
+c2040_device::c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	c2040_device(mconfig, C2040, tag, owner, clock)
 {
 }
 
 
 //-------------------------------------------------
-//  c3040_t - constructor
+//  c3040_device - constructor
 //-------------------------------------------------
 
-c3040_t::c3040_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	c2040_t(mconfig, C3040, "C3040", tag, owner, clock, "c3040", __FILE__) { }
+c3040_device::c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	c2040_device(mconfig, C3040, tag, owner, clock)
+{
+}
 
 
 //-------------------------------------------------
-//  c4040_t - constructor
+//  c4040_device - constructor
 //-------------------------------------------------
 
-c4040_t::c4040_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	c2040_t(mconfig, C4040, "C4040", tag, owner, clock, "c4040", __FILE__) { }
+c4040_device::c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	c2040_device(mconfig, C4040, tag, owner, clock)
+{
+}
 
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void c2040_t::device_start()
+void c2040_device::device_start()
 {
 	// install image callbacks
 	m_fdc->set_floppy(m_floppy0, m_floppy1);
@@ -753,7 +743,7 @@ void c2040_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void c2040_t::device_reset()
+void c2040_device::device_reset()
 {
 	m_maincpu->reset();
 
@@ -780,7 +770,7 @@ void c2040_t::device_reset()
 //  ieee488_atn -
 //-------------------------------------------------
 
-void c2040_t::ieee488_atn(int state)
+void c2040_device::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
@@ -792,7 +782,7 @@ void c2040_t::ieee488_atn(int state)
 //  ieee488_ifc -
 //-------------------------------------------------
 
-void c2040_t::ieee488_ifc(int state)
+void c2040_device::ieee488_ifc(int state)
 {
 	if (!m_ifc && state)
 	{

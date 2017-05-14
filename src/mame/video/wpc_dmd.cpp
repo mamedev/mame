@@ -5,7 +5,7 @@
 #include "rendlay.h"
 #include "screen.h"
 
-const device_type WPC_DMD = device_creator<wpc_dmd_device>;
+DEFINE_DEVICE_TYPE(WPC_DMD, wpc_dmd_device, "wpc_dmd", "Williams Pinball Controller Dot Matrix Display")
 
 DEVICE_ADDRESS_MAP_START( registers, 8, wpc_dmd_device )
 	AM_RANGE(0, 0) AM_WRITE(bank2_w)
@@ -32,7 +32,7 @@ MACHINE_CONFIG_END
 
 
 wpc_dmd_device::wpc_dmd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WPC_DMD, "Williams Pinball Controller Dot Matrix Display", tag, owner, clock, "wpc_dmd", __FILE__),
+	device_t(mconfig, WPC_DMD, tag, owner, clock),
 	scanline_cb(*this),
 	dmd0(*this, ":dmd0"),
 	dmd2(*this, ":dmd2"),

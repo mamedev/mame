@@ -379,7 +379,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type FD1094 = device_creator<fd1094_device>;
+DEFINE_DEVICE_TYPE(FD1094, fd1094_device, "fd1094", "Hitachi FD1094 Encrypted CPU")
 
 /*
 317-0162 CPU also needs to mask:
@@ -553,7 +553,7 @@ uint16_t *fd1094_decryption_cache::decrypted_opcodes(uint8_t state)
 
 
 fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_device(mconfig, FD1094, "FD1094", tag, owner, clock, "fd1094", __FILE__)
+	: m68000_device(mconfig, FD1094, tag, owner, clock)
 	, m_decrypted_opcodes_bank(*this, "^fd1094_decrypted_opcodes")
 	, m_state(0x00)
 	, m_irqmode(false)
@@ -562,9 +562,6 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 	, m_rom(*this, DEVICE_SELF)
 	, m_key(*this, "key")
 {
-	// override the name after the m68000 initializes
-	m_name.assign("FD1094");
-
 	// add the decrypted opcodes map
 //  m_address_map[AS_DECRYPTED_OPCODES] = ADDRESS_MAP_NAME(decrypted_opcodes_map);
 

@@ -31,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SWIFTLINK = device_creator<c64_swiftlink_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_SWIFTLINK, c64_swiftlink_cartridge_device, "c64_swiftlink", "C64 SwiftLink cartridge")
 
 
 //-------------------------------------------------
@@ -101,7 +101,7 @@ ioport_constructor c64_swiftlink_cartridge_device::device_input_ports() const
 //-------------------------------------------------
 
 c64_swiftlink_cartridge_device::c64_swiftlink_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_SWIFTLINK, "C64 SwiftLink cartridge", tag, owner, clock, "c64_swiftlink", __FILE__),
+	device_t(mconfig, C64_SWIFTLINK, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_acia(*this, MOS6551_TAG),
 	m_io_cs(*this, "CS"),

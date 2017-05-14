@@ -137,6 +137,11 @@
 #include "emu.h"
 #include "fm.h"
 
+#if (BUILD_YM2612||BUILD_YM3438)
+#include "2612intf.h"
+#endif /* (BUILD_YM2612||BUILD_YM3438) */
+
+
 /* shared function building option */
 #define BUILD_OPN (BUILD_YM2203||BUILD_YM2608||BUILD_YM2610||BUILD_YM2610B||BUILD_YM2612||BUILD_YM3438)
 #define BUILD_OPN_PRESCALER (BUILD_YM2203||BUILD_YM2608)
@@ -605,7 +610,6 @@ struct fm2612_FM_CH
 struct fm2612_FM_ST
 {
 	device_t *device;
-	void *      param;              /* this chip parameter  */
 	double      freqbase;           /* frequency base       */
 	int         timer_prescaler;    /* timer prescaler      */
 	uint8_t       irq;                /* interrupt level      */
@@ -683,7 +687,7 @@ struct fm2612_FM_OPN
 };
 
 /* here's the virtual YM2612 */
-struct YM2612
+struct ym2612_state
 {
 	uint8_t       REGS[512];          /* registers            */
 	fm2612_FM_OPN      OPN;                /* OPN state            */
@@ -722,7 +726,7 @@ static inline void FM_STATUS_SET(fm2612_FM_ST *ST,int flag)
 	{
 		ST->irq = 1;
 		/* callback user interrupt handler (IRQ is OFF to ON) */
-		if(ST->IRQ_Handler) (ST->IRQ_Handler)(ST->param,1);
+		if(ST->IRQ_Handler) (ST->IRQ_Handler)(ST->device,1);
 	}
 }
 
@@ -735,7 +739,7 @@ static inline void FM_STATUS_RESET(fm2612_FM_ST *ST,int flag)
 	{
 		ST->irq = 0;
 		/* callback user interrupt handler (IRQ is ON to OFF) */
-		if(ST->IRQ_Handler) (ST->IRQ_Handler)(ST->param,0);
+		if(ST->IRQ_Handler) (ST->IRQ_Handler)(ST->device,0);
 	}
 }
 
@@ -880,7 +884,7 @@ static inline void FM_KEYOFF_CSM(fm2612_FM_CH *CH , int s )
 }
 
 /* OPN Mode Register Write */
-static inline void set_timers(fm2612_FM_OPN *OPN, fm2612_FM_ST *ST, void *n, int v)
+static inline void set_timers(fm2612_FM_OPN *OPN, fm2612_FM_ST *ST, device_t *n, int v)
 {
 	/* b7 = CSM MODE */
 	/* b6 = 3 slot mode */
@@ -947,7 +951,7 @@ static inline void set_timers(fm2612_FM_OPN *OPN, fm2612_FM_ST *ST, void *n, int
 	{
 		ST->irq = 0;
 		/* callback user interrupt handler (IRQ is ON to OFF) */
-		if(ST->IRQ_Handler) (ST->IRQ_Handler)(ST->param, 0);
+		if(ST->IRQ_Handler) (ST->IRQ_Handler)(ST->device, 0);
 	}
 	ST->mode = v;
 }
@@ -960,7 +964,7 @@ static inline void TimerAOver(fm2612_FM_ST *ST)
 	if(ST->mode & 0x04) FM_STATUS_SET(ST,0x01);
 	/* clear or reload the counter */
 	ST->TAC = (1024-ST->TA);
-	if (ST->timer_handler) (ST->timer_handler)(ST->param,0,ST->TAC * ST->timer_prescaler,ST->clock);
+	if (ST->timer_handler) (ST->timer_handler)(ST->device,0,ST->TAC * ST->timer_prescaler,ST->clock);
 }
 /* Timer B Overflow */
 static inline void TimerBOver(fm2612_FM_ST *ST)
@@ -969,7 +973,7 @@ static inline void TimerBOver(fm2612_FM_ST *ST)
 	if(ST->mode & 0x08) FM_STATUS_SET(ST,0x02);
 	/* clear or reload the counter */
 	ST->TBC = ( 256-ST->TB)<<4;
-	if (ST->timer_handler) (ST->timer_handler)(ST->param,1,ST->TBC * ST->timer_prescaler,ST->clock);
+	if (ST->timer_handler) (ST->timer_handler)(ST->device,1,ST->TBC * ST->timer_prescaler,ST->clock);
 }
 
 
@@ -1596,7 +1600,7 @@ static inline signed int op_calc1(uint32_t phase, unsigned int env, signed int p
 	return tl_tab[p];
 }
 
-static inline void chan_calc(YM2612 *F2612, fm2612_FM_OPN *OPN, fm2612_FM_CH *CH)
+static inline void chan_calc(ym2612_state *F2612, fm2612_FM_OPN *OPN, fm2612_FM_CH *CH)
 {
 	uint32_t AM = OPN->LFO_AM >> CH->ams;
 	unsigned int eg_out = volume_calc(&CH->SLOT[SLOT1]);
@@ -1766,7 +1770,7 @@ static void OPNWriteMode(fm2612_FM_OPN *OPN, int r, int v)
 		OPN->ST.TB = v;
 		break;
 	case 0x27:  /* mode, timer control */
-		set_timers( OPN, &(OPN->ST),OPN->ST.param,v );
+		set_timers( OPN, &(OPN->ST),OPN->ST.device,v );
 		break;
 	case 0x28:  /* key on / off */
 		c = v & 0x03;
@@ -2039,7 +2043,7 @@ static void OPNSetPres(fm2612_FM_OPN *OPN, int pres, int timer_prescaler, int SS
 	OPN->ST.timer_prescaler = timer_prescaler;
 
 	/* SSG part  prescaler set */
-	if( SSGpres ) (*OPN->ST.SSG->set_clock)( OPN->ST.param, OPN->ST.clock * 2 / SSGpres );
+	if( SSGpres ) (*OPN->ST.SSG->set_clock)( OPN->ST.device, OPN->ST.clock * 2 / SSGpres );
 
 	/* make time tables */
 	init_timetables(OPN, OPN->ST.freqbase);
@@ -2177,7 +2181,7 @@ static void init_tables(void)
 /* Generate samples for one of the YM2612s */
 void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
 {
-	YM2612 *F2612 = (YM2612 *)chip;
+	ym2612_state *F2612 = (ym2612_state *)chip;
 	fm2612_FM_OPN *OPN   = &F2612->OPN;
 	int32_t *out_fm = OPN->out_fm;
 	int i;
@@ -2325,7 +2329,7 @@ void ym2612_postload(void *chip)
 {
 	if (chip)
 	{
-		YM2612 *F2612 = (YM2612 *)chip;
+		ym2612_state *F2612 = (ym2612_state *)chip;
 		int r;
 
 		/* DAC data & port */
@@ -2351,7 +2355,7 @@ void ym2612_postload(void *chip)
 	}
 }
 
-static void YM2612_save_state(YM2612 *F2612, device_t *device)
+static void YM2612_save_state(ym2612_state *F2612, device_t *device)
 {
 	device->save_item(NAME(F2612->REGS));
 	FMsave_state_st(device,&F2612->OPN.ST);
@@ -2366,18 +2370,17 @@ static void YM2612_save_state(YM2612 *F2612, device_t *device)
 #endif /* MAME_EMU_SAVE_H */
 
 /* initialize YM2612 emulator(s) */
-void * ym2612_init(void *param, device_t *device, int clock, int rate,
+void * ym2612_init(device_t *device, int clock, int rate,
 				FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler)
 {
-	YM2612 *F2612;
+	ym2612_state *F2612;
 
 	/* allocate extend state space */
-	F2612 = auto_alloc_clear(device->machine(), <YM2612>());
+	F2612 = auto_alloc_clear(device->machine(), <ym2612_state>());
 	/* allocate total level table (128kb space) */
 	init_tables();
 
 	F2612->device = device;
-	F2612->OPN.ST.param = param;
 	F2612->OPN.type = TYPE_YM2612;
 	F2612->OPN.P_CH = F2612->CH;
 	F2612->OPN.ST.device = device;
@@ -2397,7 +2400,7 @@ void * ym2612_init(void *param, device_t *device, int clock, int rate,
 
 void ym2612_clock_changed(void *chip, int clock, int rate)
 {
-	YM2612 *F2612 = (YM2612 *)chip;
+	ym2612_state *F2612 = (ym2612_state *)chip;
 
 	F2612->OPN.ST.clock = clock;
 	F2612->OPN.ST.rate = rate;
@@ -2406,7 +2409,7 @@ void ym2612_clock_changed(void *chip, int clock, int rate)
 /* shut down emulator */
 void ym2612_shutdown(void *chip)
 {
-	YM2612 *F2612 = (YM2612 *)chip;
+	ym2612_state *F2612 = (ym2612_state *)chip;
 
 	FMCloseTable();
 	auto_free(F2612->OPN.ST.device->machine(), F2612);
@@ -2416,7 +2419,7 @@ void ym2612_shutdown(void *chip)
 void ym2612_reset_chip(void *chip)
 {
 	int i;
-	YM2612 *F2612 = (YM2612 *)chip;
+	ym2612_state *F2612 = (ym2612_state *)chip;
 	fm2612_FM_OPN *OPN   = &F2612->OPN;
 
 	OPNSetPres( OPN, 6*24, 6*24, 0);
@@ -2465,7 +2468,7 @@ void ym2612_reset_chip(void *chip)
 /* v = value   */
 int ym2612_write(void *chip, int a, uint8_t v)
 {
-	YM2612 *F2612 = (YM2612 *)chip;
+	ym2612_state *F2612 = (ym2612_state *)chip;
 	int addr;
 
 	v &= 0xff;  /* adjust to 8 bit bus */
@@ -2489,7 +2492,7 @@ int ym2612_write(void *chip, int a, uint8_t v)
 			switch( addr )
 			{
 			case 0x2a:  /* DAC data (YM2612) */
-				ym2612_update_req(F2612->OPN.ST.param);
+				ym2612_device::update_request(F2612->OPN.ST.device);
 				F2612->dacout = ((int)v - 0x80) << 6;   /* level unknown */
 				break;
 			case 0x2b:  /* DAC Sel  (YM2612) */
@@ -2497,13 +2500,13 @@ int ym2612_write(void *chip, int a, uint8_t v)
 				F2612->dacen = v & 0x80;
 				break;
 			default:    /* OPN section */
-				ym2612_update_req(F2612->OPN.ST.param);
+				ym2612_device::update_request(F2612->OPN.ST.device);
 				/* write register */
 				OPNWriteMode(&(F2612->OPN),addr,v);
 			}
 			break;
 		default:    /* 0x30-0xff OPN section */
-			ym2612_update_req(F2612->OPN.ST.param);
+			ym2612_device::update_request(F2612->OPN.ST.device);
 			/* write register */
 			OPNWriteReg(&(F2612->OPN),addr,v);
 		}
@@ -2520,7 +2523,7 @@ int ym2612_write(void *chip, int a, uint8_t v)
 
 		addr = F2612->OPN.ST.address;
 		F2612->REGS[addr | 0x100] = v;
-		ym2612_update_req(F2612->OPN.ST.param);
+		ym2612_device::update_request(F2612->OPN.ST.device);
 		OPNWriteReg(&(F2612->OPN),addr | 0x100,v);
 		break;
 	}
@@ -2529,7 +2532,7 @@ int ym2612_write(void *chip, int a, uint8_t v)
 
 uint8_t ym2612_read(void *chip,int a)
 {
-	YM2612 *F2612 = (YM2612 *)chip;
+	ym2612_state *F2612 = (ym2612_state *)chip;
 
 	switch( a&3)
 	{
@@ -2538,7 +2541,7 @@ uint8_t ym2612_read(void *chip,int a)
 	case 1:
 	case 2:
 	case 3:
-		LOG(F2612->device,LOG_WAR,("YM2612 #%p:A=%d read unmapped area\n",F2612->OPN.ST.param,a));
+		LOG(F2612->device,LOG_WAR,("YM2612 #%p:A=%d read unmapped area\n",F2612->OPN.ST.device,a));
 		return FM_STATUS_FLAG(&F2612->OPN.ST);
 	}
 	return 0;
@@ -2546,7 +2549,7 @@ uint8_t ym2612_read(void *chip,int a)
 
 int ym2612_timer_over(void *chip,int c)
 {
-	YM2612 *F2612 = (YM2612 *)chip;
+	ym2612_state *F2612 = (ym2612_state *)chip;
 
 	if( c )
 	{   /* Timer B */
@@ -2554,7 +2557,7 @@ int ym2612_timer_over(void *chip,int c)
 	}
 	else
 	{   /* Timer A */
-		ym2612_update_req(F2612->OPN.ST.param);
+		ym2612_device::update_request(F2612->OPN.ST.device);
 		/* timer update */
 		TimerAOver( &(F2612->OPN.ST) );
 		/* CSM mode key,TL controll */

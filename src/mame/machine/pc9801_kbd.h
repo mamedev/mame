@@ -5,11 +5,11 @@
     PC-9801 Keyboard simulation
 
 ***************************************************************************/
+#ifndef MAME_MACHINE_PC9801_KBD_H
+#define MAME_MACHINE_PC9801_KBD_H
 
 #pragma once
 
-#ifndef __PC9801_KBDDEV_H__
-#define __PC9801_KBDDEV_H__
 
 
 //**************************************************************************
@@ -32,7 +32,7 @@ public:
 	// construction/destruction
 	pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<pc9801_kbd_device &>(device).m_write_irq.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<pc9801_kbd_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
 
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -60,7 +60,7 @@ protected:
 
 
 // device type definition
-extern const device_type PC9801_KBD;
+DECLARE_DEVICE_TYPE(PC9801_KBD, pc9801_kbd_device)
 
 
 
@@ -70,4 +70,4 @@ extern const device_type PC9801_KBD;
 
 
 
-#endif
+#endif // MAME_MACHINE_PC9801_KBD_H

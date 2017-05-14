@@ -131,7 +131,7 @@
 
 
 // device type definition
-const device_type QS1000 = device_creator<qs1000_device>;
+DEFINE_DEVICE_TYPE(QS1000, qs1000_device, "qs1000", "QS1000")
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -175,7 +175,7 @@ ROM_END
 //  qs1000_device - constructor
 //-------------------------------------------------
 qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, QS1000, "QS1000", tag, owner, clock, "qs1000", __FILE__),
+	: device_t(mconfig, QS1000, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 24),
 		m_external_rom(false),

@@ -242,7 +242,7 @@ WRITE8_MEMBER( rollerg_state::banking_callback )
 }
 
 
-static MACHINE_CONFIG_START( rollerg, rollerg_state )
+static MACHINE_CONFIG_START( rollerg )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* ? */
@@ -348,5 +348,5 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1991, rollerg,  0,       rollerg, rollerg, driver_device, 0, ROT0, "Konami", "Rollergames (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rollergj, rollerg, rollerg, rollerg, driver_device, 0, ROT0, "Konami", "Rollergames (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rollerg,  0,       rollerg, rollerg, rollerg_state, 0, ROT0, "Konami", "Rollergames (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rollergj, rollerg, rollerg, rollerg, rollerg_state, 0, ROT0, "Konami", "Rollergames (Japan)", MACHINE_SUPPORTS_SAVE )

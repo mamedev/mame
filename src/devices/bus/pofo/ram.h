@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_POFO_RAM_H
+#define MAME_BUS_POFO_RAM_H
 
-#ifndef __PORTFOLIO_RAM_CARD__
-#define __PORTFOLIO_RAM_CARD__
+#pragma once
 
 #include "ccm.h"
 #include "machine/nvram.h"
@@ -20,15 +20,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> portfolio_ram_card_t
+// ======================> portfolio_ram_card_device
 
-class portfolio_ram_card_t :  public device_t,
+class portfolio_ram_card_device :  public device_t,
 							  public device_portfolio_memory_card_slot_interface,
 							  public device_nvram_interface
 {
 public:
 	// construction/destruction
-	portfolio_ram_card_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	portfolio_ram_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -48,8 +48,6 @@ protected:
 
 
 // device type definition
-extern const device_type PORTFOLIO_RAM_CARD;
+DECLARE_DEVICE_TYPE(PORTFOLIO_RAM_CARD, portfolio_ram_card_device)
 
-
-
-#endif
+#endif // MAME_BUS_POFO_RAM_H

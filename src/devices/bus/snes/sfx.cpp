@@ -15,12 +15,12 @@
 //  sns_rom_superfx_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_LOROM_SUPERFX = device_creator<sns_rom_superfx_device>;
+DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERFX, sns_rom_superfx_device, "sns_rom_superfx", "SNES Cart (LoROM) + SuperFX")
 
 
 sns_rom_superfx_device::sns_rom_superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: sns_rom_device(mconfig, SNS_LOROM_SUPERFX, "SNES Cart (LoROM) + SuperFX", tag, owner, clock, "sns_rom_superfx", __FILE__),
-			m_superfx(*this, "superfx")
+	: sns_rom_device(mconfig, SNS_LOROM_SUPERFX, tag, owner, clock)
+	, m_superfx(*this, "superfx")
 {
 }
 

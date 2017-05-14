@@ -18,7 +18,7 @@
 
 
 // device type definition
-const device_type BSMT2000 = device_creator<bsmt2000_device>;
+DEFINE_DEVICE_TYPE(BSMT2000, bsmt2000_device, "bsmt2000", "BSMT2000")
 
 
 //**************************************************************************
@@ -26,14 +26,14 @@ const device_type BSMT2000 = device_creator<bsmt2000_device>;
 //**************************************************************************
 
 // program map for the DSP (points to internal ROM)
-static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, bsmt2000_device)
+static ADDRESS_MAP_START(tms_program_map, AS_PROGRAM, 16, bsmt2000_device)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
 
 // I/O map for the DSP
-static ADDRESS_MAP_START( tms_io_map, AS_IO, 16, bsmt2000_device)
+static ADDRESS_MAP_START(tms_io_map, AS_IO, 16, bsmt2000_device)
 	AM_RANGE(0, 0) AM_READWRITE(tms_register_r, tms_rom_addr_w)
 	AM_RANGE(1, 1) AM_READWRITE(tms_data_r, tms_rom_bank_w)
 	AM_RANGE(2, 2) AM_READ(tms_rom_r)
@@ -70,19 +70,19 @@ ROM_END
 //-------------------------------------------------
 
 bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BSMT2000, "BSMT2000", tag, owner, clock, "bsmt2000", __FILE__),
-		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 32),
-		m_ready_callback(nullptr),
-		m_stream(nullptr),
-		m_cpu(nullptr),
-		m_register_select(0),
-		m_write_data(0),
-		m_rom_address(0),
-		m_rom_bank(0),
-		m_left_data(0),
-		m_right_data(0),
-		m_write_pending(false)
+	: device_t(mconfig, BSMT2000, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 32)
+	, m_ready_callback()
+	, m_stream(nullptr)
+	, m_cpu(*this, "bsmt2000")
+	, m_register_select(0)
+	, m_write_data(0)
+	, m_rom_address(0)
+	, m_rom_bank(0)
+	, m_left_data(0)
+	, m_right_data(0)
+	, m_write_pending(false)
 {
 }
 
@@ -92,10 +92,10 @@ bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag,
 //  helper to set the ready callback
 //-------------------------------------------------
 
-void bsmt2000_device::static_set_ready_callback(device_t &device, ready_callback callback)
+void bsmt2000_device::static_set_ready_callback(device_t &device, ready_callback &&callback)
 {
 	bsmt2000_device &bsmt = downcast<bsmt2000_device &>(device);
-	bsmt.m_ready_callback = callback;
+	bsmt.m_ready_callback = std::move(callback);
 }
 
 
@@ -127,8 +127,7 @@ machine_config_constructor bsmt2000_device::device_mconfig_additions() const
 
 void bsmt2000_device::device_start()
 {
-	// find our CPU
-	m_cpu = subdevice<tms32015_device>("bsmt2000");
+	m_ready_callback.bind_relative_to(*owner());
 
 	// create the stream; BSMT typically runs at 24MHz and writes to a DAC, so
 	// in theory we should generate a 24MHz stream, but that's certainly overkill
@@ -269,8 +268,8 @@ READ16_MEMBER( bsmt2000_device::tms_data_r )
 {
 	// also implicitly clear the write pending flag
 	m_write_pending = false;
-	if (m_ready_callback != nullptr)
-		(*m_ready_callback)(*this);
+	if (!m_ready_callback.isnull())
+		m_ready_callback();
 	return m_write_data;
 }
 

@@ -9,6 +9,19 @@
 #include "emu.h"
 #include "snes_carts.h"
 
+#include "rom.h"
+#include "rom21.h"
+#include "bsx.h"
+#include "sa1.h"
+#include "sdd1.h"
+#include "sfx.h"
+#include "sgb.h"
+#include "spc7110.h"
+#include "sufami.h"
+#include "upd.h"
+#include "event.h"
+
+
 SLOT_INTERFACE_START(snes_cart)
 	SLOT_INTERFACE_INTERNAL("lorom",         SNS_LOROM)
 	SLOT_INTERFACE_INTERNAL("lorom_bsx",     SNS_LOROM_BSX) // LoROM + BS-X slot - unsupported

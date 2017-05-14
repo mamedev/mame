@@ -27,7 +27,7 @@ TODO:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SEGA_SK1100 = device_creator<sega_sk1100_device>;
+DEFINE_DEVICE_TYPE(SEGA_SK1100, sega_sk1100_device, "sega_sk1100", "Sega SK-1100 Keyboard")
 
 
 /*-------------------------------------------------
@@ -188,7 +188,7 @@ machine_config_constructor sega_sk1100_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 sega_sk1100_device::sega_sk1100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SEGA_SK1100, "Sega SK-1100 Keyboard", tag, owner, clock, "sega_sk1100", __FILE__),
+	device_t(mconfig, SEGA_SK1100, tag, owner, clock),
 	device_sg1000_expansion_slot_interface(mconfig, *this),
 	m_cassette(*this, "cassette"),
 	m_ppi(*this, UPD9255_0_TAG),

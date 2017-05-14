@@ -120,6 +120,7 @@ C = MB3514 / 9325 M36
 #include "emu.h"
 #include "includes/megadriv.h"
 #include "sound/315-5641.h"
+#include "bus/megadrive/rom.h"
 #include "softlist.h"
 
 
@@ -384,7 +385,7 @@ MACHINE_START_MEMBER(pico_state,pico)
 	m_vdp->stop_timers();
 }
 
-static MACHINE_CONFIG_START( pico, pico_state )
+static MACHINE_CONFIG_START( pico )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -405,7 +406,7 @@ static MACHINE_CONFIG_START( pico, pico_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( picopal, pico_state )
+static MACHINE_CONFIG_START( picopal )
 	MCFG_FRAGMENT_ADD( md_pal )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -596,7 +597,7 @@ MACHINE_START_MEMBER(copera_state,copera)
 
 }
 
-static MACHINE_CONFIG_START( copera, copera_state )
+static MACHINE_CONFIG_START( copera )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -624,4 +625,4 @@ ROM_START( copera )
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
 
-CONS( 1993, copera,       0,         0,      copera,         pico, pico_base_state,   picoj,    "Yamaha / Sega",   "Yamaha Mixt Book Player Copera", MACHINE_NOT_WORKING)
+CONS( 1993, copera,       0,         0,      copera,         pico, copera_state,   picoj,    "Yamaha / Sega",   "Yamaha Mixt Book Player Copera", MACHINE_NOT_WORKING)

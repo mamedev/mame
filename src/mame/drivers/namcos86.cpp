@@ -1047,7 +1047,7 @@ GFXDECODE_END
 
 /*******************************************************************/
 
-static MACHINE_CONFIG_START( hopmappy, namcos86_state )
+static MACHINE_CONFIG_START( hopmappy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", M6809, XTAL_49_152MHz/32)

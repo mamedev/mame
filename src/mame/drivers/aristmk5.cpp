@@ -1803,7 +1803,7 @@ void aristmk5_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
+static MACHINE_CONFIG_START( aristmk5 )
 	MCFG_CPU_ADD("maincpu", ARM, MASTER_CLOCK/6)    // 12000000
 	MCFG_CPU_PROGRAM_MAP(aristmk5_drame_map)
 

@@ -6,20 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VIP_VP575_H
+#define MAME_BUS_VIP_VP575_H
+
 #pragma once
 
-#ifndef __VP575__
-#define __VP575__
-
 #include "exp.h"
-
-
-
-//**************************************************************************
-//  MACROS/CONSTANTS
-//**************************************************************************
-
-#define MAX_SLOTS 5
 
 
 
@@ -80,7 +72,9 @@ protected:
 	virtual void vip_run_w(int state) override;
 
 private:
-	vip_expansion_slot_device *m_expansion_slot[MAX_SLOTS];
+	static constexpr unsigned MAX_SLOTS = 5;
+
+	required_device_array<vip_expansion_slot_device, MAX_SLOTS> m_expansion_slot;
 
 	int m_int[MAX_SLOTS];
 	int m_dma_out[MAX_SLOTS];
@@ -89,7 +83,6 @@ private:
 
 
 // device type definition
-extern const device_type VP575;
+DECLARE_DEVICE_TYPE(VP575, vp575_device)
 
-
-#endif
+#endif // MAME_BUS_VIP_VP575_H

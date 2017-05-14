@@ -130,7 +130,7 @@ MACHINE_START_MEMBER(pgm_arm_type2_state,pgm_arm_type2)
 
 /******* ARM 55857F *******/
 
-MACHINE_CONFIG_START( pgm_arm_type2, pgm_arm_type2_state )
+MACHINE_CONFIG_START( pgm_arm_type2 )
 	MCFG_FRAGMENT_ADD(pgmbase)
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type2_state, pgm_arm_type2 )

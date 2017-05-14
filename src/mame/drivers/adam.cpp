@@ -1047,7 +1047,7 @@ DEVICE_INPUT_DEFAULTS_END
 //  MACHINE_CONFIG( adam )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( adam, adam_state )
+static MACHINE_CONFIG_START( adam )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_15909MHz/2)
 	MCFG_CPU_PROGRAM_MAP(adam_mem)
@@ -1146,5 +1146,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT                    COMPANY         FULLNAME            FLAGS
-COMP( 1982, adam,       0,          coleco, adam,       adam,       driver_device,  0,      "Coleco",       "Adam",             MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       STATE        INIT    COMPANY         FULLNAME            FLAGS
+COMP( 1982, adam,       0,          coleco, adam,       adam,       adam_state,  0,      "Coleco",       "Adam",             MACHINE_SUPPORTS_SAVE )

@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "8530scc.h"
 
-const device_type SCC8530 = device_creator<scc8530_t>;
+DEFINE_DEVICE_TYPE(SCC8530, scc8530_t, "scc8530l", "Zilog 8530 SCC (legacy)")
 
 
 /***************************************************************************
@@ -26,7 +26,8 @@ const device_type SCC8530 = device_creator<scc8530_t>;
 ***************************************************************************/
 
 scc8530_t::scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SCC8530, "Zilog 8530 SCC (Legacy)", tag, owner, clock, "scc8530l", __FILE__), mode(0), reg(0), status(0), IRQV(0), MasterIRQEnable(0), lastIRQStat(0), IRQType(),
+	device_t(mconfig, SCC8530, tag, owner, clock),
+	mode(0), reg(0), status(0), IRQV(0), MasterIRQEnable(0), lastIRQStat(0), IRQType(),
 	intrq_cb(*this)
 {
 }

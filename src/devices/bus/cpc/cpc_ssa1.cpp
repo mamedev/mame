@@ -19,8 +19,8 @@ SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_SSA1 = device_creator<cpc_ssa1_device>;
-const device_type CPC_DKSPEECH = device_creator<cpc_dkspeech_device>;
+DEFINE_DEVICE_TYPE(CPC_SSA1,     cpc_ssa1_device,     "cpc_ssa1",     "Amstrad SSA-1")
+DEFINE_DEVICE_TYPE(CPC_DKSPEECH, cpc_dkspeech_device, "cpc_dkspeech", "DK'Tronics Speech Synthesiser")
 
 //-------------------------------------------------
 //  device I/O handlers
@@ -162,7 +162,7 @@ machine_config_constructor cpc_dkspeech_device::device_mconfig_additions() const
 //**************************************************************************
 
 cpc_ssa1_device::cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CPC_SSA1, "SSA-1", tag, owner, clock, "cpc_ssa1", __FILE__),
+	device_t(mconfig, CPC_SSA1, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr), m_rom(nullptr),
 	m_lrq(1), m_sby(0),
 	m_sp0256_device(*this,"sp0256")
@@ -170,7 +170,7 @@ cpc_ssa1_device::cpc_ssa1_device(const machine_config &mconfig, const char *tag,
 }
 
 cpc_dkspeech_device::cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CPC_DKSPEECH, "DK'Tronics Speech Synthesiser", tag, owner, clock, "cpc_dkspeech", __FILE__),
+	device_t(mconfig, CPC_DKSPEECH, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr), m_rom(nullptr),
 	m_lrq(1), m_sby(0),
 	m_sp0256_device(*this,"sp0256")

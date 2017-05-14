@@ -4,8 +4,10 @@
  * Data East Pinball DMD Type 1 display
  */
 
-#ifndef DECODMD1_H_
-#define DECODMD1_H_
+#ifndef MAME_VIDEO_DECODMD1_H
+#define MAME_VIDEO_DECODMD1_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
@@ -13,10 +15,6 @@
 #define MCFG_DECODMD_TYPE1_ADD(_tag, _region) \
 	MCFG_DEVICE_ADD(_tag, DECODMD1, 0) \
 	decodmd_type1_device::static_set_gfxregion(*device, _region);
-
-#define B_CLR 0x01
-#define B_SET 0x02
-#define B_CLK 0x04
 
 class decodmd_type1_device : public device_t
 {
@@ -49,6 +47,10 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	static constexpr unsigned B_CLR = 0x01;
+	static constexpr unsigned B_SET = 0x02;
+	static constexpr unsigned B_CLK = 0x04;
+
 	uint8_t m_latch;
 	uint8_t m_status;
 	uint8_t m_ctrl;
@@ -73,7 +75,7 @@ private:
 	void set_busy(uint8_t input, uint8_t val);
 };
 
-extern const device_type DECODMD1;
+DECLARE_DEVICE_TYPE(DECODMD1, decodmd_type1_device)
 
 
-#endif /* DECODMD1_H_ */
+#endif // MAME_VIDEO_DECODMD1_H

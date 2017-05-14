@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ISA_IBM_MFC_H
+#define MAME_BUS_ISA_IBM_MFC_H
 
-#ifndef __ISA_IBM_MUSIC_FEATURE_CARD_H__
-#define __ISA_IBM_MUSIC_FEATURE_CARD_H__
+#pragma once
 
 
 #include "isa.h"
@@ -84,6 +84,6 @@ private:
 
 
 // Device type definition
-extern const device_type ISA8_IBM_MFC;
+DECLARE_DEVICE_TYPE(ISA8_IBM_MFC, isa8_ibm_mfc_device)
 
-#endif  /* __ISA_IBM_MUSIC_FEATURE_CARD_H__ */
+#endif // MAME_BUS_ISA_IBM_MFC_H

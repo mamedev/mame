@@ -53,12 +53,11 @@ Notes:
 
 ***************************************************************************/
 
-class galgames_slot_device;
-extern const device_type GALGAMES_CART;
-extern const device_type GALGAMES_BIOS_CART;
-extern const device_type GALGAMES_STARPAK2_CART;
-extern const device_type GALGAMES_STARPAK3_CART;
-extern const device_type GALGAMES_SLOT;
+DECLARE_DEVICE_TYPE(GALGAMES_CART,          galgames_cart_device)
+DECLARE_DEVICE_TYPE(GALGAMES_BIOS_CART,     galgames_bios_cart_device)
+DECLARE_DEVICE_TYPE(GALGAMES_STARPAK2_CART, galgames_starpak2_cart_device)
+DECLARE_DEVICE_TYPE(GALGAMES_STARPAK3_CART, galgames_starpak3_cart_device)
+DECLARE_DEVICE_TYPE(GALGAMES_SLOT,          galgames_slot_device)
 
 // CART declaration
 
@@ -67,7 +66,7 @@ class galgames_cart_device : public device_t, public device_rom_interface
 public:
 	// construction/destruction
 	galgames_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		galgames_cart_device(mconfig, GALGAMES_CART, "Galaxy Games StarPak Cartridge", tag, owner, clock, "starpak_cart", __FILE__)
+		galgames_cart_device(mconfig, GALGAMES_CART, tag, owner, clock)
 	{ }
 
 	// static configuration
@@ -96,12 +95,9 @@ protected:
 	galgames_cart_device(
 			const machine_config &mconfig,
 			device_type type,
-			const char *name,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock,
-			const char *shortname,
-			const char *source);
+			uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override { }
@@ -131,7 +127,7 @@ protected:
 };
 
 // device type definition
-const device_type GALGAMES_CART = device_creator<galgames_cart_device>;
+DEFINE_DEVICE_TYPE(GALGAMES_CART, galgames_cart_device, "starpak_cart", "Galaxy Games StarPak Cartridge")
 
 #define MCFG_GALGAMES_CART_INDEX(_cart) \
 	galgames_cart_device::static_set_cart(*device, _cart);
@@ -156,14 +152,14 @@ class galgames_bios_cart_device : public galgames_cart_device
 public:
 	// construction/destruction
 	galgames_bios_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		galgames_cart_device(mconfig, GALGAMES_BIOS_CART, "Galaxy Games BIOS Cartridge", tag, owner, clock, "galgames_bios_cart", __FILE__)
+		galgames_cart_device(mconfig, GALGAMES_BIOS_CART, tag, owner, clock)
 	{ }
 protected:
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override { return MACHINE_CONFIG_NAME(bios); }
 };
 
-const device_type GALGAMES_BIOS_CART = device_creator<galgames_bios_cart_device>;
+DEFINE_DEVICE_TYPE(GALGAMES_BIOS_CART, galgames_bios_cart_device, "galgames_bios_cart", "Galaxy Games BIOS Cartridge")
 
 #define MCFG_GALGAMES_BIOS_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_BIOS_CART, 0) \
@@ -186,14 +182,14 @@ class galgames_starpak2_cart_device : public galgames_cart_device
 public:
 	// construction/destruction
 	galgames_starpak2_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		galgames_cart_device(mconfig, GALGAMES_STARPAK2_CART, "Galaxy Games StarPak 2 Cartridge", tag, owner, clock, "starpak2_cart", __FILE__)
+		galgames_cart_device(mconfig, GALGAMES_STARPAK2_CART, tag, owner, clock)
 	{ }
 protected:
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override { return MACHINE_CONFIG_NAME(starpak2); }
 };
 
-const device_type GALGAMES_STARPAK2_CART = device_creator<galgames_starpak2_cart_device>;
+DEFINE_DEVICE_TYPE(GALGAMES_STARPAK2_CART, galgames_starpak2_cart_device, "starpak2_cart", "Galaxy Games StarPak 2 Cartridge")
 
 #define MCFG_GALGAMES_STARPAK2_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_STARPAK2_CART, 0) \
@@ -218,14 +214,14 @@ class galgames_starpak3_cart_device : public galgames_cart_device
 public:
 	// construction/destruction
 	galgames_starpak3_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		galgames_cart_device(mconfig, GALGAMES_STARPAK3_CART, "Galaxy Games StarPak 3 Cartridge", tag, owner, clock, "starpak3_cart", __FILE__)
+		galgames_cart_device(mconfig, GALGAMES_STARPAK3_CART, tag, owner, clock)
 	{ }
 protected:
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override { return MACHINE_CONFIG_NAME(starpak3); }
 };
 
-const device_type GALGAMES_STARPAK3_CART = device_creator<galgames_starpak3_cart_device>;
+DEFINE_DEVICE_TYPE(GALGAMES_STARPAK3_CART, galgames_starpak3_cart_device, "starpak3_cart", "Galaxy Games StarPak 3 Cartridge")
 
 #define MCFG_GALGAMES_STARPAK3_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_STARPAK3_CART, 0) \
@@ -306,7 +302,7 @@ protected:
 };
 
 // device type definition
-const device_type GALGAMES_SLOT = device_creator<galgames_slot_device>;
+DEFINE_DEVICE_TYPE(GALGAMES_SLOT, galgames_slot_device, "starpak_slot", "Galaxy Games Slot")
 
 #define MCFG_GALGAMES_SLOT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_SLOT, 0)
@@ -316,13 +312,10 @@ const device_type GALGAMES_SLOT = device_creator<galgames_slot_device>;
 galgames_cart_device::galgames_cart_device(
 		const machine_config &mconfig,
 		device_type type,
-		const char *name,
 		const char *tag,
 		device_t *owner,
-		uint32_t clock,
-		const char *shortname,
-		const char *source):
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		uint32_t clock):
+	device_t(mconfig, type, tag, owner, clock),
 	device_rom_interface(mconfig, *this, 21, ENDIANNESS_BIG, 16),
 	m_mconfig_additions(nullptr),
 	m_cart(0),
@@ -568,7 +561,7 @@ DEVICE_ADDRESS_MAP_START( slot_map, 16, galgames_slot_device )
 ADDRESS_MAP_END
 
 galgames_slot_device::galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, GALGAMES_SLOT, "Galaxy Games Slot", tag, owner, clock, "galgames_slot", __FILE__),
+	device_t(mconfig, GALGAMES_SLOT, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("slot_space", ENDIANNESS_BIG, 16,22, 0, address_map_delegate(FUNC(galgames_slot_device::slot_map), this)),
 	m_ram(*this, "ram"),
@@ -968,7 +961,7 @@ int galgames_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 	return reg_low | (reg_mid << 16);
 }
 
-static MACHINE_CONFIG_START( galgames_base, galgames_state )
+static MACHINE_CONFIG_START( galgames_base )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(galgames_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galgames_state, scanline_interrupt, "screen", 0, 1)
@@ -996,7 +989,7 @@ static MACHINE_CONFIG_START( galgames_base, galgames_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz / 16, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified (voices in galgame4 seem ok)
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz / 16, PIN7_HIGH) // clock frequency & pin 7 not verified (voices in galgame4 seem ok)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1214,7 +1207,7 @@ ROM_START( galgame4 )
 ROM_END
 
 
-GAME( 1998, galgbios, 0,        galgbios, galgames, driver_device, 0, ROT0, "Creative Electronics & Software",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT )
-GAME( 1998, galgame2, galgbios, galgame2, galgames, driver_device, 0, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",             0 )
-GAME( 1998, galgame3, galgbios, galgame3, galgames, driver_device, 0, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games StarPak 3",             0 )
-GAME( 1998, galgame4, galgbios, galgame3, galgames, driver_device, 0, ROT0, "Creative Electronics & Software",         "Galaxy Games StarPak 4 (prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, galgbios, 0,        galgbios, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT )
+GAME( 1998, galgame2, galgbios, galgame2, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",             0 )
+GAME( 1998, galgame3, galgbios, galgame3, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games StarPak 3",             0 )
+GAME( 1998, galgame4, galgbios, galgame3, galgames, galgames_state, 0, ROT0, "Creative Electronics & Software",         "Galaxy Games StarPak 4 (prototype)", MACHINE_IMPERFECT_GRAPHICS )

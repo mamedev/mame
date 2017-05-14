@@ -16,11 +16,11 @@
 #include "emu.h"
 #include "kl5c80a12.h"
 
-const device_type KL5C80A12 = device_creator<kl5c80a12_device>;
+DEFINE_DEVICE_TYPE(KL5C80A12, kl5c80a12_device, "kl5c80a12", "KL5C80A12")
 
 
 kl5c80a12_device::kl5c80a12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80_device(mconfig, KL5C80A12, "KL5C80A12", tag, owner, clock, "kl5c80a12", __FILE__)
+	: z80_device(mconfig, KL5C80A12, tag, owner, clock)
 {
 }
 

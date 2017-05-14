@@ -7,8 +7,8 @@
 **********************************************************************/
 
 
-#ifndef __BBC_OPUS3__
-#define __BBC_OPUS3__
+#ifndef MAME_BUS_BBC_1MHZBUS_OPUS3_H
+#define MAME_BUS_BBC_1MHZBUS_OPUS3_H
 
 #include "1mhzbus.h"
 #include "machine/ram.h"
@@ -48,7 +48,7 @@ protected:
 private:
 	required_memory_region m_dfs_rom;
 	required_device<ram_device> m_ramdisk;
-	required_device<wd1770_t> m_fdc;
+	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 
@@ -59,7 +59,7 @@ private:
 
 
 // device type definition
-extern const device_type BBC_OPUS3;
+DECLARE_DEVICE_TYPE(BBC_OPUS3, bbc_opus3_device)
 
 
-#endif /* __BBC_OPUS3__ */
+#endif // MAME_BUS_BBC_1MHZBUS_OPUS3_H

@@ -10,6 +10,8 @@
 #include "emu.h"
 #include "mb86235fe.h"
 
+#include "mb86235defs.h"
+
 
 #define AA_USED(desc,x)             do { (desc).regin[0] |= 1 << (x); } while(0)
 #define AA_MODIFIED(desc,x)         do { (desc).regout[0] |= 1 << (x); } while(0)

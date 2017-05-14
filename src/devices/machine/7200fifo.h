@@ -45,10 +45,10 @@ The following chips are functionally equivalent and pin-compatible.
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_7200FIFO_H
+#define MAME_MACHINE_7200FIFO_H
 
-#ifndef _7200FIFO_H
-#define _7200FIFO_H
+#pragma once
 
 
 
@@ -83,9 +83,9 @@ public:
 	fifo7200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_ef_handler(device_t &device, _Object object) { return downcast<fifo7200_device &>(device).m_ef_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_ff_handler(device_t &device, _Object object) { return downcast<fifo7200_device &>(device).m_ff_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_hf_handler(device_t &device, _Object object) { return downcast<fifo7200_device &>(device).m_hf_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_ef_handler(device_t &device, Object &&cb) { return downcast<fifo7200_device &>(device).m_ef_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ff_handler(device_t &device, Object &&cb) { return downcast<fifo7200_device &>(device).m_ff_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_hf_handler(device_t &device, Object &&cb) { return downcast<fifo7200_device &>(device).m_hf_handler.set_callback(std::forward<Object>(cb)); }
 	static void set_ram_size(device_t &device, int size) { downcast<fifo7200_device &>(device).m_ram_size = size; }
 
 	DECLARE_READ_LINE_MEMBER( ef_r ) { return !m_ef; } // _EF
@@ -125,7 +125,6 @@ private:
 };
 
 // device type definition
-extern const device_type FIFO7200;
+DECLARE_DEVICE_TYPE(FIFO7200, fifo7200_device)
 
-
-#endif /* _7200FIFO_H */
+#endif // MAME_MACHINE_7200FIFO_H

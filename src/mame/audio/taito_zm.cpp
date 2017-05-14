@@ -31,14 +31,14 @@ TODO:
 
 /**************************************************************************/
 
-const device_type TAITO_ZOOM = device_creator<taito_zoom_device>;
+DEFINE_DEVICE_TYPE(TAITO_ZOOM, taito_zoom_device, "taito_zoom", "Taito Zoom Sound System")
 
 //-------------------------------------------------
 //  taito_zoom_device - constructor
 //-------------------------------------------------
 
 taito_zoom_device::taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TAITO_ZOOM, "Taito Zoom Sound System", tag, owner, clock, "taito_zoom", __FILE__),
+	: device_t(mconfig, TAITO_ZOOM, tag, owner, clock),
 	m_soundcpu(*this, ":mn10200"),
 	m_zsg2(*this, ":zsg2"),
 	m_reg_address(0),

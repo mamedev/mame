@@ -730,7 +730,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( geebee, warpwarp_state )
+static MACHINE_CONFIG_START( geebee )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
@@ -768,7 +768,7 @@ static MACHINE_CONFIG_DERIVED( navarone, geebee )
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,navarone)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bombbee, warpwarp_state )
+static MACHINE_CONFIG_START( bombbee )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)

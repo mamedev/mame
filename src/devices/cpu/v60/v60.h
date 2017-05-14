@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Farfetch'd, R. Belmont
-#pragma once
+#ifndef MAME_CPU_V60_V60_H
+#define MAME_CPU_V60_V60_H
 
-#ifndef __V60_H__
-#define __V60_H__
+#pragma once
 
 
 enum
@@ -85,11 +85,12 @@ class v60_device : public cpu_device
 public:
 	// construction/destruction
 	v60_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	v60_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	void stall();
 
 protected:
+	v60_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int databits, int addrbits, uint32_t pir);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -782,8 +783,7 @@ protected:
 };
 
 
-extern const device_type V60;
-extern const device_type V70;
+DECLARE_DEVICE_TYPE(V60, v60_device)
+DECLARE_DEVICE_TYPE(V70, v70_device)
 
-
-#endif /* __V60_H__ */
+#endif // MAME_CPU_V60_V60_H

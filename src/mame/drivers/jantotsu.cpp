@@ -494,7 +494,7 @@ void jantotsu_state::machine_reset()
 	m_adpcm_trigger = 0;
 }
 
-static MACHINE_CONFIG_START( jantotsu, jantotsu_state )
+static MACHINE_CONFIG_START( jantotsu )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/4)
@@ -525,7 +525,7 @@ static MACHINE_CONFIG_START( jantotsu, jantotsu_state )
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(jantotsu_state, jan_adpcm_int))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)  /* 6 KHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -562,4 +562,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, jantotsu,  0,    jantotsu, jantotsu, driver_device,  0, ROT270, "Sanritsu", "4nin-uchi Mahjong Jantotsu", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jantotsu,  0,    jantotsu, jantotsu, jantotsu_state,  0, ROT270, "Sanritsu", "4nin-uchi Mahjong Jantotsu", MACHINE_SUPPORTS_SAVE )

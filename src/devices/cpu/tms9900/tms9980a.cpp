@@ -76,7 +76,7 @@
 ****************************************************************************/
 
 tms9980a_device::tms9980a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms99xx_device(mconfig, TMS9980A, "TMS9980A", tag, 8, 14, 11, owner, clock, "tms9980a", __FILE__)
+	: tms99xx_device(mconfig, TMS9980A, tag, 8, 14, 11, owner, clock)
 {
 }
 
@@ -298,4 +298,4 @@ offs_t tms9980a_device::disasm_disassemble(std::ostream &stream, offs_t pc, cons
 	return CPU_DISASSEMBLE_NAME(tms9980)(this, stream, pc, oprom, opram, options);
 }
 
-const device_type TMS9980A = device_creator<tms9980a_device>;
+DEFINE_DEVICE_TYPE(TMS9980A, tms9980a_device, "tms9980a", "TMS9980A")

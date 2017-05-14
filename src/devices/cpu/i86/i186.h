@@ -1,24 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef I186_H__
-#define I186_H__
+#ifndef MAME_CPU_I86_I186_H
+#define MAME_CPU_I86_I186_H
+
+#pragma once
 
 #include "i86.h"
 
-extern const device_type I80186;
-extern const device_type I80188;
+DECLARE_DEVICE_TYPE(I80186, i80186_cpu_device)
+DECLARE_DEVICE_TYPE(I80188, i80188_cpu_device)
 
 class i80186_cpu_device : public i8086_common_cpu_device
 {
 public:
 	// construction/destruction
 	i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	i80186_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int data_bus_size);
 
-	template<class _Object> static devcb_base &static_set_read_slave_ack_callback(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_read_slave_ack_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_chip_select_callback(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_out_chip_select_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_tmrout0_handler(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_out_tmrout0_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_tmrout1_handler(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_out_tmrout1_func.set_callback(object); }
+	template <class Object> static devcb_base &static_set_read_slave_ack_callback(device_t &device, Object &&cb) { return downcast<i80186_cpu_device &>(device).m_read_slave_ack_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_chip_select_callback(device_t &device, Object &&cb) { return downcast<i80186_cpu_device &>(device).m_out_chip_select_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_tmrout0_handler(device_t &device, Object &&cb) { return downcast<i80186_cpu_device &>(device).m_out_tmrout0_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_tmrout1_handler(device_t &device, Object &&cb) { return downcast<i80186_cpu_device &>(device).m_out_tmrout1_func.set_callback(std::forward<Object>(cb)); }
 
 	IRQ_CALLBACK_MEMBER(int_callback);
 	DECLARE_WRITE_LINE_MEMBER(drq0_w) { if(state) drq_callback(0); m_dma[0].drq_state = state; }
@@ -31,9 +32,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(int3_w) { external_int(3, state); }
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 
 protected:
+	i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size);
+
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks / 2); }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); }
@@ -148,4 +151,4 @@ public:
 #define MCFG_80186_TMROUT1_HANDLER(_devcb) \
 		devcb = &i80186_cpu_device::static_set_tmrout1_handler(*device, DEVCB_##_devcb);
 
-#endif
+#endif // MAME_CPU_I86_I186_H

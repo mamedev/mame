@@ -9,9 +9,9 @@
 **********************************************************************/
 
 #include "emu.h"
+#include "includes/thomson.h"
 #include "machine/thomflop.h"
 #include "formats/thom_dsk.h"
-#include "includes/thomson.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
 
@@ -593,14 +593,14 @@ READ8_MEMBER( thomson_state::to7_sys_portb_in )
    because the Data Transmit Ready bit is shared in an incompatible way!
 */
 
-const device_type TO7_IO_LINE = device_creator<to7_io_line_device>;
+DEFINE_DEVICE_TYPE(TO7_IO_LINE, to7_io_line_device, "to7_io_line", "TO7 Serial source")
 
 //-------------------------------------------------
 //  to7_io_line_device - constructor
 //-------------------------------------------------
 
 to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TO7_IO_LINE, "T07 Serial source", tag, owner, clock, "to7_io_line", __FILE__),
+	: device_t(mconfig, TO7_IO_LINE, tag, owner, clock),
 	m_pia_io(*this, THOM_PIA_IO),
 	m_rs232(*this, "rs232"),
 	m_last_low(0)

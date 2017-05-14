@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_PET_PETUJA_H
+#define MAME_BUS_PET_PETUJA_H
 
-#ifndef __PETUJA__
-#define __PETUJA__
+#pragma once
 
 
 #include "user.h"
@@ -56,7 +56,7 @@ protected:
 
 
 // device type definition
-extern const device_type PET_USERPORT_JOYSTICK_ADAPTER;
+DECLARE_DEVICE_TYPE(PET_USERPORT_JOYSTICK_ADAPTER, pet_userport_joystick_adapter_device)
 
 
-#endif
+#endif // MAME_BUS_PET_PETUJA_H

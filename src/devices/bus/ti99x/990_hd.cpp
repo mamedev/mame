@@ -280,7 +280,7 @@ int ti990_hdc_device::is_unit_loaded(int unit)
     Parse the disk select lines, and return the corresponding tape unit.
     (-1 if none)
 */
-int ti990_hdc_device::cur_disk_unit(void)
+int ti990_hdc_device::cur_disk_unit()
 {
 	int reply;
 
@@ -974,11 +974,10 @@ static MACHINE_CONFIG_FRAGMENT( ti990_hdc )
 	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)
 MACHINE_CONFIG_END
 
-const device_type TI990_HDC = device_creator<ti990_hdc_device>;
+DEFINE_DEVICE_TYPE(TI990_HDC, ti990_hdc_device, "ti990_hdc", "Generic TI-990 Hard Disk Controller")
 
 ti990_hdc_device::ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TI990_HDC, "Generic TI-990 Hard Disk Controller", tag, owner, clock, "hdc_990", __FILE__),
-	m_interrupt_callback(*this)
+	: device_t(mconfig, TI990_HDC, tag, owner, clock), m_interrupt_callback(*this)
 {
 }
 

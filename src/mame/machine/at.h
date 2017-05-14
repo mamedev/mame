@@ -87,7 +87,7 @@ private:
 	uint8_t m_nmi_enabled;
 };
 
-extern const device_type AT_MB;
+DECLARE_DEVICE_TYPE(AT_MB, at_mb_device)
 
 MACHINE_CONFIG_EXTERN(at_softlists);
 

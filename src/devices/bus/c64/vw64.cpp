@@ -55,7 +55,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_VW64 = device_creator<c64_vizawrite_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_VW64, c64_vizawrite_cartridge_device, "c64_vizawrite", "VizaWrite 64")
 
 
 
@@ -68,7 +68,7 @@ const device_type C64_VW64 = device_creator<c64_vizawrite_cartridge_device>;
 //-------------------------------------------------
 
 c64_vizawrite_cartridge_device::c64_vizawrite_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_VW64, "VizaWrite 64", tag, owner, clock, "c64_vizawrite", __FILE__),
+	device_t(mconfig, C64_VW64, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this), m_game_timer(nullptr)
 {
 }

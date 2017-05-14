@@ -10,8 +10,10 @@
  *
  *****************************************************************************/
 
-#ifndef __SH4_H__
-#define __SH4_H__
+#ifndef MAME_CPU_SH4_SH4_H
+#define MAME_CPU_SH4_SH4_H
+
+#pragma once
 
 // doesn't actually seem to improve performance at all
 #define SH4_USE_FASTRAM_OPTIMIZATION 0
@@ -197,9 +199,6 @@ typedef void (*sh4_ftcsr_callback)(uint32_t);
 class sh34_base_device : public cpu_device
 {
 public:
-	// construction/destruction
-	sh34_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, endianness_t endianness, address_map_constructor internal);
-
 //#if SH4_USE_FASTRAM_OPTIMIZATION
 	void add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 //#endif
@@ -229,6 +228,9 @@ public:
 	void sh4_dma_ddt(struct sh4_ddt_dma *s);
 
 protected:
+	// construction/destruction
+	sh34_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -253,7 +255,6 @@ protected:
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
-protected:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
@@ -742,9 +743,6 @@ protected:
 class sh3_base_device : public sh34_base_device
 {
 public:
-	// construction/destruction
-	sh3_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, endianness_t endianness);
-
 	DECLARE_WRITE32_MEMBER( sh3_internal_w );
 	DECLARE_READ32_MEMBER( sh3_internal_r );
 
@@ -752,6 +750,9 @@ public:
 	DECLARE_READ32_MEMBER( sh3_internal_high_r );
 
 protected:
+	// construction/destruction
+	sh3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
+
 	virtual void device_reset() override;
 };
 
@@ -759,9 +760,6 @@ protected:
 class sh4_base_device : public sh34_base_device
 {
 public:
-	// construction/destruction
-	sh4_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, endianness_t endianness);
-
 	DECLARE_WRITE32_MEMBER( sh4_internal_w );
 	DECLARE_READ32_MEMBER( sh4_internal_r );
 
@@ -779,6 +777,9 @@ public:
 	sh4_utlb m_utlb[64];
 
 protected:
+	// construction/destruction
+	sh4_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
@@ -820,10 +821,10 @@ protected:
 };
 
 
-extern const device_type SH3LE;
-extern const device_type SH3BE;
-extern const device_type SH4LE;
-extern const device_type SH4BE;
+DECLARE_DEVICE_TYPE(SH3LE, sh3_device)
+DECLARE_DEVICE_TYPE(SH3BE, sh3be_device)
+DECLARE_DEVICE_TYPE(SH4LE, sh4_device)
+DECLARE_DEVICE_TYPE(SH4BE, sh4be_device)
 
 
 /***************************************************************************
@@ -840,4 +841,4 @@ extern const device_type SH4BE;
 void sh4drc_set_options(device_t *device, uint32_t options);
 void sh4drc_add_pcflush(device_t *device, offs_t address);
 
-#endif /* __SH4_H__ */
+#endif // MAME_CPU_SH4_SH4_H

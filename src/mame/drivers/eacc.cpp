@@ -237,7 +237,7 @@ WRITE8_MEMBER( eacc_state::eacc_digit_w )
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( eacc, eacc_state )
+static MACHINE_CONFIG_START( eacc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_3_579545MHz)  /* Divided by 4 inside the m6802*/
 	MCFG_CPU_PROGRAM_MAP(eacc_mem)
@@ -276,5 +276,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME        FLAGS */
-COMP( 1982, eacc,       0,          0,      eacc,       eacc, driver_device,   0,     "Electronics Australia", "EA Car Computer", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT   COMPANY                  FULLNAME           FLAGS
+COMP( 1982, eacc,   0,      0,      eacc,    eacc,  eacc_state, 0,     "Electronics Australia", "EA Car Computer", MACHINE_NO_SOUND_HW)

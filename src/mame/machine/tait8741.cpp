@@ -13,7 +13,7 @@ Taito 8741 emulation
 #include "tait8741.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) printf x; } while (0)
+#include "logmacro.h"
 
 /****************************************************************************
 
@@ -33,10 +33,10 @@ gladiatr and Great Swordsman set.
 #define CMD_08 1
 #define CMD_4a 2
 
-const device_type TAITO8741_4PACK = device_creator<taito8741_4pack_device>;
+DEFINE_DEVICE_TYPE(TAITO8741_4PACK, taito8741_4pack_device, "taito8741_4pack", "I8741 MCU Simulation (Taito 4Pack)")
 
 taito8741_4pack_device::taito8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TAITO8741_4PACK, "I8741 MCU Simulation (Taito 4Pack)", tag, owner, clock, "taito8741_4pack", __FILE__),
+	: device_t(mconfig, TAITO8741_4PACK, tag, owner, clock),
 	m_port_handler_0_r(*this),
 	m_port_handler_1_r(*this),
 	m_port_handler_2_r(*this),
@@ -91,7 +91,7 @@ TIMER_CALLBACK_MEMBER( taito8741_4pack_device::serial_tx )
 		sst = &m_taito8741[st->connect];
 		/* transfer data */
 		serial_rx(sst,st->txd);
-		LOG(("8741-%d Serial data TX to %d\n",num,st->connect));
+		LOG("8741-%d Serial data TX to %d\n",num,st->connect);
 		if( sst->mode==TAITO8741_SLAVE)
 			sst->serial_out = 1;
 	}
@@ -275,7 +275,7 @@ int taito8741_4pack_device::status_r(int num)
 {
 	I8741 *st = &m_taito8741[num];
 	update(num);
-	LOG(("%s:8741-%d ST Read %02x\n",machine().describe_context(),num,st->status));
+	LOG("%s:8741-%d ST Read %02x\n",machine().describe_context(),num,st->status);
 	return st->status;
 }
 
@@ -285,7 +285,7 @@ int taito8741_4pack_device::data_r(int num)
 	I8741 *st = &m_taito8741[num];
 	int ret = st->toData;
 	st->status &= 0xfe;
-	LOG(("%s:8741-%d DATA Read %02x\n",machine().describe_context(),num,ret));
+	LOG("%s:8741-%d DATA Read %02x\n",machine().describe_context(),num,ret);
 
 	/* update chip */
 	update(num);
@@ -303,7 +303,7 @@ int taito8741_4pack_device::data_r(int num)
 void taito8741_4pack_device::data_w(int num, int data)
 {
 	I8741 *st = &m_taito8741[num];
-	LOG(("%s:8741-%d DATA Write %02x\n",machine().describe_context(),num,data));
+	LOG("%s:8741-%d DATA Write %02x\n",machine().describe_context(),num,data);
 	st->fromData = data;
 	st->status |= 0x02;
 	/* update chip */
@@ -314,7 +314,7 @@ void taito8741_4pack_device::data_w(int num, int data)
 void taito8741_4pack_device::command_w(int num, int data)
 {
 	I8741 *st = &m_taito8741[num];
-	LOG(("%s:8741-%d CMD Write %02x\n",machine().describe_context(),num,data));
+	LOG("%s:8741-%d CMD Write %02x\n",machine().describe_context(),num,data);
 	st->fromCmd = data;
 	st->status |= 0x04;
 	/* update chip */

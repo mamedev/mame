@@ -7,17 +7,16 @@
  *
  */
 
-#pragma once
+#ifndef MAME_MACHINE_DS1205_H
+#define MAME_MACHINE_DS1205_H
 
-#ifndef __DS1205_H__
-#define __DS1205_H__
+#pragma once
 
 
 #define MCFG_DS1205_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, DS1205, 0 )
 
-class ds1205_device : public device_t,
-	public device_nvram_interface
+class ds1205_device : public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
@@ -95,6 +94,6 @@ private:
 
 
 // device type definition
-extern const device_type DS1205;
+DECLARE_DEVICE_TYPE(DS1205, ds1205_device)
 
-#endif
+#endif // MAME_MACHINE_DS1205_H

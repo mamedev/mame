@@ -186,7 +186,7 @@ void citycon_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( citycon, citycon_state )
+static MACHINE_CONFIG_START( citycon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2048000)        /* 2.048 MHz ??? */

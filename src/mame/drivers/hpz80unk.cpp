@@ -55,7 +55,7 @@ public:
 	DECLARE_READ8_MEMBER(port03_r);
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_READ8_MEMBER(portfc_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	required_shared_ptr<uint8_t> m_p_rom;
 	uint8_t m_term_data;
 	uint8_t m_port02_data;
@@ -114,12 +114,12 @@ void hpz80unk_state::machine_reset()
 	// this should be rom/ram banking
 }
 
-WRITE8_MEMBER( hpz80unk_state::kbd_put )
+void hpz80unk_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( hpz80unk, hpz80unk_state )
+static MACHINE_CONFIG_START( hpz80unk )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(hpz80unk_mem)
@@ -127,7 +127,7 @@ static MACHINE_CONFIG_START( hpz80unk, hpz80unk_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(hpz80unk_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(hpz80unk_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -155,5 +155,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT      INIT     COMPANY                          FULLNAME       FLAGS */
-COMP( 1977, hpz80unk, 0,      0,       hpz80unk,  hpz80unk, driver_device,  0,   "Hewlett-Packard", "unknown Z80-based mainframe", MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY            FULLNAME                       FLAGS
+COMP( 1977, hpz80unk, 0,      0,       hpz80unk,  hpz80unk, hpz80unk_state, 0,    "Hewlett-Packard", "unknown Z80-based mainframe", MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

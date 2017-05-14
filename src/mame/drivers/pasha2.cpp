@@ -412,7 +412,7 @@ void pasha2_state::machine_reset()
 	m_vbuffer = 0;
 }
 
-static MACHINE_CONFIG_START( pasha2, pasha2_state )
+static MACHINE_CONFIG_START( pasha2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E116XT, 20000000*4)     /* 4x internal multiplier */
@@ -437,10 +437,10 @@ static MACHINE_CONFIG_START( pasha2, pasha2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	//and ATMEL DREAM SAM9773

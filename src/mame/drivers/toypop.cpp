@@ -651,7 +651,7 @@ INTERRUPT_GEN_MEMBER(namcos16_state::slave_vblank_irq)
 		device.execute().set_input_line(6,HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( liblrabl, namcos16_state )
+static MACHINE_CONFIG_START( liblrabl )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(master_liblrabl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos16_state, master_scanline, "screen", 0, 1)
@@ -665,20 +665,20 @@ static MACHINE_CONFIG_START( liblrabl, namcos16_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos16_state,  irq0_line_hold, 60)
 
 
-	MCFG_DEVICE_ADD("58xx", NAMCO58XX, 0)
+	MCFG_DEVICE_ADD("58xx", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1_RIGHT"))
 	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2_RIGHT"))
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
-	MCFG_DEVICE_ADD("56xx_1", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("56xx_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(READ8(namcos16_state, dipA_h))
 	MCFG_NAMCO56XX_IN_1_CB(READ8(namcos16_state, dipB_l))
 	MCFG_NAMCO56XX_IN_2_CB(READ8(namcos16_state, dipB_h))
 	MCFG_NAMCO56XX_IN_3_CB(READ8(namcos16_state, dipA_l))
 	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(namcos16_state, flip))
 
-	MCFG_DEVICE_ADD("56xx_2", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("56xx_2", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1_LEFT"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2_LEFT"))
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("SERVICE"))
@@ -764,5 +764,5 @@ ROM_START( toypop )
 	ROM_LOAD( "tp1-6.3d", 0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
 ROM_END
 
-GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, driver_device, 0,   ROT0,   "Namco", "Libble Rabble", MACHINE_NO_COCKTAIL )
-GAME( 1986, toypop,   0,     toypop,   toypop,   driver_device, 0,   ROT0,   "Namco", "Toypop", MACHINE_NO_COCKTAIL )
+GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, 0,   ROT0,   "Namco", "Libble Rabble", MACHINE_NO_COCKTAIL )
+GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, 0,   ROT0,   "Namco", "Toypop",        MACHINE_NO_COCKTAIL )

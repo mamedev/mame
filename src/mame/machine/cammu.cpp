@@ -39,21 +39,27 @@ DEVICE_ADDRESS_MAP_START(map, 32, cammu_c3_device)
 	AM_RANGE(0x000, 0xfff) AM_READWRITE(cammu_r, cammu_w)
 ADDRESS_MAP_END
 
-const device_type CAMMU_C4T = device_creator<cammu_c4t_device>;
-const device_type CAMMU_C4I = device_creator<cammu_c4i_device>;
-const device_type CAMMU_C3 = device_creator<cammu_c3_device>;
+DEFINE_DEVICE_TYPE(CAMMU_C4T, cammu_c4t_device, "c4t", "C4E/C4T CAMMU")
+DEFINE_DEVICE_TYPE(CAMMU_C4I, cammu_c4i_device, "c4i", "C4I CAMMU")
+DEFINE_DEVICE_TYPE(CAMMU_C3,  cammu_c3_device,  "c3",  "C1/C3 CAMMU")
 
 cammu_c4t_device::cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cammu_device(mconfig, CAMMU_C4T, "C4E/C4T CAMMU", tag, owner, clock, "c4t", __FILE__) { }
+	: cammu_device(mconfig, CAMMU_C4T, tag, owner, clock)
+{
+}
 
 cammu_c4i_device::cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cammu_device(mconfig, CAMMU_C4I, "C4I CAMMU", tag, owner, clock, "c4i", __FILE__) { }
+	: cammu_device(mconfig, CAMMU_C4I, tag, owner, clock)
+{
+}
 
 cammu_c3_device::cammu_c3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cammu_device(mconfig, CAMMU_C3, "C1/C3 CAMMU", tag, owner, clock, "c3", __FILE__) { }
+	: cammu_device(mconfig, CAMMU_C3, tag, owner, clock)
+{
+}
 
-cammu_device::cammu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+cammu_device::cammu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this),
 	m_main_space_config("main", ENDIANNESS_LITTLE, 32, 32, 0),
 	m_io_space_config("io", ENDIANNESS_LITTLE, 32, 32, 0),

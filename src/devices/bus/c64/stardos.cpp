@@ -44,7 +44,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_STARDOS = device_creator<c64_stardos_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_STARDOS, c64_stardos_cartridge_device, "c64_stardos", "C64 StarDOS cartridge")
 
 
 //-------------------------------------------------
@@ -114,7 +114,7 @@ void c64_stardos_cartridge_device::charge_io2_capacitor()
 //-------------------------------------------------
 
 c64_stardos_cartridge_device::c64_stardos_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_STARDOS, "C64 StarDOS cartridge", tag, owner, clock, "c64_stardos", __FILE__),
+	device_t(mconfig, C64_STARDOS, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_io1_charge(0),
 	m_io2_charge(0)

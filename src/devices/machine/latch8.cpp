@@ -73,27 +73,6 @@ WRITE8_MEMBER( latch8_device::reset_w )
 	m_value = 0;
 }
 
-/* read bit x                 */
-/* return (latch >> x) & 0x01 */
-
-READ_LINE_MEMBER(latch8_device::bit0_r) { return BIT(m_value, 0); }
-READ_LINE_MEMBER(latch8_device::bit1_r) { return BIT(m_value, 1); }
-READ_LINE_MEMBER(latch8_device::bit2_r) { return BIT(m_value, 2); }
-READ_LINE_MEMBER(latch8_device::bit3_r) { return BIT(m_value, 3); }
-READ_LINE_MEMBER(latch8_device::bit4_r) { return BIT(m_value, 4); }
-READ_LINE_MEMBER(latch8_device::bit5_r) { return BIT(m_value, 5); }
-READ_LINE_MEMBER(latch8_device::bit6_r) { return BIT(m_value, 6); }
-READ_LINE_MEMBER(latch8_device::bit7_r) { return BIT(m_value, 7); }
-
-READ_LINE_MEMBER(latch8_device::bit0_q_r) { return BIT(m_value, 0) ^ 1; }
-READ_LINE_MEMBER(latch8_device::bit1_q_r) { return BIT(m_value, 1) ^ 1; }
-READ_LINE_MEMBER(latch8_device::bit2_q_r) { return BIT(m_value, 2) ^ 1; }
-READ_LINE_MEMBER(latch8_device::bit3_q_r) { return BIT(m_value, 3) ^ 1; }
-READ_LINE_MEMBER(latch8_device::bit4_q_r) { return BIT(m_value, 4) ^ 1; }
-READ_LINE_MEMBER(latch8_device::bit5_q_r) { return BIT(m_value, 5) ^ 1; }
-READ_LINE_MEMBER(latch8_device::bit6_q_r) { return BIT(m_value, 6) ^ 1; }
-READ_LINE_MEMBER(latch8_device::bit7_q_r) { return BIT(m_value, 7) ^ 1; }
-
 /* write bit x from data into bit determined by offset */
 /* latch = (latch & ~(1<<offset)) | (((data >> x) & 0x01) << offset) */
 
@@ -120,18 +99,18 @@ WRITE8_MEMBER( latch8_device::bit5_w ) { bitx_w(5, offset, data); }
 WRITE8_MEMBER( latch8_device::bit6_w ) { bitx_w(6, offset, data); }
 WRITE8_MEMBER( latch8_device::bit7_w ) { bitx_w(7, offset, data); }
 
-const device_type LATCH8 = device_creator<latch8_device>;
+DEFINE_DEVICE_TYPE(LATCH8, latch8_device, "latch8", "8-bit latch")
 
 latch8_device::latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, LATCH8, "8 bit latch", tag, owner, clock, "latch8", __FILE__),
-		m_value(0),
-		m_has_write(0),
-		m_has_read(0),
-		m_maskout(0),
-		m_xorvalue(0),
-		m_nosync(0),
-		m_write_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
-		m_read_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	: device_t(mconfig, LATCH8, tag, owner, clock)
+	, m_value(0)
+	, m_has_write(0)
+	, m_has_read(0)
+	, m_maskout(0)
+	, m_xorvalue(0)
+	, m_nosync(0)
+	, m_write_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_read_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 {
 }
 

@@ -247,7 +247,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( thunderj, thunderj_state )
+static MACHINE_CONFIG_START( thunderj )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)

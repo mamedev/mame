@@ -33,7 +33,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C2031 = device_creator<c2031_device>;
+DEFINE_DEVICE_TYPE(C2031, c2031_device, "c2031", "Commodore 2031")
 
 
 //-------------------------------------------------
@@ -399,19 +399,20 @@ inline int c2031_device::get_device_number()
 //-------------------------------------------------
 
 c2031_device::c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, C2031, "C2031", tag, owner, clock, "c2031", __FILE__),
-		device_ieee488_interface(mconfig, *this),
-		m_maincpu(*this, M6502_TAG),
-		m_via0(*this, M6522_0_TAG),
-		m_via1(*this, M6522_1_TAG),
-		m_ga(*this, C64H156_TAG),
-		m_floppy(*this, C64H156_TAG":0:525ssqd"),
-		m_address(*this, "ADDRESS"),
-		m_nrfd_out(1),
-		m_ndac_out(1),
-		m_atna(1), m_ifc(0),
-		m_via0_irq(0),
-		m_via1_irq(0)
+	: device_t(mconfig, C2031, tag, owner, clock)
+	, device_ieee488_interface(mconfig, *this)
+	, m_maincpu(*this, M6502_TAG)
+	, m_via0(*this, M6522_0_TAG)
+	, m_via1(*this, M6522_1_TAG)
+	, m_ga(*this, C64H156_TAG)
+	, m_floppy(*this, C64H156_TAG":0:525ssqd")
+	, m_address(*this, "ADDRESS")
+	, m_nrfd_out(1)
+	, m_ndac_out(1)
+	, m_atna(1)
+	, m_ifc(0)
+	, m_via0_irq(0)
+	, m_via1_irq(0)
 {
 }
 

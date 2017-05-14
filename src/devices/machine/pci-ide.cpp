@@ -3,10 +3,10 @@
 #include "emu.h"
 #include "pci-ide.h"
 
-const device_type IDE_PCI = device_creator<ide_pci_device>;
+DEFINE_DEVICE_TYPE(IDE_PCI, ide_pci_device, "ide_pci", "PCI IDE interface")
 
 ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, IDE_PCI, "IDE PCI interface", tag, owner, clock, "ide_pci", __FILE__),
+	: pci_device(mconfig, IDE_PCI, tag, owner, clock),
 	m_ide(*this, "ide"),
 	m_ide2(*this, "ide2"),
 	m_irq_num(-1),

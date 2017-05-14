@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_VT83C461_H
+#define MAME_MACHINE_VT83C461_H
 
-#ifndef __VT83C461_H__
-#define __VT83C461_H__
+#pragma once
 
 #include "idectrl.h"
 
@@ -27,8 +27,6 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
 	MCFG_DEVICE_MODIFY(_tag)
 
-#define IDE_CONFIG_REGISTERS                0x10
-
 class vt83c461_device : public ide_controller_32_device
 {
 public:
@@ -41,11 +39,13 @@ protected:
 	virtual void device_start() override;
 
 private:
+	static constexpr unsigned  IDE_CONFIG_REGISTERS= 0x10;
+
 	uint8_t           m_config_unknown;
 	uint8_t           m_config_register[IDE_CONFIG_REGISTERS];
 	uint8_t           m_config_register_num;
 };
 
-extern const device_type VT83C461;
+DECLARE_DEVICE_TYPE(VT83C461, vt83c461_device)
 
-#endif
+#endif // MAME_MACHINE_VT83C461_H

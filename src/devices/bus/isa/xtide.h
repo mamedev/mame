@@ -1,20 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Phill Harvey-Smith
+#ifndef MAME_BUS_ISA_XTIDE_H
+#define MAME_BUS_ISA_XTIDE_H
+
 #pragma once
 
-#ifndef __XTIDE_H__
-#define __XTIDE_H__
-
+#include "isa.h"
 #include "machine/ataintf.h"
 #include "machine/eeprompar.h"
-#include "isa.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class xtide_device : public device_t,
-	public device_isa8_card_interface
+class xtide_device : public device_t, public device_isa8_card_interface
 {
 public:
 	// construction/destruction
@@ -33,7 +32,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_config_complete() override { m_shortname = "xtide"; }
 
 private:
 	required_device<ata_interface_device> m_ata;
@@ -45,6 +43,6 @@ private:
 
 
 // device type definition
-extern const device_type ISA8_XTIDE;
+DECLARE_DEVICE_TYPE(ISA8_XTIDE, xtide_device)
 
-#endif  /* __XTIDE__ */
+#endif // MAME_BUS_ISA_XTIDE_H

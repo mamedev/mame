@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_6883SAM_H
+#define MAME_MACHINE_6883SAM_H
 
-#ifndef __6883SAM__
-#define __6883SAM__
+#pragma once
 
 
 #define MCFG_SAM6883_ADD(_tag, _clock, _cputag, _cpuspace) \
@@ -88,7 +88,7 @@ class sam6883_device : public device_t, public sam6883_friend_device
 public:
 	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_res_rd_callback(device_t &device, _Object object) { return downcast<sam6883_device &>(device).m_read_res.set_callback(object); }
+	template <class Object> static devcb_base &set_res_rd_callback(device_t &device, Object &&cb) { return downcast<sam6883_device &>(device).m_read_res.set_callback(std::forward<Object>(cb)); }
 
 	static void configure_cpu(device_t &device, const char *tag, address_spacenum space)
 	{
@@ -151,7 +151,7 @@ private:
 
 	// represents one of the memory "spaces" (e.g. - $8000-$9FFF) that
 	// can ultimately point to a bank
-	template<uint16_t _addrstart, uint16_t _addrend>
+	template <uint16_t _addrstart, uint16_t _addrend>
 	class sam_space
 	{
 	public:
@@ -173,7 +173,7 @@ private:
 
 	// incidentals
 	address_space *             m_cpu_space;
-	devcb_read8                m_read_res;
+	devcb_read8                 m_read_res;
 	sam_bank                    m_banks[8];
 	sam_space<0x0000, 0x7FFF>   m_space_0000;
 	sam_space<0x8000, 0x9FFF>   m_space_8000;
@@ -260,6 +260,6 @@ private:
 	void update_memory(void);
 };
 
-extern const device_type SAM6883;
+DECLARE_DEVICE_TYPE(SAM6883, sam6883_device)
 
-#endif /* __6883SAM__ */
+#endif // MAME_MACHINE_6883SAM_H

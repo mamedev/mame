@@ -54,7 +54,7 @@ void nes_state::ppu_nmi(int *ppu_regs)
 }
 
 
-static MACHINE_CONFIG_START( nes, nes_state )
+static MACHINE_CONFIG_START( nes )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(nes_map)
@@ -65,7 +65,7 @@ static MACHINE_CONFIG_START( nes, nes_state )
 	// the number of cycles in each scanline for the PPU scanline timer. Since the PPU has 20 vblank scanlines + 2
 	// non-rendering scanlines, we compensate. This ends up being 2500 cycles for the non-rendering portion, 2273
 	// cycles for the actual vblank period.
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_NTSC-PPU_VBLANK_FIRST_SCANLINE+1+2)))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nes_state, screen_update_nes)
@@ -110,7 +110,7 @@ static MACHINE_CONFIG_DERIVED( nespal, nes )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50.0070)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_PAL-PPU_VBLANK_FIRST_SCANLINE+1+2)))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
 	MCFG_SCREEN_SIZE(32*8, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 MACHINE_CONFIG_END
@@ -141,7 +141,7 @@ static MACHINE_CONFIG_DERIVED( nespalc, nespal )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50.0070)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(PALC_APU_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_PAL-PPU_VBLANK_FIRST_SCANLINE_PALC+1+2)))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(PALC_APU_CLOCK/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC+1+2)))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( famipalc, nespalc )
@@ -184,9 +184,9 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 		slot->pcb_start(machine(), m_ciram.get(), false);
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::chr_w),(device_nes_cart_interface *)slot));
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(device_nes_cart_interface::nt_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::nt_w),(device_nes_cart_interface *)slot));
-		m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),(device_nes_cart_interface *)slot));
-		m_ppu->set_hblank_callback(ppu2c0x_hblank_delegate(FUNC(nes_disksys_device::hblank_irq),(nes_disksys_device *)slot));
-		m_ppu->set_latch(ppu2c0x_latch_delegate(FUNC(device_nes_cart_interface::ppu_latch),(device_nes_cart_interface *)slot));
+		m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),(device_nes_cart_interface *)slot));
+		m_ppu->set_hblank_callback(ppu2c0x_device::hblank_delegate(FUNC(nes_disksys_device::hblank_irq),(nes_disksys_device *)slot));
+		m_ppu->set_latch(ppu2c0x_device::latch_delegate(FUNC(device_nes_cart_interface::ppu_latch),(device_nes_cart_interface *)slot));
 	}
 }
 
@@ -341,38 +341,38 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT  COMPAT MACHINE   INPUT    INIT    COMPANY       FULLNAME */
+//    YEAR  NAME       PARENT      COMPAT  MACHINE    INPUT    STATE          INIT     COMPANY          FULLNAME
 
-/* Nintendo Entertainment System hardware */
-CONS( 1985, nes,       0,          0,    nes,       nes,     driver_device,     0,       "Nintendo",      "Nintendo Entertainment System / Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1987, nespal,    nes,        0,    nespal,    nes,     driver_device,     0,       "Nintendo",      "Nintendo Entertainment System (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// Nintendo Entertainment System hardware
+CONS( 1985, nes,       0,          0,      nes,       nes,     nes_state,     0,       "Nintendo",      "Nintendo Entertainment System / Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1987, nespal,    nes,        0,      nespal,    nes,     nes_state,     0,       "Nintendo",      "Nintendo Entertainment System (PAL)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 // M82 Display Unit
 // supports up to twelve cartridge slots
-CONS( 198?, m82,       nes,        0,    nes,       nes,     driver_device,     0,       "Nintendo",      "M82 Display Unit (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-CONS( 198?, m82p,      nes,        0,    nespal,    nes,     driver_device,     0,       "Nintendo",      "M82 Display Unit (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 198?, m82,       nes,        0,      nes,       nes,     nes_state,     0,       "Nintendo",      "M82 Display Unit (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 198?, m82p,      nes,        0,      nespal,    nes,     nes_state,     0,       "Nintendo",      "M82 Display Unit (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-/* Famicom hardware */
-CONS( 1983, famicom,   0,          0,    famicom,   famicom, nes_state,         famicom, "Nintendo",      "Famicom", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1983, fds,       famicom,    0,    fds,       famicom, nes_state,         famicom, "Nintendo",      "Famicom (w/ Disk System add-on)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1986, famitwin,  famicom,    0,    famitwin,  famicom, nes_state,         famicom, "Sharp",         "Famicom Twin", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// Famicom hardware
+CONS( 1983, famicom,   0,          0,      famicom,   famicom, nes_state,     famicom, "Nintendo",      "Famicom",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1983, fds,       famicom,    0,      fds,       famicom, nes_state,     famicom, "Nintendo",      "Famicom (w/ Disk System add-on)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1986, famitwin,  famicom,    0,      famitwin,  famicom, nes_state,     famicom, "Sharp",         "Famicom Twin",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-/* Clone hardware */
-/* Many knockoffs using derivatives of the UMC board design, later incorporated into single CMOS chips, were manufactured before and past the end of the Famicom's timeline. */
+// Clone hardware
+// Many knockoffs using derivatives of the UMC board design, later incorporated into single CMOS chips, were manufactured before and past the end of the Famicom's timeline.
 
-/* !! PAL clones documented here !! */
+// !! PAL clones documented here !!
 // Famicom-based
-CONS( 1992, iq501,     0,          0,    famipalc,  nes,     nes_state,         famicom, "Micro Genius",  "IQ-501", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1992, iq502,     0,          0,    famipalc,  nes,     nes_state,         famicom, "Micro Genius",  "IQ-502", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1992, dendy,     iq501,      0,    famipalc,  nes,     nes_state,         famicom, "Steepler",      "Dendy Classic 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1992, dendy2,    iq502,      0,    famipalc,  nes,     nes_state,         famicom, "Steepler",      "Dendy Classic 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 198?, gchinatv,  0,          0,    famipalc,  nes,     nes_state,         famicom, "Golden China",  "Golden China TV Game", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1992, iq501,     0,          0,      famipalc,  nes,     nes_state,     famicom, "Micro Genius",  "IQ-501",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1992, iq502,     0,          0,      famipalc,  nes,     nes_state,     famicom, "Micro Genius",  "IQ-502",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1992, dendy,     iq501,      0,      famipalc,  nes,     nes_state,     famicom, "Steepler",      "Dendy Classic 1",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1992, dendy2,    iq502,      0,      famipalc,  nes,     nes_state,     famicom, "Steepler",      "Dendy Classic 2",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 198?, gchinatv,  0,          0,      famipalc,  nes,     nes_state,     famicom, "Golden China",  "Golden China TV Game", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Subor/Xiao Ba Wang hardware and derivatives
 // These clones implement a keyboard and a parallel port for printing from a word processor. Later models have mice, PS/2 ports, serial ports and a floppy drive.
-CONS( 1993, sb486,     0,          0,    suborkbd,  nes,     nes_state,         famicom, "Subor",         "SB-486", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1993, sb486,     0,          0,      suborkbd,  nes,     nes_state,     famicom, "Subor",         "SB-486", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-/* !! NTSC clones documented here !! */
+// !! NTSC clones documented here !!
 // Famicom-based
 // Bung hardware
 // Mice, keyboard, etc, including a floppy drive that allows you to run games with a selection of 4 internal "mappers" available on the system.
-CONS( 1996, drpcjr,    0,          0,    famicom,   famicom, nes_state,         famicom, "Bung",          "Doctor PC Jr", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1996, drpcjr,    0,          0,      famicom,   famicom, nes_state,     famicom, "Bung",          "Doctor PC Jr", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -119,7 +119,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 #endif
 
 /* LOCAL _BRG is set in z80scc.h, local timer based BRG is not complete and will be removed if not needed for synchrounous mode */
-#if LOCAL_BRG
+#if Z80SCC_USE_LOCAL_BRG
 #define START_BIT_HUNT 1
 #define START_BIT_ADJUST 1
 #else
@@ -134,16 +134,16 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 //  DEVICE DEFINITIONS
 //**************************************************************************
 // device type definition
-const device_type Z80SCC   = device_creator<z80scc_device>;
-const device_type Z80SCC_CHANNEL = device_creator<z80scc_channel>;
-const device_type SCC8030  = device_creator<scc8030_device>;
-const device_type SCC80C30 = device_creator<scc80C30_device>;
-const device_type SCC80230 = device_creator<scc80230_device>;
-const device_type SCC8530N = device_creator<scc8530_device>;  // remove trailing N when 8530scc.c is fully replaced and removed
-const device_type SCC85C30 = device_creator<scc85C30_device>;
-const device_type SCC85230 = device_creator<scc85230_device>;
-const device_type SCC85233 = device_creator<scc85233_device>;
-const device_type SCC8523L = device_creator<scc8523L_device>;
+DEFINE_DEVICE_TYPE(Z80SCC,         z80scc_device,   "z80scc",         "Z80 SCC")
+DEFINE_DEVICE_TYPE(Z80SCC_CHANNEL, z80scc_channel,  "z80scc_channel", "Z80 SCC Channel")
+DEFINE_DEVICE_TYPE(SCC8030,        scc8030_device,  "scc8030",        "Zilog Z8030 SCC")
+DEFINE_DEVICE_TYPE(SCC80C30,       scc80c30_device, "scc80c30",       "Zilog Z80C30 SCC")
+DEFINE_DEVICE_TYPE(SCC80230,       scc80230_device, "scc80230",       "Zilog Z80230 ESCC")
+DEFINE_DEVICE_TYPE(SCC8530N,       scc8530_device,  "scc8530",        "Zilog Z8530 SCC")  // remove trailing N when 8530scc.c is fully replaced and removed
+DEFINE_DEVICE_TYPE(SCC85C30,       scc85c30_device, "scc85c30",       "Zilog Z85C30 SCC")
+DEFINE_DEVICE_TYPE(SCC85230,       scc85230_device, "scc85230",       "Zilog Z85230 ESCC")
+DEFINE_DEVICE_TYPE(SCC85233,       scc85233_device, "scc85233",       "Zilog Z85233 EMSCC")
+DEFINE_DEVICE_TYPE(SCC8523L,       scc8523l_device, "scc8523l",       "Zilog Z8523L SCC")
 
 //-------------------------------------------------
 //  device_mconfig_additions -
@@ -166,8 +166,8 @@ machine_config_constructor z80scc_device::device_mconfig_additions() const
 //  z80scc_device - constructor
 //-------------------------------------------------
 
-z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: device_t(mconfig, type, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this),
 	m_chanA(*this, CHANA_TAG),
 	m_chanB(*this, CHANB_TAG),
@@ -198,35 +198,49 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 }
 
 z80scc_device::z80scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, Z80SCC, "Z80 SCC", tag, owner, clock, TYPE_Z80SCC, "z80scc", __FILE__)
+	: z80scc_device(mconfig, Z80SCC, tag, owner, clock, TYPE_Z80SCC)
 {
-	for (auto & elem : m_int_state)
-		elem = 0;
 }
 
 scc8030_device::scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, SCC8030, "SCC 8030", tag, owner, clock, TYPE_SCC8030, "scc8030", __FILE__){ }
+	: z80scc_device(mconfig, SCC8030, tag, owner, clock, TYPE_SCC8030)
+{
+}
 
-scc80C30_device::scc80C30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, SCC80C30, "SCC 80C30", tag, owner, clock, TYPE_SCC80C30, "scc80c30", __FILE__){ }
+scc80c30_device::scc80c30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z80scc_device(mconfig, SCC80C30, tag, owner, clock, TYPE_SCC80C30)
+{
+}
 
 scc80230_device::scc80230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, SCC80230, "SCC 80230", tag, owner, clock, TYPE_SCC80230, "scc80230", __FILE__){ }
+	: z80scc_device(mconfig, SCC80230, tag, owner, clock, TYPE_SCC80230)
+{
+}
 
 scc8530_device::scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, SCC8530N, "SCC 8530", tag, owner, clock, TYPE_SCC8530, "scc8530", __FILE__){ }
+	: z80scc_device(mconfig, SCC8530N, tag, owner, clock, TYPE_SCC8530)
+{
+}
 
-scc85C30_device::scc85C30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, SCC85C30, "SCC 85C30", tag, owner, clock, TYPE_SCC85C30, "scc85c30", __FILE__){ }
+scc85c30_device::scc85c30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z80scc_device(mconfig, SCC85C30, tag, owner, clock, TYPE_SCC85C30)
+{
+}
 
 scc85230_device::scc85230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, SCC85230, "SCC 85230", tag, owner, clock, TYPE_SCC85230, "scc85230", __FILE__){ }
+	: z80scc_device(mconfig, SCC85230, tag, owner, clock, TYPE_SCC85230)
+{
+}
 
 scc85233_device::scc85233_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, SCC85233, "SCC 85233", tag, owner, clock, TYPE_SCC85233, "scc85233", __FILE__){ }
+	: z80scc_device(mconfig, SCC85233, tag, owner, clock, TYPE_SCC85233)
+{
+}
 
-scc8523L_device::scc8523L_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80scc_device(mconfig, SCC8523L, "SCC 8523L", tag, owner, clock, TYPE_SCC8523L, "scc8523l", __FILE__){ }
+scc8523l_device::scc8523l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z80scc_device(mconfig, SCC8523L, tag, owner, clock, TYPE_SCC8523L)
+{
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -838,9 +852,9 @@ WRITE8_MEMBER( z80scc_device::ba_cd_inv_w )
 //-------------------------------------------------
 
 z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, Z80SCC_CHANNEL, "Z80 SCC channel", tag, owner, clock, "z80scc_channel", __FILE__),
+	: device_t(mconfig, Z80SCC_CHANNEL, tag, owner, clock),
 		device_serial_interface(mconfig, *this),
-#if LOCAL_BRG
+#if Z80SCC_USE_LOCAL_BRG
 		m_brg_counter(0),
 #else
 		m_brg_rate(0),
@@ -893,13 +907,13 @@ void z80scc_channel::device_start()
 
 	m_uart->m_wr0_ptrbits = 0;
 
-	m_rx_fifo_sz = (m_uart->m_variant & SET_ESCC) ? 8 : 3;
+	m_rx_fifo_sz = (m_uart->m_variant & z80scc_device::SET_ESCC) ? 8 : 3;
 	m_rx_fifo_wp = m_rx_fifo_rp = 0;
 
-	m_tx_fifo_sz = (m_uart->m_variant & SET_ESCC) ? 4 : 1;
+	m_tx_fifo_sz = (m_uart->m_variant & z80scc_device::SET_ESCC) ? 4 : 1;
 	m_tx_fifo_wp = m_tx_fifo_rp = 0;
 
-#if LOCAL_BRG
+#if Z80SCC_USE_LOCAL_BRG
 	// baudrate clocks and timers
 	baudtimer = timer_alloc(TIMER_ID_BAUD);
 #endif
@@ -982,7 +996,7 @@ void z80scc_channel::device_reset()
 	m_wr3  &= 0x01;
 	m_wr4   = 0x04;
 	m_wr5   = 0x00;
-	if (m_uart->m_variant & (z80scc_device::TYPE_SCC85C30 | SET_ESCC))
+	if (m_uart->m_variant & (z80scc_device::TYPE_SCC85C30 | z80scc_device::SET_ESCC))
 		m_wr7 = 0x20;
 	//  WR9,WR10,WR11 and WR14 has a different hard reset (see z80scc_device::device_reset()) values
 	m_uart->m_wr9 &= 0xdf;
@@ -1015,7 +1029,7 @@ void z80scc_channel::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 //  LOG("%s %d\n", FUNCNAME, id);
 
-#if LOCAL_BRG
+#if Z80SCC_USE_LOCAL_BRG
 	switch(id)
 	{
 	case TIMER_ID_BAUD:
@@ -1128,7 +1142,7 @@ void z80scc_channel::tra_complete()
 
 		if (m_wr1 & WR1_TX_INT_ENABLE && m_tx_int_disarm == 0)
 		{
-			if ((m_uart->m_variant & SET_ESCC) &&
+			if ((m_uart->m_variant & z80scc_device::SET_ESCC) &&
 				(m_wr7p & WR7P_TX_FIFO_EMPTY)  &&
 				m_tx_fifo_wp == m_tx_fifo_rp)  // ESCC and fifo empty bit set and fifo is completelly empty?
 			{
@@ -1373,7 +1387,7 @@ uint8_t z80scc_channel::do_sccreg_rr2()
 			{
 				LOGINT(" - Checking an INT source %d\n", i);
 				m_rr2 = m_uart->modify_vector(m_rr2, i < 3 ? z80scc_device::CHANNEL_A : z80scc_device::CHANNEL_B, m_uart->m_int_source[i] & 3);
-				if ((m_uart->m_variant & (SET_ESCC | SET_CMOS)) && (m_uart->m_wr9 & WR9_BIT_IACK))
+				if ((m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::SET_CMOS)) && (m_uart->m_wr9 & WR9_BIT_IACK))
 				{
 					LOGINT(" - Found an INT request to ack while reading RR2\n");
 					elem = Z80_DAISY_IEO; // Set IUS bit (called IEO in z80 daisy lingo)
@@ -1411,7 +1425,7 @@ uint8_t z80scc_channel::do_sccreg_rr3()
 uint8_t z80scc_channel::do_sccreg_rr4()
 {
 	LOGR("%s\n", FUNCNAME);
-	if (m_uart->m_variant & (SET_ESCC | z80scc_device::TYPE_SCC85C30))
+	if (m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::TYPE_SCC85C30))
 		return (BIT(m_wr7, 6) ? m_wr4 : m_rr0);
 	else
 		return m_rr0;
@@ -1424,7 +1438,7 @@ uint8_t z80scc_channel::do_sccreg_rr4()
 uint8_t z80scc_channel::do_sccreg_rr5()
 {
 	LOGR("%s\n", FUNCNAME);
-	if (m_uart->m_variant & (SET_ESCC | z80scc_device::TYPE_SCC85C30))
+	if (m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::TYPE_SCC85C30))
 		return BIT(m_wr7, 6) ? m_wr5 : m_rr1;
 	else
 		return m_rr1;
@@ -1459,7 +1473,7 @@ uint8_t z80scc_channel::do_sccreg_rr6()
 uint8_t z80scc_channel::do_sccreg_rr7()
 {
 	LOGR("%s\n", FUNCNAME);
-	if (!(m_uart->m_variant & (SET_NMOS)))
+	if (!(m_uart->m_variant & (z80scc_device::SET_NMOS)))
 	{
 		logerror(" %s() not implemented feature\n", FUNCNAME);
 		return 0;
@@ -1482,7 +1496,7 @@ uint8_t z80scc_channel::do_sccreg_rr8()
 uint8_t z80scc_channel::do_sccreg_rr9()
 {
 	LOGR("%s\n", FUNCNAME);
-	if (m_uart->m_variant & (SET_ESCC | z80scc_device::TYPE_SCC85C30))
+	if (m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::TYPE_SCC85C30))
 		return BIT(m_wr7, 6) ? m_wr3 : m_rr13;
 	else
 		return m_rr13;
@@ -1503,7 +1517,7 @@ uint8_t z80scc_channel::do_sccreg_rr10()
 uint8_t z80scc_channel::do_sccreg_rr11()
 {
 	LOGR("%s\n", FUNCNAME);
-	if (m_uart->m_variant & (SET_ESCC | z80scc_device::TYPE_SCC85C30))
+	if (m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::TYPE_SCC85C30))
 		return BIT(m_wr7, 6) ? m_wr10 : m_rr15;
 	else
 		return m_rr15;
@@ -1532,7 +1546,7 @@ On the NMOS/CMOS version, a read to this location returns an image of RR10.*/
 uint8_t z80scc_channel::do_sccreg_rr14()
 {
 	LOGR("%s\n", FUNCNAME);
-	if (m_uart->m_variant & (SET_ESCC | z80scc_device::TYPE_SCC85C30))
+	if (m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::TYPE_SCC85C30))
 		return BIT(m_wr7, 6) ? m_wr7 : m_rr10;
 	else
 		return m_rr10;
@@ -1559,7 +1573,7 @@ uint8_t z80scc_channel::scc_register_read( uint8_t reg)
 	uint8_t wreg = 0;
 
 	/* Sort out 80X30 limitations in register access */
-	if (BIT(m_wr15, 2) == 0 || m_uart->m_variant & SET_NMOS)
+	if (BIT(m_wr15, 2) == 0 || m_uart->m_variant & z80scc_device::SET_NMOS)
 	{
 		if (reg > 3 && reg < 8) reg &= 0x03;
 		else if (reg == 9) reg = 13;
@@ -1567,7 +1581,7 @@ uint8_t z80scc_channel::scc_register_read( uint8_t reg)
 	}
 	else if (BIT(m_wr15, 2) != 0)
 	{
-		if (m_uart->m_variant & SET_ESCC && BIT(m_wr7p, 6) != 0)
+		if (m_uart->m_variant & z80scc_device::SET_ESCC && BIT(m_wr7p, 6) != 0)
 		{
 			if (reg > 3 && reg < 6) wreg = 1;
 			else if (reg == 9)  { reg = 3;  wreg = 1; }
@@ -1637,7 +1651,7 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 {
 	m_wr0 = data;
 
-	if (m_uart->m_variant & SET_Z85X3X)
+	if (m_uart->m_variant & z80scc_device::SET_Z85X3X)
 		m_uart->m_wr0_ptrbits = data & WR0_REGISTER_MASK;
 
 	switch (data & WR0_COMMAND_MASK)
@@ -1649,7 +1663,7 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		  version of the SCC. Note that WR0 changes form depending upon the SCC version.
 		  Register access for the Z80X30 version of the SCC is accomplished through direct
 		  addressing*/
-		if (m_uart->m_variant & SET_Z85X3X)
+		if (m_uart->m_variant & z80scc_device::SET_Z85X3X)
 		{
 			LOG("%s %s: %c : - Point High command\n", FUNCNAME, m_owner->tag(), 'A' + m_index);
 			m_uart->m_wr0_ptrbits |= 8;
@@ -1681,7 +1695,7 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		   priority conditions to request interrupts. This command allows the use of the internal
 		   daisy chain (even in systems without an external daisy chain) and is the last operation in
 		   an interrupt service routine. */
-		if (m_uart->m_variant & (SET_NMOS))
+		if (m_uart->m_variant & z80scc_device::SET_NMOS)
 		{
 			logerror("WR0 SWI ack command not supported on NMOS\n");
 			LOGCMD("%s: %c : WR0_RESET_HIGHEST_IUS command not available on NMOS!\n", m_owner->tag(), 'A' + m_index);
@@ -1759,7 +1773,7 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		logerror(" Wrong CRC reset/init command:%02x\n", data & WR0_CRC_RESET_CODE_MASK);
 	}
 
-	if ( m_uart->m_variant & SET_Z85X3X)
+	if (m_uart->m_variant & z80scc_device::SET_Z85X3X)
 	{
 		m_uart->m_wr0_ptrbits &= ~WR0_REGISTER_MASK;
 		m_uart->m_wr0_ptrbits |= (m_wr0 & (WR0_REGISTER_MASK));
@@ -1934,7 +1948,7 @@ void z80scc_channel::do_sccreg_wr9(uint8_t data)
 		/*"The effects of this command are identical to those of a hardware reset, except that the Shift Right/Shift Left bit is
 		  not changed and the MIE, Status High/Status Low and DLC bits take the programmed values that accompany this command."
 		*/
-		if (m_uart->m_variant & SET_Z80X30)
+		if (m_uart->m_variant & z80scc_device::SET_Z80X30)
 		{
 			uint8_t tmp_wr0 = m_wr0; // Save the Shift Left/Shift Right bits
 			m_uart->device_reset();
@@ -2144,7 +2158,7 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 		{
 			LOG("   - PCLK as source\n");
 
-#if LOCAL_BRG
+#if Z80SCC_USE_LOCAL_BRG
 			baudtimer->adjust(attotime::from_hz(rate), TIMER_ID_BAUD, attotime::from_hz(rate)); // Start the baudrate generator
 #if START_BIT_HUNT
 			m_rcv_mode = RCV_SEEKING;
@@ -2158,7 +2172,7 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 	}
 	else if ( (m_wr14 & WR14_BRG_ENABLE) && !(data & WR14_BRG_ENABLE) ) // baud rate generator being disabled?
 	{
-#if LOCAL_BRG
+#if Z80SCC_USE_LOCAL_BRG
 		baudtimer->adjust(attotime::never, TIMER_ID_BAUD, attotime::never); // Stop the baudrate generator
 		m_brg_counter = 0;
 #endif
@@ -2422,7 +2436,7 @@ void z80scc_channel::data_write(uint8_t data)
 	m_tx_int_disarm = 0; 
 	if (m_wr1 & WR1_TX_INT_ENABLE)
 	{
-		if ((m_uart->m_variant & SET_ESCC) &&
+		if ((m_uart->m_variant & z80scc_device::SET_ESCC) &&
 			(m_wr7p & WR7P_TX_FIFO_EMPTY)  &&
 			m_tx_fifo_wp == m_tx_fifo_rp)  // ESCC and fifo empty bit set and fifo is completelly empty?
 		{

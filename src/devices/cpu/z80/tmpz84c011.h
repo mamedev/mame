@@ -7,10 +7,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_Z80_TMPZ84C011_H
+#define MAME_CPU_Z80_TMPZ84C011_H
 
-#ifndef __TMPZ84C011__
-#define __TMPZ84C011__
+#pragma once
 
 #include "z80.h"
 #include "machine/z80ctc.h"
@@ -172,7 +172,7 @@ private:
 
 
 // device type definition
-extern const device_type TMPZ84C011;
+DECLARE_DEVICE_TYPE(TMPZ84C011, tmpz84c011_device)
 
 
-#endif /// __TMPZ84C011__
+#endif // MAME_CPU_Z80_TMPZ84C011_H

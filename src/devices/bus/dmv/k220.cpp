@@ -122,7 +122,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMV_K220 = device_creator<dmv_k220_device>;
+DEFINE_DEVICE_TYPE(DMV_K220, dmv_k220_device, "dmv_k220", "K220 diagnostic")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -133,13 +133,14 @@ const device_type DMV_K220 = device_creator<dmv_k220_device>;
 //-------------------------------------------------
 
 dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, DMV_K220, "K220 diagnostic", tag, owner, clock, "dmv_k220", __FILE__),
-		device_dmvslot_interface( mconfig, *this ),
-		m_pit(*this, "pit8253"),
-		m_ppi(*this, "ppi8255"),
-		m_ram(*this, "ram"),
-		m_rom(*this, "rom"), m_portc(0)
-	{
+	: device_t(mconfig, DMV_K220, tag, owner, clock)
+	, device_dmvslot_interface(mconfig, *this)
+	, m_pit(*this, "pit8253")
+	, m_ppi(*this, "ppi8255")
+	, m_ram(*this, "ram")
+	, m_rom(*this, "rom")
+	, m_portc(0)
+{
 }
 
 //-------------------------------------------------

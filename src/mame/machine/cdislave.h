@@ -21,10 +21,10 @@ TODO:
 
 *******************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_CDISLAVE_H
+#define MAME_MACHINE_CDISLAVE_H
 
-#ifndef __CDISLAVE_H__
-#define __CDISLAVE_H__
+#pragma once
 
 
 //**************************************************************************

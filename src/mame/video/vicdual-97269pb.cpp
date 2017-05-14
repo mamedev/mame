@@ -72,7 +72,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type S97269PB = device_creator<s97269pb_device>;
+DEFINE_DEVICE_TYPE(S97269PB, s97269pb_device, "s97269pb", "N-Sub Daughterboard 97269-P-B")
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -92,7 +92,7 @@ const tiny_rom_entry *s97269pb_device::device_rom_region() const
 //-------------------------------------------------
 
 s97269pb_device::s97269pb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, S97269PB, "N-Sub Daughterboard 97269-P-B", tag, owner, clock, "s97269pb", __FILE__),
+	device_t(mconfig, S97269PB, tag, owner, clock),
 	m_prom_ptr(*this, "s97269pb")
 {
 }

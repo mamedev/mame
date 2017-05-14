@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __SEGA8_MGEAR_H
-#define __SEGA8_MGEAR_H
+#ifndef MAME_BUS_SEGA8_MGEAR_H
+#define MAME_BUS_SEGA8_MGEAR_H
+
+#pragma once
 
 #include "sega8_slot.h"
 #include "rom.h"
@@ -23,7 +25,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_cart) override { return m_subslot->read_cart(space, offset); }
 	virtual DECLARE_WRITE8_MEMBER(write_cart) override { m_subslot->write_cart(space, offset, data); }
 	virtual DECLARE_WRITE8_MEMBER(write_mapper) override { m_subslot->write_mapper(space, offset, data); }
-	virtual int get_lphaser_xoffs() override { return m_subslot->m_cart ? m_subslot->m_cart->get_lphaser_xoffs() : -1; }
+	virtual int get_lphaser_xoffs() override { return m_subslot->get_lphaser_xoffs(); }
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
@@ -33,7 +35,6 @@ protected:
 
 
 // device type definition
-extern const device_type SEGA8_ROM_MGEAR;
+DECLARE_DEVICE_TYPE(SEGA8_ROM_MGEAR, sega8_mgear_device)
 
-
-#endif
+#endif // MAME_BUS_SEGA8_MGEAR_H

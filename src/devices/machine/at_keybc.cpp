@@ -8,14 +8,13 @@
 
 #include "emu.h"
 #include "at_keybc.h"
-#include "cpu/mcs48/mcs48.h"
 
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type AT_KEYBOARD_CONTROLLER = device_creator<at_keyboard_controller_device>;
+DEFINE_DEVICE_TYPE(AT_KEYBOARD_CONTROLLER, at_keyboard_controller_device, "at_keybc", "AT Keyboard Controller")
 
 static INPUT_PORTS_START( at_keybc )
 	PORT_START("DSW")
@@ -55,7 +54,7 @@ ROM_END
 //-------------------------------------------------
 
 at_keyboard_controller_device::at_keyboard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AT_KEYBOARD_CONTROLLER, "AT Keyboard Controller", tag, owner, clock, "at_keybc", __FILE__),
+	: device_t(mconfig, AT_KEYBOARD_CONTROLLER, tag, owner, clock),
 		m_cpu(nullptr),
 		m_system_reset_cb(*this),
 		m_gate_a20_cb(*this),

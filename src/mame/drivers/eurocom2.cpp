@@ -73,12 +73,8 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_p_videoram(*this, "videoram")
 		, m_screen(*this, "screen")
-	{ }
-
-	// driver_device overrides
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	{
+	}
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -89,9 +85,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vico_w);
 
 	DECLARE_READ8_MEMBER(kbd_get);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-
-	emu_timer *m_sst;
+	void kbd_put(u8 data);
 
 	DECLARE_READ_LINE_MEMBER(pia1_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia1_ca2_r);
@@ -99,6 +93,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
 
 protected:
+	// driver_device overrides
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	emu_timer *m_sst;
+
 	floppy_image_device *m_floppy;
 	bool m_sst_state, m_kbd_ready;
 	bitmap_ind16 m_tmpbmp;
@@ -110,7 +111,7 @@ protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 	required_device<acia6850_device> m_acia;
-	required_device<fd1793_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<screen_device> m_screen;
 };
@@ -251,7 +252,7 @@ READ8_MEMBER(eurocom2_state::kbd_get)
 	return m_kbd_data;
 }
 
-WRITE8_MEMBER(eurocom2_state::kbd_put)
+void eurocom2_state::kbd_put(u8 data)
 {
 	m_kbd_ready = true;
 	m_kbd_data = data;
@@ -333,7 +334,7 @@ static ADDRESS_MAP_START(eurocom2_map, AS_PROGRAM, 8, eurocom2_state)
 	AM_RANGE(0xfcf5, 0xfcf5) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
 	AM_RANGE(0xfcf6, 0xfcf7) AM_WRITE(vico_w)
 	AM_RANGE(0xfcf8, 0xfcfb) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0xfd30, 0xfd37) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
+	AM_RANGE(0xfd30, 0xfd37) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	AM_RANGE(0xfd38, 0xfd38) AM_READWRITE(fdc_aux_r, fdc_aux_w)
 	AM_RANGE(0xfd40, 0xffff) AM_ROM AM_REGION("maincpu", 0xd40) AM_WRITENOP
 ADDRESS_MAP_END
@@ -426,7 +427,7 @@ static SLOT_INTERFACE_START( eurocom_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( eurocom2, eurocom2_state )
+static MACHINE_CONFIG_START( eurocom2 )
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_5_3586MHz/4)
 	MCFG_CPU_PROGRAM_MAP(eurocom2_map)
 
@@ -438,7 +439,7 @@ static MACHINE_CONFIG_START( eurocom2, eurocom2_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(eurocom2_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(eurocom2_state, kbd_put))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA_READCA1_HANDLER(READLINE(eurocom2_state, pia1_ca1_r))  // keyboard strobe
@@ -469,7 +470,7 @@ static MACHINE_CONFIG_START( eurocom2, eurocom2_state )
 //  MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS(waveterm, eurocom2, waveterm_state)
+static MACHINE_CONFIG_DERIVED(waveterm, eurocom2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(waveterm_map)
 
@@ -517,6 +518,6 @@ ROM_START(waveterm)
 ROM_END
 
 
-//    YEAR  NAME      PARENT    COMPAT MACHINE   INPUT     CLASS           INIT  COMPANY  FULLNAME         FLAGS
-COMP( 1981, eurocom2, 0,        0,     eurocom2, eurocom2, driver_device,  0,    "Eltec", "Eurocom II V7", MACHINE_IS_SKELETON)
-COMP( 1982, waveterm, eurocom2, 0,     waveterm, waveterm, driver_device,  0,    "PPG",   "Waveterm A",    MACHINE_IS_SKELETON)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY  FULLNAME         FLAGS
+COMP( 1981, eurocom2, 0,        0,      eurocom2, eurocom2, eurocom2_state, 0,    "Eltec", "Eurocom II V7", MACHINE_IS_SKELETON )
+COMP( 1982, waveterm, eurocom2, 0,      waveterm, waveterm, waveterm_state, 0,    "PPG",   "Waveterm A",    MACHINE_IS_SKELETON )

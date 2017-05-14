@@ -43,7 +43,7 @@ DRIVER_INIT_MEMBER(by68701_state,by68701)
 {
 }
 
-static MACHINE_CONFIG_START( by68701, by68701_state )
+static MACHINE_CONFIG_START( by68701 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, 3579545/4)
 	MCFG_CPU_PROGRAM_MAP(by68701_map)
@@ -132,7 +132,7 @@ ROM_END
 
 GAME(1981,  flashgdnp1, flashgdn,   by68701,    by68701, by68701_state, by68701,    ROT0,   "Bally",    "Flash Gordon (prototype rev. 1)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981,  flashgdnp2, flashgdn,   by68701,    by68701, by68701_state, by68701,    ROT0,   "Bally",    "Flash Gordon (prototype rev. 2)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  eballdlxp1, eballdlx,   by68701,    by68701, by68701_state, by68701,    ROT0,   "Bally",    "Eight Ball Deluxe (prototype rev. 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  eballdlxp2, eballdlx,   by68701,    by68701, by68701_state, by68701,    ROT0,   "Bally",    "Eight Ball Deluxe (prototype rev. 2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  eballdlxp3, eballdlx,   by68701,    by68701, by68701_state, by68701,    ROT0,   "Bally",    "Eight Ball Deluxe (prototype rev. 3)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  eballdlxp4, eballdlx,   by68701,    by68701, by68701_state, by68701,    ROT0,   "Bally",    "Eight Ball Deluxe (prototype rev. 4)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  eballdlxp1, eballdlx,   by68701,    by68701, by68701_state, by68701,    ROT0,   "Bally",    "Eight Ball Deluxe (prototype rev. 1)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  eballdlxp2, eballdlx,   by68701,    by68701, by68701_state, by68701,    ROT0,   "Bally",    "Eight Ball Deluxe (prototype rev. 2)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  eballdlxp3, eballdlx,   by68701,    by68701, by68701_state, by68701,    ROT0,   "Bally",    "Eight Ball Deluxe (prototype rev. 3)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  eballdlxp4, eballdlx,   by68701,    by68701, by68701_state, by68701,    ROT0,   "Bally",    "Eight Ball Deluxe (prototype rev. 4)",  MACHINE_IS_SKELETON_MECHANICAL)

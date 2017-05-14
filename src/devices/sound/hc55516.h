@@ -1,17 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
+#ifndef MAME_SOUND_HC55516_H
+#define MAME_SOUND_HC55516_H
+
 #pragma once
 
-#ifndef __HC55516_H__
-#define __HC55516_H__
-
-class hc55516_device : public device_t,
-									public device_sound_interface
+class hc55516_device : public device_t, public device_sound_interface
 {
 public:
 	hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	hc55516_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	~hc55516_device() {}
 
 	/* sets the digit (0 or 1) */
 	void digit_w(int digit);
@@ -23,6 +20,8 @@ public:
 	int clock_state_r();
 
 protected:
+	hc55516_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -60,12 +59,12 @@ protected:
 	void process_digit();
 };
 
-extern const device_type HC55516;
 
 class mc3417_device : public hc55516_device
 {
 public:
 	mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -74,12 +73,12 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
-extern const device_type MC3417;
 
 class mc3418_device : public hc55516_device
 {
 public:
 	mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -88,7 +87,9 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
-extern const device_type MC3418;
 
+DECLARE_DEVICE_TYPE(HC55516, hc55516_device)
+DECLARE_DEVICE_TYPE(MC3417,  mc3417_device)
+DECLARE_DEVICE_TYPE(MC3418,  mc3418_device)
 
-#endif /* __HC55516_H__ */
+#endif // MAME_SOUND_HC55516_H

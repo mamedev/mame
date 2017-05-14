@@ -45,8 +45,8 @@ TODO:
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "minx.h"
+#include "debugger.h"
 
 #define FLAG_I  0x80
 #define FLAG_D  0x40
@@ -72,11 +72,11 @@ TODO:
 #define GET_MINX_PC     ( ( m_PC & 0x8000 ) ? ( m_V << 15 ) | (m_PC & 0x7FFF ) : m_PC )
 
 
-const device_type MINX = device_creator<minx_cpu_device>;
+DEFINE_DEVICE_TYPE(MINX, minx_cpu_device, "minx", "Nintendo Minx")
 
 
 minx_cpu_device::minx_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, MINX, "Nintendo Minx", tag, owner, clock, "minx", __FILE__)
+	: cpu_device(mconfig, MINX, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 24, 0)
 {
 }

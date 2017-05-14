@@ -6,26 +6,30 @@
 #define DP8390_BYTE_ORDER(w) ((m_regs.dcr & 3) == 3 ? ((data << 8) | (data >> 8)) : data)
 #define LOOPBACK (!(m_regs.dcr & 8) && (m_regs.tcr & 6))
 
-const device_type DP8390D = device_creator<dp8390d_device>;
-const device_type RTL8019A = device_creator<rtl8019a_device>;
+DEFINE_DEVICE_TYPE(DP8390D,  dp8390d_device,  "dp8390d",  "DP8390D")
+DEFINE_DEVICE_TYPE(RTL8019A, rtl8019a_device, "rtl8019a", "RTL8019A")
 
 dp8390d_device::dp8390d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: dp8390_device(mconfig, DP8390D, "DP8390D", tag, owner, clock, 10.0f, "dp8390d", __FILE__) {
-		m_type = TYPE_DP8390D;
+	: dp8390_device(mconfig, DP8390D, tag, owner, clock, TYPE::DP8390D, 10.0f)
+{
 }
 
 rtl8019a_device::rtl8019a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: dp8390_device(mconfig, RTL8019A, "RTL8019A", tag, owner, clock, 10.0f, "rtl8019a", __FILE__) {
-		m_type = TYPE_RTL8019A;
+	: dp8390_device(mconfig, RTL8019A, tag, owner, clock, TYPE::RTL8019A, 10.0f)
+{
 }
 
-dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, float bandwidth, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_network_interface(mconfig, *this, bandwidth), m_type(0),
-		m_irq_cb(*this),
-		m_breq_cb(*this),
-		m_mem_read_cb(*this),
-		m_mem_write_cb(*this), m_reset(0), m_cs(false), m_rdma_active(0)
+dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, TYPE variant, float bandwidth)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_network_interface(mconfig, *this, bandwidth)
+	, m_variant(variant)
+	, m_irq_cb(*this)
+	, m_breq_cb(*this)
+	, m_mem_read_cb(*this)
+	, m_mem_write_cb(*this)
+	, m_reset(0)
+	, m_cs(false)
+	, m_rdma_active(0)
 {
 }
 
@@ -296,7 +300,7 @@ READ16_MEMBER(dp8390_device::dp8390_r) {
 		data = m_regs.cr;
 		break;
 	default:
-		if(m_type == TYPE_RTL8019A) {
+		if(m_variant == TYPE::RTL8019A) {
 			switch((offset & 0x0f)|(m_regs.cr & 0xc0)) {
 				case 0x0a:
 					data = 'P';
@@ -464,7 +468,7 @@ WRITE16_MEMBER(dp8390_device::dp8390_w) {
 		set_cr(data);
 		break;
 	default:
-		if(m_type == TYPE_RTL8019A) {
+		if(m_variant == TYPE::RTL8019A) {
 			switch((offset & 0x0f)|(m_regs.cr & 0xc0)) {
 				// XXX: rest of the regs
 				default:

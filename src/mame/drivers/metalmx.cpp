@@ -685,7 +685,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( metalmx, metalmx_state )
+static MACHINE_CONFIG_START( metalmx )
 
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_14_31818MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)

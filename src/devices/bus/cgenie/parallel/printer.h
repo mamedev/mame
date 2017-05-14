@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CGENIE_PARALLEL_PRINTER_H
+#define MAME_BUS_CGENIE_PARALLEL_PRINTER_H
 
-#ifndef __CGENIE_PARALLEL_PRINTER_H__
-#define __CGENIE_PARALLEL_PRINTER_H__
+#pragma once
 
 #include "parallel.h"
 #include "bus/centronics/ctronics.h"
@@ -21,7 +21,7 @@
 
 // ======================> cgenie_printer_device
 
-class cgenie_printer_device : public device_t, public device_parallel_interface
+class cgenie_printer_device : public device_t, public device_cg_parallel_interface
 {
 public:
 	// construction/destruction
@@ -52,6 +52,6 @@ private:
 };
 
 // device type definition
-extern const device_type CGENIE_PRINTER;
+DECLARE_DEVICE_TYPE(CGENIE_PRINTER, cgenie_printer_device)
 
-#endif // __CGENIE_PARALLEL_PRINTER_H__
+#endif // MAME_BUS_CGENIE_PARALLEL_PRINTER_H

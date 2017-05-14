@@ -8,12 +8,12 @@
 #include "emu.h"
 #include "st0016.h"
 
-#define VERBOSE (0)
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 // device type definition
-const device_type ST0016 = device_creator<st0016_device>;
+DEFINE_DEVICE_TYPE(ST0016, st0016_device, "st0016", "Seta ST0016 (Audio)")
 
 
 //**************************************************************************
@@ -25,15 +25,15 @@ const device_type ST0016 = device_creator<st0016_device>;
 //-------------------------------------------------
 
 st0016_device::st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ST0016, "ST0016 (Audio)", tag, owner, clock, "st0016_audio", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_ram_read_cb(*this)
+	: device_t(mconfig, ST0016, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_stream(nullptr)
+	, m_ram_read_cb(*this)
+	, m_vpos{ 0, 0, 0, 0, 0, 0, 0, 0 }
+	, m_frac{ 0, 0, 0, 0, 0, 0, 0, 0 }
+	, m_lponce{ 0, 0, 0, 0, 0, 0, 0, 0 }
 {
-	memset(m_vpos, 0, sizeof(int)*8);
-	memset(m_frac, 0, sizeof(int)*8);
-	memset(m_lponce, 0, sizeof(int)*8);
-	memset(m_regs, 0, sizeof(uint8_t)*0x100);
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
 
 
@@ -152,13 +152,13 @@ WRITE8_MEMBER( st0016_device::st0016_snd_w )
 		{
 			m_vpos[voice] = m_frac[voice] = m_lponce[voice] = 0;
 
-			LOG(("Key on V%02d: st %06x-%06x lp %06x-%06x frq %x flg %x\n", voice,
+			LOG("Key on V%02d: st %06x-%06x lp %06x-%06x frq %x flg %x\n", voice,
 				m_regs[vbase+2]<<16   | m_regs[vbase+1]<<8   | m_regs[vbase+2],
 				m_regs[vbase+0xe]<<16 | m_regs[vbase+0xd]<<8 | m_regs[vbase+0xc],
 				m_regs[vbase+6]<<16   | m_regs[vbase+5]<<8   | m_regs[vbase+4],
 				m_regs[vbase+0xa]<<16 | m_regs[vbase+0x9]<<8 | m_regs[vbase+0x8],
 				m_regs[vbase+0x11]<<8 | m_regs[vbase+0x10],
-				m_regs[vbase+0x16]));
+				m_regs[vbase+0x16]);
 		}
 	}
 }

@@ -2,14 +2,14 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Wang PC PM-001B Medium-Resolution Video Controller emulation
+    Wang PC Text/Image/Graphics controller emulation
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_WANGPC_TIG_H
+#define MAME_BUS_WANGPC_TIG_H
 
-#ifndef __WANGPC_TIG__
-#define __WANGPC_TIG__
+#pragma once
 
 #include "wangpc.h"
 #include "video/upd7220.h"
@@ -62,7 +62,6 @@ private:
 
 
 // device type definition
-extern const device_type WANGPC_TIG;
+DECLARE_DEVICE_TYPE(WANGPC_TIG, wangpc_tig_device)
 
-
-#endif
+#endif // MAME_BUS_WANGPC_TIG_H

@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_VIDEO_K001005_H
+#define MAME_VIDEO_K001005_H
+
 #pragma once
-#ifndef __K001005_H__
-#define __K001005_H__
+
+#include "video/poly.h"
+#include "cpu/sharc/sharc.h"
 
 #include <float.h>
-#include "video/poly.h"
-#include "video/k001006.h"
-#include "cpu/sharc/sharc.h"
 
 
 struct k001005_polydata
@@ -44,7 +45,6 @@ class k001005_renderer : public poly_manager<float, k001005_polydata, 8, 50000>
 {
 public:
 	k001005_renderer(device_t &parent, screen_device &screen, device_t *k001006);
-	~k001005_renderer() {}
 
 	void reset();
 	void push_data(uint32_t data);
@@ -60,16 +60,16 @@ public:
 	void draw_scanline_tex(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
 	void draw_scanline_gouraud_blend(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
 
-	static const int POLY_Z = 0;
-	static const int POLY_FOG = 1;
-	static const int POLY_BRI = 2;
-	static const int POLY_U = 3;
-	static const int POLY_V = 4;
-	static const int POLY_W = 5;
-	static const int POLY_A = 2;
-	static const int POLY_R = 3;
-	static const int POLY_G = 4;
-	static const int POLY_B = 5;
+	static constexpr int POLY_Z = 0;
+	static constexpr int POLY_FOG = 1;
+	static constexpr int POLY_BRI = 2;
+	static constexpr int POLY_U = 3;
+	static constexpr int POLY_V = 4;
+	static constexpr int POLY_W = 5;
+	static constexpr int POLY_A = 2;
+	static constexpr int POLY_R = 3;
+	static constexpr int POLY_G = 4;
+	static constexpr int POLY_B = 5;
 
 private:
 	std::unique_ptr<bitmap_rgb32> m_fb[2];
@@ -99,12 +99,10 @@ private:
 };
 
 
-class k001005_device : public device_t,
-								public device_video_interface
+class k001005_device : public device_t, public device_video_interface
 {
 public:
 	k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~k001005_device() {}
 
 	static void set_texel_chip(device_t &device, const char *tag);
 
@@ -138,10 +136,10 @@ private:
 	k001005_renderer *m_renderer;
 };
 
-extern const device_type K001005;
+DECLARE_DEVICE_TYPE(K001005, k001005_device)
 
 
 #define MCFG_K001005_TEXEL_CHIP(_tag) \
 	k001005_device::set_texel_chip(*device, _tag);
 
-#endif
+#endif // MAME_VIDEO_K001005_H

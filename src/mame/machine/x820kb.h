@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_X820KB_H
+#define MAME_MACHINE_X820KB_H
 
-#ifndef __XEROX_820_KEYBOARD__
-#define __XEROX_820_KEYBOARD__
+#pragma once
 
 #include "cpu/mcs48/mcs48.h"
 
@@ -20,7 +20,7 @@
 //**************************************************************************
 
 #define MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(_devcb) \
-	devcb = &xerox_820_keyboard_t::set_kbstb_wr_callback(*device, DEVCB_##_devcb);
+	devcb = &xerox_820_keyboard_device::set_kbstb_wr_callback(*device, DEVCB_##_devcb);
 
 
 
@@ -28,15 +28,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> xerox_820_keyboard_t
+// ======================> xerox_820_keyboard_device
 
-class xerox_820_keyboard_t :  public device_t
+class xerox_820_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	xerox_820_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xerox_820_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_kbstb_wr_callback(device_t &device, _Object object) { return downcast<xerox_820_keyboard_t &>(device).m_kbstb_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_kbstb_wr_callback(device_t &device, Object &&cb) { return downcast<xerox_820_keyboard_device &>(device).m_kbstb_cb.set_callback(std::forward<Object>(cb)); }
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -70,8 +70,7 @@ private:
 
 
 // device type definition
-extern const device_type XEROX_820_KEYBOARD;
+DECLARE_DEVICE_TYPE(XEROX_820_KEYBOARD, xerox_820_keyboard_device)
 
 
-
-#endif
+#endif // MAME_MACHINE_X820KB_H

@@ -32,7 +32,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PDS030_LVIEW = device_creator<nubus_lview_device>;
+DEFINE_DEVICE_TYPE(PDS030_LVIEW, nubus_lview_device, "pd3_lviw", "Sigma Designs L-View")
 
 
 //-------------------------------------------------
@@ -63,20 +63,17 @@ const tiny_rom_entry *nubus_lview_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_lview_device::nubus_lview_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, PDS030_LVIEW, "Sigma Designs L-View", tag, owner, clock, "pd3_lviw", __FILE__),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0)
+	nubus_lview_device(mconfig, PDS030_LVIEW, tag, owner, clock)
 {
-	m_assembled_tag = std::string(tag).append(":").append(LVIEW_SCREEN_NAME);
-	m_screen_tag = m_assembled_tag.c_str();
 }
 
-nubus_lview_device::nubus_lview_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0)
+nubus_lview_device::nubus_lview_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	device_nubus_card_interface(mconfig, *this),
+	m_vram32(nullptr), m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0),
+	m_assembled_tag(util::string_format("%s:%s", tag, LVIEW_SCREEN_NAME))
 {
-	m_assembled_tag = std::string(tag).append(":").append(LVIEW_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 

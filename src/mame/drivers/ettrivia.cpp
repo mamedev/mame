@@ -39,11 +39,13 @@ class ettrivia_state : public driver_device
 {
 public:
 	ettrivia_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_fg_videoram(*this, "fg_videoram"),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		: driver_device(mconfig, type, tag)
+		, m_fg_videoram(*this, "fg_videoram")
+		, m_bg_videoram(*this, "bg_videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+	{
+	}
 
 	int m_palreg;
 	int m_gfx_bank;
@@ -285,7 +287,7 @@ INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( ettrivia, ettrivia_state )
+static MACHINE_CONFIG_START( ettrivia )
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -464,8 +466,8 @@ ROM_START( strvmstr )
 	ROM_LOAD( "entrtn.hi3",   0x38000, 0x8000, CRC(a8cf603b) SHA1(6efa5753d8d252452b3f5be8635a28364e4d8de1) )
 ROM_END
 
-GAME( 1985, promutrv, 0,        ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 1)", 0 )
-GAME( 1985, promutrva,promutrv, ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 )
-GAME( 1985, promutrvb,promutrv, ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", 0 )
-GAME( 1985, promutrvc,promutrv, ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 4)", 0 )
-GAME( 1986, strvmstr, 0,        ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master", MACHINE_WRONG_COLORS )
+GAME( 1985, promutrv,  0,        ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 1)", 0 )
+GAME( 1985, promutrva, promutrv, ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 )
+GAME( 1985, promutrvb, promutrv, ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", 0 )
+GAME( 1985, promutrvc, promutrv, ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 4)", 0 )
+GAME( 1986, strvmstr,  0,        ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master",                       MACHINE_WRONG_COLORS )

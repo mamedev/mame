@@ -5,6 +5,10 @@
     Pole Position hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_POLEPOS_H
+#define MAME_INCLUDES_POLEPOS_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/namco.h"
@@ -161,6 +165,8 @@ private:
 	filter2_context m_filter_engine[3];
 };
 
-extern const device_type POLEPOS;
+DECLARE_DEVICE_TYPE(POLEPOS, polepos_sound_device)
 
 DISCRETE_SOUND_EXTERN( polepos );
+
+#endif // MAME_INCLUDES_POLEPOS_H

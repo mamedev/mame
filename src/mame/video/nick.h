@@ -168,6 +168,6 @@ private:
 
 
 // device type definition
-extern const device_type NICK;
+DECLARE_DEVICE_TYPE(NICK, nick_device)
 
 #endif // MAME_VIDEO_NICK_H

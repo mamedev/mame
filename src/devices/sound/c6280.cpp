@@ -41,9 +41,6 @@
 #include "emu.h"
 #include "c6280.h"
 
-/* only needed for io_buffer */
-#include "cpu/h6280/h6280.h"
-
 
 void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
@@ -229,10 +226,10 @@ WRITE8_MEMBER( c6280_device::c6280_w )
 	}
 }
 
-const device_type C6280 = device_creator<c6280_device>;
+DEFINE_DEVICE_TYPE(C6280, c6280_device, "c6280", "Hudson HuC6280")
 
 c6280_device::c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, C6280, "HuC6280", tag, owner, clock, "c6280", __FILE__)
+	: device_t(mconfig, C6280, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_cpudevice(*this, finder_base::DUMMY_TAG)
 {

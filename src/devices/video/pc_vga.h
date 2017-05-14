@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_VIDEO_PC_VGA_H
-#define MAME_DEVICES_VIDEO_PC_VGA_H
+#ifndef MAME_VIDEO_PC_VGA_H
+#define MAME_VIDEO_PC_VGA_H
 
 #include "screen.h"
 
@@ -17,21 +17,6 @@ MACHINE_CONFIG_EXTERN( pcvideo_vga );
 MACHINE_CONFIG_EXTERN( pcvideo_trident_vga );
 MACHINE_CONFIG_EXTERN( pcvideo_gamtor_vga );
 MACHINE_CONFIG_EXTERN( pcvideo_s3_vga );
-
-enum
-{
-	SCREEN_OFF = 0,
-	TEXT_MODE,
-	VGA_MODE,
-	EGA_MODE,
-	CGA_MODE,
-	MONO_MODE,
-	RGB8_MODE,
-	RGB15_MODE,
-	RGB16_MODE,
-	RGB24_MODE,
-	RGB32_MODE
-};
 
 // ======================> vga_device
 
@@ -59,7 +44,22 @@ public:
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
 
 protected:
-	vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	enum
+	{
+		SCREEN_OFF = 0,
+		TEXT_MODE,
+		VGA_MODE,
+		EGA_MODE,
+		CGA_MODE,
+		MONO_MODE,
+		RGB8_MODE,
+		RGB15_MODE,
+		RGB16_MODE,
+		RGB24_MODE,
+		RGB32_MODE
+	};
+
+	vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -89,20 +89,20 @@ protected:
 	{
 		uint8_t res = 0;
 
-		switch(vga.gc.logical_op & 3)
+		switch (vga.gc.logical_op & 3)
 		{
-			case 0: /* NONE */
-				res = (data & mask) | (vga.gc.latch[plane] & ~mask);
-				break;
-			case 1: /* AND */
-				res = (data | ~mask) & (vga.gc.latch[plane]);
-				break;
-			case 2: /* OR */
-				res = (data & mask) | (vga.gc.latch[plane]);
-				break;
-			case 3: /* XOR */
-				res = (data & mask) ^ (vga.gc.latch[plane]);
-				break;
+		case 0: /* NONE */
+			res = (data & mask) | (vga.gc.latch[plane] & ~mask);
+			break;
+		case 1: /* AND */
+			res = (data | ~mask) & (vga.gc.latch[plane]);
+			break;
+		case 2: /* OR */
+			res = (data & mask) | (vga.gc.latch[plane]);
+			break;
+		case 3: /* XOR */
+			res = (data & mask) ^ (vga.gc.latch[plane]);
+			break;
 		}
 
 		return res;
@@ -238,7 +238,7 @@ protected:
 
 
 // device type definition
-extern const device_type VGA;
+DECLARE_DEVICE_TYPE(VGA, vga_device)
 
 // ======================> svga_device
 
@@ -250,7 +250,7 @@ public:
 
 protected:
 	// construction/destruction
-	svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	svga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	void svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -380,8 +380,9 @@ public:
 		uint8_t wait_vector_count;
 
 	} ibm8514;
+
 protected:
-	ibm8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	ibm8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
@@ -402,7 +403,7 @@ private:
 };
 
 // device type definition
-extern const device_type IBM8514A;
+DECLARE_DEVICE_TYPE(IBM8514A, ibm8514a_device)
 
 #define MCFG_8514A_ADD(_tag, _param) \
 		MCFG_DEVICE_ADD(_tag, IBM8514A, 0) \
@@ -413,7 +414,7 @@ extern const device_type IBM8514A;
 		downcast<ibm8514a_device*>(device)->set_vga_owner();
 
 
-class mach8_device :  public ibm8514a_device
+class mach8_device : public ibm8514a_device
 {
 public:
 	mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -445,7 +446,7 @@ public:
 	READ16_MEMBER(mach8_clksel_r) { return mach8.clksel; }
 
 protected:
-	mach8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_start() override;
 	struct
 	{
@@ -457,7 +458,7 @@ protected:
 };
 
 // device type definition
-extern const device_type MACH8;
+DECLARE_DEVICE_TYPE(MACH8, mach8_device)
 
 #define MCFG_MACH8_ADD(_tag, _param) \
 		MCFG_DEVICE_ADD(_tag, MACH8, 0) \
@@ -511,12 +512,12 @@ private:
 
 
 // device type definition
-extern const device_type TSENG_VGA;
+DECLARE_DEVICE_TYPE(TSENG_VGA, tseng_vga_device)
 
 
 // ======================> ati_vga_device
 
-class ati_vga_device :  public svga_device
+class ati_vga_device : public svga_device
 {
 public:
 	// construction/destruction
@@ -535,7 +536,7 @@ public:
 
 	mach8_device* get_8514() { return m_8514; }
 protected:
-	ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_start() override;
 private:
 	void ati_define_video_mode();
@@ -549,7 +550,7 @@ private:
 };
 
 // device type definition
-extern const device_type ATI_VGA;
+DECLARE_DEVICE_TYPE(ATI_VGA, ati_vga_device)
 
 
 // ======================> s3_vga_device
@@ -577,7 +578,7 @@ public:
 	ibm8514a_device* get_8514() { return m_8514; }
 
 protected:
-	s3_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	s3_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -640,7 +641,7 @@ private:
 };
 
 // device type definition
-extern const device_type S3_VGA;
+DECLARE_DEVICE_TYPE(S3_VGA, s3_vga_device)
 
 // ======================> gamtor_vga_device
 
@@ -663,7 +664,7 @@ public:
 
 
 // device type definition
-extern const device_type GAMTOR_VGA;
+DECLARE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device)
 
 /*
   pega notes (paradise)
@@ -706,4 +707,4 @@ extern const device_type GAMTOR_VGA;
 */
 
 
-#endif /* MAME_DEVICES_VIDEO_PC_VGA_H */
+#endif // MAME_VIDEO_PC_VGA_H

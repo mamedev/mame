@@ -6,8 +6,10 @@
  *
  ****************************************************************************/
 
-#ifndef __ABC80__
-#define __ABC80__
+#ifndef MAME_INCLUDES_ABC80_H
+#define MAME_INCLUDES_ABC80_H
+
+#pragma once
 
 #include "bus/abcbus/abcbus.h"
 #include "bus/rs232/rs232.h"
@@ -94,7 +96,7 @@ public:
 	required_device<z80pio_device> m_pio;
 	required_device<sn76477_device> m_csg;
 	required_device<cassette_image_device> m_cassette;
-	required_device<abcbus_slot_t> m_bus;
+	required_device<abcbus_slot_device> m_bus;
 	required_device<abc80_keyboard_device> m_kb;
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
@@ -145,7 +147,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pio_pb_w );
 
 	DECLARE_WRITE_LINE_MEMBER( keydown_w );
-	DECLARE_WRITE8_MEMBER( kbd_w );
+	void kbd_w(u8 data);
 	DECLARE_WRITE8_MEMBER( csg_w );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( bac );
@@ -188,4 +190,4 @@ public:
 
 MACHINE_CONFIG_EXTERN( abc80_video );
 
-#endif
+#endif // MAME_INCLUDES_ABC80_H

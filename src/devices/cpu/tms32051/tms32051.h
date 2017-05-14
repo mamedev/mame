@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-#pragma once
+#ifndef MAME_CPU_TMS32051_TMS32051_H
+#define MAME_CPU_TMS32051_TMS32051_H
 
-#ifndef __TMS32051_H__
-#define __TMS32051_H__
+#pragma once
 
 
 enum
@@ -58,12 +58,13 @@ class tms32051_device : public cpu_device
 public:
 	// construction/destruction
 	tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor internal_pgm, address_map_constructor internal_data);
 
 	DECLARE_READ16_MEMBER( cpuregs_r );
 	DECLARE_WRITE16_MEMBER( cpuregs_w );
 
 protected:
+	tms32051_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_pgm, address_map_constructor internal_data);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -379,8 +380,7 @@ protected:
 };
 
 
-extern const device_type TMS32051;
-extern const device_type TMS32053;
+DECLARE_DEVICE_TYPE(TMS32051, tms32051_device)
+DECLARE_DEVICE_TYPE(TMS32053, tms32053_device)
 
-
-#endif /* __TMS32051_H__ */
+#endif // MAME_CPU_TMS32051_TMS32051_H

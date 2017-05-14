@@ -19,7 +19,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_MIRACLE = device_creator<nes_miracle_device>;
+DEFINE_DEVICE_TYPE(NES_MIRACLE, nes_miracle_device, "nes_miracle", "NES Miracle Piano Controller")
 
 
 MACHINE_CONFIG_FRAGMENT( nes_miracle )
@@ -60,12 +60,12 @@ void nes_miracle_device::device_timer(emu_timer &timer, device_timer_id id, int 
 //-------------------------------------------------
 
 nes_miracle_device::nes_miracle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, NES_MIRACLE, "Miracle Piano Controller", tag, owner, clock, "nes_miracle", __FILE__),
-					device_serial_interface(mconfig, *this),
-					device_nes_control_port_interface(mconfig, *this),
-					m_midiin(*this, "mdin"),
-					m_midiout(*this, "mdout"), strobe_timer(nullptr), m_strobe_on(0), m_midi_mode(0), m_sent_bits(0), m_strobe_clock(0),
-					m_data_sent(0), m_xmit_read(0), m_xmit_write(0), m_recv_read(0), m_recv_write(0), m_tx_busy(false), m_read_status(false), m_status_bit(false)
+	device_t(mconfig, NES_MIRACLE, tag, owner, clock),
+	device_serial_interface(mconfig, *this),
+	device_nes_control_port_interface(mconfig, *this),
+	m_midiin(*this, "mdin"),
+	m_midiout(*this, "mdout"), strobe_timer(nullptr), m_strobe_on(0), m_midi_mode(0), m_sent_bits(0), m_strobe_clock(0),
+	m_data_sent(0), m_xmit_read(0), m_xmit_write(0), m_recv_read(0), m_recv_write(0), m_tx_busy(false), m_read_status(false), m_status_bit(false)
 {
 }
 

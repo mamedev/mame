@@ -8,8 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef __H8_DMA_H__
-#define __H8_DMA_H__
+#ifndef MAME_CPU_H8_H8_DMA_H
+#define MAME_CPU_H8_H8_DMA_H
+
+#pragma once
 
 #include "h8.h"
 #include "h8_intc.h"
@@ -151,7 +153,7 @@ protected:
 	void start(int submodule);
 };
 
-extern const device_type H8_DMA;
-extern const device_type H8_DMA_CHANNEL;
+DECLARE_DEVICE_TYPE(H8_DMA,         h8_dma_device)
+DECLARE_DEVICE_TYPE(H8_DMA_CHANNEL, h8_dma_channel_device)
 
-#endif
+#endif // MAME_CPU_H8_H8_DMA_H

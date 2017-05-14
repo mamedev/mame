@@ -4,12 +4,14 @@
  *  Data East Pinball DMD Type 3 Display
  */
 
-#ifndef DECODMD3_H_
-#define DECODMD3_H_
+#ifndef MAME_VIDEO_DECODMD3_H
+#define MAME_VIDEO_DECODMD3_H
+
+#pragma once
 
 #include "cpu/m68000/m68000.h"
-#include "video/mc6845.h"
 #include "machine/ram.h"
+#include "video/mc6845.h"
 
 #define MCFG_DECODMD_TYPE3_ADD(_tag, _region) \
 	MCFG_DEVICE_ADD(_tag, DECODMD3, 0) \
@@ -19,11 +21,6 @@ class decodmd_type3_device : public device_t
 {
 public:
 	decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	required_device<cpu_device> m_cpu;
-	required_device<mc6845_device> m_mc6845;
-	required_device<ram_device> m_ram;
-	required_memory_bank m_rambank;
-	required_memory_bank m_rombank;
 
 	DECLARE_WRITE8_MEMBER(data_w);
 	DECLARE_READ8_MEMBER(busy_r);
@@ -39,14 +36,20 @@ public:
 
 	static void static_set_gfxregion(device_t &device, const char *tag);
 
-	memory_region* m_rom;
-
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	required_device<cpu_device> m_cpu;
+	required_device<mc6845_device> m_mc6845;
+	required_device<ram_device> m_ram;
+	required_memory_bank m_rambank;
+	required_memory_bank m_rombank;
+
+	memory_region* m_rom;
+
 	uint8_t m_status;
 	uint8_t m_crtc_index;
 	uint8_t m_crtc_reg[0x100];
@@ -58,7 +61,6 @@ private:
 	const char* m_gfxtag;
 };
 
-extern const device_type DECODMD3;
+DECLARE_DEVICE_TYPE(DECODMD3, decodmd_type3_device)
 
-
-#endif /* DECODMD3_H_ */
+#endif // MAME_VIDEO_DECODMD3_H

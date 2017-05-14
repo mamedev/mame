@@ -688,7 +688,7 @@ void vic10_state::machine_reset()
 //  MACHINE_CONFIG( vic10 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vic10, vic10_state )
+static MACHINE_CONFIG_START( vic10 )
 	// basic hardware
 	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL_8MHz/8)
 	MCFG_CPU_PROGRAM_MAP(vic10_mem)
@@ -761,4 +761,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1982, vic10,      0,    0,    vic10, vic10, driver_device,     0, "Commodore Business Machines", "VIC-10 / Max Machine / UltiMax (NTSC)", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, vic10,      0,    0,    vic10, vic10, vic10_state,     0, "Commodore Business Machines", "VIC-10 / Max Machine / UltiMax (NTSC)", MACHINE_SUPPORTS_SAVE )

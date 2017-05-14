@@ -17,10 +17,10 @@
 
 #define LOG_PORT80  0
 
-const device_type AT_MB = device_creator<at_mb_device>;
+DEFINE_DEVICE_TYPE(AT_MB, at_mb_device, "at_mb", "PC/AT Motherboard")
 
 at_mb_device::at_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AT_MB, "PC/AT Motherboard", tag, owner, clock, "at_mb", __FILE__),
+	: device_t(mconfig, AT_MB, tag, owner, clock),
 	m_maincpu(*this, ":maincpu"),
 	m_isabus(*this, "isabus"),
 	m_pic8259_slave(*this, "pic8259_slave"),

@@ -9,8 +9,8 @@
 
 *********************************************************************/
 
-#ifndef __SWIM_H__
-#define __SWIM_H__
+#ifndef MAME_MACHINE_SWIM_H
+#define MAME_MACHINE_SWIM_H
 
 #include "machine/applefdc.h"
 
@@ -19,7 +19,7 @@
     DEVICE
 ***************************************************************************/
 
-extern const device_type SWIM;
+DECLARE_DEVICE_TYPE(SWIM, swim_device)
 
 class swim_device : public applefdc_base_device
 {
@@ -60,4 +60,4 @@ private:
 	MCFG_DEVICE_MODIFY(_tag)          \
 	MCFG_APPLEFDC_CONFIG(_intrf)
 
-#endif // __SWIM_H__
+#endif // MAME_MACHINE_SWIM_H

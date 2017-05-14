@@ -7,11 +7,11 @@
     Functions to emulate general the various Midway sound cards.
 
 ***************************************************************************/
+#ifndef MAME_AUDIO_MIDWAY_H
+#define MAME_AUDIO_MIDWAY_H
 
 #pragma once
 
-#ifndef __MIDWAY_AUDIO__
-#define __MIDWAY_AUDIO__
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
@@ -27,10 +27,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern const device_type MIDWAY_SSIO;
-extern const device_type MIDWAY_SOUNDS_GOOD;
-extern const device_type MIDWAY_TURBO_CHEAP_SQUEAK;
-extern const device_type MIDWAY_SQUAWK_N_TALK;
+DECLARE_DEVICE_TYPE(MIDWAY_SSIO,               midway_ssio_device)
+DECLARE_DEVICE_TYPE(MIDWAY_SOUNDS_GOOD,        midway_sounds_good_device)
+DECLARE_DEVICE_TYPE(MIDWAY_TURBO_CHEAP_SQUEAK, midway_turbo_cheap_squeak_device)
+DECLARE_DEVICE_TYPE(MIDWAY_SQUAWK_N_TALK,      midway_squawk_n_talk_device)
 
 
 
@@ -232,4 +232,4 @@ private:
 	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE(ssio, midway_ssio_device, write)
 
 
-#endif /* __MIDWAY_AUDIO__ */
+#endif // MAME_AUDIO_MIDWAY_H

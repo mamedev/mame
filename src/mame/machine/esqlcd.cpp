@@ -10,7 +10,7 @@
 
 //#define VERBOSE
 
-const device_type ESQ2x16_SQ1 = device_creator<esq2x16_sq1_t>;
+DEFINE_DEVICE_TYPE(ESQ2X16_SQ1, esq2x16_sq1_device, "esq2x16_sq1", "Ensoniq 2x16 VFD (SQ-1 variant)")
 
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
 static MACHINE_CONFIG_FRAGMENT(esq2x16)
@@ -32,7 +32,7 @@ MACHINE_CONFIG_END
 //*****************************************************************************
 // standard ascii 5x7 font
 // defines ascii characters 0x20-0x7F (32-127)
-static unsigned char Font5x7[][5] = {
+static unsigned char const Font5x7[][5] = {
 	{0x00, 0x00, 0x08, 0x00, 0x00}, // _Undef_      0x00 - dots for debug purposes
 	{0x01, 0x00, 0x00, 0x00, 0x40}, // _Undef_      0x01 - dots for debug purposes
 	{0x02, 0x00, 0x00, 0x00, 0x00}, // _Undef_      0x02
@@ -163,12 +163,12 @@ static unsigned char Font5x7[][5] = {
 	{0x08, 0x1C, 0x2A, 0x08, 0x08}  // <-           0x7F
 };
 //--------------------------------------------------------------------------------------------------------------------------------------------
-machine_config_constructor esq2x16_sq1_t::device_mconfig_additions() const
+machine_config_constructor esq2x16_sq1_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( esq2x16 );
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
-void esq2x16_sq1_t::write_char(int data)
+void esq2x16_sq1_device::write_char(int data)
 {
 	int DisplayCode = data;
 	int LedState;
@@ -183,7 +183,7 @@ void esq2x16_sq1_t::write_char(int data)
 	) data = '^';  // musical notes
 
 	// Resolve here 2-Bytes commands: the command was saved previously
-	switch (m_LcdCommand) {
+	switch (m_lcd_command) {
 		case 0:
 			// No current command.
 			break;
@@ -191,30 +191,30 @@ void esq2x16_sq1_t::write_char(int data)
 		case 0x87:
 			// Go To
 			#ifdef VERBOSE
-			printf("LCD %02X: Go To %02X                  - pos=%02X (%d)\n", m_LcdCommand, DisplayCode, m_lcdPos, m_lcdPage);
+			printf("LCD %02X: Go To %02X                  - pos=%02X (%d)\n", m_lcd_command, DisplayCode, m_lcdPos, m_lcdPage);
 			#endif
 			m_lcdPos = DisplayCode;
-			m_LcdCommand = 0;
+			m_lcd_command = 0;
 			return;
 			break;
 
 		case 0x88:
 			// Save Cursor position - What the second byte (00 or 01) means?
 			#ifdef VERBOSE
-			printf("LCD %02X: Save Pos.      (%02X)       - pos=%02X (%d)\n", m_LcdCommand, DisplayCode, m_lcdPos, m_lcdPage);
+			printf("LCD %02X: Save Pos.      (%02X)       - pos=%02X (%d)\n", m_lcd_command, DisplayCode, m_lcdPos, m_lcdPage);
 			#endif
 			m_lcdSavedPos = m_lcdPos;
-			m_LcdCommand = 0;
+			m_lcd_command = 0;
 			return;
 			break;
 
 		case 0x89:
 			// Restore Cursor position - What the second byte (00 or 01) means?
 			#ifdef VERBOSE
-			printf("LCD %02X: Restore Pos.   (%02X)       - pos=%02X (%d)\n", m_LcdCommand, DisplayCode, m_lcdPos, m_lcdPage);
+			printf("LCD %02X: Restore Pos.   (%02X)       - pos=%02X (%d)\n", m_lcd_command, DisplayCode, m_lcdPos, m_lcdPage);
 			#endif
 			m_lcdPos = m_lcdSavedPos;
-			m_LcdCommand = 0;
+			m_lcd_command = 0;
 			return;
 			break;
 
@@ -222,7 +222,7 @@ void esq2x16_sq1_t::write_char(int data)
 		case 0x8E:
 		case 0x8F:
 			// LED OFF, ON, BLINK
-			LedState = m_LcdCommand & 0x03;
+			LedState = m_lcd_command & 0x03;
 			if (
 				DisplayCode >= 16 || // Out of bounds
 				DisplayCode == 6  || // non-existent
@@ -232,7 +232,7 @@ void esq2x16_sq1_t::write_char(int data)
 				)
 			{
 				#ifdef VERBOSE
-				printf("LCD %02X: Led %02d does'nt exist       - pos=%02X (%d)\n", m_LcdCommand, DisplayCode, m_lcdPos, m_lcdPage);
+				printf("LCD %02X: Led %02d does'nt exist       - pos=%02X (%d)\n", m_lcd_command, DisplayCode, m_lcdPos, m_lcdPage);
 				#endif
 			}
 			else
@@ -244,15 +244,15 @@ void esq2x16_sq1_t::write_char(int data)
 				}
 				update_display();
 			}
-			m_LcdCommand = 0;
+			m_lcd_command = 0;
 			return;
 			break;
 
 		default:
 			#ifdef VERBOSE
-			printf("LCD: Unknown 2-Bytes Command:%02X-%02X - pos=%02X (%d)\n", m_LcdCommand, DisplayCode, m_lcdPos, m_lcdPage);
+			printf("LCD: Unknown 2-Bytes Command:%02X-%02X - pos=%02X (%d)\n", m_lcd_command, DisplayCode, m_lcdPos, m_lcdPage);
 			#endif
-			m_LcdCommand = 0;
+			m_lcd_command = 0;
 			return;
 			break;
 	}
@@ -277,7 +277,7 @@ void esq2x16_sq1_t::write_char(int data)
 			case 0x88:  // Save Cursor Position
 			case 0x89:  // Restore Cursor Position
 				// Save the command for the next byte
-				m_LcdCommand = DisplayCode;
+				m_lcd_command = DisplayCode;
 				return;
 				break;
 
@@ -286,7 +286,7 @@ void esq2x16_sq1_t::write_char(int data)
 			case 0x86:
 			case 0x95:
 				// ??? - related to blinking chars? - 2 bytes command
-				m_LcdCommand = DisplayCode;
+				m_lcd_command = DisplayCode;
 				return;
 				break;
 
@@ -294,7 +294,7 @@ void esq2x16_sq1_t::write_char(int data)
 			case 0x8E:
 			case 0x8F:
 				// LEDs OFF,ON and BLINK - 2 bytes command
-				m_LcdCommand = DisplayCode;
+				m_lcd_command = DisplayCode;
 				return;
 				break;
 
@@ -306,7 +306,7 @@ void esq2x16_sq1_t::write_char(int data)
 				#ifdef VERBOSE
 				printf("LCD %02X: Page Change ?             - pos=%02X (%d)\n", DisplayCode, m_lcdPos, m_lcdPage);
 				#endif
-				m_LcdCommand = 0;
+				m_lcd_command = 0;
 				return;
 				break;
 
@@ -329,7 +329,7 @@ void esq2x16_sq1_t::write_char(int data)
 				#ifdef VERBOSE
 				printf("LCD %02X: Unknown Command           - pos=%02X (%d)\n", DisplayCode, m_lcdPos, m_lcdPage);
 				#endif
-				m_LcdCommand = 0;
+				m_lcd_command = 0;
 				return;
 				break;
 		}
@@ -342,13 +342,13 @@ void esq2x16_sq1_t::write_char(int data)
 	#endif
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
-esq2x16_sq1_t::esq2x16_sq1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_t(mconfig, ESQ2x16_SQ1, "Ensoniq 2x16 VFD (SQ-1 variant)", tag, owner, clock, "esq2x16_sq1", __FILE__)
+esq2x16_sq1_device::esq2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ2X16_SQ1, tag, owner, clock)
 {
 	m_rows = 2;
 	m_cols = 16;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
-void esq2x16_sq1_t::update_display()
+void esq2x16_sq1_device::update_display()
 {
 	char lcdCharRow;
 
@@ -366,35 +366,35 @@ void esq2x16_sq1_t::update_display()
 		{
 			// stealed from tecnbras.cpp and modified
 			for (int rr=0; rr<7; rr++) {
-				lcdCharRow = RotateLcdChar(m_lcdpg[page][pos],rr);
+				lcdCharRow = rotate_lcd_char(m_lcdpg[page][pos],rr);
 				machine().output().set_indexed_value("pg_", (page+1)*1000 + pos*7 + rr, 0x1F & lcdCharRow);
 			}
 		}
 	}
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
-void esq2x16_sq1_t::device_reset()
+void esq2x16_sq1_device::device_reset()
 {
 	//lcd_reset();
-	m_lcdPage = m_lcdSavedPos = m_lcdPos = m_LcdCommand = 0;
+	m_lcdPage = m_lcdSavedPos = m_lcdPos = m_lcd_command = 0;
 	memset(m_leds,  0, sizeof(m_leds));
 	memset(m_lcdpg,  1, sizeof(m_lcdpg));   // Set to 1 for debug: to see what "pages" are set to 0 from the firmware
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
-void esq2x16_sq1_t::lcd_reset()
+void esq2x16_sq1_device::lcd_reset()
 {
-	m_lcdPage = m_lcdSavedPos = m_lcdPos = m_LcdCommand = 0;
+	m_lcdPage = m_lcdSavedPos = m_lcdPos = m_lcd_command = 0;
 	memset(m_leds,  0, sizeof(m_leds));
 	memset(m_lcdpg,  0, sizeof(m_lcdpg));
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
-void esq2x16_sq1_t::page_reset()
+void esq2x16_sq1_device::page_reset()
 {
 	memset(m_lcdpg[m_lcdPage],  0, 32);
-	m_lcdPos = m_LcdCommand = 0;
+	m_lcdPos = m_lcd_command = 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
-char esq2x16_sq1_t::RotateLcdChar(uint8_t lcdChar, int charRow)
+char esq2x16_sq1_device::rotate_lcd_char(uint8_t lcdChar, int charRow)
 {
 	char lcdCharRow = 0;
 	for (int cc=0; cc<5; cc++){

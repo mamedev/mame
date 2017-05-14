@@ -1024,7 +1024,7 @@ static INPUT_PORTS_START( mgprem11 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( cubo, cubo_state )
+static MACHINE_CONFIG_START( cubo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)

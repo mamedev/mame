@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "i82439hx.h"
 
-const device_type I82439HX = device_creator<i82439hx_host_device>;
+DEFINE_DEVICE_TYPE(I82439HX, i82439hx_host_device, "i82439hx", "Intel 82439HX northbridge")
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, i82439hx_host_device)
 	AM_RANGE(0x50, 0x53) AM_READWRITE8(pcon_r,   pcon_w,   0x000000ff)
@@ -25,7 +25,7 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i82439hx_host_device)
 ADDRESS_MAP_END
 
 i82439hx_host_device::i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, I82439HX, "i82439hx northbridge", tag, owner, clock, "i82439hx", __FILE__)
+	: pci_host_device(mconfig, I82439HX, tag, owner, clock)
 {
 }
 

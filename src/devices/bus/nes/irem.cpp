@@ -35,36 +35,36 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_LROG017 = device_creator<nes_lrog017_device>;
-const device_type NES_HOLYDIVR = device_creator<nes_holydivr_device>;
-const device_type NES_TAM_S1 = device_creator<nes_tam_s1_device>;
-const device_type NES_G101 = device_creator<nes_g101_device>;
-const device_type NES_H3001 = device_creator<nes_h3001_device>;
+DEFINE_DEVICE_TYPE(NES_LROG017,  nes_lrog017_device,  "nes_lrog017",  "NES Cart Irem Discrete 74*161/161/21/138 PCB")
+DEFINE_DEVICE_TYPE(NES_HOLYDIVR, nes_holydivr_device, "nes_holydivr", "NES Cart Irem Holy Diver PCB")
+DEFINE_DEVICE_TYPE(NES_TAM_S1,   nes_tam_s1_device,   "nes_tam_s1",   "NES Cart Irem TAM-S1 PCB")
+DEFINE_DEVICE_TYPE(NES_G101,     nes_g101_device,     "nes_g101",     "NES Cart Irem G-101 PCB")
+DEFINE_DEVICE_TYPE(NES_H3001,    nes_h3001_device,    "ns_h3001",     "NES Cart Irem H-3001 PCB")
 
 
 nes_lrog017_device::nes_lrog017_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_LROG017, "NES Cart Irem Discrete 74*161/161/21/138 PCB", tag, owner, clock, "nes_lrog017", __FILE__)
+	: nes_nrom_device(mconfig, NES_LROG017, tag, owner, clock)
 {
 }
 
 nes_holydivr_device::nes_holydivr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_HOLYDIVR, "NES Cart Irem Holy Diver PCB", tag, owner, clock, "nes_holydivr", __FILE__)
+	: nes_nrom_device(mconfig, NES_HOLYDIVR, tag, owner, clock)
 {
 }
 
 nes_tam_s1_device::nes_tam_s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_TAM_S1, "NES Cart Irem TAM-S1 PCB", tag, owner, clock, "nes_tam_s1", __FILE__)
+	: nes_nrom_device(mconfig, NES_TAM_S1, tag, owner, clock)
 {
 }
 
 nes_g101_device::nes_g101_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_G101, "NES Cart Irem G-101 PCB", tag, owner, clock, "nes_g101", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_G101, tag, owner, clock), m_latch(0)
+{
 }
 
 nes_h3001_device::nes_h3001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_H3001, "NES Cart Irem H-3001 PCB", tag, owner, clock, "nes_h3001", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), irq_timer(nullptr)
-				{
+	: nes_nrom_device(mconfig, NES_H3001, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), irq_timer(nullptr)
+{
 }
 
 

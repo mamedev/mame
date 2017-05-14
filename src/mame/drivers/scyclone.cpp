@@ -41,26 +41,28 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/mb14241.h"
+#include "sound/dac.h"
+#include "sound/sn76477.h"
+#include "sound/volt_reg.h"
+
 #include "screen.h"
 #include "speaker.h"
-#include "machine/mb14241.h"
-#include "sound/sn76477.h"
-#include "sound/dac.h"
-#include "machine/gen_latch.h"
-#include "sound/volt_reg.h"
+
 
 class scyclone_state : public driver_device
 {
 public:
-	scyclone_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	scyclone_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_stars(*this, "stars"),
 		m_gfx1pal(*this, "gfx1pal"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch")
-		{ }
+	{ }
 
 	DECLARE_WRITE8_MEMBER(vidctrl_w);
 
@@ -593,7 +595,7 @@ INTERRUPT_GEN_MEMBER(scyclone_state::irq)
 }
 
 
-static MACHINE_CONFIG_START( scyclone, scyclone_state )
+static MACHINE_CONFIG_START( scyclone )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000/2) // MOSTEK Z80-CPU   ? MHz  (there's also a 9.987MHz XTAL)  intermissions seem driven directly by CPU speed for reference

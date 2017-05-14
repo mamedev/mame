@@ -241,7 +241,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( pentagon, spectrum_128, pentagon_state )
+static MACHINE_CONFIG_DERIVED( pentagon, spectrum_128 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_14MHz / 4)
 	MCFG_CPU_IO_MAP(pentagon_io)
@@ -347,6 +347,6 @@ ROM_START(pent1024)
 	ROMX_LOAD( "gluk51.rom",   0x018000, 0x4000, CRC(ea8c760b) SHA1(adaab28066ca46fbcdcf084c3b53d5a1b82d94a9), ROM_BIOS(9))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1989, pentagon, spec128,  0,      pentagon,   spec_plus, driver_device,   0,      "<unknown>",        "Pentagon", 0)
-COMP( 19??, pent1024, spec128,  0,      pent1024,   spec_plus, driver_device,   0,      "<unknown>",        "Pentagon 1024", 0)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT      STATE            INIT    COMPANY       FULLNAME         FLAGS
+COMP( 1989, pentagon, spec128,  0,      pentagon,   spec_plus, pentagon_state,  0,      "<unknown>",  "Pentagon",      0 )
+COMP( 19??, pent1024, spec128,  0,      pent1024,   spec_plus, pentagon_state,  0,      "<unknown>",  "Pentagon 1024", 0 )

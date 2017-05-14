@@ -4,10 +4,10 @@
 #include "emu.h"
 #include "i8271.h"
 
-const device_type I8271 = device_creator<i8271_device>;
+DEFINE_DEVICE_TYPE(I8271, i8271_device, "i8271", "Intel 8271 FDC")
 
 i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, I8271, "Intel 8271", tag, owner, clock, "i8271", __FILE__), ready_connected(false), mode(0), main_phase(0),
+	: device_t(mconfig, I8271, tag, owner, clock), ready_connected(false), mode(0), main_phase(0),
 	intrq_cb(*this),
 	drq_cb(*this),
 	hdl_cb(*this),

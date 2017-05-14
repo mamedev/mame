@@ -31,8 +31,9 @@
 */
 
 #include "emu.h"
-#include "sound/cdda.h"
 #include "scsp.h"
+
+#include "sound/cdda.h"
 
 
 #define ICLIP16(x) (x<-32768)?-32768:((x>32767)?32767:x)
@@ -111,19 +112,19 @@ static const double DRTimes[64]={100000/*infinity*/,100000/*infinity*/,118200.0,
 					28.0,25.0,22.0,18.0,14.0,12.0,11.0,8.5,7.1,6.1,5.4,4.3,3.6,3.1};
 
 #define MEM4B()     ((m_udata.data[0]>>0x0)&0x0200)
-#define DAC18B()        ((m_udata.data[0]>>0x0)&0x0100)
+#define DAC18B()    ((m_udata.data[0]>>0x0)&0x0100)
 #define MVOL()      ((m_udata.data[0]>>0x0)&0x000F)
 #define RBL()       ((m_udata.data[1]>>0x7)&0x0003)
 #define RBP()       ((m_udata.data[1]>>0x0)&0x003F)
-#define MOFULL()        ((m_udata.data[2]>>0x0)&0x1000)
-#define MOEMPTY()       ((m_udata.data[2]>>0x0)&0x0800)
+#define MOFULL()    ((m_udata.data[2]>>0x0)&0x1000)
+#define MOEMPTY()   ((m_udata.data[2]>>0x0)&0x0800)
 #define MIOVF()     ((m_udata.data[2]>>0x0)&0x0400)
-#define MIFULL()        ((m_udata.data[2]>>0x0)&0x0200)
-#define MIEMPTY()       ((m_udata.data[2]>>0x0)&0x0100)
+#define MIFULL()    ((m_udata.data[2]>>0x0)&0x0200)
+#define MIEMPTY()   ((m_udata.data[2]>>0x0)&0x0100)
 
-#define SCILV0()        ((m_udata.data[0x24/2]>>0x0)&0xff)
-#define SCILV1()        ((m_udata.data[0x26/2]>>0x0)&0xff)
-#define SCILV2()        ((m_udata.data[0x28/2]>>0x0)&0xff)
+#define SCILV0()    ((m_udata.data[0x24/2]>>0x0)&0xff)
+#define SCILV1()    ((m_udata.data[0x26/2]>>0x0)&0xff)
+#define SCILV2()    ((m_udata.data[0x28/2]>>0x0)&0xff)
 
 #define SCIEX0  0
 #define SCIEX1  1
@@ -141,10 +142,10 @@ static const double DRTimes[64]={100000/*infinity*/,100000/*infinity*/,118200.0,
 
 static const float SDLT[8]={-1000000.0f,-36.0f,-30.0f,-24.0f,-18.0f,-12.0f,-6.0f,0.0f};
 
-const device_type SCSP = device_creator<scsp_device>;
+DEFINE_DEVICE_TYPE(SCSP, scsp_device, "scsp", "YMF292-F SCSP")
 
 scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SCSP, "SCSP", tag, owner, clock, "scsp", __FILE__),
+	: device_t(mconfig, SCSP, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_roffset(0),
 		m_irq_cb(*this),
@@ -499,7 +500,7 @@ void scsp_device::init()
 {
 	int i;
 
-	SCSPDSP_Init(&m_DSP);
+	m_DSP.Init();
 
 	m_IrqTimA = m_IrqTimBC = m_IrqMidi = 0;
 	m_MidiR=m_MidiW = 0;
@@ -954,7 +955,7 @@ void scsp_device::w16(address_space &space,unsigned int addr,unsigned short val)
 
 			if(addr==0xBF0)
 			{
-				SCSPDSP_Start(&m_DSP);
+				m_DSP.Start();
 			}
 		}
 	}
@@ -1241,7 +1242,7 @@ void scsp_device::DoMasterSamples(int nsamples)
 
 		for(sl=0;sl<32;++sl)
 		{
-#if FM_DELAY
+#if SCSP_FM_DELAY
 			m_RBUFDST=m_DELAYBUF+m_DELAYPTR;
 #else
 			m_RBUFDST=m_RINGBUF+m_BUFPTR;
@@ -1255,7 +1256,7 @@ void scsp_device::DoMasterSamples(int nsamples)
 				sample=UpdateSlot(slot);
 
 				Enc=((TL(slot))<<0x0)|((IMXL(slot))<<0xd);
-				SCSPDSP_SetSample(&m_DSP,(sample*m_LPANTABLE[Enc])>>(SHIFT-2),ISEL(slot),IMXL(slot));
+				m_DSP.SetSample((sample*m_LPANTABLE[Enc])>>(SHIFT-2),ISEL(slot),IMXL(slot));
 				Enc=((TL(slot))<<0x0)|((DIPAN(slot))<<0x8)|((DISDL(slot))<<0xd);
 				{
 					smpl+=(sample*m_LPANTABLE[Enc])>>SHIFT;
@@ -1263,18 +1264,18 @@ void scsp_device::DoMasterSamples(int nsamples)
 				}
 			}
 
-#if FM_DELAY
-			m_RINGBUF[(m_BUFPTR+64-(FM_DELAY-1))&63] = m_DELAYBUF[(m_DELAYPTR+FM_DELAY-(FM_DELAY-1))%FM_DELAY];
+#if SCSP_FM_DELAY
+			m_RINGBUF[(m_BUFPTR+64-(SCSP_FM_DELAY-1))&63] = m_DELAYBUF[(m_DELAYPTR+SCSP_FM_DELAY-(SCSP_FM_DELAY-1))%SCSP_FM_DELAY];
 #endif
 			++m_BUFPTR;
 			m_BUFPTR&=63;
-#if FM_DELAY
+#if SCSP_FM_DELAY
 			++m_DELAYPTR;
-			if(m_DELAYPTR>FM_DELAY-1) m_DELAYPTR=0;
+			if(m_DELAYPTR>SCSP_FM_DELAY-1) m_DELAYPTR=0;
 #endif
 		}
 
-		SCSPDSP_Step(&m_DSP);
+		m_DSP.Step();
 
 		for(i=0;i<16;++i)
 		{

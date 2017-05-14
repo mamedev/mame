@@ -24,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC1112 = device_creator<vic1112_device>;
+DEFINE_DEVICE_TYPE(VIC1112, vic1112_device, "vic1112", "VIC-1112 IEEE-488 Interface")
 
 
 WRITE_LINE_MEMBER( vic1112_device::via0_irq_w )
@@ -136,11 +136,12 @@ machine_config_constructor vic1112_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 vic1112_device::vic1112_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VIC1112, "VIC1112", tag, owner, clock, "vic1112", __FILE__),
-		device_vic20_expansion_card_interface(mconfig, *this),
-		m_via0(*this, M6522_0_TAG),
-		m_via1(*this, M6522_1_TAG),
-		m_bus(*this, IEEE488_TAG), m_via0_irq(0), m_via1_irq(0)
+	: device_t(mconfig, VIC1112, tag, owner, clock)
+	, device_vic20_expansion_card_interface(mconfig, *this)
+	, m_via0(*this, M6522_0_TAG)
+	, m_via1(*this, M6522_1_TAG)
+	, m_bus(*this, IEEE488_TAG)
+	, m_via0_irq(0), m_via1_irq(0)
 {
 }
 
@@ -176,21 +177,12 @@ uint8_t vic1112_device::vic20_cd_r(address_space &space, offs_t offset, uint8_t 
 {
 	if (!io2)
 	{
-		if (offset & 0x10)
-		{
-			data = m_via1->read(space, offset & 0x0f);
-		}
-		else
-		{
-			data = m_via0->read(space, offset & 0x0f);
-		}
+		data = (BIT(offset, 4) ? m_via1 : m_via0)->read(space, offset & 0x0f);
 	}
 	else if (!blk5)
 	{
 		if (offset & 0x1000)
-		{
 			data = m_blk5[offset & 0x17ff];
-		}
 	}
 
 	return data;
@@ -205,13 +197,6 @@ void vic1112_device::vic20_cd_w(address_space &space, offs_t offset, uint8_t dat
 {
 	if (!io2)
 	{
-		if (offset & 0x10)
-		{
-			m_via1->write(space, offset & 0x0f, data);
-		}
-		else
-		{
-			m_via0->write(space, offset & 0x0f, data);
-		}
+		(BIT(offset, 4) ? m_via1 : m_via0)->write(space, offset & 0x0f, data);
 	}
 }

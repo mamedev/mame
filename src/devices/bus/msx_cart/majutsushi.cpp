@@ -7,11 +7,11 @@
 #include "speaker.h"
 
 
-const device_type MSX_CART_MAJUTSUSHI = device_creator<msx_cart_majutsushi>;
+DEFINE_DEVICE_TYPE(MSX_CART_MAJUTSUSHI, msx_cart_majutsushi_device, "msx_cart_majutsushi", "MSX Cartridge - Majutsushi")
 
 
-msx_cart_majutsushi::msx_cart_majutsushi(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_MAJUTSUSHI, "MSX Cartridge - Majutsushi", tag, owner, clock, "msx_cart_majutsushi", __FILE__)
+msx_cart_majutsushi_device::msx_cart_majutsushi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSX_CART_MAJUTSUSHI, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_dac(*this, "dac")
 {
@@ -35,21 +35,21 @@ static MACHINE_CONFIG_FRAGMENT( majutsushi )
 MACHINE_CONFIG_END
 
 
-machine_config_constructor msx_cart_majutsushi::device_mconfig_additions() const
+machine_config_constructor msx_cart_majutsushi_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( majutsushi );
 }
 
 
-void msx_cart_majutsushi::device_start()
+void msx_cart_majutsushi_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_majutsushi::restore_banks), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_majutsushi_device::restore_banks), this));
 }
 
 
-void msx_cart_majutsushi::restore_banks()
+void msx_cart_majutsushi_device::restore_banks()
 {
 	m_bank_base[0] = get_rom_base() + ( m_selected_bank[0] & 0x0f ) * 0x2000;
 	m_bank_base[1] = get_rom_base() + ( m_selected_bank[1] & 0x0f ) * 0x2000;
@@ -62,7 +62,7 @@ void msx_cart_majutsushi::restore_banks()
 }
 
 
-void msx_cart_majutsushi::device_reset()
+void msx_cart_majutsushi_device::device_reset()
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -71,7 +71,7 @@ void msx_cart_majutsushi::device_reset()
 }
 
 
-void msx_cart_majutsushi::initialize_cartridge()
+void msx_cart_majutsushi_device::initialize_cartridge()
 {
 	if ( get_rom_size() != 0x20000 )
 	{
@@ -82,13 +82,13 @@ void msx_cart_majutsushi::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_majutsushi::read_cart)
+READ8_MEMBER(msx_cart_majutsushi_device::read_cart)
 {
 	return m_bank_base[offset >> 13][offset & 0x1fff];
 }
 
 
-WRITE8_MEMBER(msx_cart_majutsushi::write_cart)
+WRITE8_MEMBER(msx_cart_majutsushi_device::write_cart)
 {
 	switch (offset & 0xe000)
 	{

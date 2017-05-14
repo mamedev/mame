@@ -177,7 +177,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mustache_state::scanline)
 
 
 
-static MACHINE_CONFIG_START( mustache, mustache_state )
+static MACHINE_CONFIG_START( mustache )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)

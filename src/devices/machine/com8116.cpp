@@ -9,13 +9,8 @@
 #include "emu.h"
 #include "com8116.h"
 
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LOG 0
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 
@@ -24,7 +19,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type COM8116 = device_creator<com8116_device>;
+DEFINE_DEVICE_TYPE(COM8116, com8116_device, "com8116", "COM8116 Dual BRG")
 
 // Parts with T after the number do not have an internal oscillator and require an external clock source
 // The SMC/COM 5xxx parts are all dual 5v/12v parts, while the 8xxx parts are 5v only
@@ -89,7 +84,7 @@ const int com8116_device::divisors_16X_4_9152MHz_SY2661_2[] =
 //-------------------------------------------------
 
 com8116_device::com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COM8116, "COM8116", tag, owner, clock, "com8116", __FILE__),
+	device_t(mconfig, COM8116, tag, owner, clock),
 	m_fx4_handler(*this),
 	m_fr_handler(*this),
 	m_ft_handler(*this)
@@ -171,7 +166,7 @@ void com8116_device::str_w(uint8_t data)
 	int fr_divider = data & 0x0f;
 	int fr_clock = clock() / m_fr_divisors[fr_divider];
 
-	if (LOG) logerror("COM8116 '%s' Receiver Divisor Select %01x: %u (%u Hz)\n", tag(), data & 0x0f, m_fr_divisors[fr_divider], fr_clock);
+	LOG("COM8116 Receiver Divisor Select %01x: %u (%u Hz)\n", data & 0x0f, m_fr_divisors[fr_divider], fr_clock);
 
 	m_fr_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(fr_clock * 2));
 }
@@ -191,7 +186,7 @@ void com8116_device::stt_w(uint8_t data)
 	int ft_divider = data & 0x0f;
 	int ft_clock = clock() / m_ft_divisors[ft_divider];
 
-	if (LOG) logerror("COM8116 '%s' Transmitter Divisor Select %01x: %u (%u Hz)\n", tag(), data & 0x0f, m_ft_divisors[ft_divider], ft_clock);
+	LOG("COM8116 Transmitter Divisor Select %01x: %u (%u Hz)\n", data & 0x0f, m_ft_divisors[ft_divider], ft_clock);
 
 	m_ft_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(ft_clock * 2));
 }

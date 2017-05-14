@@ -10,10 +10,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_GAMEGEAR_GGEXT_H
+#define MAME_BUS_GAMEGEAR_GGEXT_H
 
-#ifndef __GG_EXT_PORT__
-#define __GG_EXT_PORT__
+#pragma once
 
 
 
@@ -55,9 +55,9 @@ public:
 	virtual ~gg_ext_port_device();
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_th_input_handler(device_t &device, _Object object) { return downcast<gg_ext_port_device &>(device).m_th_pin_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_th_input_handler(device_t &device, Object &&cb) { return downcast<gg_ext_port_device &>(device).m_th_pin_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_pixel_handler(device_t &device, _Object object) { return downcast<gg_ext_port_device &>(device).m_pixel_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_pixel_handler(device_t &device, Object &&cb) { return downcast<gg_ext_port_device &>(device).m_pixel_handler.set_callback(std::forward<Object>(cb)); }
 
 	// Currently, only the support for SMS Controller Adaptor is emulated,
 	// for when SMS Compatibility mode is enabled. In that mode, the 10 pins
@@ -100,13 +100,14 @@ class device_gg_ext_port_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_gg_ext_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_gg_ext_port_interface();
 
-	virtual uint8_t peripheral_r() { return 0xff; };
-	virtual void peripheral_w(uint8_t data) { };
+	virtual uint8_t peripheral_r() { return 0xff; }
+	virtual void peripheral_w(uint8_t data) { }
 
 protected:
+	device_gg_ext_port_interface(const machine_config &mconfig, device_t &device);
+
 	gg_ext_port_device *m_port;
 };
 
@@ -118,4 +119,4 @@ extern const device_type GG_EXT_PORT;
 SLOT_INTERFACE_EXTERN( gg_ext_port_devices );
 
 
-#endif
+#endif // MAME_BUS_GAMEGEAR_GGEXT_H

@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __A78_SLOT_H
-#define __A78_SLOT_H
+#ifndef MAME_BUS_A7800_A78_SLOT_H
+#define MAME_BUS_A7800_A78_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -43,7 +45,6 @@ class device_a78_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_a78_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_a78_cart_interface();
 
 	// memory accessor
@@ -67,6 +68,8 @@ public:
 	uint32_t get_nvram_size() { return m_nvram.size(); }
 
 protected:
+	device_a78_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -137,7 +140,7 @@ private:
 
 
 // device type definition
-extern const device_type A78_CART_SLOT;
+DECLARE_DEVICE_TYPE(A78_CART_SLOT, a78_cart_slot_device)
 
 
 /***************************************************************************
@@ -151,4 +154,4 @@ extern const device_type A78_CART_SLOT;
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
-#endif
+#endif // MAME_BUS_A7800_A78_SLOT_H

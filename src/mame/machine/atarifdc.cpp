@@ -10,15 +10,16 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+#include "atarifdc.h"
+
+#include "machine/6821pia.h"
+#include "sound/pokey.h"
+
+#include "formats/atari_dsk.h"
+
 #include <ctype.h>
 
-#include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "includes/atari400.h"
-#include "atarifdc.h"
-#include "sound/pokey.h"
-#include "machine/6821pia.h"
-#include "formats/atari_dsk.h"
 
 #define VERBOSE_SERIAL  0
 #define VERBOSE_CHKSUM  0
@@ -749,10 +750,10 @@ legacy_floppy_image_device *atari_fdc_device::atari_floppy_get_device_child(int 
 	return nullptr;
 }
 
-const device_type ATARI_FDC = device_creator<atari_fdc_device>;
+DEFINE_DEVICE_TYPE(ATARI_FDC, atari_fdc_device, "atari_fdc", "Atari FDC")
 
 atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ATARI_FDC, "Atari FDC", tag, owner, clock, "atari_fdc", __FILE__),
+	: device_t(mconfig, ATARI_FDC, tag, owner, clock),
 	m_serout_count(0),
 	m_serout_offs(0),
 	m_serout_chksum(0),

@@ -28,7 +28,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type M37450 = device_creator<m37450_device>;
+DEFINE_DEVICE_TYPE(M37450, m37450_device, "m37450", "Mitsubishi M37450")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -37,8 +37,8 @@ const device_type M37450 = device_creator<m37450_device>;
 //-------------------------------------------------
 //  m3745x_device - constructor
 //-------------------------------------------------
-m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map, const char *shortname, const char *source) :
-	m740_device(mconfig, type, name, tag, owner, clock, "m3745x", source),
+m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
+	m740_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
 	read_p3(*this),
 	read_p4(*this),
@@ -499,11 +499,11 @@ static ADDRESS_MAP_START( m37450_map, AS_PROGRAM, 8, m37450_device )
 ADDRESS_MAP_END
 
 m37450_device::m37450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m3745x_device(mconfig, M37450, "Mitsubishi M37450", tag, owner, clock, ADDRESS_MAP_NAME(m37450_map), "m3745x", __FILE__)
+	m37450_device(mconfig, M37450, tag, owner, clock)
 {
 }
 
-m37450_device::m37450_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	m3745x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m37450_map), shortname, source)
+m37450_device::m37450_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	m3745x_device(mconfig, type, tag, owner, clock, ADDRESS_MAP_NAME(m37450_map))
 {
 }

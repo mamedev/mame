@@ -122,8 +122,17 @@
 #define TRACE_GROM 0
 #define TRACE_PUNMAP 0
 
+enum
+{
+	SGMSEL = 1,
+	TSGSEL = 2,
+	P8GSEL = 4,
+	P3GSEL = 8,
+	VIDSEL = 16
+};
+
 mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MAINBOARD8, "TI-99/8 Mainboard", tag, owner, clock, "ti998_mainboard", __FILE__),
+	: device_t(mconfig, TI99_MAINBOARD8, tag, owner, clock),
 	m_A14_set(false),
 	m_pending_write(false),
 	m_speech_ready(true),
@@ -994,17 +1003,18 @@ void mainboard8_device::device_reset()
 }
 
 MACHINE_CONFIG_FRAGMENT( ti998_mainboard )
-	MCFG_DEVICE_ADD(VAQUERRO_TAG, VAQUERRO, 0)
-	MCFG_DEVICE_ADD(MOFETTA_TAG, MOFETTA, 0)
-	MCFG_DEVICE_ADD(AMIGO_TAG, AMIGO, 0)
-	MCFG_DEVICE_ADD(OSO_TAG, OSO, 0)
+	MCFG_DEVICE_ADD(VAQUERRO_TAG, TI99_VAQUERRO, 0)
+	MCFG_DEVICE_ADD(MOFETTA_TAG, TI99_MOFETTA, 0)
+	MCFG_DEVICE_ADD(AMIGO_TAG, TI99_AMIGO, 0)
+	MCFG_DEVICE_ADD(OSO_TAG, TI99_OSO, 0)
 MACHINE_CONFIG_END
 
 machine_config_constructor mainboard8_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( ti998_mainboard );
 }
-const device_type MAINBOARD8 = device_creator<mainboard8_device>;
+
+DEFINE_DEVICE_TYPE(TI99_MAINBOARD8, mainboard8_device, "ti998_mainboard", "TI-99/8 Mainboard")
 
 
 /***************************************************************************
@@ -1084,7 +1094,7 @@ const device_type MAINBOARD8 = device_creator<mainboard8_device>;
 ***************************************************************************/
 
 vaquerro_device::vaquerro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, VAQUERRO, "Logical Address Space Decoder", tag, owner, clock, "ti998_vaquerro", __FILE__),
+	: device_t(mconfig, TI99_VAQUERRO, tag, owner, clock),
 	m_crus(ASSERT_LINE),
 	m_crugl(ASSERT_LINE),
 	m_ggrdy(ASSERT_LINE)
@@ -1408,12 +1418,12 @@ void vaquerro_device::device_reset()
        asserted, while the READY line remains Low.
     7. Continue at 3.
 */
-void waitstate_generator::select_in(bool addressed)
+void vaquerro_device::waitstate_generator::select_in(bool addressed)
 {
 	m_addressed = addressed;
 }
 
-int waitstate_generator::select_out()
+int vaquerro_device::waitstate_generator::select_out()
 {
 	return (!m_counting && m_addressed)? m_selvalue : 0;
 }
@@ -1421,22 +1431,22 @@ int waitstate_generator::select_out()
 /*
     Should be low by default.
 */
-line_state waitstate_generator::ready_out()
+line_state vaquerro_device::waitstate_generator::ready_out()
 {
 	return (m_ready && !m_counting && m_generate)? ASSERT_LINE : CLEAR_LINE;
 }
 
-bool waitstate_generator::is_counting()
+bool vaquerro_device::waitstate_generator::is_counting()
 {
 	return m_counting;
 }
 
-bool waitstate_generator::is_generating()
+bool vaquerro_device::waitstate_generator::is_generating()
 {
 	return m_generate;
 }
 
-bool waitstate_generator::is_ready()
+bool vaquerro_device::waitstate_generator::is_ready()
 {
 	return m_ready;
 }
@@ -1444,12 +1454,12 @@ bool waitstate_generator::is_ready()
 /*
     READY in. This may only show an effect with the next trailing edge of CLKOUT.
 */
-void grom_waitstate_generator::ready_in(line_state ready)
+void vaquerro_device::grom_waitstate_generator::ready_in(line_state ready)
 {
 	m_ready = (ready==ASSERT_LINE);
 }
 
-void grom_waitstate_generator::clock_in(line_state clkout)
+void vaquerro_device::grom_waitstate_generator::clock_in(line_state clkout)
 {
 	if (clkout == ASSERT_LINE)
 	{
@@ -1470,7 +1480,7 @@ void grom_waitstate_generator::clock_in(line_state clkout)
 	}
 }
 
-void waitstate_generator::treset_in(line_state reset)
+void vaquerro_device::waitstate_generator::treset_in(line_state reset)
 {
 	if (reset==ASSERT_LINE)
 	{
@@ -1479,7 +1489,7 @@ void waitstate_generator::treset_in(line_state reset)
 	}
 }
 
-void video_waitstate_generator::clock_in(line_state clkout)
+void vaquerro_device::video_waitstate_generator::clock_in(line_state clkout)
 {
 	if (clkout == ASSERT_LINE)
 	{
@@ -1500,7 +1510,7 @@ void video_waitstate_generator::clock_in(line_state clkout)
 	}
 }
 
-const device_type VAQUERRO = device_creator<vaquerro_device>;
+DEFINE_DEVICE_TYPE(TI99_VAQUERRO, vaquerro_device, "ti998_vaquerro", "TI-99/8 Logical Address Space Decoder")
 
 /***************************************************************************
   ===== MOFETTA: Physical Address Space decoder =====
@@ -1538,7 +1548,7 @@ enum
 };
 
 mofetta_device::mofetta_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MOFETTA, "Physical Address Space Decoder", tag, owner, clock, "ti998_mofetta", __FILE__),
+	: device_t(mconfig, TI99_MOFETTA, tag, owner, clock),
 	m_gotfirstword(false)
 {
 }
@@ -1761,7 +1771,7 @@ void mofetta_device::device_reset()
 }
 
 
-const device_type MOFETTA = device_creator<mofetta_device>;
+DEFINE_DEVICE_TYPE(TI99_MOFETTA, mofetta_device, "ti998_mofetta", "TI-99/8 Physical Address Space Decoder")
 
 /***************************************************************************
 
@@ -1837,7 +1847,7 @@ const device_type MOFETTA = device_creator<mofetta_device>;
 ***************************************************************************/
 
 amigo_device::amigo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, AMIGO, "Address space mapper", tag, owner, clock, "ti998_amigo", __FILE__),
+	: device_t(mconfig, TI99_AMIGO, tag, owner, clock),
 	m_logical_space(true),
 	m_crus(ASSERT_LINE)
 {
@@ -2156,7 +2166,7 @@ void amigo_device::device_reset()
 	m_logical_space = true;
 }
 
-const device_type AMIGO = device_creator<amigo_device>;
+DEFINE_DEVICE_TYPE(TI99_AMIGO, amigo_device, "ti998_amigo", "TI-99/8 Address space mapper")
 
 /***************************************************************************
 
@@ -2226,7 +2236,7 @@ enum
 };
 
 oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, OSO, "Hexbus interface", tag, owner, clock, "oso", __FILE__), m_data(0), m_status(0), m_control(0), m_xmit(0)
+	: device_t(mconfig, TI99_OSO, tag, owner, clock), m_data(0), m_status(0), m_control(0), m_xmit(0)
 {
 }
 
@@ -2295,4 +2305,4 @@ void oso_device::device_start()
 	save_item(NAME(m_xmit));
 }
 
-const device_type OSO = device_creator<oso_device>;
+DEFINE_DEVICE_TYPE(TI99_OSO, oso_device, "ti998_oso", "TI-99/8 Hexbus interface")

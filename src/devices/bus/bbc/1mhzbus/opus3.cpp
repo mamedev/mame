@@ -45,7 +45,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_OPUS3 = device_creator<bbc_opus3_device>;
+DEFINE_DEVICE_TYPE(BBC_OPUS3, bbc_opus3_device, "bbc_opus3", "Opus Challenger 3-in-1")
 
 
 //-------------------------------------------------
@@ -117,7 +117,7 @@ const tiny_rom_entry *bbc_opus3_device::device_rom_region() const
 //-------------------------------------------------
 
 bbc_opus3_device::bbc_opus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_OPUS3, "Opus Challenger 3-in-1", tag, owner, clock, "bbc_opus3", __FILE__),
+	: device_t(mconfig, BBC_OPUS3, tag, owner, clock),
 		device_bbc_1mhzbus_interface(mconfig, *this),
 		m_dfs_rom(*this, "dfs_rom"),
 		m_ramdisk(*this, "ramdisk"),
@@ -136,7 +136,7 @@ void bbc_opus3_device::device_start()
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<bbc_1mhzbus_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfcf8, 0xfcfb, READ8_DEVICE_DELEGATE(m_fdc, wd1770_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_t, write));
+	space.install_readwrite_handler(0xfcf8, 0xfcfb, READ8_DEVICE_DELEGATE(m_fdc, wd1770_device, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_device, write));
 	space.install_write_handler(0xfcfc, 0xfcfc, WRITE8_DELEGATE(bbc_opus3_device, wd1770l_write));
 	space.install_write_handler(0xfcfe, 0xfcff, WRITE8_DELEGATE(bbc_opus3_device, page_w));
 	space.install_readwrite_handler(0xfd00, 0xfdff, READ8_DELEGATE(bbc_opus3_device, ramdisk_r), WRITE8_DELEGATE(bbc_opus3_device, ramdisk_w));

@@ -6,13 +6,13 @@
 
 *********************************************************************/
 
+#ifndef MAME_BUS_PC_KBD_PCXT83_H
+#define MAME_BUS_PC_KBD_PCXT83_H
+
 #pragma once
 
-#ifndef __PC_KBD_IBM_PC_XT_83__
-#define __PC_KBD_IBM_PC_XT_83__
-
-#include "cpu/mcs48/mcs48.h"
 #include "pc_kbdc.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/rescap.h"
 
 
@@ -23,8 +23,7 @@
 
 // ======================> ibm_pc_xt_83_keyboard_device
 
-class ibm_pc_xt_83_keyboard_device :  public device_t,
-										public device_pc_kbd_interface
+class ibm_pc_xt_83_keyboard_device : public device_t, public device_pc_kbd_interface
 {
 public:
 	// construction/destruction
@@ -64,8 +63,7 @@ private:
 
 
 // device type definition
-extern const device_type PC_KBD_IBM_PC_XT_83;
+DECLARE_DEVICE_TYPE(PC_KBD_IBM_PC_XT_83, ibm_pc_xt_83_keyboard_device)
 
 
-
-#endif
+#endif // MAME_BUS_PC_KBD_PCXT83_H

@@ -77,7 +77,7 @@ void tr606_state::machine_start()
 	// register for savestates
 }
 
-static MACHINE_CONFIG_START( tr606, tr606_state )
+static MACHINE_CONFIG_START( tr606 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D650, TP2_HZ)
@@ -107,4 +107,4 @@ ROM_START( tr606 )
 ROM_END
 
 
-CONS( 1982, tr606, 0, 0, tr606, tr606, driver_device, 0, "Roland", "TR-606 Drumatix", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tr606, 0, 0, tr606, tr606, tr606_state, 0, "Roland", "TR-606 Drumatix", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

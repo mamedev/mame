@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_DRIVER_INIT(dps1);
 	DECLARE_MACHINE_RESET(dps1);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 
 private:
 	bool m_dma_dir;
@@ -201,7 +201,7 @@ DRIVER_INIT_MEMBER( dps1_state, dps1 )
 static INPUT_PORTS_START( dps1 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( dps1_state::kbd_put )
+void dps1_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -210,7 +210,7 @@ static SLOT_INTERFACE_START( floppies )
 	SLOT_INTERFACE( "floppy0", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( dps1, dps1_state )
+static MACHINE_CONFIG_START( dps1 )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(dps1_mem)
@@ -219,7 +219,7 @@ static MACHINE_CONFIG_START( dps1, dps1_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(dps1_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dps1_state, kbd_put))
 
 	// floppy
 	MCFG_UPD765A_ADD("fdc", false, true)

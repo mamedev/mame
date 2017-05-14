@@ -9,13 +9,13 @@
 #include "emu.h"
 #include "i8355.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
 
 enum
 {
@@ -39,7 +39,7 @@ enum
 //**************************************************************************
 
 // device type definition
-const device_type I8355 = device_creator<i8355_device>;
+DEFINE_DEVICE_TYPE(I8355, i8355_device, "i8355", "Intel 8355")
 
 
 
@@ -57,8 +57,8 @@ inline uint8_t i8355_device::read_port(int port)
 
 	if (m_ddr[port] != 0xff)
 	{
-		if (port == 0) {data |= m_in_pa_cb(0) & ~m_ddr[port];}
-		else { data |= m_in_pb_cb(0) & ~m_ddr[port];}
+		if (port == 0) { data |= m_in_pa_cb(0) & ~m_ddr[port]; }
+		else { data |= m_in_pb_cb(0) & ~m_ddr[port]; }
 	}
 
 	return data;
@@ -88,7 +88,7 @@ inline void i8355_device::write_port(int port, uint8_t data)
 //-------------------------------------------------
 
 i8355_device::i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, I8355, "Intel 8355", tag, owner, clock, "i8355", __FILE__),
+	: device_t(mconfig, I8355, tag, owner, clock),
 		m_in_pa_cb(*this),
 		m_out_pa_cb(*this),
 		m_in_pb_cb(*this),
@@ -166,14 +166,14 @@ WRITE8_MEMBER( i8355_device::io_w )
 	{
 	case REGISTER_PORT_A:
 	case REGISTER_PORT_B:
-		if (LOG) logerror("I8355 '%s' Port %c Write %02x\n", tag(), 'A' + port, data);
+		LOG("I8355 Port %c Write %02x\n", 'A' + port, data);
 
 		write_port(port, data);
 		break;
 
 	case REGISTER_PORT_A_DDR:
 	case REGISTER_PORT_B_DDR:
-		if (LOG) logerror("I8355 '%s' Port %c DDR: %02x\n", tag(), 'A' + port, data);
+		LOG("I8355 Port %c DDR: %02x\n", 'A' + port, data);
 
 		m_ddr[port] = data;
 		write_port(port, data);

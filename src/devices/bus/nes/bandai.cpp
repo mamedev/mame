@@ -17,7 +17,7 @@
 
  * Bandai Datach Joint ROM System [mapper 157] is emulated in a separate source file
    to implement also the subslot, but the PCB is basically a Bandai LZ93D50 + 24C02 EEPROM
-   pcb with added barcode reader and subslot
+   PCB with added barcode reader and subslot
 
  * Bandai Karaoke Studio [mapper 188] is emulated in a separate source file
    to implement also the subslot and the mic inputs
@@ -50,58 +50,56 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_OEKAKIDS = device_creator<nes_oekakids_device>;
-const device_type NES_FCG = device_creator<nes_fcg_device>;
-const device_type NES_LZ93D50 = device_creator<nes_lz93d50_device>;
-const device_type NES_LZ93D50_24C01 = device_creator<nes_lz93d50_24c01_device>;
-const device_type NES_LZ93D50_24C02 = device_creator<nes_lz93d50_24c02_device>;
-const device_type NES_FJUMP2 = device_creator<nes_fjump2_device>;
+DEFINE_DEVICE_TYPE(NES_OEKAKIDS,      nes_oekakids_device,      "nes_oeka",        "NES Cart Bandai Oeka Kids PCB")
+DEFINE_DEVICE_TYPE(NES_FCG,           nes_fcg_device,           "nes_fcg",         "NES Cart Bandai FCG PCB")
+DEFINE_DEVICE_TYPE(NES_LZ93D50,       nes_lz93d50_device,       "nes_lz93d50",     "NES Cart Bandai LZ93D50 PCB")
+DEFINE_DEVICE_TYPE(NES_LZ93D50_24C01, nes_lz93d50_24c01_device, "nes_lz93d50_ep1", "NES Cart Bandai LZ93D50 + 24C01 PCB")
+DEFINE_DEVICE_TYPE(NES_LZ93D50_24C02, nes_lz93d50_24c02_device, "nes_lz93d50_ep2", "NES Cart Bandai LZ93D50 + 24C02 PCB")
+DEFINE_DEVICE_TYPE(NES_FJUMP2,        nes_fjump2_device,        "nes_fjump2",      "NES Cart Bandai Famicom Jump II PCB")
 
 
 nes_oekakids_device::nes_oekakids_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_OEKAKIDS, "NES Cart Bandai Oeka Kids PCB", tag, owner, clock, "nes_oeka", __FILE__), m_reg(0), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_OEKAKIDS, tag, owner, clock), m_reg(0), m_latch(0)
+{
 }
 
-nes_fcg_device::nes_fcg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
-				{
+nes_fcg_device::nes_fcg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+{
 }
 
 nes_fcg_device::nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_FCG, "NES Cart Bandai FCG PCB", tag, owner, clock, "nes_fcg", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
-				{
+	: nes_fcg_device(mconfig, NES_FCG, tag, owner, clock)
+{
 }
 
-nes_lz93d50_device::nes_lz93d50_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: nes_fcg_device(mconfig, type, name, tag, owner, clock, shortname, source)
+nes_lz93d50_device::nes_lz93d50_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_fcg_device(mconfig, type, tag, owner, clock)
 {
 }
 
 nes_lz93d50_device::nes_lz93d50_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_fcg_device(mconfig, NES_LZ93D50, "NES Cart Bandai LZ93D50 PCB", tag, owner, clock, "nes_lz93d50", __FILE__)
+	: nes_lz93d50_device(mconfig, NES_LZ93D50, tag, owner, clock)
 {
 }
 
-nes_lz93d50_24c01_device::nes_lz93d50_24c01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: nes_lz93d50_device(mconfig, type, name, tag, owner, clock, shortname, source),
-						m_i2cmem(*this, "i2cmem"), m_i2c_dir(0)
-				{
+nes_lz93d50_24c01_device::nes_lz93d50_24c01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_lz93d50_device(mconfig, type, tag, owner, clock), m_i2cmem(*this, "i2cmem"), m_i2c_dir(0)
+{
 }
 
 nes_lz93d50_24c01_device::nes_lz93d50_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_lz93d50_device(mconfig, NES_LZ93D50_24C01, "NES Cart Bandai LZ93D50 + 24C01 PCB", tag, owner, clock, "nes_lz93d50_ep1", __FILE__),
-						m_i2cmem(*this, "i2cmem"), m_i2c_dir(0)
-				{
+	: nes_lz93d50_24c01_device(mconfig, NES_LZ93D50_24C01, tag, owner, clock)
+{
 }
 
 nes_lz93d50_24c02_device::nes_lz93d50_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_lz93d50_24c01_device(mconfig, NES_LZ93D50_24C02, "NES Cart Bandai LZ93D50 + 24C02 PCB", tag, owner, clock, "nes_lz93d50_ep2", __FILE__)
+	: nes_lz93d50_24c01_device(mconfig, NES_LZ93D50_24C02, tag, owner, clock)
 {
 }
 
 nes_fjump2_device::nes_fjump2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_lz93d50_device(mconfig, NES_FJUMP2, "NES Cart Bandai Famicom Jump II PCB", tag, owner, clock, "nes_fjump2", __FILE__)
+	: nes_lz93d50_device(mconfig, NES_FJUMP2, tag, owner, clock)
 {
 }
 

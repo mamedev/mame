@@ -30,7 +30,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VS9209 = device_creator<vs9209_device>;
+DEFINE_DEVICE_TYPE(VS9209, vs9209_device, "vs9209", "VS9209 I/O")
 
 //**************************************************************************
 //  DEVICE DEFINITION
@@ -41,9 +41,9 @@ const device_type VS9209 = device_creator<vs9209_device>;
 //-------------------------------------------------
 
 vs9209_device::vs9209_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, VS9209, "VS9209 I/O", tag, owner, clock, "vs9209", __FILE__),
-		m_input_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
-		m_output_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	: device_t(mconfig, VS9209, tag, owner, clock)
+	, m_input_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_output_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 {
 }
 

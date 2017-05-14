@@ -51,9 +51,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type MD_CART_SLOT = device_creator<md_cart_slot_device>;
-const device_type PICO_CART_SLOT = device_creator<pico_cart_slot_device>;
-const device_type COPERA_CART_SLOT = device_creator<copera_cart_slot_device>;
+DEFINE_DEVICE_TYPE(MD_CART_SLOT,     md_cart_slot_device,     "md_cart_slot",     "Mega Drive Cartridge Slot")
+DEFINE_DEVICE_TYPE(PICO_CART_SLOT,   pico_cart_slot_device,   "pico_cart_slot",   "Pico Cartridge Slot")
+DEFINE_DEVICE_TYPE(COPERA_CART_SLOT, copera_cart_slot_device, "copera_cart_slot", "Copera Cartridge Slot")
 
 //**************************************************************************
 //    MD cartridges Interface
@@ -160,27 +160,27 @@ uint32_t device_md_cart_interface::get_padded_size(uint32_t size)
 //-------------------------------------------------
 //  base_md_cart_slot_device - constructor
 //-------------------------------------------------
-base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(SEGA_STD), m_cart(nullptr),
-						m_must_be_loaded(1)
+base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(SEGA_STD), m_cart(nullptr),
+	m_must_be_loaded(1)
 {
 }
 
 md_cart_slot_device::md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						base_md_cart_slot_device(mconfig, MD_CART_SLOT, "MD Cartridge Slot", tag, owner, clock, "md_cart_slot", __FILE__)
+	base_md_cart_slot_device(mconfig, MD_CART_SLOT, tag, owner, clock)
 {
 }
 
 pico_cart_slot_device::pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						base_md_cart_slot_device(mconfig, PICO_CART_SLOT, "Pico Cartridge Slot", tag, owner, clock, "pico_cart_slot", __FILE__)
+	base_md_cart_slot_device(mconfig, PICO_CART_SLOT, tag, owner, clock)
 {
 }
 
 copera_cart_slot_device::copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						base_md_cart_slot_device(mconfig, COPERA_CART_SLOT, "Copera Cartridge Slot", tag, owner, clock, "copera_cart_slot", __FILE__)
+	base_md_cart_slot_device(mconfig, COPERA_CART_SLOT, tag, owner, clock)
 {
 }
 

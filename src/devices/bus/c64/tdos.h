@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_TDOS_H
+#define MAME_BUS_C64_TDOS_H
 
-#ifndef __TDOS__
-#define __TDOS__
+#pragma once
 
 #include "exp.h"
 #include "machine/mc6852.h"
@@ -54,7 +54,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_TDOS;
+DECLARE_DEVICE_TYPE(C64_TDOS, c64_tdos_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_TDOS_H

@@ -22,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISBC_218A = device_creator<isbc_218a_device>;
+DEFINE_DEVICE_TYPE(ISBC_218A, isbc_218a_device, "isbc_218a", "ISBX 218a for ISBC")
 
 
 //-------------------------------------------------
@@ -82,7 +82,7 @@ machine_config_constructor isbc_218a_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 isbc_218a_device::isbc_218a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISBC_218A, "ISBX 218a for ISBC", tag, owner, clock, "isbc_218a", __FILE__),
+	device_t(mconfig, ISBC_218A, tag, owner, clock),
 	device_isbx_card_interface(mconfig, *this),
 	m_fdc(*this, I8272_TAG),
 	m_floppy0(*this, I8272_TAG":0"), m_reset(false), m_motor(false)

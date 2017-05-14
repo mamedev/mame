@@ -688,7 +688,7 @@ static INPUT_PORTS_START( noki3310 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( noki3310, noki3310_state )
+static MACHINE_CONFIG_START( noki3310 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7_BE, 26000000 / 2)  // MAD2WD1 13 MHz, clock internally supplied to ARM core can be divided by 2, in sleep mode a 32768 Hz clock is used
@@ -873,16 +873,16 @@ ROM_START( noki8890 )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT     CLASS          INIT  COMPANY     FULLNAME            FLAGS */
-SYST( 1999, noki3210, 0,      0,      noki3310,  noki3310, driver_device,  0,  "Nokia", "Nokia 3210", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
-SYST( 1999, noki7110, 0,      0,      noki7110,  noki3310, driver_device,  0,  "Nokia", "Nokia 7110", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
-SYST( 1999, noki8210, 0,      0,      noki3310,  noki3310, driver_device,  0,  "Nokia", "Nokia 8210", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
-SYST( 1999, noki8850, 0,      0,      noki3310,  noki3310, driver_device,  0,  "Nokia", "Nokia 8850", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
-SYST( 2000, noki3310, 0,      0,      noki3310,  noki3310, driver_device,  0,  "Nokia", "Nokia 3310", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
-SYST( 2000, noki6210, 0,      0,      noki6210,  noki3310, driver_device,  0,  "Nokia", "Nokia 6210", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
-SYST( 2000, noki6250, 0,      0,      noki6210,  noki3310, driver_device,  0,  "Nokia", "Nokia 6250", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
-SYST( 2000, noki8250, 0,      0,      noki3310,  noki3310, driver_device,  0,  "Nokia", "Nokia 8250", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
-SYST( 2000, noki8890, 0,      0,      noki3310,  noki3310, driver_device,  0,  "Nokia", "Nokia 8890", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
-SYST( 2001, noki3330, 0,      0,      noki3330,  noki3310, driver_device,  0,  "Nokia", "Nokia 3330", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
-SYST( 2002, noki3410, 0,      0,      noki3410,  noki3310, driver_device,  0,  "Nokia", "Nokia 3410", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
-SYST( 2002, noki5210, 0,      0,      noki3330,  noki3310, driver_device,  0,  "Nokia", "Nokia 5210", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT     CLASS            INIT  COMPANY  FULLNAME      FLAGS
+SYST( 1999, noki3210, 0,      0,      noki3310,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 3210", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+SYST( 1999, noki7110, 0,      0,      noki7110,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 7110", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+SYST( 1999, noki8210, 0,      0,      noki3310,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 8210", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+SYST( 1999, noki8850, 0,      0,      noki3310,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 8850", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+SYST( 2000, noki3310, 0,      0,      noki3310,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 3310", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+SYST( 2000, noki6210, 0,      0,      noki6210,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 6210", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+SYST( 2000, noki6250, 0,      0,      noki6210,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 6250", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+SYST( 2000, noki8250, 0,      0,      noki3310,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 8250", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+SYST( 2000, noki8890, 0,      0,      noki3310,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 8890", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+SYST( 2001, noki3330, 0,      0,      noki3330,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 3330", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+SYST( 2002, noki3410, 0,      0,      noki3410,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 3410", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+SYST( 2002, noki5210, 0,      0,      noki3330,  noki3310, noki3310_state,  0,    "Nokia", "Nokia 5210", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )

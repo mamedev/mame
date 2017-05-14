@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Olivier Galibert
-#pragma once
+#ifndef MAME_AUDIO_DSBZ80_H
+#define MAME_AUDIO_DSBZ80_H
 
-#ifndef __DSBZ80_H__
-#define __DSBZ80_H__
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
@@ -65,5 +65,6 @@ private:
 
 // device type definition
 extern const device_type DSBZ80;
+DECLARE_DEVICE_TYPE(DSBZ80, dsbz80_device)
 
-#endif  /* __DSBZ80_H__ */
+#endif // MAME_AUDIO_DSBZ80_H

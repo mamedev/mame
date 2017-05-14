@@ -10,15 +10,15 @@
 #include "scsicd.h"
 
 // device type definition
-const device_type SCSICD = device_creator<scsicd_device>;
+DEFINE_DEVICE_TYPE(SCSICD, scsicd_device, "scsicd", "SCSI CD")
 
 scsicd_device::scsicd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	scsihle_device(mconfig, SCSICD, "SCSI CD", tag, owner, clock, "scsicd", __FILE__)
+	scsicd_device(mconfig, SCSICD, tag, owner, clock)
 {
 }
 
-scsicd_device::scsicd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	scsihle_device(mconfig, type, name, tag, owner, clock, shortname, source)
+scsicd_device::scsicd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	scsihle_device(mconfig, type, tag, owner, clock)
 {
 }
 

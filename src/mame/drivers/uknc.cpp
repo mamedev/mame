@@ -57,7 +57,7 @@ uint32_t uknc_state::screen_update_uknc(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-static MACHINE_CONFIG_START( uknc, uknc_state )
+static MACHINE_CONFIG_START( uknc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", K1801VM2, 8000000)
 	MCFG_T11_INITIAL_MODE(0x8000)
@@ -90,5 +90,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1987, uknc,   0,      0,       uknc,      uknc, driver_device,    0,    "<unknown>",  "UKNC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY       FULLNAME  FLAGS */
+COMP( 1987, uknc,   0,      0,       uknc,      uknc,  uknc_state,   0,    "<unknown>",  "UKNC",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -8,10 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __AGAT7VIDEO__
-#define __AGAT7VIDEO__
+#ifndef MAME_VIDEO_AGAT7_H
+#define MAME_VIDEO_AGAT7_H
 
-#include "emu.h"
+#pragma once
 
 #include "machine/ram.h"
 
@@ -20,8 +20,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class agat7video_device:
-	public device_t
+class agat7video_device : public device_t
 {
 public:
 	// construction/destruction
@@ -70,6 +69,6 @@ public:
 };
 
 // device type definition
-extern const device_type AGAT7VIDEO;
+DECLARE_DEVICE_TYPE(AGAT7VIDEO, agat7video_device)
 
-#endif /* __AGAT7VIDEO__ */
+#endif // MAME_VIDEO_AGAT7_H

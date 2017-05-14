@@ -25,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MIDI_SIEL = device_creator<c64_siel_midi_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_MIDI_SIEL, c64_siel_midi_cartridge_device, "c64_midisiel", "C64 Siel MIDI")
 
 
 WRITE_LINE_MEMBER( c64_siel_midi_cartridge_device::acia_irq_w )
@@ -80,7 +80,7 @@ machine_config_constructor c64_siel_midi_cartridge_device::device_mconfig_additi
 //-------------------------------------------------
 
 c64_siel_midi_cartridge_device::c64_siel_midi_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_MIDI_SIEL, "C64 Siel MIDI", tag, owner, clock, "c64_midisiel", __FILE__),
+	device_t(mconfig, C64_MIDI_SIEL, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_acia(*this, MC6850_TAG)
 {

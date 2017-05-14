@@ -13,10 +13,10 @@
  * Host
  */
 
-const device_type NV2A_HOST = device_creator<nv2a_host_device>;
+DEFINE_DEVICE_TYPE(NV2A_HOST, nv2a_host_device, "nv2a_host", "NV2A PCI Bridge Device - Host Bridge")
 
 nv2a_host_device::nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, NV2A_HOST, "PCI Bridge Device - Host Bridge", tag, owner, clock, "nv2a_host", __FILE__),
+	: pci_host_device(mconfig, NV2A_HOST, tag, owner, clock),
 	  cpu_tag(nullptr),
 	  cpu(nullptr)
 {
@@ -59,7 +59,7 @@ void nv2a_host_device::device_reset()
  * Ram
  */
 
-const device_type NV2A_RAM = device_creator<nv2a_ram_device>;
+DEFINE_DEVICE_TYPE(NV2A_RAM, nv2a_ram_device, "nv2a_ram", "NV2A Memory Controller - SDRAM")
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, nv2a_ram_device)
 	AM_RANGE(0x6c, 0x6f) AM_READWRITE(config_register_r, config_register_w)
@@ -67,7 +67,7 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, nv2a_ram_device)
 ADDRESS_MAP_END
 
 nv2a_ram_device::nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, NV2A_RAM, "Memory Controller - SDRAM", tag, owner, clock, "nv2a_ram", __FILE__)
+	: pci_device(mconfig, NV2A_RAM, tag, owner, clock)
 {
 }
 
@@ -84,14 +84,14 @@ WRITE32_MEMBER(nv2a_ram_device::config_register_w)
  * LPC Bus
  */
 
-const device_type MCPX_LPC = device_creator<mcpx_lpc_device>;
+DEFINE_DEVICE_TYPE(MCPX_LPC, mcpx_lpc_device, "mcpx_lpc", "MCPX HUB Interface - ISA Bridge")
 
 DEVICE_ADDRESS_MAP_START(lpc_io, 32, mcpx_lpc_device)
 	AM_RANGE(0x00000000, 0x000000ff)  AM_READWRITE(lpc_r, lpc_w)
 ADDRESS_MAP_END
 
 mcpx_lpc_device::mcpx_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_LPC, "HUB Interface - ISA Bridge", tag, owner, clock, "mcpx_lpc", __FILE__)
+	: pci_device(mconfig, MCPX_LPC, tag, owner, clock)
 {
 }
 
@@ -120,7 +120,7 @@ WRITE32_MEMBER(mcpx_lpc_device::lpc_w)
  * SMBus
  */
 
-const device_type MCPX_SMBUS = device_creator<mcpx_smbus_device>;
+DEFINE_DEVICE_TYPE(MCPX_SMBUS, mcpx_smbus_device, "mcpx_smbus", "MCPX SMBus Controller")
 
 DEVICE_ADDRESS_MAP_START(smbus_io0, 32, mcpx_smbus_device)
 	AM_RANGE(0x00000000, 0x0000000f) AM_NOP
@@ -135,7 +135,7 @@ DEVICE_ADDRESS_MAP_START(smbus_io2, 32, mcpx_smbus_device)
 ADDRESS_MAP_END
 
 mcpx_smbus_device::mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_SMBUS, "SMBus Controller", tag, owner, clock, "mcpx_smbus", __FILE__),
+	: pci_device(mconfig, MCPX_SMBUS, tag, owner, clock),
 	m_interrupt_handler(*this)
 {
 }
@@ -219,14 +219,14 @@ WRITE32_MEMBER(mcpx_smbus_device::smbus_w)
  * OHCI USB Controller
  */
 
-const device_type MCPX_OHCI = device_creator<mcpx_ohci_device>;
+DEFINE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device, "mcpx_ohci", "MCPX OHCI USB Controller")
 
 DEVICE_ADDRESS_MAP_START(ohci_mmio, 32, mcpx_ohci_device)
 	AM_RANGE(0x00000000, 0x00000fff) AM_READWRITE(ohci_r, ohci_w)
 ADDRESS_MAP_END
 
 mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_OHCI, "MCPX OHCI USB Controller", tag, owner, clock, "mcpx_ohci", __FILE__),
+	: pci_device(mconfig, MCPX_OHCI, tag, owner, clock),
 	ohci_usb(nullptr),
 	m_interrupt_handler(*this),
 	timer(nullptr)
@@ -292,7 +292,7 @@ WRITE32_MEMBER(mcpx_ohci_device::ohci_w)
  * Ethernet
  */
 
-const device_type MCPX_ETH = device_creator<mcpx_eth_device>;
+DEFINE_DEVICE_TYPE(MCPX_ETH, mcpx_eth_device, "mcpx_eth", "MCP Networking Adapter")
 
 DEVICE_ADDRESS_MAP_START(eth_mmio, 32, mcpx_eth_device)
 	AM_RANGE(0x00000000, 0x0000003ff) AM_READWRITE(eth_r, eth_w)
@@ -303,7 +303,7 @@ DEVICE_ADDRESS_MAP_START(eth_io, 32, mcpx_eth_device)
 ADDRESS_MAP_END
 
 mcpx_eth_device::mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_ETH, "MCP Networking Adapter", tag, owner, clock, "mcpx_eth", __FILE__)
+	: pci_device(mconfig, MCPX_ETH, tag, owner, clock)
 {
 }
 
@@ -343,14 +343,14 @@ WRITE32_MEMBER(mcpx_eth_device::eth_io_w)
  * Audio Processing Unit
  */
 
-const device_type MCPX_APU = device_creator<mcpx_apu_device>;
+DEFINE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device, "mcpx_apu", "MCP APU")
 
 DEVICE_ADDRESS_MAP_START(apu_mmio, 32, mcpx_apu_device)
 	AM_RANGE(0x00000000, 0x00007ffff) AM_READWRITE(apu_r, apu_w)
 ADDRESS_MAP_END
 
 mcpx_apu_device::mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_APU, "MCP APU", tag, owner, clock, "mcpx_apu", __FILE__),
+	: pci_device(mconfig, MCPX_APU, tag, owner, clock),
 	cpu_tag(nullptr),
 	cpu(nullptr)
 {
@@ -536,7 +536,7 @@ WRITE32_MEMBER(mcpx_apu_device::apu_w)
  * AC97 Audio Controller
  */
 
-const device_type MCPX_AC97_AUDIO = device_creator<mcpx_ac97_audio_device>;
+DEFINE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device, "mcpx_ac97_audio", "MCPX AC'97 Audio Codec Interface")
 
 DEVICE_ADDRESS_MAP_START(ac97_mmio, 32, mcpx_ac97_audio_device)
 	AM_RANGE(0x00000000, 0x000000fff) AM_READWRITE(ac97_audio_r, ac97_audio_w)
@@ -551,7 +551,7 @@ DEVICE_ADDRESS_MAP_START(ac97_io1, 32, mcpx_ac97_audio_device)
 ADDRESS_MAP_END
 
 mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_AC97_AUDIO, "AC`97 Audio Codec Interface", tag, owner, clock, "mcpx_av97_audio", __FILE__)
+	: pci_device(mconfig, MCPX_AC97_AUDIO, tag, owner, clock)
 {
 }
 
@@ -641,10 +641,10 @@ WRITE32_MEMBER(mcpx_ac97_audio_device::ac97_audio_io1_w)
  * AC97 Modem Controller
  */
 
-const device_type MCPX_AC97_MODEM = device_creator<mcpx_ac97_modem_device>;
+DEFINE_DEVICE_TYPE(MCPX_AC97_MODEM, mcpx_ac97_modem_device, "mcpx_ac97_modem", "MCPX AC'97 Modem Controller")
 
 mcpx_ac97_modem_device::mcpx_ac97_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_AC97_MODEM, "AC`97 Modem Controller", tag, owner, clock, "mcpx_ac97_modem", __FILE__)
+	: pci_device(mconfig, MCPX_AC97_MODEM, tag, owner, clock)
 {
 }
 
@@ -652,7 +652,7 @@ mcpx_ac97_modem_device::mcpx_ac97_modem_device(const machine_config &mconfig, co
  * IDE Controller
  */
 
-const device_type MCPX_IDE = device_creator<mcpx_ide_device>;
+DEFINE_DEVICE_TYPE(MCPX_IDE, mcpx_ide_device, "mcpx_ide", "MCPX IDE Controller")
 
 DEVICE_ADDRESS_MAP_START(mcpx_ide_io, 32, mcpx_ide_device)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w)
@@ -665,7 +665,7 @@ static MACHINE_CONFIG_FRAGMENT(mcpx_ide)
 MACHINE_CONFIG_END
 
 mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MCPX_IDE, "MCPX IDE Controller", tag, owner, clock, "mcpx_ide", __FILE__),
+	: pci_device(mconfig, MCPX_IDE, tag, owner, clock),
 	m_interrupt_handler(*this)
 {
 }
@@ -697,10 +697,10 @@ WRITE_LINE_MEMBER(mcpx_ide_device::ide_interrupt)
  * AGP Bridge
  */
 
-const device_type NV2A_AGP = device_creator<nv2a_agp_device>;
+DEFINE_DEVICE_TYPE(NV2A_AGP, nv2a_agp_device, "nv2a_agp", "NV2A AGP Host to PCI Bridge")
 
 nv2a_agp_device::nv2a_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: agp_bridge_device(mconfig, NV2A_AGP, "AGP Host to PCI Bridge", tag, owner, clock, "nv2a_agp", __FILE__)
+	: agp_bridge_device(mconfig, NV2A_AGP, tag, owner, clock)
 {
 }
 
@@ -718,7 +718,7 @@ void nv2a_agp_device::device_reset()
  * NV2A 3D Accelerator
  */
 
-const device_type NV2A_GPU = device_creator<nv2a_gpu_device>;
+DEFINE_DEVICE_TYPE(NV2A_GPU, nv2a_gpu_device, "nv2a_gpu", "NVIDIA NV2A GPU")
 
 DEVICE_ADDRESS_MAP_START(nv2a_mmio, 32, nv2a_gpu_device)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_READWRITE(geforce_r, geforce_w)
@@ -729,7 +729,7 @@ DEVICE_ADDRESS_MAP_START(nv2a_mirror, 32, nv2a_gpu_device)
 ADDRESS_MAP_END
 
 nv2a_gpu_device::nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, NV2A_GPU, "Nvidia NV2A GPU", tag, owner, clock, "nv2a_gpu", __FILE__),
+	: pci_device(mconfig, NV2A_GPU, tag, owner, clock),
 	nvidia_nv2a(nullptr),
 	cpu_tag(nullptr),
 	m_interrupt_handler(*this),

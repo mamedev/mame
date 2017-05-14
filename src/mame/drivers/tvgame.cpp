@@ -93,7 +93,7 @@ uint32_t tvgame_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-static MACHINE_CONFIG_START( tvgame, tvgame_state )
+static MACHINE_CONFIG_START( tvgame )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(tvgame_mem)
@@ -131,5 +131,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY   FULLNAME       FLAGS */
-CONS( 2011, tvgame, 0,      0,       tvgame,    tvgame,  driver_device, 0,    "Mr. Isizu", "Z80 TV Game System", 0 )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT  COMPANY      FULLNAME              FLAGS
+CONS( 2011, tvgame, 0,      0,       tvgame,    tvgame,  tvgame_state, 0,    "Mr. Isizu", "Z80 TV Game System", 0 )

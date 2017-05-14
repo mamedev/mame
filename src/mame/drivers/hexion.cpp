@@ -239,7 +239,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::scanline)
 }
 
 
-static MACHINE_CONFIG_START( hexion, hexion_state )
+static MACHINE_CONFIG_START( hexion )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) /* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) /* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_K051649_ADD("k051649", XTAL_24MHz/16) /* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
@@ -279,7 +279,7 @@ static MACHINE_CONFIG_DERIVED( hexionb, hexion )
 
 	MCFG_DEVICE_REMOVE("k051649")
 
-	MCFG_OKIM6295_ADD("oki2", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -337,5 +337,5 @@ ROM_START( hexionb )
 	//PAL20L10 @U31
 ROM_END
 
-GAME( 1992, hexion, 0,      hexion, hexion, driver_device, 0, ROT0, "Konami",                     "Hexion (Japan ver JAB)", 0 )
-GAME( 1992, hexionb,hexion, hexionb,hexion, driver_device, 0, ROT0, "bootleg (Impeuropex Corp.)", "Hexion (Asia ver AAA, bootleg)", 0 ) // we're missing an original Asia AAA
+GAME( 1992, hexion, 0,      hexion, hexion, hexion_state, 0, ROT0, "Konami",                     "Hexion (Japan ver JAB)",         0 )
+GAME( 1992, hexionb,hexion, hexionb,hexion, hexion_state, 0, ROT0, "bootleg (Impeuropex Corp.)", "Hexion (Asia ver AAA, bootleg)", 0 ) // we're missing an original Asia AAA

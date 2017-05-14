@@ -16,7 +16,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type CENTRONICS_DIGIBLASTER = device_creator<centronics_digiblaster_device>;
+DEFINE_DEVICE_TYPE(CENTRONICS_DIGIBLASTER, centronics_digiblaster_device, "digiblst", "Digiblaster (DIY)")
 
 static MACHINE_CONFIG_FRAGMENT( digiblst )
 	/* sound hardware */
@@ -35,7 +35,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 centronics_digiblaster_device::centronics_digiblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CENTRONICS_DIGIBLASTER, "Digiblaster (DIY)", tag, owner, clock, "digiblst", __FILE__),
+	: device_t(mconfig, CENTRONICS_DIGIBLASTER, tag, owner, clock),
 	device_centronics_peripheral_interface( mconfig, *this ),
 	m_dac(*this, "dac"),
 	m_data(0)

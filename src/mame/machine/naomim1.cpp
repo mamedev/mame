@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "naomim1.h"
 
-const device_type NAOMI_M1_BOARD = device_creator<naomi_m1_board>;
+DEFINE_DEVICE_TYPE(NAOMI_M1_BOARD, naomi_m1_board, "naomi_m1_board", "Sega NAOMI M1 Board")
 
 DEVICE_ADDRESS_MAP_START(submap, 16, naomi_m1_board)
 	AM_RANGE(0x0a, 0x0b) AM_READ(actel_id_r)
@@ -13,8 +13,8 @@ DEVICE_ADDRESS_MAP_START(submap, 16, naomi_m1_board)
 ADDRESS_MAP_END
 
 naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: naomi_board(mconfig, NAOMI_M1_BOARD, "Sega NAOMI M1 Board", tag, owner, clock, "naomi_m1_board", __FILE__),
-		m_region(*this, DEVICE_SELF)
+	: naomi_board(mconfig, NAOMI_M1_BOARD, tag, owner, clock)
+	, m_region(*this, DEVICE_SELF)
 {
 }
 

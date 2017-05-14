@@ -5,6 +5,10 @@
     Coors Light Bowling/Bowl-O-Rama hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CAPBOWL_H
+#define MAME_INCLUDES_CAPBOWL_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
@@ -72,8 +76,10 @@ public:
 	TIMER_CALLBACK_MEMBER(update);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	inline rgb_t pen_for_pixel( uint8_t *src, uint8_t pix );
+	inline rgb_t pen_for_pixel( uint8_t const *src, uint8_t pix );
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_CAPBOWL_H

@@ -974,7 +974,7 @@ void nmg5_state::machine_reset()
 	m_input_data = 0;
 }
 
-static MACHINE_CONFIG_START( nmg5, nmg5_state )
+static MACHINE_CONFIG_START( nmg5 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -1016,7 +1016,7 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1000000 , OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -73,7 +73,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NICK = device_creator<nick_device>;
+DEFINE_DEVICE_TYPE(NICK, nick_device, "nick", "NICK")
 
 
 DEVICE_ADDRESS_MAP_START( vram_map, 8, nick_device )
@@ -103,7 +103,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 nick_device::nick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NICK, "NICK", tag, owner, clock, "nick", __FILE__),
+	: device_t(mconfig, NICK, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(nick_map)),

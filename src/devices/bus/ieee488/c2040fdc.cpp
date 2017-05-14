@@ -38,7 +38,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C2040_FDC = device_creator<c2040_fdc_t>;
+DEFINE_DEVICE_TYPE(C2040_FDC, c2040_fdc_device, "c2040_fdc", "Commodore 2040 FDC")
 
 
 //-------------------------------------------------
@@ -55,7 +55,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *c2040_fdc_t::device_rom_region() const
+const tiny_rom_entry *c2040_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( c2040_fdc );
 }
@@ -67,11 +67,11 @@ const tiny_rom_entry *c2040_fdc_t::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  c2040_fdc_t - constructor
+//  c2040_fdc_device - constructor
 //-------------------------------------------------
 
-c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C2040_FDC, "C2040 FDC", tag, owner, clock, "c2040fdc", __FILE__),
+c2040_fdc_device::c2040_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C2040_FDC, tag, owner, clock),
 	m_write_sync(*this),
 	m_write_ready(*this),
 	m_write_error(*this),
@@ -103,7 +103,7 @@ c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void c2040_fdc_t::device_start()
+void c2040_fdc_device::device_start()
 {
 	// resolve callbacks
 	m_write_sync.resolve_safe();
@@ -132,7 +132,7 @@ void c2040_fdc_t::device_start()
 //  device clock is altered in any way
 //-------------------------------------------------
 
-void c2040_fdc_t::device_clock_changed()
+void c2040_fdc_device::device_clock_changed()
 {
 	m_period = attotime::from_hz(clock());
 }
@@ -142,7 +142,7 @@ void c2040_fdc_t::device_clock_changed()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void c2040_fdc_t::device_reset()
+void c2040_fdc_device::device_reset()
 {
 	live_abort();
 }
@@ -152,18 +152,18 @@ void c2040_fdc_t::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void c2040_fdc_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void c2040_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	live_sync();
 	live_run();
 }
 
-floppy_image_device* c2040_fdc_t::get_floppy()
+floppy_image_device* c2040_fdc_device::get_floppy()
 {
 	return cur_live.drv_sel ? m_floppy1 : m_floppy0;
 }
 
-void c2040_fdc_t::live_start()
+void c2040_fdc_device::live_start()
 {
 	cur_live.tm = machine().time();
 	cur_live.state = RUNNING;
@@ -185,31 +185,31 @@ void c2040_fdc_t::live_start()
 	live_run();
 }
 
-void c2040_fdc_t::checkpoint()
+void c2040_fdc_device::checkpoint()
 {
 	get_next_edge(machine().time());
 	checkpoint_live = cur_live;
 }
 
-void c2040_fdc_t::rollback()
+void c2040_fdc_device::rollback()
 {
 	cur_live = checkpoint_live;
 	get_next_edge(cur_live.tm);
 }
 
-void c2040_fdc_t::start_writing(const attotime &tm)
+void c2040_fdc_device::start_writing(const attotime &tm)
 {
 	cur_live.write_start_time = tm;
 	cur_live.write_position = 0;
 }
 
-void c2040_fdc_t::stop_writing(const attotime &tm)
+void c2040_fdc_device::stop_writing(const attotime &tm)
 {
 	commit(tm);
 	cur_live.write_start_time = attotime::never;
 }
 
-bool c2040_fdc_t::write_next_bit(bool bit, const attotime &limit)
+bool c2040_fdc_device::write_next_bit(bool bit, const attotime &limit)
 {
 	if(cur_live.write_start_time.is_never()) {
 		cur_live.write_start_time = cur_live.tm;
@@ -228,7 +228,7 @@ bool c2040_fdc_t::write_next_bit(bool bit, const attotime &limit)
 	return false;
 }
 
-void c2040_fdc_t::commit(const attotime &tm)
+void c2040_fdc_device::commit(const attotime &tm)
 {
 	if(cur_live.write_start_time.is_never() || tm == cur_live.write_start_time || !cur_live.write_position)
 		return;
@@ -242,7 +242,7 @@ void c2040_fdc_t::commit(const attotime &tm)
 	cur_live.write_position = 0;
 }
 
-void c2040_fdc_t::live_delay(int state)
+void c2040_fdc_device::live_delay(int state)
 {
 	cur_live.next_state = state;
 	if(cur_live.tm != machine().time())
@@ -251,7 +251,7 @@ void c2040_fdc_t::live_delay(int state)
 		live_sync();
 }
 
-void c2040_fdc_t::live_sync()
+void c2040_fdc_device::live_sync()
 {
 	if(!cur_live.tm.is_never()) {
 		if(cur_live.tm > machine().time()) {
@@ -274,7 +274,7 @@ void c2040_fdc_t::live_sync()
 	}
 }
 
-void c2040_fdc_t::live_abort()
+void c2040_fdc_device::live_abort()
 {
 	if(!cur_live.tm.is_never() && cur_live.tm > machine().time()) {
 		rollback();
@@ -294,7 +294,7 @@ void c2040_fdc_t::live_abort()
 	cur_live.error = 1;
 }
 
-void c2040_fdc_t::live_run(const attotime &limit)
+void c2040_fdc_device::live_run(const attotime &limit)
 {
 	if(cur_live.state == IDLE || cur_live.next_state != -1)
 		return;
@@ -423,14 +423,14 @@ void c2040_fdc_t::live_run(const attotime &limit)
 	}
 }
 
-void c2040_fdc_t::get_next_edge(const attotime &when)
+void c2040_fdc_device::get_next_edge(const attotime &when)
 {
 	floppy_image_device *floppy = get_floppy();
 
 	cur_live.edge = floppy ? floppy->get_next_transition(when) : attotime::never;
 }
 
-int c2040_fdc_t::get_next_bit(attotime &tm, const attotime &limit)
+int c2040_fdc_device::get_next_bit(attotime &tm, const attotime &limit)
 {
 	attotime next = tm + m_period;
 
@@ -443,7 +443,7 @@ int c2040_fdc_t::get_next_bit(attotime &tm, const attotime &limit)
 	return bit && cur_live.rw_sel;
 }
 
-READ8_MEMBER( c2040_fdc_t::read )
+READ8_MEMBER( c2040_fdc_device::read )
 {
 	uint8_t e = checkpoint_live.e;
 	offs_t i = checkpoint_live.i;
@@ -455,7 +455,7 @@ READ8_MEMBER( c2040_fdc_t::read )
 	return data;
 }
 
-WRITE8_MEMBER( c2040_fdc_t::write )
+WRITE8_MEMBER( c2040_fdc_device::write )
 {
 	if (m_pi != data)
 	{
@@ -467,19 +467,19 @@ WRITE8_MEMBER( c2040_fdc_t::write )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::ds0_w )
+WRITE_LINE_MEMBER( c2040_fdc_device::ds0_w )
 {
 	m_ds0 = state;
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::ds1_w )
+WRITE_LINE_MEMBER( c2040_fdc_device::ds1_w )
 {
 	m_ds1 = state;
 
 	ds_w(m_ds1 << 1 | m_ds0);
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::drv_sel_w )
+WRITE_LINE_MEMBER( c2040_fdc_device::drv_sel_w )
 {
 	if (m_drv_sel != state)
 	{
@@ -491,7 +491,7 @@ WRITE_LINE_MEMBER( c2040_fdc_t::drv_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::mode_sel_w )
+WRITE_LINE_MEMBER( c2040_fdc_device::mode_sel_w )
 {
 	if (m_mode_sel != state)
 	{
@@ -503,7 +503,7 @@ WRITE_LINE_MEMBER( c2040_fdc_t::mode_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::rw_sel_w )
+WRITE_LINE_MEMBER( c2040_fdc_device::rw_sel_w )
 {
 	if (m_rw_sel != state)
 	{
@@ -520,7 +520,7 @@ WRITE_LINE_MEMBER( c2040_fdc_t::rw_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::mtr0_w )
+WRITE_LINE_MEMBER( c2040_fdc_device::mtr0_w )
 {
 	if (m_mtr0 != state)
 	{
@@ -542,7 +542,7 @@ WRITE_LINE_MEMBER( c2040_fdc_t::mtr0_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::mtr1_w )
+WRITE_LINE_MEMBER( c2040_fdc_device::mtr1_w )
 {
 	if (m_mtr1 != state)
 	{
@@ -564,7 +564,7 @@ WRITE_LINE_MEMBER( c2040_fdc_t::mtr1_w )
 	}
 }
 
-void c2040_fdc_t::stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp)
+void c2040_fdc_device::stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp)
 {
 	if (mtr) return;
 
@@ -594,7 +594,7 @@ void c2040_fdc_t::stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int 
 	old_stp = stp;
 }
 
-void c2040_fdc_t::stp0_w(int stp)
+void c2040_fdc_device::stp0_w(int stp)
 {
 	if (m_stp0 != stp)
 	{
@@ -605,7 +605,7 @@ void c2040_fdc_t::stp0_w(int stp)
 	}
 }
 
-void c2040_fdc_t::stp1_w(int stp)
+void c2040_fdc_device::stp1_w(int stp)
 {
 	if (m_stp1 != stp)
 	{
@@ -616,7 +616,7 @@ void c2040_fdc_t::stp1_w(int stp)
 	}
 }
 
-void c2040_fdc_t::ds_w(int ds)
+void c2040_fdc_device::ds_w(int ds)
 {
 	if (m_ds != ds)
 	{
@@ -628,7 +628,7 @@ void c2040_fdc_t::ds_w(int ds)
 	}
 }
 
-void c2040_fdc_t::set_floppy(floppy_image_device *floppy0, floppy_image_device *floppy1)
+void c2040_fdc_device::set_floppy(floppy_image_device *floppy0, floppy_image_device *floppy1)
 {
 	m_floppy0 = floppy0;
 	m_floppy1 = floppy1;

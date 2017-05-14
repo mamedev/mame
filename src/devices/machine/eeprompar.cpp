@@ -51,8 +51,8 @@
 //  eeprom_parallel_base_device - constructor
 //-------------------------------------------------
 
-eeprom_parallel_base_device::eeprom_parallel_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
-	: eeprom_base_device(mconfig, devtype, name, tag, owner, shortname, file)
+eeprom_parallel_base_device::eeprom_parallel_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner)
+	: eeprom_base_device(mconfig, devtype, tag, owner)
 {
 }
 
@@ -88,8 +88,8 @@ void eeprom_parallel_base_device::device_reset()
 //  eeprom_parallel_28xx_device - constructor
 //-------------------------------------------------
 
-eeprom_parallel_28xx_device::eeprom_parallel_28xx_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
-	: eeprom_parallel_base_device(mconfig, devtype, name, tag, owner, shortname, file)
+eeprom_parallel_28xx_device::eeprom_parallel_28xx_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner)
+	: eeprom_parallel_base_device(mconfig, devtype, tag, owner)
 {
 }
 
@@ -117,11 +117,12 @@ READ8_MEMBER(eeprom_parallel_28xx_device::read)
 // macro for defining a new device class
 #define DEFINE_PARALLEL_EEPROM_DEVICE(_baseclass, _lowercase, _uppercase, _bits, _cells) \
 eeprom_parallel_##_lowercase##_device::eeprom_parallel_##_lowercase##_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) \
-	: eeprom_parallel_##_baseclass##_device(mconfig, EEPROM_PARALLEL_##_uppercase, "Parallel EEPROM " #_uppercase " (" #_cells "x" #_bits ")", tag, owner, #_lowercase, __FILE__) \
+	: eeprom_parallel_##_baseclass##_device(mconfig, EEPROM_PARALLEL_##_uppercase, tag, owner) \
 { \
 	static_set_size(*this, _cells, _bits); \
 } \
-const device_type EEPROM_PARALLEL_##_uppercase = device_creator<eeprom_parallel_##_lowercase##_device>;
+DEFINE_DEVICE_TYPE(EEPROM_PARALLEL_##_uppercase, eeprom_parallel_##_lowercase##_device, #_lowercase, "Parallel EEPROM " #_uppercase " (" #_cells "x" #_bits ")")
+
 // standard 28XX class of 8-bit EEPROMs
 DEFINE_PARALLEL_EEPROM_DEVICE(28xx, 2804, 2804, 8, 512)
 DEFINE_PARALLEL_EEPROM_DEVICE(28xx, 2816, 2816, 8, 2048)

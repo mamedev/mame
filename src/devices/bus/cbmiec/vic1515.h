@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CBMIEC_VIC1515_H
+#define MAME_BUS_CBMIEC_VIC1515_H
 
-#ifndef __VIC1515__
-#define __VIC1515__
+#pragma once
 
 #include "cbmiec.h"
 #include "cpu/mcs48/mcs48.h"
@@ -20,14 +20,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vic1515_t
+// ======================> vic1515_device
 
-class vic1515_t :  public device_t,
-					public device_cbm_iec_interface
+class vic1515_device : public device_t, public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
-	vic1515_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vic1515_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -47,8 +46,7 @@ protected:
 
 
 // device type definition
-extern const device_type VIC1515;
+DECLARE_DEVICE_TYPE(VIC1515, vic1515_device)
 
 
-
-#endif
+#endif // MAME_BUS_CBMIEC_VIC1515_H

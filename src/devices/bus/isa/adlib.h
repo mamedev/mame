@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-#pragma once
+#ifndef MAME_BUS_ISA_ADLIB_H
+#define MAME_BUS_ISA_ADLIB_H
 
-#ifndef __ISA_ADLIB_H__
-#define __ISA_ADLIB_H__
+#pragma once
 
 #include "isa.h"
 #include "sound/3812intf.h"
@@ -38,6 +38,6 @@ private:
 
 
 // device type definition
-extern const device_type ISA8_ADLIB;
+DECLARE_DEVICE_TYPE(ISA8_ADLIB, isa8_adlib_device)
 
-#endif  /* __ISA_ADLIB_H__ */
+#endif // MAME_BUS_ISA_ADLIB_H

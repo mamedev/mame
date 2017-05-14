@@ -6,9 +6,10 @@
 
 */
 
-#ifndef _AMIS2000_H_
-#define _AMIS2000_H_
+#ifndef MAME_CPU_AMIS2000_AMIS2000_H
+#define MAME_CPU_AMIS2000_AMIS2000_H
 
+#pragma once
 
 
 // generic input pins (4 bits each)
@@ -42,9 +43,19 @@
 class amis2000_base_device : public cpu_device
 {
 public:
+	// static configuration helpers
+	template <class Object> static devcb_base &set_read_k_callback(device_t &device, Object &&cb) { return downcast<amis2000_base_device &>(device).m_read_k.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_i_callback(device_t &device, Object &&cb) { return downcast<amis2000_base_device &>(device).m_read_i.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_d_callback(device_t &device, Object &&cb) { return downcast<amis2000_base_device &>(device).m_read_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_d_callback(device_t &device, Object &&cb) { return downcast<amis2000_base_device &>(device).m_write_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_a_callback(device_t &device, Object &&cb) { return downcast<amis2000_base_device &>(device).m_write_a.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_f_callback(device_t &device, Object &&cb) { return downcast<amis2000_base_device &>(device).m_write_f.set_callback(std::forward<Object>(cb)); }
+	static void set_7seg_table(device_t &device, const u8 *ptr) { downcast<amis2000_base_device &>(device).m_7seg_table = ptr; }
+
+protected:
 	// construction/destruction
-	amis2000_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u8 bu_bits, u8 callstack_bits, u8 callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	amis2000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bu_bits, u8 callstack_bits, u8 callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
+		: cpu_device(mconfig, type, tag, owner, clock)
 		, m_program_config("program", ENDIANNESS_BIG, 8, prgwidth, 0, program)
 		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
 		, m_bu_bits(bu_bits)
@@ -57,18 +68,9 @@ public:
 		, m_write_d(*this)
 		, m_write_a(*this)
 		, m_write_f(*this)
-	{ }
+	{
+	}
 
-	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_k_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_read_k.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_i_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_read_i.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_d_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_read_d.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_write_d.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_a_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_write_a.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_f_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_write_f.set_callback(object); }
-	static void set_7seg_table(device_t &device, const u8 *ptr) { downcast<amis2000_base_device &>(device).m_7seg_table = ptr; }
-
-protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -236,10 +238,8 @@ protected:
 };
 
 
+DECLARE_DEVICE_TYPE(AMI_S2000, amis2000_cpu_device)
+DECLARE_DEVICE_TYPE(AMI_S2150, amis2150_cpu_device)
+DECLARE_DEVICE_TYPE(AMI_S2152, amis2152_cpu_device)
 
-extern const device_type AMI_S2000;
-extern const device_type AMI_S2150;
-extern const device_type AMI_S2152;
-
-
-#endif /* _AMIS2000_H_ */
+#endif // MAME_CPU_AMIS2000_AMIS2000_H

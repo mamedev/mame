@@ -14,16 +14,17 @@
     * F988 - YMZ294 #2 (left) register select
 */
 
-#ifndef CPC_PLAYCITY_H_
-#define CPC_PLAYCITY_H_
+#ifndef MAME_BUS_CPC_PLAYCITY_H
+#define MAME_BUS_CPC_PLAYCITY_H
+
+#pragma once
 
 
 #include "cpcexp.h"
 #include "sound/ay8910.h"
 #include "machine/z80ctc.h"
 
-class cpc_playcity_device : public device_t,
-				public device_cpc_expansion_card_interface
+class cpc_playcity_device : public device_t, public device_cpc_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -61,7 +62,7 @@ private:
 };
 
 // device type definition
-extern const device_type CPC_PLAYCITY;
+DECLARE_DEVICE_TYPE(CPC_PLAYCITY, cpc_playcity_device)
 
 
-#endif /* CPC_PLAYCITY_H_ */
+#endif // MAME_BUS_CPC_PLAYCITY_H

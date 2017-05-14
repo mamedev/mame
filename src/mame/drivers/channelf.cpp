@@ -207,7 +207,7 @@ static MACHINE_CONFIG_FRAGMENT( channelf_cart )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","channelf")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( channelf, channelf_state )
+static MACHINE_CONFIG_START( channelf )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
@@ -234,7 +234,7 @@ static MACHINE_CONFIG_START( channelf, channelf_state )
 	MCFG_FRAGMENT_ADD( channelf_cart )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sabavdpl, channelf_state )
+static MACHINE_CONFIG_START( sabavdpl )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( sabavdpl, channelf_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( channlf2, channelf_state )
+static MACHINE_CONFIG_START( channlf2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
@@ -290,7 +290,7 @@ static MACHINE_CONFIG_START( channlf2, channelf_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sabavpl2, channelf_state )
+static MACHINE_CONFIG_START( sabavpl2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
@@ -342,12 +342,12 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     INIT   COMPANY         FULLNAME        FLAGS */
-CONS( 1976, channelf,  0,        0,    channelf,  channelf, driver_device,   0,      "Fairchild",    "Channel F",                            0 )
-CONS( 1977, sabavdpl,  channelf, 0,    sabavdpl,  channelf, driver_device,   0,      "SABA",         "SABA Videoplay",                       0 )
-CONS( 197?, luxorves,  channelf, 0,    sabavdpl,  channelf, driver_device,   0,      "Luxor",        "Luxor Video Entertainment System",     0 )
-CONS( 1978, channlf2,  0, channelf,    channlf2,  channelf, driver_device,   0,      "Fairchild",    "Channel F II",                         0 )
-CONS( 1978, sabavpl2,  channlf2, 0,    sabavpl2,  channelf, driver_device,   0,      "SABA",         "SABA Videoplay 2",                     0 )
-CONS( 197?, luxorvec,  channlf2, 0,    sabavpl2,  channelf, driver_device,   0,      "Luxor",        "Luxor Video Entertainment Computer",   0 )
-CONS( 197?, itttelma,  channlf2, 0,    sabavpl2,  channelf, driver_device,   0,      "ITT",          "ITT Tele-Match Processor",             0 )
-CONS( 1978, ingtelma,  channlf2, 0,    sabavpl2,  channelf, driver_device,   0,      "Ingelen",      "Ingelen Tele-Match Processor",         0 )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE            INIT   COMPANY         FULLNAME                                FLAGS */
+CONS( 1976, channelf,  0,        0,      channelf,  channelf, channelf_state,  0,     "Fairchild",    "Channel F",                            0 )
+CONS( 1977, sabavdpl,  channelf, 0,      sabavdpl,  channelf, channelf_state,  0,     "SABA",         "SABA Videoplay",                       0 )
+CONS( 197?, luxorves,  channelf, 0,      sabavdpl,  channelf, channelf_state,  0,     "Luxor",        "Luxor Video Entertainment System",     0 )
+CONS( 1978, channlf2,  0, channelf,      channlf2,  channelf, channelf_state,  0,     "Fairchild",    "Channel F II",                         0 )
+CONS( 1978, sabavpl2,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "SABA",         "SABA Videoplay 2",                     0 )
+CONS( 197?, luxorvec,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "Luxor",        "Luxor Video Entertainment Computer",   0 )
+CONS( 197?, itttelma,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "ITT",          "ITT Tele-Match Processor",             0 )
+CONS( 1978, ingtelma,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "Ingelen",      "Ingelen Tele-Match Processor",         0 )

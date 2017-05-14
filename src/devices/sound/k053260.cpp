@@ -62,7 +62,7 @@
 
 
 // device type definition
-const device_type K053260 = device_creator<k053260_device>;
+DEFINE_DEVICE_TYPE(K053260, k053260_device, "k053260", "K053260 KDSC")
 
 
 //**************************************************************************
@@ -74,12 +74,13 @@ const device_type K053260 = device_creator<k053260_device>;
 //-------------------------------------------------
 
 k053260_device::k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K053260, "K053260 KDSC", tag, owner, clock, "k053260", __FILE__)
+	: device_t(mconfig, K053260, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this, 21)
 	, m_stream(nullptr)
 	, m_keyon(0)
 	, m_mode(0)
+	, m_voice{ { *this }, { *this }, { *this }, { *this } }
 {
 	memset(m_portdata, 0, sizeof(m_portdata));
 }
@@ -99,7 +100,7 @@ void k053260_device::device_start()
 	save_item(NAME(m_mode));
 
 	for (int i = 0; i < 4; i++)
-		m_voice[i].voice_start(*this, i);
+		m_voice[i].voice_start(i);
 }
 
 
@@ -288,8 +289,8 @@ void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	}
 	else
 	{
-		memset( outputs[0], 0, samples * sizeof(*outputs[0]));
-		memset( outputs[1], 0, samples * sizeof(*outputs[1]));
+		memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+		memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 	}
 }
 
@@ -298,24 +299,22 @@ void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  KDSC_Voice - one of the four voices
 //**************************************************************************
 
-void k053260_device::KDSC_Voice::voice_start(k053260_device &device, int index)
+void k053260_device::KDSC_Voice::voice_start(int index)
 {
-	m_device = &device;
-
 	voice_reset();
 
-	device.save_item(NAME(m_position), index);
-	device.save_item(NAME(m_pan_volume), index);
-	device.save_item(NAME(m_counter), index);
-	device.save_item(NAME(m_output), index);
-	device.save_item(NAME(m_playing), index);
-	device.save_item(NAME(m_start), index);
-	device.save_item(NAME(m_length), index);
-	device.save_item(NAME(m_pitch), index);
-	device.save_item(NAME(m_volume), index);
-	device.save_item(NAME(m_pan), index);
-	device.save_item(NAME(m_loop), index);
-	device.save_item(NAME(m_kadpcm), index);
+	m_device.save_item(NAME(m_position), index);
+	m_device.save_item(NAME(m_pan_volume), index);
+	m_device.save_item(NAME(m_counter), index);
+	m_device.save_item(NAME(m_output), index);
+	m_device.save_item(NAME(m_playing), index);
+	m_device.save_item(NAME(m_start), index);
+	m_device.save_item(NAME(m_length), index);
+	m_device.save_item(NAME(m_pitch), index);
+	m_device.save_item(NAME(m_volume), index);
+	m_device.save_item(NAME(m_pan), index);
+	m_device.save_item(NAME(m_loop), index);
+	m_device.save_item(NAME(m_kadpcm), index);
 }
 
 void k053260_device::KDSC_Voice::voice_reset()
@@ -389,7 +388,7 @@ void k053260_device::KDSC_Voice::key_on()
 	m_counter = 0x1000 - CLOCKS_PER_SAMPLE; // force update on next sound_stream_update
 	m_output = 0;
 	m_playing = true;
-	if (LOG) m_device->logerror("K053260: start = %06x, length = %06x, pitch = %04x, vol = %02x, loop = %s, %s\n",
+	if (LOG) m_device.logerror("K053260: start = %06x, length = %06x, pitch = %04x, vol = %02x, loop = %s, %s\n",
 					m_start, m_length, m_pitch, m_volume, m_loop ? "yes" : "no", m_kadpcm ? "KADPCM" : "PCM" );
 }
 
@@ -432,7 +431,7 @@ void k053260_device::KDSC_Voice::play(stream_sample_t *outputs)
 			}
 		}
 
-		uint8_t romdata = m_device->read_byte(m_start + bytepos);
+		uint8_t romdata = m_device.read_byte(m_start + bytepos);
 
 		if (m_kadpcm)
 		{
@@ -456,5 +455,5 @@ uint8_t k053260_device::KDSC_Voice::read_rom()
 
 	m_position = (m_position + 1) & 0xffff;
 
-	return m_device->read_byte(offs);
+	return m_device.read_byte(offs);
 }

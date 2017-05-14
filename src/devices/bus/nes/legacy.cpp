@@ -34,28 +34,28 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_FFE3 = device_creator<nes_ffe3_device>;
-const device_type NES_FFE4 = device_creator<nes_ffe4_device>;
-const device_type NES_FFE8 = device_creator<nes_ffe8_device>;
+DEFINE_DEVICE_TYPE(NES_FFE3, nes_ffe3_device, "nes_ff3", "NES Cart FFE-3 PCB")
+DEFINE_DEVICE_TYPE(NES_FFE4, nes_ffe4_device, "nes_ff4", "NES Cart FFE-4 PCB")
+DEFINE_DEVICE_TYPE(NES_FFE8, nes_ffe8_device, "nes_ff8", "NES Cart FFE-8 PCB")
 
 
 nes_ffe3_device::nes_ffe3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_FFE3, "NES Cart FFE-3 PCB", tag, owner, clock, "nes_ff3", __FILE__)
+	: nes_nrom_device(mconfig, NES_FFE3, tag, owner, clock)
 {
 }
 
-nes_ffe4_device::nes_ffe4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_exram_enabled(0), m_exram_bank(0)
-				{
+nes_ffe4_device::nes_ffe4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_exram_enabled(0), m_exram_bank(0)
+{
 }
 
 nes_ffe4_device::nes_ffe4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_FFE4, "NES Cart FFE-4 PCB", tag, owner, clock, "nes_ff4", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_exram_enabled(0), m_exram_bank(0)
-				{
+	: nes_ffe4_device(mconfig, NES_FFE4, tag, owner, clock)
+{
 }
 
 nes_ffe8_device::nes_ffe8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_ffe4_device(mconfig, NES_FFE8, "NES Cart FFE-8 PCB", tag, owner, clock, "nes_ff8", __FILE__)
+	: nes_ffe4_device(mconfig, NES_FFE8, tag, owner, clock)
 {
 }
 

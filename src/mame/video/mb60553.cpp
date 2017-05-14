@@ -13,27 +13,25 @@
 #include "screen.h"
 
 
-const device_type MB60553 = device_creator<mb60553_zooming_tilemap_device>;
+DEFINE_DEVICE_TYPE(MB60553, mb60553_zooming_tilemap_device, "mb60553", "MB60553 Zooming Tilemap")
 
 mb60553_zooming_tilemap_device::mb60553_zooming_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MB60553, "MB60553 Zooming Tilemap", tag, owner, clock, "mb60553", __FILE__),
-	m_vram(nullptr),
-	m_pal_base(0),
-	m_lineram(nullptr),
-	m_gfx_region(0),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	: device_t(mconfig, MB60553, tag, owner, clock)
+	, m_tmap(nullptr)
+	, m_vram()
+	, m_regs{ 0, 0, 0, 0, 0, 0, 0, 0 }
+	, m_bank{ 0, 0, 0, 0, 0, 0, 0, 0, }
+	, m_pal_base(0)
+	, m_lineram()
+	, m_gfx_region(0)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
-	for (int i = 0; i < 8; i++)
-	{
-		m_regs[i] = 0;
-		m_bank[i] = 0;
-	}
 }
 
 
 void mb60553_zooming_tilemap_device::device_start()
 {
-	if(!m_gfxdecode->started())
+	if (!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
 	m_lineram = make_unique_clear<uint16_t[]>(0x1000/2);
@@ -179,14 +177,8 @@ void mb60553_zooming_tilemap_device::reg_written( int num_reg)
 TILEMAP_MAPPER_MEMBER(mb60553_zooming_tilemap_device::twc94_scan)
 {
 	/* logical (col,row) -> memory offset */
-	return (row*64) + (col&63) + ((col&64)<<6);
+	return (row << 6) + (col & 0x003f) + (BIT(col, 6) << 12);
 }
-
-void mb60553_zooming_tilemap_device::set_pal_base( int pal_base)
-{
-	m_pal_base = pal_base;
-}
-
 
 void mb60553_zooming_tilemap_device::draw_roz_core(screen_device &screen, bitmap_ind16 &destbitmap, const rectangle &cliprect,
 		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, bool wraparound)
@@ -297,12 +289,6 @@ void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& 
 
 	}
 }
-
-tilemap_t* mb60553_zooming_tilemap_device::get_tilemap()
-{
-	return m_tmap;
-}
-
 
 WRITE16_MEMBER(mb60553_zooming_tilemap_device::regs_w)
 {

@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "nextmo.h"
 
-const device_type NEXTMO = device_creator<nextmo_device>;
+DEFINE_DEVICE_TYPE(NEXTMO, nextmo_device, "nextmo", "NeXT Magneto-optical drive")
 
 DEVICE_ADDRESS_MAP_START(map, 8, nextmo_device)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(r4_r, r4_w)
@@ -19,7 +19,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, nextmo_device)
 ADDRESS_MAP_END
 
 nextmo_device::nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NEXTMO, "NeXT Magneto-optical drive", tag, owner, clock, "nextmo", __FILE__),
+	device_t(mconfig, NEXTMO, tag, owner, clock),
 	r4(0),
 	irq_cb(*this),
 	drq_cb(*this)

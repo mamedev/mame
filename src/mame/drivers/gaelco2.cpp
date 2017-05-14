@@ -159,7 +159,7 @@ static INPUT_PORTS_START( maniacsq )
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( maniacsq, gaelco2_state )
+static MACHINE_CONFIG_START( maniacsq )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 26000000/2)     /* 13 MHz? */
 	MCFG_CPU_PROGRAM_MAP(maniacsq_map)
@@ -292,7 +292,7 @@ static INPUT_PORTS_START( bang )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, -6.0 / 240, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bang, bang_state )
+static MACHINE_CONFIG_START( bang )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 30000000/2)         /* 15 MHz */
 	MCFG_CPU_PROGRAM_MAP(bang_map)
@@ -531,7 +531,7 @@ static INPUT_PORTS_START( alighunt )
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( alighunt, gaelco2_state )
+static MACHINE_CONFIG_START( alighunt )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/2)         /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(alighunt_map)
@@ -767,7 +767,7 @@ static INPUT_PORTS_START( touchgo )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_TOGGLE
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( touchgo, gaelco2_state )
+static MACHINE_CONFIG_START( touchgo )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)         /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(touchgo_map)
@@ -981,7 +981,7 @@ static INPUT_PORTS_START( snowboar )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( snowboar, gaelco2_state )
+static MACHINE_CONFIG_START( snowboar )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 30000000/2)         /* 15 MHz */
 	MCFG_CPU_PROGRAM_MAP(snowboar_map)
@@ -1218,7 +1218,7 @@ static INPUT_PORTS_START( wrally2 )
 	PORT_BIT( 0xff, 0x8A, IPT_PADDLE_V ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("P2 Wheel")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wrally2, wrally2_state )
+static MACHINE_CONFIG_START( wrally2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 26000000/2)         /* 13 MHz */
 	MCFG_CPU_PROGRAM_MAP(wrally2_map)
@@ -1529,17 +1529,17 @@ GAME( 1995, touchgon, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgop, ROT
 GAME( 1995, touchgoe, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgop, ROT0, "Gaelco", "Touch & Go (earlier revision)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1995, touchgok, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
 
-GAME( 1995, wrally2,  0,        wrally2,  wrally2,  driver_device, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1995, wrally2,  0,        wrally2,  wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 
-GAME( 1996, maniacsq, 0,        maniacsq, maniacsq, driver_device, 0,        ROT0, "Gaelco", "Maniac Square (unprotected)", 0 )
+GAME( 1996, maniacsq, 0,        maniacsq, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected)", 0 )
 GAME( 1996, maniacsqa,maniacsq, maniacsq, maniacsq, gaelco2_state, maniacsqa,ROT0, "Gaelco", "Maniac Square (protected)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 
-GAME( 1996, snowboar, 0,        snowboar, snowboar, driver_device, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
+GAME( 1996, snowboar, 0,        snowboar, snowboar, gaelco2_state, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
 GAME( 1996, snowboara,snowboar, snowboar, snowboar, gaelco2_state, snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", 0 )
 
 GAME( 1998, bang,     0,        bang,     bang,     bang_state,    bang,     ROT0, "Gaelco", "Bang!", 0 )
 GAME( 1998, bangj,    bang,     bang,     bang,     bang_state,    bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
 
 // are these ACTUALLY Gaelco hardware, or do they just use the same Dallas?
-GAME( 1999, grtesoro,  0,       maniacsq, maniacsq, driver_device, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v5.01) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1999, grtesoro4, grtesoro,maniacsq, maniacsq, driver_device, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v4.0) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1999, grtesoro,  0,       maniacsq, maniacsq, gaelco2_state, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v5.01) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1999, grtesoro4, grtesoro,maniacsq, maniacsq, gaelco2_state, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v4.0) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

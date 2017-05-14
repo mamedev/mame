@@ -107,7 +107,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( aim65_40, aim65_40_state )
+static MACHINE_CONFIG_START( aim65_40 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(aim65_40_mem)
@@ -141,5 +141,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY     FULLNAME     FLAGS */
-COMP( 1981, aim65_40, 0,      0,      aim65_40, aim65_40, driver_device, 0,    "Rockwell", "AIM-65/40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY     FULLNAME     FLAGS
+COMP( 1981, aim65_40, 0,      0,      aim65_40, aim65_40, aim65_40_state, 0,    "Rockwell", "AIM-65/40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

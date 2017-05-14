@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 
+#ifndef MAME_BUS_NEOGEO_PROT_CTHD_H
+#define MAME_BUS_NEOGEO_PROT_CTHD_H
+
 #pragma once
 
-#ifndef __CTHD_PROT__
-#define __CTHD_PROT__
-
-extern const device_type CTHD_PROT;
+DECLARE_DEVICE_TYPE(NG_CTHD_PROT, cthd_prot_device)
 
 #define MCFG_CTHD_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, CTHD_PROT, 0)
+	MCFG_DEVICE_ADD(_tag, NG_CTHD_PROT, 0)
 
 
 class cthd_prot_device :  public device_t
@@ -40,4 +40,4 @@ protected:
 	virtual void device_reset() override;
 };
 
-#endif
+#endif // MAME_BUS_NEOGEO_PROT_CTHD_H

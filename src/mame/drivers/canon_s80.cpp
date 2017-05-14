@@ -24,8 +24,8 @@ class canons80_state : public driver_device
 {
 public:
 	canons80_state(const machine_config &mconfig, device_type type, const char *tag)
-			: driver_device(mconfig, type, tag)
-			{ }
+		: driver_device(mconfig, type, tag)
+	{ }
 
 	DECLARE_DRIVER_INIT(canons80);
 };
@@ -36,14 +36,15 @@ static ADDRESS_MAP_START(canons80_map, AS_PROGRAM, 8, canons80_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( canons80, canons80_state )
+static MACHINE_CONFIG_START( canons80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6301, 5000000) /* hd63a01xop 5 MHz guessed: TODO: check on PCB */
 	MCFG_CPU_PROGRAM_MAP(canons80_map)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(canons80_state, canons80)
-{}
+{
+}
 
 ROM_START( canons80 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 6800 code */

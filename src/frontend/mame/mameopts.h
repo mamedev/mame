@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_FRONTEND_MAMEOPTS_H
+#define MAME_FRONTEND_MAMEOPTS_H
 
-#ifndef __MAMEOPTS_H__
-#define __MAMEOPTS_H__
+#pragma once
 
 #include "emuopts.h"
 
@@ -45,7 +45,7 @@ enum
 //**************************************************************************
 
 // forward references
-struct game_driver;
+class game_driver;
 class software_part;
 
 class mame_options
@@ -88,4 +88,4 @@ private:
 	static int m_device_options;
 };
 
-#endif  /* __MAMEOPTS_H__ */
+#endif  // MAME_FRONTEND_MAMEOPTS_H

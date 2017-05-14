@@ -153,7 +153,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 
 
 
-static MACHINE_CONFIG_START( brandt8641, brandt8641_state )
+static MACHINE_CONFIG_START( brandt8641 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // U4 ,4MHz crystal on board
 	MCFG_CPU_PROGRAM_MAP(brandt8641_mem)
@@ -190,4 +190,4 @@ ROM_START( br8641 )
 ROM_END
 
 /* Driver */
-COMP( 1986, br8641, 0, 0, brandt8641, brandt8641, driver_device, 0, "Brandt", "Brandt 8641", MACHINE_NOT_WORKING )
+COMP( 1986, br8641, 0, 0, brandt8641, brandt8641, brandt8641_state, 0, "Brandt", "Brandt 8641", MACHINE_NOT_WORKING )

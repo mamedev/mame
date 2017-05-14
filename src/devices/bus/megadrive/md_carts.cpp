@@ -9,6 +9,15 @@
 #include "emu.h"
 #include "md_carts.h"
 
+#include "rom.h"
+#include "svp.h"
+#include "sk.h"
+#include "ggenie.h"
+#include "eeprom.h"
+#include "jcart.h"
+#include "stm95.h"
+
+
 SLOT_INTERFACE_START(md_cart)
 	SLOT_INTERFACE_INTERNAL("rom",  MD_STD_ROM)
 	SLOT_INTERFACE_INTERNAL("rom_svp",  MD_ROM_SVP)

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_TRS80M2KB_H
+#define MAME_MACHINE_TRS80M2KB_H
 
-#ifndef __TRS80M2_KEYBOARD__
-#define __TRS80M2_KEYBOARD__
+#pragma once
 
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
@@ -45,7 +45,7 @@ public:
 	// construction/destruction
 	trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_clock_wr_callback(device_t &device, _Object object) { return downcast<trs80m2_keyboard_device &>(device).m_write_clock.set_callback(object); }
+	template <class Object> static devcb_base &set_clock_wr_callback(device_t &device, Object &&cb) { return downcast<trs80m2_keyboard_device &>(device).m_write_clock.set_callback(std::forward<Object>(cb)); }
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -87,8 +87,8 @@ private:
 
 
 // device type definition
-extern const device_type TRS80M2_KEYBOARD;
+DECLARE_DEVICE_TYPE(TRS80M2_KEYBOARD, trs80m2_keyboard_device)
 
 
 
-#endif
+#endif // MAME_MACHINE_TRS80M2KB_H

@@ -1,14 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria,Aaron Giles
+#ifndef MAME_SOUND_NAMCO_H
+#define MAME_SOUND_NAMCO_H
+
 #pragma once
-
-#ifndef __NAMCO_H__
-#define __NAMCO_H__
-
-/* 8 voices max */
-#define MAX_VOICES 8
-
-#define MAX_VOLUME 16
 
 
 #define MCFG_NAMCO_AUDIO_VOICES(_voices) \
@@ -18,32 +13,34 @@
 	namco_audio_device::set_stereo(*device, _stereo);
 
 
-/* this structure defines the parameters for a channel */
-struct sound_channel
-{
-	uint32_t frequency;
-	uint32_t counter;
-	int32_t volume[2];
-	int32_t noise_sw;
-	int32_t noise_state;
-	int32_t noise_seed;
-	uint32_t noise_counter;
-	int32_t noise_hold;
-	int32_t waveform_select;
-};
-
 class namco_audio_device : public device_t,
 							public device_sound_interface
 {
 public:
-	namco_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	~namco_audio_device() {}
-
 	// static configuration
 	static void set_voices(device_t &device, int voices) { downcast<namco_audio_device &>(device).m_voices = voices; }
 	static void set_stereo(device_t &device, int stereo) { downcast<namco_audio_device &>(device).m_stereo = stereo; }
 
 protected:
+	static constexpr unsigned MAX_VOICES = 8;
+	static constexpr unsigned MAX_VOLUME = 16;
+
+	/* this structure defines the parameters for a channel */
+	struct sound_channel
+	{
+		uint32_t frequency;
+		uint32_t counter;
+		int32_t volume[2];
+		int32_t noise_sw;
+		int32_t noise_state;
+		int32_t noise_seed;
+		uint32_t noise_counter;
+		int32_t noise_hold;
+		int32_t waveform_select;
+	};
+
+	namco_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -96,7 +93,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
-extern const device_type NAMCO;
 
 class namco_15xx_device : public namco_audio_device
 {
@@ -113,7 +109,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
-extern const device_type NAMCO_15XX;
 
 class namco_cus30_device : public namco_audio_device
 {
@@ -130,6 +125,9 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
-extern const device_type NAMCO_CUS30;
 
-#endif /* __NAMCO_H__ */
+DECLARE_DEVICE_TYPE(NAMCO,       namco_device)
+DECLARE_DEVICE_TYPE(NAMCO_15XX,  namco_15xx_device)
+DECLARE_DEVICE_TYPE(NAMCO_CUS30, namco_cus30_device)
+
+#endif // MAME_SOUND_NAMCO_H

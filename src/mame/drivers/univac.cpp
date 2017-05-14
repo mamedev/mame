@@ -167,7 +167,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( uts20, univac_state )
+static MACHINE_CONFIG_START( uts20 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(uts20_mem)
@@ -211,5 +211,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT     COMPANY            FULLNAME       FLAGS */
-COMP( 1980, uts20,  0,      0,       uts20,     uts20, driver_device,   0,      "Sperry Univac",   "UTS-20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY            FULLNAME  FLAGS
+COMP( 1980, uts20,  0,      0,       uts20,     uts20, univac_state,   0,      "Sperry Univac",   "UTS-20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

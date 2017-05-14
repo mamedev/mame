@@ -162,7 +162,7 @@ void mephisto_pinball_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( mephisto, mephisto_pinball_state )
+static MACHINE_CONFIG_START( mephisto )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_18MHz/3)
 	MCFG_CPU_PROGRAM_MAP(mephisto_map)
@@ -247,6 +247,6 @@ ROM_START(mephistp1)
 ROM_END
 
 
-GAME(1987,  mephistp,   0,         mephisto,  mephisto, driver_device,  0,  ROT0,  "Stargame",    "Mephisto (rev. 1.2)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, driver_device,  0,  ROT0,  "Stargame",    "Mephisto (rev. 1.1)",     MACHINE_IS_SKELETON_MECHANICAL)
-//GAME(1988,  sport2k,    0,         sport2k,   sport2k, driver_device,   0,  ROT0,  "Unidesa",     "Cirsa Sport 2000",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_pinball_state,  0,  ROT0,  "Stargame",    "Mephisto (rev. 1.2)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_pinball_state,  0,  ROT0,  "Stargame",    "Mephisto (rev. 1.1)",     MACHINE_IS_SKELETON_MECHANICAL)
+//GAME(1988,  sport2k,    0,         sport2k,   sport2k, mephisto_pinball_state,   0,  ROT0,  "Unidesa",     "Cirsa Sport 2000",        MACHINE_IS_SKELETON_MECHANICAL)

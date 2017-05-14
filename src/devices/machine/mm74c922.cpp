@@ -9,13 +9,8 @@
 #include "emu.h"
 #include "mm74c922.h"
 
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LOG 1
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 
@@ -23,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MM74C922 = device_creator<mm74c922_device>;
+DEFINE_DEVICE_TYPE(MM74C922, mm74c922_device, "mm74c922", "MM74C923 16/20-Key Encoder")
 const device_type MM74C923 = MM74C922;
 
 
@@ -38,7 +33,7 @@ const device_type MM74C923 = MM74C922;
 //-------------------------------------------------
 
 mm74c922_device::mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MM74C922, "MM74C922", tag, owner, clock, "mm74c922", __FILE__),
+	device_t(mconfig, MM74C922, tag, owner, clock),
 	m_write_da(*this),
 	m_read_x1(*this),
 	m_read_x2(*this),
@@ -104,7 +99,7 @@ void mm74c922_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 uint8_t mm74c922_device::read()
 {
-	if (LOG) logerror("MM74C922 '%s' Data Read: %02x\n", tag(), m_data);
+	LOG("MM74C922 Data Read: %02x\n", m_data);
 
 	return m_data;
 }
@@ -120,7 +115,7 @@ void mm74c922_device::change_output_lines()
 	{
 		m_da = m_next_da;
 
-		if (LOG) logerror("MM74C922 '%s' Data Available: %u\n", tag(), m_da);
+		LOG("MM74C922 Data Available: %u\n", m_da);
 
 		m_write_da(m_da);
 	}
@@ -167,7 +162,7 @@ void mm74c922_device::detect_keypress()
 			m_next_da = 0;
 			m_data = 0xff; // high-Z
 
-			if (LOG) logerror("MM74C922 '%s' Key Released\n", tag());
+			LOG("MM74C922 Key Released\n");
 		}
 	}
 	else
@@ -183,7 +178,7 @@ void mm74c922_device::detect_keypress()
 
 				m_data = (y << 2) | m_x;
 
-				if (LOG) logerror("MM74C922 '%s' Key Depressed: X %u Y %u = %02x\n", tag(), m_x, y, m_data);
+				LOG("MM74C922 Key Depressed: X %u Y %u = %02x\n", m_x, y, m_data);
 				return;
 			}
 		}

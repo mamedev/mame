@@ -48,7 +48,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_MCC = device_creator<wangpc_mcc_device>;
+DEFINE_DEVICE_TYPE(WANGPC_MCC, wangpc_mcc_device, "wangpc_mcc", "Wang PC-PM043 Multiport Communications Controller")
 
 
 //-------------------------------------------------
@@ -104,7 +104,7 @@ inline void wangpc_mcc_device::set_irq(int state)
 //-------------------------------------------------
 
 wangpc_mcc_device::wangpc_mcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WANGPC_MCC, "Wang PC-PM043", tag, owner, clock, "wangpc_mcc", __FILE__),
+	device_t(mconfig, WANGPC_MCC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_sio(*this, Z80SIO2_TAG),
 	m_dart(*this, Z80DART_TAG), m_option(0), m_irq(0)

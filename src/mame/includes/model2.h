@@ -51,7 +51,7 @@ public:
 		m_gears(*this, "GEARS"),
 		m_analog_ports(*this, {"ANA0", "ANA1", "ANA2", "ANA3"}),
 		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"})
-		{ }
+	{ }
 
 	required_shared_ptr<uint32_t> m_workram;
 	required_shared_ptr<uint32_t> m_bufferram;

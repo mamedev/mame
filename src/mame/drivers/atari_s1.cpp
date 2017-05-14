@@ -435,7 +435,7 @@ void atari_s1_state::machine_reset()
 	m_audiores = 0;
 }
 
-static MACHINE_CONFIG_START( atari_s1, atari_s1_state )
+static MACHINE_CONFIG_START( atari_s1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLK)
 	MCFG_CPU_PROGRAM_MAP(atari_s1_map)
@@ -528,8 +528,8 @@ ROM_START(spcrider)
 ROM_END
 
 
-GAME( 1976, atarians, 0,         atarians, atari_s1, driver_device, 0, ROT0, "Atari", "The Atarians", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1977, time2000, 0,         atari_s1, atari_s1, driver_device, 0, ROT0, "Atari", "Time 2000", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1977, aavenger, 0,         atari_s1, atari_s1, driver_device, 0, ROT0, "Atari", "Airborne Avenger", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1978, midearth, 0,         midearth, atari_s1, driver_device, 0, ROT0, "Atari", "Middle Earth", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1978, spcrider, 0,         atari_s1, atari_s1, driver_device, 0, ROT0, "Atari", "Space Riders", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1976, atarians, 0,         atarians, atari_s1, atari_s1_state, 0, ROT0, "Atari", "The Atarians",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1977, time2000, 0,         atari_s1, atari_s1, atari_s1_state, 0, ROT0, "Atari", "Time 2000",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1977, aavenger, 0,         atari_s1, atari_s1, atari_s1_state, 0, ROT0, "Atari", "Airborne Avenger", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME( 1978, midearth, 0,         midearth, atari_s1, atari_s1_state, 0, ROT0, "Atari", "Middle Earth",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1978, spcrider, 0,         atari_s1, atari_s1, atari_s1_state, 0, ROT0, "Atari", "Space Riders",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

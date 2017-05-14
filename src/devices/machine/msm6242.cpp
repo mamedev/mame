@@ -16,6 +16,18 @@
 #include "emu.h"
 #include "machine/msm6242.h"
 
+#define LOG_GENERAL     (1U << 0)
+#define LOG_UNMAPPED    (1U << 1)
+#define LOG_IRQ         (1U << 2)
+#define LOG_IRQ_ENABLE  (1U << 3)
+
+//#define VERBOSE (LOG_GENERAL | LOG_UNMAPPED | LOG_IRQ | LOG_IRQ_ENABLE)
+#include "logmacro.h"
+
+#define LOGUNMAPPED(...)    LOGMASKED(LOG_UNMAPPED, __VA_ARGS__)
+#define LOGIRQ(...)         LOGMASKED(LOG_IRQ, __VA_ARGS__)
+#define LOGIRQENABLE(...)   LOGMASKED(LOG_IRQ_ENABLE, __VA_ARGS__)
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -43,10 +55,6 @@ enum
 
 #define TIMER_RTC_CALLBACK      1
 
-#define LOG_UNMAPPED            0
-#define LOG_IRQ                 0
-#define LOG_IRQ_ENABLE          0
-
 
 
 //**************************************************************************
@@ -54,11 +62,11 @@ enum
 //**************************************************************************
 
 // device type definitions
-const device_type MSM6242 = device_creator<msm6242_device>;
-const device_type RTC62421 = device_creator<rtc62421_device>;
-const device_type RTC62423 = device_creator<rtc62423_device>;
-const device_type RTC72421 = device_creator<rtc72421_device>;
-const device_type RTC72423 = device_creator<rtc72423_device>;
+DEFINE_DEVICE_TYPE(MSM6242,  msm6242_device,  "msm6242",  "OKI MSM6242 RTC")
+DEFINE_DEVICE_TYPE(RTC62421, rtc62421_device, "rtc62421", "Epson RTC-62421 RTC")
+DEFINE_DEVICE_TYPE(RTC62423, rtc62423_device, "rtc62423", "Epson RTC-62423 RTC")
+DEFINE_DEVICE_TYPE(RTC72421, rtc72421_device, "rtc72421", "Epson RTC-72421 RTC")
+DEFINE_DEVICE_TYPE(RTC72423, rtc72423_device, "rtc72423", "Epson RTC-72423 RTC")
 
 
 //**************************************************************************
@@ -70,16 +78,14 @@ const device_type RTC72423 = device_creator<rtc72423_device>;
 //-------------------------------------------------
 
 msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSM6242, "MSM6242 RTC", tag, owner, clock, "msm6242", __FILE__),
-		device_rtc_interface(mconfig, *this),
-		m_out_int_handler(*this)
+	: msm6242_device(mconfig, MSM6242, tag, owner, clock)
 {
 }
 
-msm6242_device::msm6242_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *filename)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, filename),
-		device_rtc_interface(mconfig, *this),
-		m_out_int_handler(*this)
+msm6242_device::msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_rtc_interface(mconfig, *this)
+	, m_out_int_handler(*this)
 {
 }
 
@@ -185,8 +191,7 @@ void msm6242_device::irq(uint8_t irq_type)
 	if (m_irq_flag == 1 && m_irq_type == irq_type)
 	{
 		// log if appropriate
-		if (LOG_IRQ)
-			logerror("%s: MSM6242 logging IRQ #%d\n", machine().describe_context(), (int) irq_type);
+		LOGIRQ("%s: MSM6242 logging IRQ #%u\n", machine().describe_context(), irq_type);
 
 		// ...and assert the output line
 		if (!m_out_int_handler.isnull())
@@ -491,8 +496,7 @@ READ8_MEMBER( msm6242_device::read )
 
 		default:
 			result = 0x00;
-			if (LOG_UNMAPPED)
-				logerror("%s: MSM6242 unmapped offset %02x read\n", machine().describe_context(), offset);
+			LOGUNMAPPED("%s: MSM6242 unmapped offset %02x read\n", machine().describe_context(), offset);
 			break;
 	}
 
@@ -527,8 +531,7 @@ WRITE8_MEMBER( msm6242_device::write )
 				m_irq_flag = 1;
 				m_irq_type = (data & 0xc) >> 2;
 
-				if (LOG_IRQ_ENABLE)
-					logerror("%s: MSM6242 enabling irq '%s'\n", machine().describe_context(), irq_type_string(m_irq_type));
+				LOGIRQENABLE("%s: MSM6242 enabling irq '%s'\n", machine().describe_context(), irq_type_string(m_irq_type));
 			}
 			else
 			{
@@ -536,8 +539,7 @@ WRITE8_MEMBER( msm6242_device::write )
 				if ( !m_out_int_handler.isnull() )
 					m_out_int_handler( CLEAR_LINE );
 
-				if (LOG_IRQ_ENABLE)
-					logerror("%s: MSM6242 disabling irq\n", machine().describe_context());
+				LOGIRQENABLE("%s: MSM6242 disabling irq\n", machine().describe_context());
 			}
 			break;
 
@@ -555,8 +557,7 @@ WRITE8_MEMBER( msm6242_device::write )
 			break;
 
 		default:
-			if (LOG_UNMAPPED)
-				logerror("%s: MSM6242 unmapped offset %02x written with %02x\n", machine().describe_context(), offset, data);
+			LOGUNMAPPED("%s: MSM6242 unmapped offset %02x written with %02x\n", machine().describe_context(), offset, data);
 			break;
 	}
 
@@ -570,7 +571,7 @@ WRITE8_MEMBER( msm6242_device::write )
 //-------------------------------------------------
 
 rtc62421_device::rtc62421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msm6242_device(mconfig, RTC62421, "RTC-62421", tag, owner, clock, "rtc62421", __FILE__)
+	: msm6242_device(mconfig, RTC62421, tag, owner, clock)
 {
 }
 
@@ -580,7 +581,7 @@ rtc62421_device::rtc62421_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 rtc62423_device::rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msm6242_device(mconfig, RTC62423, "RTC-62423", tag, owner, clock, "rtc62423", __FILE__)
+	: msm6242_device(mconfig, RTC62423, tag, owner, clock)
 {
 }
 
@@ -590,7 +591,7 @@ rtc62423_device::rtc62423_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 rtc72421_device::rtc72421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msm6242_device(mconfig, RTC72421, "RTC-72421", tag, owner, clock, "rtc72421", __FILE__)
+	: msm6242_device(mconfig, RTC72421, tag, owner, clock)
 {
 }
 
@@ -600,6 +601,6 @@ rtc72421_device::rtc72421_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 rtc72423_device::rtc72423_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msm6242_device(mconfig, RTC72423, "RTC-72423", tag, owner, clock, "rtc72423", __FILE__)
+	: msm6242_device(mconfig, RTC72423, tag, owner, clock)
 {
 }

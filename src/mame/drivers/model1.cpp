@@ -862,12 +862,12 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_SHARE("display_list1")
 	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
 
-	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
+	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile_device, tile_r, tile_w)
 	AM_RANGE(0x720000, 0x720001) AM_WRITENOP        // Unknown, always 0
 	AM_RANGE(0x740000, 0x740001) AM_WRITENOP        // Horizontal synchronization register
 	AM_RANGE(0x760000, 0x760001) AM_WRITENOP        // Vertical synchronization register
 	AM_RANGE(0x770000, 0x770001) AM_WRITENOP        // Video synchronization switch
-	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
+	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile_device, char_r, char_w)
 
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_SHARE("palette")
 	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_SHARE("color_xlat")
@@ -914,12 +914,12 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_SHARE("display_list1")
 	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
 
-	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
+	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile_device, tile_r, tile_w)
 	AM_RANGE(0x720000, 0x720001) AM_WRITENOP        // Unknown, always 0
 	AM_RANGE(0x740000, 0x740001) AM_WRITENOP        // Horizontal synchronization register
 	AM_RANGE(0x760000, 0x760001) AM_WRITENOP        // Vertical synchronization register
 	AM_RANGE(0x770000, 0x770001) AM_WRITENOP        // Video synchronization switch
-	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
+	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile_device, char_r, char_w)
 
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_SHARE("palette")
 	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_SHARE("color_xlat")
@@ -1598,7 +1598,7 @@ ROM_START( netmerc )
 	ROM_LOAD( "u2", 0x4000, 0x4000, CRC(c589f428) SHA1(98dc0114a5f89636b4e237ed954e19f1cfd186ab) )
 ROM_END
 
-static MACHINE_CONFIG_START( model1, model1_state )
+static MACHINE_CONFIG_START( model1 )
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_mem)
 	MCFG_CPU_IO_MAP(model1_io)
@@ -1649,7 +1649,7 @@ static MACHINE_CONFIG_DERIVED(swa, model1)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( model1_vr, model1_state )
+static MACHINE_CONFIG_START( model1_vr )
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_vr_mem)
 	MCFG_CPU_IO_MAP(model1_vr_io)
@@ -1758,12 +1758,12 @@ WRITE16_MEMBER(model1_state::r360_w)
 	}
 }
 
-GAME( 1993, vf,         0,       model1,    vf, driver_device,      0,          ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1992, vr,         0,       model1_vr, vr, driver_device,      0,          ROT0, "Sega", "Virtua Racing", MACHINE_IMPERFECT_GRAPHICS, layout_vr )
-GAME( 1993, vformula,   vr,      model1_vr, vr, driver_device,      0,          ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,        0,       swa,       swa, driver_device,     0,          ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, wingwar,    0,       model1,    wingwar, driver_device, 0,          ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwaru,   wingwar, model1,    wingwar, driver_device, 0,          ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwarj,   wingwar, model1,    wingwar, driver_device, 0,          ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
+GAME( 1993, vf,         0,       model1,    vf,      model1_state,  0,          ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1992, vr,         0,       model1_vr, vr,      model1_state,  0,          ROT0, "Sega", "Virtua Racing", MACHINE_IMPERFECT_GRAPHICS, layout_vr )
+GAME( 1993, vformula,   vr,      model1_vr, vr,      model1_state,  0,          ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, swa,        0,       swa,       swa,     model1_state,  0,          ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, wingwar,    0,       model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwaru,   wingwar, model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwarj,   wingwar, model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
 GAME( 1994, wingwar360, wingwar, model1,    wingwar, model1_state,  wingwar360, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
-GAME( 1993, netmerc,    0,       model1,    vf, driver_device,      0,          ROT0, "Sega", "NetMerc?", MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       model1,    vf,      model1_state,  0,          ROT0, "Sega", "NetMerc?", MACHINE_NOT_WORKING )

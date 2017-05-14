@@ -17,7 +17,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
 		m_ram(*this, RAM_TAG)
-		{ }
+	{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
@@ -66,7 +66,7 @@ void ps2_state::machine_start()
 	}
 }
 
-static MACHINE_CONFIG_START( ps2m30286, ps2_state )
+static MACHINE_CONFIG_START( ps2m30286 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, 10000000)
 	MCFG_CPU_PROGRAM_MAP(ps2_16_map)
@@ -90,7 +90,7 @@ static MACHINE_CONFIG_START( ps2m30286, ps2_state )
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ps2386, ps2_state )
+static MACHINE_CONFIG_START( ps2386 )
 	MCFG_CPU_ADD("maincpu", I386, 12000000)
 	MCFG_CPU_PROGRAM_MAP(ps2_32_map)
 	MCFG_CPU_IO_MAP(ps2_32_io)
@@ -245,11 +245,11 @@ ROM_START( i8580111 )
 	ROM_LOAD16_BYTE( "15f6639.bin", 0x00001, 0x10000, CRC(82cf0f7d) SHA1(13bb39225757b89749af70e881af0228673dbe0c))
 ROM_END
 
-COMP ( 1990, i8530h31, ibm5170, 0,       ps2m30286, 0, driver_device, 0,  "International Business Machines",  "IBM PS/2 8530-H31 (Model 30/286)", MACHINE_NOT_WORKING )
-COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, 0, driver_device, 0,  "International Business Machines",  "IBM PS/2 Model 30-286", MACHINE_NOT_WORKING )
-COMP ( 198?, i8535043, ibm5170, 0,       ps2386,    0, driver_device, 0,  "International Business Machines",  "IBM PS/2 8535-043 (Model 35)", MACHINE_NOT_WORKING )
-COMP ( 198?, i8550021, ibm5170, 0,       ps2386,    0, driver_device, 0,  "International Business Machines",  "IBM PS/2 8550-021 (Model 50)", MACHINE_NOT_WORKING )
-COMP ( 198?, i8550061, ibm5170, 0,       ps2386,    0, driver_device, 0,  "International Business Machines",  "IBM PS/2 8550-061 (Model 50Z)", MACHINE_NOT_WORKING )
-COMP ( 1989, i8555081, ibm5170, 0,       ps2386,    0, driver_device, 0,  "International Business Machines",  "IBM PS/2 8550-081 (Model 55SX)", MACHINE_NOT_WORKING )
-COMP ( 198?, i8580071, ibm5170, 0,       ps2386,    0, driver_device, 0,  "International Business Machines",  "IBM PS/2 8580-071 (Model 80)", MACHINE_NOT_WORKING )
-COMP ( 198?, i8580111, ibm5170, 0,       ps2386,    0, driver_device, 0,  "International Business Machines",  "IBM PS/2 8580-111 (Model 80)", MACHINE_NOT_WORKING )
+COMP ( 1990, i8530h31, ibm5170, 0,       ps2m30286, 0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8530-H31 (Model 30/286)", MACHINE_NOT_WORKING )
+COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, 0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 Model 30-286", MACHINE_NOT_WORKING )
+COMP ( 198?, i8535043, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8535-043 (Model 35)", MACHINE_NOT_WORKING )
+COMP ( 198?, i8550021, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8550-021 (Model 50)", MACHINE_NOT_WORKING )
+COMP ( 198?, i8550061, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8550-061 (Model 50Z)", MACHINE_NOT_WORKING )
+COMP ( 1989, i8555081, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8550-081 (Model 55SX)", MACHINE_NOT_WORKING )
+COMP ( 198?, i8580071, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8580-071 (Model 80)", MACHINE_NOT_WORKING )
+COMP ( 198?, i8580111, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8580-111 (Model 80)", MACHINE_NOT_WORKING )

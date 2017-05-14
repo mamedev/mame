@@ -21,7 +21,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_DX1 = device_creator<a2bus_dx1_device>;
+DEFINE_DEVICE_TYPE(A2BUS_DX1, a2bus_dx1_device, "a2dx1", "Decillonix DX-1")
 
 MACHINE_CONFIG_FRAGMENT( a2dx1 )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -50,8 +50,8 @@ machine_config_constructor a2bus_dx1_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_dx1_device::a2bus_dx1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_dx1_device::a2bus_dx1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_dac(*this, "dac"),
 	m_dacvol(*this, "dacvol")
@@ -59,10 +59,7 @@ a2bus_dx1_device::a2bus_dx1_device(const machine_config &mconfig, device_type ty
 }
 
 a2bus_dx1_device::a2bus_dx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_DX1, "Decillonix DX-1", tag, owner, clock, "a2dx1", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_dac(*this, "dac"),
-	m_dacvol(*this, "dacvol")
+	a2bus_dx1_device(mconfig, A2BUS_DX1, tag, owner, clock)
 {
 }
 

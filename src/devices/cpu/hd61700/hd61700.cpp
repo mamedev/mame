@@ -23,8 +23,10 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "hd61700.h"
+
+#include "debugger.h"
+
 
 // internal ROM
 #define INT_ROM                 0x0c00
@@ -95,28 +97,27 @@ static const uint16_t irq_vector[] = {0x0032, 0x0042, 0x0052, 0x0062, 0x0072};
 //  HD61700 DEVICE
 //**************************************************************************
 
-const device_type HD61700 = device_creator<hd61700_cpu_device>;
+DEFINE_DEVICE_TYPE(HD61700, hd61700_cpu_device, "hd61700", "HD61700")
 
 //-------------------------------------------------
 //  hd61700_cpu_device - constructor
 //-------------------------------------------------
 
 hd61700_cpu_device::hd61700_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, HD61700, "HD61700", tag, owner, clock, "hd61700", __FILE__),
-		m_program_config("program", ENDIANNESS_BIG, 16, 18, -1),
-		m_ppc(0x0000),
-		m_curpc(0x0000),
-		m_pc(0),
-		m_flags(0),
-		m_lcd_ctrl_cb(*this),
-		m_lcd_read_cb(*this),
-		m_lcd_write_cb(*this),
-		m_kb_read_cb(*this),
-		m_kb_write_cb(*this),
-		m_port_read_cb(*this),
-		m_port_write_cb(*this)
+	: cpu_device(mconfig, HD61700, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 16, 18, -1)
+	, m_ppc(0x0000)
+	, m_curpc(0x0000)
+	, m_pc(0)
+	, m_flags(0)
+	, m_lcd_ctrl_cb(*this)
+	, m_lcd_read_cb(*this)
+	, m_lcd_write_cb(*this)
+	, m_kb_read_cb(*this)
+	, m_kb_write_cb(*this)
+	, m_port_read_cb(*this)
+	, m_port_write_cb(*this)
 {
-	// ...
 }
 
 
@@ -304,7 +305,7 @@ offs_t hd61700_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, c
 //  check_irqs - check if need interrupts
 //-------------------------------------------------
 
-bool hd61700_cpu_device::check_irqs(void)
+bool hd61700_cpu_device::check_irqs()
 {
 	for (int i=4; i>=0; i--)
 	{

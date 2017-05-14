@@ -682,7 +682,7 @@ INPUT_PORTS_END
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( splus, splus_state )   // basic machine hardware
+static MACHINE_CONFIG_START( splus )   // basic machine hardware
 	MCFG_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(splus_map)
 	MCFG_CPU_IO_MAP(splus_iomap)
@@ -726,5 +726,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME        PARENT  MACHINE  INPUT   INIT     ROT    COMPANY                                  FULLNAME                       FLAGS             LAYOUT  */
+//     YEAR  NAME        PARENT  MACHINE  INPUT  STATE         INIT     ROT    COMPANY                                FULLNAME                       FLAGS                LAYOUT
 GAMEL( 1994, spss4240,   0,      splus,   splus, splus_state,  splus,   ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  MACHINE_NOT_WORKING, layout_splus )

@@ -3,6 +3,9 @@
 #include "emu.h"
 #include "ibm6580_kbd.h"
 
+#include "cpu/mcs48/mcs48.h"
+
+
 #define VERBOSE_DBG 0       /* general debug messages */
 
 #define DBG_LOG(N,M,A) \
@@ -16,7 +19,7 @@
 	} while (0)
 
 
-const device_type DW_KEYBOARD = device_creator<dw_keyboard_device>;
+DEFINE_DEVICE_TYPE(DW_KEYBOARD, dw_keyboard_device, "dw_kbd", "IBM Displaywriter Keyboard")
 
 ROM_START( dw_keyboard )
 	ROM_REGION(0x800, "mcu", 0)
@@ -183,7 +186,7 @@ ioport_constructor dw_keyboard_device::device_input_ports() const
 }
 
 dw_keyboard_device::dw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DW_KEYBOARD, "IBM Displaywriter Keyboard", tag, owner, clock, "dw_kbd", __FILE__)
+	: device_t(mconfig, DW_KEYBOARD, tag, owner, clock)
 	, m_kbd(*this, "COL.%u", 0)
 	, m_out_data(*this)
 	, m_out_clock(*this)

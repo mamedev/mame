@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_IEEE488_SOFTBOX_H
+#define MAME_BUS_IEEE488_SOFTBOX_H
 
-#ifndef __PET_SOFTBOX__
-#define __PET_SOFTBOX__
+#pragma once
 
 #include "ieee488.h"
 #include "bus/rs232/rs232.h"
@@ -68,15 +68,14 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
-	required_device<corvus_hdc_t> m_hdc;
+	required_device<corvus_hdc_device> m_hdc;
 
 	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
 };
 
 
 // device type definition
-extern const device_type SOFTBOX;
+DECLARE_DEVICE_TYPE(SOFTBOX, softbox_device)
 
 
-
-#endif
+#endif // MAME_BUS_IEEE488_SOFTBOX_H

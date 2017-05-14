@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SNES_CTRL_MIRACLE_H
+#define MAME_BUS_SNES_CTRL_MIRACLE_H
 
-#ifndef __SNES_MIRACLE__
-#define __SNES_MIRACLE__
+#pragma once
 
 
 #include "ctrl.h"
@@ -26,34 +26,35 @@ class snes_miracle_device : public device_t,
 							public device_snes_control_port_interface
 {
 public:
-	static const int XMIT_RING_SIZE = 64;
-	static const int RECV_RING_SIZE = 64;
-
 	// construction/destruction
 	snes_miracle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
+
+protected:
+	static constexpr device_timer_id TIMER_STROBE_ON = 0;
+
+	static constexpr int XMIT_RING_SIZE = 64;
+	static constexpr int RECV_RING_SIZE = 64;
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// serial overrides
 	virtual void rcv_complete() override;    // Rx completed receiving byte
 	virtual void tra_complete() override;    // Tx completed sending byte
 	virtual void tra_callback() override;    // Tx send bit
 
-	void xmit_char(uint8_t data);
-
-	required_device<midi_port_device> m_midiin, m_midiout;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
 	uint8_t read_pin4() override;
 	void write_pin6(uint8_t data) override;
 	void write_strobe(uint8_t data) override;
 
-	static const device_timer_id TIMER_STROBE_ON = 0;
+	void xmit_char(uint8_t data);
+
+	required_device<midi_port_device> m_midiin, m_midiout;
+
 	emu_timer *strobe_timer;
 
 	int m_strobe_on, m_midi_mode, m_sent_bits;
@@ -66,6 +67,6 @@ protected:
 };
 
 // device type definition
-extern const device_type SNES_MIRACLE;
+DECLARE_DEVICE_TYPE(SNES_MIRACLE, snes_miracle_device)
 
-#endif
+#endif // MAME_BUS_SNES_CTRL_MIRACLE_H

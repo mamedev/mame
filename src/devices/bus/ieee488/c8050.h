@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_IEE488_C8050_H
+#define MAME_BUS_IEE488_C8050_H
 
-#ifndef __C8050__
-#define __C8050__
+#pragma once
 
 #include "ieee488.h"
 #include "c8050fdc.h"
@@ -24,15 +24,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c8050_t
+// ======================> c8050_device
 
-class c8050_t :  public device_t,
-					public device_ieee488_interface
+class c8050_device : public device_t, public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	c8050_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	c8050_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -50,6 +48,8 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
+	c8050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -62,13 +62,13 @@ protected:
 
 	required_device<m6502_device> m_maincpu;
 	required_device<m6504_device> m_fdccpu;
-	required_device<mos6532_t> m_riot0;
-	required_device<mos6532_t> m_riot1;
-	required_device<mos6530_t> m_miot;
+	required_device<mos6532_new_device> m_riot0;
+	required_device<mos6532_new_device> m_riot1;
+	required_device<mos6530_new_device> m_miot;
 	required_device<via6522_device> m_via;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
-	required_device<c8050_fdc_t> m_fdc;
+	required_device<c8050_fdc_device> m_fdc;
 	required_ioport m_address;
 
 	// IEEE-488 bus
@@ -79,13 +79,13 @@ protected:
 };
 
 
-// ======================> c8250_t
+// ======================> c8250_device
 
-class c8250_t :  public c8050_t
+class c8250_device : public c8050_device
 {
 public:
 	// construction/destruction
-	c8250_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -94,13 +94,13 @@ public:
 };
 
 
-// ======================> c8250lp_t
+// ======================> c8250lp_device
 
-class c8250lp_t :  public c8050_t
+class c8250lp_device : public c8050_device
 {
 public:
 	// construction/destruction
-	c8250lp_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -110,13 +110,13 @@ public:
 };
 
 
-// ======================> sfd1001_t
+// ======================> sfd1001_device
 
-class sfd1001_t :  public c8050_t
+class sfd1001_device : public c8050_device
 {
 public:
 	// construction/destruction
-	sfd1001_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sfd1001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -127,11 +127,10 @@ public:
 
 
 // device type definition
-extern const device_type C8050;
-extern const device_type C8250;
-extern const device_type C8250LP;
-extern const device_type SFD1001;
+DECLARE_DEVICE_TYPE(C8050,   c8050_device)
+DECLARE_DEVICE_TYPE(C8250,   c8250_device)
+DECLARE_DEVICE_TYPE(C8250LP, c8250lp_device)
+DECLARE_DEVICE_TYPE(SFD1001, sfd1001_device)
 
 
-
-#endif
+#endif // MAME_BUS_IEE488_C8050_H

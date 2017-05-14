@@ -287,7 +287,7 @@ WRITE32_MEMBER(hp9k3xx_state::buserror_w)
 	}
 }
 
-static MACHINE_CONFIG_START( hp9k310, hp9k3xx_state )
+static MACHINE_CONFIG_START( hp9k310 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68010, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k310_map)
@@ -302,7 +302,7 @@ static MACHINE_CONFIG_START( hp9k310, hp9k3xx_state )
 	MCFG_SCREEN_REFRESH_RATE(70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp9k320, hp9k3xx_state )
+static MACHINE_CONFIG_START( hp9k320 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68020FPU, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k320_map)
@@ -317,7 +317,7 @@ static MACHINE_CONFIG_START( hp9k320, hp9k3xx_state )
 	MCFG_SCREEN_REFRESH_RATE(70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp9k330, hp9k3xx_state )
+static MACHINE_CONFIG_START( hp9k330 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68020PMMU, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
@@ -332,7 +332,7 @@ static MACHINE_CONFIG_START( hp9k330, hp9k3xx_state )
 	MCFG_SCREEN_REFRESH_RATE(70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp9k340, hp9k3xx_state )
+static MACHINE_CONFIG_START( hp9k340 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68030, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START( hp9k340, hp9k3xx_state )
 	MCFG_SCREEN_REFRESH_RATE(70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp9k370, hp9k3xx_state )
+static MACHINE_CONFIG_START( hp9k370 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k370_map)
@@ -362,7 +362,7 @@ static MACHINE_CONFIG_START( hp9k370, hp9k3xx_state )
 	MCFG_SCREEN_REFRESH_RATE(70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp9k380, hp9k3xx_state )
+static MACHINE_CONFIG_START( hp9k380 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68040, 25000000) // 25 MHz?  33?
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
@@ -377,7 +377,7 @@ static MACHINE_CONFIG_START( hp9k380, hp9k3xx_state )
 	MCFG_SCREEN_REFRESH_RATE(70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp9k382, hp9k3xx_state )
+static MACHINE_CONFIG_START( hp9k382 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68040, 25000000) // 25 MHz?  33?
 	MCFG_CPU_PROGRAM_MAP(hp9k382_map)
@@ -459,11 +459,11 @@ ROM_START( hp9k382 )
 	ROM_LOAD( "1818-5282_8ce61e951207_28c64.bin", 0x000000, 0x002000, CRC(740442f3) SHA1(ab65bd4eec1024afb97fc2dd3bd3f017e90f49ae) )
 ROM_END
 
-/*    YEAR  NAME    PARENT   COMPAT  MACHINE   INPUT                 INIT    COMPANY          FULLNAME       FLAGS */
-COMP( 1985, hp9k310, 0,      0,      hp9k310,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/310", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1985, hp9k320, 0,      0,      hp9k320,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/320", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1987, hp9k330, 0,      0,      hp9k330,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/330", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1989, hp9k340, hp9k330,0,      hp9k340,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/340", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1988, hp9k370, hp9k330,0,      hp9k370,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/370", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1991, hp9k380, 0,      0,      hp9k380,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/380", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1991, hp9k382, 0,      0,      hp9k382,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/382", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT   COMPAT  MACHINE   INPUT    STATE       INIT  COMPANY            FULLNAME      FLAGS */
+COMP( 1985, hp9k310, 0,      0,      hp9k310,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/310", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1985, hp9k320, 0,      0,      hp9k320,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/320", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1987, hp9k330, 0,      0,      hp9k330,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/330", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1989, hp9k340, hp9k330,0,      hp9k340,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/340", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1988, hp9k370, hp9k330,0,      hp9k370,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/370", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1991, hp9k380, 0,      0,      hp9k380,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/380", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1991, hp9k382, 0,      0,      hp9k382,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/382", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

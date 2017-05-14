@@ -7,8 +7,8 @@
 #include "speaker.h"
 
 
-device_type const TI8X_SPEAKER_STEREO = device_creator<bus::ti8x::stereo_speaker_device>;
-device_type const TI8X_SPEAKER_MONO = device_creator<bus::ti8x::mono_speaker_device>;
+DEFINE_DEVICE_TYPE_NS(TI8X_SPEAKER_STEREO, bus::ti8x, stereo_speaker_device, "ti8x_stspkr", "TI-8x Speaker (Stereo)")
+DEFINE_DEVICE_TYPE_NS(TI8X_SPEAKER_MONO,   bus::ti8x, mono_speaker_device,   "ti8x_mspkr",  "TI-8x Speaker (Mono)")
 
 
 namespace bus { namespace ti8x {
@@ -41,7 +41,7 @@ stereo_speaker_device::stereo_speaker_device(
 		char const *tag,
 		device_t *owner,
 		uint32_t clock)
-	: device_t(mconfig, TI8X_SPEAKER_STEREO, "TI-8x Speaker (Stereo)", tag, owner, clock, "ti8xstspkr", __FILE__)
+	: device_t(mconfig, TI8X_SPEAKER_STEREO, tag, owner, clock)
 	, device_ti8x_link_port_interface(mconfig, *this)
 	, m_left_speaker(*this, "lspkr")
 	, m_right_speaker(*this, "rspkr")
@@ -78,7 +78,7 @@ mono_speaker_device::mono_speaker_device(
 		char const *tag,
 		device_t *owner,
 		uint32_t clock)
-	: device_t(mconfig, TI8X_SPEAKER_MONO, "TI-8x Speaker (Mono)", tag, owner, clock, "ti8xmspkr", __FILE__)
+	: device_t(mconfig, TI8X_SPEAKER_MONO, tag, owner, clock)
 	, device_ti8x_link_port_interface(mconfig, *this)
 	, m_speaker(*this, "spkr")
 	, m_tip_state(true)

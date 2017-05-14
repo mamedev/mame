@@ -31,7 +31,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_232 = device_creator<coco_232_device>;
+DEFINE_DEVICE_TYPE(COCO_232, coco_232_device, "coco_232", "CoCo RS-232 PAK")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -42,9 +42,9 @@ const device_type COCO_232 = device_creator<coco_232_device>;
 //-------------------------------------------------
 
 coco_232_device::coco_232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, COCO_232, "CoCo RS-232 PAK", tag, owner, clock, "coco_232", __FILE__),
-		device_cococart_interface( mconfig, *this ),
-		m_uart(*this, UART_TAG)
+	: device_t(mconfig, COCO_232, tag, owner, clock)
+	, device_cococart_interface(mconfig, *this)
+	, m_uart(*this, UART_TAG)
 {
 }
 

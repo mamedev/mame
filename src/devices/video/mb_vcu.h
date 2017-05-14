@@ -1,9 +1,9 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese
-#pragma once
+#ifndef MAME_VIDEO_MB_VCU_H
+#define MAME_VIDEO_MB_VCU_H
 
-#ifndef __MB_VCUDEV_H__
-#define __MB_VCUDEV_H__
+#pragma once
 
 
 //**************************************************************************
@@ -45,7 +45,8 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
+
 private:
 	inline uint8_t read_byte(offs_t address);
 	inline void write_byte(offs_t address, uint8_t data);
@@ -76,7 +77,7 @@ private:
 
 
 // device type definition
-extern const device_type MB_VCU;
+DECLARE_DEVICE_TYPE(MB_VCU, mb_vcu_device)
 
 
 //**************************************************************************
@@ -89,4 +90,4 @@ extern const device_type MB_VCU;
 #define MCFG_MB_VCU_PALETTE(_palette_tag) \
 	mb_vcu_device::static_set_palette_tag(*device, "^" _palette_tag);
 
-#endif
+#endif // MAME_VIDEO_MB_VCU_H

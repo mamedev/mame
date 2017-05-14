@@ -92,10 +92,7 @@
 #include "machine/eepromser.h"
 
 
-
-
-
-deco146port_xx port_table[] = {
+static deco146port_xx const port_table[] = {
 /* 0x000 */ { 0x08a,           {  NIB1__, NIB2__, NIB3__, BLANK_ },  0, 1 },
 /* 0x002 */ { 0x0aa,           {  NIB3__, NIB2__, NIB0__, NIB1__ },  0, 0 },
 /* 0x004 */ { 0x018,           {  NIB2R2, NIB3__, BLANK_, BLANK_ },  0, 1 },
@@ -1122,7 +1119,7 @@ deco146port_xx port_table[] = {
 /* 0x7fe */ { 0x04c,           {  NIB1__, NIB2__, NIB0__, NIB3__ },  0, 1 }
 };
 
-uint16_t reorder(uint16_t input, uint8_t *weights)
+inline uint16_t reorder(uint16_t input, uint8_t const *weights)
 {
 	uint16_t temp = 0;
 	for(int i = 0; i < 16; i++)
@@ -1315,12 +1312,9 @@ uint16_t deco_146_base_device::read_data(uint16_t address, uint16_t mem_mask, ui
 }
 
 
-//const device_type DECO146BASE = device_creator<deco_146_base_device>;
 
-
-
-deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 	m_sound_latch(*this, ":soundlatch")
 {
 	m_port_a_r =  deco146_port_read_cb(FUNC(deco_146_base_device::port_a_default), this);
@@ -1458,15 +1452,6 @@ void deco_146_base_device::device_reset()
 }
 
 
-
-
-
-
-
-
-const device_type DECO146PROT = device_creator<deco146_device>;
-
-
 uint16_t deco_146_base_device::read_data_getloc(uint16_t address, int& location)
 {
 	uint16_t retdata = 0;
@@ -1502,8 +1487,12 @@ uint16_t deco_146_base_device::read_data_getloc(uint16_t address, int& location)
 }
 
 
+
+DEFINE_DEVICE_TYPE(DECO146PROT, deco146_device, "deco146", "DECO 146 Protection")
+
+
 deco146_device::deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: deco_146_base_device(mconfig, DECO146PROT, "DECO 146 Protection", tag, owner, clock, "deco146", __FILE__)
+	: deco_146_base_device(mconfig, DECO146PROT, tag, owner, clock)
 {
 	m_bankswitch_swap_read_address = 0x78;
 	m_magic_read_address_xor = 0x44a;

@@ -161,12 +161,12 @@ Timming
 ****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "alph8201.h"
+#include "debugger.h"
 
 
-const device_type ALPHA8201L = device_creator<alpha8201_cpu_device>;
-const device_type ALPHA8301L = device_creator<alpha8301_cpu_device>;
+DEFINE_DEVICE_TYPE(ALPHA8201L, alpha8201_cpu_device, "alpha8201l", "ALPHA-8201L")
+DEFINE_DEVICE_TYPE(ALPHA8301L, alpha8301_cpu_device, "alpha8301l", "ALPHA-8301L")
 
 
 /* instruction cycle count */
@@ -185,26 +185,22 @@ const device_type ALPHA8301L = device_creator<alpha8301_cpu_device>;
 
 
 alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cpu_device(mconfig, ALPHA8201L, "ALPHA-8201L", tag, owner, clock, "alpha8201l", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)
-	, m_opmap(opcode_8201)
+	: alpha8201_cpu_device(mconfig, ALPHA8201L, tag, owner, clock, opcode_8201)
 {
 }
 
 
-alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const s_opcode *opmap)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)
-	, m_opmap(opcode_8201)
+	, m_opmap(opmap)
 {
 }
 
 alpha8301_cpu_device::alpha8301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: alpha8201_cpu_device(mconfig, ALPHA8301L, "ALPHA-8301L", tag, owner, clock, "alpha8301l", __FILE__)
+	: alpha8201_cpu_device(mconfig, ALPHA8301L, tag, owner, clock, opcode_8301)
 {
-	m_opmap = opcode_8301;
 }
 
 

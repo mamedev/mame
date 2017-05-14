@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/leland.h"
+#include "audio/leland.h"
 
 
 /* constants */

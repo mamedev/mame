@@ -986,7 +986,7 @@ INTERRUPT_GEN_MEMBER(luckgrln_state::luckgrln_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( luckgrln, luckgrln_state )
+static MACHINE_CONFIG_START( luckgrln )
 	MCFG_CPU_ADD("maincpu", Z180,8000000)
 	MCFG_CPU_PROGRAM_MAP(mainmap)
 	MCFG_CPU_IO_MAP(portmap)
@@ -1092,8 +1092,8 @@ ROM_END
 
 /*********************************************
 *                Game Drivers                *
-**********************************************
+**********************************************/
 
-       YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY           FULLNAME                                 FLAGS             LAYOUT  */
+//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY           FULL NAME                                 FLAGS             LAYOUT
 GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", MACHINE_NO_SOUND, layout_luckgrln )
-GAMEL( 1993, 7smash,   0,      _7smash,  _7smash,  driver_device,  0,        ROT0, "Sovic",          "7 Smash",                                MACHINE_NO_SOUND, layout_7smash )
+GAMEL( 1993, 7smash,   0,      _7smash,  _7smash,  luckgrln_state, 0,        ROT0, "Sovic",          "7 Smash",                                MACHINE_NO_SOUND, layout_7smash )

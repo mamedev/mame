@@ -11,47 +11,49 @@
 
 *****************************************************************************/
 
-#ifndef __TMS9902_H__
-#define __TMS9902_H__
+#ifndef MAME_MACHINE_TMS9902_H
+#define MAME_MACHINE_TMS9902_H
+
+#pragma once
 
 
-// Serial control protocol values
-#define TYPE_TMS9902 0x01
-
-// Configuration (output only)
-#define CONFIG   0x80
-#define RATERECV 0x70
-#define RATEXMIT 0x60
-#define DATABITS 0x50
-#define STOPBITS 0x40
-#define PARITY   0x30
-
-// Exceptional states (BRK: both directions; FRMERR/PARERR: input only)
-#define EXCEPT 0x40
-#define BRK    0x02
-#define FRMERR 0x04
-#define PARERR 0x06
-
-// Line states (RTS, DTR: output; CTS, DSR, RI, DCD: input)
-#define LINES 0x00
-#define RTS 0x20
-#define CTS 0x10
-#define DSR 0x08
-#define DCD 0x04
-#define DTR 0x02
-#define RI  0x01
-
-extern const device_type TMS9902;
+DECLARE_DEVICE_TYPE(TMS9902, tms9902_device)
 
 class tms9902_device : public device_t
 {
 public:
+	// Serial control protocol values
+	static constexpr unsigned TYPE_TMS9902 = 0x01;
+
+	// Configuration (output only)
+	static constexpr unsigned CONFIG   = 0x80;
+	static constexpr unsigned RATERECV = 0x70;
+	static constexpr unsigned RATEXMIT = 0x60;
+	static constexpr unsigned DATABITS = 0x50;
+	static constexpr unsigned STOPBITS = 0x40;
+	static constexpr unsigned PARITY   = 0x30;
+
+	// Exceptional states (BRK: both directions; FRMERR/PARERR: input only)
+	static constexpr unsigned EXCEPT = 0x40;
+	static constexpr unsigned BRK    = 0x02;
+	static constexpr unsigned FRMERR = 0x04;
+	static constexpr unsigned PARERR = 0x06;
+
+	// Line states (RTS, DTR: output; CTS, DSR, RI, DCD: input)
+	static constexpr unsigned LINES = 0x00;
+	static constexpr unsigned RTS   = 0x20;
+	static constexpr unsigned CTS   = 0x10;
+	static constexpr unsigned DSR   = 0x08;
+	static constexpr unsigned DCD   = 0x04;
+	static constexpr unsigned DTR   = 0x02;
+	static constexpr unsigned RI    = 0x01;
+
 	tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_int_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_int_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_rcv_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_rcv_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_xmit_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_xmit_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_ctrl_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_ctrl_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_int_callback(device_t &device, Object &&cb) { return downcast<tms9902_device &>(device).m_int_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rcv_callback(device_t &device, Object &&cb) { return downcast<tms9902_device &>(device).m_rcv_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_xmit_callback(device_t &device, Object &&cb) { return downcast<tms9902_device &>(device).m_xmit_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ctrl_callback(device_t &device, Object &&cb) { return downcast<tms9902_device &>(device).m_ctrl_cb.set_callback(std::forward<Object>(cb)); }
 
 	void    set_clock(bool state);
 
@@ -187,16 +189,16 @@ private:
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_TMS9902_INT_CB(_devcb) \
-	devcb = &tms9902_device::set_int_callback(*device, DEVCB_##_devcb);
+#define MCFG_TMS9902_INT_CB(cb) \
+		devcb = &tms9902_device::set_int_callback(*device, (DEVCB_##cb));
 
-#define MCFG_TMS9902_RCV_CB(_devcb) \
-	devcb = &tms9902_device::set_rcv_callback(*device, DEVCB_##_devcb);
+#define MCFG_TMS9902_RCV_CB(cb) \
+		devcb = &tms9902_device::set_rcv_callback(*device, (DEVCB_##cb));
 
-#define MCFG_TMS9902_XMIT_CB(_devcb) \
-	devcb = &tms9902_device::set_xmit_callback(*device, DEVCB_##_devcb);
+#define MCFG_TMS9902_XMIT_CB(cb) \
+		devcb = &tms9902_device::set_xmit_callback(*device, (DEVCB_##cb));
 
-#define MCFG_TMS9902_CTRL_CB(_devcb) \
-	devcb = &tms9902_device::set_ctrl_callback(*device, DEVCB_##_devcb);
+#define MCFG_TMS9902_CTRL_CB(cb) \
+		devcb = &tms9902_device::set_ctrl_callback(*device, (DEVCB_##cb));
 
-#endif /* __TMS9902_H__ */
+#endif // MAME_MACHINE_TMS9902_H

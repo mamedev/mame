@@ -263,7 +263,7 @@ inline void itech8_state::consume_rle(int count)
 
 void itech8_state::perform_blit(address_space &space)
 {
-	offs_t addr = m_tms34061->m_display.regs[TMS34061_XYADDRESS] | ((m_tms34061->m_display.regs[TMS34061_XYOFFSET] & 0x300) << 8);
+	offs_t addr = m_tms34061->xyaddress() | ((m_tms34061->xyoffset() & 0x300) << 8);
 	uint8_t shift = (BLITTER_FLAGS & BLITFLAG_SHIFT) ? 4 : 0;
 	int transparent = (BLITTER_FLAGS & BLITFLAG_TRANSPARENT);
 	int ydir = (BLITTER_FLAGS & BLITFLAG_YFLIP) ? -1 : 1;
@@ -283,7 +283,7 @@ void itech8_state::perform_blit(address_space &space)
 		logerror("Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
 				m_screen->vpos(),
 				(m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
-				m_tms34061->m_display.regs[TMS34061_XYADDRESS] | ((m_tms34061->m_display.regs[TMS34061_XYOFFSET] & 0x300) << 8),
+				m_tms34061->xyaddress() | ((m_tms34061->xyoffset() & 0x300) << 8),
 				BLITTER_WIDTH, BLITTER_HEIGHT, BLITTER_FLAGS);
 
 	/* initialize the fetcher */
@@ -455,7 +455,7 @@ WRITE8_MEMBER(itech8_state::blitter_w)
 		if (BLIT_LOGGING)
 		{
 			logerror("Blit: XY=%1X%04X SRC=%02X%02X%02X SIZE=%3dx%3d FLAGS=%02x",
-						(m_tms34061->m_display.regs[TMS34061_XYOFFSET] >> 8) & 0x0f, m_tms34061->m_display.regs[TMS34061_XYADDRESS],
+						(m_tms34061->xyoffset() >> 8) & 0x0f, m_tms34061->xyaddress(),
 						m_grom_bank, m_blitter_data[0], m_blitter_data[1],
 						m_blitter_data[4], m_blitter_data[5],
 						m_blitter_data[2]);
@@ -584,7 +584,7 @@ uint32_t itech8_state::screen_update_2layer(screen_device &screen, bitmap_rgb32 
 	m_tms34061->get_display_state();
 
 	/* if we're blanked, just fill with black */
-	if (m_tms34061->m_display.blanked)
+	if (m_tms34061->blanked())
 	{
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
@@ -619,7 +619,7 @@ uint32_t itech8_state::screen_update_grmatch(screen_device &screen, bitmap_rgb32
 	m_tms34061->get_display_state();
 
 	/* if we're blanked, just fill with black */
-	if (m_tms34061->m_display.blanked)
+	if (m_tms34061->blanked())
 	{
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
@@ -667,7 +667,7 @@ uint32_t itech8_state::screen_update_2page(screen_device &screen, bitmap_rgb32 &
 	m_tms34061->get_display_state();
 
 	/* if we're blanked, just fill with black */
-	if (m_tms34061->m_display.blanked)
+	if (m_tms34061->blanked())
 	{
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
@@ -698,7 +698,7 @@ uint32_t itech8_state::screen_update_2page_large(screen_device &screen, bitmap_r
 	m_tms34061->get_display_state();
 
 	/* if we're blanked, just fill with black */
-	if (m_tms34061->m_display.blanked)
+	if (m_tms34061->blanked())
 	{
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;

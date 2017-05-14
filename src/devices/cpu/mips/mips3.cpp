@@ -98,31 +98,31 @@ static const uint8_t fpmode_source[4] =
 #define ROPCODE(pc)     direct->read_dword(pc)
 
 
-const device_type VR4300BE = device_creator<vr4300be_device>;
-const device_type VR4300LE = device_creator<vr4300le_device>;
-const device_type VR4310BE = device_creator<vr4310be_device>;
-const device_type VR4310LE = device_creator<vr4310le_device>;
-const device_type R4600BE = device_creator<r4600be_device>;
-const device_type R4600LE = device_creator<r4600le_device>;
-const device_type R4650BE = device_creator<r4650be_device>;
-const device_type R4650LE = device_creator<r4650le_device>;
-const device_type R4700BE = device_creator<r4700be_device>;
-const device_type R4700LE = device_creator<r4700le_device>;
-const device_type TX4925BE = device_creator<tx4925be_device>;
-const device_type TX4925LE = device_creator<tx4925le_device>;
-const device_type R5000BE = device_creator<r5000be_device>;
-const device_type R5000LE = device_creator<r5000le_device>;
-const device_type VR5500BE = device_creator<vr5500be_device>;
-const device_type VR5500LE = device_creator<vr5500le_device>;
-const device_type QED5271BE = device_creator<qed5271be_device>;
-const device_type QED5271LE = device_creator<qed5271le_device>;
-const device_type RM7000BE = device_creator<rm7000be_device>;
-const device_type RM7000LE = device_creator<rm7000le_device>;
+DEFINE_DEVICE_TYPE(VR4300BE,  vr4300be_device,  "vr4300be",  "VR4300 (big)")
+DEFINE_DEVICE_TYPE(VR4300LE,  vr4300le_device,  "vr4300le",  "VR4300 (little)")
+DEFINE_DEVICE_TYPE(VR4310BE,  vr4310be_device,  "vr4310be",  "VR4310 (big)")
+DEFINE_DEVICE_TYPE(VR4310LE,  vr4310le_device,  "vr4310le",  "VR4310 (little)")
+DEFINE_DEVICE_TYPE(R4600BE,   r4600be_device,   "r4600be",   "R4600 (big)")
+DEFINE_DEVICE_TYPE(R4600LE,   r4600le_device,   "r4600le",   "R4600 (little)")
+DEFINE_DEVICE_TYPE(R4650BE,   r4650be_device,   "r4650be",   "IDT R4650 (big)")
+DEFINE_DEVICE_TYPE(R4650LE,   r4650le_device,   "r4650le",   "IDT R4650 (little)")
+DEFINE_DEVICE_TYPE(R4700BE,   r4700be_device,   "r4700be",   "R4700 (big)")
+DEFINE_DEVICE_TYPE(R4700LE,   r4700le_device,   "r4700le",   "R4700 (little)")
+DEFINE_DEVICE_TYPE(TX4925BE,  tx4925be_device,  "tx4925be",  "TX4925 (big)")
+DEFINE_DEVICE_TYPE(TX4925LE,  tx4925le_device,  "tx4925le",  "TX4925 (little)")
+DEFINE_DEVICE_TYPE(R5000BE,   r5000be_device,   "r5000be",   "R5000 (big)")
+DEFINE_DEVICE_TYPE(R5000LE,   r5000le_device,   "r5000le",   "R5000 (little)")
+DEFINE_DEVICE_TYPE(VR5500BE,  vr5500be_device,  "vr5500be",  "VR5500 (big)")
+DEFINE_DEVICE_TYPE(VR5500LE,  vr5500le_device,  "vr5500le",  "VR5500 (little)")
+DEFINE_DEVICE_TYPE(QED5271BE, qed5271be_device, "qed5271be", "QED5271 (big)")
+DEFINE_DEVICE_TYPE(QED5271LE, qed5271le_device, "qed5271le", "QED5271 (little)")
+DEFINE_DEVICE_TYPE(RM7000BE,  rm7000be_device,  "rm7000be",  "RM7000 (big)")
+DEFINE_DEVICE_TYPE(RM7000LE,  rm7000le_device,  "rm7000le",  "RM7000 (little)")
 
 
 // VR4300 and VR5432 have 4 fewer PFN bits, and only 32 TLB entries
-mips3_device::mips3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, mips3_flavor flavor, endianness_t endianness)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+mips3_device::mips3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mips3_flavor flavor, endianness_t endianness)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", endianness, 32, 32, 0, 32, MIPS3_MIN_PAGE_SHIFT)
 	, m_flavor(flavor)

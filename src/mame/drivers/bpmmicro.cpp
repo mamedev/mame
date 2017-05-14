@@ -357,7 +357,7 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( bpmmicro, bpmmicro_state )
+static MACHINE_CONFIG_START( bpmmicro )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_32MHz/4) /* divider is guessed, cpu is an AMD N80L286-16/S part */
 	MCFG_CPU_PROGRAM_MAP(i286_mem)
@@ -413,5 +413,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE           INIT           COMPANY              FULLNAME      FLAGS */
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE           INIT         COMPANY              FULLNAME      FLAGS
 COMP( 1992, bp1200,     0,          0,      bpmmicro,   bpmmicro, bpmmicro_state, bp1200,      "BP Microsystems",   "BP-1200",    MACHINE_IS_SKELETON | MACHINE_NO_SOUND_HW )

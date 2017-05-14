@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SCV_CART_SLOT = device_creator<scv_cart_slot_device>;
+DEFINE_DEVICE_TYPE(SCV_CART_SLOT, scv_cart_slot_device, "scv_cart_slot", "SCV Cartridge Slot")
 
 //**************************************************************************
 //    SCV cartridges Interface
@@ -73,10 +73,10 @@ void device_scv_cart_interface::ram_alloc(uint32_t size)
 //  scv_cart_slot_device - constructor
 //-------------------------------------------------
 scv_cart_slot_device::scv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, SCV_CART_SLOT, "SCV Cartridge Slot", tag, owner, clock, "scv_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(SCV_8K), m_cart(nullptr)
+	device_t(mconfig, SCV_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(SCV_8K), m_cart(nullptr)
 {
 }
 

@@ -8,10 +8,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_FMT_ICMEM_H
+#define MAME_MACHINE_FMT_ICMEM_H
 
-#ifndef __FMT_ICMEM_H__
-#define __FMT_ICMEM_H__
+#pragma once
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -24,8 +24,7 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-class fmt_icmem_device :  public device_t,
-				public device_image_interface
+class fmt_icmem_device : public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
@@ -70,7 +69,7 @@ private:
 
 
 // device type definition
-extern const device_type FMT_ICMEM;
+DECLARE_DEVICE_TYPE(FMT_ICMEM, fmt_icmem_device)
 
 
-#endif  /* __FMT_ICMEM_H__ */
+#endif  // MAME_MACHINE_FMT_ICMEM_H

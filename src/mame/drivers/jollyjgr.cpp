@@ -669,7 +669,7 @@ void jollyjgr_state::machine_reset()
 	m_tilemap_bank = 0;
 }
 
-static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
+static MACHINE_CONFIG_START( jollyjgr )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6)  /* 3MHz verified */
 	MCFG_CPU_PROGRAM_MAP(jollyjgr_map)

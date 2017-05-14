@@ -293,14 +293,14 @@ WRITE32_MEMBER( dm7000_state::dcr_w )
 	dcr[offset] = data;
 }
 
-WRITE8_MEMBER( dm7000_state::kbd_put )
+void dm7000_state::kbd_put(u8 data)
 {
 	//printf("%02X\n", data);
 	m_term_data = data;
 	m_scc0_lsr = 1;
 }
 
-static MACHINE_CONFIG_START( dm7000, dm7000_state )
+static MACHINE_CONFIG_START( dm7000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",PPC405GP, 252000000 / 10) // Should be PPC405D4?
 	// Slowed down 10 times in order to get normal response for now
@@ -317,7 +317,7 @@ static MACHINE_CONFIG_START( dm7000, dm7000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dm7000_state, screen_update_dm7000)
 
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(dm7000_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dm7000_state, kbd_put))
 
 MACHINE_CONFIG_END
 
@@ -347,7 +347,7 @@ ROM_START( dm500 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT    INIT     COMPANY                FULLNAME       FLAGS */
-SYST( 2003, dm7000,  0,       0,       dm7000,    dm7000, driver_device,  0,   "Dream Multimedia",   "Dreambox 7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST( 2004, dm5620,  dm7000,  0,       dm7000,    dm7000, driver_device,  0,   "Dream Multimedia",   "Dreambox 5620", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST( 2006, dm500,   dm7000,  0,       dm7000,    dm7000, driver_device,  0,   "Dream Multimedia",   "Dreambox 500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY             FULLNAME         FLAGS
+SYST( 2003, dm7000,  0,       0,       dm7000,    dm7000, dm7000_state, 0,    "Dream Multimedia", "Dreambox 7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST( 2004, dm5620,  dm7000,  0,       dm7000,    dm7000, dm7000_state, 0,    "Dream Multimedia", "Dreambox 5620", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST( 2006, dm500,   dm7000,  0,       dm7000,    dm7000, dm7000_state, 0,    "Dream Multimedia", "Dreambox 500",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

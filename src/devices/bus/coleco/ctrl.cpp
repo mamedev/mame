@@ -15,7 +15,7 @@
 //  DEVICE DEFINITION
 //**************************************************************************
 
-const device_type COLECOVISION_CONTROL_PORT = device_creator<colecovision_control_port_device>;
+DEFINE_DEVICE_TYPE(COLECOVISION_CONTROL_PORT, colecovision_control_port_device, "colecovision_control_port", "ColecoVision control port")
 
 
 
@@ -46,8 +46,9 @@ device_colecovision_control_port_interface::device_colecovision_control_port_int
 //-------------------------------------------------
 
 colecovision_control_port_device::colecovision_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COLECOVISION_CONTROL_PORT, "ColecoVision control port", tag, owner, clock, "colecovision_control_port", __FILE__),
-	device_slot_interface(mconfig, *this), m_device(nullptr),
+	device_t(mconfig, COLECOVISION_CONTROL_PORT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_device(nullptr),
 	m_write_irq(*this)
 {
 }

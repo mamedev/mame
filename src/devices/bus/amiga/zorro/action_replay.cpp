@@ -22,9 +22,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ACTION_REPLAY_MK1 = device_creator<action_replay_mk1_device>;
-const device_type ACTION_REPLAY_MK2 = device_creator<action_replay_mk2_device>;
-const device_type ACTION_REPLAY_MK3 = device_creator<action_replay_mk3_device>;
+DEFINE_DEVICE_TYPE(ACTION_REPLAY_MK1, action_replay_mk1_device, "amiga_ar1", "Datel Action Replay MK-I")
+DEFINE_DEVICE_TYPE(ACTION_REPLAY_MK2, action_replay_mk2_device, "amiga_ar2", "Datel Action Replay MK-II")
+DEFINE_DEVICE_TYPE(ACTION_REPLAY_MK3, action_replay_mk3_device, "amiga_ar3", "Datel Action Replay MK-III")
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -98,26 +98,25 @@ const tiny_rom_entry *action_replay_mk3_device::device_rom_region() const
 //  action_replay_device - constructor
 //-------------------------------------------------
 
-action_replay_device::action_replay_device(const machine_config &mconfig, device_type type, const char *tag,
-	device_t *owner, uint32_t clock, const char *name, const char *shortname) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+action_replay_device::action_replay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_exp_card_interface(mconfig, *this),
 	m_button(*this, "freeze")
 {
 }
 
 action_replay_mk1_device::action_replay_mk1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	action_replay_device(mconfig, ACTION_REPLAY_MK1, tag, owner, clock, "Datel Action Replay MK-I", "amiga_ar1")
+	action_replay_device(mconfig, ACTION_REPLAY_MK1, tag, owner, clock)
 {
 }
 
 action_replay_mk2_device::action_replay_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	action_replay_device(mconfig, ACTION_REPLAY_MK2, tag, owner, clock, "Datel Action Replay MK-II", "amiga_ar2")
+	action_replay_device(mconfig, ACTION_REPLAY_MK2, tag, owner, clock)
 {
 }
 
 action_replay_mk3_device::action_replay_mk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	action_replay_device(mconfig, ACTION_REPLAY_MK3, tag, owner, clock, "Datel Action Replay MK-III", "amiga_ar3")
+	action_replay_device(mconfig, ACTION_REPLAY_MK3, tag, owner, clock)
 {
 }
 

@@ -65,7 +65,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MACKBD = device_creator<mackbd_device>;
+DEFINE_DEVICE_TYPE(MACKBD, mackbd_device, "mackbd", "Macintosh Keyboard")
 
 ROM_START( mackbd )
 	ROM_REGION(0x800, MACKBD_CPU_TAG, 0)
@@ -212,7 +212,7 @@ ioport_constructor mackbd_device::device_input_ports() const
 //-------------------------------------------------
 
 mackbd_device::mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MACKBD, "Macintosh keyboard", tag, owner, clock, "mackbd", __FILE__),
+	: device_t(mconfig, MACKBD, tag, owner, clock),
 	m_maincpu(*this, MACKBD_CPU_TAG),
 	m_clkout_handler(*this),
 	m_dataout_handler(*this)

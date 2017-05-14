@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CBMIEC_DIAG264_LB_IEC_H
+#define MAME_BUS_CBMIEC_DIAG264_LB_IEC_H
 
-#ifndef __DIAG264_IEC_LOOPBACK__
-#define __DIAG264_IEC_LOOPBACK__
+#pragma once
 
 #include "cbmiec.h"
 
@@ -38,8 +38,7 @@ protected:
 
 
 // device type definition
-extern const device_type DIAG264_SERIAL_LOOPBACK;
+DECLARE_DEVICE_TYPE(DIAG264_SERIAL_LOOPBACK, diag264_serial_loopback_device)
 
 
-
-#endif
+#endif // MAME_BUS_CBMIEC_DIAG264_LB_IEC_H

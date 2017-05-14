@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_IEEE488_C2040_H
+#define MAME_BUS_IEEE488_C2040_H
 
-#ifndef __C2040__
-#define __C2040__
+#pragma once
 
 #include "ieee488.h"
 #include "c2040fdc.h"
@@ -24,15 +24,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c2040_t
+// ======================> c2040_device
 
-class c2040_t :  public device_t,
-					public device_ieee488_interface
+class c2040_device : public device_t, public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	c2040_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	c2040_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -50,6 +48,8 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
+	c2040_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -70,13 +70,13 @@ protected:
 
 	required_device<m6502_device> m_maincpu;
 	required_device<m6504_device> m_fdccpu;
-	required_device<mos6532_t> m_riot0;
-	required_device<mos6532_t> m_riot1;
-	required_device<mos6530_t> m_miot;
+	required_device<mos6532_new_device> m_riot0;
+	required_device<mos6532_new_device> m_riot1;
+	required_device<mos6530_new_device> m_miot;
 	required_device<via6522_device> m_via;
 	required_device<floppy_image_device> m_floppy0;
 	optional_device<floppy_image_device> m_floppy1;
-	required_device<c2040_fdc_t> m_fdc;
+	required_device<c2040_fdc_device> m_fdc;
 	required_memory_region m_gcr;
 	required_ioport m_address;
 
@@ -88,13 +88,13 @@ protected:
 };
 
 
-// ======================> c3040_t
+// ======================> c3040_device
 
-class c3040_t :  public c2040_t
+class c3040_device :  public c2040_device
 {
 public:
 	// construction/destruction
-	c3040_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -104,13 +104,13 @@ public:
 };
 
 
-// ======================> c4040_t
+// ======================> c4040_device
 
-class c4040_t :  public c2040_t
+class c4040_device :  public c2040_device
 {
 public:
 	// construction/destruction
-	c4040_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -121,10 +121,9 @@ public:
 
 
 // device type definition
-extern const device_type C2040;
-extern const device_type C3040;
-extern const device_type C4040;
+DECLARE_DEVICE_TYPE(C2040, c2040_device)
+DECLARE_DEVICE_TYPE(C3040, c3040_device)
+DECLARE_DEVICE_TYPE(C4040, c4040_device)
 
 
-
-#endif
+#endif // MAME_BUS_IEEE488_C2040_H

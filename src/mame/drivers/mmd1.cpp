@@ -413,10 +413,10 @@ READ8_MEMBER( mmd1_state::mmd2_kbd_r )
 WRITE8_MEMBER( mmd1_state::mmd2_status_callback )
 {
 	// operate the HALT LED
-	output().set_value("led_halt", ~data & I8085_STATUS_HLTA);
+	output().set_value("led_halt", ~data & i8080_cpu_device::STATUS_HLTA);
 	// operate the HOLD LED - this should connect to the HLDA pin,
 	// but it isn't emulated, using WO instead (whatever that does).
-	output().set_value("led_hold", data & I8085_STATUS_WO);
+	output().set_value("led_hold", data & i8080_cpu_device::STATUS_WO);
 }
 
 WRITE_LINE_MEMBER( mmd1_state::mmd2_inte_callback )
@@ -475,7 +475,7 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 	membank("bank8")->configure_entry(2, &p_ram[0xd800]);
 }
 
-static MACHINE_CONFIG_START( mmd1, mmd1_state )
+static MACHINE_CONFIG_START( mmd1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 6750000 / 9)
 	MCFG_CPU_PROGRAM_MAP(mmd1_mem)
@@ -487,7 +487,7 @@ static MACHINE_CONFIG_START( mmd1, mmd1_state )
 	MCFG_DEFAULT_LAYOUT(layout_mmd1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mmd2, mmd1_state )
+static MACHINE_CONFIG_START( mmd2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 6750000 / 9)
 	MCFG_CPU_PROGRAM_MAP(mmd2_mem)
@@ -526,6 +526,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY            FULLNAME       FLAGS */
-COMP( 1976, mmd1,    0,       0,     mmd1,      mmd1, driver_device,     0,   "E&L Instruments Inc", "MMD-1", MACHINE_NO_SOUND_HW)
-COMP( 1976, mmd2,    mmd1,    0,     mmd2,      mmd2, mmd1_state,    mmd2, "E&L Instruments Inc", "MMD-2", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY                FULLNAME  FLAGS
+COMP( 1976, mmd1,  0,      0,      mmd1,    mmd1,  mmd1_state, 0,    "E&L Instruments Inc", "MMD-1",  MACHINE_NO_SOUND_HW )
+COMP( 1976, mmd2,  mmd1,   0,      mmd2,    mmd2,  mmd1_state, mmd2, "E&L Instruments Inc", "MMD-2",  MACHINE_NO_SOUND_HW )

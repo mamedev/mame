@@ -510,7 +510,7 @@ static GFXDECODE_START( h19 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, h19_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( h19, h19_state )
+static MACHINE_CONFIG_START( h19 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, H19_CLOCK) // From schematics
 	MCFG_CPU_PROGRAM_MAP(h19_mem)
@@ -600,10 +600,9 @@ ROM_START( watz19 )
 ROM_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT    MACHINE    INPUT          INIT    COMPANY      FULLNAME          FLAGS */
-COMP( 1979, h19,     0,       0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE       INIT   COMPANY      FULLNAME                         FLAGS
+COMP( 1979, h19,     0,      0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19",                 0 )
 //Super-19 ROM - ATG Systems, Inc - Adv in Sextant Issue 4, Winter 1983. With the magazine lead-time, likely released late 1982.
-COMP( 1982, super19, h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", 0 )
+COMP( 1982, super19, h19,    0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", 0 )
 // Watzman ROM - HUG p/n 885-1121, announced in REMark Issue 33, Oct. 1982
-COMP( 1982, watz19,  h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Watzman ROM", 0 )
-
+COMP( 1982, watz19,  h19,    0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19 w/ Watzman ROM",  0 )

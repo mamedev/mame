@@ -1,18 +1,22 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet
+#ifndef MAME_VIDEO_733_ASR
+#define MAME_VIDEO_733_ASR
+
+#pragma once
 
 #define asr733_chr_region ":gfx1"
-
-enum
-{
-	/* 8 bytes per character definition */
-	asr733_single_char_len = 8,
-	asr733_chr_region_len   = 128*asr733_single_char_len
-};
 
 class asr733_device : public device_t, public device_gfx_interface
 {
 public:
+	enum
+	{
+		/* 8 bytes per character definition */
+		single_char_len = 8,
+		chr_region_len   = 128*single_char_len
+	};
+
 	asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_PALETTE_INIT(asr733);
@@ -20,13 +24,13 @@ public:
 	DECLARE_READ8_MEMBER(cru_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
 
-	template<class _Object> static devcb_base &static_set_keyint_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &static_set_keyint_callback(device_t &device, Object &&cb)
 	{
-		return downcast<asr733_device &>(device).m_keyint_line.set_callback(object);
+		return downcast<asr733_device &>(device).m_keyint_line.set_callback(std::forward<Object>(cb));
 	}
-	template<class _Object> static devcb_base &static_set_lineint_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &static_set_lineint_callback(device_t &device, Object &&cb)
 	{
-		return downcast<asr733_device &>(device).m_lineint_line.set_callback(object);
+		return downcast<asr733_device &>(device).m_lineint_line.set_callback(std::forward<Object>(cb));
 	}
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -76,10 +80,12 @@ private:
 	devcb_write_line                   m_lineint_line;
 };
 
-extern const device_type ASR733;
+DECLARE_DEVICE_TYPE(ASR733, asr733_device)
 
 #define MCFG_ASR733_KEYINT_HANDLER( _intcallb ) \
 	devcb = &asr733_device::static_set_keyint_callback( *device, DEVCB_##_intcallb );
 
 #define MCFG_ASR733_LINEINT_HANDLER( _intcallb ) \
 	devcb = &asr733_device::static_set_lineint_callback( *device, DEVCB_##_intcallb );
+
+#endif // MAME_VIDEO_733_ASR

@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles,smf
-#pragma once
+#ifndef MAME_SOUND_CDDA_H
+#define MAME_SOUND_CDDA_H
 
-#ifndef __CDDA_H__
-#define __CDDA_H__
+#pragma once
 
 #include "cdrom.h"
 
-class cdda_device : public device_t,
-									public device_sound_interface
+
+class cdda_device : public device_t, public device_sound_interface
 {
 public:
 	cdda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -25,8 +25,6 @@ public:
 	int audio_paused();
 	int audio_ended();
 
-	cdrom_file *        m_disc;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -36,6 +34,8 @@ protected:
 
 private:
 	void get_audio_data(stream_sample_t *bufL, stream_sample_t *bufR, uint32_t samples_wanted);
+
+	cdrom_file *        m_disc;
 
 	// internal state
 	sound_stream *      m_stream;
@@ -49,7 +49,6 @@ private:
 	int16_t               m_audio_volume[2];
 };
 
-extern const device_type CDDA;
+DECLARE_DEVICE_TYPE(CDDA, cdda_device)
 
-
-#endif /* __CDDA_H__ */
+#endif // MAME_SOUND_CDDA_H

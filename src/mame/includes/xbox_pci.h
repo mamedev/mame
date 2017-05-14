@@ -299,7 +299,7 @@ protected:
 	virtual void device_reset() override;
 };
 
-extern const device_type NV2A_AGP;
+DECLARE_DEVICE_TYPE(NV2A_AGP, nv2a_agp_device)
 
 /*
  * NV2A 3D Accelerator
@@ -331,7 +331,7 @@ private:
 	DECLARE_ADDRESS_MAP(nv2a_mirror, 32);
 };
 
-extern const device_type NV2A_GPU;
+DECLARE_DEVICE_TYPE(NV2A_GPU, nv2a_gpu_device)
 
 #define MCFG_MCPX_NV2A_GPU_CPU(_cpu_tag) \
 	downcast<nv2a_gpu_device *>(device)->set_cpu_tag(_cpu_tag);

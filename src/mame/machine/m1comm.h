@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ariane Fugmann
+#ifndef MAME_MACHINE_M1COMM_H
+#define MAME_MACHINE_M1COMM_H
+
 #pragma once
 
-#ifndef __M1COMM_H__
-#define __M1COMM_H__
-
-#define __M1COMM_SIMULATION__
+#define M1COMM_SIMULATION
 
 #include "cpu/z80/z80.h"
 
@@ -80,7 +80,7 @@ private:
 	char m_remotehost[256];
 	uint8_t m_buffer[0x1000];
 
-#ifdef __M1COMM_SIMULATION__
+#ifdef M1COMM_SIMULATION
 	uint8_t m_linkenable;
 	uint16_t m_linktimer;
 	uint8_t m_linkalive;
@@ -94,4 +94,4 @@ private:
 // device type definition
 extern const device_type M1COMM;
 
-#endif  /* __M1COMM_H__ */
+#endif  // MAME_MACHINE_M1COMM_H

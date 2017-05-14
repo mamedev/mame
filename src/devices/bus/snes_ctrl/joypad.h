@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SNES_CTRL_JOYPAD_H
+#define MAME_BUS_SNES_CTRL_JOYPAD_H
 
-#ifndef __SNES_JOYPAD__
-#define __SNES_JOYPAD__
+#pragma once
 
 
 #include "ctrl.h"
@@ -50,5 +50,4 @@ private:
 // device type definition
 extern const device_type SNES_JOYPAD;
 
-
-#endif
+#endif // MAME_BUS_SNES_CTRL_JOYPAD_H

@@ -7,6 +7,8 @@
     Generic ticket dispensing device.
 
 ***************************************************************************/
+#ifndef MAME_MACHINE_TICKET_H
+#define MAME_MACHINE_TICKET_H
 
 #pragma once
 
@@ -16,7 +18,7 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type TICKET_DISPENSER;
+DECLARE_DEVICE_TYPE(TICKET_DISPENSER, ticket_dispenser_device)
 
 
 
@@ -87,3 +89,5 @@ protected:
 	uint8_t m_power;
 	emu_timer *m_timer;
 };
+
+#endif // MAME_MACHINE_TICKET_H

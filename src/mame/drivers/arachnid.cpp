@@ -414,10 +414,10 @@ void arachnid_state::machine_start()
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( arachnid, arachnid_state )
+    MACHINE_CONFIG_START( arachnid )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( arachnid, arachnid_state )
+static MACHINE_CONFIG_START( arachnid )
 	// basic machine hardware
 	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(arachnid_map)
@@ -469,5 +469,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                   FULLNAME */
-GAME( 1990, arac6000,   0,         arachnid,        arachnid, driver_device,    0,    ROT0,  "Arachnid",         "Super Six Plus II English Mark Darts", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+/*    YEAR  NAME        PARENT     MACHINE   INPUT     STATE              INIT         COMPANY             FULLNAME */
+GAME( 1990, arac6000,   0,         arachnid, arachnid, arachnid_state,    0,    ROT0,  "Arachnid",         "Super Six Plus II English Mark Darts", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

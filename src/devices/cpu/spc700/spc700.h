@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Karl Stenerud
+#ifndef MAME_CPU_SPC700_SPC700_H
+#define MAME_CPU_SPC700_SPC700_H
+
 #pragma once
 
-#ifndef __SPC700_H__
-#define __SPC700_H__
 
-
-class spc700_device :  public cpu_device
+class spc700_device : public cpu_device
 {
 public:
 	// construction/destruction
@@ -25,7 +25,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -109,7 +109,7 @@ private:
 };
 
 
-extern const device_type SPC700;
+DECLARE_DEVICE_TYPE(SPC700, spc700_device)
 
 
 /* ======================================================================== */
@@ -138,4 +138,4 @@ enum
 /* ============================== END OF FILE ============================= */
 /* ======================================================================== */
 
-#endif /* __SPC700_H__ */
+#endif // MAME_CPU_SPC700_SPC700_H

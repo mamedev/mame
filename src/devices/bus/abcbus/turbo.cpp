@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TURBO_KONTROLLER = device_creator<turbo_kontroller_device>;
+DEFINE_DEVICE_TYPE(TURBO_KONTROLLER, turbo_kontroller_device, "unidisk", "Turbo-Kontroller")
 
 
 //-------------------------------------------------
@@ -111,7 +111,7 @@ machine_config_constructor turbo_kontroller_device::device_mconfig_additions() c
 //-------------------------------------------------
 
 turbo_kontroller_device::turbo_kontroller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TURBO_KONTROLLER, "Turbo-Kontroller", tag, owner, clock, "unidisk", __FILE__),
+	: device_t(mconfig, TURBO_KONTROLLER, tag, owner, clock),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG)
 {

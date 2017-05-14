@@ -819,7 +819,7 @@ void amaticmg_state::machine_reset()
 *          Machine Drivers          *
 ************************************/
 
-static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
+static MACHINE_CONFIG_START( amaticmg )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)     /* WRONG! */
 	MCFG_CPU_PROGRAM_MAP(amaticmg_map)

@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_NASBUS_FLOPPY_H
+#define MAME_BUS_NASBUS_FLOPPY_H
 
-#ifndef __NASBUS_FLOPPY_H__
-#define __NASBUS_FLOPPY_H__
+#pragma once
 
 #include "nasbus.h"
 #include "machine/wd_fdc.h"
@@ -42,7 +42,7 @@ protected:
 private:
 	TIMER_CALLBACK_MEMBER(motor_off);
 
-	required_device<fd1793_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
@@ -55,6 +55,6 @@ private:
 };
 
 // device type definition
-extern const device_type NASCOM_FDC;
+DECLARE_DEVICE_TYPE(NASCOM_FDC, nascom_fdc_device)
 
-#endif // __NASBUS_FLOPPY_H__
+#endif // MAME_BUS_NASBUS_FLOPPY_H

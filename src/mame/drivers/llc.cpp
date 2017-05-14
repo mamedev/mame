@@ -125,24 +125,21 @@ static INPUT_PORTS_START( llc2 )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( llc_state::kbd_put )
+void llc_state::kbd_put(u8 data)
 {
-	static uint8_t s1[16]={0x40, 0x1e, 0x12, 0x1b, 0x19, 0x14, 0x15, 0x1d, 0x16, 0x17, 0x1c, 0x3c, 0x3f, 0x3d, 0x3e, 0x10}; // 0x20 to 0x2F
-	static uint8_t s2[7] ={0x1a, 0x11, 0x7c, 0x13, 0x7b, 0x1f, 0x00}; // 0x3A to 0x40
-	static uint8_t s3[6] ={0x5c, 0x00, 0x5b, 0x7e, 0x00, 0x5e}; // 0x5B to 0x60
+	static constexpr uint8_t s1[16]={0x40, 0x1e, 0x12, 0x1b, 0x19, 0x14, 0x15, 0x1d, 0x16, 0x17, 0x1c, 0x3c, 0x3f, 0x3d, 0x3e, 0x10}; // 0x20 to 0x2F
+	static constexpr uint8_t s2[7] ={0x1a, 0x11, 0x7c, 0x13, 0x7b, 0x1f, 0x00}; // 0x3A to 0x40
+	static constexpr uint8_t s3[6] ={0x5c, 0x00, 0x5b, 0x7e, 0x00, 0x5e}; // 0x5B to 0x60
 
 	m_term_data = data;
 
 	if ((data >= 0x20) && (data <= 0x2f))
 		m_term_data = s1[data-0x20];
-	else
-	if ((data >= 0x3a) && (data <= 0x40))
+	else if ((data >= 0x3a) && (data <= 0x40))
 		m_term_data = s2[data-0x3a];
-	else
-	if ((data >= 0x5b) && (data <= 0x60))
+	else if ((data >= 0x5b) && (data <= 0x60))
 		m_term_data = s3[data-0x5b];
-	else
-	if (data >= 0x7b)
+	else if (data >= 0x7b)
 		m_term_data = 0;
 
 	if (m_term_data)
@@ -198,7 +195,7 @@ static GFXDECODE_START( llc2 )
 GFXDECODE_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( llc1, llc_state )
+static MACHINE_CONFIG_START( llc1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3MHz)
 	MCFG_Z80_DAISY_CHAIN(llc1_daisy_chain)
@@ -239,10 +236,10 @@ static MACHINE_CONFIG_START( llc1, llc_state )
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(llc_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(llc_state, kbd_put))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( llc2, llc_state )
+static MACHINE_CONFIG_START( llc2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3MHz)
 	MCFG_Z80_DAISY_CHAIN(llc2_daisy_chain)
@@ -310,6 +307,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY    FULLNAME       FLAGS */
-COMP( 1984, llc1,   0,      0,      llc1,       llc1, llc_state,       llc1,    "SCCH",    "LLC-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1984, llc2,   llc1,   0,      llc2,       llc2, llc_state,       llc2,    "SCCH",    "LLC-2", 0 )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT     COMPANY    FULLNAME  FLAGS */
+COMP( 1984, llc1,   0,      0,      llc1,    llc1,  llc_state,  llc1,    "SCCH",    "LLC-1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1984, llc2,   llc1,   0,      llc2,    llc2,  llc_state,  llc2,    "SCCH",    "LLC-2",  0 )

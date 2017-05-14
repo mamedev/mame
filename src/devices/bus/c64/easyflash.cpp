@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_EASYFLASH = device_creator<c64_easyflash_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_EASYFLASH, c64_easyflash_cartridge_device, "c64_easyflash", "C64 EasyFlash cartridge")
 
 
 //-------------------------------------------------
@@ -82,7 +82,7 @@ ioport_constructor c64_easyflash_cartridge_device::device_input_ports() const
 //-------------------------------------------------
 
 c64_easyflash_cartridge_device::c64_easyflash_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_EASYFLASH, "C64 EasyFlash cartridge", tag, owner, clock, "c64_easyflash", __FILE__),
+	device_t(mconfig, C64_EASYFLASH, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_flash_roml(*this, AM29F040_0_TAG),
 	m_flash_romh(*this, AM29F040_1_TAG),

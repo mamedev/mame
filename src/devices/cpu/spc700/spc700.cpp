@@ -62,10 +62,12 @@ Address  Function Register  R/W  When Reset          Remarks
 /* ================================ INCLUDES ============================== */
 /* ======================================================================== */
 
-#include <limits.h>
 #include "emu.h"
-#include "debugger.h"
 #include "spc700.h"
+
+#include "debugger.h"
+
+#include <limits.h>
 
 
 /* ======================================================================== */
@@ -216,11 +218,11 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 
 
 
-const device_type SPC700 = device_creator<spc700_device>;
+DEFINE_DEVICE_TYPE(SPC700, spc700_device, "spc700", "SPC700")
 
 
 spc700_device::spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SPC700, "SPC700", tag, owner, clock, "spc700", __FILE__)
+	: cpu_device(mconfig, SPC700, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_a(0)
 	, m_x(0)

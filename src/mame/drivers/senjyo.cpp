@@ -550,7 +550,7 @@ static GFXDECODE_START( senjyo )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( senjyo, senjyo_state )
+static MACHINE_CONFIG_START( senjyo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
@@ -940,10 +940,10 @@ DRIVER_INIT_MEMBER(senjyo_state,senjyo)
 }
 
 
-GAME( 1983, senjyo,   0,        senjyo,    senjyo, senjyo_state,   senjyo,   ROT90, "Tehkan", "Senjyo", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforc, 0,        senjyo,    starforc, senjyo_state, starforc, ROT90, "Tehkan", "Star Force", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforce,starforc, senjyox_e, starforc, senjyo_state, starfore, ROT90, "Tehkan", "Star Force (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforcb,starforc, starforb,  starforc, senjyo_state, starfore, ROT90, "bootleg", "Star Force (encrypted, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforca,starforc, senjyox_a, starforc, senjyo_state, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, megaforc, starforc, senjyo,    starforc, senjyo_state, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, baluba,   0,        senjyo,    baluba, senjyo_state,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, senjyo,    0,        senjyo,    senjyo,   senjyo_state, senjyo,   ROT90, "Tehkan",  "Senjyo", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforc,  0,        senjyo,    starforc, senjyo_state, starforc, ROT90, "Tehkan",  "Star Force", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforce, starforc, senjyox_e, starforc, senjyo_state, starfore, ROT90, "Tehkan",  "Star Force (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforcb, starforc, starforb,  starforc, senjyo_state, starfore, ROT90, "bootleg", "Star Force (encrypted, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforca, starforc, senjyox_a, starforc, senjyo_state, starfora, ROT90, "Tehkan",  "Star Force (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, megaforc,  starforc, senjyo,    starforc, senjyo_state, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, baluba,    0,        senjyo,    baluba,   senjyo_state, starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )

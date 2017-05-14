@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_COMX35_CLM_H
+#define MAME_BUS_COMX35_CLM_H
 
-#ifndef __COMX_CLM__
-#define __COMX_CLM__
+#pragma once
 
 #include "exp.h"
 #include "video/mc6845.h"
@@ -57,7 +57,7 @@ private:
 
 
 // device type definition
-extern const device_type COMX_CLM;
+DECLARE_DEVICE_TYPE(COMX_CLM, comx_clm_device)
 
 
-#endif
+#endif // MAME_BUS_COMX35_CLM_H

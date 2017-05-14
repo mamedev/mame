@@ -28,7 +28,7 @@ enum
 	IRQREG_INPUT1
 };
 
-const device_type E0C6S46 = device_creator<e0c6s46_device>;
+DEFINE_DEVICE_TYPE(E0C6S46, e0c6s46_device, "e0c6s46", "Seiko Epson E0C6S46")
 
 
 // internal memory maps
@@ -47,7 +47,7 @@ ADDRESS_MAP_END
 
 // device definitions
 e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: e0c6200_cpu_device(mconfig, E0C6S46, "E0C6S46", tag, owner, clock, ADDRESS_MAP_NAME(e0c6s46_program), ADDRESS_MAP_NAME(e0c6s46_data), "e0c6s46", __FILE__)
+	: e0c6200_cpu_device(mconfig, E0C6S46, tag, owner, clock, ADDRESS_MAP_NAME(e0c6s46_program), ADDRESS_MAP_NAME(e0c6s46_data))
 	, m_vram1(*this, "vram1")
 	, m_vram2(*this, "vram2"), m_osc(0), m_svd(0), m_lcd_control(0), m_lcd_contrast(0)
 	, m_pixel_update_handler(nullptr)

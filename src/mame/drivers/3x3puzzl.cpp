@@ -382,7 +382,7 @@ void _3x3puzzle_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( _3x3puzzle, _3x3puzzle_state )
+static MACHINE_CONFIG_START( _3x3puzzle )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,MAIN_CLOCK)
@@ -404,7 +404,7 @@ static MACHINE_CONFIG_START( _3x3puzzle, _3x3puzzle_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -503,6 +503,6 @@ ROM_END
 
 
 
-GAME( 1998, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Enterprise)", MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
-GAME( 1998, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  driver_device, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Normal)", MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
-GAME( 199?, casanova,  0,          _3x3puzzle,  casanova,    driver_device, 0,       ROT0, "Promat",              "Casanova", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  _3x3puzzle_state, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Enterprise)", MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
+GAME( 1998, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  _3x3puzzle_state, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Normal)",     MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
+GAME( 199?, casanova,  0,          _3x3puzzle,  casanova,    _3x3puzzle_state, 0,       ROT0, "Promat",              "Casanova",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "nextkbd.h"
 
-const device_type NEXTKBD = device_creator<nextkbd_device>;
+DEFINE_DEVICE_TYPE(NEXTKBD, nextkbd_device, "nextkbd", "NeXT Keyboard")
 
 DEVICE_ADDRESS_MAP_START(amap, 32, nextkbd_device)
 	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_snd_r, ctrl_snd_w, 0xff000000)
@@ -16,7 +16,7 @@ DEVICE_ADDRESS_MAP_START(amap, 32, nextkbd_device)
 ADDRESS_MAP_END
 
 nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NEXTKBD, "NEXTKBD", tag, owner, clock, "nextkbd", __FILE__),
+	device_t(mconfig, NEXTKBD, tag, owner, clock),
 	int_change_cb(*this),
 	int_power_cb(*this),
 	int_nmi_cb(*this),

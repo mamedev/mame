@@ -59,9 +59,12 @@ Registers:
 #define VERBOSE_REGISTER_WRITE 0
 #define VERBOSE_REGISTER_READ 0
 
-#define LOG_SOUND(x) do { if (VERBOSE_SOUND) logerror x; } while (0)
-#define LOG_REGISTER_WRITE(x) do { if (VERBOSE_REGISTER_WRITE) logerror x; } while (0)
-#define LOG_REGISTER_READ(x) do { if (VERBOSE_REGISTER_READ) logerror x; } while (0)
+#define LOG_SOUND(...) do { if (VERBOSE_SOUND) logerror(__VA_ARGS__); } while (0)
+#define LOG_REGISTER_WRITE(...) do { if (VERBOSE_REGISTER_WRITE) logerror(__VA_ARGS__); } while (0)
+#define LOG_REGISTER_READ(...) do { if (VERBOSE_REGISTER_READ) logerror(__VA_ARGS__); } while (0)
+
+
+namespace {
 
 #define FREQ_BASE_BITS        8                 // Frequency fixed decimal shift bits
 #define ENV_BASE_BITS        16                 // wave form envelope fixed decimal shift bits
@@ -78,15 +81,17 @@ struct X1_010_CHANNEL {
 	unsigned char   reserve[2];
 };
 
+} // anonymous namespace
+
 
 /* mixer tables and internal buffers */
 //static short  *mixer_buffer = nullptr;
 
 
-const device_type X1_010 = device_creator<x1_010_device>;
+DEFINE_DEVICE_TYPE(X1_010, x1_010_device, "x1_010", "Seta X1-010")
 
 x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, X1_010, "X1-010", tag, owner, clock, "x1_010", __FILE__),
+	: device_t(mconfig, X1_010, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_rate(0),
@@ -95,10 +100,10 @@ x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, dev
 		m_sound_enable(0),
 		m_base_clock(0)
 {
-	memset(m_reg, 0, sizeof(m_reg));
-	memset(m_HI_WORD_BUF, 0, sizeof(m_HI_WORD_BUF));
-	memset(m_smp_offset, 0, sizeof(SETA_NUM_CHANNELS));
-	memset(m_env_offset, 0, sizeof(SETA_NUM_CHANNELS));
+	std::fill(std::begin(m_reg), std::end(m_reg), 0);
+	std::fill(std::begin(m_HI_WORD_BUF), std::end(m_HI_WORD_BUF), 0);
+	std::fill(std::begin(m_smp_offset), std::end(m_smp_offset), 0);
+	std::fill(std::begin(m_env_offset), std::end(m_env_offset), 0);
 }
 
 //-------------------------------------------------
@@ -112,12 +117,12 @@ void x1_010_device::device_start()
 	m_base_clock    = clock();
 	m_rate          = clock() / 512;
 
-	for( i = 0; i < SETA_NUM_CHANNELS; i++ ) {
+	for( i = 0; i < NUM_CHANNELS; i++ ) {
 		m_smp_offset[i] = 0;
 		m_env_offset[i] = 0;
 	}
 	/* Print some more debug info */
-	LOG_SOUND(("masterclock = %d rate = %d\n", clock(), m_rate ));
+	LOG_SOUND("masterclock = %d rate = %d\n", clock(), m_rate );
 
 	/* get stream channels */
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
@@ -154,12 +159,12 @@ WRITE8_MEMBER( x1_010_device::write )
 	channel = offset/sizeof(X1_010_CHANNEL);
 	reg     = offset%sizeof(X1_010_CHANNEL);
 
-	if( channel < SETA_NUM_CHANNELS && reg == 0
+	if( channel < NUM_CHANNELS && reg == 0
 		&& (m_reg[offset]&1) == 0 && (data&1) != 0 ) {
 		m_smp_offset[channel] = 0;
 		m_env_offset[channel] = 0;
 	}
-	LOG_REGISTER_WRITE(("%s: offset %6X : data %2X\n", machine().describe_context(), offset, data ));
+	LOG_REGISTER_WRITE("%s: offset %6X : data %2X\n", machine().describe_context(), offset, data);
 	m_reg[offset] = data;
 }
 
@@ -172,7 +177,7 @@ READ16_MEMBER( x1_010_device::word_r )
 
 	ret = m_HI_WORD_BUF[offset]<<8;
 	ret += (read( space, offset )&0xff);
-	LOG_REGISTER_READ(( "%s: Read X1-010 Offset:%04X Data:%04X\n", machine().describe_context(), offset, ret ));
+	LOG_REGISTER_READ("%s: Read X1-010 Offset:%04X Data:%04X\n", machine().describe_context(), offset, ret);
 	return ret;
 }
 
@@ -180,7 +185,7 @@ WRITE16_MEMBER( x1_010_device::word_w )
 {
 	m_HI_WORD_BUF[offset] = (data>>8)&0xff;
 	write( space, offset, data&0xff );
-	LOG_REGISTER_WRITE(( "%s: Write X1-010 Offset:%04X Data:%04X\n", machine().describe_context(), offset, data ));
+	LOG_REGISTER_WRITE("%s: Write X1-010 Offset:%04X Data:%04X\n", machine().describe_context(), offset, data);
 }
 
 
@@ -202,7 +207,7 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 //  if( m_sound_enable == 0 ) return;
 
-	for( ch = 0; ch < SETA_NUM_CHANNELS; ch++ ) {
+	for( ch = 0; ch < NUM_CHANNELS; ch++ ) {
 		reg = (X1_010_CHANNEL *)&(m_reg[ch*sizeof(X1_010_CHANNEL)]);
 		if( (reg->status&1) != 0 ) {                            // Key On
 			stream_sample_t *bufL = outputs[0];
@@ -221,8 +226,8 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				smp_step = (uint32_t)((float)m_base_clock/8192.0f
 							*freq*(1<<FREQ_BASE_BITS)/(float)m_rate);
 				if( smp_offs == 0 ) {
-					LOG_SOUND(( "Play sample %p - %p, channel %X volume %d:%d freq %X step %X offset %X\n",
-						start, end, ch, volL, volR, freq, smp_step, smp_offs ));
+					LOG_SOUND("Play sample %p - %p, channel %X volume %d:%d freq %X step %X offset %X\n",
+						start, end, ch, volL, volR, freq, smp_step, smp_offs);
 				}
 				for( i = 0; i < samples; i++ ) {
 					delta = smp_offs>>FREQ_BASE_BITS;
@@ -248,8 +253,8 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				env_step = (uint32_t)((float)m_base_clock/128.0f/1024.0f/4.0f*reg->start*(1<<ENV_BASE_BITS)/(float)m_rate);
 				/* Print some more debug info */
 				if( smp_offs == 0 ) {
-					LOG_SOUND(( "Play waveform %X, channel %X volume %X freq %4X step %X offset %X\n",
-						reg->volume, ch, reg->end, freq, smp_step, smp_offs ));
+					LOG_SOUND("Play waveform %X, channel %X volume %X freq %4X step %X offset %X\n",
+						reg->volume, ch, reg->end, freq, smp_step, smp_offs);
 				}
 				for( i = 0; i < samples; i++ ) {
 					int vol;

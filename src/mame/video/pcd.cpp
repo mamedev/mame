@@ -9,11 +9,11 @@
 #include "screen.h"
 
 
-const device_type PCD_VIDEO = device_creator<pcd_video_device>;
-const device_type PCX_VIDEO = device_creator<pcx_video_device>;
+DEFINE_DEVICE_TYPE(PCD_VIDEO, pcd_video_device, "pcd_video", "Siemens PC-D Video")
+DEFINE_DEVICE_TYPE(PCX_VIDEO, pcx_video_device, "pcx_video", "Siemens PC-X Video")
 
-pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, nullptr, "palette"),
 	m_maincpu(*this, ":maincpu"),
 	m_mcu(*this, "graphics"),
@@ -23,7 +23,7 @@ pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type 
 }
 
 pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	pcdx_video_device(mconfig, PCD_VIDEO, "Siemens PC-D Video", tag, owner, clock, "pcd_video", __FILE__),
+	pcdx_video_device(mconfig, PCD_VIDEO, tag, owner, clock),
 	m_mouse_btn(*this, "MOUSE"),
 	m_mouse_x(*this, "MOUSEX"),
 	m_mouse_y(*this, "MOUSEY"),
@@ -33,7 +33,7 @@ pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *ta
 }
 
 pcx_video_device::pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	pcdx_video_device(mconfig, PCX_VIDEO, "Siemens PC-X Video", tag, owner, clock, "pcx_video", __FILE__),
+	pcdx_video_device(mconfig, PCX_VIDEO, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_vram(4*1024),
 	m_charrom(*this, "char"),

@@ -62,17 +62,17 @@
 
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
-#define READ_PORT(num)           m_in_##num(space, 0)
-#define WRITE_PORT(num,data)     m_out_##num(space, 0, data)
+#define READ_PORT(num)           m_in[num](space, 0)
+#define WRITE_PORT(num, data)    m_out[num](space, 0, data)
 
 WRITE8_MEMBER( namco_51xx_device::write )
 {
 	data &= 0x07;
 
-	LOG(("%s: custom 51XX write %02x\n",machine().describe_context(),data));
+	LOG("%s: custom 51XX write %02x\n",machine().describe_context(),data);
 
 	if (m_coincred_mode)
 	{
@@ -168,7 +168,7 @@ static const int joy_map[16] =
 
 READ8_MEMBER( namco_51xx_device::read )
 {
-	LOG(("%s: custom 51XX read\n",machine().describe_context()));
+	LOG("%s: custom 51XX read\n",machine().describe_context());
 
 	if (m_mode == 0) /* switch mode */
 	{
@@ -341,17 +341,13 @@ ROM_START( namco_51xx )
 	ROM_LOAD( "51xx.bin",     0x0000, 0x0400, CRC(c2f57ef8) SHA1(50de79e0d6a76bda95ffb02fcce369a79e6abfec) )
 ROM_END
 
-const device_type NAMCO_51XX = device_creator<namco_51xx_device>;
+DEFINE_DEVICE_TYPE(NAMCO_51XX, namco_51xx_device, "namco51", "Namco 51xx")
 
 namco_51xx_device::namco_51xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_51XX, "Namco 51xx", tag, owner, clock, "namco51", __FILE__),
+	: device_t(mconfig, NAMCO_51XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
-	m_in_0(*this),
-	m_in_1(*this),
-	m_in_2(*this),
-	m_in_3(*this),
-	m_out_0(*this),
-	m_out_1(*this),
+	m_in{ { *this }, { *this }, { *this }, { *this } },
+	m_out{ { *this }, { *this } },
 	m_lastcoins(0),
 	m_lastbuttons(0),
 	m_mode(0),
@@ -367,14 +363,12 @@ namco_51xx_device::namco_51xx_device(const machine_config &mconfig, const char *
 void namco_51xx_device::device_start()
 {
 	/* resolve our read callbacks */
-	m_in_0.resolve_safe(0);
-	m_in_1.resolve_safe(0);
-	m_in_2.resolve_safe(0);
-	m_in_3.resolve_safe(0);
+	for (devcb_read8 &cb : m_in)
+		cb.resolve_safe(0);
 
 	/* resolve our write callbacks */
-	m_out_0.resolve_safe();
-	m_out_1.resolve_safe();
+	for (devcb_write8 &cb : m_out)
+		cb.resolve_safe();
 
 	save_item(NAME(m_lastcoins));
 	save_item(NAME(m_lastbuttons));

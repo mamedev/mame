@@ -24,22 +24,23 @@ TODO:
 #include "mpeg_audio.h"
 
 // device type definition
-const device_type YMZ770 = device_creator<ymz770_device>;
+DEFINE_DEVICE_TYPE(YMZ770, ymz770_device, "ymz770", "Yamaha YMZ770 AMMS-A")
 
 //-------------------------------------------------
 //  ymz770_device - constructor
 //-------------------------------------------------
 
 ymz770_device::ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, YMZ770, "Yamaha YMZ770", tag, owner, clock, "ymz770", __FILE__),
-		device_sound_interface(mconfig, *this), m_stream(nullptr),
-		m_cur_reg(0),
-		m_mute(0),
-		m_doen(0),
-		m_vlma(0),
-		m_bsl(0),
-		m_cpl(0),
-		m_rom(*this, DEVICE_SELF)
+	: device_t(mconfig, YMZ770, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_stream(nullptr)
+	, m_cur_reg(0)
+	, m_mute(0)
+	, m_doen(0)
+	, m_vlma(0)
+	, m_bsl(0)
+	, m_cpl(0)
+	, m_rom(*this, DEVICE_SELF)
 {
 }
 

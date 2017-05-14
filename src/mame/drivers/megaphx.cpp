@@ -350,7 +350,7 @@ WRITE8_MEMBER(megaphx_state::port_c_w)
 }
 
 
-static MACHINE_CONFIG_START( megaphx, megaphx_state )
+static MACHINE_CONFIG_START( megaphx )
 
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??  can't read xtal due to reflections, CPU is an 8Mhz part
 	MCFG_CPU_PROGRAM_MAP(megaphx_68k_map)
