@@ -47,7 +47,7 @@ public:
 template <unsigned bits>
 constexpr stream_sample_t dac_multiply(const double vref, const stream_sample_t code)
 {
-	return (bits > 1) ? ((vref * code) / (1 << bits)) : (vref * code);
+	return (bits > 1) ? ((vref * code) / (1 << (bits))) : (vref * code);
 }
 
 template <unsigned bits>

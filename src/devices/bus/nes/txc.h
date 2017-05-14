@@ -32,7 +32,7 @@ protected:
 };
 
 
-// ======================> nes_txc_dumarac_device
+// ======================> nes_txc_dumarc_device
 
 class nes_txc_dumarc_device : public nes_txc_22211_device
 {
@@ -97,7 +97,7 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_TXC_22211,      nes_txc_22211_device)
-DECLARE_DEVICE_TYPE(NES_TXC_DUMARACING, nes_txc_dumarac_device)
+DECLARE_DEVICE_TYPE(NES_TXC_DUMARACING, nes_txc_dumarc_device)
 DECLARE_DEVICE_TYPE(NES_TXC_MJBLOCK,    nes_txc_mjblock_device)
 DECLARE_DEVICE_TYPE(NES_TXC_STRIKEW,    nes_txc_strikew_device)
 DECLARE_DEVICE_TYPE(NES_TXC_COMMANDOS,  nes_txc_commandos_device)
