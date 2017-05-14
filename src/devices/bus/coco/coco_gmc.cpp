@@ -2,7 +2,7 @@
 // copyright-holders:tim lindner
 /***************************************************************************
 
-    coco_gmc.c
+    coco_gmc.cpp
 
     Code for emulating the Games Master Cartridge. A banked switched ROM
     cartridge with a SN76489AN programmable sound generator.
@@ -54,9 +54,9 @@ machine_config_constructor coco_pak_gmc_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( cocopak_gmc );
 }
 
-/*-------------------------------------------------
-    write
--------------------------------------------------*/
+//-------------------------------------------------
+//    write
+//-------------------------------------------------
 
 WRITE8_MEMBER(coco_pak_gmc_device::write)
 {

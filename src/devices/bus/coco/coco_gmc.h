@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:tim lindner
-#pragma once
+#ifndef MAME_DEVICES_BUS_COCO_COCO_GMC_H
+#define MAME_DEVICES_BUS_COCO_COCO_GMC_H
 
-#ifndef __COCO_GMC_H__
-#define __COCO_GMC_H__
+#pragma once
 
 #include "coco_pak.h"
 #include "sound/sn76496.h"
@@ -29,4 +29,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(COCO_PAK_GMC, coco_pak_gmc_device)
 
-#endif  /* __COCO_GMC_H__ */
+#endif  // MAME_DEVICES_BUS_COCO_COCO_GMC_H
