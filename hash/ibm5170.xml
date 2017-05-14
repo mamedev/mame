@@ -5042,6 +5042,39 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="darkseed">
+		<description>Dark Seed</description>
+		<year>1992</year>
+		<publisher>Dro Soft</publisher>
+		<info name="version" value="1.5" />
+		<info name="developer" value="Cyberdreams, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dark Seed [Dro Soft] [1992] [3.5DD] [Disk 1 of 5].img" size="737280" crc="06f697be" sha1="11e8b1fdc50916bc81f25e925b4050408b7031a3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dark Seed [Dro Soft] [1992] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="d4d69fd4" sha1="5ea3bc34d513233b2ec15576a2a73415ad85f231" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dark Seed [Dro Soft] [1992] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="53bc2c6e" sha1="9e6a36d08d5d4731f3091e65da7decf17e4e3c2e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dark Seed [Dro Soft] [1992] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="8c5fb082" sha1="04927d147fc8de30f3c9d8c8e1754e0cfcdbaf52" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dark Seed [Dro Soft] [1992] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="b777d050" sha1="59e6a93fc0a4044e84dc5f950d1dae0b64a1a28b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="descsw">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Descent (Shareware, 1.0)</description>
@@ -6230,6 +6263,29 @@ Missing files come here
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk7.img" size="737280" crc="077b9c18" sha1="8d299cd5fe2ed0dd93253d383c12e3fa889a4b39" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkeyk">
+		<description>The Secret of Monkey Island (3.5", Kixx XL release)</description>
+		<year>1993</year>
+		<publisher>Kixx</publisher>
+		<info name="developer" value="Lucasfilm Games" />
+		<info name="version" value="(VGA) 1.1 (2-15-91)" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Secret of Monkey Island [Kixx] [1993] [3.5DD] [Disk 1 of 3].img" size="737280" crc="6e2a88e9" sha1="fb9c3ab1e392292eb40209db9ce840e5689c88d4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island [Kixx] [1993] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="b480b9cc" sha1="a8d94121f86289ece8708c00618296716be3292f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island [Kixx] [1993] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="aa3cc8ba" sha1="d8f774bd3be4a85ac4d02e7f6c13ecee254aa560" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
