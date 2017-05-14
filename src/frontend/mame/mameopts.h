@@ -80,6 +80,9 @@ private:
 	// softlist handling
 	static std::map<std::string, std::string> evaluate_initial_softlist_options(emu_options &options);
 
+	// special function to fish hashpath out of INI files - needed for softlist processing
+	static void populate_hashpath_from_ini_files(emu_options &options);
+
 	// represents an "invalid" value (an empty string is valid so we can't use that; what I
 	// really want to return is std::optional<std::string> but C++17 isn't here yet)
 	static std::string value_specifier_invalid_value() { return std::string("\x01\x02\x03"); }
