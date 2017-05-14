@@ -192,9 +192,13 @@ cli_frontend::~cli_frontend()
 {
 }
 
-void cli_frontend::start_execution(mame_machine_manager *manager, std::vector<std::string> &args)
+void cli_frontend::start_execution(mame_machine_manager *manager, const std::vector<std::string> &args)
 {
 	std::ostringstream option_errors;
+
+	// because softlist evaluation relies on hashpath being populated, we are going to go through
+	// a special step to force it to be evaluated
+	mame_options::populate_hashpath_from_args_and_inis(m_options, args);
 
 	// parse the command line, adding any system-specific options
 	try

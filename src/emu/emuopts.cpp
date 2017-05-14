@@ -399,8 +399,9 @@ namespace
 //  emu_options - constructor
 //-------------------------------------------------
 
-emu_options::emu_options(bool general_only)
-	: m_system(nullptr)
+emu_options::emu_options(option_support support)
+	: m_support(support)
+	, m_system(nullptr)
 	, m_coin_impulse(0)
 	, m_joystick_contradictory(false)
 	, m_sleep(true)
@@ -408,11 +409,10 @@ emu_options::emu_options(bool general_only)
 	, m_ui(UI_CABINET)
 {
 	// add entries
-	if (!general_only)
-	{
+	if (support == option_support::FULL || support == option_support::GENERAL_AND_SYSTEM)
 		add_entry(std::make_shared<system_name_option_entry>(*this));
+	if (support == option_support::FULL)
 		add_entry(std::make_shared<software_name_option_entry>(*this));
-	}
 	add_entries(emu_options::s_option_entries);
 
 	// adding handlers to keep copies of frequently requested options in member variables
@@ -478,10 +478,11 @@ void emu_options::set_system_name(std::string &&new_system_name)
 	// did we change anything?
 	if (new_system != m_system)
 	{
-		// if so, specify the new system and update
+		// if so, specify the new system and update (if we're fully supporting slot/image options)
 		m_system = new_system;
 		m_software_name.clear();
-		update_slot_and_image_options();
+		if (m_support == option_support::FULL)
+			update_slot_and_image_options();
 	}
 }
 

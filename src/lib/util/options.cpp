@@ -585,7 +585,7 @@ void core_options::set_description(const char *name, const char *description)
 //  command line arguments
 //-------------------------------------------------
 
-void core_options::parse_command_line(std::vector<std::string> &args, int priority)
+void core_options::parse_command_line(const std::vector<std::string> &args, int priority, bool ignore_unknown_options)
 {
 	std::ostringstream error_stream;
 	condition_type condition = condition_type::NONE;
@@ -612,7 +612,6 @@ void core_options::parse_command_line(std::vector<std::string> &args, int priori
 
 	// iterate through arguments
 	int unadorned_index = 0;
-	size_t new_argc = 1;
 	for (size_t arg = 1; arg < args.size(); arg++)
 	{
 		// determine the entry name to search for
@@ -624,7 +623,6 @@ void core_options::parse_command_line(std::vector<std::string> &args, int priori
 		if (is_unadorned && !m_command.empty())
 		{
 			m_command_arguments.push_back(std::move(args[arg]));
-			args[arg].clear();
 			continue;
 		}
 
@@ -632,21 +630,8 @@ void core_options::parse_command_line(std::vector<std::string> &args, int priori
 		auto curentry = get_entry(optionname);
 		if (!curentry)
 		{
-			// we need to relocate this option
-			if (new_argc != arg)
-				args[new_argc] = std::move(args[arg]);
-			new_argc++;
-
-			if (!is_unadorned)
-			{
-				arg++;
-				if (arg < args.size())
-				{
-					if (new_argc != arg)
-						args[new_argc] = std::move(args[arg]);
-					new_argc++;
-				}
-			}
+			if (!ignore_unknown_options)
+				throw options_error_exception("Error: unknown option: -%s\n", optionname);
 			continue;
 		}
 
@@ -666,20 +651,16 @@ void core_options::parse_command_line(std::vector<std::string> &args, int priori
 		}
 		else if (arg + 1 < args.size())
 		{
-			args[arg++].clear();
-			newdata = std::move(args[arg]);
+			newdata = args[++arg];
 		}
 		else
 		{
 			throw options_error_exception("Error: option %s expected a parameter\n", curarg);
 		}
-		args[arg].clear();
 
 		// set the new data
 		do_set_value(*curentry, std::move(newdata), priority, error_stream, condition);
 	}
-
-	args.resize(new_argc);
 
 	// did we have any errors that may need to be aggregated?
 	throw_options_exception_if_appropriate(condition, error_stream);

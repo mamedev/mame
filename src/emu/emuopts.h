@@ -274,8 +274,15 @@ public:
 		UI_SIMPLE
 	};
 
+	enum class option_support
+	{
+		FULL,					// full option support
+		GENERAL_AND_SYSTEM,		// support for general options and system (no softlist)
+		GENERAL_ONLY			// only support for general options
+	};
+
 	// construction/destruction
-	emu_options(bool general_only = false);
+	emu_options(option_support support = option_support::FULL);
 	~emu_options();
 
 	// mutation
@@ -489,7 +496,8 @@ private:
 	// static list of options entries
 	static const options_entry                          s_option_entries[];
 
-	// the current driver
+	// the basics
+	option_support										m_support;
 	const game_driver *                                 m_system;
 
 	// slots and devices

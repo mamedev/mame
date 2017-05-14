@@ -193,7 +193,7 @@ info_xml_creator::info_xml_creator(driver_enumerator &drivlist, bool filter_devi
 	: m_output(nullptr)
 	, m_drivlist(drivlist)
 	, m_filter_devices(filter_devices)
-	, m_lookup_options(true)
+	, m_lookup_options(emu_options::option_support::GENERAL_ONLY)
 {
 	m_lookup_options.copy_from(m_drivlist.options());
 }

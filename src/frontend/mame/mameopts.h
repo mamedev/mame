@@ -54,6 +54,7 @@ public:
 	// parsing wrappers
 	static void parse_standard_inis(emu_options &options, std::ostream &error_stream, const game_driver *driver = nullptr);
 	static const game_driver *system(const emu_options &options);
+	static void populate_hashpath_from_args_and_inis(emu_options &options, const std::vector<std::string> &args);
 
 private:
 	// INI parsing helper

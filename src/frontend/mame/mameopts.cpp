@@ -138,3 +138,59 @@ void mame_options::parse_one_ini(emu_options &options, const char *basename, int
 	}
 
 }
+
+
+//-------------------------------------------------
+//  populate_hashpath_from_args_and_inis
+//-------------------------------------------------
+
+void mame_options::populate_hashpath_from_args_and_inis(emu_options &options, const std::vector<std::string> &args)
+{
+	// The existence of this function comes from the fact that for softlist options to be properly
+	// evaluated, we need to have the hashpath variable set.  The problem is that the hashpath may
+	// be set anywhere on the command line, but also in any of the myriad INI files that we parse, some
+	// of which may be system specific (e.g. - nes.ini) or otherwise influenced by the system (e.g. - vector.ini)
+	//
+	// I think that it is terrible that we have to do a completely independent pass on the command line and every
+	// argument simply because any one of these things might be setting - hashpath.Unless we invest the effort in
+	// building some sort of "late binding" apparatus for options(e.g. - delay evaluation of softlist options until
+	// we've scoured all INIs for hashpath) that can completely straddle the command line and the INI worlds, doing
+	// this is the best that we can do IMO.
+
+	// parse the command line
+	emu_options temp_options(emu_options::option_support::GENERAL_AND_SYSTEM);
+	try
+	{
+		temp_options.parse_command_line(args, OPTION_PRIORITY_CMDLINE, true);
+	}
+	catch (options_exception &)
+	{
+		// Something is very long; we have bigger problems than -hashpath possibly
+		// being in never-never land.  Punt and let the main code fail
+		return;
+	}
+
+	// if we have an auxillary verb, hashpath is irrelevant
+	if (!temp_options.command().empty())
+		return;
+
+	// read INI files
+	if (temp_options.read_config())
+	{
+		std::ostringstream error_stream;
+		parse_standard_inis(temp_options, error_stream);
+	}
+
+	// and fish out hashpath
+	const auto entry = temp_options.get_entry(OPTION_HASHPATH);
+	if (entry)
+	{
+		try
+		{
+			options.set_value(OPTION_HASHPATH, entry->value(), entry->priority());
+		}
+		catch (options_exception &)
+		{
+		}
+	}
+}

@@ -60,7 +60,7 @@ private:
 	void execute_commands(const char *exename);
 	void display_help(const char *exename);
 	void output_single_softlist(FILE *out, software_list_device &swlist);
-	void start_execution(mame_machine_manager *manager, std::vector<std::string> &args);
+	void start_execution(mame_machine_manager *manager, const std::vector<std::string> &args);
 
 	// internal state
 	emu_options &       m_options;
