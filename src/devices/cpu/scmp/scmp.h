@@ -1,17 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-#ifndef __SCMP_H__
-#define __SCMP_H__
+#ifndef MAME_CPU_SCMP_SCMP_H
+#define MAME_CPU_SCMP_SCMP_H
 
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-enum
-{
-	SCMP_PC, SCMP_P1, SCMP_P2, SCMP_P3, SCMP_AC, SCMP_ER, SCMP_SR
-};
+#pragma once
 
 
 #define MCFG_SCMP_CONFIG(_flag_out_devcb, _sout_devcb, _sin_devcb, _sensea_devcb, _senseb_devcb, _halt_devcb) \
@@ -28,17 +20,23 @@ class scmp_device : public cpu_device
 public:
 	// construction/destruction
 	scmp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	scmp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_flag_out_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_flag_out_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_sout_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_sout_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_sin_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_sin_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_sensea_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_sensea_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_senseb_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_senseb_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_halt_cb(device_t &device, _Object object) { return downcast<scmp_device &>(device).m_halt_func.set_callback(object); }
+	template <class Object> static devcb_base &set_flag_out_cb(device_t &device, Object &&cb) { return downcast<scmp_device &>(device).m_flag_out_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sout_cb(device_t &device, Object &&cb) { return downcast<scmp_device &>(device).m_sout_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sin_cb(device_t &device, Object &&cb) { return downcast<scmp_device &>(device).m_sin_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sensea_cb(device_t &device, Object &&cb) { return downcast<scmp_device &>(device).m_sensea_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_senseb_cb(device_t &device, Object &&cb) { return downcast<scmp_device &>(device).m_senseb_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_halt_cb(device_t &device, Object &&cb) { return downcast<scmp_device &>(device).m_halt_func.set_callback(std::forward<Object>(cb)); }
 
 protected:
+	enum
+	{
+		SCMP_PC, SCMP_P1, SCMP_P2, SCMP_P3, SCMP_AC, SCMP_ER, SCMP_SR
+	};
+
+	scmp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -50,7 +48,7 @@ protected:
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -94,7 +92,6 @@ private:
 	inline uint16_t GET_ADDR(uint8_t code);
 	void execute_one(int opcode);
 	void take_interrupt();
-
 };
 
 
@@ -110,8 +107,7 @@ protected:
 };
 
 
-extern const device_type SCMP;
-extern const device_type INS8060;
+DECLARE_DEVICE_TYPE(SCMP, scmp_device)
+DECLARE_DEVICE_TYPE(INS8060, ins8060_device)
 
-
-#endif
+#endif // MAME_CPU_SCMP_SCMP_H

@@ -157,10 +157,10 @@ static const int vlm5030_speed_table[8] =
 	IP_SIZE_SLOW
 };
 
-const device_type VLM5030 = device_creator<vlm5030_device>;
+DEFINE_DEVICE_TYPE(VLM5030, vlm5030_device, "vlm5030", "Sanyo VLM5030")
 
 vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VLM5030, "VLM5030", tag, owner, clock, "vlm5030", __FILE__),
+	: device_t(mconfig, VLM5030, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 16),
 		m_channel(nullptr),

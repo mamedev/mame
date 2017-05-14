@@ -6,9 +6,10 @@
 
 **********************************************************************/
 
-#ifndef __MC6845__
-#define __MC6845__
+#ifndef MAME_VIDEO_MC6845_H
+#define MAME_VIDEO_MC6845_H
 
+#pragma once
 
 
 #define MCFG_MC6845_ADD(_tag, _variant, _screen_tag, _clock) \
@@ -36,19 +37,19 @@
 	mc6845_device::set_char_width(*device, _pixels);
 
 #define MCFG_MC6845_RECONFIGURE_CB(_class, _method) \
-	mc6845_device::set_reconfigure_callback(*device, mc6845_reconfigure_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	mc6845_device::set_reconfigure_callback(*device, mc6845_device::reconfigure_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_MC6845_BEGIN_UPDATE_CB(_class, _method) \
-	mc6845_device::set_begin_update_callback(*device, mc6845_begin_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	mc6845_device::set_begin_update_callback(*device, mc6845_device::begin_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_MC6845_UPDATE_ROW_CB(_class, _method) \
-	mc6845_device::set_update_row_callback(*device, mc6845_update_row_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	mc6845_device::set_update_row_callback(*device, mc6845_device::update_row_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_MC6845_END_UPDATE_CB(_class, _method) \
-	mc6845_device::set_end_update_callback(*device, mc6845_end_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	mc6845_device::set_end_update_callback(*device, mc6845_device::end_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_MC6845_ADDR_CHANGED_CB(_class, _method) \
-	mc6845_device::set_on_update_addr_change_callback(*device, mc6845_on_update_addr_changed_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	mc6845_device::set_on_update_addr_change_callback(*device, mc6845_device::on_update_addr_changed_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_MC6845_OUT_DE_CB(_write) \
 	devcb = &mc6845_device::set_out_de_callback(*device, DEVCB_##_write);
@@ -64,42 +65,31 @@
 
 
 /* callback definitions */
-typedef device_delegate<void (int width, int height, const rectangle &visarea, attoseconds_t frame_period)> mc6845_reconfigure_delegate;
 #define MC6845_RECONFIGURE(name)  void name(int width, int height, const rectangle &visarea, attoseconds_t frame_period)
 
-typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect)> mc6845_begin_update_delegate;
 #define MC6845_BEGIN_UPDATE(name)  void name(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
-typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t ma, uint8_t ra,
-								uint16_t y, uint8_t x_count, int8_t cursor_x, int de, int hbp, int vbp)> mc6845_update_row_delegate;
 #define MC6845_UPDATE_ROW(name)     void name(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t ma, uint8_t ra, \
 												uint16_t y, uint8_t x_count, int8_t cursor_x, int de, int hbp, int vbp)
 
-typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect)> mc6845_end_update_delegate;
 #define MC6845_END_UPDATE(name)     void name(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
-typedef device_delegate<void (int address, int strobe)> mc6845_on_update_addr_changed_delegate;
 #define MC6845_ON_UPDATE_ADDR_CHANGED(name) void name(int address, int strobe)
 
 
 class mc6845_device :   public device_t,
 						public device_video_interface
 {
-	friend class mc6845_1_device;
-	friend class r6545_1_device;
-	friend class c6545_1_device;
-	friend class h46505_device;
-	friend class hd6845_device;
-	friend class sy6545_1_device;
-	friend class sy6845e_device;
-	friend class hd6345_device;
-	friend class ams40041_device;
-	friend class ams40489_device;
-
 public:
+	typedef device_delegate<void (int width, int height, const rectangle &visarea, attoseconds_t frame_period)> reconfigure_delegate;
+	typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect)> begin_update_delegate;
+	typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t ma, uint8_t ra,
+									uint16_t y, uint8_t x_count, int8_t cursor_x, int de, int hbp, int vbp)> update_row_delegate;
+	typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect)> end_update_delegate;
+	typedef device_delegate<void (int address, int strobe)> on_update_addr_changed_delegate;
+
 	// construction/destruction
 	mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	mc6845_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	static void set_show_border_area(device_t &device, bool show) { downcast<mc6845_device &>(device).m_show_border_area = show; }
 	static void set_visarea_adjust(device_t &device, int min_x, int max_x, int min_y, int max_y)
@@ -112,16 +102,16 @@ public:
 	}
 	static void set_char_width(device_t &device, int pixels) { downcast<mc6845_device &>(device).m_hpixels_per_column = pixels; }
 
-	static void set_reconfigure_callback(device_t &device, mc6845_reconfigure_delegate callback) { downcast<mc6845_device &>(device).m_reconfigure_cb = callback; }
-	static void set_begin_update_callback(device_t &device, mc6845_begin_update_delegate callback) { downcast<mc6845_device &>(device).m_begin_update_cb = callback; }
-	static void set_update_row_callback(device_t &device, mc6845_update_row_delegate callback) { downcast<mc6845_device &>(device).m_update_row_cb = callback; }
-	static void set_end_update_callback(device_t &device, mc6845_end_update_delegate callback) { downcast<mc6845_device &>(device).m_end_update_cb = callback; }
-	static void set_on_update_addr_change_callback(device_t &device, mc6845_on_update_addr_changed_delegate callback) { downcast<mc6845_device &>(device).m_on_update_addr_changed_cb = callback; }
+	static void set_reconfigure_callback(device_t &device, reconfigure_delegate &&cb) { downcast<mc6845_device &>(device).m_reconfigure_cb = std::move(cb); }
+	static void set_begin_update_callback(device_t &device, begin_update_delegate &&cb) { downcast<mc6845_device &>(device).m_begin_update_cb = std::move(cb); }
+	static void set_update_row_callback(device_t &device, update_row_delegate &&cb) { downcast<mc6845_device &>(device).m_update_row_cb = std::move(cb); }
+	static void set_end_update_callback(device_t &device, end_update_delegate &&cb) { downcast<mc6845_device &>(device).m_end_update_cb = std::move(cb); }
+	static void set_on_update_addr_change_callback(device_t &device, on_update_addr_changed_delegate &&cb) { downcast<mc6845_device &>(device).m_on_update_addr_changed_cb = std::move(cb); }
 
-	template<class _Object> static devcb_base &set_out_de_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_de_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_cur_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_cur_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_hsync_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_hsync_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_vsync_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_vsync_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_de_callback(device_t &device, Object &&cb) { return downcast<mc6845_device &>(device).m_out_de_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_cur_callback(device_t &device, Object &&cb) { return downcast<mc6845_device &>(device).m_out_cur_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_hsync_callback(device_t &device, Object &&cb) { return downcast<mc6845_device &>(device).m_out_hsync_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_vsync_callback(device_t &device, Object &&cb) { return downcast<mc6845_device &>(device).m_out_vsync_cb.set_callback(std::forward<Object>(cb)); }
 
 	/* select one of the registers for reading or writing */
 	DECLARE_WRITE8_MEMBER( address_w );
@@ -168,6 +158,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+	mc6845_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -290,26 +282,26 @@ protected:
 
 	int m_hpixels_per_column;       /* number of pixels per video memory address */
 
-	mc6845_reconfigure_delegate m_reconfigure_cb;
+	reconfigure_delegate m_reconfigure_cb;
 
 	/* if specified, this gets called before any pixel update,
 	 optionally return a pointer that will be passed to the
 	 update and tear down callbacks */
-	mc6845_begin_update_delegate m_begin_update_cb;
+	begin_update_delegate m_begin_update_cb;
 
 	/* this gets called for every row, the driver must output
 	 x_count * hpixels_per_column pixels.
 	 cursor_x indicates the character position where the cursor is, or -1
 	 if there is no cursor on this row */
-	mc6845_update_row_delegate  m_update_row_cb;
+	update_row_delegate  m_update_row_cb;
 
 	/* if specified, this gets called after all row updating is complete */
-	mc6845_end_update_delegate  m_end_update_cb;
+	end_update_delegate  m_end_update_cb;
 
 	/* Called whenever the update address changes
 	 * For vblank/hblank timing strobe indicates the physical update.
 	 * vblank/hblank timing not supported yet! */
-	mc6845_on_update_addr_changed_delegate m_on_update_addr_changed_cb;
+	on_update_addr_changed_delegate m_on_update_addr_changed_cb;
 
 	/* if specified, this gets called for every change of the display enable pin (pin 18) */
 	devcb_write_line            m_out_de_cb;
@@ -435,7 +427,6 @@ class mos8563_device : public mc6845_device,
 						public device_memory_interface
 {
 public:
-	mos8563_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
@@ -453,6 +444,8 @@ public:
 	MC6845_UPDATE_ROW( vdc_update_row );
 
 protected:
+	mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
@@ -507,20 +500,18 @@ protected:
 };
 
 
-extern const device_type MC6845;
-extern const device_type MC6845_1;
-extern const device_type R6545_1;
-extern const device_type C6545_1;
-extern const device_type H46505;
-extern const device_type HD6845;
-extern const device_type SY6545_1;
-extern const device_type SY6845E;
-extern const device_type HD6345;
-extern const device_type AMS40041;
-extern const device_type AMS40489;
-extern const device_type MOS8563;
-extern const device_type MOS8568;
+DECLARE_DEVICE_TYPE(MC6845,   mc6845_device)
+DECLARE_DEVICE_TYPE(MC6845_1, mc6845_1_device)
+DECLARE_DEVICE_TYPE(R6545_1,  r6545_1_device)
+DECLARE_DEVICE_TYPE(C6545_1,  c6545_1_device)
+DECLARE_DEVICE_TYPE(H46505,   h46505_device)
+DECLARE_DEVICE_TYPE(HD6845,   hd6845_device)
+DECLARE_DEVICE_TYPE(SY6545_1, sy6545_1_device)
+DECLARE_DEVICE_TYPE(SY6845E,  sy6845e_device)
+DECLARE_DEVICE_TYPE(HD6345,   hd6345_device)
+DECLARE_DEVICE_TYPE(AMS40041, ams40041_device)
+DECLARE_DEVICE_TYPE(AMS40489, ams40489_device)
+DECLARE_DEVICE_TYPE(MOS8563,  mos8563_device)
+DECLARE_DEVICE_TYPE(MOS8568,  mos8568_device)
 
-
-
-#endif
+#endif // MAME_VIDEO_MC6845_H

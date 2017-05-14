@@ -1,28 +1,30 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef __MSX_CART_HOLY_QURAN_H
-#define __MSX_CART_HOLY_QURAN_H
+#ifndef MAME_BUS_MSX_CART_HOLY_QURAN_H
+#define MAME_BUS_MSX_CART_HOLY_QURAN_H
+
+#pragma once
 
 #include "bus/msx_cart/cartridge.h"
 
 
-extern const device_type MSX_CART_HOLY_QURAN;
+DECLARE_DEVICE_TYPE(MSX_CART_HOLY_QURAN, msx_cart_holy_quran_device)
 
 
-class msx_cart_holy_quran : public device_t
-						, public msx_cart_interface
+class msx_cart_holy_quran_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_holy_quran(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	msx_cart_holy_quran_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void initialize_cartridge() override;
 
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
 	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void restore_banks();
 
@@ -34,4 +36,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_BUS_MSX_CART_HOLY_QURAN_H

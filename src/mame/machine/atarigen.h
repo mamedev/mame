@@ -103,9 +103,9 @@
 // ======================> atari_sound_comm_device
 
 // device type definition
-extern const device_type ATARI_SOUND_COMM;
+DECLARE_DEVICE_TYPE(ATARI_SOUND_COMM, atari_sound_comm_device)
 
-class atari_sound_comm_device :  public device_t
+class atari_sound_comm_device : public device_t
 {
 public:
 	// construction/destruction
@@ -175,7 +175,7 @@ private:
 // ======================> atari_vad_device
 
 // device type definition
-extern const device_type ATARI_VAD;
+DECLARE_DEVICE_TYPE(ATARI_VAD, atari_vad_device)
 
 class atari_vad_device :    public device_t,
 							public device_video_interface
@@ -256,14 +256,14 @@ private:
 // ======================> atari_eeprom_device
 
 // device type definition
-extern const device_type ATARI_EEPROM_2804;
-extern const device_type ATARI_EEPROM_2816;
+DECLARE_DEVICE_TYPE(ATARI_EEPROM_2804, atari_eeprom_2804_device)
+DECLARE_DEVICE_TYPE(ATARI_EEPROM_2816, atari_eeprom_2816_device)
 
 class atari_eeprom_device : public device_t
 {
 protected:
 	// construction/destruction
-	atari_eeprom_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
+	atari_eeprom_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
 
 public:
 	// unlock controls

@@ -39,10 +39,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_CXD1095_H
+#define MAME_MACHINE_CXD1095_H
 
-#ifndef DEVICES_MACHINE_CXD1095_H
-#define DEVICES_MACHINE_CXD1095_H
+#pragma once
 
 //**************************************************************************
 //  CONFIGURATION MACROS
@@ -83,13 +83,13 @@ public:
 	cxd1095_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// static configuration
-	template<class Object>
+	template <class Object>
 	static devcb_base &set_input_cb(device_t &device, int p, Object &&obj)
 	{
 		assert(p >= 0 && p < 5);
 		return downcast<cxd1095_device &>(device).m_input_cb[p].set_callback(std::forward<Object>(obj));
 	}
-	template<class Object>
+	template <class Object>
 	static devcb_base &set_output_cb(device_t &device, int p, Object &&obj)
 	{
 		assert(p >= 0 && p < 5);
@@ -116,6 +116,6 @@ private:
 };
 
 // device type definition
-extern const device_type CXD1095;
+DECLARE_DEVICE_TYPE(CXD1095, cxd1095_device)
 
-#endif
+#endif // MAME_MACHINE_CXD1095_H

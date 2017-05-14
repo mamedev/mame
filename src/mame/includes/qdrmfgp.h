@@ -39,6 +39,7 @@ public:
 	uint16_t m_control;
 	int32_t m_gp2_irq_control;
 	int32_t m_pal;
+	emu_timer *m_gp2_timer;
 
 	DECLARE_WRITE16_MEMBER(gp_control_w);
 	DECLARE_WRITE16_MEMBER(gp2_control_w);

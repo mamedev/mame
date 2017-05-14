@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV603 = device_creator<sv603_device>;
+DEFINE_DEVICE_TYPE(SV603, sv603_device, "sv603", "SV-603 Coleco Game Adapter")
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -80,7 +80,7 @@ DEVICE_IMAGE_LOAD_MEMBER( sv603_device, cartridge )
 //-------------------------------------------------
 
 sv603_device::sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SV603, "SV-603 Coleco Game Adapter", tag, owner, clock, "sv603", __FILE__),
+	device_t(mconfig, SV603, tag, owner, clock),
 	device_svi_expander_interface(mconfig, *this),
 	m_bios(*this, "bios"),
 	m_snd(*this, "snd"),

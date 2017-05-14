@@ -831,7 +831,7 @@ GFXDECODE_END
 */
 
 
-static MACHINE_CONFIG_START( cybertnk, cybertnk_state )
+static MACHINE_CONFIG_START( cybertnk )
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz/2)
 	MCFG_CPU_PROGRAM_MAP(master_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq1_line_assert)

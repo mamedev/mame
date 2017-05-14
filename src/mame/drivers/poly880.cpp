@@ -242,7 +242,7 @@ void poly880_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( poly880, poly880_state )
+static MACHINE_CONFIG_START( poly880 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_3728MHz/8)
 	MCFG_CPU_PROGRAM_MAP(poly880_mem)
@@ -285,5 +285,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME                FLAGS */
-COMP( 1983, poly880,    0,      0,      poly880,    poly880, driver_device,    0,   "VEB Polytechnik", "Poly-Computer 880", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY            FULLNAME             FLAGS
+COMP( 1983, poly880,    0,      0,      poly880,  poly880, poly880_state, 0,    "VEB Polytechnik", "Poly-Computer 880", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

@@ -8,10 +8,10 @@
 
 *************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_LDVP931_H
+#define MAME_MACHINE_LDVP931_H
 
-#ifndef __LDVP931_H__
-#define __LDVP931_H__
+#pragma once
 
 #include "laserdsc.h"
 #include "cpu/mcs48/mcs48.h"
@@ -30,7 +30,7 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type PHILLIPS_22VP931;
+DECLARE_DEVICE_TYPE(PHILLIPS_22VP931, phillips_22vp931_device)
 
 
 
@@ -134,5 +134,4 @@ protected:
 	int16_t               m_advanced;                 // number of frames advanced
 };
 
-
-#endif
+#endif // MAME_MACHINE_LDVP931_H

@@ -35,10 +35,11 @@
 #include "emu.h"
 #include "mc6843.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 /******************* parameters ******************/
-
-#define VERBOSE 0
 
 /* macro-command numbers */
 #define CMD_STZ 0x2 /* seek track zero */
@@ -65,17 +66,12 @@ static const char *const mc6843_cmd[16] =
 };
 
 
-/******************* utility function and macros ********************/
-
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-
-
-const device_type MC6843 = device_creator<mc6843_device>;
+DEFINE_DEVICE_TYPE(MC6843, mc6843_device, "mc5843", "Motorola MC6843 FDC")
 
 mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MC6843, "MC6843 floppy controller", tag, owner, clock, "mc6843", __FILE__),
+	: device_t(mconfig, MC6843, tag, owner, clock),
 	m_write_irq(*this),
 	m_CTAR(0),
 	m_CMR(0),
@@ -232,7 +228,7 @@ void mc6843_device::status_update( )
 	}
 
 	m_write_irq( irq );
-	LOG(( "status_update: irq=%i (CMR=%02X, ISR=%02X)\n", irq, m_CMR, m_ISR ));
+	LOG( "status_update: irq=%i (CMR=%02X, ISR=%02X)\n", irq, m_CMR, m_ISR );
 }
 
 
@@ -275,7 +271,7 @@ void mc6843_device::finish_STZ( )
 		img->floppy_drive_seek( -1 );
 	}
 
-	LOG(( "%f mc6843_finish_STZ: actual=%i\n", machine().time().as_double(), img->floppy_drive_get_current_track() ));
+	LOG( "%f mc6843_finish_STZ: actual=%i\n", machine().time().as_double(), img->floppy_drive_get_current_track() );
 
 	/* update state */
 	m_CTAR = 0;
@@ -297,7 +293,7 @@ void mc6843_device::finish_SEK( )
 	// TODO: not sure how CTAR bit 7 is handled here, but this is the safest approach for now
 	img->floppy_drive_seek( m_GCR - (m_CTAR & 0x7F) );
 
-	LOG(( "%f mc6843_finish_SEK: from %i to %i (actual=%i)\n", machine().time().as_double(), (m_CTAR & 0x7F), m_GCR, img->floppy_drive_get_current_track() ));
+	LOG( "%f mc6843_finish_SEK: from %i to %i (actual=%i)\n", machine().time().as_double(), (m_CTAR & 0x7F), m_GCR, img->floppy_drive_get_current_track() );
 
 	/* update state */
 	m_CTAR = m_GCR;
@@ -318,7 +314,7 @@ int mc6843_device::address_search( chrn_id* id )
 		if ( ( ! img->floppy_drive_get_next_id( m_side, id ) ) || ( id->flags & ID_FLAG_CRC_ERROR_IN_ID_FIELD ) || ( id->N != 0 ) )
 		{
 			/* read address error */
-			LOG(( "%f mc6843_address_search: get_next_id failed\n", machine().time().as_double() ));
+			LOG( "%f mc6843_address_search: get_next_id failed\n", machine().time().as_double() );
 			m_STRB |= 0x0a; /* set CRC error & Sector Address Undetected */
 			cmd_end( );
 			return 0;
@@ -327,7 +323,7 @@ int mc6843_device::address_search( chrn_id* id )
 		if ( id->C != m_LTAR )
 		{
 			/* track mismatch */
-			LOG(( "%f mc6843_address_search: track mismatch: logical=%i real=%i\n", machine().time().as_double(), m_LTAR, id->C ));
+			LOG( "%f mc6843_address_search: track mismatch: logical=%i real=%i\n", machine().time().as_double(), m_LTAR, id->C );
 			m_data[0] = id->C; /* make the track number available to the CPU */
 			m_STRA |= 0x20;    /* set Track Not Equal */
 			cmd_end( );
@@ -337,7 +333,7 @@ int mc6843_device::address_search( chrn_id* id )
 		if ( id->R == m_SAR )
 		{
 			/* found! */
-			LOG(( "%f mc6843_address_search: sector %i found on track %i\n", machine().time().as_double(), id->R, id->C ));
+			LOG( "%f mc6843_address_search: sector %i found on track %i\n", machine().time().as_double(), id->R, id->C );
 			if ( ! (m_CMR & 0x20) )
 			{
 				m_ISR |= 0x04; /* if no DMA, set Status Sense */
@@ -351,7 +347,7 @@ int mc6843_device::address_search( chrn_id* id )
 			if ( r >= 4 )
 			{
 				/* time-out after 3 full revolutions */
-				LOG(( "%f mc6843_address_search: no sector %i found after 3 revolutions\n", machine().time().as_double(), m_SAR ));
+				LOG( "%f mc6843_address_search: no sector %i found after 3 revolutions\n", machine().time().as_double(), m_SAR );
 				m_STRB |= 0x08; /* set Sector Address Undetected */
 				cmd_end( );
 				return 0;
@@ -372,7 +368,7 @@ int mc6843_device::address_search_read( chrn_id* id )
 
 	if ( id->flags & ID_FLAG_CRC_ERROR_IN_DATA_FIELD )
 	{
-		LOG(( "%f mc6843_address_search_read: data CRC error\n", machine().time().as_double() ));
+		LOG( "%f mc6843_address_search_read: data CRC error\n", machine().time().as_double() );
 		m_STRB |= 0x06; /* set CRC error & Data Mark Undetected */
 		cmd_end( );
 		return 0;
@@ -380,7 +376,7 @@ int mc6843_device::address_search_read( chrn_id* id )
 
 	if ( id->flags & ID_FLAG_DELETED_DATA )
 	{
-		LOG(( "%f mc6843_address_search_read: deleted data\n", machine().time().as_double() ));
+		LOG( "%f mc6843_address_search_read: deleted data\n", machine().time().as_double() );
 		m_STRA |= 0x02; /* set Delete Data Mark Detected */
 	}
 
@@ -449,7 +445,7 @@ void mc6843_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			{
 				int cmd = m_CMR & 0x0f;
 
-				LOG(( "%f mc6843_cont: timer called for cmd=%s(%i)\n", machine().time().as_double(), mc6843_cmd[cmd], cmd ));
+				LOG( "%f mc6843_cont: timer called for cmd=%s(%i)\n", machine().time().as_double(), mc6843_cmd[cmd], cmd );
 
 				m_timer_cont->adjust( attotime::never );
 
@@ -487,10 +483,10 @@ READ8_MEMBER( mc6843_device::read )
 	{
 		int cmd = m_CMR & 0x0f;
 
-		LOG(( "%f %s mc6843_r: data input cmd=%s(%i), pos=%i/%i, GCR=%i, ",
+		LOG( "%f %s mc6843_r: data input cmd=%s(%i), pos=%i/%i, GCR=%i, ",
 				machine().time().as_double(), machine().describe_context(),
 				mc6843_cmd[cmd], cmd, m_data_idx,
-				m_data_size, m_GCR ));
+				m_data_size, m_GCR );
 
 		if ( cmd == CMD_SSR || cmd == CMD_MSR )
 		{
@@ -544,24 +540,24 @@ READ8_MEMBER( mc6843_device::read )
 			logerror( "%s mc6843 read in unsupported command mode %i\n", machine().describe_context(), cmd );
 		}
 
-		LOG(( "data=%02X\n", data ));
+		LOG( "data=%02X\n", data );
 
 		break;
 	}
 
 	case 1: /* Current-Track Address Register (CTAR) */
 		data = m_CTAR;
-		LOG(( "%f %s mc6843_r: read CTAR %i (actual=%i)\n",
+		LOG( "%f %s mc6843_r: read CTAR %i (actual=%i)\n",
 				machine().time().as_double(), machine().describe_context(), data,
-				floppy_image()->floppy_drive_get_current_track()));
+				floppy_image()->floppy_drive_get_current_track());
 		break;
 
 	case 2: /* Interrupt Status Register (ISR) */
 		data = m_ISR;
-		LOG(( "%f %s mc6843_r: read ISR %02X: cmd=%scomplete settle=%scomplete sense-rq=%i STRB=%i\n",
+		LOG( "%f %s mc6843_r: read ISR %02X: cmd=%scomplete settle=%scomplete sense-rq=%i STRB=%i\n",
 				machine().time().as_double(), machine().describe_context(), data,
 				(data & 1) ? "" : "not-" , (data & 2) ? "" : "not-",
-				(data >> 2) & 1, (data >> 3) & 1 ));
+				(data >> 2) & 1, (data >> 3) & 1 );
 
 		/* reset */
 		m_ISR &= 8; /* keep STRB */
@@ -584,19 +580,19 @@ READ8_MEMBER( mc6843_device::read )
 			m_STRA |= 0x40;
 
 		data = m_STRA;
-		LOG(( "%f %s mc6843_r: read STRA %02X: data-rq=%i del-dta=%i ready=%i t0=%i wp=%i trk-dif=%i idx=%i busy=%i\n",
+		LOG( "%f %s mc6843_r: read STRA %02X: data-rq=%i del-dta=%i ready=%i t0=%i wp=%i trk-dif=%i idx=%i busy=%i\n",
 				machine().time().as_double(), machine().describe_context(), data,
 				data & 1, (data >> 1) & 1, (data >> 2) & 1, (data >> 3) & 1,
-				(data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1 ));
+				(data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1 );
 		break;
 	}
 
 	case 4: /* Status Register B (STRB) */
 		data = m_STRB;
-		LOG(( "%f %s mc6843_r: read STRB %02X: data-err=%i CRC-err=%i dta--mrk-err=%i sect-mrk-err=%i seek-err=%i fi=%i wr-err=%i hard-err=%i\n",
+		LOG( "%f %s mc6843_r: read STRB %02X: data-err=%i CRC-err=%i dta--mrk-err=%i sect-mrk-err=%i seek-err=%i fi=%i wr-err=%i hard-err=%i\n",
 				machine().time().as_double(), machine().describe_context(), data,
 				data & 1, (data >> 1) & 1, (data >> 2) & 1, (data >> 3) & 1,
-				(data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1 ));
+				(data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1 );
 
 		/* (partial) reset */
 		m_STRB &= ~0xfb;
@@ -605,9 +601,9 @@ READ8_MEMBER( mc6843_device::read )
 
 	case 7: /* Logical-Track Address Register (LTAR) */
 		data = m_LTAR;
-		LOG(( "%f %s mc6843_r: read LTAR %i (actual=%i)\n",
+		LOG( "%f %s mc6843_r: read LTAR %i (actual=%i)\n",
 				machine().time().as_double(), machine().describe_context(), data,
-				floppy_image()->floppy_drive_get_current_track()));
+				floppy_image()->floppy_drive_get_current_track());
 		break;
 
 	default:
@@ -625,10 +621,10 @@ WRITE8_MEMBER( mc6843_device::write )
 		int cmd = m_CMR & 0x0f;
 		int FWF = (m_CMR >> 4) & 1;
 
-		LOG(( "%f %s mc6843_w: data output cmd=%s(%i), pos=%i/%i, GCR=%i, data=%02X\n",
+		LOG( "%f %s mc6843_w: data output cmd=%s(%i), pos=%i/%i, GCR=%i, data=%02X\n",
 				machine().time().as_double(), machine().describe_context(),
 				mc6843_cmd[cmd], cmd, m_data_idx,
-				m_data_size, m_GCR, data ));
+				m_data_size, m_GCR, data );
 
 		if ( cmd == CMD_SSW || cmd == CMD_MSW || cmd == CMD_SWD )
 		{
@@ -643,7 +639,7 @@ WRITE8_MEMBER( mc6843_device::write )
 				/* end of sector write */
 				legacy_floppy_image_device* img = floppy_image( );
 
-				LOG(( "%f %s mc6843_w: write sector %i\n", machine().time().as_double(), machine().describe_context(), m_data_id ));
+				LOG( "%f %s mc6843_w: write sector %i\n", machine().time().as_double(), machine().describe_context(), m_data_id );
 
 				img->floppy_drive_write_sector_data(
 					m_side, m_data_id,
@@ -707,7 +703,7 @@ WRITE8_MEMBER( mc6843_device::write )
 					uint8_t track  = m_data[1];
 					uint8_t sector = m_data[3];
 					uint8_t filler = 0xe5; /* standard Thomson filler */
-					LOG(( "%f %s mc6843_w: address id detected track=%i sector=%i\n", machine().time().as_double(), machine().describe_context(), track, sector));
+					LOG( "%f %s mc6843_w: address id detected track=%i sector=%i\n", machine().time().as_double(), machine().describe_context(), track, sector);
 					img->floppy_drive_format_sector( m_side, sector, track, 0, sector, 0, filler );
 				}
 				else
@@ -736,19 +732,19 @@ WRITE8_MEMBER( mc6843_device::write )
 
 	case 1: /* Current-Track Address Register (CTAR) */
 		m_CTAR = data;
-		LOG(( "%f %s mc6843_w: set CTAR to %i %02X (actual=%i) \n",
+		LOG( "%f %s mc6843_w: set CTAR to %i %02X (actual=%i) \n",
 				machine().time().as_double(), machine().describe_context(), m_CTAR, data,
-				floppy_image()->floppy_drive_get_current_track()));
+				floppy_image()->floppy_drive_get_current_track());
 		break;
 
 	case 2: /* Command Register (CMR) */
 	{
 		int cmd = data & 15;
 
-		LOG(( "%f %s mc6843_w: set CMR to $%02X: cmd=%s(%i) FWF=%i DMA=%i ISR3-intr=%i fun-intr=%i\n",
+		LOG( "%f %s mc6843_w: set CMR to $%02X: cmd=%s(%i) FWF=%i DMA=%i ISR3-intr=%i fun-intr=%i\n",
 				machine().time().as_double(), machine().describe_context(),
 				data, mc6843_cmd[cmd], cmd, (data >> 4) & 1, (data >> 5) & 1,
-				(data >> 6) & 1, (data >> 7) & 1 ));
+				(data >> 6) & 1, (data >> 7) & 1 );
 
 		/* sanitize state */
 		m_STRA &= ~0x81; /* clear Busy & Data Transfer Request */
@@ -792,33 +788,33 @@ WRITE8_MEMBER( mc6843_device::write )
 		m_SUR = data;
 
 		/* assume CLK freq = 1MHz (IBM 3740 compatibility) */
-		LOG(( "%f %s mc6843_w: set SUR to $%02X: head settling time=%fms, track-to-track seek time=%f\n",
+		LOG( "%f %s mc6843_w: set SUR to $%02X: head settling time=%fms, track-to-track seek time=%f\n",
 				machine().time().as_double(), machine().describe_context(),
-				data, 4.096 * (data & 15), 1.024 * ((data >> 4) & 15) ));
+				data, 4.096 * (data & 15), 1.024 * ((data >> 4) & 15) );
 		break;
 
 	case 4: /* Sector Address Register (SAR) */
 		m_SAR = data & 0x1f;
-		LOG(( "%f %s mc6843_w: set SAR to %i (%02X)\n", machine().time().as_double(), machine().describe_context(), m_SAR, data ));
+		LOG( "%f %s mc6843_w: set SAR to %i (%02X)\n", machine().time().as_double(), machine().describe_context(), m_SAR, data );
 		break;
 
 	case 5: /* General Count Register (GCR) */
 		m_GCR = data & 0x7f;
-		LOG(( "%f %s mc6843_w: set GCR to %i (%02X)\n", machine().time().as_double(), machine().describe_context(), m_GCR, data ));
+		LOG( "%f %s mc6843_w: set GCR to %i (%02X)\n", machine().time().as_double(), machine().describe_context(), m_GCR, data );
 		break;
 
 	case 6: /* CRC Control Register (CCR) */
 		m_CCR = data & 3;
-		LOG(( "%f %s mc6843_w: set CCR to %02X: CRC=%s shift=%i\n",
+		LOG( "%f %s mc6843_w: set CCR to %02X: CRC=%s shift=%i\n",
 				machine().time().as_double(), machine().describe_context(), data,
-				(data & 1) ? "enabled" : "disabled", (data >> 1) & 1 ));
+				(data & 1) ? "enabled" : "disabled", (data >> 1) & 1 );
 		break;
 
 	case 7: /* Logical-Track Address Register (LTAR) */
 		m_LTAR = data & 0x7f;
-		LOG(( "%f %s mc6843_w: set LTAR to %i %02X (actual=%i)\n",
+		LOG( "%f %s mc6843_w: set LTAR to %i %02X (actual=%i)\n",
 				machine().time().as_double(), machine().describe_context(), m_LTAR, data,
-				floppy_image()->floppy_drive_get_current_track()));
+				floppy_image()->floppy_drive_get_current_track());
 		break;
 
 	default:

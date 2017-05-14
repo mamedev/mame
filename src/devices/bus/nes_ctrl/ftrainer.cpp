@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_FTRAINER = device_creator<nes_ftrainer_device>;
+DEFINE_DEVICE_TYPE(NES_FTRAINER, nes_ftrainer_device, "nes_famtrain", "Bandai Family Trainer")
 
 
 static INPUT_PORTS_START( nes_joypad )
@@ -85,7 +85,7 @@ ioport_constructor nes_ftrainer_device::device_input_ports() const
 //-------------------------------------------------
 
 nes_ftrainer_device::nes_ftrainer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NES_FTRAINER, "Bandai Family Trainer", tag, owner, clock, "nes_famtrain", __FILE__)
+	: device_t(mconfig, NES_FTRAINER, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_trainer(*this, "FT_COL.%u", 0)
 	, m_row_scan(0)

@@ -21,11 +21,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_I8214_H
+#define MAME_MACHINE_I8214_H
+
 #pragma once
-
-#ifndef __I8214__
-#define __I8214__
-
 
 
 
@@ -47,14 +46,14 @@
 
 // ======================> i8214_device
 
-class i8214_device :    public device_t
+class i8214_device : public device_t
 {
 public:
 	// construction/destruction
 	i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8214_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb_base &set_enlg_wr_callback(device_t &device, _Object object) { return downcast<i8214_device &>(device).m_write_enlg.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<i8214_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_enlg_wr_callback(device_t &device, Object &&cb) { return downcast<i8214_device &>(device).m_write_enlg.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( sgs_w );
 	DECLARE_WRITE_LINE_MEMBER( etlg_w );
@@ -87,8 +86,6 @@ private:
 
 
 // device type definition
-extern const device_type I8214;
+DECLARE_DEVICE_TYPE(I8214, i8214_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_I8214_H

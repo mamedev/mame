@@ -247,7 +247,7 @@ INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 	m_maincpu->set_input_line(sm8500_cpu_device::LCDC_INT, ASSERT_LINE );
 }
 
-static MACHINE_CONFIG_START( gamecom, gamecom_state )
+static MACHINE_CONFIG_START( gamecom )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	MCFG_CPU_PROGRAM_MAP( gamecom_mem_map)
@@ -303,5 +303,5 @@ ROM_START( gamecom )
 	ROM_LOAD( "external.bin", 0x00000, 0x40000, CRC(e235a589) SHA1(97f782e72d738f4d7b861363266bf46b438d9b50) )
 ROM_END
 
-/*    YEAR  NAME     PARENT COMPAT MACHINE  INPUT    CLASS            INIT    COMPANY  FULLNAME */
-CONS( 1997, gamecom, 0,     0,     gamecom, gamecom, gamecom_state, gamecom, "Tiger", "Game.com", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT     COMPANY  FULLNAME    FLAGS
+CONS( 1997, gamecom, 0,      0,      gamecom, gamecom, gamecom_state, gamecom, "Tiger", "Game.com", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

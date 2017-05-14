@@ -22,7 +22,7 @@
 #include "smartmed.h"
 
 
-#define MAX_SMARTMEDIA  1
+namespace {
 
 /* machine-independent big-endian 32-bit integer */
 struct UINT32BE
@@ -30,13 +30,13 @@ struct UINT32BE
 	uint8_t bytes[4];
 };
 
-static inline uint32_t get_UINT32BE(UINT32BE word)
+inline uint32_t get_UINT32BE(UINT32BE word)
 {
 	return (word.bytes[0] << 24) | (word.bytes[1] << 16) | (word.bytes[2] << 8) | word.bytes[3];
 }
 
 #ifdef UNUSED_FUNCTION
-static inline void set_UINT32BE(UINT32BE *word, uint32_t data)
+inline void set_UINT32BE(UINT32BE *word, uint32_t data)
 {
 	word->bytes[0] = (data >> 24) & 0xff;
 	word->bytes[1] = (data >> 16) & 0xff;
@@ -69,37 +69,28 @@ enum
 	header_len = sizeof(SM_disk_image_header)
 };
 
+} // anonymous namespace
 
-const device_type NAND = device_creator<nand_device>;
+
+DEFINE_DEVICE_TYPE(NAND, nand_device, "nand", "NAND Flash Memory")
 
 nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAND, "NAND Flash Memory", tag, owner, clock, "nand", __FILE__),
-		m_page_data_size(0),
-		m_page_total_size(0),
-		m_num_pages(0),
-		m_log2_pages_per_block(0),
-		m_pagereg(nullptr),
-		m_id_len(0),
-		m_col_address_cycles(0),
-		m_row_address_cycles(0),
-		m_sequential_row_read(0),
-		m_write_rnb(*this)
+	: nand_device(mconfig, NAND, tag, owner, clock)
 {
-	memset(m_id, 0, sizeof(m_id));
 }
 
-nand_device::nand_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_page_data_size(0),
-		m_page_total_size(0),
-		m_num_pages(0),
-		m_log2_pages_per_block(0),
-		m_pagereg(nullptr),
-		m_id_len(0),
-		m_col_address_cycles(0),
-		m_row_address_cycles(0),
-		m_sequential_row_read(0),
-		m_write_rnb(*this)
+nand_device::nand_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_page_data_size(0)
+	, m_page_total_size(0)
+	, m_num_pages(0)
+	, m_log2_pages_per_block(0)
+	, m_pagereg(nullptr)
+	, m_id_len(0)
+	, m_col_address_cycles(0)
+	, m_row_address_cycles(0)
+	, m_sequential_row_read(0)
+	, m_write_rnb(*this)
 {
 	memset(m_id, 0, sizeof(m_id));
 }
@@ -121,9 +112,9 @@ void nand_device::device_start()
 	m_mode_3065 = 0;
 	m_pagereg = std::make_unique<uint8_t[]>(m_page_total_size);
 
-	#ifdef SMARTMEDIA_IMAGE_SAVE
+#ifdef SMARTMEDIA_IMAGE_SAVE
 	m_image_format = 0;
-	#endif
+#endif
 	m_write_rnb.resolve_safe();
 }
 
@@ -182,9 +173,9 @@ image_init_result smartmedia_image_device::smartmedia_format_1()
 	}
 	fread(m_data_ptr, m_page_total_size*m_num_pages);
 
-	#ifdef SMARTMEDIA_IMAGE_SAVE
+#ifdef SMARTMEDIA_IMAGE_SAVE
 	m_image_format = 1;
-	#endif
+#endif
 
 	return image_init_result::PASS;
 }
@@ -272,9 +263,9 @@ image_init_result smartmedia_image_device::smartmedia_format_2()
 
 	fread(m_data_ptr, m_page_total_size*m_num_pages);
 
-	#ifdef SMARTMEDIA_IMAGE_SAVE
+#ifdef SMARTMEDIA_IMAGE_SAVE
 	m_image_format = 2;
-	#endif
+#endif
 
 	return image_init_result::PASS;
 }
@@ -300,7 +291,7 @@ image_init_result smartmedia_image_device::call_load()
 */
 void smartmedia_image_device::call_unload()
 {
-	#ifdef SMARTMEDIA_IMAGE_SAVE
+#ifdef SMARTMEDIA_IMAGE_SAVE
 	if (!is_readonly())
 	{
 		if (m_image_format == 1)
@@ -329,7 +320,7 @@ void smartmedia_image_device::call_unload()
 			fwrite( m_data_ptr, m_page_total_size * m_num_pages);
 		}
 	}
-	#endif
+#endif
 
 	m_page_data_size = 0;
 	m_page_total_size = 0;
@@ -352,9 +343,9 @@ void smartmedia_image_device::call_unload()
 	m_row_address_cycles = 0;
 	m_sequential_row_read = 0;
 
-	#ifdef SMARTMEDIA_IMAGE_SAVE
+#ifdef SMARTMEDIA_IMAGE_SAVE
 	m_image_format = 0;
-	#endif
+#endif
 
 	return;
 }
@@ -777,10 +768,10 @@ void nand_device::device_reset()
 }
 
 
-const device_type SMARTMEDIA = device_creator<smartmedia_image_device>;
+DEFINE_DEVICE_TYPE(SMARTMEDIA, smartmedia_image_device, "smartmedia", "SmartMedia Flash card")
 
 smartmedia_image_device::smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nand_device(mconfig, SMARTMEDIA, "SmartMedia Flash ROM", tag, owner, clock, "smartmedia", __FILE__),
-		device_image_interface(mconfig, *this)
+	: nand_device(mconfig, SMARTMEDIA, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_WANGPC_LIC_H
+#define MAME_BUS_WANGPC_LIC_H
 
-#ifndef __WANGPC_LIC__
-#define __WANGPC_LIC__
+#pragma once
 
 #include "wangpc.h"
 
@@ -46,7 +46,6 @@ protected:
 
 
 // device type definition
-extern const device_type WANGPC_LIC;
+DECLARE_DEVICE_TYPE(WANGPC_LIC, wangpc_lic_device)
 
-
-#endif
+#endif // MAME_BUS_WANGPC_LIC_H

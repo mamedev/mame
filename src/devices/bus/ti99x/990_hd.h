@@ -3,21 +3,19 @@
 /*
     990_hd.h: include file for 990_hd.c
 */
-#ifndef __990_HD_H_
-#define __990_HD_H_
+#ifndef MAME_BUS_TI99X_990_HD_H
+#define MAME_BUS_TI99X_990_HD_H
+
+#pragma once
 
 #include "imagedev/harddriv.h"
-
-/* max disk units per controller: 4 is the protocol limit, but it may be
-overridden if more than one controller is used */
-#define MAX_DISK_UNIT 4
 
 class ti990_hdc_device : public device_t
 {
 public:
 	ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<ti990_hdc_device &>(device).m_interrupt_callback.set_callback(object); }
+	template <class Object> static devcb_base &static_set_int_callback(device_t &device, Object &&cb) { return downcast<ti990_hdc_device &>(device).m_interrupt_callback.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
@@ -32,7 +30,7 @@ protected:
 	int get_id_from_device( device_t *device );
 
 	inline int is_unit_loaded(int unit);
-	int cur_disk_unit(void);
+	int cur_disk_unit();
 	void update_interrupt();
 	int check_sector_address(int unit, unsigned int cylinder, unsigned int head, unsigned int sector);
 	int sector_to_lba(int unit, unsigned int cylinder, unsigned int head, unsigned int sector, unsigned int *lba);
@@ -45,7 +43,11 @@ protected:
 	void unformatted_read();
 	void restore();
 	void execute_command();
+
 private:
+	// max disk units per controller: 4 is the protocol limit, but it may be overridden if more than one controller is used
+    static constexpr unsigned MAX_DISK_UNIT = 4;
+
 	enum format_t
 	{
 		format_mame,
@@ -75,6 +77,6 @@ private:
 #define MCFG_TI990_HDC_INT_CALLBACK( _write ) \
 	devcb = &ti990_hdc_device::static_set_int_callback( *device, DEVCB_##_write );
 
-extern const device_type TI990_HDC;
+DECLARE_DEVICE_TYPE(TI990_HDC, ti990_hdc_device)
 
-#endif
+#endif // MAME_BUS_TI99X_990_HD_H

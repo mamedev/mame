@@ -10,11 +10,11 @@
 #include "sony08.h"
 
 
-const device_type MSX_SLOT_SONY08 = device_creator<msx_slot_sony08_device>;
+DEFINE_DEVICE_TYPE(MSX_SLOT_SONY08, msx_slot_sony08_device, "msx_slot_sony08", "MSX Internal SONY08")
 
 
 msx_slot_sony08_device::msx_slot_sony08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_SLOT_SONY08, "MSX Internal SONY08", tag, owner, clock, "msx_slot_sony08", __FILE__)
+	: device_t(mconfig, MSX_SLOT_SONY08, tag, owner, clock)
 	, msx_internal_slot_interface()
 	, m_nvram(*this, "nvram")
 	, m_rom_region(*this, finder_base::DUMMY_TAG)

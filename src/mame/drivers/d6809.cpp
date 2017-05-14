@@ -100,7 +100,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER( term_r );
 	DECLARE_WRITE8_MEMBER( term_w );
 	uint8_t m_term_data;
@@ -134,7 +134,7 @@ static INPUT_PORTS_START( d6809 )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( d6809_state::kbd_put )
+void d6809_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -144,7 +144,7 @@ void d6809_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( d6809, d6809_state )
+static MACHINE_CONFIG_START( d6809 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(d6809_mem)
@@ -152,7 +152,7 @@ static MACHINE_CONFIG_START( d6809, d6809_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(d6809_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(d6809_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -163,5 +163,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY     FULLNAME       FLAGS */
-COMP( 1983, d6809,  0,      0,       d6809,     d6809, driver_device,   0,     "Dunfield", "6809 Portable", MACHINE_IS_SKELETON | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  STATE        INIT  COMPANY     FULLNAME         FLAGS
+COMP( 1983, d6809,  0,      0,       d6809,   d6809, d6809_state, 0,    "Dunfield", "6809 Portable", MACHINE_IS_SKELETON | MACHINE_NO_SOUND_HW )

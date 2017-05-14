@@ -1868,7 +1868,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( system16a, segas16a_state )
+static MACHINE_CONFIG_START( system16a )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)

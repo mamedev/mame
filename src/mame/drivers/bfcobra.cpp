@@ -1631,7 +1631,7 @@ INTERRUPT_GEN_MEMBER(bfcobra_state::vblank_gen)
 	update_irqs();
 }
 
-static MACHINE_CONFIG_START( bfcobra, bfcobra_state )
+static MACHINE_CONFIG_START( bfcobra )
 	MCFG_CPU_ADD("maincpu", Z80, Z80_XTAL)
 	MCFG_CPU_PROGRAM_MAP(z80_prog_map)
 	MCFG_CPU_IO_MAP(z80_io_map)

@@ -104,11 +104,50 @@
 #include "emu.h"
 #include "mb89352.h"
 
+// SCSI lines readable via PSNS register (reg 5)
+#define MB89352_LINE_REQ 0x80
+#define MB89352_LINE_ACK 0x40
+#define MB89352_LINE_ATN 0x20
+#define MB89352_LINE_SEL 0x10
+#define MB89352_LINE_BSY 0x08
+#define MB89352_LINE_MSG 0x04
+#define MB89352_LINE_CD  0x02
+#define MB89352_LINE_IO  0x01
+
+// INTS bits
+#define INTS_RESET            0x01
+#define INTS_HARD_ERROR       0x02
+#define INTS_TIMEOUT          0x04
+#define INTS_SERVICE_REQUIRED 0x08
+#define INTS_COMMAND_COMPLETE 0x10
+#define INTS_DISCONNECTED     0x20
+#define INTS_RESELECTION      0x40
+#define INTS_SELECTION        0x80
+
+// SSTS status bits
+#define SSTS_DREG_EMPTY       0x01
+#define SSTS_DREG_FULL        0x02
+#define SSTS_TC_ZERO          0x04
+#define SSTS_SCSI_RST         0x08
+#define SSTS_XFER_IN_PROGRESS 0x10
+#define SSTS_SPC_BSY          0x20
+#define SSTS_TARG_CONNECTED   0x40
+#define SSTS_INIT_CONNECTED   0x80
+
+// SERR error status bits
+#define SERR_OFFSET     0x01
+#define SERR_SHORT_XFR  0x02
+#define SERR_PHASE_ERR  0x04
+#define SERR_TC_PAR     0x08
+#define SERR_SPC_PAR    0x40
+#define SERR_SCSI_PAR   0x80
+
+
 /*
  *  Device config
  */
 
-const device_type MB89352A = device_creator<mb89352_device>;
+DEFINE_DEVICE_TYPE(MB89352A, mb89352_device, "mb89352", "Fujitsu MB89352A")
 
 
 /*
@@ -116,7 +155,7 @@ const device_type MB89352A = device_creator<mb89352_device>;
  */
 
 mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	legacy_scsi_host_adapter(mconfig, MB89352A, "MB89352A", tag, owner, clock, "mb89352", __FILE__),
+	legacy_scsi_host_adapter(mconfig, MB89352A, tag, owner, clock),
 	m_irq_cb(*this),
 	m_drq_cb(*this)
 {

@@ -12,8 +12,8 @@
 
 
 // MCU types
-const device_type SM511 = device_creator<sm511_device>;
-const device_type SM512 = device_creator<sm512_device>;
+DEFINE_DEVICE_TYPE(SM511, sm511_device, "sm511", "SM511")
+DEFINE_DEVICE_TYPE(SM512, sm512_device, "sm512", "SM512")
 
 
 // internal memory maps
@@ -45,16 +45,19 @@ offs_t sm511_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u
 
 // device definitions
 sm511_device::sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm510_base_device(mconfig, SM511, "SM511", tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, ADDRESS_MAP_NAME(program_4k), 7 /* data width */, ADDRESS_MAP_NAME(data_96_32x4), "sm511", __FILE__)
-{ }
+	: sm511_device(mconfig, SM511, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, ADDRESS_MAP_NAME(program_4k), 7 /* data width */, ADDRESS_MAP_NAME(data_96_32x4))
+{
+}
 
-sm511_device::sm511_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-	: sm510_base_device(mconfig, type, name, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data, shortname, source)
-{ }
+sm511_device::sm511_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
+	: sm510_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data)
+{
+}
 
 sm512_device::sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm511_device(mconfig, SM512, "SM512", tag, owner, clock, 2, 12, ADDRESS_MAP_NAME(program_4k), 7, ADDRESS_MAP_NAME(data_80_48x4), "sm512", __FILE__)
-{ }
+	: sm511_device(mconfig, SM512, tag, owner, clock, 2, 12, ADDRESS_MAP_NAME(program_4k), 7, ADDRESS_MAP_NAME(data_80_48x4))
+{
+}
 
 
 

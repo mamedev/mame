@@ -809,7 +809,7 @@ static const char *const m10_sample_names[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( m10, m10_state )
+static MACHINE_CONFIG_START( m10 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,IREMM10_CPU_CLOCK)
@@ -872,7 +872,7 @@ static MACHINE_CONFIG_DERIVED( m11, m10 )
 	/* sound hardware */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( m15, m10_state )
+static MACHINE_CONFIG_START( m15 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,IREMM15_CPU_CLOCK)
@@ -1045,10 +1045,10 @@ ROM_START( greenber )
 	ROM_LOAD( "gb9", 0x3000, 0x0400, CRC(c27b9ba3) SHA1(a2f4f0c4b61eb03bba13ae5d25dc01009a4f86ee) ) // ok ?
 ROM_END
 
-GAME( 1979, andromed,  0,        m11,     skychut, m10_state,  andromed, ROT270, "IPM",  "Andromeda (Japan?)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad,  0,        m10,     ipminvad, driver_device, 0,        ROT270, "IPM",  "IPM Invader", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, andromed,  0,        m11,     skychut,  m10_state, andromed, ROT270, "IPM",  "Andromeda (Japan?)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad,  0,        m10,     ipminvad, m10_state, 0,        ROT270, "IPM",  "IPM Invader",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, m10_state, ipminva1, ROT270, "IPM",  "IPM Invader (Incomplete Dump)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, skychut,   0,        m11,     skychut, driver_device,  0,        ROT270, "Irem", "Sky Chuter", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacbeam,  0,        m15,     spacbeam, driver_device, 0,        ROT270, "Irem", "Space Beam", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
-GAME( 1979, headoni,   0,        headoni, headoni, driver_device,  0,        ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, greenber,  0,        m15,     spacbeam, driver_device, 0,        ROT270, "Irem", "Green Beret (Irem)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, skychut,   0,        m11,     skychut,  m10_state, 0,        ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacbeam,  0,        m15,     spacbeam, m10_state, 0,        ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
+GAME( 1979, headoni,   0,        headoni, headoni,  m10_state, 0,        ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, greenber,  0,        m15,     spacbeam, m10_state, 0,        ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

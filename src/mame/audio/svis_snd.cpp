@@ -11,7 +11,7 @@
 
 
 // device type definition
-const device_type SVISION_SND = device_creator<svision_sound_device>;
+DEFINE_DEVICE_TYPE(SVISION_SND, svision_sound_device, "svision_sound", "Super Vision Audio Custom")
 
 
 //**************************************************************************
@@ -23,9 +23,9 @@ const device_type SVISION_SND = device_creator<svision_sound_device>;
 //-------------------------------------------------
 
 svision_sound_device::svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SVISION_SND, "Super Vision Audio Custom", tag, owner, clock, "svision_sound", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_mixer_channel(nullptr)
+	: device_t(mconfig, SVISION_SND, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_mixer_channel(nullptr)
 {
 }
 
@@ -54,47 +54,46 @@ void svision_sound_device::device_start()
 void svision_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *left=outputs[0], *right=outputs[1];
-	int i, j;
-	SVISION_CHANNEL *channel;
 
-	for (i = 0; i < samples; i++, left++, right++)
+	for (int i = 0; i < samples; i++, left++, right++)
 	{
 		*left = 0;
 		*right = 0;
-		for (channel=m_channel, j=0; j<ARRAY_LENGTH(m_channel); j++, channel++)
+		for (int j = 0; j < ARRAY_LENGTH(m_channel); j++)
 		{
-			if (channel->size != 0)
+			CHANNEL &channel(m_channel[j]);
+			if (channel.size != 0)
 			{
-				if (channel->on||channel->count)
+				if (channel.on||channel.count)
 				{
 					bool on = false;
-					switch (channel->waveform)
+					switch (channel.waveform)
 					{
 						case 0:
-							on = channel->pos <= (28 * channel->size) >> 5;
+							on = channel.pos <= (28 * channel.size) >> 5;
 							break;
 						case 1:
-							on = channel->pos <= (24 * channel->size) >> 5;
+							on = channel.pos <= (24 * channel.size) >> 5;
 							break;
 						default:
 						case 2:
-							on = channel->pos <= channel->size / 2;
+							on = channel.pos <= channel.size / 2;
 							break;
 						case 3:
-							on = channel->pos <= (9 * channel->size) >> 5;
+							on = channel.pos <= (9 * channel.size) >> 5;
 							break;
 					}
 					{
-						int16_t s = on ? channel->volume << 8 : 0;
+						int16_t s = on ? channel.volume << 8 : 0;
 						if (j == 0)
 							*right += s;
 						else
 							*left += s;
 					}
 				}
-				channel->pos++;
-				if (channel->pos >= channel->size)
-					channel->pos = 0;
+				channel.pos++;
+				if (channel.pos >= channel.size)
+					channel.pos = 0;
 			}
 		}
 		if (m_noise.on && (m_noise.play || m_noise.count))
@@ -110,13 +109,13 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			{
 				switch (m_noise.type)
 				{
-					case SVISION_NOISE_Type7Bit:
+					case NOISE::Type::Type7Bit:
 						m_noise.value = m_noise.state & 0x40 ? 1 : 0;
 						b1 = (m_noise.state & 0x40) != 0;
 						b2 = (m_noise.state & 0x20) != 0;
 						m_noise.state=(m_noise.state<<1)+(b1!=b2?1:0);
 						break;
-					case SVISION_NOISE_Type14Bit:
+					case NOISE::Type::Type14Bit:
 					default:
 						m_noise.value = m_noise.state & 0x2000 ? 1 : 0;
 						b1 = (m_noise.state & 0x2000) != 0;
@@ -204,7 +203,7 @@ WRITE8_MEMBER( svision_sound_device::noise_w )
 			m_noise.count = data + 1;
 			break;
 		case 2:
-			m_noise.type = (SVISION_NOISE_Type) (data & 1);
+			m_noise.type = NOISE::Type(data & 1);
 			m_noise.play = data & 2;
 			m_noise.right = data & 4;
 			m_noise.left = data & 8;
@@ -235,35 +234,35 @@ void svision_sound_device::sound_decrement()
 
 void svision_sound_device::soundport_w(int which, int offset, int data)
 {
-	SVISION_CHANNEL *channel = &m_channel[which];
+	CHANNEL &channel(m_channel[which]);
 	uint16_t size;
 
 	m_mixer_channel->update();
-	channel->reg[offset] = data;
+	channel.reg[offset] = data;
 
 	switch (offset)
 	{
 		case 0:
 		case 1:
-			size = channel->reg[0] | ((channel->reg[1] & 7) << 8);
+			size = channel.reg[0] | ((channel.reg[1] & 7) << 8);
 			if (size)
 			{
-				//  channel->size=(int)(device->machine().sample_rate()*(size<<5)/4e6);
-				channel->size= (int) (machine().sample_rate() * (size << 5) / machine().device("maincpu")->unscaled_clock());
+				//  channel.size=(int)(device->machine().sample_rate()*(size<<5)/4e6);
+				channel.size= (int) (machine().sample_rate() * (size << 5) / machine().device("maincpu")->unscaled_clock());
 			}
 			else
 			{
-				channel->size = 0;
+				channel.size = 0;
 			}
-			channel->pos = 0;
+			channel.pos = 0;
 			break;
 		case 2:
-			channel->on = data & 0x40;
-			channel->waveform = (data & 0x30) >> 4;
-			channel->volume = data & 0xf;
+			channel.on = data & 0x40;
+			channel.waveform = (data & 0x30) >> 4;
+			channel.volume = data & 0xf;
 			break;
 		case 3:
-			channel->count = data + 1;
+			channel.count = data + 1;
 			break;
 	}
 }

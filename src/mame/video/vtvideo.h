@@ -9,20 +9,20 @@ DEC VT Terminal video emulation
 
 **********************************************************************/
 
-#ifndef __VT_VIDEO__
-#define __VT_VIDEO__
+#ifndef MAME_VIDEO_VTVIDEO_H
+#define MAME_VIDEO_VTVIDEO_H
+
+#pragma once
 
 
 class vt100_video_device : public device_t,
 	public device_video_interface
 {
 public:
-	vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~vt100_video_device() {}
 
-	template<class _Object> static devcb_base &set_ram_rd_callback(device_t &device, _Object object) { return downcast<vt100_video_device &>(device).m_read_ram.set_callback(object); }
-	template<class _Object> static devcb_base &set_clear_video_irq_wr_callback(device_t &device, _Object object) { return downcast<vt100_video_device &>(device).m_write_clear_video_interrupt.set_callback(object); }
+	template <class Object> static devcb_base &set_ram_rd_callback(device_t &device, Object &&cb) { return downcast<vt100_video_device &>(device).m_read_ram.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_clear_video_irq_wr_callback(device_t &device, Object &&cb) { return downcast<vt100_video_device &>(device).m_write_clear_video_interrupt.set_callback(std::forward<Object>(cb)); }
 
 	static void set_chargen_tag(device_t &device, const char *tag) { downcast<vt100_video_device &>(device).m_char_rom.set_tag(tag); }
 
@@ -33,6 +33,8 @@ public:
 
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 protected:
+	vt100_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -64,6 +66,7 @@ protected:
 	uint8_t m_fill_lines;
 	uint8_t m_frequency;
 	uint8_t m_interlaced;
+	emu_timer * m_lba7_change_timer;
 
 	required_region_ptr<uint8_t> m_char_rom; /* character rom region */
 	required_device<palette_device> m_palette;
@@ -92,8 +95,8 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
-extern const device_type VT100_VIDEO;
-extern const device_type RAINBOW_VIDEO;
+DECLARE_DEVICE_TYPE(VT100_VIDEO, vt100_video_device)
+DECLARE_DEVICE_TYPE(RAINBOW_VIDEO, rainbow_video_device)
 
 
 #define MCFG_VT_SET_SCREEN MCFG_VIDEO_SET_SCREEN
@@ -107,4 +110,4 @@ extern const device_type RAINBOW_VIDEO;
 #define MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(_write) \
 	devcb = &vt100_video_device::set_clear_video_irq_wr_callback(*device, DEVCB_##_write);
 
-#endif
+#endif // MAME_VIDEO_VTVIDEO_H

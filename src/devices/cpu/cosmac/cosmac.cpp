@@ -260,16 +260,16 @@ cosmac_device::ophandler cdp1802_device::get_ophandler(uint8_t opcode)
 //**************************************************************************
 
 // device type definition
-const device_type CDP1801 = device_creator<cdp1801_device>;
-const device_type CDP1802 = device_creator<cdp1802_device>;
+DEFINE_DEVICE_TYPE(CDP1801, cdp1801_device, "cdp1801", "RCA CDP1801")
+DEFINE_DEVICE_TYPE(CDP1802, cdp1802_device, "cdp1802", "RCA CDP1802")
 
 
 //-------------------------------------------------
 //  cosmac_device - constructor
 //-------------------------------------------------
 
-cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 3),
 		m_read_wait(*this),
@@ -302,7 +302,7 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 //-------------------------------------------------
 
 cdp1801_device::cdp1801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cosmac_device(mconfig, CDP1801, "CDP1801", tag, owner, clock, "cdp1801", __FILE__)
+	: cosmac_device(mconfig, CDP1801, tag, owner, clock)
 {
 }
 
@@ -312,7 +312,7 @@ cdp1801_device::cdp1801_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 cdp1802_device::cdp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cosmac_device(mconfig, CDP1802, "CDP1802", tag, owner, clock, "cdp1802", __FILE__)
+	: cosmac_device(mconfig, CDP1802, tag, owner, clock)
 {
 }
 

@@ -683,7 +683,7 @@ static INPUT_PORTS_START( endless )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( kinstb, snesb_state )
+static MACHINE_CONFIG_START( kinstb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
@@ -1137,10 +1137,10 @@ ROM_END
 
 
 
-GAME( 199?, kinstb,       0,     kinstb,         kinstb, snesb_state,    kinstb,       ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, mk3snes,      0,     mk3snes,        kinstb, snesb_state,    mk3snes,      ROT0, "bootleg",  "Mortal Kombat 3 (SNES bootleg)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, kinstb,       0,     kinstb,         kinstb,   snesb_state,  kinstb,       ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, mk3snes,      0,     mk3snes,        kinstb,   snesb_state,  mk3snes,      ROT0, "bootleg",  "Mortal Kombat 3 (SNES bootleg)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, ffight2b,     0,     ffight2b,       ffight2b, snesb_state,  ffight2b,     ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, iron,         0,     kinstb,         iron, snesb_state,      iron,         ROT0, "bootleg",  "Iron (SNES bootleg)",                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, denseib,      0,     kinstb,         denseib, snesb_state,   denseib,      ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, iron,         0,     kinstb,         iron,     snesb_state,  iron,         ROT0, "bootleg",  "Iron (SNES bootleg)",                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, denseib,      0,     kinstb,         denseib,  snesb_state,  denseib,      ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, sblast2b,     0,     kinstb,         sblast2b, snesb_state,  sblast2b,     ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1996, endless,      0,     kinstb,         endless, snesb_state,   endless,      ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg)",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, endless,      0,     kinstb,         endless,  snesb_state,  endless,      ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg)",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

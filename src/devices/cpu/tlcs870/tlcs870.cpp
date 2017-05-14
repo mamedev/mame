@@ -15,8 +15,8 @@
 
 
 #include "emu.h"
-#include "debugger.h"
 #include "tlcs870.h"
+#include "debugger.h"
 
 
 // di, ei, j, and test are just 'alias' opcodes
@@ -150,7 +150,7 @@ static const char *const reg16p[] = {
 
 
 
-const device_type TMP87PH40AN = device_creator<tmp87ph40an_device>;
+DEFINE_DEVICE_TYPE(TMP87PH40AN, tmp87ph40an_device, "tmp87ph40an", "TMP87PH40AN")
 
 static ADDRESS_MAP_START(tmp87ph40an_mem, AS_PROGRAM, 8, tlcs870_device)
 #if 0
@@ -233,8 +233,8 @@ static ADDRESS_MAP_START(tmp87ph40an_mem, AS_PROGRAM, 8, tlcs870_device)
 ADDRESS_MAP_END
 
 
-tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor program_map)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_intram(*this, "intram")
@@ -243,7 +243,7 @@ tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type type, 
 
 
 tmp87ph40an_device::tmp87ph40an_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs870_device(mconfig, TMP87PH40AN, "TMP87PH40AN", tag, owner, clock, "tmp87ph40an", __FILE__, ADDRESS_MAP_NAME(tmp87ph40an_mem))
+	: tlcs870_device(mconfig, TMP87PH40AN, tag, owner, clock, ADDRESS_MAP_NAME(tmp87ph40an_mem))
 {
 }
 

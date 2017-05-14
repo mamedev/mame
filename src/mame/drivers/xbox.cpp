@@ -130,11 +130,11 @@ void xbox_state::hack_eeprom()
 
 void xbox_state::machine_start()
 {
-	ohci_game_controller *usb_device;
+	ohci_game_controller_device *usb_device;
 
 	xbox_base_state::machine_start();
 	xbox_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
-	usb_device = machine().device<ohci_game_controller>("ohci_gamepad");
+	usb_device = machine().device<ohci_game_controller_device>("ohci_gamepad");
 	if (usb_device != nullptr) {
 		usb_device->initialize(machine());
 		machine().device<mcpx_ohci_device>(":pci:02.0")->plug_usb_device(3, usb_device); // connect to root hub port 3, chihiro needs to use 1 and 2
@@ -165,7 +165,7 @@ SLOT_INTERFACE_START(xbox_ata_devices)
 	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_DERIVED_CLASS(xbox, xbox_base, xbox_state)
+static MACHINE_CONFIG_DERIVED(xbox, xbox_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xbox_map)
 	MCFG_CPU_IO_MAP(xbox_map_io)
@@ -231,4 +231,4 @@ ROM_END
 // For a generic system:
 // SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
 
-CONS( 2001, xbox,  0,  0,   xbox,  xbox, driver_device,  0,       "Microsoft",      "XBOX", MACHINE_IS_SKELETON )
+CONS( 2001, xbox,  0,  0,   xbox,  xbox, xbox_state,  0,       "Microsoft",      "XBOX", MACHINE_IS_SKELETON )

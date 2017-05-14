@@ -60,8 +60,8 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC77 = device_creator<abc77_device>;
-const device_type ABC55 = device_creator<abc55_device>;
+DEFINE_DEVICE_TYPE(ABC77, abc77_device, "abc77", "Luxor ABC 77")
+DEFINE_DEVICE_TYPE(ABC55, abc55_device, "abc55", "Luxor ABC 55")
 
 
 //-------------------------------------------------
@@ -424,8 +424,8 @@ inline void abc77_device::key_down(int state)
 //  abc77_device - constructor
 //-------------------------------------------------
 
-abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	abc_keyboard_interface(mconfig, *this),
 	m_maincpu(*this, I8035_TAG),
 	m_watchdog(*this, "watchdog"),
@@ -440,10 +440,10 @@ abc77_device::abc77_device(const machine_config &mconfig, device_type type, cons
 }
 
 abc55_device::abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	abc77_device(mconfig, ABC55, "Luxor ABC 55", tag, owner, clock, "abc55", __FILE__) { }
+	abc77_device(mconfig, ABC55, tag, owner, clock) { }
 
 abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	abc77_device(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock, "abc77", __FILE__) { }
+	abc77_device(mconfig, ABC77, tag, owner, clock) { }
 
 
 //-------------------------------------------------

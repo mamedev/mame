@@ -536,7 +536,7 @@ static GFXDECODE_START( atamanot )
 	GFXDECODE_ENTRY( "kanji_lc", 0, layout_8x16,     0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ssingles, ssingles_state )
+static MACHINE_CONFIG_START( ssingles )
 
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(ssingles_map)

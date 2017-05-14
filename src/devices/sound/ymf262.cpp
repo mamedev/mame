@@ -113,6 +113,8 @@ differences between OPL2 and OPL3 shown in datasheets:
 #define CONN_PHASEMOD   19
 #define CONN_PHASEMOD2  20
 
+namespace {
+
 /* save output as raw 16-bit sample */
 
 /*#define SAVE_SAMPLE*/
@@ -188,8 +190,8 @@ struct OPL3_SLOT
 	uint8_t   waveform_number;
 	unsigned int wavetable;
 
-//unsigned char reserved[128-84];//speedup: pump up the struct size to power of 2
-unsigned char reserved[128-100];//speedup: pump up the struct size to power of 2
+	//unsigned char reserved[128-84];//speedup: pump up the struct size to power of 2
+	unsigned char reserved[128-100];//speedup: pump up the struct size to power of 2
 
 };
 
@@ -214,7 +216,7 @@ struct OPL3_CH
 	*/
 	uint8_t   extended;   /* set to 1 if this channel forms up a 4op channel with another channel(only used by first of pair of channels, ie 0,1,2 and 9,10,11) */
 
-unsigned char reserved[512-272];//speedup:pump up the struct size to power of 2
+	unsigned char reserved[512-272];//speedup:pump up the struct size to power of 2
 
 };
 
@@ -266,12 +268,12 @@ struct OPL3
 	uint8_t   nts;                    /* NTS (note select)            */
 
 	/* external event callback handlers */
-	OPL3_TIMERHANDLER  timer_handler;/* TIMER handler                */
-	void *TimerParam;                   /* TIMER parameter              */
-	OPL3_IRQHANDLER    IRQHandler;  /* IRQ handler                  */
-	void *IRQParam;                 /* IRQ parameter                */
-	OPL3_UPDATEHANDLER UpdateHandler;/* stream update handler       */
-	void *UpdateParam;              /* stream update parameter      */
+	OPL3_TIMERHANDLER timer_handler;
+	device_t *TimerParam;
+	OPL3_IRQHANDLER IRQHandler;
+	device_t *IRQParam;
+	OPL3_UPDATEHANDLER UpdateHandler;
+	device_t *UpdateParam;
 
 	uint8_t type;                     /* chip type                    */
 	int clock;                      /* master clock  (Hz)           */
@@ -279,7 +281,26 @@ struct OPL3
 	double freqbase;                /* frequency base               */
 	attotime TimerBase;         /* Timer base time (==sampling time)*/
 	device_t *device;
+
+	/* Optional handlers */
+	void SetTimerHandler(OPL3_TIMERHANDLER handler, device_t *device)
+	{
+		timer_handler = handler;
+		TimerParam = device;
+	}
+	void SetIRQHandler(OPL3_IRQHANDLER handler, device_t *device)
+	{
+		IRQHandler = handler;
+		IRQParam = device;
+	}
+	void SetUpdateHandler(OPL3_UPDATEHANDLER handler, device_t *device)
+	{
+		UpdateHandler = handler;
+		UpdateParam = device;
+	}
 };
+
+} // anonymous namespace
 
 
 
@@ -2358,24 +2379,6 @@ static void OPL3Destroy(OPL3 *chip)
 }
 
 
-/* Optional handlers */
-
-static void OPL3SetTimerHandler(OPL3 *chip,OPL3_TIMERHANDLER timer_handler,void *param)
-{
-	chip->timer_handler   = timer_handler;
-	chip->TimerParam = param;
-}
-static void OPL3SetIRQHandler(OPL3 *chip,OPL3_IRQHANDLER IRQHandler,void *param)
-{
-	chip->IRQHandler     = IRQHandler;
-	chip->IRQParam = param;
-}
-static void OPL3SetUpdateHandler(OPL3 *chip,OPL3_UPDATEHANDLER UpdateHandler,void *param)
-{
-	chip->UpdateHandler = UpdateHandler;
-	chip->UpdateParam = param;
-}
-
 /* YMF262 I/O interface */
 static int OPL3Write(OPL3 *chip, int a, int v)
 {
@@ -2569,17 +2572,17 @@ int ymf262_timer_over(void *chip, int c)
 	return OPL3TimerOver((OPL3 *)chip, c);
 }
 
-void ymf262_set_timer_handler(void *chip, OPL3_TIMERHANDLER timer_handler, void *param)
+void ymf262_set_timer_handler(void *chip, OPL3_TIMERHANDLER timer_handler, device_t *device)
 {
-	OPL3SetTimerHandler((OPL3 *)chip, timer_handler, param);
+	reinterpret_cast<OPL3 *>(chip)->SetTimerHandler(timer_handler, device);
 }
-void ymf262_set_irq_handler(void *chip,OPL3_IRQHANDLER IRQHandler,void *param)
+void ymf262_set_irq_handler(void *chip, OPL3_IRQHANDLER IRQHandler, device_t *device)
 {
-	OPL3SetIRQHandler((OPL3 *)chip, IRQHandler, param);
+	reinterpret_cast<OPL3 *>(chip)->SetIRQHandler(IRQHandler, device);
 }
-void ymf262_set_update_handler(void *chip,OPL3_UPDATEHANDLER UpdateHandler,void *param)
+void ymf262_set_update_handler(void *chip, OPL3_UPDATEHANDLER UpdateHandler, device_t *device)
 {
-	OPL3SetUpdateHandler((OPL3 *)chip, UpdateHandler, param);
+	reinterpret_cast<OPL3 *>(chip)->SetUpdateHandler(UpdateHandler, device);
 }
 
 

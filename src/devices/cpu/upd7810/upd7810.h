@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller
-#pragma once
+#ifndef MAME_CPU_UPD7810_UPD7810_H
+#define MAME_CPU_UPD7810_UPD7810_H
 
-#ifndef __UPD7810_H__
-#define __UPD7810_H__
+#pragma once
 
 
 /*
@@ -129,35 +129,34 @@ class upd7810_device : public cpu_device
 public:
 	// construction/destruction
 	upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	upd7810_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_to_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_to_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_co0_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_co0_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_co1_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_co1_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_txd_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_txd_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_rxd_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_rxd_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_an0_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an0_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_an1_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an1_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_an2_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an2_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_an3_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an3_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_an4_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an4_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_an5_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an5_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_an6_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an6_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_an7_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an7_func.set_callback(object); }
+	template <class Object> static devcb_base &set_to_func(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_to_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_co0_func(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_co0_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_co1_func(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_co1_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_txd_func(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_txd_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rxd_func(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_rxd_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an0_func(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_an0_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an1_func(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_an1_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an2_func(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_an2_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an3_func(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_an3_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an4_func(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_an4_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an5_func(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_an5_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an6_func(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_an6_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an7_func(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_an7_func.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_pa_in_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pa_in_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pb_in_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pb_in_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pc_in_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pc_in_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pd_in_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pd_in_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pf_in_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pf_in_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pa_out_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pa_out_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pb_out_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pb_out_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pc_out_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pc_out_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pd_out_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pd_out_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pf_out_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pf_out_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_pa_in_cb(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_pa_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pb_in_cb(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_pb_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pc_in_cb(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_pc_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pd_in_cb(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_pd_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pf_in_cb(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_pf_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pa_out_cb(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_pa_out_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pb_out_cb(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_pb_out_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pc_out_cb(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_pc_out_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pd_out_cb(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_pd_out_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pf_out_cb(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_pf_out_cb.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_pt_in_cb(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_pt_in_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_pt_in_cb(device_t &device, Object &&cb) { return downcast<upd7810_device &>(device).m_pt_in_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER(pa_w);
 	DECLARE_WRITE8_MEMBER(pb_w);
@@ -207,6 +206,8 @@ protected:
 		INTAN7 = 0x0008,
 		INTSB  = 0x0010
 	};
+
+	upd7810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -1464,9 +1465,10 @@ class upd78c05_device : public upd7810_device
 public:
 	// construction/destruction
 	upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	upd78c05_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
+	upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }
@@ -1484,11 +1486,10 @@ public:
 };
 
 
-extern const device_type UPD7810;
-extern const device_type UPD7807;
-extern const device_type UPD7801;
-extern const device_type UPD78C05;
-extern const device_type UPD78C06;
+DECLARE_DEVICE_TYPE(UPD7810,  upd7810_device)
+DECLARE_DEVICE_TYPE(UPD7807,  upd7807_device)
+DECLARE_DEVICE_TYPE(UPD7801,  upd7801_device)
+DECLARE_DEVICE_TYPE(UPD78C05, upd78c05_device)
+DECLARE_DEVICE_TYPE(UPD78C06, upd78c06_device)
 
-
-#endif /* __UPD7810_H__ */
+#endif // MAME_CPU_UPD7810_UPD7810_H

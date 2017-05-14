@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_PLUS4_C1551_H
+#define MAME_BUS_PLUS4_C1551_H
 
-#ifndef __C1551__
-#define __C1551__
+#pragma once
 
 #include "exp.h"
 #include "cpu/m6502/m6510t.h"
@@ -23,14 +23,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c1551_t
+// ======================> c1551_device
 
-class c1551_t :  public device_t,
-					public device_plus4_expansion_card_interface
+class c1551_device : public device_t, public device_plus4_expansion_card_interface
 {
 public:
 	// construction/destruction
-	c1551_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -96,7 +95,6 @@ private:
 
 // device type definition
 extern const device_type C1551;
+DECLARE_DEVICE_TYPE(C1551, c1551_device)
 
-
-
-#endif
+#endif // MAME_BUS_PLUS4_C1551_H

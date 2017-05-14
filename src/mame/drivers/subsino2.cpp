@@ -2352,7 +2352,7 @@ INPUT_PORTS_END
                                 Bishou Jan
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( bishjan, subsino2_state )
+static MACHINE_CONFIG_START( bishjan )
 	MCFG_CPU_ADD("maincpu", H83044, XTAL_44_1MHz / 3)
 	MCFG_CPU_PROGRAM_MAP( bishjan_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
@@ -2399,7 +2399,7 @@ MACHINE_CONFIG_END
                                 Magic Train
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mtrain, subsino2_state )
+static MACHINE_CONFIG_START( mtrain )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown clock */
 	MCFG_CPU_PROGRAM_MAP( mtrain_map )
 	MCFG_CPU_IO_MAP( mtrain_io )
@@ -2423,7 +2423,7 @@ static MACHINE_CONFIG_START( mtrain, subsino2_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, OKIM6295_PIN7_HIGH)    // probably
+	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, PIN7_HIGH)    // probably
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2431,7 +2431,7 @@ MACHINE_CONFIG_END
                           Sakura Love - Ying Hua Lian
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( saklove, subsino2_state )
+static MACHINE_CONFIG_START( saklove )
 	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz*2 )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( saklove_map )
 	MCFG_CPU_IO_MAP( saklove_io )
@@ -2455,7 +2455,7 @@ static MACHINE_CONFIG_START( saklove, subsino2_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz / 4) // ? chip and clock unknown
@@ -2466,7 +2466,7 @@ MACHINE_CONFIG_END
                                 X-Plan
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( xplan, subsino2_state )
+static MACHINE_CONFIG_START( xplan )
 	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz*2 )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( xplan_map )
 	MCFG_CPU_IO_MAP( xplan_io )
@@ -2491,7 +2491,7 @@ static MACHINE_CONFIG_START( xplan, subsino2_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, OKIM6295_PIN7_HIGH)    // probably
+	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, PIN7_HIGH)    // probably
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

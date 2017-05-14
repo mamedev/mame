@@ -209,7 +209,7 @@ void vcs80_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( vcs80, vcs80_state )
+static MACHINE_CONFIG_START( vcs80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_5MHz/2) /* U880D */
 	MCFG_CPU_PROGRAM_MAP(vcs80_mem)
@@ -249,5 +249,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY             FULLNAME    FLAGS */
-COMP( 1983, vcs80,  0,      0,      vcs80,  vcs80, driver_device, 0, "Eckhard Schiller", "VCS-80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   STATE         INIT  COMPANY             FULLNAME  FLAGS */
+COMP( 1983, vcs80,  0,      0,      vcs80,  vcs80,  vcs80_state,  0,    "Eckhard Schiller", "VCS-80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)

@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_VIDEO_TIGEROAD_SPR_H
+#define MAME_VIDEO_TIGEROAD_SPR_H
+
+#pragma once
 
 class tigeroad_spr_device : public device_t
 {
@@ -15,4 +19,6 @@ protected:
 private:
 };
 
-extern const device_type TIGEROAD_SPRITE;
+DECLARE_DEVICE_TYPE(TIGEROAD_SPRITE, tigeroad_spr_device)
+
+#endif // MAME_VIDEO_TIGEROAD_SPR_H

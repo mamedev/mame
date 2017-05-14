@@ -24,10 +24,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_SOUND_LMC1992_H
+#define MAME_SOUND_LMC1992_H
 
-#ifndef __LMC1992__
-#define __LMC1992__
+#pragma once
 
 
 
@@ -105,8 +105,6 @@ private:
 
 
 // device type definition
-extern const device_type LMC1992;
+DECLARE_DEVICE_TYPE(LMC1992, lmc1992_device)
 
-
-
-#endif
+#endif // MAME_SOUND_LMC1992_H

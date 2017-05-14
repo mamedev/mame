@@ -12,11 +12,11 @@ Road generator. Two roads allow for forking. Gfx data fetched from ROM. Refer to
 
 #define TC0150ROD_RAM_SIZE 0x2000
 
-const device_type TC0150ROD = device_creator<tc0150rod_device>;
+DEFINE_DEVICE_TYPE(TC0150ROD, tc0150rod_device, "tc0150rod", "Taito TC0150ROD")
 
 tc0150rod_device::tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0150ROD, "Taito TC0150ROD", tag, owner, clock, "tc0150rod", __FILE__),
-	m_roadgfx(*this, DEVICE_SELF, 0x40000)
+	: device_t(mconfig, TC0150ROD, tag, owner, clock)
+	, m_roadgfx(*this, DEVICE_SELF, 0x40000)
 {
 }
 

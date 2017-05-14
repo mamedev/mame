@@ -914,7 +914,7 @@ void hp48_state::hp48_encode_nibble( uint8_t* dst, uint8_t* src, int size )
 
 
 /* ----- card images ------ */
-const device_type HP48_PORT = device_creator<hp48_port_image_device>;
+DEFINE_DEVICE_TYPE(HP48_PORT, hp48_port_image_device, "hp48_port_image", "HP48 memory card")
 
 /* helper for load and create */
 void hp48_port_image_device::hp48_fill_port()
@@ -1011,8 +1011,8 @@ void hp48_port_image_device::device_start()
 }
 
 hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HP48_PORT, "HP48 memory card", tag, owner, clock, "hp48_port_image", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, HP48_PORT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -1110,11 +1110,15 @@ void hp48_state::hp48_machine_start( hp48_models model )
 	}
 
 	/* timers */
-	machine().scheduler().timer_pulse(attotime::from_hz( 16 ), timer_expired_delegate(FUNC(hp48_state::hp48_timer1_cb),this));
-	machine().scheduler().timer_pulse(attotime::from_hz( 8192 ), timer_expired_delegate(FUNC(hp48_state::hp48_timer2_cb),this));
+	m_1st_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::hp48_timer1_cb), this));
+	m_1st_timer->adjust(attotime::from_hz( 16 ), 0, attotime::from_hz( 16 ));
+
+	m_2nd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::hp48_timer2_cb), this));
+	m_2nd_timer->adjust(attotime::from_hz( 8192 ), 0, attotime::from_hz( 8192 ));
 
 	/* 1ms keyboard polling */
-	machine().scheduler().timer_pulse(attotime::from_msec( 1 ), timer_expired_delegate(FUNC(hp48_state::hp48_kbd_cb),this));
+	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::hp48_kbd_cb), this));
+	m_kbd_timer->adjust(attotime::from_msec( 1 ), 0, attotime::from_msec( 1 ));
 
 	/* save state */
 	save_item(NAME(m_out) );

@@ -86,17 +86,17 @@ public:
 	required_device<z80dart_device> m_dart;
 	required_device<scc8530_t> m_scc;
 	required_device<z8536_device> m_cio;
-	required_device<fd1797_t> m_fdc;
+	required_device<fd1797_device> m_fdc;
 	required_device<e0516_device> m_rtc;
 	required_device<nmc9306_device> m_nvram;
 	required_device<ram_device> m_ram;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
-	required_device<abcbus_slot_t> m_bus0i;
-	required_device<abcbus_slot_t> m_bus0x;
-	required_device<abcbus_slot_t> m_bus1;
-	required_device<abcbus_slot_t> m_bus2;
+	required_device<abcbus_slot_device> m_bus0i;
+	required_device<abcbus_slot_device> m_bus0x;
+	required_device<abcbus_slot_device> m_bus1;
+	required_device<abcbus_slot_device> m_bus2;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

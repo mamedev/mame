@@ -541,7 +541,7 @@ MACHINE_RESET_MEMBER(chinagat_state,chinagat)
 }
 
 
-static MACHINE_CONFIG_START( chinagat, chinagat_state )
+static MACHINE_CONFIG_START( chinagat )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK / 2)     /* 1.5 MHz (12MHz oscillator / 4 internally) */
@@ -582,11 +582,11 @@ static MACHINE_CONFIG_START( chinagat, chinagat_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.80)
 	MCFG_SOUND_ROUTE(1, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1065000, OKIM6295_PIN7_HIGH) // pin 7 not verified, clock frequency estimated with recording
+	MCFG_OKIM6295_ADD("oki", 1065000, PIN7_HIGH) // pin 7 not verified, clock frequency estimated with recording
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( saiyugoub1, chinagat_state )
+static MACHINE_CONFIG_START( saiyugoub1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)      /* 68B09EP 1.5 MHz (12MHz oscillator) */
@@ -638,11 +638,11 @@ static MACHINE_CONFIG_START( saiyugoub1, chinagat_state )
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, 9263750 / 24)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(chinagat_state, saiyugoub1_m5205_irq_w)) /* Interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)          /* vclk input mode (6030Hz, 4-bit) */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)          /* vclk input mode (6030Hz, 4-bit) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( saiyugoub2, chinagat_state )
+static MACHINE_CONFIG_START( saiyugoub2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)      /* 1.5 MHz (12MHz oscillator) */
@@ -916,8 +916,8 @@ DRIVER_INIT_MEMBER(chinagat_state,chinagat)
 }
 
 
-/*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT    MONITOR COMPANY    FULLNAME     FLAGS ) */
-GAME( 1988, chinagat,   0,        chinagat,   chinagat, chinagat_state, chinagat, ROT0, "Technos Japan (Taito / Romstar license)", "China Gate (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, saiyugou,   chinagat, chinagat,   chinagat, chinagat_state, chinagat, ROT0, "Technos Japan", "Sai Yu Gou Ma Roku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, saiyugoub1, chinagat, saiyugoub1, chinagat, chinagat_state, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, saiyugoub2, chinagat, saiyugoub2, chinagat, chinagat_state, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", MACHINE_SUPPORTS_SAVE )
+//  ( YEAR  NAME        PARENT    MACHINE     INPUT     STATE           INIT      MONITOR COMPANY    FULLNAME     FLAGS ) */
+GAME( 1988, chinagat,   0,        chinagat,   chinagat, chinagat_state, chinagat, ROT0,   "Technos Japan (Taito / Romstar license)", "China Gate (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, saiyugou,   chinagat, chinagat,   chinagat, chinagat_state, chinagat, ROT0,   "Technos Japan", "Sai Yu Gou Ma Roku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, saiyugoub1, chinagat, saiyugoub1, chinagat, chinagat_state, chinagat, ROT0,   "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, saiyugoub2, chinagat, saiyugoub2, chinagat, chinagat_state, chinagat, ROT0,   "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", MACHINE_SUPPORTS_SAVE )

@@ -1006,7 +1006,7 @@ static SLOT_INTERFACE_START(pcw16_com)
 	SLOT_INTERFACE("msystems_mouse", MSYSTEM_SERIAL_MOUSE)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pcw16, pcw16_state )
+static MACHINE_CONFIG_START( pcw16 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pcw16_map)
@@ -1093,5 +1093,5 @@ ROM_START(pcw16)
 ROM_END
 
 
-/*     YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT    COMPANY          FULLNAME */
-COMP( 1995, pcw16,    0,        0,      pcw16,     pcw16, driver_device,    0,      "Amstrad plc",   "PcW16", MACHINE_NOT_WORKING )
+/*    YEAR  NAME     PARENT    COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY         FULLNAME */
+COMP( 1995, pcw16,   0,        0,      pcw16,   pcw16, pcw16_state, 0,    "Amstrad plc",  "PcW16", MACHINE_NOT_WORKING )

@@ -664,7 +664,7 @@ void spyhuntertec_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( spyhuntertec, spyhuntertec_state )
+static MACHINE_CONFIG_START( spyhuntertec )
 
 // note: no ctc, no nvram
 // 2*z80, 3*ay8912

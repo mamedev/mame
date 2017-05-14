@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CGENIE_EXPANSION_FLOPPY_H
+#define MAME_BUS_CGENIE_EXPANSION_FLOPPY_H
 
-#ifndef __CGENIE_EXPANSION_FLOPPY_H__
-#define __CGENIE_EXPANSION_FLOPPY_H__
+#pragma once
 
 #include "expansion.h"
 #include "machine/wd_fdc.h"
@@ -22,7 +22,7 @@
 
 // ======================> floppy_controller_device
 
-class cgenie_fdc_device : public device_t, public device_expansion_interface
+class cgenie_fdc_device : public device_t, public device_cg_exp_interface
 {
 public:
 	// construction/destruction
@@ -49,7 +49,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_device<fd1793_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
@@ -68,6 +68,6 @@ private:
 };
 
 // device type definition
-extern const device_type CGENIE_FDC;
+DECLARE_DEVICE_TYPE(CGENIE_FDC, cgenie_fdc_device)
 
-#endif // __CGENIE_EXPANSION_FLOPPY_H__
+#endif // MAME_BUS_CGENIE_EXPANSION_FLOPPY_H

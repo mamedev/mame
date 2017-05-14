@@ -1530,7 +1530,7 @@ void hng64_state::machine_reset()
 
 MACHINE_CONFIG_EXTERN(hng64_audio);
 
-static MACHINE_CONFIG_START(hng64, hng64_state)
+static MACHINE_CONFIG_START(hng64)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
 	MCFG_MIPS3_ICACHE_SIZE(16384)

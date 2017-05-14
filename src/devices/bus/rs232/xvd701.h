@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef JVC_XV701_H_
-#define JVC_XV701_H_
+#ifndef MAME_BUS_RS232_XVD701_H
+#define MAME_BUS_RS232_XVD701_H
 
 #include "rs232.h"
 
@@ -25,7 +25,7 @@ protected:
 	virtual void rcv_complete() override;
 
 private:
-	static const int TIMER_RESPONSE = 1;
+	static constexpr int TIMER_RESPONSE = 1;
 
 	void send_response();
 	unsigned char sum(unsigned char *buffer, int length);
@@ -36,6 +36,6 @@ private:
 	emu_timer *m_timer_response;
 };
 
-extern const device_type JVC_XVD701;
+DECLARE_DEVICE_TYPE(JVC_XVD701, jvc_xvd701_device)
 
-#endif
+#endif // MAME_BUS_RS232_XVD701_H

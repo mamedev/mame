@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CGENIE_JOYSTICK = device_creator<cgenie_joystick_device>;
+DEFINE_DEVICE_TYPE(CGENIE_JOYSTICK, cgenie_joystick_device, "cgenie_joystick", "Joystick Interface EG2013")
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -94,8 +94,8 @@ ioport_constructor cgenie_joystick_device::device_input_ports() const
 //-------------------------------------------------
 
 cgenie_joystick_device::cgenie_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CGENIE_JOYSTICK, "Joystick Interface EG2013", tag, owner, clock, "cgenie_joystick", __FILE__),
-	device_parallel_interface(mconfig, *this),
+	device_t(mconfig, CGENIE_JOYSTICK, tag, owner, clock),
+	device_cg_parallel_interface(mconfig, *this),
 	m_joy(*this, "JOY.%u", 0),
 	m_keypad(*this, "KEYPAD.%u", 0),
 	m_select(0)

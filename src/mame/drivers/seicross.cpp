@@ -390,7 +390,7 @@ INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( no_nvram, seicross_state )
+static MACHINE_CONFIG_START( no_nvram )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz / 6)   /* D780C, 3.072 MHz? */
@@ -633,10 +633,10 @@ DRIVER_INIT_MEMBER(seicross_state,friskytb)
 }
 
 
-GAME( 1981, friskyt,  0,        nvram,    friskyt, driver_device,  0,        ROT0,  "Nichibutsu", "Frisky Tom (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskyta, friskyt,  nvram,    friskyt, driver_device,  0,        ROT0,  "Nichibutsu", "Frisky Tom (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskytb, friskyt,  friskytb, friskyt, seicross_state, friskytb, ROT0,  "Nichibutsu", "Frisky Tom (set 3, encrypted)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // protection mcu runs encrypted opcodes
-GAME( 1982, radrad,   0,        no_nvram, radrad, driver_device,   0,        ROT0,  "Nichibutsu USA", "Radical Radial (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, radradj,  radrad,   no_nvram, radrad, driver_device,   0,        ROT0,  "Logitec Corp.", "Radical Radial (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, seicross, 0,        no_nvram, seicross, driver_device, 0,        ROT90, "Nichibutsu / Alice", "Seicross", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzon, seicross, no_nvram, seicross, driver_device, 0,        ROT90, "Nichibutsu / Alice", "Sector Zone", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyt,  0,        nvram,    friskyt,  seicross_state, 0,        ROT0,  "Nichibutsu", "Frisky Tom (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyta, friskyt,  nvram,    friskyt,  seicross_state, 0,        ROT0,  "Nichibutsu", "Frisky Tom (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskytb, friskyt,  friskytb, friskyt,  seicross_state, friskytb, ROT0,  "Nichibutsu", "Frisky Tom (set 3, encrypted)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // protection mcu runs encrypted opcodes
+GAME( 1982, radrad,   0,        no_nvram, radrad,   seicross_state, 0,        ROT0,  "Nichibutsu USA", "Radical Radial (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, radradj,  radrad,   no_nvram, radrad,   seicross_state, 0,        ROT0,  "Logitec Corp.", "Radical Radial (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, seicross, 0,        no_nvram, seicross, seicross_state, 0,        ROT90, "Nichibutsu / Alice", "Seicross", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzon, seicross, no_nvram, seicross, seicross_state, 0,        ROT90, "Nichibutsu / Alice", "Sector Zone", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

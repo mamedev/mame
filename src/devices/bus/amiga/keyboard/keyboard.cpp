@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type AMIGA_KEYBOARD_INTERFACE = device_creator<amiga_keyboard_bus_device>;
+DEFINE_DEVICE_TYPE(AMIGA_KEYBOARD_INTERFACE, amiga_keyboard_bus_device, "amiga_kbd", "Amiga Keyboard Interface")
 
 
 //**************************************************************************
@@ -28,7 +28,7 @@ const device_type AMIGA_KEYBOARD_INTERFACE = device_creator<amiga_keyboard_bus_d
 //-------------------------------------------------
 
 amiga_keyboard_bus_device::amiga_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, AMIGA_KEYBOARD_INTERFACE, "Amiga Keyboard Interface", tag, owner, clock, "amiga_kbd", __FILE__),
+	device_t(mconfig, AMIGA_KEYBOARD_INTERFACE, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_kbd(nullptr),
 	m_kclk_handler(*this), m_kdat_handler(*this), m_krst_handler(*this)

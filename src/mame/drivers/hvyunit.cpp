@@ -644,7 +644,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
+static MACHINE_CONFIG_START( hvyunit )
 
 	MCFG_CPU_ADD("master", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(master_memory)
@@ -815,7 +815,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, hvyunit, 0,        hvyunit, hvyunit, driver_device,  0, ROT0, "Kaneko / Taito", "Heavy Unit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hvyunitj, hvyunit, hvyunit, hvyunitj, driver_device, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hvyunitjo,hvyunit, hvyunit, hvyunitj, driver_device, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hvyunitu, hvyunit, hvyunit, hvyunitj, driver_device, 0, ROT0, "Kaneko / Taito", "Heavy Unit -U.S.A. Version- (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunit, 0,        hvyunit, hvyunit,  hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunitj, hvyunit, hvyunit, hvyunitj, hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunitjo,hvyunit, hvyunit, hvyunitj, hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunitu, hvyunit, hvyunit, hvyunitj, hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit -U.S.A. Version- (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

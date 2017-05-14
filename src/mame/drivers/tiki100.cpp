@@ -695,7 +695,7 @@ void tiki100_state::machine_reset()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( tiki100, tiki100_state )
+static MACHINE_CONFIG_START( tiki100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(tiki100_mem)
@@ -807,6 +807,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME        FLAGS */
-COMP( 1984, kontiki,    0,          0,      tiki100,    tiki100, driver_device, 0,      "Kontiki Data A/S", "KONTIKI 100",  MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tiki100,    kontiki,    0,      tiki100,    tiki100, driver_device, 0,      "Tiki Data A/S",    "TIKI 100",     MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT    STATE          INIT    COMPANY             FULLNAME        FLAGS
+COMP( 1984, kontiki,    0,          0,      tiki100,    tiki100, tiki100_state, 0,      "Kontiki Data A/S", "KONTIKI 100",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tiki100,    kontiki,    0,      tiki100,    tiki100, tiki100_state, 0,      "Tiki Data A/S",    "TIKI 100",     MACHINE_SUPPORTS_SAVE )

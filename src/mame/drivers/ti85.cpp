@@ -564,7 +564,7 @@ static INPUT_PORTS_START (ti83)
 INPUT_PORTS_END
 
 /* machine definition */
-static MACHINE_CONFIG_START( ti81, ti85_state )
+static MACHINE_CONFIG_START( ti81 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(ti81_mem)
@@ -906,15 +906,15 @@ ROM_START (ti84p)
 	ROMX_LOAD( "ti84pb100v255mp.bin", 0x00000, 0x100000, CRC(4af31251) SHA1(8f67269346644b87e7cd0f353f5f4030e787cf57), ROM_BIOS(1) )
 ROM_END
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT  INIT                    COMPANY              FULLNAME                     FLAGS
-COMP( 1990, ti81,       0,      0,      ti81,    ti81,  driver_device,   0,     "Texas Instruments", "TI-81",                     MACHINE_NO_SOUND_HW )
-COMP( 1992, ti85,       0,      0,      ti85d,   ti85,  driver_device,   0,     "Texas Instruments", "TI-85",                     MACHINE_NO_SOUND_HW )
-COMP( 1993, ti82,       0,      0,      ti82,    ti82,  driver_device,   0,     "Texas Instruments", "TI-82",                     MACHINE_NO_SOUND_HW )
-COMP( 1994, ti81v2,     ti81,   0,      ti81v2,  ti81,  driver_device,   0,     "Texas Instruments", "TI-81 v2.0",                MACHINE_NO_SOUND_HW )
-COMP( 1996, ti83,       0,      0,      ti83,    ti83,  driver_device,   0,     "Texas Instruments", "TI-83",                     MACHINE_NO_SOUND_HW )
-COMP( 1997, ti86,       0,      0,      ti86,    ti85,  driver_device,   0,     "Texas Instruments", "TI-86",                     MACHINE_NO_SOUND_HW )
-COMP( 1998, ti73,       0,      0,      ti73,    ti82,  driver_device,   0,     "Texas Instruments", "TI-73",                     MACHINE_NO_SOUND_HW )
-COMP( 1999, ti83p,      0,      0,      ti83p,   ti82,  driver_device,   0,     "Texas Instruments", "TI-83 Plus",                MACHINE_NO_SOUND_HW )
-COMP( 2001, ti83pse,    0,      0,      ti83pse, ti82,  driver_device,   0,     "Texas Instruments", "TI-83 Plus Silver Edition", MACHINE_NO_SOUND_HW )
-COMP( 2004, ti84p,      0,      0,      ti84p,   ti82,  driver_device,   0,     "Texas Instruments", "TI-84 Plus",                MACHINE_NO_SOUND_HW )
-COMP( 2004, ti84pse,    0,      0,      ti84pse, ti82,  driver_device,   0,     "Texas Instruments", "TI-84 Plus Silver Edition", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY              FULLNAME                     FLAGS
+COMP( 1990, ti81,       0,      0,      ti81,    ti81,  ti85_state,  0,     "Texas Instruments", "TI-81",                     MACHINE_NO_SOUND_HW )
+COMP( 1992, ti85,       0,      0,      ti85d,   ti85,  ti85_state,  0,     "Texas Instruments", "TI-85",                     MACHINE_NO_SOUND_HW )
+COMP( 1993, ti82,       0,      0,      ti82,    ti82,  ti85_state,  0,     "Texas Instruments", "TI-82",                     MACHINE_NO_SOUND_HW )
+COMP( 1994, ti81v2,     ti81,   0,      ti81v2,  ti81,  ti85_state,  0,     "Texas Instruments", "TI-81 v2.0",                MACHINE_NO_SOUND_HW )
+COMP( 1996, ti83,       0,      0,      ti83,    ti83,  ti85_state,  0,     "Texas Instruments", "TI-83",                     MACHINE_NO_SOUND_HW )
+COMP( 1997, ti86,       0,      0,      ti86,    ti85,  ti85_state,  0,     "Texas Instruments", "TI-86",                     MACHINE_NO_SOUND_HW )
+COMP( 1998, ti73,       0,      0,      ti73,    ti82,  ti85_state,  0,     "Texas Instruments", "TI-73",                     MACHINE_NO_SOUND_HW )
+COMP( 1999, ti83p,      0,      0,      ti83p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-83 Plus",                MACHINE_NO_SOUND_HW )
+COMP( 2001, ti83pse,    0,      0,      ti83pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-83 Plus Silver Edition", MACHINE_NO_SOUND_HW )
+COMP( 2004, ti84p,      0,      0,      ti84p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus",                MACHINE_NO_SOUND_HW )
+COMP( 2004, ti84pse,    0,      0,      ti84pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus Silver Edition", MACHINE_NO_SOUND_HW )

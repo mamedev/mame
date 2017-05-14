@@ -295,7 +295,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(blockout_state::blockout_scanline)
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( blockout, blockout_state )
+static MACHINE_CONFIG_START( blockout )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
@@ -328,7 +328,7 @@ static MACHINE_CONFIG_START( blockout, blockout_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -427,8 +427,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, blockout, 0,        blockout, blockout, driver_device, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, blockout2,blockout, blockout, blockout, driver_device, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, blockoutj,blockout, blockout, blockoutj, driver_device,0, ROT0, "Technos Japan / California Dreams", "Block Out (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, agress,   0,        agress,   agress, driver_device,   0, ROT0, "Palco", "Agress - Missile Daisenryaku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2003, agressb,  agress,   agress,   agress, driver_device,   0, ROT0, "bootleg", "Agress - Missile Daisenryaku (English bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockout, 0,        blockout, blockout,  blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockout2,blockout, blockout, blockout,  blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockoutj,blockout, blockout, blockoutj, blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, agress,   0,        agress,   agress,    blockout_state, 0, ROT0, "Palco",   "Agress - Missile Daisenryaku (Japan)",           MACHINE_SUPPORTS_SAVE )
+GAME( 2003, agressb,  agress,   agress,   agress,    blockout_state, 0, ROT0, "bootleg", "Agress - Missile Daisenryaku (English bootleg)", MACHINE_SUPPORTS_SAVE )

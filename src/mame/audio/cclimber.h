@@ -7,18 +7,18 @@
     Functions to emulate the cclimber audio boards
 
 ***************************************************************************/
+#ifndef MAME_AUDIO_CCLIMBER_H
+#define MAME_AUDIO_CCLIMBER_H
 
 #pragma once
 
-#ifndef __CCLIMBER_AUDIO__
-#define __CCLIMBER_AUDIO__
-
 #include "sound/samples.h"
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern const device_type CCLIMBER_AUDIO;
+DECLARE_DEVICE_TYPE(CCLIMBER_AUDIO, cclimber_audio_device)
 
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
@@ -60,4 +60,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_AUDIO_CCLIMBER_H

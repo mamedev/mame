@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_SOUND_AWACS_H
+#define MAME_SOUND_AWACS_H
 
-#ifndef __AWACS_H__
-#define __AWACS_H__
+#pragma once
 
 
 
@@ -47,8 +47,6 @@ public:
 
 	void set_dma_base(address_space &space, int offset0, int offset1);
 
-	sound_stream *m_stream;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -56,6 +54,8 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	sound_stream *m_stream;
 
 	// inline data
 	uint8_t m_regs[0x100];
@@ -71,7 +71,6 @@ protected:
 
 
 // device type definition
-extern const device_type AWACS;
+DECLARE_DEVICE_TYPE(AWACS, awacs_device)
 
-
-#endif /* __AWACS_H__ */
+#endif // MAME_SOUND_AWACS_H

@@ -458,7 +458,7 @@ extern SLOT_INTERFACE_START(spc1000_exp)
 	SLOT_INTERFACE("vdp", SPC1000_VDP_EXP)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( spc1000, spc1000_state )
+static MACHINE_CONFIG_START( spc1000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(spc1000_mem)
@@ -471,7 +471,7 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(spc1000_state, irq_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(spc1000_state, mc6847_videoram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(spc1000_state, get_char_rom)
-	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM2)
+	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2)
 	// other lines not connected
 
 	/* sound hardware */
@@ -520,5 +520,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1982, spc1000,  0,      0,       spc1000,   spc1000, driver_device,  0,   "Samsung", "SPC-1000", 0 )
+//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS           INIT  COMPANY    FULLNAME    FLAGS
+COMP( 1982, spc1000,  0,      0,       spc1000,   spc1000, spc1000_state,  0,    "Samsung", "SPC-1000", 0 )

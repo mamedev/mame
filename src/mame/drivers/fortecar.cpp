@@ -672,7 +672,7 @@ void fortecar_state::machine_reset()
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_CONFIG_START( fortecar, fortecar_state )
+static MACHINE_CONFIG_START( fortecar )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)      /* 3 MHz, measured */
 	MCFG_CPU_PROGRAM_MAP(fortecar_map)
@@ -781,6 +781,6 @@ DRIVER_INIT_MEMBER(fortecar_state, fortecar)
 *          Game Drivers            *
 ***********************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY       FULLNAME                        FLAGS                LAYOUT */
+//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT   COMPANY        FULLNAME                        FLAGS                LAYOUT
 GAMEL( 1994, fortecrd, 0,        fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                   layout_fortecrd )
 GAMEL( 1994, fortecar, fortecrd, fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", MACHINE_NOT_WORKING, layout_fortecrd )

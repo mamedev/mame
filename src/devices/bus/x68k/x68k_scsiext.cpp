@@ -18,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type X68K_SCSIEXT = device_creator<x68k_scsiext_device>;
+DEFINE_DEVICE_TYPE(X68K_SCSIEXT, x68k_scsiext_device, "x68k_cz6bs1", "Sharp CZ-6BS1 SCSI-1")
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -57,9 +57,10 @@ machine_config_constructor x68k_scsiext_device::device_mconfig_additions() const
 }
 
 x68k_scsiext_device::x68k_scsiext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, X68K_SCSIEXT, "Sharp CZ-6BS1 SCSI-1", tag, owner, clock, "x68k_cz6bs1", __FILE__),
-		device_x68k_expansion_card_interface(mconfig, *this), m_slot(nullptr),
-		m_spc(*this, "mb89352")
+	: device_t(mconfig, X68K_SCSIEXT, tag, owner, clock)
+	, device_x68k_expansion_card_interface(mconfig, *this)
+	, m_slot(nullptr),
+	m_spc(*this, "mb89352")
 {
 }
 

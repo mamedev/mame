@@ -5,7 +5,7 @@
 
     - Notes -
       Cycle counts are generally considered to be 100% accurate per-instruction, does not support mid-instruction
-      interrupts although no software has been countered yet that requires it. Evidence of cycle accuracy is given
+      interrupts although no software has been encountered yet that requires it. Evidence of cycle accuracy is given
       in the form of the demoscene 'wild' demo, Craft, by [lft], which uses an ATmega88 to write video out a 6-bit
       RGB DAC pixel-by-pixel, synchronously with the frame timing. Intentionally modifying the timing of any of
       the existing opcodes has been shown to wildly corrupt the video output in Craft, so one can assume that the
@@ -37,10 +37,10 @@
 
 */
 
-#pragma once
+#ifndef MAME_CPU_AVR8_AVR8_H
+#define MAME_CPU_AVR8_AVR8_H
 
-#ifndef __AVR8_H__
-#define __AVR8_H__
+#pragma once
 
 
 //**************************************************************************
@@ -90,10 +90,7 @@ public:
 
 	// public interfaces
 	virtual void update_interrupt(int source);
-	uint64_t get_elapsed_cycles()
-	{
-		return m_elapsed_cycles;
-	}
+	uint64_t get_elapsed_cycles() const { return m_elapsed_cycles; }
 
 	// register handling
 	DECLARE_WRITE8_MEMBER( regs_w );
@@ -109,7 +106,7 @@ protected:
 		CPU_TYPE_ATMEGA2560
 	};
 
-	avr8_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t address_mask, address_map_constructor internal_map, uint8_t cpu_type, const char *shortname, const char *source);
+	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t address_mask, address_map_constructor internal_map, uint8_t cpu_type);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -251,10 +248,10 @@ protected:
 };
 
 // device type definition
-extern const device_type ATMEGA88;
-extern const device_type ATMEGA644;
-extern const device_type ATMEGA1280;
-extern const device_type ATMEGA2560;
+DECLARE_DEVICE_TYPE(ATMEGA88,   atmega88_device)
+DECLARE_DEVICE_TYPE(ATMEGA644,  atmega644_device)
+DECLARE_DEVICE_TYPE(ATMEGA1280, atmega1280_device)
+DECLARE_DEVICE_TYPE(ATMEGA2560, atmega2560_device)
 
 // ======================> atmega88_device
 

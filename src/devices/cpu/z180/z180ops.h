@@ -213,7 +213,7 @@ uint32_t z180_device::ARG16()
 #define RET_COND(cond,opcode)                                   \
 	if( cond )                                                  \
 	{                                                           \
-		POP(PC);                                              \
+		POP(PC);                                                \
 		CC(ex,opcode);                                          \
 	}
 
@@ -221,19 +221,19 @@ uint32_t z180_device::ARG16()
  * RETN
  ***************************************************************/
 #define RETN    {                                               \
-	LOG(("Z180 '%s' RETN IFF1:%d IFF2:%d\n", tag(), m_IFF1, m_IFF2)); \
-	POP(PC);                                                  \
-	m_IFF1 = m_IFF2;                                                \
+	LOG("Z180 RETN IFF1:%d IFF2:%d\n", m_IFF1, m_IFF2);         \
+	POP(PC);                                                    \
+	m_IFF1 = m_IFF2;                                            \
 }
 
 /***************************************************************
  * RETI
  ***************************************************************/
 #define RETI    {                                               \
-	POP(PC);                                                  \
+	POP(PC);                                                    \
 /* according to http://www.msxnet.org/tech/Z80/z80undoc.txt */  \
-/*  m_IFF1 = m_IFF2;  */                                            \
-	daisy_call_reti_device();                 \
+/*  m_IFF1 = m_IFF2;  */                                        \
+	daisy_call_reti_device();                                   \
 }
 
 /***************************************************************

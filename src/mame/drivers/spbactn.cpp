@@ -405,7 +405,7 @@ static GFXDECODE_START( spbactnp )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( spbactn, spbactn_state )
+static MACHINE_CONFIG_START( spbactn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
@@ -446,12 +446,12 @@ static MACHINE_CONFIG_START( spbactn, spbactn_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, OKIM6295_PIN7_HIGH) /* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH) /* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spbactnp, spbactn_state )
+static MACHINE_CONFIG_START( spbactnp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
@@ -499,7 +499,7 @@ static MACHINE_CONFIG_START( spbactnp, spbactn_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -597,6 +597,6 @@ ROM_START( spbactnp )
 	ROM_LOAD( "tcm1.19g.bin", 0x00000, 0x53, CRC(2c54354a) SHA1(11d8b6cdaf052b5a9fbcf6b6fbf99c5f89575cfa) )
 ROM_END
 
-GAME( 1991, spbactn, 0,        spbactn, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, spbactnj, spbactn, spbactn, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, spbactnp, spbactn, spbactnp, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // early proto, (c) date is 2 years earlier!
+GAME( 1991, spbactn,  0,       spbactn,  spbactn, spbactn_state, 0, ROT90, "Tecmo", "Super Pinball Action (US)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, spbactnj, spbactn, spbactn,  spbactn, spbactn_state, 0, ROT90, "Tecmo", "Super Pinball Action (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spbactnp, spbactn, spbactnp, spbactn, spbactn_state, 0, ROT90, "Tecmo", "Super Pinball Action (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // early proto, (c) date is 2 years earlier!

@@ -27,19 +27,9 @@ DRIVER_INIT_MEMBER(patinho_feio_state, patinho_feio)
 	m_prev_RC = 0;
 }
 
-READ16_MEMBER(patinho_feio_state::rc_r)
-{
-	return ioport("RC")->read();
-}
-
-READ16_MEMBER(patinho_feio_state::buttons_r)
-{
-	return ioport("BUTTONS")->read();
-}
-
 void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_data, uint16_t mem_addr, uint16_t PC, uint8_t FLAGS, uint16_t RC, uint8_t mode){
 	char lamp_id[11];
-	const char* button_names[] = {
+	static char const *const button_names[] = {
 		"NORMAL",
 		"CICLOUNICO",
 		"INSTRUCAOUNICA",
@@ -116,7 +106,7 @@ TIMER_CALLBACK_MEMBER(patinho_feio_state::decwriter_callback)
 	m_decwriter_timer->enable(0); //stop the timer
 }
 
-WRITE8_MEMBER(patinho_feio_state::decwriter_kbd_input)
+void patinho_feio_state::decwriter_kbd_input(u8 data)
 {
 	m_maincpu->transfer_byte_from_external_device(0xA, ~data);
 }
@@ -139,7 +129,7 @@ TIMER_CALLBACK_MEMBER(patinho_feio_state::teletype_callback)
 	m_teletype_timer->enable(0); //stop the timer
 }
 
-WRITE8_MEMBER(patinho_feio_state::teletype_kbd_input)
+void patinho_feio_state::teletype_kbd_input(u8 data)
 {
 	//I figured out that the data is provided inverted (2's complement)
 	//based on a comment in the source code listing of the HEXAM program.
@@ -251,12 +241,12 @@ static INPUT_PORTS_START( patinho_feio )
 	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MEMORIA (Liberada/Protegida)") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
+static MACHINE_CONFIG_START( patinho_feio )
 	/* basic machine hardware */
 	/* CPU @ approx. 500 kHz (memory cycle time is 2usec) */
 	MCFG_CPU_ADD("maincpu", PATO_FEIO_CPU, 500000)
-	MCFG_PATINHO_RC_READ_CB(READ16(patinho_feio_state, rc_r))
-	MCFG_PATINHO_BUTTONS_READ_CB(READ16(patinho_feio_state, buttons_r))
+	MCFG_PATINHO_RC_READ_CB(IOPORT("RC"))
+	MCFG_PATINHO_BUTTONS_READ_CB(IOPORT("BUTTONS"))
 
 	/* Printer */
 //  MCFG_PATINHO_IODEV_WRITE_CB(0x5, WRITE8(patinho_feio_state, printer_data_w))
@@ -284,11 +274,11 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 
 	/* DECWRITER */
 	MCFG_DEVICE_ADD("decwriter", TELEPRINTER, 0)
-	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(WRITE8(patinho_feio_state, decwriter_kbd_input))
+	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(PUT(patinho_feio_state, decwriter_kbd_input))
 
 	/* Teletype */
 	MCFG_DEVICE_ADD("teletype", TELEPRINTER, 1)
-	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(WRITE8(patinho_feio_state, teletype_kbd_input))
+	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(PUT(patinho_feio_state, teletype_kbd_input))
 
 	/* punched tape */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "patinho_tape")
@@ -318,5 +308,5 @@ ROM_START( patinho )
 	ROM_LOAD( "micro-pre-loader.bin", 0x000, 0x02a, CRC(1921feab) SHA1(bb063102e44e9ab963f95b45710141dc2c5046b0) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE        INPUT         INIT                              COMPANY                                           FULLNAME */
-COMP( 1972, patinho,  0,        0,      patinho_feio,  patinho_feio, patinho_feio_state, patinho_feio, "Escola Politecnica - Universidade de Sao Paulo", "Patinho Feio" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE        INPUT         STATE               INIT          COMPANY                                           FULLNAME         FLAGS
+COMP( 1972, patinho,  0,        0,      patinho_feio,  patinho_feio, patinho_feio_state, patinho_feio, "Escola Politecnica - Universidade de Sao Paulo", "Patinho Feio" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

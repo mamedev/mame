@@ -470,7 +470,7 @@ private:
 
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	required_device<palette_device> m_palette;
-	required_device<segas24_tile> m_tiles;
+	required_device<segas24_tile_device> m_tiles;
 
 	// I/O related
 	uint16_t  m_lamp_state;

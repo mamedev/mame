@@ -47,7 +47,9 @@ public:
 		m_fg_tilemapram(*this, "fg_tilemapram"),
 		m_bg_tilemapram(*this, "bg_tilemapram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{
+	}
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_fg_tilemapram;
@@ -282,7 +284,7 @@ static GFXDECODE_START( good )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( good, good_state )
+static MACHINE_CONFIG_START( good )
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000 /2)
 	MCFG_CPU_PROGRAM_MAP(good_map)
@@ -304,7 +306,7 @@ static MACHINE_CONFIG_START( good, good_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -325,4 +327,4 @@ ROM_START( good )
 	ROM_LOAD16_BYTE( "grp-04", 0x40001, 0x20000, CRC(83dbbb52) SHA1(e597f3cbb54b5cdf2230ea6318f970319061e31b) )
 ROM_END
 
-GAME( 1998, good,   0,   good,   good, driver_device,   0,  ROT0,  "<unknown>", "Good (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, good,   0,   good,   good, good_state,   0,  ROT0,  "<unknown>", "Good (Korea)", MACHINE_SUPPORTS_SAVE )

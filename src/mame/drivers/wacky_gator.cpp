@@ -270,7 +270,7 @@ static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, wackygtr_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( wackygtr, wackygtr_state )
+static MACHINE_CONFIG_START( wackygtr )
 
 	MCFG_CPU_ADD("maincpu", M6809E, XTAL_3_579545MHz)   // HD68B09P
 	MCFG_CPU_PROGRAM_MAP(program_map)
@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( wackygtr, wackygtr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz )
 	MCFG_MSM5205_VCLK_CB(WRITELINE(wackygtr_state, adpcm_int))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz )

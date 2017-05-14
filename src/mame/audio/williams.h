@@ -20,9 +20,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern const device_type WILLIAMS_NARC_SOUND;
-extern const device_type WILLIAMS_CVSD_SOUND;
-extern const device_type WILLIAMS_ADPCM_SOUND;
+DECLARE_DEVICE_TYPE(WILLIAMS_CVSD_SOUND, williams_cvsd_sound_device)
+DECLARE_DEVICE_TYPE(WILLIAMS_NARC_SOUND, williams_narc_sound_device)
+DECLARE_DEVICE_TYPE(WILLIAMS_ADPCM_SOUND, williams_adpcm_sound_device)
 
 
 

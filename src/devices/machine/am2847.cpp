@@ -9,12 +9,12 @@
 #include "emu.h"
 #include "am2847.h"
 
-const device_type AM2847 = device_creator<am2847_device>;
-const device_type AM2849 = device_creator<am2849_device>;
-const device_type TMS3409 = device_creator<tms3409_device>;
+DEFINE_DEVICE_TYPE(AM2847,  am2847_device,  "am2847",  "AMD Am2847 80-bit Static Shift Register")
+DEFINE_DEVICE_TYPE(AM2849,  am2849_device,  "am2849",  "AMD Am2849 96-bit Static Shift Register")
+DEFINE_DEVICE_TYPE(TMS3409, tms3409_device, "tms3409", "TI TMS3409 80-bit Static Shift Register")
 
-am2847_base_device::am2847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, size_t size)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+am2847_base_device::am2847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, size_t size)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_in(0)
 	, m_out(0)
 	, m_rc(0)
@@ -24,17 +24,17 @@ am2847_base_device::am2847_base_device(const machine_config &mconfig, device_typ
 }
 
 am2847_device::am2847_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: am2847_base_device(mconfig, AM2847, "AMD Am2847 80-bit Static Shift Register", tag, owner, clock, "am2847", 5)
+	: am2847_base_device(mconfig, AM2847, tag, owner, clock, 5)
 {
 }
 
 am2849_device::am2849_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: am2847_base_device(mconfig, AM2849, "AMD Am2849 96-bit Static Shift Register", tag, owner, clock, "am2847", 6)
+	: am2847_base_device(mconfig, AM2849, tag, owner, clock, 6)
 {
 }
 
 tms3409_device::tms3409_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: am2847_base_device(mconfig, TMS3409, "TI TMS3409 80-bit Static Shift Register", tag, owner, clock, "am2847", 5)
+	: am2847_base_device(mconfig, TMS3409, tag, owner, clock, 5)
 {
 }
 

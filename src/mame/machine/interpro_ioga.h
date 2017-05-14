@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#pragma once
+#ifndef MAME_MACHINE_INTERPRO_IOGA_H
+#define MAME_MACHINE_INTERPRO_IOGA_H
 
-#ifndef INTERPRO_IOGA_H_
-#define INTERPRO_IOGA_H_
+#pragma once
 
 
 #define MCFG_INTERPRO_IOGA_ADD(_tag) \
@@ -249,6 +249,6 @@ private:
 };
 
 // device type definition
-extern const device_type INTERPRO_IOGA;
+DECLARE_DEVICE_TYPE(INTERPRO_IOGA, interpro_ioga_device)
 
-#endif
+#endif // MAME_MACHINE_INTERPRO_IOGA_H

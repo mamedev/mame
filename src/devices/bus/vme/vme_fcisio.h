@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Joakim Larsson Edstrom
-#ifndef VME_FCISIO_H
-#define VME_FCISIO_H
+#ifndef MAME_BUS_VME_VME_FCISIO_H
+#define MAME_BUS_VME_VME_FCISIO_H
+
 #pragma once
 
 #include "machine/scnxx562.h"
@@ -9,14 +10,11 @@
 #include "machine/68153bim.h"
 #include "bus/vme/vme.h"
 
-extern const device_type VME_FCISIO1;
+DECLARE_DEVICE_TYPE(VME_FCISIO1, vme_fcisio1_card_device)
 
-class vme_fcisio1_card_device :
-	public device_t
-	,public device_vme_card_interface
+class vme_fcisio1_card_device : public device_t, public device_vme_card_interface
 {
 public:
-	vme_fcisio1_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	vme_fcisio1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
@@ -31,6 +29,8 @@ public:
 	DECLARE_WRITE8_MEMBER (not_implemented_w);
 
 protected:
+	vme_fcisio1_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -48,4 +48,4 @@ private:
 	uint16_t  *m_sysrom;
 };
 
-#endif // VME_FCISIO_H
+#endif // MAME_BUS_VME_VME_FCISIO_H

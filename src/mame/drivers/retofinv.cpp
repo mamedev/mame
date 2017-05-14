@@ -360,7 +360,7 @@ INTERRUPT_GEN_MEMBER(retofinv_state::sub_vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( retofinv, retofinv_state )
+static MACHINE_CONFIG_START( retofinv )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz? */
@@ -525,6 +525,6 @@ ROM_END
 
 
 
-GAME( 1985, retofinv, 0,        retofinv, retofinv, driver_device, 0, ROT90, "Taito Corporation", "Return of the Invaders", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinv1,retofinv, retofinb, retofinv, driver_device, 0, ROT90, "bootleg", "Return of the Invaders (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinv2,retofinv, retofinb, retofin2, driver_device, 0, ROT90, "bootleg", "Return of the Invaders (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinv, 0,        retofinv, retofinv, retofinv_state, 0, ROT90, "Taito Corporation", "Return of the Invaders",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinv1,retofinv, retofinb, retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinv2,retofinv, retofinb, retofin2, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg set 2)", MACHINE_SUPPORTS_SAVE )

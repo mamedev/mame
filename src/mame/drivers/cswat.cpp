@@ -253,7 +253,7 @@ void cswat_state::machine_start()
 	save_item(NAME(m_nmi_enabled));
 }
 
-static MACHINE_CONFIG_START( cswat, cswat_state )
+static MACHINE_CONFIG_START( cswat )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809E, XTAL_18_432MHz/3/4) // HD68A09EP, 1.5MHz?
@@ -304,4 +304,4 @@ ROM_START( cswat )
 ROM_END
 
 
-GAME( 1984, cswat, 0, cswat, cswat, driver_device, 0, ROT0, "Namco", "Cosmoswat", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, cswat, 0, cswat, cswat, cswat_state, 0, ROT0, "Namco", "Cosmoswat", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )

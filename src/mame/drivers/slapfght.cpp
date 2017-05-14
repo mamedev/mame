@@ -925,7 +925,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( perfrman, slapfght_state )
+static MACHINE_CONFIG_START( perfrman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4) // 4MHz? XTAL is known, divider is guessed
@@ -970,7 +970,7 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tigerh, slapfght_state )
+static MACHINE_CONFIG_START( tigerh )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_36MHz/6) // 6MHz
@@ -1034,7 +1034,7 @@ static MACHINE_CONFIG_DERIVED( tigerhb2, tigerhb1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( slapfigh, slapfght_state )
+static MACHINE_CONFIG_START( slapfigh )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_36MHz/6) // 6MHz
@@ -2017,14 +2017,14 @@ ROM_END
 
 
 /*  ( YEAR  NAME        PARENT    MACHINE     INPUT      INIT                       MONITOR, COMPANY, FULLNAME, FLAGS ) */
-GAME( 1985, perfrman,   0,        perfrman,   perfrman,  driver_device,  0,         ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman,  driver_device,  0,         ROT270, "Toaplan / Data East USA", "Performan (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, perfrman,   0,        perfrman,   perfrman,  slapfght_state, 0,         ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman,  slapfght_state, 0,         ROT270, "Toaplan / Data East USA", "Performan (US)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, tigerh,     0,        tigerh,     tigerh,    driver_device,  0,         ROT270, "Toaplan / Taito America Corp.", "Tiger Heli (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,    driver_device,  0,         ROT270, "Toaplan / Taito", "Tiger Heli (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhb1,   tigerh,   tigerhb1,   tigerh,    driver_device,  0,         ROT270, "bootleg", "Tiger Heli (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhb2,   tigerh,   tigerhb2,   tigerh,    driver_device,  0,         ROT270, "bootleg", "Tiger Heli (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhb3,   tigerh,   tigerhb2,   tigerh,    driver_device,  0,         ROT270, "bootleg", "Tiger Heli (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerh,     0,        tigerh,     tigerh,    slapfght_state, 0,         ROT270, "Toaplan / Taito America Corp.", "Tiger Heli (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,    slapfght_state, 0,         ROT270, "Toaplan / Taito", "Tiger Heli (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb1,   tigerh,   tigerhb1,   tigerh,    slapfght_state, 0,         ROT270, "bootleg", "Tiger Heli (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb2,   tigerh,   tigerhb2,   tigerh,    slapfght_state, 0,         ROT270, "bootleg", "Tiger Heli (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb3,   tigerh,   tigerhb2,   tigerh,    slapfght_state, 0,         ROT270, "bootleg", "Tiger Heli (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, alcon,      0,        slapfigh,   slapfigh,  slapfght_state, slapfigh,  ROT270, "Toaplan / Taito America Corp.", "Alcon (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh,  slapfght_state, slapfigh,  ROT270, "Toaplan / Taito", "Slap Fight (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

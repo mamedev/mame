@@ -18,9 +18,9 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
-
 #include "sc61860.h"
+
+#include "debugger.h"
 
 
 #define I 0
@@ -41,16 +41,15 @@
 #define C 95
 
 
-#define VERBOSE 0
+//#define VERBOSE 1
+#include "logmacro.h"
 
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
-
-const device_type SC61860 = device_creator<sc61860_device>;
+DEFINE_DEVICE_TYPE(SC61860, sc61860_device, "sc61860", "SC61860")
 
 
 sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SC61860, "SC61860", tag, owner, clock, "sc61860", __FILE__)
+	: cpu_device(mconfig, SC61860, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_reset(*this)
 	, m_brk(*this)

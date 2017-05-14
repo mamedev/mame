@@ -83,6 +83,7 @@
 
 #include "emu.h"
 #include "vme_mzr8300.h"
+
 #include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
@@ -113,7 +114,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_MZR8300 = device_creator<vme_mzr8300_card_device>;
+DEFINE_DEVICE_TYPE(VME_MZR8300, vme_mzr8300_card_device, "mzr8300", "Mizar 8300 SIO serial board")
 
 /* These values are borrowed just to get the terminal going and should be replaced
  * once a proper serial board hardware (ie MZ 8300) is found and emulated. */
@@ -128,8 +129,8 @@ MACHINE_CONFIG_FRAGMENT( mzr8300 )
 	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_rts))
 
 	MCFG_RS232_PORT_ADD ("rs232p1", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("sio0", upd7201N_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("sio0", upd7201N_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("sio0", upd7201_new_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("sio0", upd7201_new_device, ctsb_w))
 
 	MCFG_Z80SIO_ADD("sio1", XTAL_4MHz, 0, 0, 0, 0 )
 MACHINE_CONFIG_END
@@ -150,18 +151,16 @@ machine_config_constructor vme_mzr8300_card_device::device_mconfig_additions() c
 //  LIVE DEVICE
 //**************************************************************************
 
-vme_mzr8300_card_device::vme_mzr8300_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_vme_card_interface(mconfig, *this)
+vme_mzr8300_card_device::vme_mzr8300_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_vme_card_interface(mconfig, *this)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 vme_mzr8300_card_device::vme_mzr8300_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VME_MZR8300, "Mizar 8300 SIO serial board", tag, owner, clock, "mzr8300", __FILE__),
-	device_vme_card_interface(mconfig, *this)
+	vme_mzr8300_card_device(mconfig, VME_MZR8300, tag, owner, clock)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 void vme_mzr8300_card_device::device_start()

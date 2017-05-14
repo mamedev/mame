@@ -723,7 +723,7 @@ INTERRUPT_GEN_MEMBER(paradise_state::irq)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( paradise, paradise_state )
+static MACHINE_CONFIG_START( paradise )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)          /* Z8400B - 6mhz Verified */
@@ -748,10 +748,10 @@ static MACHINE_CONFIG_START( paradise, paradise_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_12MHz/12, OKIM6295_PIN7_HIGH)    /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki1", XTAL_12MHz/12, PIN7_HIGH)    /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki2", XTAL_12MHz/12, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

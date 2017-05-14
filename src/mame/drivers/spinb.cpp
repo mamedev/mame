@@ -519,7 +519,7 @@ WRITE8_MEMBER( spinb_state::ppia_c_w )
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc_a, 5))
-		m_msm_a->set_prescaler_selector(*m_msm_a, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
+		m_msm_a->set_prescaler_selector(*m_msm_a, BIT(data, 5) ? msm5205_device::S48_4B : msm5205_device::S96_4B); // S1 pin
 	m_msm_a->reset_w(BIT(data, 6));
 	m_ic5a->clear_w(!BIT(data, 6));
 	m_portc_a = data & 0xfe;
@@ -529,7 +529,7 @@ WRITE8_MEMBER( spinb_state::ppim_c_w )
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc_m, 5))
-		m_msm_m->set_prescaler_selector(*m_msm_m, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
+		m_msm_m->set_prescaler_selector(*m_msm_m, BIT(data, 5) ? msm5205_device::S48_4B : msm5205_device::S96_4B); // S1 pin
 	m_msm_m->reset_w(BIT(data, 6));
 	m_ic5m->clear_w(!BIT(data, 6));
 	m_portc_m = data & 0xfe;
@@ -637,7 +637,7 @@ uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-static MACHINE_CONFIG_START( spinb, spinb_state )
+static MACHINE_CONFIG_START( spinb )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(spinb_map)
@@ -668,12 +668,12 @@ static MACHINE_CONFIG_START( spinb, spinb_state )
 	MCFG_SPEAKER_STANDARD_MONO("msmavol")
 	MCFG_SOUND_ADD("msm_a", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(spinb_state, vck_a_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 4KHz 4-bit */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmavol", 1.0)
 	MCFG_SPEAKER_STANDARD_MONO("msmmvol")
 	MCFG_SOUND_ADD("msm_m", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(spinb_state, vck_m_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 4KHz 4-bit */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmmvol", 1.0)
 
 	/* Devices */

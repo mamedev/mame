@@ -18,10 +18,10 @@ The data bus is 16 bits wide.
 #define TC0110PCR_RAM_SIZE 0x2000
 
 
-const device_type TC0110PCR = device_creator<tc0110pcr_device>;
+DEFINE_DEVICE_TYPE(TC0110PCR, tc0110pcr_device, "tc0110pcr", "Taito TC0110PCR")
 
 tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0110PCR, "Taito TC0110PCR", tag, owner, clock, "tc0110pcr", __FILE__)
+	: device_t(mconfig, TC0110PCR, tag, owner, clock)
 	, m_ram(nullptr)
 	, m_type(0)
 	, m_addr(0)

@@ -195,7 +195,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-struct game_driver;
+class game_driver;
 class device_slot_interface;
 class emu_options;
 

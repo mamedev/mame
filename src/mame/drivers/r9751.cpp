@@ -492,7 +492,7 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( r9751, r9751_state )
+static MACHINE_CONFIG_START( r9751 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(r9751_mem)
@@ -536,5 +536,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
-COMP( 1988, r9751,   0,          0,      r9751,   r9751, r9751_state, r9751,      "ROLM Systems, Inc.",   "ROLM 9751 Model 10", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT      COMPAT  MACHINE  INPUT  STATE        INIT      COMPANY                 FULLNAME              FLAGS
+COMP( 1988, r9751,   0,          0,      r9751,   r9751, r9751_state, r9751,    "ROLM Systems, Inc.",   "ROLM 9751 Model 10", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

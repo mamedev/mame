@@ -7,7 +7,7 @@
 // 2 = everything
 const int V = 0;
 
-const device_type H8_DTC         = device_creator<h8_dtc_device>;
+DEFINE_DEVICE_TYPE(H8_DTC, h8_dtc_device, "h8_dtc", "H8 DTC controller")
 
 const int h8_dtc_device::vector_to_enable[92] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, // NMI at 7
@@ -25,7 +25,7 @@ const int h8_dtc_device::vector_to_enable[92] = {
 };
 
 h8_dtc_device::h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, H8_DTC, "H8 DTC controller", tag, owner, clock, "h8_dtc", __FILE__),
+	device_t(mconfig, H8_DTC, tag, owner, clock),
 	cpu(*this, DEVICE_SELF_OWNER)
 {
 }

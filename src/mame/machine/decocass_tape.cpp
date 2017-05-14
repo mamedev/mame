@@ -7,9 +7,10 @@
  ***********************************************************************/
 
 #include "emu.h"
+#include "machine/decocass_tape.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/decocass_tape.h"
 
 #define LOG_CASSETTE_STATE      0
 
@@ -56,10 +57,10 @@
 
 static uint16_t tape_crc16_byte(uint16_t crc, uint8_t data);
 
-const device_type DECOCASS_TAPE = device_creator<decocass_tape_device>;
+DEFINE_DEVICE_TYPE(DECOCASS_TAPE, decocass_tape_device, "decocass_tape", "DECO Cassette Tape")
 
 decocass_tape_device::decocass_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECOCASS_TAPE, "DECO Cassette Tape", tag, owner, clock, "decocass_tape", __FILE__),
+	: device_t(mconfig, DECOCASS_TAPE, tag, owner, clock),
 	m_tape_timer(nullptr),
 	m_speed(0),
 	m_region(REGION_LEADER),

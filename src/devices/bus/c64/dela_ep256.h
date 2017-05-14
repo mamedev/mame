@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_DELA_EP256_H
+#define MAME_BUS_C64_DELA_EP256_H
 
-#ifndef __DELA_EP256__
-#define __DELA_EP256__
+#pragma once
 
 
 #include "exp.h"
@@ -52,8 +52,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_DELA_EP256;
+DECLARE_DEVICE_TYPE(C64_DELA_EP256, c64_dela_ep256_cartridge_device)
 
 
-
-#endif
+#endif // MAME_BUS_C64_DELA_EP256_H

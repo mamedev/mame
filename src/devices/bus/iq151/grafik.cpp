@@ -28,7 +28,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151_GRAFIK = device_creator<iq151_grafik_device>;
+DEFINE_DEVICE_TYPE(IQ151_GRAFIK, iq151_grafik_device, "iq151_grafik", "IQ151 grafik")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -39,10 +39,10 @@ const device_type IQ151_GRAFIK = device_creator<iq151_grafik_device>;
 //-------------------------------------------------
 
 iq151_grafik_device::iq151_grafik_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, IQ151_GRAFIK, "IQ151 grafik", tag, owner, clock, "iq151_grafik", __FILE__),
-		device_iq151cart_interface( mconfig, *this ),
-		m_ppi8255(*this, "ppi8255"), m_posx(0), m_posy(0), m_all(0), m_pen(0), m_fast(0), m_ev(0), m_ex(0), m_sel(0)
-	{
+	: device_t(mconfig, IQ151_GRAFIK, tag, owner, clock)
+	, device_iq151cart_interface(mconfig, *this)
+	, m_ppi8255(*this, "ppi8255"), m_posx(0), m_posy(0), m_all(0), m_pen(0), m_fast(0), m_ev(0), m_ex(0), m_sel(0)
+{
 }
 
 //-------------------------------------------------

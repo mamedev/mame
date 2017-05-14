@@ -196,7 +196,7 @@ static GFXDECODE_START( pda600 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( pda600, pda600_state )
+static MACHINE_CONFIG_START( pda600 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z180, XTAL_14_31818MHz)
 	MCFG_CPU_PROGRAM_MAP(pda600_mem)
@@ -235,5 +235,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY        FULLNAME       FLAGS */
-COMP( 1993, pda600,  0,       0,     pda600,    pda600, driver_device,   0,  "Amstrad plc", "PenPad PDA 600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    STATE          INIT  COMPANY        FULLNAME          FLAGS */
+COMP( 1993, pda600,  0,      0,      pda600,    pda600,  pda600_state,  0,    "Amstrad plc", "PenPad PDA 600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

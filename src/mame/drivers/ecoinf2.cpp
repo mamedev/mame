@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ox_port5c_out_w);
 	DECLARE_DRIVER_INIT(ecoinf2);
 
-		void update_lamps(void)
+	void update_lamps()
 	{
 		for (int i=0; i<16; i++)
 		{
@@ -500,7 +500,7 @@ static INPUT_PORTS_START( ecoinf2 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ecoinf2_oxo, ecoinf2_state )
+static MACHINE_CONFIG_START( ecoinf2_oxo )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180,4000000) // some of these hit invalid opcodes with a plain z80, some don't?
 	MCFG_CPU_PROGRAM_MAP(oxo_memmap)
@@ -790,13 +790,13 @@ DRIVER_INIT_MEMBER(ecoinf2_state,ecoinf2)
 }
 
 // OXO wh type (Phoenix?) (watchdog on port 5c?)
-GAME( 19??, ec_oxocg,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Classic Gold (Electrocoin) (?)"      , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_oxocl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Club (Electrocoin) (?)"     , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_oxogb,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Golden Bars (Electrocoin) (?)"       , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_oxorl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Reels (Electrocoin) (?)"     , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_oxorv,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Revolution (Electrocoin) (?)"        , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_suprl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Super Reels (Electrocoin) (?)"       , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_rcc,     0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Royal Casino Club (Electrocoin) (?)"     , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxocg,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Classic Gold (Electrocoin) (?)",                              MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxocl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Club (Electrocoin) (?)",                                      MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxogb,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Golden Bars (Electrocoin) (?)",                               MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxorl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Reels (Electrocoin) (?)",                                     MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxorv,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Revolution (Electrocoin) (?)",                                MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_suprl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Super Reels (Electrocoin) (?)",                                   MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_rcc,     0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Royal Casino Club (Electrocoin) (?)",                             MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
 
-GAME( 19??, ec_sumnd,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Concept Games Ltd", "Super Multi Nudger (Concept / Electrocoin Oxo) (?)"        , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_sumnc,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Concept Games Ltd", "Casino Super Multi Nudger (Concept / Electrocoin Oxo) (?)"     , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_sumnd,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Concept Games Ltd", "Super Multi Nudger (Concept / Electrocoin Oxo) (?)",        MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_sumnc,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Concept Games Ltd", "Casino Super Multi Nudger (Concept / Electrocoin Oxo) (?)", MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)

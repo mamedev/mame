@@ -228,7 +228,7 @@ WRITE8_MEMBER(bogeyman_state::colbank_w)
 	}
 }
 
-static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
+static MACHINE_CONFIG_START( bogeyman )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* Verified */
@@ -294,4 +294,4 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1985, bogeyman, 0, bogeyman, bogeyman, driver_device, 0, ROT0, "Technos Japan", "Bogey Manor", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bogeyman, 0, bogeyman, bogeyman, bogeyman_state, 0, ROT0, "Technos Japan", "Bogey Manor", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -29,7 +29,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MC1502_FDC = device_creator<mc1502_fdc_device>;
+DEFINE_DEVICE_TYPE(MC1502_FDC, mc1502_fdc_device, "mc1502_fdc", "MC-1502 floppy")
 
 FLOPPY_FORMATS_MEMBER( mc1502_fdc_device::floppy_formats )
 	FLOPPY_PC_FORMAT
@@ -204,7 +204,7 @@ WRITE8_MEMBER(mc1502_fdc_device::mc1502_fdc_w)
 //-------------------------------------------------
 
 mc1502_fdc_device::mc1502_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MC1502_FDC, "MC-1502 floppy", tag, owner, clock, "mc1502_fdc", __FILE__)
+	: device_t(mconfig, MC1502_FDC, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_fdc(*this, "fdc")
 	, motor_on(0)
@@ -222,14 +222,14 @@ void mc1502_fdc_device::device_start()
 
 	// BIOS 5.0-5.2x
 	m_isa->install_device(0x010c, 0x010f,
-		READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
-		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
+		READ8_DEVICE_DELEGATE(m_fdc, fd1793_device, read),
+		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_device, write) );
 	m_isa->install_device(0x0100, 0x010b, read8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_r), this ), write8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_w), this ) );
 
 	// BIOS 5.3x
 	m_isa->install_device(0x0048, 0x004b,
-		READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
-		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
+		READ8_DEVICE_DELEGATE(m_fdc, fd1793_device, read),
+		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_device, write) );
 	m_isa->install_device(0x004c, 0x004f, read8_delegate( FUNC(mc1502_fdc_device::mc1502_fdcv2_r), this ), write8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_w), this ) );
 
 	motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc1502_fdc_device::motor_callback),this));

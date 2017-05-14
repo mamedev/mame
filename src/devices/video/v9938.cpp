@@ -38,8 +38,8 @@ todo:
 #include "emu.h"
 #include "v9938.h"
 
-#define VERBOSE 0
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 enum
 {
@@ -84,17 +84,17 @@ ADDRESS_MAP_END
 
 
 // devices
-const device_type V9938 = device_creator<v9938_device>;
-const device_type V9958 = device_creator<v9958_device>;
+DEFINE_DEVICE_TYPE(V9938, v9938_device, "v9938", "Yamaha V9938 VDP")
+DEFINE_DEVICE_TYPE(V9958, v9958_device, "v9958", "Yamaha V9958 VDP")
 
 
-v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, uint32_t clock)
-:   device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int model)
+:   device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_palette_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_space_config("vram", ENDIANNESS_BIG, 8, 18),
-	m_model(0),
+	m_model(model),
 	m_offset_x(0),
 	m_offset_y(0),
 	m_visible_y(0),
@@ -123,15 +123,13 @@ v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, cons
 }
 
 v9938_device::v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: v99x8_device(mconfig, V9938, "V9938 VDP", "v9938", tag, owner, clock)
+: v99x8_device(mconfig, V9938, tag, owner, clock, MODEL_V9938)
 {
-	m_model = MODEL_V9938;
 }
 
 v9958_device::v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: v99x8_device(mconfig, V9958, "V9958 VDP", "v9958", tag, owner, clock)
+: v99x8_device(mconfig, V9958, tag, owner, clock, MODEL_V9958)
 {
-	m_model = MODEL_V9958;
 }
 
 
@@ -156,7 +154,7 @@ void v99x8_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		(((scanline + m_cont_reg[23]) & 255) == m_cont_reg[19]) )
 	{
 		m_stat_reg[1] |= 1;
-		LOG(("V9938: scanline interrupt (%d)\n", scanline));
+		LOG("V9938: scanline interrupt (%d)\n", scanline);
 	}
 	else if (!(m_cont_reg[0] & 0x10))
 	{
@@ -336,7 +334,7 @@ void v9958_device::palette_init()
 		fatalerror("V9958: not enough palette, must be 19780");
 
 	// set up YJK table
-	LOG(("Building YJK table for V9958 screens, may take a while ... \n"));
+	LOG("Building YJK table for V9958 screens, may take a while ... \n");
 	i = 0;
 	for (y=0;y<32;y++) for (k=0;k<64;k++) for (j=0;j<64;j++)
 	{
@@ -378,7 +376,7 @@ void v9958_device::palette_init()
 	}
 
 	if (i != 19268)
-		LOG( ("Table creation failed - %d colours out of 19286 created\n", i));
+		LOG("Table creation failed - %d colours out of 19286 created\n", i);
 }
 
 uint32_t v99x8_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -508,7 +506,7 @@ uint8_t v99x8_device::status_r()
 		break;
 	}
 
-	LOG(("V9938: Read %02x from S#%d\n", ret, reg));
+	LOG("V9938: Read %02x from S#%d\n", ret, reg);
 	check_int ();
 
 	return ret;
@@ -820,7 +818,7 @@ void v99x8_device::check_int()
 	if (n != m_int_state)
 	{
 		m_int_state = n;
-		LOG(("V9938: IRQ line %s\n", n ? "up" : "down"));
+		LOG("V9938: IRQ line %s\n", n ? "up" : "down");
 	}
 
 	/*
@@ -856,7 +854,7 @@ void v99x8_device::register_write (int reg, int data)
 
 	if (reg > 46)
 	{
-		LOG(("V9938: Attempted to write to non-existant R#%d\n", reg));
+		LOG("V9938: Attempted to write to non-existant R#%d\n", reg);
 		return;
 	}
 
@@ -869,7 +867,7 @@ void v99x8_device::register_write (int reg, int data)
 		m_cont_reg[reg] = data;
 		set_mode();
 		check_int();
-		LOG(("v9938: mode = %s\n", v9938_modes[m_mode]));
+		LOG("v9938: mode = %s\n", v9938_modes[m_mode]);
 		break;
 
 	case 18:
@@ -888,14 +886,14 @@ void v99x8_device::register_write (int reg, int data)
 	case 20:
 	case 21:
 	case 22:
-		LOG(("v9938: Write %02xh to R#%d; color burst not emulated\n", data, reg));
+		LOG("v9938: Write %02xh to R#%d; color burst not emulated\n", data, reg);
 		break;
 	case 25:
 	case 26:
 	case 27:
 		if (m_model != MODEL_V9958)
 		{
-			LOG(("v9938: Attempting to write %02xh to V9958 R#%d\n", data, reg));
+			LOG("v9938: Attempting to write %02xh to V9958 R#%d\n", data, reg);
 			data = 0;
 		}
 		else
@@ -915,7 +913,7 @@ void v99x8_device::register_write (int reg, int data)
 	}
 
 	if (reg != 15)
-		LOG(("v9938: Write %02x to R#%d\n", data, reg));
+		LOG("v9938: Write %02x to R#%d\n", data, reg);
 
 	m_cont_reg[reg] = data;
 }
@@ -2272,7 +2270,7 @@ inline void v99x8_device::VDPpsetlowlevel(int addr, uint8_t CL, uint8_t M, uint8
 	case 11:  if (CL) val ^= CL; break;
 	case 12:  if (CL) val = (val & M) | ~(CL|M); break;
 	default:
-		LOG(("v9938: invalid operation %d in pset\n", OP));
+		LOG("v9938: invalid operation %d in pset\n", OP);
 	}
 
 	m_vram_space->write_byte(addr, val);
@@ -2899,12 +2897,12 @@ void v99x8_device::report_vdp_command(uint8_t Op)
 	CM = Op>>4;
 	LO = Op&0x0F;
 
-	LOG(("V9938: Opcode %02Xh %s-%s (%d,%d)->(%d,%d),%d [%d,%d]%s\n",
+	LOG("V9938: Opcode %02Xh %s-%s (%d,%d)->(%d,%d),%d [%d,%d]%s\n",
 		Op, Commands[CM], Ops[LO],
 		SX,SY, DX,DY, CL, m_cont_reg[45]&0x04? -NX:NX,
 		m_cont_reg[45]&0x08? -NY:NY,
 		m_cont_reg[45]&0x70? " on ExtVRAM":""
-		));
+		);
 }
 
 /** VDPDraw() ************************************************/
@@ -2981,7 +2979,7 @@ uint8_t v99x8_device::command_unit_w(uint8_t Op)
 		m_vdp_engine=&v99x8_device::hmmc_engine;
 		break;
 	default:
-		LOG(("V9938: Unrecognized opcode %02Xh\n",Op));
+		LOG("V9938: Unrecognized opcode %02Xh\n",Op);
 		return(0);
 	}
 

@@ -92,7 +92,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_WRITE8_MEMBER(pa_ivg_w);
 	DECLARE_READ8_MEMBER(pb_ivg_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_WRITE8_MEMBER(ds_w);
 	DECLARE_MACHINE_RESET(cpu09);
 	DECLARE_MACHINE_RESET(ivg09);
@@ -105,7 +105,7 @@ private:
 	optional_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cassette_image_device> m_cass;
 	optional_device<pia6821_device> m_pia_ivg;
-	optional_device<fd1795_t> m_fdc;
+	optional_device<fd1795_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<beep_device> m_beep;
 	required_device<cpu_device> m_maincpu;
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START(ivg09_mem, AS_PROGRAM, 8, tavernie_state)
 	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pia_ivg", pia6821_device, read, write)
 	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("fdc", fd1795_t, read, write)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("fdc", fd1795_device, read, write)
 	AM_RANGE(0xe080, 0xe080) AM_WRITE(ds_w)
 	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0xeb04, 0xeb04) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
@@ -284,7 +284,7 @@ WRITE8_MEMBER( tavernie_state::pa_ivg_w )
 // bits 0-3 are attribute bits
 }
 
-WRITE8_MEMBER( tavernie_state::kbd_put )
+void tavernie_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 	m_pia_ivg->cb1_w(0);
@@ -297,7 +297,7 @@ WRITE_LINE_MEMBER( tavernie_state::write_acia_clock )
 	m_acia->write_rxc(state);
 }
 
-static MACHINE_CONFIG_START( cpu09, tavernie_state )
+static MACHINE_CONFIG_START( cpu09 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(cpu09_mem)
@@ -359,7 +359,7 @@ static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(tavernie_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(tavernie_state, kbd_put))
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000) // unknown clock
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -396,6 +396,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT    COMPANY        FULLNAME   FLAGS */
-COMP( 1982, cpu09,  0,      0,       cpu09,   cpu09,   driver_device,   0,   "C. Tavernier",  "CPU09", MACHINE_NOT_WORKING )
-COMP( 1983, ivg09,  cpu09,  0,       ivg09,   ivg09,   driver_device,   0,   "C. Tavernier",  "CPU09 with IVG09 and IFD09", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT    CLASS           INIT  COMPANY         FULLNAME                      FLAGS
+COMP( 1982, cpu09,  0,      0,       cpu09,   cpu09,   tavernie_state, 0,    "C. Tavernier", "CPU09",                      MACHINE_NOT_WORKING )
+COMP( 1983, ivg09,  cpu09,  0,       ivg09,   ivg09,   tavernie_state, 0,    "C. Tavernier", "CPU09 with IVG09 and IFD09", MACHINE_NOT_WORKING )

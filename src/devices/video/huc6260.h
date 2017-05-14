@@ -6,17 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_VIDEO_HUC6260_H
+#define MAME_VIDEO_HUC6260_H
 
-#ifndef __HUC6260_H_
-#define __HUC6260_H_
-
-
-
-#define HUC6260_PALETTE_SIZE    1024
-
-/* Screen timing stuff */
-#define HUC6260_WPF         1365    /* width of a line in frame including blanking areas */
-#define HUC6260_LPF         263     /* max number of lines in a single frame */
+#pragma once
 
 
 #define MCFG_HUC6260_NEXT_PIXEL_DATA_CB(_devcb) \
@@ -36,13 +29,20 @@ class huc6260_device :  public device_t,
 						public device_video_interface
 {
 public:
+	static constexpr unsigned PALETTE_SIZE = 1024;
+
+	/* Screen timing stuff */
+	static constexpr unsigned WPF = 1365;   // width of a line in frame including blanking areas
+	static constexpr unsigned LPF = 263;    // max number of lines in a single frame
+
+
 	// construction/destruction
 	huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_next_pixel_data_callback(device_t &device, _Object object) { return downcast<huc6260_device &>(device).m_next_pixel_data_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_time_til_next_event_callback(device_t &device, _Object object) { return downcast<huc6260_device &>(device).m_time_til_next_event_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_vsync_changed_callback(device_t &device, _Object object) { return downcast<huc6260_device &>(device).m_vsync_changed_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_hsync_changed_callback(device_t &device, _Object object) { return downcast<huc6260_device &>(device).m_hsync_changed_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_next_pixel_data_callback(device_t &device, Object &&cb) { return downcast<huc6260_device &>(device).m_next_pixel_data_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_time_til_next_event_callback(device_t &device, Object &&cb) { return downcast<huc6260_device &>(device).m_time_til_next_event_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_vsync_changed_callback(device_t &device, Object &&cb) { return downcast<huc6260_device &>(device).m_vsync_changed_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_hsync_changed_callback(device_t &device, Object &&cb) { return downcast<huc6260_device &>(device).m_hsync_changed_cb.set_callback(std::forward<Object>(cb)); }
 
 	void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( read );
@@ -91,7 +91,6 @@ private:
 };
 
 
-extern const device_type HUC6260;
+DECLARE_DEVICE_TYPE(HUC6260, huc6260_device)
 
-
-#endif
+#endif // MAME_VIDEO_HUC6260_H

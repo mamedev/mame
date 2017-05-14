@@ -187,7 +187,7 @@ private:
 
 
 // device type definition
-extern const device_type SOFTWARE_LIST;
+DECLARE_DEVICE_TYPE(SOFTWARE_LIST, software_list_device)
 
 // device type iterator
 typedef device_type_iterator<software_list_device> software_list_device_iterator;

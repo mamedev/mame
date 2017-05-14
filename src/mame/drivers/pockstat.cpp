@@ -972,7 +972,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( pockstat, pockstat_state )
+static MACHINE_CONFIG_START( pockstat )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, DEFAULT_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pockstat_mem)
@@ -1008,5 +1008,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT     INIT  COMPANY                             FULLNAME       FLAGS */
-CONS( 1999, pockstat, 0,      0,      pockstat,  pockstat, driver_device, 0,    "Sony Computer Entertainment Inc", "Sony PocketStation", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT     STATE           INIT  COMPANY                            FULLNAME              FLAGS
+CONS( 1999, pockstat, 0,      0,      pockstat,  pockstat, pockstat_state, 0,    "Sony Computer Entertainment Inc", "Sony PocketStation", MACHINE_SUPPORTS_SAVE )

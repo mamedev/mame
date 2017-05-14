@@ -341,7 +341,7 @@ static GFXDECODE_START( ksm )
 	GFXDECODE_ENTRY("chargen", 0x0000, ksm_charlayout, 0, 1)
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ksm, ksm_state )
+static MACHINE_CONFIG_START( ksm )
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_15_4MHz/10)
 	MCFG_CPU_PROGRAM_MAP(ksm_mem)
 	MCFG_CPU_IO_MAP(ksm_io)
@@ -405,5 +405,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY     FULLNAME       FLAGS */
-COMP( 1986, dvk_ksm,  0,      0,       ksm,       ksm,     driver_device,     0,     "USSR",     "DVK KSM",     0)
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE       INIT   COMPANY     FULLNAME       FLAGS */
+COMP( 1986, dvk_ksm,  0,      0,       ksm,       ksm,     ksm_state,  0,     "USSR",     "DVK KSM",     0)

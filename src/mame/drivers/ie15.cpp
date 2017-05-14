@@ -29,7 +29,7 @@ public:
 };
 
 
-static MACHINE_CONFIG_START( ie15, ie15_state )
+static MACHINE_CONFIG_START( ie15 )
 	MCFG_DEVICE_ADD("ie15", IE15, 0)
 MACHINE_CONFIG_END
 
@@ -37,5 +37,5 @@ MACHINE_CONFIG_END
 ROM_START(ie15)
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY     FULLNAME       FLAGS */
-COMP( 1980, ie15,     0,      0,       ie15,      0,       driver_device,     0,     "USSR",     "15IE-00-013", 0)
+//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE           INIT   COMPANY     FULLNAME       FLAGS
+COMP( 1980, ie15,     0,      0,       ie15,      0,       ie15_state,     0,     "USSR",     "15IE-00-013", 0)

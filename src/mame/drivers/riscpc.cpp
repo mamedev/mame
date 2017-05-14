@@ -799,7 +799,7 @@ void riscpc_state::machine_reset()
 	m_flyback_timer->adjust( attotime::never);
 }
 
-static MACHINE_CONFIG_START( rpc600, riscpc_state )
+static MACHINE_CONFIG_START( rpc600 )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_30MHz ) // ARM610
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -814,7 +814,7 @@ static MACHINE_CONFIG_START( rpc600, riscpc_state )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( rpc700, riscpc_state )
+static MACHINE_CONFIG_START( rpc700 )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_40MHz ) // ARM710
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -829,7 +829,7 @@ static MACHINE_CONFIG_START( rpc700, riscpc_state )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( a7000, riscpc_state )
+static MACHINE_CONFIG_START( a7000 )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_32MHz ) // ARM7500
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -849,7 +849,7 @@ static MACHINE_CONFIG_DERIVED( a7000p, a7000 )
 	MCFG_CPU_CLOCK(XTAL_48MHz)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sarpc, riscpc_state )
+static MACHINE_CONFIG_START( sarpc )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, 202000000 ) // StrongARM
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -864,7 +864,7 @@ static MACHINE_CONFIG_START( sarpc, riscpc_state )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sarpc_j233, riscpc_state )
+static MACHINE_CONFIG_START( sarpc_j233 )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, 233000000 ) // StrongARM
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -947,10 +947,10 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY FULLNAME        FLAGS */
-COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, driver_device,   0,      "Acorn",  "Risc PC 600",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, driver_device,   0,      "Acorn",  "Risc PC 700",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, driver_device,   0,      "Acorn",  "Archimedes A7000",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, driver_device,   0,      "Acorn",  "Archimedes A7000+",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, driver_device,   0,      "Acorn",  "StrongARM Risc PC",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, driver_device,   0,      "Acorn",  "J233 StrongARM Risc PC",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE         INIT  COMPANY   FULLNAME                  FLAGS */
+COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, riscpc_state, 0,    "Acorn",  "Risc PC 600",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, riscpc_state, 0,    "Acorn",  "Risc PC 700",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, riscpc_state, 0,    "Acorn",  "Archimedes A7000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, riscpc_state, 0,    "Acorn",  "Archimedes A7000+",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, riscpc_state, 0,    "Acorn",  "StrongARM Risc PC",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, riscpc_state, 0,    "Acorn",  "J233 StrongARM Risc PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

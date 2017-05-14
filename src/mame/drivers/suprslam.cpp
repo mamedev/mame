@@ -289,7 +289,7 @@ void suprslam_state::machine_reset()
 	m_pending_command = 0;
 }
 
-static MACHINE_CONFIG_START( suprslam, suprslam_state )
+static MACHINE_CONFIG_START( suprslam )
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(suprslam_map)
@@ -375,4 +375,4 @@ ROM_END
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1995, suprslam, 0, suprslam, suprslam, driver_device, 0, ROT0, "Banpresto / Toei Animation", "From TV Animation Slam Dunk - Super Slams", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, suprslam, 0, suprslam, suprslam, suprslam_state, 0, ROT0, "Banpresto / Toei Animation", "From TV Animation Slam Dunk - Super Slams", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

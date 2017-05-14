@@ -135,7 +135,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal ) // set up terminal to default to 
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( isbc8030, isbc8030_state )
+static MACHINE_CONFIG_START( isbc8030 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_22_1184MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(isbc8030_mem)
@@ -173,5 +173,5 @@ ROM_START( isbc8030 )
 	ROM_LOAD( "mon830.bin", 0x0000, 0x0800, CRC(cda15115) SHA1(242dad14a919568178b363c3e27f22ec0a5849b3))
 ROM_END
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS           INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1978, isbc8030,  0,        0,      isbc8030,  isbc8030,  driver_device,  0,     "Intel",  "iSBC 80/30",  MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT   COMPANY   FULLNAME       FLAGS */
+COMP( 1978, isbc8030,  0,        0,      isbc8030,  isbc8030,  isbc8030_state,  0,     "Intel",  "iSBC 80/30",  MACHINE_NO_SOUND_HW )

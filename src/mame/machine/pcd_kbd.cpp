@@ -7,7 +7,7 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
-const device_type PCD_KEYBOARD = device_creator<pcd_keyboard_device>;
+DEFINE_DEVICE_TYPE(PCD_KEYBOARD, pcd_keyboard_device, "pcd_kbd", "Siemens PC-D Keyboard")
 
 ROM_START( pcd_keyboard )
 	ROM_REGION(0x1000, "mcu", 0)
@@ -224,7 +224,7 @@ ioport_constructor pcd_keyboard_device::device_input_ports() const
 }
 
 pcd_keyboard_device::pcd_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PCD_KEYBOARD, "PC-D Keyboard", tag, owner, clock, "pcd_kbd", __FILE__)
+	: device_t(mconfig, PCD_KEYBOARD, tag, owner, clock)
 	, m_rows(*this, "ROW.%u", 0)
 	, m_p1(0)
 	, m_out_tx_handler(*this)

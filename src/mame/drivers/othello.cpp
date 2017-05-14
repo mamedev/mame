@@ -389,7 +389,7 @@ void othello_state::machine_reset()
 	m_n7751_busy = 0;
 }
 
-static MACHINE_CONFIG_START( othello, othello_state )
+static MACHINE_CONFIG_START( othello )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz/2)
@@ -464,4 +464,4 @@ ROM_START( othello )
 	ROM_LOAD( "7.ic42",   0x4000, 0x2000, CRC(a76705f7) SHA1(b7d2a65d65d065732ddd0b3b738749369b382b48))
 ROM_END
 
-GAME( 1984, othello,  0,       othello,  othello, driver_device,  0, ROT0, "Success", "Othello (version 3.0)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, othello,  0,       othello,  othello, othello_state,  0, ROT0, "Success", "Othello (version 3.0)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

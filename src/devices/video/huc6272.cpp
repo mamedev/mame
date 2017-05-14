@@ -20,7 +20,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type huc6272 = device_creator<huc6272_device>;
+DEFINE_DEVICE_TYPE(HUC6272, huc6272_device, "huc6272", "Hudson HuC6272 \"King\"")
 
 static ADDRESS_MAP_START( microprg_map, AS_PROGRAM, 16, huc6272_device )
 	AM_RANGE(0x00, 0x0f) AM_RAM AM_SHARE("microprg_ram")
@@ -41,7 +41,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, huc6272, "HuC6272 \"King\"", tag, owner, clock, "huc6272", __FILE__),
+	: device_t(mconfig, HUC6272, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, nullptr, *ADDRESS_MAP_NAME(microprg_map)),
 		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, nullptr, *ADDRESS_MAP_NAME(kram_map)),

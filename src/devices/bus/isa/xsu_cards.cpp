@@ -7,8 +7,28 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "isa_cards.h"
 #include "xsu_cards.h"
+
+#include "cga.h"
+
+// storage
+#include "mc1502_fdc.h"
+#include "p1_fdc.h"
+#include "p1_hdc.h"
+
+// misc
+#include "mc1502_rom.h"
+#include "p1_rom.h"
+#include "p1_sound.h"
+
+// non-native
+#include "com.h"
+#include "fdc.h"
+#include "hdc.h"
+#include "lpt.h"
+#include "mda.h"
+#include "xtide.h"
+
 
 SLOT_INTERFACE_START( p1_isa8_cards )
 	SLOT_INTERFACE("rom", P1_ROM)       // B003

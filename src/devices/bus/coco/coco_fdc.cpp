@@ -71,11 +71,10 @@
 
 class coco_fdc_device_base : public coco_family_fdc_device_base
 {
-public:
-	// construction/destruction
-	coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 protected:
+	// construction/destruction
+	coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	enum class rtc_type
 	{
 		DISTO = 0x00,
@@ -94,7 +93,7 @@ protected:
 	rtc_type real_time_clock();
 
 	// devices
-	required_device<wd1773_t>                   m_wd17xx;
+	required_device<wd1773_device>              m_wd17xx;
 	required_device<ds1315_device>              m_ds1315;
 	required_device_array<floppy_connector, 4>  m_floppies;
 
@@ -185,8 +184,8 @@ uint8_t* coco_family_fdc_device_base::get_cart_base()
 //  coco_fdc_device_base - constructor
 //-------------------------------------------------
 
-coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: coco_family_fdc_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
+coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: coco_family_fdc_device_base(mconfig, type, tag, owner, clock)
 	, m_wd17xx(*this, WD_TAG)
 	, m_ds1315(*this, CLOUD9_TAG)
 	, m_floppies(*this, WD_TAG ":%u", 0)
@@ -418,7 +417,7 @@ namespace
 	public:
 		// construction/destruction
 		coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: coco_fdc_device_base(mconfig, COCO_FDC, "CoCo FDC", tag, owner, clock, "coco_fdc", __FILE__)
+			: coco_fdc_device_base(mconfig, COCO_FDC, tag, owner, clock)
 		{
 		}
 
@@ -432,7 +431,8 @@ namespace
 	};
 
 }
-const device_type COCO_FDC = device_creator<coco_fdc_device>;
+
+DEFINE_DEVICE_TYPE(COCO_FDC, coco_fdc_device, "coco_fdc", "CoCo FDC")
 
 
 //**************************************************************************
@@ -454,7 +454,7 @@ namespace
 	public:
 		// construction/destruction
 		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: coco_fdc_device_base(mconfig, COCO_FDC_V11, "CoCo FDC v1.1", tag, owner, clock, "coco_fdc_v11", __FILE__)
+			: coco_fdc_device_base(mconfig, COCO_FDC_V11, tag, owner, clock)
 		{
 		}
 
@@ -465,9 +465,9 @@ namespace
 			return ROM_NAME(coco_fdc_v11);
 		}
 	};
-};
+}
 
-const device_type COCO_FDC_V11 = device_creator<coco_fdc_v11_device>;
+DEFINE_DEVICE_TYPE(COCO_FDC_V11, coco_fdc_v11_device, "coco_fdc_v11", "CoCo FDC v1.1")
 
 
 //**************************************************************************
@@ -489,7 +489,7 @@ namespace
 	public:
 		// construction/destruction
 		coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: coco_fdc_device_base(mconfig, COCO3_HDB1, "CoCo3 HDB-DOS", tag, owner, clock, "coco3_hdb1", __FILE__)
+			: coco_fdc_device_base(mconfig, COCO3_HDB1, tag, owner, clock)
 		{
 		}
 
@@ -500,9 +500,9 @@ namespace
 			return ROM_NAME(coco3_hdb1);
 		}
 	};
-};
+}
 
-const device_type COCO3_HDB1 = device_creator<coco3_hdb1_device>;
+DEFINE_DEVICE_TYPE(COCO3_HDB1, coco3_hdb1_device, "coco3_hdb1", "CoCo3 HDB-DOS")
 
 //**************************************************************************
 //              CP400 FDC
@@ -520,7 +520,7 @@ namespace
 	public:
 		// construction/destruction
 		cp400_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: coco_fdc_device_base(mconfig, CP400_FDC, "CP400 FDC", tag, owner, clock, "cp400_fdc", __FILE__)
+			: coco_fdc_device_base(mconfig, CP400_FDC, tag, owner, clock)
 		{
 		}
 
@@ -531,6 +531,6 @@ namespace
 			return ROM_NAME(cp400_fdc);
 		}
 	};
-};
+}
 
-const device_type CP400_FDC = device_creator<cp400_fdc_device>;
+DEFINE_DEVICE_TYPE(CP400_FDC, cp400_fdc_device, "cp400_fdc", "CP400 FDC")

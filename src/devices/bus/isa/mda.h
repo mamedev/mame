@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Miodrag Milanovic
-#pragma once
+#ifndef MAME_BUS_ISA_MDA_H
+#define MAME_BUS_ISA_MDA_H
 
-#ifndef __ISA_MDA_H__
-#define __ISA_MDA_H__
+#pragma once
 
 #include "isa.h"
 #include "video/mc6845.h"
@@ -22,7 +22,6 @@ public:
 
 	// construction/destruction
 	isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	isa8_mda_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -42,9 +41,12 @@ public:
 	MC6845_UPDATE_ROW( mda_text_blink_update_row );
 
 protected:
+	isa8_mda_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 public:
 	int m_framecnt;
 
@@ -61,7 +63,7 @@ public:
 
 
 // device type definition
-extern const device_type ISA8_MDA;
+DECLARE_DEVICE_TYPE(ISA8_MDA, isa8_mda_device)
 
 // ======================> isa8_hercules_device
 
@@ -94,7 +96,7 @@ public:
 
 
 // device type definition
-extern const device_type ISA8_HERCULES;
+DECLARE_DEVICE_TYPE(ISA8_HERCULES, isa8_hercules_device)
 
 // ======================> isa8_ec1840_0002_device
 
@@ -124,6 +126,6 @@ public:
 };
 
 // device type definition
-extern const device_type ISA8_EC1840_0002;
+DECLARE_DEVICE_TYPE(ISA8_EC1840_0002, isa8_ec1840_0002_device)
 
-#endif  /* __ISA_MDA_H__ */
+#endif // MAME_BUS_ISA_MDA_H

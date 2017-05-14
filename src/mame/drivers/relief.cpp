@@ -267,7 +267,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( relief, relief_state )
+static MACHINE_CONFIG_START( relief )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -302,7 +302,7 @@ static MACHINE_CONFIG_START( relief, relief_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/4/3, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/4/3, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 

@@ -1695,7 +1695,7 @@ WRITE8_MEMBER(fhawk_state::portA_w)
 }
 
 
-static MACHINE_CONFIG_START( fhawk, fhawk_state )
+static MACHINE_CONFIG_START( fhawk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
@@ -1748,7 +1748,7 @@ static MACHINE_CONFIG_START( fhawk, fhawk_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( champwr, fhawk, champwr_state )
+static MACHINE_CONFIG_DERIVED( champwr, fhawk )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1768,13 +1768,13 @@ static MACHINE_CONFIG_DERIVED_CLASS( champwr, fhawk, champwr_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(champwr_state, msm5205_vck)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( raimais, fhawk, taitol_2cpu_state )
+static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1795,7 +1795,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( raimais, fhawk, taitol_2cpu_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( kurikint, taitol_2cpu_state )
+static MACHINE_CONFIG_START( kurikint )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
@@ -1839,7 +1839,7 @@ static MACHINE_CONFIG_START( kurikint, taitol_2cpu_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( plotting, taitol_1cpu_state )
+static MACHINE_CONFIG_START( plotting )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
@@ -1899,7 +1899,7 @@ static MACHINE_CONFIG_DERIVED( puzznici, plotting )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( horshoes, plotting, horshoes_state )
+static MACHINE_CONFIG_DERIVED( horshoes, plotting )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1928,7 +1928,7 @@ static MACHINE_CONFIG_DERIVED( cachat, plotting )
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_1cpu_state, cachat)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( evilston, taitol_2cpu_state )
+static MACHINE_CONFIG_START( evilston )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* not verified */
@@ -2550,48 +2550,48 @@ DRIVER_INIT_MEMBER(taitol_1cpu_state, plottinga)
 }
 
 
-GAME( 1988, raimais,   0,        raimais,   raimais,   driver_device,     0,         ROT0,   "Taito Corporation Japan", "Raimais (World)", 0 )
-GAME( 1988, raimaisj,  raimais,  raimais,   raimaisj,  driver_device,     0,         ROT0,   "Taito Corporation", "Raimais (Japan)", 0 )
-GAME( 1988, raimaisjo, raimais,  raimais,   raimaisj,  driver_device,     0,         ROT0,   "Taito Corporation", "Raimais (Japan, first revision)", 0 )
+GAME( 1988, raimais,   0,        raimais,   raimais,   taitol_2cpu_state, 0,         ROT0,   "Taito Corporation Japan", "Raimais (World)", 0 )
+GAME( 1988, raimaisj,  raimais,  raimais,   raimaisj,  taitol_2cpu_state, 0,         ROT0,   "Taito Corporation", "Raimais (Japan)", 0 )
+GAME( 1988, raimaisjo, raimais,  raimais,   raimaisj,  taitol_2cpu_state, 0,         ROT0,   "Taito Corporation", "Raimais (Japan, first revision)", 0 )
 
-GAME( 1988, fhawk,     0,        fhawk,     fhawk,     driver_device,     0,         ROT270, "Taito Corporation Japan", "Fighting Hawk (World)", 0 )
-GAME( 1988, fhawkj,    fhawk,    fhawk,     fhawkj,    driver_device,     0,         ROT270, "Taito Corporation", "Fighting Hawk (Japan)", 0 )
+GAME( 1988, fhawk,     0,        fhawk,     fhawk,     fhawk_state,       0,         ROT270, "Taito Corporation Japan", "Fighting Hawk (World)", 0 )
+GAME( 1988, fhawkj,    fhawk,    fhawk,     fhawkj,    fhawk_state,       0,         ROT270, "Taito Corporation", "Fighting Hawk (Japan)", 0 )
 
-GAME( 1989, champwr,   0,        champwr,   champwr,   driver_device,     0,         ROT0,   "Taito Corporation Japan", "Champion Wrestler (World)", MACHINE_IMPERFECT_SOUND )
-GAME( 1989, champwru,  champwr,  champwr,   champwru,  driver_device,     0,         ROT0,   "Taito America Corporation", "Champion Wrestler (US)", MACHINE_IMPERFECT_SOUND )
-GAME( 1989, champwrj,  champwr,  champwr,   champwrj,  driver_device,     0,         ROT0,   "Taito Corporation", "Champion Wrestler (Japan)", MACHINE_IMPERFECT_SOUND )
+GAME( 1989, champwr,   0,        champwr,   champwr,   champwr_state,     0,         ROT0,   "Taito Corporation Japan", "Champion Wrestler (World)", MACHINE_IMPERFECT_SOUND )
+GAME( 1989, champwru,  champwr,  champwr,   champwru,  champwr_state,     0,         ROT0,   "Taito America Corporation", "Champion Wrestler (US)", MACHINE_IMPERFECT_SOUND )
+GAME( 1989, champwrj,  champwr,  champwr,   champwrj,  champwr_state,     0,         ROT0,   "Taito Corporation", "Champion Wrestler (Japan)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1988, kurikint,  0,        kurikint,  kurikint,  driver_device,     0,         ROT0,   "Taito Corporation Japan", "Kuri Kinton (World)", 0 )
-GAME( 1988, kurikintu, kurikint, kurikint,  kurikintj, driver_device,     0,         ROT0,   "Taito America Corporation", "Kuri Kinton (US)", 0 )
-GAME( 1988, kurikintj, kurikint, kurikint,  kurikintj, driver_device,     0,         ROT0,   "Taito Corporation", "Kuri Kinton (Japan)", 0 )
-GAME( 1988, kurikinta, kurikint, kurikint,  kurikinta, driver_device,     0,         ROT0,   "Taito Corporation Japan", "Kuri Kinton (World, prototype?)", 0 )
+GAME( 1988, kurikint,  0,        kurikint,  kurikint,  taitol_2cpu_state, 0,         ROT0,   "Taito Corporation Japan", "Kuri Kinton (World)", 0 )
+GAME( 1988, kurikintu, kurikint, kurikint,  kurikintj, taitol_2cpu_state, 0,         ROT0,   "Taito America Corporation", "Kuri Kinton (US)", 0 )
+GAME( 1988, kurikintj, kurikint, kurikint,  kurikintj, taitol_2cpu_state, 0,         ROT0,   "Taito Corporation", "Kuri Kinton (Japan)", 0 )
+GAME( 1988, kurikinta, kurikint, kurikint,  kurikinta, taitol_2cpu_state, 0,         ROT0,   "Taito Corporation Japan", "Kuri Kinton (World, prototype?)", 0 )
 
-GAME( 1989, plotting,  0,        plotting,  plotting,  driver_device,     0,         ROT0,   "Taito Corporation Japan", "Plotting (World set 1)", 0 )
+GAME( 1989, plotting,  0,        plotting,  plotting,  taitol_1cpu_state, 0,         ROT0,   "Taito Corporation Japan", "Plotting (World set 1)", 0 )
 GAME( 1989, plottinga, plotting, plotting,  plotting,  taitol_1cpu_state, plottinga, ROT0,   "Taito Corporation Japan", "Plotting (World set 2, protected)", 0 )
-GAME( 1989, plottingb, plotting, plotting,  plotting,  driver_device,     0,         ROT0,   "Taito Corporation Japan", "Plotting (World set 3, earliest version)", 0 )
-GAME( 1989, plottingu, plotting, plotting,  plottingu, driver_device,     0,         ROT0,   "Taito America Corporation", "Plotting (US)", 0 )
-GAME( 1989, flipull,   plotting, plotting,  plotting,  driver_device,     0,         ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
+GAME( 1989, plottingb, plotting, plotting,  plotting,  taitol_1cpu_state, 0,         ROT0,   "Taito Corporation Japan", "Plotting (World set 3, earliest version)", 0 )
+GAME( 1989, plottingu, plotting, plotting,  plottingu, taitol_1cpu_state, 0,         ROT0,   "Taito America Corporation", "Plotting (US)", 0 )
+GAME( 1989, flipull,   plotting, plotting,  plotting,  taitol_1cpu_state, 0,         ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
 
-GAME( 1989, puzznic,   0,        puzznic,   puzznic,   driver_device,     0,         ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
-GAME( 1989, puzznicu,  puzznic,  puzznic,   puzznic,   driver_device,     0,         ROT0,   "Taito America Corporation", "Puzznic (US)", 0 )
-GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   driver_device,     0,         ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
-GAME( 1989, puzznici,  puzznic,  puzznici,  puzznic,   driver_device,     0,         ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )
-GAME( 1989, puzznicb,  puzznic,  puzznici,  puzznic,   driver_device,     0,         ROT0,   "bootleg", "Puzznic (bootleg, set 1)", 0 )
-GAME( 1989, puzznicba, puzznic,  puzznici,  puzznic,   driver_device,     0,         ROT0,   "bootleg", "Puzznic (bootleg, set 2)", 0 )
+GAME( 1989, puzznic,   0,        puzznic,   puzznic,   taitol_1cpu_state, 0,         ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
+GAME( 1989, puzznicu,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, 0,         ROT0,   "Taito America Corporation", "Puzznic (US)", 0 )
+GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, 0,         ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
+GAME( 1989, puzznici,  puzznic,  puzznici,  puzznic,   taitol_1cpu_state, 0,         ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )
+GAME( 1989, puzznicb,  puzznic,  puzznici,  puzznic,   taitol_1cpu_state, 0,         ROT0,   "bootleg", "Puzznic (bootleg, set 1)", 0 )
+GAME( 1989, puzznicba, puzznic,  puzznici,  puzznic,   taitol_1cpu_state, 0,         ROT0,   "bootleg", "Puzznic (bootleg, set 2)", 0 )
 
-GAME( 1990, horshoes,  0,        horshoes,  horshoes,  driver_device,     0,         ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )
+GAME( 1990, horshoes,  0,        horshoes,  horshoes,  horshoes_state,    0,         ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )
 
-GAME( 1990, palamed,   0,        palamed,   palamed,   driver_device,     0,         ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
+GAME( 1990, palamed,   0,        palamed,   palamed,   taitol_1cpu_state, 0,         ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
 
-GAME( 1993, cachat,    0,        cachat,    cachat,    driver_device,     0,         ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )
-GAME( 1993, tubeit,    cachat,   cachat,    tubeit,    driver_device,     0,         ROT0,   "bootleg", "Tube-It", 0 ) // No (c) message
+GAME( 1993, cachat,    0,        cachat,    cachat,    taitol_1cpu_state, 0,         ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )
+GAME( 1993, tubeit,    cachat,   cachat,    tubeit,    taitol_1cpu_state, 0,         ROT0,   "bootleg", "Tube-It", 0 ) // No (c) message
 
-GAME( 199?, cubybop,   0,        cachat,    cubybop,   driver_device,     0,         ROT0,   "Hot-B", "Cuby Bop (location test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
+GAME( 199?, cubybop,   0,        cachat,    cubybop,   taitol_1cpu_state, 0,         ROT0,   "Hot-B", "Cuby Bop (location test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
 
-GAME( 1992, plgirls,   0,        cachat,    plgirls,   driver_device,     0,         ROT270, "Hot-B", "Play Girls", 0 )
-GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   driver_device,     0,         ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
+GAME( 1992, plgirls,   0,        cachat,    plgirls,   taitol_1cpu_state, 0,         ROT270, "Hot-B", "Play Girls", 0 )
+GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   taitol_1cpu_state, 0,         ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
 
-GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  driver_device,     0,         ROT270, "Hot-B", "Play Girls 2", 0 )
-GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  driver_device,     0,         ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
+GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "Hot-B", "Play Girls 2", 0 )
+GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
 
-GAME( 1990, evilston,  0,        evilston,  evilston,  driver_device,     0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", MACHINE_IMPERFECT_SOUND ) // not Taito PCB, just uses TC0090LVC
+GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", MACHINE_IMPERFECT_SOUND ) // not Taito PCB, just uses TC0090LVC

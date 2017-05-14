@@ -351,7 +351,7 @@ ADDRESS_MAP_END
 *     Machine Drivers      *
 ***************************/
 
-static MACHINE_CONFIG_START( chsuper, chsuper_state )
+static MACHINE_CONFIG_START( chsuper )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 4)   /* HD64180RP8, 8 MHz? */

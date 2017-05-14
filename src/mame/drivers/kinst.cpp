@@ -666,7 +666,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( kinst, kinst_state )
+static MACHINE_CONFIG_START( kinst )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4600LE, MASTER_CLOCK*2)
@@ -932,7 +932,7 @@ DRIVER_INIT_MEMBER(kinst_state,kinst2)
  *
  *************************************/
 
-GAME( 1994, kinst,    0,      kinst, kinst, kinst_state,  kinst,   ROT0, "Rare", "Killer Instinct (v1.5d)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, kinst,    0,      kinst, kinst,  kinst_state, kinst,   ROT0, "Rare", "Killer Instinct (v1.5d)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, kinst14,  kinst,  kinst, kinst2, kinst_state, kinst,   ROT0, "Rare", "Killer Instinct (v1.4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, kinst13,  kinst,  kinst, kinst2, kinst_state, kinst,   ROT0, "Rare", "Killer Instinct (v1.3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, kinstp,   kinst,  kinst, kinst2, kinst_state, kinst,   ROT0, "Rare", "Killer Instinct (proto v4.7)", MACHINE_SUPPORTS_SAVE )

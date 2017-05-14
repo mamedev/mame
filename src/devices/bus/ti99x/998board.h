@@ -13,97 +13,33 @@
 
 *****************************************************************************/
 
-#ifndef __MAPPER8__
-#define __MAPPER8__
+#ifndef MAME_BUS_TI99X_998BOARD_H
+#define MAME_BUS_TI99X_998BOARD_H
+
+#pragma once
 
 #include "ti99defs.h"
+#include "gromport.h"
+
+#include "bus/ti99/peb/peribox.h"
+#include "machine/ram.h"
 #include "machine/tmc0430.h"
-#include "video/tms9928a.h"
 #include "sound/sn76496.h"
 #include "sound/tms5220.h"
-#include "gromport.h"
-#include "bus/ti99_peb/peribox.h"
-#include "machine/ram.h"
+#include "video/tms9928a.h"
 
-extern const device_type MAINBOARD8;
+DECLARE_DEVICE_TYPE(TI99_MAINBOARD8, mainboard8_device)
 
 #define VAQUERRO_TAG "vaquerro"
 #define MOFETTA_TAG "mofetta"
 #define AMIGO_TAG "amigo"
 #define OSO_TAG "oso"
 
-class mainboard8_device;
-extern const device_type VAQUERRO;
-extern const device_type MOFETTA;
-extern const device_type AMIGO;
-extern const device_type OSO;
+DECLARE_DEVICE_TYPE(TI99_VAQUERRO, vaquerro_device)
+DECLARE_DEVICE_TYPE(TI99_MOFETTA,  mofetta_device)
+DECLARE_DEVICE_TYPE(TI99_AMIGO,    amigo_device)
+DECLARE_DEVICE_TYPE(TI99_OSO,      oso_device)
 
-
-enum
-{
-	SGMSEL = 1,
-	TSGSEL = 2,
-	P8GSEL = 4,
-	P3GSEL = 8,
-	VIDSEL = 16
-};
-
-/*
-    Wait state generator (part of Vaquerro)
-*/
-class waitstate_generator
-{
-public:
-	waitstate_generator() :
-		m_counting(false),
-		m_generate(false),
-		m_counter(0),
-		m_addressed(true),
-		m_ready(true)   { };
-
-	virtual ~waitstate_generator() { }
-	void select_in(bool addressed);
-	virtual void ready_in(line_state ready) =0;
-	virtual void clock_in(line_state clkout) =0;
-	void treset_in(line_state reset);
-
-	int select_out();
-	void init(int select_value) { m_selvalue = select_value; }
-
-	line_state ready_out();
-
-	bool is_counting();
-	bool is_generating();
-	bool is_ready();
-
-protected:
-	// Two flipflops
-	bool m_counting;
-	bool m_generate;
-	// Counter
-	int  m_counter;
-
-	// Select value (indicates selected line)
-	int  m_selvalue;
-
-	// Line state flags
-	bool m_addressed;
-	bool m_ready;
-};
-
-class grom_waitstate_generator : public waitstate_generator
-{
-public:
-	void ready_in(line_state ready) override;
-	void clock_in(line_state clkout) override;
-};
-
-class video_waitstate_generator : public waitstate_generator
-{
-public:
-	void ready_in(line_state ready) override { };
-	void clock_in(line_state clkout) override;
-};
 
 /*
     Custom chip: Vaquerro
@@ -146,6 +82,65 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( p3gry );
 
 private:
+	/*
+		Wait state generator (part of Vaquerro)
+	*/
+	class waitstate_generator
+	{
+	public:
+		waitstate_generator() :
+			m_counting(false),
+			m_generate(false),
+			m_counter(0),
+			m_addressed(true),
+			m_ready(true)
+		{
+		}
+
+		virtual ~waitstate_generator() { }
+		void select_in(bool addressed);
+		virtual void ready_in(line_state ready) = 0;
+		virtual void clock_in(line_state clkout) = 0;
+		void treset_in(line_state reset);
+
+		int select_out();
+		void init(int select_value) { m_selvalue = select_value; }
+
+		line_state ready_out();
+
+		bool is_counting();
+		bool is_generating();
+		bool is_ready();
+
+	protected:
+		// Two flipflops
+		bool m_counting;
+		bool m_generate;
+		// Counter
+		int  m_counter;
+
+		// Select value (indicates selected line)
+		int  m_selvalue;
+
+		// Line state flags
+		bool m_addressed;
+		bool m_ready;
+	};
+
+	class grom_waitstate_generator : public waitstate_generator
+	{
+	public:
+		void ready_in(line_state ready) override;
+		void clock_in(line_state clkout) override;
+	};
+
+	class video_waitstate_generator : public waitstate_generator
+	{
+	public:
+		void ready_in(line_state ready) override { }
+		void clock_in(line_state clkout) override;
+	};
+
 	// Memory cycle state
 	bool m_memen;
 
@@ -455,8 +450,8 @@ public:
 	// void set_gromport(gromport_device* dev) { m_gromport = dev; }
 
 protected:
-	void device_start(void) override;
-	void device_reset(void) override;
+	void device_start() override;
+	void device_reset() override;
 	machine_config_constructor device_mconfig_additions() const override;
 
 private:
@@ -518,7 +513,7 @@ private:
 	required_device<tms9928a_device>        m_video;
 	required_device<sn76496_base_device>    m_sound;
 	required_device<cd2501ecd_device>       m_speech;
-	required_device<gromport_device>        m_gromport;
+	required_device<ti99_gromport_device>   m_gromport;
 	required_device<peribox_device>         m_peb;
 	required_device<ram_device>             m_sram;
 	required_device<ram_device>             m_dram;

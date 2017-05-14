@@ -43,48 +43,46 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_VRC1 = device_creator<nes_konami_vrc1_device>;
-const device_type NES_VRC2 = device_creator<nes_konami_vrc2_device>;
-const device_type NES_VRC3 = device_creator<nes_konami_vrc3_device>;
-const device_type NES_VRC4 = device_creator<nes_konami_vrc4_device>;
-const device_type NES_VRC6 = device_creator<nes_konami_vrc6_device>;
-const device_type NES_VRC7 = device_creator<nes_konami_vrc7_device>;
+DEFINE_DEVICE_TYPE(NES_VRC1, nes_konami_vrc1_device, "nes_vrc1", "NES Cart Konami VRC-1 PCB")
+DEFINE_DEVICE_TYPE(NES_VRC2, nes_konami_vrc2_device, "nes_vrc2", "NES Cart Konami VRC-2 PCB")
+DEFINE_DEVICE_TYPE(NES_VRC3, nes_konami_vrc3_device, "nes_vrc3", "NES Cart Konami VRC-3 PCB")
+DEFINE_DEVICE_TYPE(NES_VRC4, nes_konami_vrc4_device, "nes_vrc4", "NES Cart Konami VRC-4 PCB")
+DEFINE_DEVICE_TYPE(NES_VRC6, nes_konami_vrc6_device, "nes_vrc6", "NES Cart Konami VRC-6 PCB")
+DEFINE_DEVICE_TYPE(NES_VRC7, nes_konami_vrc7_device, "nes_vrc7", "NES Cart Konami VRC-7 PCB")
 
 
 nes_konami_vrc1_device::nes_konami_vrc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_VRC1, "NES Cart Konami VRC-1 PCB", tag, owner, clock, "nes_vrc1", __FILE__)
+	: nes_nrom_device(mconfig, NES_VRC1, tag, owner, clock)
 {
 }
 
 nes_konami_vrc2_device::nes_konami_vrc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_VRC2, "NES Cart Konami VRC-2 PCB", tag, owner, clock, "nes_vrc2", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_VRC2, tag, owner, clock), m_latch(0)
+{
 }
 
 nes_konami_vrc3_device::nes_konami_vrc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_VRC3, "NES Cart Konami VRC-3 PCB", tag, owner, clock, "nes_vrc3", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_enable_latch(0), m_irq_mode(0), irq_timer(nullptr)
-				{
+	: nes_nrom_device(mconfig, NES_VRC3, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_enable_latch(0), m_irq_mode(0), irq_timer(nullptr)
+{
 }
 
-nes_konami_vrc4_device::nes_konami_vrc4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_latch(0), m_mmc_prg_bank(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_enable_latch(0), m_irq_mode(0), m_irq_prescale(0), irq_timer(nullptr)
-				{
+nes_konami_vrc4_device::nes_konami_vrc4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_mmc_prg_bank(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_enable_latch(0), m_irq_mode(0), m_irq_prescale(0), irq_timer(nullptr)
+{
 }
 
 nes_konami_vrc4_device::nes_konami_vrc4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_VRC4, "NES Cart Konami VRC-4 PCB", tag, owner, clock, "nes_vrc4", __FILE__), m_latch(0), m_mmc_prg_bank(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_enable_latch(0), m_irq_mode(0), m_irq_prescale(0), irq_timer(nullptr)
-				{
+	: nes_konami_vrc4_device(mconfig, NES_VRC4, tag, owner, clock)
+{
 }
 
 nes_konami_vrc6_device::nes_konami_vrc6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_konami_vrc4_device(mconfig, NES_VRC6, "NES Cart Konami VRC-6 PCB", tag, owner, clock, "nes_vrc6", __FILE__),
-					m_vrc6snd(*this, "vrc6snd")
+	: nes_konami_vrc4_device(mconfig, NES_VRC6, tag, owner, clock), m_vrc6snd(*this, "vrc6snd")
 {
 }
 
 nes_konami_vrc7_device::nes_konami_vrc7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_konami_vrc4_device(mconfig, NES_VRC7, "NES Cart Konami VRC-7 PCB", tag, owner, clock, "nes_vrc7", __FILE__),
-					m_ym2413(*this, "ym")
+	: nes_konami_vrc4_device(mconfig, NES_VRC7, tag, owner, clock), m_ym2413(*this, "ym")
 {
 }
 

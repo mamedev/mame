@@ -54,7 +54,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CUDA = device_creator<cuda_device>;
+DEFINE_DEVICE_TYPE(CUDA, cuda_device, "cuda", "Apple Cuda")
 
 ROM_START( cuda )
 	ROM_REGION(0x4400, CUDA_CPU_TAG, 0)
@@ -383,7 +383,7 @@ WRITE8_MEMBER( cuda_device::pram_w )
 //-------------------------------------------------
 
 cuda_device::cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CUDA, "Apple Cuda", tag, owner, clock, "cuda", __FILE__),
+	: device_t(mconfig, CUDA, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	write_reset(*this),
 	write_linechange(*this),

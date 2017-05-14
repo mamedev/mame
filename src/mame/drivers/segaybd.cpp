@@ -1303,7 +1303,7 @@ INPUT_PORTS_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( yboard, segaybd_state )
+static MACHINE_CONFIG_START( yboard )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -1376,7 +1376,7 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
 	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/8)
-	MCFG_SEGAPCM_BANK(BANK_12M | BANK_MASKF8)
+	MCFG_SEGAPCM_BANK_MASK(BANK_12M, BANK_MASKF8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2724,25 +2724,25 @@ DRIVER_INIT_MEMBER(segaybd_state,rchase)
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR, NAME,      PARENT,  MACHINE, INPUT,    INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS,                                     LAYOUT
-GAME( 1988, gforce2,   0,        yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gforce2sd, gforce2, yboard_deluxe,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Super Deluxe unit)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gforce2ja, gforce2,  yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan, Rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gforce2j,  gforce2,  yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,       INPUT,    STATE,         INIT,    MONITOR,COMPANY,FULLNAME,FLAGS,                                     LAYOUT
+GAME( 1988, gforce2,   0,        yboard,        gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gforce2sd, gforce2,  yboard_deluxe, gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Super Deluxe unit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gforce2ja, gforce2,  yboard,        gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan, Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gforce2j,  gforce2,  yboard,        gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, gloc,      0,        yboard,      gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, glocu,     gloc,     yboard,      gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, glocr360,  gloc,     yboard,      glocr360, segaybd_state, r360,    ROT0,   "Sega", "G-LOC R360", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gloc,      0,        yboard,        gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, glocu,     gloc,     yboard,        gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, glocr360,  gloc,     yboard,        glocr360, segaybd_state, r360,    ROT0,   "Sega", "G-LOC R360", MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1988, pdrift,    0,        yboard,      pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Rev A)", MACHINE_SUPPORTS_SAVE,   layout_pdrift )
-GAMEL(1988, pdrifta,   pdrift,   yboard,      pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
-GAMEL(1988, pdrifte,   pdrift,   yboard,      pdrifte,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
-GAMEL(1988, pdriftj,   pdrift,   yboard,      pdriftj,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
+GAMEL(1988, pdrift,    0,        yboard,        pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Rev A)", MACHINE_SUPPORTS_SAVE,   layout_pdrift )
+GAMEL(1988, pdrifta,   pdrift,   yboard,        pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
+GAMEL(1988, pdrifte,   pdrift,   yboard,        pdrifte,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
+GAMEL(1988, pdriftj,   pdrift,   yboard,        pdriftj,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
 
-GAMEL(1988, pdriftl,   0,        yboard_link, pdriftl,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE, layout_pdrift)
+GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE, layout_pdrift)
 
-GAME( 1991, rchase,    0,        yboard,      rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rchasej,   rchase,   yboard,      rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rchase,    0,        yboard,        rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rchasej,   rchase,   yboard,        rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, strkfgtr,  0,        yboard,      strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, strkfgtrj, strkfgtr, yboard,      strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, strkfgtr,  0,        yboard,        strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, strkfgtrj, strkfgtr, yboard,        strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -9,8 +9,10 @@ Ernesto Corvi & Mariusz Wojcieszek
 
 ***************************************************************************/
 
-#ifndef __AMIGA_H__
-#define __AMIGA_H__
+#ifndef MAME_INCLUDES_AMIGA_H
+#define MAME_INCLUDES_AMIGA_H
+
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 #include "machine/bankdev.h"
@@ -579,7 +581,7 @@ protected:
 	optional_device<rs232_port_device> m_rs232;
 	optional_device<centronics_device> m_centronics;
 	required_device<paula_8364_device> m_paula;
-	optional_device<amiga_fdc> m_fdc;
+	optional_device<amiga_fdc_device> m_fdc;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_overlay;
@@ -703,4 +705,4 @@ void amiga_sprite_enable_comparitor(running_machine &machine, int which, int ena
 MACHINE_CONFIG_EXTERN( pal_video );
 MACHINE_CONFIG_EXTERN( ntsc_video );
 
-#endif /* __AMIGA_H__ */
+#endif // MAME_INCLUDES_AMIGA_H

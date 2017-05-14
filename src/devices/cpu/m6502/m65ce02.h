@@ -7,16 +7,16 @@
     6502 with Z register and some more stuff
 
 ***************************************************************************/
+#ifndef MAME_CPU_M6502_M65CE02_H
+#define MAME_CPU_M6502_M65CE02_H
 
-#ifndef __M65CE02_H__
-#define __M65CE02_H__
+#pragma once
 
 #include "m65c02.h"
 
 class m65ce02_device : public m65c02_device {
 public:
 	m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	m65ce02_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	static const disasm_entry disasm_entries[0x100];
 
@@ -25,6 +25,8 @@ public:
 	virtual void do_exec_partial() override;
 
 protected:
+	m65ce02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	uint16_t  TMP3;                   /* temporary internal values */
 	uint8_t   Z;                      /* Z index register */
 	uint16_t  B;                      /* Zero page base address (always xx00) */
@@ -148,6 +150,6 @@ enum {
 	M65CE02_B
 };
 
-extern const device_type M65CE02;
+DECLARE_DEVICE_TYPE(M65CE02, m65ce02_device)
 
-#endif
+#endif // MAME_CPU_M6502_M65CE02_H

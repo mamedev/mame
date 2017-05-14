@@ -321,7 +321,7 @@ READ8_MEMBER(pandoras_state::pandoras_portB_r)
 	return (m_audiocpu->total_cycles() / 512) & 0x0f;
 }
 
-static MACHINE_CONFIG_START( pandoras, pandoras_state )
+static MACHINE_CONFIG_START( pandoras )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6)  /* CPU A */
@@ -414,4 +414,4 @@ ROM_START( pandoras )
 ROM_END
 
 
-GAME( 1984, pandoras, 0, pandoras, pandoras, driver_device, 0, ROT90, "Konami / Interlogic", "Pandora's Palace", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pandoras, 0, pandoras, pandoras, pandoras_state, 0, ROT90, "Konami / Interlogic", "Pandora's Palace", MACHINE_SUPPORTS_SAVE )

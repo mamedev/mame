@@ -595,7 +595,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jackie_state::irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( jackie, jackie_state )
+static MACHINE_CONFIG_START( jackie )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)

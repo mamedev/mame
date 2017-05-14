@@ -139,7 +139,7 @@ static GFXDECODE_START( ssrj )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ssrj, ssrj_state )
+static MACHINE_CONFIG_START( ssrj )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)
@@ -190,4 +190,4 @@ ROM_START( ssrj )
 
 ROM_END
 
-GAME( 1985, ssrj,  0,       ssrj,  ssrj, driver_device,  0, ROT90, "Taito Corporation", "Super Speed Race Junior (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ssrj,  0,       ssrj,  ssrj, ssrj_state,  0, ROT90, "Taito Corporation", "Super Speed Race Junior (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

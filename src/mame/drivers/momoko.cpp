@@ -253,7 +253,7 @@ void momoko_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( momoko, momoko_state )
+static MACHINE_CONFIG_START( momoko )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/2)   /* 5.0MHz */
@@ -423,6 +423,6 @@ ROM_START( momokob ) // bootleg board, almost exact copy of an original one
 	ROM_LOAD( "momoko-b.bin", 0x0100,  0x0020, CRC(427b0e5c) SHA1(aa2797b899571527cc96013fd3420b841954ee67) )
 ROM_END
 
-GAME( 1986, momoko,       0, momoko, momoko, driver_device, 0, ROT0, "Jaleco",  "Momoko 120% (Japanese text)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, momokoe, momoko, momoko, momoko, driver_device, 0, ROT0, "Jaleco",  "Momoko 120% (English text)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, momokob, momoko, momoko, momoko, driver_device, 0, ROT0, "bootleg", "Momoko 120% (bootleg)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, momoko,       0, momoko, momoko, momoko_state, 0, ROT0, "Jaleco",  "Momoko 120% (Japanese text)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, momokoe, momoko, momoko, momoko, momoko_state, 0, ROT0, "Jaleco",  "Momoko 120% (English text)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, momokob, momoko, momoko, momoko, momoko_state, 0, ROT0, "bootleg", "Momoko 120% (bootleg)",       MACHINE_SUPPORTS_SAVE )

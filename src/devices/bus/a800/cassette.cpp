@@ -25,7 +25,7 @@ TODO:
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A8SIO_CASSETTE = device_creator<a8sio_cassette_device>;
+DEFINE_DEVICE_TYPE(A8SIO_CASSETTE, a8sio_cassette_device, "a8sio_cass", "Atari 8 bit cassette")
 const device_timer_id TIMER_CASSETTE_READ = 1;
 
 static MACHINE_CONFIG_FRAGMENT( cassette )
@@ -45,19 +45,16 @@ machine_config_constructor a8sio_cassette_device::device_mconfig_additions() con
 //**************************************************************************
 
 a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, A8SIO_CASSETTE, "Atari 8 bit cassette", tag, owner, clock, "a8sio_cass", __FILE__)
-	, device_a8sio_card_interface(mconfig, *this)
-	, m_cassette(*this, "cassette"), m_read_timer(nullptr)
-		, m_old_cass_signal(0)
-	, m_signal_count(0)
+	: a8sio_cassette_device(mconfig, A8SIO_CASSETTE, tag, owner, clock)
 {
 }
 
-a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_a8sio_card_interface(mconfig, *this)
-	, m_cassette(*this, "cassette"), m_read_timer(nullptr)
-		, m_old_cass_signal(0)
+	, m_cassette(*this, "cassette")
+	, m_read_timer(nullptr)
+	, m_old_cass_signal(0)
 	, m_signal_count(0)
 {
 }

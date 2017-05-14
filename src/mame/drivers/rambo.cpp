@@ -138,7 +138,7 @@ void rambo_state::machine_reset()
 	m_port_l = 0;
 }
 
-static MACHINE_CONFIG_START( rambo, rambo_state )
+static MACHINE_CONFIG_START( rambo )
 
 	MCFG_CPU_ADD("maincpu", ATMEGA2560, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(rambo_prg_map)
@@ -223,5 +223,5 @@ ROM_START( metamaq2 )
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
 
-/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT   CLASS        INIT         COMPANY           FULLNAME */
-COMP(2012, metamaq2,      0,        0,   rambo,    0,      rambo_state, rambo,    "Metamaquina", "Metamaquina 2 desktop 3d printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT    COMPANY        FULLNAME                            FLAGS
+COMP(2012, metamaq2, 0,      0,      rambo,   0,     rambo_state, rambo,  "Metamaquina", "Metamaquina 2 desktop 3d printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

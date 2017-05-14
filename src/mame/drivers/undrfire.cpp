@@ -676,7 +676,7 @@ INTERRUPT_GEN_MEMBER(undrfire_state::undrfire_interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( undrfire, undrfire_state )
+static MACHINE_CONFIG_START( undrfire )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20 MHz - NOT verified */
@@ -719,7 +719,7 @@ static MACHINE_CONFIG_START( undrfire, undrfire_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cbombers, undrfire_state )
+static MACHINE_CONFIG_START( cbombers )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20 MHz - NOT verified */
@@ -1158,9 +1158,9 @@ DRIVER_INIT_MEMBER(undrfire_state,cbombers)
 
 
 
-GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation Japan",   "Under Fire (World)", 0 )
-GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito America Corporation", "Under Fire (US)", 0 )
-GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation",         "Under Fire (Japan)", 0 )
-GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)", MACHINE_IMPERFECT_GRAPHICS, layout_cbombers )
-GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan)", MACHINE_IMPERFECT_GRAPHICS, layout_cbombers )
+GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation Japan",   "Under Fire (World)",              0 )
+GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito America Corporation", "Under Fire (US)",                 0 )
+GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation",         "Under Fire (Japan)",              0 )
+GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)",           MACHINE_IMPERFECT_GRAPHICS, layout_cbombers )
+GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan)",           MACHINE_IMPERFECT_GRAPHICS, layout_cbombers )
 GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan Prototype)", MACHINE_IMPERFECT_GRAPHICS, layout_cbombers )

@@ -835,7 +835,7 @@ WRITE_LINE_MEMBER(jpmimpct_state::tms_irq)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( jpmimpct, jpmimpct_state )
+static MACHINE_CONFIG_START( jpmimpct )
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(m68k_program_map)
 
@@ -1307,7 +1307,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( impctawp, jpmimpct_state )
+MACHINE_CONFIG_START( impctawp )
 	MCFG_CPU_ADD("maincpu",M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(awp68k_program_map)
 
@@ -1745,20 +1745,20 @@ ROM_END
 
 /* Video */
 
-GAME( 1995, cluedo,   0,       jpmimpct, cluedo, driver_device,   0, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedod,  cluedo,  jpmimpct, cluedo, driver_device,   0, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2c, cluedo,  jpmimpct, cluedo, driver_device,   0, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2,  cluedo,  jpmimpct, cluedo, driver_device,   0, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialp, 0,       jpmimpct, trivialp, driver_device, 0, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialpd,trivialp,jpmimpct, trivialp, driver_device, 0, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialpo,trivialp,jpmimpct, trivialp, driver_device, 0, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )
-GAME( 1997, scrabble, 0,       jpmimpct, scrabble, driver_device, 0, ROT0, "JPM", "Scrabble (rev. F)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1997, scrabbled,scrabble,jpmimpct, scrabble, driver_device, 0, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",MACHINE_SUPPORTS_SAVE )
-GAME( 1998, hngmnjpm, 0,       jpmimpct, hngmnjpm, driver_device, 0, ROT0, "JPM", "Hangman (JPM)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1998, hngmnjpmd,hngmnjpm,jpmimpct, hngmnjpm, driver_device, 0, ROT0, "JPM", "Hangman (JPM) (Protocol)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1999, coronatn, 0,       jpmimpct, coronatn, driver_device, 0, ROT0, "JPM", "Coronation Street Quiz Game", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, coronatnd,coronatn,jpmimpct, coronatn, driver_device, 0, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, tqst,     0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "JPM", "Treasure Quest"             , MACHINE_NOT_WORKING) // incomplete (ACE?)
-GAME( 199?, snlad,    0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
-GAME( 199?, buzzundr, 0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "Ace", "Buzzundrum (Ace)", MACHINE_NOT_WORKING )
-GAME( 199?, monspdr , 0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "Ace", "Money Spider (Ace)", MACHINE_NOT_WORKING )
+GAME( 1995, cluedo,   0,       jpmimpct, cluedo,   jpmimpct_state, 0, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedod,  cluedo,  jpmimpct, cluedo,   jpmimpct_state, 0, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo2c, cluedo,  jpmimpct, cluedo,   jpmimpct_state, 0, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo2,  cluedo,  jpmimpct, cluedo,   jpmimpct_state, 0, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialp, 0,       jpmimpct, trivialp, jpmimpct_state, 0, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialpd,trivialp,jpmimpct, trivialp, jpmimpct_state, 0, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialpo,trivialp,jpmimpct, trivialp, jpmimpct_state, 0, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )
+GAME( 1997, scrabble, 0,       jpmimpct, scrabble, jpmimpct_state, 0, ROT0, "JPM", "Scrabble (rev. F)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1997, scrabbled,scrabble,jpmimpct, scrabble, jpmimpct_state, 0, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",MACHINE_SUPPORTS_SAVE )
+GAME( 1998, hngmnjpm, 0,       jpmimpct, hngmnjpm, jpmimpct_state, 0, ROT0, "JPM", "Hangman (JPM)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1998, hngmnjpmd,hngmnjpm,jpmimpct, hngmnjpm, jpmimpct_state, 0, ROT0, "JPM", "Hangman (JPM) (Protocol)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coronatn, 0,       jpmimpct, coronatn, jpmimpct_state, 0, ROT0, "JPM", "Coronation Street Quiz Game", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coronatnd,coronatn,jpmimpct, coronatn, jpmimpct_state, 0, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, tqst,     0,       jpmimpct, cluedo  , jpmimpct_state, 0, ROT0, "JPM", "Treasure Quest"             , MACHINE_NOT_WORKING) // incomplete (ACE?)
+GAME( 199?, snlad,    0,       jpmimpct, cluedo  , jpmimpct_state, 0, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
+GAME( 199?, buzzundr, 0,       jpmimpct, cluedo  , jpmimpct_state, 0, ROT0, "Ace", "Buzzundrum (Ace)", MACHINE_NOT_WORKING )
+GAME( 199?, monspdr , 0,       jpmimpct, cluedo  , jpmimpct_state, 0, ROT0, "Ace", "Money Spider (Ace)", MACHINE_NOT_WORKING )

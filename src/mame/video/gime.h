@@ -9,10 +9,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_VIDEO_GIME_H
+#define MAME_VIDEO_GIME_H
 
-#ifndef __GIME__
-#define __GIME__
+#pragma once
 
 #include "video/mc6847.h"
 #include "machine/6883sam.h"
@@ -55,9 +55,9 @@ class cococart_slot_device;
 class gime_base_device : public mc6847_friend_device, public sam6883_friend_device
 {
 public:
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb_base &set_firq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_firq.set_callback(object); }
-	template<class _Object> static devcb_base &set_floating_bus_rd_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_read_floating_bus.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<gime_base_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_firq_wr_callback(device_t &device, Object &&cb) { return downcast<gime_base_device &>(device).m_write_firq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_floating_bus_rd_callback(device_t &device, Object &&cb) { return downcast<gime_base_device &>(device).m_read_floating_bus.set_callback(std::forward<Object>(cb)); }
 	static void set_maincpu_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_maincpu_tag = tag; }
 	static void set_ram_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_ram_tag = tag; }
 	static void set_ext_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_ext_tag = tag; }
@@ -91,7 +91,7 @@ public:
 	void set_il2(bool value) { set_interrupt_value(INTERRUPT_EI2, value); }
 
 protected:
-	gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, const char *shortname, const char *source);
+	gime_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata);
 
 	// device-level overrides
 	virtual void device_start(void) override;
@@ -307,7 +307,7 @@ public:
 	gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type GIME_NTSC;
-extern const device_type GIME_PAL;
+DECLARE_DEVICE_TYPE(GIME_NTSC, gime_ntsc_device)
+DECLARE_DEVICE_TYPE(GIME_PAL,  gime_pal_device)
 
-#endif /* __GIME__ */
+#endif //MAME_VIDEO_GIME_H

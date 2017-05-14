@@ -3714,7 +3714,7 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 
 #define MAIN_CLOCK XTAL_28_63636MHz
 
-static MACHINE_CONFIG_START( coolridr, coolridr_state )
+static MACHINE_CONFIG_START( coolridr )
 	MCFG_CPU_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 mhz
 	MCFG_CPU_PROGRAM_MAP(system_h1_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_main, "screen", 0, 1)
@@ -3940,5 +3940,5 @@ DRIVER_INIT_MEMBER(coolridr_state, aquastge)
 	m_colbase = 0;
 }
 
-GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",MACHINE_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
-GAMEL( 1995, aquastge,    0, aquastge,    aquastge, coolridr_state,    aquastge, ROT0,  "Sega", "Aqua Stage",MACHINE_NOT_WORKING, layout_aquastge)
+GAME ( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
+GAMEL( 1995, aquastge,    0, aquastge,    aquastge, coolridr_state,    aquastge, ROT0,  "Sega", "Aqua Stage",  MACHINE_NOT_WORKING, layout_aquastge)

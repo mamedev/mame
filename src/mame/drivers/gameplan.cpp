@@ -956,7 +956,7 @@ MACHINE_RESET_MEMBER(gameplan_state,gameplan)
 	m_video_data = 0;
 }
 
-static MACHINE_CONFIG_START( gameplan, gameplan_state )
+static MACHINE_CONFIG_START( gameplan )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, GAMEPLAN_MAIN_CPU_CLOCK)
@@ -1175,12 +1175,12 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, killcom,   0,        gameplan, killcom, driver_device,  0, ROT0,   "Game Plan (Centuri license)", "Killer Comet", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, megatack,  0,        gameplan, megatack, driver_device, 0, ROT0,   "Game Plan (Centuri license)", "Megatack (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, megatacka, megatack, gameplan, megatack, driver_device, 0, ROT0,   "Game Plan (Centuri license)", "Megatack (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, challeng,  0,        gameplan, challeng, driver_device, 0, ROT0,   "Game Plan (Centuri license)", "Challenger", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, kaos,      0,        gameplan, kaos, driver_device,     0, ROT270, "Game Plan", "Kaos", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, leprechn,  0,        leprechn, leprechn, driver_device, 0, ROT0,   "Tong Electronic", "Leprechaun", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, potogold,  leprechn, leprechn, potogold, driver_device, 0, ROT0,   "Tong Electronic (Game Plan license)", "Pot of Gold", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, leprechp,  leprechn, leprechn, potogold, driver_device, 0, ROT0,   "Tong Electronic (Pacific Polytechnical license)", "Leprechaun (Pacific)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, piratetr,  0,        leprechn, piratetr, driver_device, 0, ROT0,   "Tong Electronic", "Pirate Treasure", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, killcom,   0,        gameplan, killcom,  gameplan_state, 0, ROT0,   "Game Plan (Centuri license)",                     "Killer Comet",         MACHINE_SUPPORTS_SAVE )
+GAME( 1980, megatack,  0,        gameplan, megatack, gameplan_state, 0, ROT0,   "Game Plan (Centuri license)",                     "Megatack (set 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1980, megatacka, megatack, gameplan, megatack, gameplan_state, 0, ROT0,   "Game Plan (Centuri license)",                     "Megatack (set 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, challeng,  0,        gameplan, challeng, gameplan_state, 0, ROT0,   "Game Plan (Centuri license)",                     "Challenger",           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, kaos,      0,        gameplan, kaos,     gameplan_state, 0, ROT270, "Game Plan",                                       "Kaos",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1982, leprechn,  0,        leprechn, leprechn, gameplan_state, 0, ROT0,   "Tong Electronic",                                 "Leprechaun",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, potogold,  leprechn, leprechn, potogold, gameplan_state, 0, ROT0,   "Tong Electronic (Game Plan license)",             "Pot of Gold",          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, leprechp,  leprechn, leprechn, potogold, gameplan_state, 0, ROT0,   "Tong Electronic (Pacific Polytechnical license)", "Leprechaun (Pacific)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, piratetr,  0,        leprechn, piratetr, gameplan_state, 0, ROT0,   "Tong Electronic",                                 "Pirate Treasure",      MACHINE_SUPPORTS_SAVE )

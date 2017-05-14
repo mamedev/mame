@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Raphael Nabet
 /* register names for apexc_get_reg & apexc_set_reg */
-#pragma once
+#ifndef MAME_CPU_APEXC_APEXC_H
+#define MAME_CPU_APEXC_APEXC_H
 
-#ifndef __APEXC_H__
-#define __APEXC_H__
+#pragma once
 
 enum
 {
@@ -81,7 +81,6 @@ protected:
 };
 
 
-extern const device_type APEXC;
+DECLARE_DEVICE_TYPE(APEXC, apexc_cpu_device)
 
-
-#endif /* __APEXC_H__ */
+#endif // MAME_CPU_APEXC_APEXC_H

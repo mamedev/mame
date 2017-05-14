@@ -1,22 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
+#ifndef MAME_SOUND_3526INTF_H
+#define MAME_SOUND_3526INTF_H
+
 #pragma once
 
-#ifndef __3526INTF_H__
-#define __3526INTF_H__
 
+#define MCFG_YM3526_IRQ_HANDLER(cb) \
+		devcb = &ym3526_device::set_irq_handler(*device, (DEVCB_##cb));
 
-#define MCFG_YM3526_IRQ_HANDLER(_devcb) \
-	devcb = &ym3526_device::set_irq_handler(*device, DEVCB_##_devcb);
-
-class ym3526_device : public device_t,
-									public device_sound_interface
+class ym3526_device : public device_t, public device_sound_interface
 {
 public:
 	ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ym3526_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ym3526_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -25,10 +24,6 @@ public:
 	DECLARE_READ8_MEMBER( read_port_r );
 	DECLARE_WRITE8_MEMBER( control_port_w );
 	DECLARE_WRITE8_MEMBER( write_port_w );
-
-	void _IRQHandler(int irq);
-	void _timer_handler(int c,const attotime &period);
-	void _ym3526_update_request();
 
 protected:
 	// device-level overrides
@@ -43,7 +38,15 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	void irq_handler(int irq);
+	void timer_handler(int c, const attotime &period);
+	void update_request() { m_stream->update(); }
+
 	void calculate_rates();
+
+	static void static_irq_handler(device_t *param, int irq) { downcast<ym3526_device *>(param)->irq_handler(irq); }
+	static void static_timer_handler(device_t *param, int c, const attotime &period) { downcast<ym3526_device *>(param)->timer_handler(c, period); }
+	static void static_update_request(device_t *param, int interval) { downcast<ym3526_device *>(param)->update_request(); }
 
 	// internal state
 	sound_stream *  m_stream;
@@ -52,7 +55,6 @@ private:
 	devcb_write_line m_irq_handler;
 };
 
-extern const device_type YM3526;
+DECLARE_DEVICE_TYPE(YM3526, ym3526_device)
 
-
-#endif /* __3526INTF_H__ */
+#endif // MAME_SOUND_3526INTF_H

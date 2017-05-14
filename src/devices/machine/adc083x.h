@@ -8,19 +8,20 @@
 
 ***************************************************************************/
 
-#ifndef __ADC083X_H__
-#define __ADC083X_H__
+#ifndef MAME_MACHINE_ADC083X_H
+#define MAME_MACHINE_ADC083X_H
+
+#pragma once
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef device_delegate<double (uint8_t input)> adc083x_input_delegate;
 #define ADC083X_INPUT_CB(name)  double name(uint8_t input)
 
 #define MCFG_ADC083X_INPUT_CB(_class, _method) \
-	adc083x_device::set_input_callback(*device, adc083x_input_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc083x_device::set_input_callback(*device, adc083x_device::input_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 /***************************************************************************
     CONSTANTS
@@ -45,10 +46,10 @@ typedef device_delegate<double (uint8_t input)> adc083x_input_delegate;
 class adc083x_device : public device_t
 {
 public:
-	adc083x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	typedef device_delegate<double (uint8_t input)> input_delegate;
 
 	// static configuration helpers
-	static void set_input_callback(device_t &device, adc083x_input_delegate input_callback) { downcast<adc083x_device &>(device).m_input_callback = input_callback; }
+	static void set_input_callback(device_t &device, input_delegate &&cb) { downcast<adc083x_device &>(device).m_input_callback = std::move(cb); }
 
 	DECLARE_WRITE_LINE_MEMBER( cs_write );
 	DECLARE_WRITE_LINE_MEMBER( clk_write );
@@ -58,10 +59,12 @@ public:
 	DECLARE_READ_LINE_MEMBER( do_read );
 
 protected:
+	adc083x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t mux_bits);
+
 	// device-level overrides
 	virtual void device_start() override;
 
-	int32_t m_mux_bits;
+	const int32_t m_mux_bits;
 
 private:
 	uint8_t conversion();
@@ -83,16 +86,15 @@ private:
 	int32_t m_bit;
 	int32_t m_output;
 
-	adc083x_input_delegate m_input_callback;
+	input_delegate m_input_callback;
 };
+
 
 class adc0831_device : public adc083x_device
 {
 public:
 	adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
-
-extern const device_type ADC0831;
 
 
 class adc0832_device : public adc083x_device
@@ -101,16 +103,12 @@ public:
 	adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type ADC0832;
-
 
 class adc0834_device : public adc083x_device
 {
 public:
 	adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
-
-extern const device_type ADC0834;
 
 
 class adc0838_device : public adc083x_device
@@ -119,7 +117,10 @@ public:
 	adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type ADC0838;
 
+DECLARE_DEVICE_TYPE(ADC0831, adc0831_device)
+DECLARE_DEVICE_TYPE(ADC0832, adc0832_device)
+DECLARE_DEVICE_TYPE(ADC0834, adc0834_device)
+DECLARE_DEVICE_TYPE(ADC0838, adc0838_device)
 
-#endif  /* __ADC083X_H__ */
+#endif // MAME_MACHINE_ADC083X_H

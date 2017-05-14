@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_FDC_SLOT = device_creator<bbc_fdc_slot_device>;
+DEFINE_DEVICE_TYPE(BBC_FDC_SLOT, bbc_fdc_slot_device, "bbc_fdc_slot", "BBC Micro FDC slot")
 
 
 //**************************************************************************
@@ -50,8 +50,8 @@ device_bbc_fdc_interface::~device_bbc_fdc_interface()
 //-------------------------------------------------
 
 bbc_fdc_slot_device::bbc_fdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, BBC_FDC_SLOT, "BBC Micro FDC slot", tag, owner, clock, "bbc_fdc_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
+	device_t(mconfig, BBC_FDC_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
 	m_card(nullptr),
 	m_intrq_handler(*this),
 	m_drq_handler(*this)

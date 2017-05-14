@@ -39,12 +39,12 @@
 //-------------------------------------------------
 
 aladdin_cart_interface::aladdin_cart_interface(const machine_config &mconfig, device_t &device)
-						: device_slot_card_interface(mconfig, device),
-							m_rom(nullptr),
-							m_rom_size(0),
-	m_lobank(0),
-	m_hibank(0),
-							m_rom_mask(0xff)
+	: device_slot_card_interface(mconfig, device)
+	, m_rom(nullptr)
+	, m_rom_size(0)
+	, m_lobank(0)
+	, m_hibank(0)
+	, m_rom_mask(0xff)
 {
 }
 
@@ -64,12 +64,13 @@ READ8_MEMBER(aladdin_cart_interface::read)
 //  sub-cart slot device
 //-------------------------------------------------
 
-const device_type NES_ALADDIN_SLOT = device_creator<nes_aladdin_slot_device>;
+DEFINE_DEVICE_TYPE(NES_ALADDIN_SLOT, nes_aladdin_slot_device, "nes_ade_slot", "NES Aladdin Deck Enhancer Cartridge Slot")
 
-nes_aladdin_slot_device::nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, NES_ALADDIN_SLOT, "NES Aladdin Deck Enhancer Cartridge Slot", tag, owner, clock, "nes_ade_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this), m_cart(nullptr)
+nes_aladdin_slot_device::nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NES_ALADDIN_SLOT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_slot_interface(mconfig, *this)
+	, m_cart(nullptr)
 {
 }
 
@@ -172,24 +173,24 @@ ROM_START( ade_rom )
 	ROM_REGION(0x40000, "aderom", ROMREGION_ERASEFF)
 ROM_END
 
-const device_type NES_ALGN_ROM = device_creator<nes_algn_rom_device>;
-const device_type NES_ALGQ_ROM = device_creator<nes_algq_rom_device>;
+DEFINE_DEVICE_TYPE(NES_ALGN_ROM, nes_algn_rom_device, "nes_algn_rom", "NES Aladdin Deck Enhancer ALGN ROM")
+DEFINE_DEVICE_TYPE(NES_ALGQ_ROM, nes_algq_rom_device, "nes_algq_rom", "NES Aladdin Deck Enhancer ALGQ ROM")
 
-nes_algn_rom_device::nes_algn_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-						: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-							aladdin_cart_interface( mconfig, *this )
+nes_algn_rom_device::nes_algn_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, aladdin_cart_interface(mconfig, *this)
 {
 }
 
 nes_algn_rom_device::nes_algn_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-						: device_t(mconfig, NES_ALGN_ROM, "NES Aladdin Deck Enhancer ALGN ROM", tag, owner, clock, "nes_algn_rom", __FILE__),
-							aladdin_cart_interface( mconfig, *this )
+	: nes_algn_rom_device(mconfig, NES_ALGN_ROM, tag, owner, clock)
 {
 }
 
 nes_algq_rom_device::nes_algq_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-						: nes_algn_rom_device(mconfig, NES_ALGQ_ROM, "NES Aladdin Deck Enhancer ALGQ ROM", tag, owner, clock, "nes_algq_rom", __FILE__), m_bank_base(0)
-					{
+	: nes_algn_rom_device(mconfig, NES_ALGQ_ROM, tag, owner, clock)
+	, m_bank_base(0)
+{
 }
 
 void nes_algn_rom_device::device_start()
@@ -260,11 +261,11 @@ void nes_algq_rom_device::write_prg(uint32_t offset, uint8_t data)
 //
 //-----------------------------------------------
 
-const device_type NES_ALADDIN = device_creator<nes_aladdin_device>;
+DEFINE_DEVICE_TYPE(NES_ALADDIN, nes_aladdin_device, "nes_aladdin", "NES Cart Camerica Aladdin PCB")
 
 nes_aladdin_device::nes_aladdin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_ALADDIN, "NES Cart Camerica Aladdin PCB", tag, owner, clock, "nes_aladdin", __FILE__),
-					m_subslot(*this, "ade_slot")
+	: nes_nrom_device(mconfig, NES_ALADDIN, tag, owner, clock)
+	, m_subslot(*this, "ade_slot")
 {
 }
 

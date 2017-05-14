@@ -41,7 +41,8 @@ public:
 	DECLARE_READ8_MEMBER(port11_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port40_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
+
 private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -88,7 +89,7 @@ WRITE8_MEMBER( ccs300_state::port10_w )
 	m_terminal->write(space, 0, data & 0x7f);
 }
 
-WRITE8_MEMBER( ccs300_state::kbd_put )
+void ccs300_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -118,7 +119,7 @@ DRIVER_INIT_MEMBER( ccs300_state, ccs300 )
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-static MACHINE_CONFIG_START( ccs300, ccs300_state )
+static MACHINE_CONFIG_START( ccs300 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(ccs300_mem)
@@ -127,7 +128,7 @@ static MACHINE_CONFIG_START( ccs300, ccs300_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ccs300_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ccs300_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -138,5 +139,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT   COMPAT   MACHINE    INPUT    CLASS          INIT          COMPANY                          FULLNAME       FLAGS */
+/*    YEAR  NAME    PARENT   COMPAT   MACHINE    INPUT    CLASS          INIT      COMPANY                        FULLNAME         FLAGS */
 COMP( 19??, ccs300, ccs2810, 0,       ccs300,    ccs300,  ccs300_state,  ccs300,   "California Computer Systems", "CCS Model 300", MACHINE_IS_SKELETON )

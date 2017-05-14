@@ -142,16 +142,15 @@
  *  - Let a controller CPU board (eg CPU-1 or CPU-30) boot from floppy or SCSI disk
  *
  ****************************************************************************/
-#define TODO "Driver for SCSI NCR5386s device needed\n"
-
 #include "emu.h"
+#include "vme_fcscsi.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/68230pit.h"
 #include "machine/wd_fdc.h"
 #include "machine/hd63450.h" // compatible with MC68450
 #include "machine/clock.h"
 #include "formats/pc_dsk.h"
-#include "vme_fcscsi.h"
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
@@ -175,11 +174,13 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+#define TODO "Driver for SCSI NCR5386s device needed\n"
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_FCSCSI1 = device_creator<vme_fcscsi1_card_device>;
+DEFINE_DEVICE_TYPE(VME_FCSCSI1, vme_fcscsi1_card_device, "fcscsi1", "Force Computer SYS68K/ISCSI-1 Intelligent Mass Storage Controller Board")
 
 #define CPU_CRYSTAL XTAL_20MHz /* Jauch */
 #define PIT_CRYSTAL XTAL_16MHz /* Jauch */
@@ -194,7 +195,7 @@ static ADDRESS_MAP_START (fcscsi1_mem, AS_PROGRAM, 16, vme_fcscsi1_card_device)
 //  AM_RANGE (0xc40000, 0xc4001f) AM_DEVREADWRITE8("scsi", ncr5386_device, read, write, 0x00ff) /* SCSI Controller interface - device support not yet available*/
 	AM_RANGE (0xc40000, 0xc4001f) AM_READWRITE8 (scsi_r, scsi_w, 0x00ff)
 	AM_RANGE (0xc80000, 0xc800ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)  /* DMA Controller interface */
-	AM_RANGE (0xcc0000, 0xcc0007) AM_DEVREADWRITE8("fdc", wd1772_t, read, write, 0x00ff)      /* Floppy Controller interface */
+	AM_RANGE (0xcc0000, 0xcc0007) AM_DEVREADWRITE8("fdc", wd1772_device, read, write, 0x00ff)      /* Floppy Controller interface */
 	AM_RANGE (0xcc0008, 0xcc0009) AM_READWRITE8 (tcr_r, tcr_w, 0x00ff) /* The Control Register, SCSI ID and FD drive select bits */
 ADDRESS_MAP_END
 
@@ -274,28 +275,21 @@ const tiny_rom_entry *vme_fcscsi1_card_device::device_rom_region() const
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
-vme_fcscsi1_card_device::vme_fcscsi1_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-	,device_vme_card_interface(mconfig, *this)
-	,m_maincpu (*this, "maincpu")
-	,m_fdc (*this, "fdc")
-	,m_pit (*this, "pit")
-	,m_dmac(*this, "mc68450")
-	,m_tcr (0)
+vme_fcscsi1_card_device::vme_fcscsi1_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_vme_card_interface(mconfig, *this)
+	, m_maincpu(*this, "maincpu")
+	, m_fdc(*this, "fdc")
+	, m_pit(*this, "pit")
+	, m_dmac(*this, "mc68450")
+	, m_tcr(0)
 {
 	LOG("%s\n", FUNCNAME);
 }
 
-vme_fcscsi1_card_device::vme_fcscsi1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VME_FCSCSI1, "Force Computer SYS68K/ISCSI-1 Intelligent Mass Storage Controller Board", tag, owner, clock, "fcscsi1", __FILE__)
-	,device_vme_card_interface(mconfig, *this)
-	,m_maincpu(*this, "maincpu")
-	,m_fdc(*this, "fdc")
-	,m_pit(*this, "pit")
-	,m_dmac(*this, "mc68450")
-	,m_tcr(0)
+vme_fcscsi1_card_device::vme_fcscsi1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vme_fcscsi1_card_device(mconfig, VME_FCSCSI1, tag, owner, clock)
 {
-	LOG("%s\n", FUNCNAME);
 }
 
 /* Start it up */

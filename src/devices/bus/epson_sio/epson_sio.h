@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_EPSON_SIO_EPSON_SIO_H
+#define MAME_BUS_EPSON_SIO_EPSON_SIO_H
 
-#ifndef __EPSON_SIO_H__
-#define __EPSON_SIO_H__
+#pragma once
 
 
 
@@ -73,23 +73,24 @@ class device_epson_sio_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_epson_sio_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_epson_sio_interface();
 
 	virtual void tx_w(int state) { };
 	virtual void pout_w(int state) { };
 
 protected:
+	device_epson_sio_interface(const machine_config &mconfig, device_t &device);
+
 	epson_sio_device *m_slot;
 };
 
 
 // device type definition
-extern const device_type EPSON_SIO;
+DECLARE_DEVICE_TYPE(EPSON_SIO, epson_sio_device)
 
 
 // supported devices
 SLOT_INTERFACE_EXTERN( epson_sio_devices );
 
 
-#endif // __EPSON_SIO_H__
+#endif // MAME_BUS_EPSON_SIO_EPSON_SIO_H

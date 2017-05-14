@@ -188,7 +188,7 @@ void pooyan_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( pooyan, pooyan_state )
+static MACHINE_CONFIG_START( pooyan )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
@@ -308,6 +308,6 @@ ROM_END
  *************************************/
 
 //    YEAR, NAME,    PARENT, MACHINE,INPUT,  INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1982, pooyan,  0,      pooyan, pooyan, driver_device, 0,   ROT90,  "Konami", "Pooyan", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pooyans, pooyan, pooyan, pooyan, driver_device, 0,   ROT90,  "Konami (Stern Electronics license)", "Pooyan (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pootan,  pooyan, pooyan, pooyan, driver_device, 0,   ROT90,  "bootleg", "Pootan", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pooyan,  0,      pooyan, pooyan, pooyan_state, 0,   ROT90,  "Konami", "Pooyan", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pooyans, pooyan, pooyan, pooyan, pooyan_state, 0,   ROT90,  "Konami (Stern Electronics license)", "Pooyan (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pootan,  pooyan, pooyan, pooyan, pooyan_state, 0,   ROT90,  "bootleg", "Pootan", MACHINE_SUPPORTS_SAVE )

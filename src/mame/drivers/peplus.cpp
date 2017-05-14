@@ -1325,7 +1325,7 @@ void peplus_state::machine_reset()
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( peplus, peplus_state )
+static MACHINE_CONFIG_START( peplus )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I80C32, XTAL_20MHz/2) /* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(peplus_map)

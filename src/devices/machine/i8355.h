@@ -29,10 +29,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_I8355_H
+#define MAME_MACHINE_I8355_H
 
-#ifndef __I8355__
-#define __I8355__
+#pragma once
 
 
 
@@ -73,10 +73,10 @@ public:
 	// construction/destruction
 	i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_in_pa_callback(device_t &device, _Object object) { return downcast<i8355_device &>(device).m_in_pa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<i8355_device &>(device).m_out_pa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pb_callback(device_t &device, _Object object) { return downcast<i8355_device &>(device).m_in_pb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<i8355_device &>(device).m_out_pb_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_in_pa_callback(device_t &device, Object &&cb) { return downcast<i8355_device &>(device).m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_pa_callback(device_t &device, Object &&cb) { return downcast<i8355_device &>(device).m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_pb_callback(device_t &device, Object &&cb) { return downcast<i8355_device &>(device).m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_pb_callback(device_t &device, Object &&cb) { return downcast<i8355_device &>(device).m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
@@ -108,8 +108,6 @@ private:
 
 
 // device type definition
-extern const device_type I8355;
+DECLARE_DEVICE_TYPE(I8355, i8355_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_I8355_H

@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TRS80M2_KEYBOARD = device_creator<trs80m2_keyboard_device>;
+DEFINE_DEVICE_TYPE(TRS80M2_KEYBOARD, trs80m2_keyboard_device, "trs80m2kb", "TRS-80 Model II Keyboard")
 
 
 
@@ -219,7 +219,7 @@ ioport_constructor trs80m2_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, TRS80M2_KEYBOARD, "TRS-80 Model II Keyboard", tag, owner, clock, "trs80m2kb", __FILE__),
+	device_t(mconfig, TRS80M2_KEYBOARD, tag, owner, clock),
 	m_maincpu(*this, I8021_TAG),
 	m_y(*this, "Y%u", 0),
 	m_write_clock(*this),

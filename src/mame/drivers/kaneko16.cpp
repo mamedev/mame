@@ -1862,7 +1862,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::kaneko16_interrupt)
     6-7]    rte
 */
 
-static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
+static MACHINE_CONFIG_START( berlwall )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* MC68000P12 */
@@ -1911,7 +1911,7 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 	MCFG_SOUND_ADD("ym2149_2", YM2149, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 12000000/6, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 12000000/6, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1921,7 +1921,7 @@ MACHINE_CONFIG_END
                             Bakuretsu Breaker
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
+static MACHINE_CONFIG_START( bakubrkr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
@@ -1977,7 +1977,7 @@ static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1996,7 +1996,7 @@ MACHINE_CONFIG_END
         6-7]    busy loop
 */
 
-static MACHINE_CONFIG_START( blazeon, kaneko16_state )
+static MACHINE_CONFIG_START( blazeon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)    /* TMP68HC000-12 */
@@ -2050,7 +2050,7 @@ MACHINE_CONFIG_END
                                  Wing Force
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( wingforc, kaneko16_state )
+static MACHINE_CONFIG_START( wingforc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)    /* TMP68HC000N-16 */
@@ -2097,7 +2097,7 @@ static MACHINE_CONFIG_START( wingforc, kaneko16_state )
 	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2116,7 +2116,7 @@ MACHINE_CONFIG_END
     VIDEO_UPDATE_AFTER_VBLANK fixes the mangled/wrong colored sprites
 */
 
-static MACHINE_CONFIG_START( gtmr, kaneko16_gtmr_state )
+static MACHINE_CONFIG_START( gtmr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
@@ -2167,16 +2167,16 @@ static MACHINE_CONFIG_START( gtmr, kaneko16_gtmr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/8, OKIM6295_PIN7_LOW)  /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/8, PIN7_LOW)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/8, OKIM6295_PIN7_LOW)  /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/8, PIN7_LOW)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gtmre, gtmr )
 	MCFG_DEVICE_MODIFY("toybox")
-	MCFG_TOYBOX_TABLE_TYPE(TABLE_ALT)
+	MCFG_TOYBOX_TABLE_TYPE(ALT)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -2228,7 +2228,7 @@ static MACHINE_CONFIG_DERIVED( bonkadv, gtmr )
 
 
 	MCFG_DEVICE_MODIFY("toybox")
-	MCFG_TOYBOX_GAME_TYPE(GAME_BONK)
+	MCFG_TOYBOX_GAME_TYPE(BONK)
 	MCFG_DEVICE_MODIFY("kan_hit")
 	kaneko_hit_device::set_type(*device, 0);
 
@@ -2239,7 +2239,7 @@ MACHINE_CONFIG_END
                                 Magical Crystal
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mgcrystl, kaneko16_state )
+static MACHINE_CONFIG_START( mgcrystl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb, TMP68HC000N-12 @U31 and X2 is 12MHz */
@@ -2294,7 +2294,7 @@ static MACHINE_CONFIG_START( mgcrystl, kaneko16_state )
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2368,7 +2368,7 @@ static ADDRESS_MAP_START( shogwarr_oki2_map, AS_0, 8, kaneko16_shogwarr_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
+static MACHINE_CONFIG_START( shogwarr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
@@ -2418,11 +2418,11 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/8, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/8, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, shogwarr_oki1_map)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/8, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/8, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, shogwarr_oki2_map)
 MACHINE_CONFIG_END
@@ -4483,7 +4483,7 @@ GAME( 1992, explbrkr, 0,        bakubrkr, bakubrkr, kaneko16_state,          kan
 GAME( 1992, bakubrkr, explbrkr, bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Bakuretsu Breaker", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, wingforc, 0,        wingforc, wingforc, kaneko16_state,          kaneko16, ROT270,"A.I (Atlus license)",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, bonkadv,  0,        bonkadv , bonkadv,  kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bonkadv,  0,        bonkadv,  bonkadv,  kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, bloodwar, 0,        bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Blood Warrior", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, oedfight, bloodwar, bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan Bloodshed Ver.)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, gtmr,     0,        gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/07/18)", MACHINE_SUPPORTS_SAVE ) // this set shows 'PCB by Jinwei Co Ltd. ROC'

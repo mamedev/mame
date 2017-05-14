@@ -28,19 +28,16 @@
 #include "kaneko_spr.h"
 #include "screen.h"
 
-const device_type KANEKO_VU002_SPRITE = device_creator<kaneko_vu002_sprite_device>;
-const device_type KANEKO_KC002_SPRITE = device_creator<kaneko_kc002_sprite_device>;
+DEFINE_DEVICE_TYPE(KANEKO_VU002_SPRITE, kaneko_vu002_sprite_device, "kaneko_vu002", "Kaneko VU002 Sprites")
+DEFINE_DEVICE_TYPE(KANEKO_KC002_SPRITE, kaneko_kc002_sprite_device, "kaneko_kc002", "Kaneko KC002 Sprites")
 
 kaneko16_sprite_device::kaneko16_sprite_device(
 		const machine_config &mconfig,
 		device_type type,
-		const char *name,
 		const char *tag,
 		device_t *owner,
-		uint32_t clock,
-		const char *shortname,
-		const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
@@ -619,12 +616,12 @@ void kaneko16_sprite_device::kaneko16_render_sprites_common(_BitmapClass &bitmap
 }
 
 kaneko_vu002_sprite_device::kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: kaneko16_sprite_device(mconfig, KANEKO_VU002_SPRITE, "Kaneko VU002 Sprites", tag, owner, clock, "kaneko_vu002", __FILE__)
+	: kaneko16_sprite_device(mconfig, KANEKO_VU002_SPRITE, tag, owner, clock)
 {
 }
 
 kaneko_kc002_sprite_device::kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: kaneko16_sprite_device(mconfig, KANEKO_KC002_SPRITE, "Kaneko KC002 Sprites", tag, owner, clock, "kaneko_kc002", __FILE__)
+	: kaneko16_sprite_device(mconfig, KANEKO_KC002_SPRITE, tag, owner, clock)
 {
 }
 

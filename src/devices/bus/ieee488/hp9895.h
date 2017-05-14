@@ -8,10 +8,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_IEEE488_HP9895_H
+#define MAME_BUS_IEEE488_HP9895_H
 
-#ifndef _HP9895_H_
-#define _HP9895_H_
+#pragma once
 
 #include "ieee488.h"
 #include "cpu/z80/z80.h"
@@ -28,9 +28,6 @@ public:
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
@@ -82,6 +79,11 @@ public:
 	// Floppy drive interface
 	void floppy_ready_cb(floppy_image_device *floppy , int state);
 
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
 	required_device<z80_device> m_cpu;
 	required_device<phi_device> m_phi;
@@ -129,6 +131,6 @@ private:
 };
 
 // device type definition
-extern const device_type HP9895;
+DECLARE_DEVICE_TYPE(HP9895, hp9895_device)
 
-#endif /* _HP9895_H_ */
+#endif // MAME_BUS_IEEE488_HP9895_H

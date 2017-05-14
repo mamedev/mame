@@ -59,7 +59,7 @@ enum read_or_write
 // referenced types from other classes
 class device_memory_interface;
 class device_t;
-struct game_driver;
+class game_driver;
 
 // forward declarations of classes defined here
 class address_map;

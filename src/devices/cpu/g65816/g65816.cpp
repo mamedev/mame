@@ -93,20 +93,24 @@ TODO general:
 #include "g65816.h"
 
 
-const device_type G65816 = device_creator<g65816_device>;
-const device_type _5A22 = device_creator<_5a22_device>;
+DEFINE_DEVICE_TYPE(G65816, g65816_device, "g65c816", "G65C816")
+DEFINE_DEVICE_TYPE(_5A22,  _5a22_device,  "5a22",    "5A22")
+
+enum
+{
+	CPU_TYPE_G65816 = 0,
+	CPU_TYPE_5A22 = 1
+};
 
 
 g65816_device::g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, G65816, "G65C816", tag, owner, clock, "g65c816", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0)
-	, m_cpu_type(CPU_TYPE_G65816)
+	: g65816_device(mconfig, G65816, tag, owner, clock, CPU_TYPE_G65816, nullptr)
 {
 }
 
 
-g65816_device::g65816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+g65816_device::g65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0, internal)
 	, m_cpu_type(cpu_type)
 {
@@ -130,7 +134,7 @@ ADDRESS_MAP_END
 
 
 _5a22_device::_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: g65816_device(mconfig, _5A22, "5A22", tag, owner, clock, "5a22", __FILE__, CPU_TYPE_5A22, ADDRESS_MAP_NAME(_5a22_map))
+	: g65816_device(mconfig, _5A22, tag, owner, clock, CPU_TYPE_5A22, ADDRESS_MAP_NAME(_5a22_map))
 {
 }
 

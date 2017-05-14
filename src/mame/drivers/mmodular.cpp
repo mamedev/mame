@@ -1281,7 +1281,7 @@ static MACHINE_CONFIG_FRAGMENT ( chess_common )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( polgar, polgar_state )
+static MACHINE_CONFIG_START( polgar )
 	MCFG_CPU_ADD("maincpu",M65C02,4915200)
 	MCFG_CPU_PROGRAM_MAP(polgar_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -1295,7 +1295,7 @@ static MACHINE_CONFIG_START( polgar, polgar_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( alm32, polgar_state )
+static MACHINE_CONFIG_START( alm32 )
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(alm32_mem)
 	MCFG_MACHINE_START_OVERRIDE(polgar_state,van32)
@@ -1324,7 +1324,7 @@ static MACHINE_CONFIG_DERIVED( milano, polgar )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( monteciv, polgar_state )
+static MACHINE_CONFIG_START( monteciv )
 	MCFG_CPU_ADD("maincpu",M65C02,8000000)
 	MCFG_CPU_PROGRAM_MAP( monteciv_mem )
 	MCFG_MACHINE_START_OVERRIDE(polgar_state, polgar )
@@ -1344,7 +1344,7 @@ static MACHINE_CONFIG_DERIVED( megaiv, monteciv )
 	MCFG_CPU_PROGRAM_MAP(megaiv_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( van16, polgar_state )
+static MACHINE_CONFIG_START( van16 )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(van16_mem)
 	MCFG_MACHINE_START_OVERRIDE(polgar_state,van16)
@@ -1362,7 +1362,7 @@ static MACHINE_CONFIG_DERIVED( alm16, van16 )
 	MCFG_CPU_PROGRAM_MAP(alm16_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( van32, polgar_state )
+static MACHINE_CONFIG_START( van32 )
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(van32_mem)
 	MCFG_MACHINE_START_OVERRIDE(polgar_state,van32)
@@ -1375,7 +1375,7 @@ static MACHINE_CONFIG_START( van32, polgar_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gen32, polgar_state )
+static MACHINE_CONFIG_START( gen32 )
 	MCFG_CPU_ADD("maincpu", M68030, XTAL_33_333MHz)
 	MCFG_CPU_PROGRAM_MAP(gen32_mem)
 	MCFG_MACHINE_START_OVERRIDE(polgar_state,van32)
@@ -1390,7 +1390,7 @@ static MACHINE_CONFIG_START( gen32, polgar_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bpl32, polgar_state )
+static MACHINE_CONFIG_START( bpl32 )
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_24_576MHz)
 	MCFG_CPU_PROGRAM_MAP(bpl32_mem)
 	MCFG_MACHINE_START_OVERRIDE(polgar_state,van32)
@@ -1508,22 +1508,22 @@ DRIVER_INIT_MEMBER(polgar_state,polgar)
 	led_status=0;
 }
 
-/*       YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     INIT     COMPANY                      FULLNAME                     FLAGS */
-	CONS(  1986, polgar,   0,       0,      polgar,    polgar, polgar_state,   polgar,  "Hegener & Glaser",          "Mephisto Polgar Schachcomputer", MACHINE_NOT_WORKING | MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK)
-	CONS(  1988, alm16,    van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Almeria 68000", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1988, alm32,    van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Alimera 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1989, academy,  0,       0,      academy,   academy, driver_device,  0,       "Hegener & Glaser",          "Mephisto Academy Schachcomputer", MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1989, megaiv,   0,       0,      megaiv,    megaiv, driver_device,   0,       "Hegener & Glaser",          "Mephisto Mega IV Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1989, milano,   polgar,  0,      milano,    polgar, polgar_state,   polgar,  "Hegener & Glaser",          "Mephisto Milano Schachcomputer", MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-//CONS(  1989, montec4,  0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1990, lyon16,   van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68000", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1990, lyon32,   van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1990, monteciv, 0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV LE Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1991, van16,    0,       0,      van16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68000", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1991, van32,    van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1993, gen32,    van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.00", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1993, gen32_41, van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1994, berlinp,  van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1996, bpl32,    van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro London Upgrade V5.00", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1996, lond020,  van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto London 68020 32 Bit", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1996, lond030,  van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 London Upgrade V5.00", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+/*         YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     STATE          INIT     COMPANY                      FULLNAME                           FLAGS */
+	CONS(  1986, polgar,   0,       0,      polgar,    polgar,   polgar_state,  polgar,  "Hegener & Glaser",          "Mephisto Polgar Schachcomputer",  MACHINE_NOT_WORKING | MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK)
+	CONS(  1988, alm16,    van16,   0,      alm16,     van16,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Almeria 68000",          MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1988, alm32,    van16,   0,      alm32,     van32,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Alimera 68020",          MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1989, academy,  0,       0,      academy,   academy,  polgar_state,  0,       "Hegener & Glaser",          "Mephisto Academy Schachcomputer", MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1989, megaiv,   0,       0,      megaiv,    megaiv,   polgar_state,  0,       "Hegener & Glaser",          "Mephisto Mega IV Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1989, milano,   polgar,  0,      milano,    polgar,   polgar_state,  polgar,  "Hegener & Glaser",          "Mephisto Milano Schachcomputer",  MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+//  CONS(  1989, montec4,  0,       0,      monteciv,  monteciv, polgar_state,  0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV",         MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1990, lyon16,   van16,   0,      alm16,     van16,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68000",             MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1990, lyon32,   van16,   0,      alm32,     van32,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68020",             MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1990, monteciv, 0,       0,      monteciv,  monteciv, polgar_state,  0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV LE Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1991, van16,    0,       0,      van16,     van16,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68000",        MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1991, van32,    van16,   0,      van32,     van32,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68020",        MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1993, gen32,    van16,   0,      gen32,     gen32,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.00",        MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1993, gen32_41, van16,   0,      gen32,     gen32,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01",        MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1994, berlinp,  van16,   0,      bpl32,     bpl32,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro 68020",       MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1996, bpl32,    van16,   0,      bpl32,     bpl32,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro London Upgrade V5.00", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1996, lond020,  van16,   0,      van32,     van32,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto London 68020 32 Bit",    MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
+	CONS(  1996, lond030,  van16,   0,      gen32,     gen32,    polgar_state,  0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 London Upgrade V5.00", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )

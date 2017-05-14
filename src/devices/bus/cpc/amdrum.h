@@ -12,8 +12,10 @@
  *
  */
 
-#ifndef AMDRUM_H_
-#define AMDRUM_H_
+#ifndef MAME_BUS_CPC_AMDRUM_H
+#define MAME_BUS_CPC_AMDRUM_H
+
+#pragma once
 
 #include "cpcexp.h"
 #include "sound/dac.h"
@@ -41,7 +43,7 @@ private:
 };
 
 // device type definition
-extern const device_type CPC_AMDRUM;
+DECLARE_DEVICE_TYPE(CPC_AMDRUM, cpc_amdrum_device)
 
 
-#endif /* AMDRUM_H_ */
+#endif // MAME_BUS_CPC_AMDRUM_H

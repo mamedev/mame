@@ -26,13 +26,13 @@
 
 
 // uCOM-43 products: 2000x8 ROM, 96x4 RAM, supports full instruction set
-const device_type NEC_D546 = device_creator<upd546_cpu_device>; // 42-pin PMOS, 35 pins for I/O
-const device_type NEC_D553 = device_creator<upd553_cpu_device>; // 42-pin PMOS, 35 pins for I/O, high voltage
-const device_type NEC_D557L = device_creator<upd557l_cpu_device>; // 28-pin PMOS, 21 pins for I/O
-const device_type NEC_D650 = device_creator<upd650_cpu_device>; // 42-pin CMOS, 35 pins for I/O
+DEFINE_DEVICE_TYPE(NEC_D546,  upd546_cpu_device,  "upd546",  "NEC uPD546") // 42-pin PMOS, 35 pins for I/O
+DEFINE_DEVICE_TYPE(NEC_D553,  upd553_cpu_device,  "upd553",  "NEC uPD553") // 42-pin PMOS, 35 pins for I/O, high voltage
+DEFINE_DEVICE_TYPE(NEC_D557L, upd557l_cpu_device, "upd557l", "NEC uPD557L") // 28-pin PMOS, 21 pins for I/O
+DEFINE_DEVICE_TYPE(NEC_D650,  upd650_cpu_device,  "upd650",  "NEC uPD650") // 42-pin CMOS, 35 pins for I/O
 
 // uCOM-44 products: 1000x8 ROM, 64x4 RAM, 1-level stack, does not support external interrupt
-const device_type NEC_D552 = device_creator<upd552_cpu_device>; // 42-pin PMOS, 35 pins for I/O, high voltage
+DEFINE_DEVICE_TYPE(NEC_D552,  upd552_cpu_device,  "upd552",  "NEC uPD552") // 42-pin PMOS, 35 pins for I/O, high voltage
 
 // uCOM-45 products: 1000x8 or 640x8 ROM, 32x4 RAM, 1-level stack
 //..
@@ -60,25 +60,52 @@ ADDRESS_MAP_END
 
 
 // device definitions
+ucom4_cpu_device::ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 8, prgwidth, 0, program)
+	, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
+	, m_prgwidth(prgwidth)
+	, m_datawidth(datawidth)
+	, m_family(family)
+	, m_stack_levels(stack_levels)
+	, m_read_a(*this)
+	, m_read_b(*this)
+	, m_read_c(*this)
+	, m_read_d(*this)
+	, m_write_c(*this)
+	, m_write_d(*this)
+	, m_write_e(*this)
+	, m_write_f(*this)
+	, m_write_g(*this)
+	, m_write_h(*this)
+	, m_write_i(*this)
+{
+}
+
 upd546_cpu_device::upd546_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: ucom4_cpu_device(mconfig, NEC_D546, "uPD546", tag, owner, clock, NEC_UCOM43, 3 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_2k), 7 /* data width */, ADDRESS_MAP_NAME(data_96x4), "upd546", __FILE__)
-{ }
+	: ucom4_cpu_device(mconfig, NEC_D546, tag, owner, clock, NEC_UCOM43, 3 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_2k), 7 /* data width */, ADDRESS_MAP_NAME(data_96x4))
+{
+}
 
 upd553_cpu_device::upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: ucom4_cpu_device(mconfig, NEC_D553, "uPD553", tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd553", __FILE__)
-{ }
+	: ucom4_cpu_device(mconfig, NEC_D553, tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4))
+{
+}
 
 upd557l_cpu_device::upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: ucom4_cpu_device(mconfig, NEC_D557L, "uPD557L", tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd557l", __FILE__)
-{ }
+	: ucom4_cpu_device(mconfig, NEC_D557L, tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4))
+{
+}
 
 upd650_cpu_device::upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: ucom4_cpu_device(mconfig, NEC_D650, "uPD650", tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd650", __FILE__)
-{ }
+	: ucom4_cpu_device(mconfig, NEC_D650, tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4))
+{
+}
 
 upd552_cpu_device::upd552_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: ucom4_cpu_device(mconfig, NEC_D552, "uPD552", tag, owner, clock, NEC_UCOM44, 1, 10, ADDRESS_MAP_NAME(program_1k), 6, ADDRESS_MAP_NAME(data_64x4), "upd552", __FILE__)
-{ }
+	: ucom4_cpu_device(mconfig, NEC_D552, tag, owner, clock, NEC_UCOM44, 1, 10, ADDRESS_MAP_NAME(program_1k), 6, ADDRESS_MAP_NAME(data_64x4))
+{
+}
 
 
 // disasm

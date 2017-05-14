@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef NAMCO50_H
-#define NAMCO50_H
+#ifndef MAME_MACHINE_NAMCO50_H
+#define MAME_MACHINE_NAMCO50_H
+
+#pragma once
 
 #include "cpu/mb88xx/mb88xx.h"
 
@@ -42,6 +44,6 @@ private:
 	uint8_t                   m_portO;
 };
 
-extern const device_type NAMCO_50XX;
+DECLARE_DEVICE_TYPE(NAMCO_50XX, namco_50xx_device)
 
-#endif  /* NAMCO50_H */
+#endif // MAME_MACHINE_NAMCO50_H

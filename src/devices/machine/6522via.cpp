@@ -148,7 +148,7 @@ uint16_t via6522_device::get_counter1_value()
 //**************************************************************************
 
 // device type definition
-const device_type VIA6522 = device_creator<via6522_device>;
+DEFINE_DEVICE_TYPE(VIA6522, via6522_device, "via6522", "6522 VIA")
 
 DEVICE_ADDRESS_MAP_START( map, 8, via6522_device )
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(read, write)
@@ -159,7 +159,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 via6522_device::via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock, "via6522", __FILE__),
+	: device_t(mconfig, VIA6522, tag, owner, clock),
 		m_in_a_handler(*this),
 		m_in_b_handler(*this),
 		m_out_a_handler(*this),

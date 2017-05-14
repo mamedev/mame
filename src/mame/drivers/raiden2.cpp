@@ -1416,7 +1416,7 @@ GFXDECODE_END
 
 /* MACHINE DRIVERS */
 
-static MACHINE_CONFIG_START( raiden2, raiden2_state )
+static MACHINE_CONFIG_START( raiden2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
@@ -1455,10 +1455,10 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/28, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/28, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1487,7 +1487,7 @@ static MACHINE_CONFIG_DERIVED( raidendx, raiden2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( zeroteam, raiden2_state )
+static MACHINE_CONFIG_START( zeroteam )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
@@ -1526,7 +1526,7 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1320000/* ? */, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 1320000/* ? */, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)

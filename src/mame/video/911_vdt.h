@@ -1,42 +1,48 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet
+#ifndef MAME_VIDEO_911_VDT_H
+#define MAME_VIDEO_911_VDT_H
+
+#pragma once
 
 #include "sound/beep.h"
 
 #define vdt911_chr_region ":gfx1"
-enum
-{
-	/* 10 bytes per character definition */
-	vdt911_single_char_len = 10,
-
-	vdt911_US_chr_offset        = 0,
-	vdt911_UK_chr_offset        = vdt911_US_chr_offset+128*vdt911_single_char_len,
-	vdt911_german_chr_offset    = vdt911_UK_chr_offset+128*vdt911_single_char_len,
-	vdt911_swedish_chr_offset   = vdt911_german_chr_offset+128*vdt911_single_char_len,
-	vdt911_norwegian_chr_offset = vdt911_swedish_chr_offset+128*vdt911_single_char_len,
-	vdt911_frenchWP_chr_offset  = vdt911_norwegian_chr_offset+128*vdt911_single_char_len,
-	vdt911_japanese_chr_offset  = vdt911_frenchWP_chr_offset+128*vdt911_single_char_len,
-
-	vdt911_chr_region_len   = vdt911_japanese_chr_offset+256*vdt911_single_char_len
-};
-
-enum vdt911_screen_size_t { char_960 = 0, char_1920 };
-enum vdt911_model_t
-{
-	vdt911_model_US = 0,
-	vdt911_model_UK,
-	vdt911_model_French,
-	vdt911_model_German,
-	vdt911_model_Swedish,       // Swedish/Finnish
-	vdt911_model_Norwegian,     // Norwegian/Danish
-	vdt911_model_Japanese,       // Katakana Japanese
-	/*vdt911_model_Arabic,*/    // Arabic
-	vdt911_model_FrenchWP      // French word processing
-};
 
 class vdt911_device : public device_t, public device_gfx_interface
 {
 public:
+	enum
+	{
+		/* 10 bytes per character definition */
+		single_char_len = 10,
+
+		US_chr_offset        = 0,
+		UK_chr_offset        = US_chr_offset+128*single_char_len,
+		german_chr_offset    = UK_chr_offset+128*single_char_len,
+		swedish_chr_offset   = german_chr_offset+128*single_char_len,
+		norwegian_chr_offset = swedish_chr_offset+128*single_char_len,
+		frenchWP_chr_offset  = norwegian_chr_offset+128*single_char_len,
+		japanese_chr_offset  = frenchWP_chr_offset+128*single_char_len,
+
+		chr_region_len   = japanese_chr_offset+256*single_char_len
+	};
+
+	enum class screen_size { char_960 = 0, char_1920 };
+
+	enum class model
+	{
+		US = 0,
+		UK,
+		French,
+		German,
+		Swedish,      // Swedish/Finnish
+		Norwegian,    // Norwegian/Danish
+		Japanese,     // Katakana Japanese
+		/*Arabic,*/   // Arabic
+		FrenchWP      // French word processing
+	};
+
 	vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(cru_r);
@@ -44,14 +50,14 @@ public:
 
 	DECLARE_PALETTE_INIT(vdt911);
 
-	template<class _Object> static devcb_base &static_set_keyint_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &static_set_keyint_callback(device_t &device, Object &&cb)
 	{
-		return downcast<vdt911_device &>(device).m_keyint_line.set_callback(object);
+		return downcast<vdt911_device &>(device).m_keyint_line.set_callback(std::forward<Object>(cb));
 	}
 
-	template<class _Object> static devcb_base &static_set_lineint_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &static_set_lineint_callback(device_t &device, Object &&cb)
 	{
-		return downcast<vdt911_device &>(device).m_lineint_line.set_callback(object);
+		return downcast<vdt911_device &>(device).m_lineint_line.set_callback(std::forward<Object>(cb));
 	}
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -71,8 +77,8 @@ private:
 	int get_refresh_rate();
 	void check_keyboard();
 
-	vdt911_screen_size_t    m_screen_size;  // char_960 for 960-char, 12-line model; char_1920 for 1920-char, 24-line model
-	vdt911_model_t          m_model;        // country code
+	screen_size    m_screen_size;  // char_960 for 960-char, 12-line model; char_1920 for 1920-char, 24-line model
+	model          m_model;        // country code
 
 	uint8_t m_data_reg;                       // dt911 write buffer
 	uint8_t m_display_RAM[2048];              // vdt911 char buffer (1kbyte for 960-char model, 2kbytes for 1920-char model)
@@ -106,10 +112,12 @@ private:
 	devcb_write_line                   m_lineint_line;
 };
 
-extern const device_type VDT911;
+DECLARE_DEVICE_TYPE(VDT911, vdt911_device)
 
 #define MCFG_VDT911_KEYINT_HANDLER( _intcallb ) \
 	devcb = &vdt911_device::static_set_keyint_callback( *device, DEVCB_##_intcallb );
 
 #define MCFG_VDT911_LINEINT_HANDLER( _intcallb ) \
 	devcb = &vdt911_device::static_set_lineint_callback( *device, DEVCB_##_intcallb );
+
+#endif // MAME_VIDEO_911_VDT_H

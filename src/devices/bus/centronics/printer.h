@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#pragma once
+#ifndef MAME_BUS_CENTRONICS_PRINTER_H
+#define MAME_BUS_CENTRONICS_PRINTER_H
 
-#ifndef __CENTRONICS_PRINTER_H__
-#define __CENTRONICS_PRINTER_H__
+#pragma once
 
 #include "ctronics.h"
 #include "imagedev/printer.h"
@@ -53,6 +53,6 @@ private:
 };
 
 // device type definition
-extern const device_type CENTRONICS_PRINTER;
+DECLARE_DEVICE_TYPE(CENTRONICS_PRINTER, centronics_printer_device)
 
-#endif
+#endif // MAME_BUS_CENTRONICS_PRINTER_H

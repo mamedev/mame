@@ -631,7 +631,7 @@ MACHINE_RESET_MEMBER(wyvernf0_state,wyvernf0)
 	m_mcu_ready = 0;
 }
 
-static MACHINE_CONFIG_START( wyvernf0, wyvernf0_state )
+static MACHINE_CONFIG_START( wyvernf0 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 6000000) // ?
@@ -731,4 +731,4 @@ ROM_START( wyvernf0 )
 	ROM_LOAD( "a39_12.ic74",  0x6000, 0x2000, CRC(1cc389de) SHA1(4213484d3a82688f312811e7a5c4d128e40584c3) )
 ROM_END
 
-GAME( 1985, wyvernf0, 0, wyvernf0, wyvernf0, driver_device, 0, ROT270, "Taito", "Wyvern F-0", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)
+GAME( 1985, wyvernf0, 0, wyvernf0, wyvernf0, wyvernf0_state, 0, ROT270, "Taito", "Wyvern F-0", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)

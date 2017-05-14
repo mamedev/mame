@@ -212,7 +212,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( apogee, apogee_state )
+static MACHINE_CONFIG_START( apogee )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(apogee_mem)
@@ -282,5 +282,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1989, apogee, radio86,0,       apogee,    apogee, radio86_state,radio86, "Zavod BRA", "Apogee BK-01", 0)
+//    YEAR  NAME    PARENT   COMPAT  MACHINE    INPUT   STATE         INIT     COMPANY      FULLNAME        FLAGS
+COMP( 1989, apogee, radio86, 0,      apogee,    apogee, apogee_state, radio86, "Zavod BRA", "Apogee BK-01", 0 )

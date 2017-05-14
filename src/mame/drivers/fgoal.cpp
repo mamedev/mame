@@ -364,7 +364,7 @@ void fgoal_state::machine_reset()
 	m_prev_coin = 0;
 }
 
-static MACHINE_CONFIG_START( fgoal, fgoal_state )
+static MACHINE_CONFIG_START( fgoal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 10065000 / 10) /* ? */
@@ -437,5 +437,5 @@ ROM_START( fgoala )
 ROM_END
 
 
-GAME( 1979, fgoal,  0,     fgoal, fgoal, driver_device, 0, ROT90, "Taito", "Field Goal (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, fgoala, fgoal, fgoal, fgoal, driver_device, 0, ROT90, "Taito", "Field Goal (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, fgoal,  0,     fgoal, fgoal, fgoal_state, 0, ROT90, "Taito", "Field Goal (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, fgoala, fgoal, fgoal, fgoal, fgoal_state, 0, ROT90, "Taito", "Field Goal (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

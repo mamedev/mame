@@ -34,12 +34,11 @@ class bartop52_state : public atari_common_state
 public:
 	bartop52_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atari_common_state(mconfig, type, tag)
-		{ }
+	{ }
 
 	TIMER_DEVICE_CALLBACK_MEMBER( bartop_interrupt );
 
 	virtual void machine_reset() override;
-	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 };
 
 
@@ -120,9 +119,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( bartop52_state::bartop_interrupt )
 	m_antic->generic_interrupt(4);
 }
 
-static MACHINE_CONFIG_START( a5200, bartop52_state )
+static MACHINE_CONFIG_START( a5200 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
+	MCFG_CPU_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
 	MCFG_CPU_PROGRAM_MAP(a5200_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bartop52_state, bartop_interrupt, "screen", 0, 1)
 
@@ -134,9 +133,9 @@ static MACHINE_CONFIG_START( a5200, bartop52_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1))
-	MCFG_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
-	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
-	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	MCFG_SCREEN_VISIBLE_AREA_ANTIC()
+	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
+	MCFG_SCREEN_SIZE_ANTIC_60HZ()
 	MCFG_SCREEN_UPDATE_DEVICE("antic", antic_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -146,7 +145,7 @@ static MACHINE_CONFIG_START( a5200, bartop52_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
+	MCFG_SOUND_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
 	MCFG_POKEY_POT0_R_CB(IOPORT("analog_0"))
 	MCFG_POKEY_POT1_R_CB(IOPORT("analog_1"))
 	MCFG_POKEY_POT2_R_CB(IOPORT("analog_2"))
@@ -164,4 +163,4 @@ ROM_START(barbball)
 	ROM_LOAD( "5200.rom",     0xf800, 0x0800, BAD_DUMP CRC(4248d3e3) SHA1(6ad7a1e8c9fad486fbec9498cb48bf5bc3adc530) )
 ROM_END
 
-GAME( 1983, barbball, 0, a5200, bartop52, driver_device, 0, ROT0, "Atari", "Barroom Baseball (prototype)", MACHINE_NOT_WORKING )
+GAME( 1983, barbball, 0, a5200, bartop52, bartop52_state, 0, ROT0, "Atari", "Barroom Baseball (prototype)", MACHINE_NOT_WORKING )

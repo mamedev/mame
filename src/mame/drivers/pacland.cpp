@@ -426,7 +426,7 @@ INTERRUPT_GEN_MEMBER(pacland_state::mcu_vblank_irq)
 		m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( pacland, pacland_state )
+static MACHINE_CONFIG_START( pacland )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_49_152MHz/32) /* 1.536 MHz */
@@ -640,8 +640,8 @@ ROM_END
 
 
 
-GAME( 1984, pacland,   0,       pacland, pacland, driver_device, 0, ROT0, "Namco", "Pac-Land (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandj,  pacland, pacland, pacland, driver_device, 0, ROT0, "Namco", "Pac-Land (Japan new)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandjo, pacland, pacland, pacland, driver_device, 0, ROT0, "Namco", "Pac-Land (Japan old)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandjo2,pacland, pacland, pacland, driver_device, 0, ROT0, "Namco", "Pac-Land (Japan older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandm,  pacland, pacland, pacland, driver_device, 0, ROT0, "Namco (Bally Midway license)", "Pac-Land (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pacland,   0,       pacland, pacland, pacland_state, 0, ROT0, "Namco", "Pac-Land (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandj,  pacland, pacland, pacland, pacland_state, 0, ROT0, "Namco", "Pac-Land (Japan new)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandjo, pacland, pacland, pacland, pacland_state, 0, ROT0, "Namco", "Pac-Land (Japan old)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandjo2,pacland, pacland, pacland, pacland_state, 0, ROT0, "Namco", "Pac-Land (Japan older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandm,  pacland, pacland, pacland, pacland_state, 0, ROT0, "Namco (Bally Midway license)", "Pac-Land (Midway)", MACHINE_SUPPORTS_SAVE )

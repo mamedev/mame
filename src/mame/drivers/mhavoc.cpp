@@ -526,7 +526,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mhavoc, mhavoc_state )
+static MACHINE_CONFIG_START( mhavoc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("alpha", M6502, MHAVOC_CLOCK_2_5M)     /* 2.5 MHz */
@@ -805,9 +805,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mhavoc,   0,      mhavoc,   mhavoc, driver_device,   0,        ROT0, "Atari",         "Major Havoc (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mhavoc2,  mhavoc, mhavoc,   mhavoc, driver_device,   0,        ROT0, "Atari",         "Major Havoc (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavoc,   0,      mhavoc,   mhavoc,   mhavoc_state, 0,        ROT0, "Atari",         "Major Havoc (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavoc2,  mhavoc, mhavoc,   mhavoc,   mhavoc_state, 0,        ROT0, "Atari",         "Major Havoc (rev 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 2006, mhavocrv, mhavoc, mhavocrv, mhavocrv, mhavoc_state, mhavocrv, ROT0, "Atari / JMA (hack/homebrew)",   "Major Havoc (Return to Vax)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mhavocp,  mhavoc, mhavoc,   mhavocp, driver_device,  0,        ROT0, "Atari",         "Major Havoc (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, alphaone, mhavoc, alphaone, alphaone, driver_device, 0,        ROT0, "Atari",         "Alpha One (prototype, 3 lives)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, alphaonea,mhavoc, alphaone, alphaone, driver_device, 0,        ROT0, "Atari",         "Alpha One (prototype, 5 lives)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavocp,  mhavoc, mhavoc,   mhavocp,  mhavoc_state, 0,        ROT0, "Atari",         "Major Havoc (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, alphaone, mhavoc, alphaone, alphaone, mhavoc_state, 0,        ROT0, "Atari",         "Alpha One (prototype, 3 lives)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, alphaonea,mhavoc, alphaone, alphaone, mhavoc_state, 0,        ROT0, "Atari",         "Alpha One (prototype, 5 lives)", MACHINE_SUPPORTS_SAVE )

@@ -6,11 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_PC9801_86_H
+#define MAME_MACHINE_PC9801_86_H
 
 #pragma once
 
-#ifndef __PC9801_86DEV_H__
-#define __PC9801_86DEV_H__
 
 #include "machine/pic8259.h"
 #include "sound/2608intf.h"
@@ -66,7 +66,7 @@ private:
 
 
 // device type definition
-extern const device_type PC9801_86;
+DECLARE_DEVICE_TYPE(PC9801_86, pc9801_86_device)
 
 
 
@@ -76,4 +76,4 @@ extern const device_type PC9801_86;
 
 
 
-#endif
+#endif // MAME_MACHINE_PC9801_86_H

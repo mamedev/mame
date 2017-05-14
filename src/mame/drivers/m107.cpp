@@ -772,7 +772,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static MACHINE_CONFIG_START( firebarr, m107_state )
+static MACHINE_CONFIG_START( firebarr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33, 28000000/2)    /* NEC V33, 28MHz clock */
@@ -1060,11 +1060,11 @@ DRIVER_INIT_MEMBER(m107_state,wpksoc)
 
 /***************************************************************************/
 
-GAME( 1993, airass,        0,             airass,   firebarr, m107_state, firebarr, ROT270, "Irem", "Air Assault (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // possible location test, but sound code is newer than Japan version
-GAME( 1993, firebarr,      airass,        firebarr, firebarr, m107_state, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, airass,    0,        airass,   firebarr, m107_state, firebarr, ROT270, "Irem", "Air Assault (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // possible location test, but sound code is newer than Japan version
+GAME( 1993, firebarr,  airass,   firebarr, firebarr, m107_state, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, dsoccr94,      0,        dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dsoccr94k,     dsoccr94, dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (Korea, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // default team selected is Korea, so likely a Korean set
+GAME( 1994, dsoccr94,  0,        dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dsoccr94k, dsoccr94, dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (Korea, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // default team selected is Korea, so likely a Korean set
 
-GAME( 1995, wpksoc,        0,        wpksoc,   wpksoc, m107_state,   wpksoc,   ROT0,   "Jaleco", "World PK Soccer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, kftgoal,       wpksoc,   wpksoc,   wpksoc, m107_state,   wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wpksoc,    0,        wpksoc,   wpksoc,   m107_state, wpksoc,   ROT0,   "Jaleco", "World PK Soccer",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, kftgoal,   wpksoc,   wpksoc,   wpksoc,   m107_state, wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

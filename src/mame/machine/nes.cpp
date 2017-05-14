@@ -67,9 +67,9 @@ void nes_state::machine_start()
 
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),m_cartslot->m_cart), write8_delegate(FUNC(device_nes_cart_interface::chr_w),m_cartslot->m_cart));
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(device_nes_cart_interface::nt_r),m_cartslot->m_cart), write8_delegate(FUNC(device_nes_cart_interface::nt_w),m_cartslot->m_cart));
-		m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),m_cartslot->m_cart));
-		m_ppu->set_hblank_callback(ppu2c0x_hblank_delegate(FUNC(device_nes_cart_interface::hblank_irq),m_cartslot->m_cart));
-		m_ppu->set_latch(ppu2c0x_latch_delegate(FUNC(device_nes_cart_interface::ppu_latch),m_cartslot->m_cart));
+		m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),m_cartslot->m_cart));
+		m_ppu->set_hblank_callback(ppu2c0x_device::hblank_delegate(FUNC(device_nes_cart_interface::hblank_irq),m_cartslot->m_cart));
+		m_ppu->set_latch(ppu2c0x_device::latch_delegate(FUNC(device_nes_cart_interface::ppu_latch),m_cartslot->m_cart));
 
 		// install additional handlers (read_h, read_ex, write_ex)
 		if (m_cartslot->get_pcb_id() == STD_EXROM || m_cartslot->get_pcb_id() == STD_NROM368 || m_cartslot->get_pcb_id() == STD_DISKSYS

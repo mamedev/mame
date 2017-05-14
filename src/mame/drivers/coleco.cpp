@@ -371,7 +371,7 @@ void coleco_state::machine_reset()
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( coleco, coleco_state )
+static MACHINE_CONFIG_START( coleco )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2) // 3.579545 MHz
@@ -487,10 +487,10 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   INIT              COMPANY             FULLNAME                            FLAGS
-CONS( 1982, coleco,   0,        0,      coleco,   coleco, driver_device, 0, "Coleco",           "ColecoVision (NTSC)",              0 )
-CONS( 1982, onyx,     coleco,   0,      coleco,   coleco, driver_device, 0, "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
-CONS( 1983, colecop,  coleco,   0,      colecop,  coleco, driver_device, 0, "Coleco",           "ColecoVision (PAL)",               0 )
-CONS( 1986, czz50,    0,        coleco, czz50,    czz50,  driver_device, 0, "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
-CONS( 1988, dina,     czz50,    0,      dina,     czz50,  driver_device, 0, "Telegames",        "Dina",                             0 )
-CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50,  driver_device, 0, "Telegames",        "Personal Arcade",                  0 )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY             FULLNAME                            FLAGS
+CONS( 1982, coleco,   0,        0,      coleco,   coleco, coleco_state, 0,    "Coleco",           "ColecoVision (NTSC)",              0 )
+CONS( 1982, onyx,     coleco,   0,      coleco,   coleco, coleco_state, 0,    "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
+CONS( 1983, colecop,  coleco,   0,      colecop,  coleco, coleco_state, 0,    "Coleco",           "ColecoVision (PAL)",               0 )
+CONS( 1986, czz50,    0,        coleco, czz50,    czz50,  coleco_state, 0,    "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
+CONS( 1988, dina,     czz50,    0,      dina,     czz50,  coleco_state, 0,    "Telegames",        "Dina",                             0 )
+CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50,  coleco_state, 0,    "Telegames",        "Personal Arcade",                  0 )

@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef __SSI2001__
-#define __SSI2001__
+#ifndef MAME_BUS_ISA_SSI2001_H
+#define MAME_BUS_ISA_SSI2001_H
+
+#pragma once
 
 #include "isa.h"
 #include "sound/mos6581.h"
@@ -23,17 +25,17 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	required_device<pc_joy_device> m_joy;
-	required_device<mos6581_device> m_sid;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	required_device<pc_joy_device> m_joy;
+	required_device<mos6581_device> m_sid;
 };
 
 // device type definition
 
-extern const device_type ISA8_SSI2001;
+DECLARE_DEVICE_TYPE(ISA8_SSI2001, ssi2001_device)
 
-#endif
+#endif // MAME_BUS_ISA_SSI2001_H

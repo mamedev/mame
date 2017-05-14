@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MCF5206E_H
+#define MAME_MACHINE_MCF5206E_H
 
-#ifndef __MCF5206E_PERIPHERAL_H__
-#define __MCF5206E_PERIPHERAL_H__
+#pragma once
 
 
 
@@ -27,28 +27,28 @@
 
 // ======================> mcf5206e_peripheral_device
 
-enum
-{
-	ICR1 = 0,
-	ICR2,
-	ICR3,
-	ICR4,
-	ICR5,
-	ICR6,
-	ICR7,
-	ICR8,
-	ICR9,
-	ICR10,
-	ICR11,
-	ICR12,
-	ICR13,
-	MAX_ICR
-};
-
 class mcf5206e_peripheral_device :  public device_t,
 									public device_memory_interface
 {
 public:
+	enum
+	{
+		ICR1 = 0,
+		ICR2,
+		ICR3,
+		ICR4,
+		ICR5,
+		ICR6,
+		ICR7,
+		ICR8,
+		ICR9,
+		ICR10,
+		ICR11,
+		ICR12,
+		ICR13,
+		MAX_ICR
+	};
+
 	// construction/destruction
 	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -155,24 +155,22 @@ public:
 	DECLARE_READ8_MEMBER( MBDR_r );
 	DECLARE_WRITE8_MEMBER( MBDR_w );
 
-
-
-
-	cpu_device* m_cpu;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override { }
 	virtual void device_clock_changed() override { }
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
-	address_space_config        m_space_config;
-
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 
 private:
+	TIMER_CALLBACK_MEMBER(timer1_callback);
 
 	void init_regs(bool first_init);
+
+	cpu_device* m_cpu;
+
+	address_space_config m_space_config;
 
 	uint8_t m_ICR[MAX_ICR];
 
@@ -188,7 +186,6 @@ private:
 	uint16_t m_TRR1;
 	uint8_t m_TER1;
 	uint16_t m_TCN1;
-	TIMER_CALLBACK_MEMBER(timer1_callback);
 
 
 	uint8_t m_PPDDR;
@@ -202,12 +199,10 @@ private:
 	uint8_t m_MBDR;
 
 	uint32_t m_coldfire_regs[0x400/4];
-
-private:
 };
 
 
 // device type definition
-extern const device_type MCF5206E_PERIPHERAL;
+DECLARE_DEVICE_TYPE(MCF5206E_PERIPHERAL, mcf5206e_peripheral_device)
 
-#endif  /* __MCF5206E_PERIPHERAL_H__ */
+#endif // MAME_MACHINE_MCF5206E_H

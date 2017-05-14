@@ -1,58 +1,52 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller
+#ifndef MAME_AUDIO_PLEIADS_H
+#define MAME_AUDIO_PLEIADS_H
+
+#pragma once
+
 #include "sound/tms36xx.h"
 
-struct pl_t_state
-{
-		pl_t_state():
-		counter(0),
-		output(0),
-		max_freq(0) {}
-
-	int counter;
-	int output;
-	int max_freq;
-};
-
-struct pl_c_state
-{
-		pl_c_state():
-		counter(0),
-		level(0),
-		charge_time(0),
-		discharge_time(0) {}
-
-	int counter;
-	int level;
-	double charge_time;
-	double discharge_time;
-};
-
-struct pl_n_state
-{
-		pl_n_state():
-		counter(0),
-		polyoffs(0),
-		freq(0) {}
-
-	int counter;
-	int polyoffs;
-	int freq;
-};
-
-class pleiads_sound_device : public device_t,
-									public device_sound_interface
+class pleiads_sound_device : public device_t, public device_sound_interface
 {
 public:
 	pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	pleiads_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	~pleiads_sound_device() {}
 
 	DECLARE_WRITE8_MEMBER( control_a_w );
 	DECLARE_WRITE8_MEMBER( control_b_w );
 	DECLARE_WRITE8_MEMBER( control_c_w );
 
 protected:
+	struct pl_t_state
+	{
+		pl_t_state() { }
+
+		int counter = 0;
+		int output = 0;
+		int max_freq = 0;
+	};
+
+	struct pl_c_state
+	{
+		pl_c_state() { }
+
+		int counter = 0;
+		int level = 0;
+		double charge_time = 0;
+		double discharge_time = 0;
+	};
+
+	struct pl_n_state
+	{
+		pl_n_state() { }
+
+		int counter = 0;
+		int polyoffs = 0;
+		int freq = 0;
+	};
+
+	pleiads_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -100,23 +94,22 @@ protected:
 	int m_opamp_resistor;
 };
 
-extern const device_type PLEIADS;
+DECLARE_DEVICE_TYPE(PLEIADS, pleiads_sound_device)
 
 class naughtyb_sound_device : public pleiads_sound_device
 {
 public:
 	naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-private:
-	// internal state
 };
 
-extern const device_type NAUGHTYB;
+DECLARE_DEVICE_TYPE(NAUGHTYB, naughtyb_sound_device)
 
 class popflame_sound_device : public pleiads_sound_device
 {
@@ -128,8 +121,8 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-private:
-	// internal state
 };
 
-extern const device_type POPFLAME;
+DECLARE_DEVICE_TYPE(POPFLAME, popflame_sound_device)
+
+#endif // MAME_AUDIO_PLEIADS_H

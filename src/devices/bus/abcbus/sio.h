@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
+#ifndef MAME_BUS_ABCBUS_SIO_H
+#define MAME_BUS_ABCBUS_SIO_H
 
-#ifndef __ABC_SIO__
-#define __ABC_SIO__
+#pragma once
 
 #include "abcbus.h"
 #include "machine/z80ctc.h"
@@ -45,8 +45,6 @@ private:
 
 
 // device type definition
-extern const device_type ABC_SIO;
+DECLARE_DEVICE_TYPE(ABC_SIO, abc_sio_device)
 
-
-
-#endif
+#endif // MAME_BUS_ABCBUS_SIO_H

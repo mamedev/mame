@@ -3,8 +3,8 @@
 #include "emu.h"
 #include "h8s2600.h"
 
-h8s2600_device::h8s2600_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_delegate map_delegate) :
-	h8s2000_device(mconfig, type, name, tag, owner, clock, shortname, source, map_delegate)
+h8s2600_device::h8s2600_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_delegate map_delegate) :
+	h8s2000_device(mconfig, type, tag, owner, clock, map_delegate)
 {
 }
 

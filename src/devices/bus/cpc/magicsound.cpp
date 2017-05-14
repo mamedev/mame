@@ -13,13 +13,11 @@
 #include "speaker.h"
 
 
-SLOT_INTERFACE_EXTERN(cpc_exp_cards);
-
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type AL_MAGICSOUND = device_creator<al_magicsound_device>;
+DEFINE_DEVICE_TYPE(AL_MAGICSOUND, al_magicsound_device, "al_magicsound", "Aleste Magic Sound Board")
 
 
 static MACHINE_CONFIG_FRAGMENT( al_magicsound )
@@ -75,7 +73,7 @@ machine_config_constructor al_magicsound_device::device_mconfig_additions() cons
 //**************************************************************************
 
 al_magicsound_device::al_magicsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, AL_MAGICSOUND, "Magic Sound Board", tag, owner, clock, "al_magicsound", __FILE__),
+	device_t(mconfig, AL_MAGICSOUND, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_dac(*this,"dac"),
 	m_dmac(*this,"dmac"),

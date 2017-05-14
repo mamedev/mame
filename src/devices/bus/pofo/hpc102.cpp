@@ -26,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type HPC102 = device_creator<hpc102_t>;
+DEFINE_DEVICE_TYPE(POFO_HPC102, pofo_hpc102_device, "pofo_hpc102", "Atari Portfolio HPC-102")
 
 
 //-------------------------------------------------
@@ -54,7 +54,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor hpc102_t::device_mconfig_additions() const
+machine_config_constructor pofo_hpc102_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( hpc102 );
 }
@@ -65,11 +65,11 @@ machine_config_constructor hpc102_t::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  hpc102_t - constructor
+//  pofo_hpc102_device - constructor
 //-------------------------------------------------
 
-hpc102_t::hpc102_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, HPC102, "Atari Portfolio HPC-102", tag, owner, clock, "hpc102", __FILE__),
+pofo_hpc102_device::pofo_hpc102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, POFO_HPC102, tag, owner, clock),
 	device_portfolio_expansion_slot_interface(mconfig, *this),
 	m_uart(*this, M82C50A_TAG)
 {
@@ -80,7 +80,7 @@ hpc102_t::hpc102_t(const machine_config &mconfig, const char *tag, device_t *own
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void hpc102_t::device_start()
+void pofo_hpc102_device::device_start()
 {
 }
 
@@ -89,7 +89,7 @@ void hpc102_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void hpc102_t::device_reset()
+void pofo_hpc102_device::device_reset()
 {
 	m_uart->reset();
 }
@@ -99,7 +99,7 @@ void hpc102_t::device_reset()
 //  eack_r - external interrupt acknowledge
 //-------------------------------------------------
 
-uint8_t hpc102_t::eack_r()
+uint8_t pofo_hpc102_device::eack_r()
 {
 	return m_vector;
 }
@@ -109,7 +109,7 @@ uint8_t hpc102_t::eack_r()
 //  nrdi_r - read
 //-------------------------------------------------
 
-uint8_t hpc102_t::nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
+uint8_t pofo_hpc102_device::nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
 {
 	if (!bcom)
 	{
@@ -132,7 +132,7 @@ uint8_t hpc102_t::nrdi_r(address_space &space, offs_t offset, uint8_t data, bool
 //  nwri_w - write
 //-------------------------------------------------
 
-void hpc102_t::nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
+void pofo_hpc102_device::nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1)
 {
 	if (!bcom)
 	{

@@ -58,6 +58,6 @@ private:
 };
 
 // device type definition
-extern const device_type APPLE2_VIDEO;
+DECLARE_DEVICE_TYPE(APPLE2_VIDEO, a2_video_device)
 
 #endif // MAME_VIDEO_APPLE2_H

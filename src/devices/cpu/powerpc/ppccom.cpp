@@ -195,20 +195,20 @@ static const uint8_t fcmp_cr_table_source[32] =
 };
 
 
-const device_type PPC601 = device_creator<ppc601_device>;
-const device_type PPC602 = device_creator<ppc602_device>;
-const device_type PPC603 = device_creator<ppc603_device>;
-const device_type PPC603E = device_creator<ppc603e_device>;
-const device_type PPC603R = device_creator<ppc603r_device>;
-const device_type PPC604 = device_creator<ppc604_device>;
-const device_type MPC8240 = device_creator<mpc8240_device>;
-const device_type PPC403GA = device_creator<ppc403ga_device>;
-const device_type PPC403GCX = device_creator<ppc403gcx_device>;
-const device_type PPC405GP = device_creator<ppc405gp_device>;
+DEFINE_DEVICE_TYPE(PPC601,    ppc601_device,    "ppc601",     "PowerPC 601")
+DEFINE_DEVICE_TYPE(PPC602,    ppc602_device,    "ppc602",     "PowerPC 602")
+DEFINE_DEVICE_TYPE(PPC603,    ppc603_device,    "ppc603",     "PowerPC 603")
+DEFINE_DEVICE_TYPE(PPC603E,   ppc603e_device,   "ppc603e",    "PowerPC 603E")
+DEFINE_DEVICE_TYPE(PPC603R,   ppc603r_device,   "ppc603r",    "PowerPC 603R")
+DEFINE_DEVICE_TYPE(PPC604,    ppc604_device,    "ppc604",     "PowerPC 604")
+DEFINE_DEVICE_TYPE(MPC8240,   mpc8240_device,   "mpc8240",    "PowerPC MPC8240")
+DEFINE_DEVICE_TYPE(PPC403GA,  ppc403ga_device,  "ppc403ga",   "PowerPC 403GA")
+DEFINE_DEVICE_TYPE(PPC403GCX, ppc403gcx_device, "ppc403gcx",  "PowerPC 403GCX")
+DEFINE_DEVICE_TYPE(PPC405GP,  ppc405gp_device,  "ppc405gp",   "PowerPC 405GP")
 
 
-ppc_device::ppc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+ppc_device::ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_BIG, data_bits, address_bits, 0, internal_map)
 	, c_bus_frequency(0)
@@ -242,37 +242,37 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 //}
 
 ppc603_device::ppc603_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC603, "PowerPC 603", tag, owner, clock, "ppc603", 32, 64, PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
+	: ppc_device(mconfig, PPC603, tag, owner, clock, 32, 64, PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
 {
 }
 
 ppc603e_device::ppc603e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC603E, "PowerPC 603e", tag, owner, clock, "ppc603e", 32, 64, PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
+	: ppc_device(mconfig, PPC603E, tag, owner, clock, 32, 64, PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
 {
 }
 
 ppc603r_device::ppc603r_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC603R, "PowerPC 603R", tag, owner, clock, "ppc603r", 32, 64, PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
+	: ppc_device(mconfig, PPC603R, tag, owner, clock, 32, 64, PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
 {
 }
 
 ppc602_device::ppc602_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC602, "PowerPC 602", tag, owner, clock, "ppc602", 32, 64, PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
+	: ppc_device(mconfig, PPC602, tag, owner, clock, 32, 64, PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
 {
 }
 
 mpc8240_device::mpc8240_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, MPC8240, "PowerPC MPC8240", tag, owner, clock, "mpc8240", 32, 64, PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4/* unknown */, nullptr)
+	: ppc_device(mconfig, MPC8240, tag, owner, clock, 32, 64, PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4/* unknown */, nullptr)
 {
 }
 
 ppc601_device::ppc601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC601, "PowerPC 601", tag, owner, clock, "ppc601", 32, 64, PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT, 0/* no TB */, nullptr)
+	: ppc_device(mconfig, PPC601, tag, owner, clock, 32, 64, PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT, 0/* no TB */, nullptr)
 {
 }
 
 ppc604_device::ppc604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc_device(mconfig, PPC604, "PowerPC 604", tag, owner, clock, "ppc604", 32, 64, PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU, 4, nullptr)
+	: ppc_device(mconfig, PPC604, tag, owner, clock, 32, 64, PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU, 4, nullptr)
 {
 }
 
@@ -280,23 +280,23 @@ static ADDRESS_MAP_START( internal_ppc4xx, AS_PROGRAM, 32, ppc4xx_device )
 	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE8(ppc4xx_spu_r, ppc4xx_spu_w, 0xffffffff)
 ADDRESS_MAP_END
 
-ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor)
-	: ppc_device(mconfig, type, name, tag, owner, clock, shortname, 31, 32, flavor, cap, tb_divisor, ADDRESS_MAP_NAME(internal_ppc4xx))
+ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor)
+	: ppc_device(mconfig, type, tag, owner, clock, 31, 32, flavor, cap, tb_divisor, ADDRESS_MAP_NAME(internal_ppc4xx))
 {
 }
 
 ppc403ga_device::ppc403ga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc4xx_device(mconfig, PPC403GA, "PowerPC 403GA", tag, owner, clock, "ppc403ga", PPC_MODEL_403GA, PPCCAP_4XX, 1)
+	: ppc4xx_device(mconfig, PPC403GA, tag, owner, clock, PPC_MODEL_403GA, PPCCAP_4XX, 1)
 {
 }
 
 ppc403gcx_device::ppc403gcx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc4xx_device(mconfig, PPC403GCX, "PowerPC 403GCX", tag, owner, clock, "ppc403gcx", PPC_MODEL_403GCX, PPCCAP_4XX, 1)
+	: ppc4xx_device(mconfig, PPC403GCX, tag, owner, clock, PPC_MODEL_403GCX, PPCCAP_4XX, 1)
 {
 }
 
 ppc405gp_device::ppc405gp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppc4xx_device(mconfig, PPC405GP, "PowerPC 405GP", tag, owner, clock, "ppc405gp", PPC_MODEL_405GP, PPCCAP_4XX | PPCCAP_VEA, 1)
+	: ppc4xx_device(mconfig, PPC405GP, tag, owner, clock, PPC_MODEL_405GP, PPCCAP_4XX | PPCCAP_VEA, 1)
 {
 }
 

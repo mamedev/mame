@@ -293,7 +293,7 @@ void d9final_state::machine_start()
 	membank("bank1")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( d9final, d9final_state )
+static MACHINE_CONFIG_START( d9final )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(d9final_map)
@@ -340,4 +340,4 @@ ROM_END
 
 
 
-GAME( 1992, d9final, 0, d9final, d9final, driver_device, 0, ROT0, "Excellent System", "Dream 9 Final (v2.24)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, d9final, 0, d9final, d9final, d9final_state, 0, ROT0, "Excellent System", "Dream 9 Final (v2.24)", MACHINE_SUPPORTS_SAVE )

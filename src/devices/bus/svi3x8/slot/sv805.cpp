@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV805 = device_creator<sv805_device>;
+DEFINE_DEVICE_TYPE(SV805, sv805_device, "sv805", "SV-805 RS-232 Interface")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -50,7 +50,7 @@ machine_config_constructor sv805_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 sv805_device::sv805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SV805, "SV-805 RS-232 Interface", tag, owner, clock, "sv805", __FILE__),
+	device_t(mconfig, SV805, tag, owner, clock),
 	device_svi_slot_interface(mconfig, *this),
 	m_uart(*this, "uart"),
 	m_rs232(*this, "rs232")

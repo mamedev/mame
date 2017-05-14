@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_VIDEO_SNES_PPU_H
-#define MAME_DEVICES_VIDEO_SNES_PPU_H
+#ifndef MAME_VIDEO_SNES_PPU_H
+#define MAME_VIDEO_SNES_PPU_H
 
 #pragma once
 
@@ -34,37 +34,6 @@
 #define SNES_LAYER_DEBUG  0
 
 
-/* offset-per-tile modes */
-enum
-{
-	SNES_OPT_NONE = 0,
-	SNES_OPT_MODE2,
-	SNES_OPT_MODE4,
-	SNES_OPT_MODE6
-};
-
-/* layers */
-enum
-{
-	SNES_BG1 = 0,
-	SNES_BG2,
-	SNES_BG3,
-	SNES_BG4,
-	SNES_OAM,
-	SNES_COLOR
-};
-
-
-struct SNES_SCANLINE
-{
-	int enable, clip;
-
-	uint16_t buffer[SNES_SCR_WIDTH];
-	uint8_t  priority[SNES_SCR_WIDTH];
-	uint8_t  layer[SNES_SCR_WIDTH];
-	uint8_t  blend_exception[SNES_SCR_WIDTH];
-};
-
 // ======================> snes_ppu_device
 
 class snes_ppu_device :  public device_t,
@@ -75,7 +44,68 @@ public:
 	snes_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	template<class _Object> static devcb_base &static_set_open_bus_callback(device_t &device, _Object object) { return downcast<snes_ppu_device &>(device).m_openbus_cb.set_callback(object); }
+	template <class Object> static devcb_base &static_set_open_bus_callback(device_t &device, Object &&cb) { return downcast<snes_ppu_device &>(device).m_openbus_cb.set_callback(std::forward<Object>(cb)); }
+
+	void refresh_scanline(bitmap_rgb32 &bitmap, uint16_t curline);
+
+	int16_t current_x() const { return m_screen->hpos() / m_htmult; }
+	int16_t current_y() const { return m_screen->vpos(); }
+	void set_latch_hv(int16_t x, int16_t y);
+
+	uint8_t read(address_space &space, uint32_t offset, uint8_t wrio_bit7);
+	void write(address_space &space, uint32_t offset, uint8_t data);
+
+	int vtotal() const { return ((m_stat78 & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC : SNES_VTOTAL_PAL; }
+	uint16_t htmult() const { return m_htmult; }
+	uint8_t interlace() const { return m_interlace; }
+	bool screen_disabled() const { return bool(m_screen_disabled); }
+	uint8_t last_visible_line() const { return m_beam.last_visible_line; }
+	uint16_t current_vert() const { return m_beam.current_vert; }
+	uint8_t saved_oam_address_low() const { return m_oam.saved_address_low; }
+	uint8_t saved_oam_address_high() const { return m_oam.saved_address_high; }
+
+	void clear_time_range_over() { m_stat77 &= 0x3f; }
+	void toggle_field() { m_stat78 ^= 0x80; }
+	void reset_interlace()
+	{
+		m_htmult = 1;
+		m_interlace = 1;
+		m_obj_interlace = 1;
+	}
+	void set_current_vert(uint16_t value) { m_beam.current_vert = value; }
+	void set_first_sprite() { m_oam.first_sprite = m_oam.priority_rotation ? ((m_oam.address >> 1) & 127) : 0; }
+
+protected:
+	/* offset-per-tile modes */
+	enum
+	{
+		SNES_OPT_NONE = 0,
+		SNES_OPT_MODE2,
+		SNES_OPT_MODE4,
+		SNES_OPT_MODE6
+	};
+
+	/* layers */
+	enum
+	{
+		SNES_BG1 = 0,
+		SNES_BG2,
+		SNES_BG3,
+		SNES_BG4,
+		SNES_OAM,
+		SNES_COLOR
+	};
+
+
+	struct SNES_SCANLINE
+	{
+		int enable, clip;
+
+		uint16_t buffer[SNES_SCR_WIDTH];
+		uint8_t  priority[SNES_SCR_WIDTH];
+		uint8_t  layer[SNES_SCR_WIDTH];
+		uint8_t  blend_exception[SNES_SCR_WIDTH];
+	};
 
 	uint8_t m_regs[0x40];
 
@@ -252,16 +282,9 @@ public:
 	void update_windowmasks(void);
 	void update_offsets(void);
 	inline void draw_blend(uint16_t offset, uint16_t *colour, uint8_t prevent_color_math, uint8_t black_pen_clip, int switch_screens);
-	void refresh_scanline(bitmap_rgb32 &bitmap, uint16_t curline);
 
-	inline int16_t current_x() { return m_screen->hpos() / m_htmult; }
-	inline int16_t current_y() { return m_screen->vpos(); }
-	void set_latch_hv(int16_t x, int16_t y);
 	void dynamic_res_change();
 	inline uint32_t get_vram_address();
-
-	uint8_t read(address_space &space, uint32_t offset, uint8_t wrio_bit7);
-	void write(address_space &space, uint32_t offset, uint8_t data);
 
 	DECLARE_READ8_MEMBER( oam_read );
 	DECLARE_WRITE8_MEMBER( oam_write );
@@ -273,7 +296,6 @@ public:
 	std::unique_ptr<uint16_t[]> m_cgram;   /* Palette RAM */
 	std::unique_ptr<uint8_t[]> m_vram;    /* Video RAM (TODO: Should be 16-bit, but it's easier this way) */
 
-protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -289,7 +311,7 @@ private:
 
 
 // device type definition
-extern const device_type SNES_PPU;
+DECLARE_DEVICE_TYPE(SNES_PPU, snes_ppu_device)
 
 
 /***************************************************************************
@@ -299,4 +321,4 @@ extern const device_type SNES_PPU;
 #define MCFG_SNES_PPU_OPENBUS_CB(_read) \
 	devcb = &snes_ppu_device::static_set_open_bus_callback(*device, DEVCB_##_read);
 
-#endif // MAME_DEVICES_VIDEO_SNES_PPU_H
+#endif // MAME_VIDEO_SNES_PPU_H

@@ -31,10 +31,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MSM58321_H
+#define MAME_MACHINE_MSM58321_H
 
-#ifndef __MSM58321__
-#define __MSM58321__
+#pragma once
 
 #include "dirtc.h"
 
@@ -76,11 +76,11 @@ public:
 	msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_d0_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_d0_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d1_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_d1_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d2_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_d2_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d3_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_d3_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_busy_handler(device_t &device, _Object object) { return downcast<msm58321_device &>(device).m_busy_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_d0_handler(device_t &device, Object &&cb) { return downcast<msm58321_device &>(device).m_d0_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_d1_handler(device_t &device, Object &&cb) { return downcast<msm58321_device &>(device).m_d1_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_d2_handler(device_t &device, Object &&cb) { return downcast<msm58321_device &>(device).m_d2_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_d3_handler(device_t &device, Object &&cb) { return downcast<msm58321_device &>(device).m_d3_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_busy_handler(device_t &device, Object &&cb) { return downcast<msm58321_device &>(device).m_busy_handler.set_callback(std::forward<Object>(cb)); }
 	static void set_year0(device_t &device, int year0) { downcast<msm58321_device &>(device).m_year0 = year0; }
 	static void set_default_24h(device_t &device, bool default_24h) { downcast<msm58321_device &>(device).m_default_24h = default_24h; }
 

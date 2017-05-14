@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_DDP = device_creator<adam_digital_data_pack_device>;
+DEFINE_DEVICE_TYPE(ADAM_DDP, adam_digital_data_pack_device, "adam_ddp", "Adam Digital Data Pack")
 
 
 //-------------------------------------------------
@@ -120,7 +120,7 @@ machine_config_constructor adam_digital_data_pack_device::device_mconfig_additio
 //-------------------------------------------------
 
 adam_digital_data_pack_device::adam_digital_data_pack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ADAM_DDP, "Adam DDP", tag, owner, clock, "adam_ddp", __FILE__),
+	: device_t(mconfig, ADAM_DDP, tag, owner, clock),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG),
 		m_ddp0(*this, "cassette"),

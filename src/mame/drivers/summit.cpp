@@ -304,7 +304,7 @@ PALETTE_INIT_MEMBER(summit_state, summit)
 {
 }
 
-static MACHINE_CONFIG_START( summit, summit_state )
+static MACHINE_CONFIG_START( summit )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(mainmap)
@@ -346,4 +346,4 @@ ROM_START( pushover )
 ROM_END
 
 
-GAME( 1981, pushover,  0,    summit, summit, driver_device,  0, ROT270, "Summit Coin", "Push Over (Summit Coin)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_WRONG_COLORS )
+GAME( 1981, pushover,  0,    summit, summit, summit_state,  0, ROT270, "Summit Coin", "Push Over (Summit Coin)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_WRONG_COLORS )

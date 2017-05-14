@@ -8,8 +8,10 @@
 
 **************************************************************************/
 
-#ifndef MAME_DEVICES_MACHINE_RAM_H
-#define MAME_DEVICES_MACHINE_RAM_H
+#ifndef MAME_MACHINE_RAM_H
+#define MAME_MACHINE_RAM_H
+
+#pragma once
 
 
 /***************************************************************************
@@ -47,7 +49,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class ram_device :  public device_t
+class ram_device : public device_t
 {
 public:
 	// construction/destruction
@@ -68,7 +70,7 @@ public:
 	// inline configuration helpers
 	static void static_set_default_size(device_t &device, const char *default_size)     { downcast<ram_device &>(device).m_default_size = default_size; }
 	static void static_set_extra_options(device_t &device, const char *extra_options)   { downcast<ram_device &>(device).m_extra_options = extra_options; }
-	static void static_set_default_value(device_t &device, uint8_t default_value)         { downcast<ram_device &>(device).m_default_value = default_value; }
+	static void static_set_default_value(device_t &device, uint8_t default_value)       { downcast<ram_device &>(device).m_default_value = default_value; }
 
 protected:
 	virtual void device_start(void) override;
@@ -87,12 +89,9 @@ private:
 
 
 // device type definition
-extern const device_type RAM;
+DECLARE_DEVICE_TYPE(RAM, ram_device)
 
 // device iterator
 typedef device_type_iterator<ram_device> ram_device_iterator;
 
-extern template class device_finder<ram_device, false>;
-extern template class device_finder<ram_device, true>;
-
-#endif // MAME_DEVICES_MACHINE_RAM_H
+#endif // MAME_MACHINE_RAM_H

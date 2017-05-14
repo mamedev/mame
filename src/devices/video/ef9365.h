@@ -8,25 +8,22 @@
 
 *********************************************************************/
 
+#ifndef MAME_VIDEO_EF9365_H
+#define MAME_VIDEO_EF9365_H
+
 #pragma once
 
-#ifndef __EF9365_H__
-#define __EF9365_H__
+#define MCFG_EF936X_PALETTE(palette_tag) \
+		ef9365_device::static_set_palette_tag(*device, ("^" palette_tag));
 
-#define EF936X_BITPLANE_MAX_SIZE 0x8000
-#define EF936X_MAX_BITPLANES  8
+#define MCFG_EF936X_BITPLANES_CNT(bitplanes_number) \
+		ef9365_device::static_set_nb_bitplanes(*device, (bitplanes_number));
 
-#define MCFG_EF936X_PALETTE(_palette_tag) \
-	ef9365_device::static_set_palette_tag(*device, "^" _palette_tag);
+#define MCFG_EF936X_DISPLAYMODE(display_mode) \
+		ef9365_device::static_set_display_mode(*device, (ef9365_device::display_mode));
 
-#define MCFG_EF936X_BITPLANES_CNT(_bitplanes_number) \
-	ef9365_device::static_set_nb_bitplanes(*device,_bitplanes_number);
-
-#define MCFG_EF936X_DISPLAYMODE(_display_mode) \
-	ef9365_device::static_set_display_mode(*device,_display_mode);
-
-#define MCFG_EF936X_IRQ_HANDLER(_devcb) \
-	devcb = &ef9365_device::set_irq_handler(*device, DEVCB_##_devcb);
+#define MCFG_EF936X_IRQ_HANDLER(cb) \
+		devcb = &ef9365_device::set_irq_handler(*device, (DEVCB_##cb));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -39,6 +36,15 @@ class ef9365_device :   public device_t,
 						public device_video_interface
 {
 public:
+	static constexpr unsigned BITPLANE_MAX_SIZE = 0x8000;
+	static constexpr unsigned MAX_BITPLANES = 8;
+
+	static constexpr int DISPLAY_MODE_256x256    = 0x00;
+	static constexpr int DISPLAY_MODE_512x512    = 0x01;
+	static constexpr int DISPLAY_MODE_512x256    = 0x02;
+	static constexpr int DISPLAY_MODE_128x128    = 0x03;
+	static constexpr int DISPLAY_MODE_64x64      = 0x04;
+
 	// construction/destruction
 	ef9365_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -73,8 +79,6 @@ protected:
 	// address space configurations
 	const address_space_config      m_space_config;
 
-	// inline helper
-
 private:
 	int get_char_pix( unsigned char c, int x, int y );
 	void plot(int x_pos,int y_pos);
@@ -94,7 +98,7 @@ private:
 	void update_interrupts();
 
 	// internal state
-	static const device_timer_id BUSY_TIMER = 0;
+	static constexpr device_timer_id BUSY_TIMER = 0;
 
 	required_region_ptr<uint8_t> m_charset;
 	address_space *m_videoram;
@@ -118,7 +122,7 @@ private:
 	uint16_t overflow_mask_y;
 	int   vsync_scanline_pos;
 
-	uint8_t m_readback_latch[EF936X_MAX_BITPLANES];   // Last DRAM Readback buffer (Filled after a Direct Memory Access Request command)
+	uint8_t m_readback_latch[MAX_BITPLANES];   // Last DRAM Readback buffer (Filled after a Direct Memory Access Request command)
 	int m_readback_latch_pix_offset;
 
 	uint32_t clock_freq;
@@ -132,27 +136,6 @@ private:
 };
 
 // device type definition
-extern const device_type EF9365;
+DECLARE_DEVICE_TYPE(EF9365, ef9365_device)
 
-#define EF936X_REG_STATUS 0x00
-#define EF936X_REG_CMD    0x00
-#define EF936X_REG_CTRL1  0x01
-#define EF936X_REG_CTRL2  0x02
-#define EF936X_REG_CSIZE  0x03
-#define EF936X_REG_DELTAX 0x05
-#define EF936X_REG_DELTAY 0x07
-#define EF936X_REG_X_MSB  0x08
-#define EF936X_REG_X_LSB  0x09
-#define EF936X_REG_Y_MSB  0x0A
-#define EF936X_REG_Y_LSB  0x0B
-#define EF936X_REG_XLP    0x0C
-#define EF936X_REG_YLP    0x0D
-
-#define EF936X_256x256_DISPLAY_MODE    0x00
-#define EF936X_512x512_DISPLAY_MODE    0x01
-#define EF936X_512x256_DISPLAY_MODE    0x02
-#define EF936X_128x128_DISPLAY_MODE    0x03
-#define EF936X_64x64_DISPLAY_MODE    0x04
-
-
-#endif
+#endif // MAME_VIDEO_EF9365_H

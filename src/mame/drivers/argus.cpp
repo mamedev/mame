@@ -530,7 +530,7 @@ static GFXDECODE_START( butasan )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( argus, argus_state )
+static MACHINE_CONFIG_START( argus )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 4 MHz */
@@ -578,7 +578,7 @@ static MACHINE_CONFIG_START( argus, argus_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( valtric, argus_state )
+static MACHINE_CONFIG_START( valtric )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
@@ -626,7 +626,7 @@ static MACHINE_CONFIG_START( valtric, argus_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( butasan, argus_state )
+static MACHINE_CONFIG_START( butasan )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
@@ -808,8 +808,8 @@ ROM_START( butasanj )
 ROM_END
 
 
-/*  ( YEAR   NAME     PARENT  MACHINE   INPUT     INIT  MONITOR  COMPANY                  FULLNAME ) */
-GAME( 1986, argus,    0,      argus,    argus, driver_device,    0,    ROT270,  "NMK (Jaleco license)", "Argus",                                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, valtric,  0,      valtric,  valtric, driver_device,  0,    ROT270,  "NMK (Jaleco license)", "Valtric",                                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, butasan,  0,      butasan,  butasan, driver_device,  0,    ROT0,    "NMK (Jaleco license)", "Butasan - Pig's & Bomber's (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, butasanj, butasan,butasan,  butasan, driver_device,  0,    ROT0,    "NMK (Jaleco license)", "Butasan (Japan, Japanese)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+/*  ( YEAR   NAME     PARENT  MACHINE   INPUT    STATE         INIT  MONITOR  COMPANY                 FULLNAME ) */
+GAME( 1986, argus,    0,      argus,    argus,   argus_state,  0,    ROT270,  "NMK (Jaleco license)", "Argus",                                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, valtric,  0,      valtric,  valtric, argus_state,  0,    ROT270,  "NMK (Jaleco license)", "Valtric",                                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, butasan,  0,      butasan,  butasan, argus_state,  0,    ROT0,    "NMK (Jaleco license)", "Butasan - Pig's & Bomber's (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, butasanj, butasan,butasan,  butasan, argus_state,  0,    ROT0,    "NMK (Jaleco license)", "Butasan (Japan, Japanese)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

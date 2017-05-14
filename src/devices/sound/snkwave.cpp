@@ -12,17 +12,14 @@
 #include "snkwave.h"
 
 
-#define CLOCK_SHIFT 8
-
-
-const device_type SNKWAVE = device_creator<snkwave_device>;
+DEFINE_DEVICE_TYPE(SNKWAVE, snkwave_device, "snkwave", "SNK Wave")
 
 //-------------------------------------------------
 //  snkwave_device - constructor
 //-------------------------------------------------
 
 snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SNKWAVE, "SNK Wave", tag, owner, clock, "snkwave", __FILE__),
+	: device_t(mconfig, SNKWAVE, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_external_clock(0),
@@ -31,7 +28,7 @@ snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, d
 		m_counter(0),
 		m_waveform_position(0)
 {
-	memset(m_waveform, 0, sizeof(m_waveform));
+	std::fill(std::begin(m_waveform), std::end(m_waveform), 0);
 }
 
 //-------------------------------------------------
@@ -58,7 +55,7 @@ void snkwave_device::device_start()
 	save_item(NAME(m_frequency));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_waveform_position));
-	save_pointer(NAME(m_waveform), SNKWAVE_WAVEFORM_LENGTH);
+	save_pointer(NAME(m_waveform), WAVEFORM_LENGTH);
 }
 
 
@@ -96,7 +93,7 @@ void snkwave_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			{
 				out += m_waveform[m_waveform_position] * steps;
 				m_counter = m_frequency;
-				m_waveform_position = (m_waveform_position + 1) & (SNKWAVE_WAVEFORM_LENGTH-1);
+				m_waveform_position = (m_waveform_position + 1) & (WAVEFORM_LENGTH-1);
 				loops -= steps;
 			}
 			else
@@ -144,10 +141,10 @@ WRITE8_MEMBER( snkwave_device::snkwave_w )
 */
 void snkwave_device::update_waveform(unsigned int offset, uint8_t data)
 {
-	assert(offset < SNKWAVE_WAVEFORM_LENGTH/4);
+	assert(offset < WAVEFORM_LENGTH/4);
 
 	m_waveform[offset * 2]     = ((data & 0x38) >> 3) << (12-CLOCK_SHIFT);
 	m_waveform[offset * 2 + 1] = ((data & 0x07) >> 0) << (12-CLOCK_SHIFT);
-	m_waveform[SNKWAVE_WAVEFORM_LENGTH-2 - offset * 2] = ~m_waveform[offset * 2 + 1];
-	m_waveform[SNKWAVE_WAVEFORM_LENGTH-1 - offset * 2] = ~m_waveform[offset * 2];
+	m_waveform[WAVEFORM_LENGTH-2 - offset * 2] = ~m_waveform[offset * 2 + 1];
+	m_waveform[WAVEFORM_LENGTH-1 - offset * 2] = ~m_waveform[offset * 2];
 }

@@ -8,21 +8,19 @@
 // 1 = everything
 const int V = 0;
 
-const device_type H8_TIMER16          = device_creator<h8_timer16_device>;
-const device_type H8_TIMER16_CHANNEL  = device_creator<h8_timer16_channel_device>;
-const device_type H8H_TIMER16_CHANNEL = device_creator<h8h_timer16_channel_device>;
-const device_type H8S_TIMER16_CHANNEL = device_creator<h8s_timer16_channel_device>;
+DEFINE_DEVICE_TYPE(H8_TIMER16,          h8_timer16_device,          "h8_timer16",          "H8 16-bit timer")
+DEFINE_DEVICE_TYPE(H8_TIMER16_CHANNEL,  h8_timer16_channel_device,  "h8_timer16_channel",  "H8 16-bit timer channel")
+DEFINE_DEVICE_TYPE(H8H_TIMER16_CHANNEL, h8h_timer16_channel_device, "h8h_timer16_channel", "H8H 16-bit timer channel")
+DEFINE_DEVICE_TYPE(H8S_TIMER16_CHANNEL, h8s_timer16_channel_device, "h8s_timer16_channel", "H8S 16-bit timer channel")
 
 h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, H8_TIMER16_CHANNEL, "H8 16-bits timer channel", tag, owner, clock, "h8_16bits_timer_channel", __FILE__),
-	cpu(*this, "^^"), chained_timer(nullptr), intc(nullptr), intc_tag(nullptr), tier_mask(0), tgr_count(0), tbr_count(0), tgr_clearing(0), tcr(0), tier(0), ier(0), isr(0), clock_type(0),
-	clock_divider(0), tcnt(0), last_clock_update(0), event_time(0), phase(0), counter_cycle(0), counter_incrementing(false), channel_active(false)
+	h8_timer16_channel_device(mconfig, H8_TIMER16_CHANNEL, tag, owner, clock)
 {
 	chain_tag = nullptr;
 }
 
-h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	cpu(*this, "^^"), chained_timer(nullptr), intc(nullptr), intc_tag(nullptr), tier_mask(0), tgr_count(0), tbr_count(0), tgr_clearing(0), tcr(0), tier(0), ier(0), isr(0), clock_type(0),
 	clock_divider(0), tcnt(0), last_clock_update(0), event_time(0), phase(0), counter_cycle(0), counter_incrementing(false), channel_active(false)
 {
@@ -316,7 +314,7 @@ void h8_timer16_channel_device::recalc_event(uint64_t cur_time)
 }
 
 h8_timer16_device::h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, H8_TIMER16, "H8 16-bits timer", tag, owner, clock, "h8_timer16", __FILE__),
+	device_t(mconfig, H8_TIMER16, tag, owner, clock),
 	cpu(*this, DEVICE_SELF_OWNER)
 {
 }
@@ -522,7 +520,7 @@ uint8_t h8_timer16_channel_device::tisr_r(int offset) const
 }
 
 h8h_timer16_channel_device::h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8_timer16_channel_device(mconfig, H8H_TIMER16_CHANNEL, "H8H 16-bits timer channel", tag, owner, clock, "h8h_16bits_timer_channel", __FILE__)
+	h8_timer16_channel_device(mconfig, H8H_TIMER16_CHANNEL, tag, owner, clock)
 {
 }
 
@@ -620,7 +618,7 @@ void h8h_timer16_channel_device::tcr_update()
 }
 
 h8s_timer16_channel_device::h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8_timer16_channel_device(mconfig, H8S_TIMER16_CHANNEL, "H8S 16-bits timer channel", tag, owner, clock, "h8s_16bits_timer_channel", __FILE__)
+	h8_timer16_channel_device(mconfig, H8S_TIMER16_CHANNEL, tag, owner, clock)
 {
 }
 

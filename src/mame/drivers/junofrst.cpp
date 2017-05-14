@@ -245,7 +245,7 @@ WRITE8_MEMBER(junofrst_state::portB_w)
 			C += 220000;    /* 220000pF = 0.22uF */
 
 		data >>= 2;
-		filter[i]->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 200, CAP_P(C));
+		filter[i]->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 200, CAP_P(C));
 	}
 }
 
@@ -410,7 +410,7 @@ INTERRUPT_GEN_MEMBER(junofrst_state::_30hz_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( junofrst, junofrst_state )
+static MACHINE_CONFIG_START( junofrst )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 1500000)         /* 1.5 MHz ??? */

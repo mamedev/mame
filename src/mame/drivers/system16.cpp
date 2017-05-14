@@ -2077,7 +2077,7 @@ static MACHINE_CONFIG_FRAGMENT( datsu_ym2151_msm5205 )
 
 	MCFG_SOUND_ADD("5205", MSM5205, 220000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(segas1x_bootleg_state, tturfbl_msm5205_callback))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -2107,7 +2107,7 @@ static MACHINE_CONFIG_FRAGMENT( datsu_2x_ym2203_msm5205 )
 
 	MCFG_SOUND_ADD("5205", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(segas1x_bootleg_state, datsu_msm5205_callback))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -2118,7 +2118,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 /* System 16A/B Bootlegs */
-static MACHINE_CONFIG_START( system16_base, segas1x_bootleg_state )
+static MACHINE_CONFIG_START( system16_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -2193,7 +2193,7 @@ static MACHINE_CONFIG_DERIVED( passsht4b, system16_base )
 
 	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
 	MCFG_DEVICE_MODIFY("5205")
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( wb3bb, system16_base )
@@ -2215,7 +2215,7 @@ static MACHINE_CONFIG_DERIVED( wb3bb, system16_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( goldnaxeb_base, segas1x_bootleg_state )
+static MACHINE_CONFIG_START( goldnaxeb_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -2342,7 +2342,7 @@ static MACHINE_CONFIG_DERIVED( altbeastbl, system16_base )
 
 	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
 	MCFG_DEVICE_MODIFY("5205")
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( beautyb, system16_base )
@@ -2359,7 +2359,7 @@ MACHINE_CONFIG_END
 
 
 /* System 18 Bootlegs */
-static MACHINE_CONFIG_START( system18, segas1x_bootleg_state )
+static MACHINE_CONFIG_START( system18 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -2438,7 +2438,7 @@ static MACHINE_CONFIG_DERIVED( shdancbl, system18 )
 
 	MCFG_SOUND_ADD("5205", MSM5205, 200000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(segas1x_bootleg_state, shdancbl_msm5205_callback))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -2456,7 +2456,7 @@ static MACHINE_CONFIG_DERIVED( shdancbla, system18 )
 
 	MCFG_SOUND_ADD("5205", MSM5205, 200000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(segas1x_bootleg_state, shdancbl_msm5205_callback))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -2474,7 +2474,7 @@ MACHINE_RESET_MEMBER(segas1x_bootleg_state,ddcrewbl)
 }
 
 
-static MACHINE_CONFIG_START( ddcrewbl, segas1x_bootleg_state )
+static MACHINE_CONFIG_START( ddcrewbl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -2502,7 +2502,7 @@ static MACHINE_CONFIG_START( ddcrewbl, segas1x_bootleg_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 10000000/10, OKIM6295_PIN7_HIGH) // clock and pin not verified
+	MCFG_OKIM6295_ADD("oki", 10000000/10, PIN7_HIGH) // clock and pin not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3881,33 +3881,33 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,astormbl)
  *************************************/
 
 /* System 16A based bootlegs (less complex tilemap system) */
-GAME( 1987, shinobld,    shinobi,   shinobi_datsu,    shinobi, segas1x_bootleg_state,   shinobl,    ROT0,   "bootleg (Datsu)", "Shinobi (Datsu bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, shinoblda,   shinobi,   shinobi_datsu,    shinobi, segas1x_bootleg_state,   shinobl,    ROT0,   "bootleg (Datsu)", "Shinobi (Datsu bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1988, passshtb,    passsht,   passshtb,    passsht, segas1x_bootleg_state,   passsht,    ROT270, "bootleg", "Passing Shot (2 Players) (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1988, passht4b,    passsht,   passsht4b,   passht4b, segas1x_bootleg_state,  shinobl,    ROT270, "bootleg", "Passing Shot (4 Players) (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1988, wb3bbl,      wb3,       wb3bb,       wb3b, segas1x_bootleg_state,      wb3bbl,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1988, wb3bble,     wb3,       wb3bb,       wb3b, segas1x_bootleg_state,      wb3bbl,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (encrypted bootleg)", MACHINE_NOT_WORKING )
+GAME( 1987, shinobld,    shinobi,   shinobi_datsu, shinobi,  segas1x_bootleg_state,  shinobl,    ROT0,   "bootleg (Datsu)", "Shinobi (Datsu bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, shinoblda,   shinobi,   shinobi_datsu, shinobi,  segas1x_bootleg_state,  shinobl,    ROT0,   "bootleg (Datsu)", "Shinobi (Datsu bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, passshtb,    passsht,   passshtb,      passsht,  segas1x_bootleg_state,  passsht,    ROT270, "bootleg", "Passing Shot (2 Players) (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, passht4b,    passsht,   passsht4b,     passht4b, segas1x_bootleg_state,  shinobl,    ROT270, "bootleg", "Passing Shot (4 Players) (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, wb3bbl,      wb3,       wb3bb,         wb3b,     segas1x_bootleg_state,  wb3bbl,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1988, wb3bble,     wb3,       wb3bb,         wb3b,     segas1x_bootleg_state,  wb3bbl,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (encrypted bootleg)", MACHINE_NOT_WORKING )
 
 /* System 16B based bootlegs */
-GAME( 1989, bayrouteb1,  bayroute,  bayrouteb1,  bayroute, segas1x_bootleg_state,  bayrouteb1, ROT0,   "bootleg (Datsu)", "Bay Route (encrypted, protected bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // broken sprites (due to missing/wrong irq code?)
-GAME( 1989, bayrouteb2,  bayroute,  bayrouteb2,  bayroute, segas1x_bootleg_state,  bayrouteb2, ROT0,   "bootleg (Datsu)", "Bay Route (Datsu bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1989, goldnaxeb1,  goldnaxe,  goldnaxeb1,  goldnaxe, segas1x_bootleg_state,  goldnaxeb1, ROT0,   "bootleg", "Golden Axe (encrypted bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, goldnaxeb2,  goldnaxe,  goldnaxeb2,  goldnaxe, segas1x_bootleg_state,  goldnaxeb2, ROT0,   "bootleg", "Golden Axe (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, tturfbl,     tturf,     tturfbl,     tturf, segas1x_bootleg_state,     tturfbl,    ROT0,   "bootleg (Datsu)", "Tough Turf (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, dduxbl,      ddux,      dduxbl,      ddux, segas1x_bootleg_state,      dduxbl,     ROT0,   "bootleg (Datsu)", "Dynamite Dux (Datsu bootleg)", MACHINE_NOT_WORKING )
-GAME( 1988, altbeastbl,  altbeast,  altbeastbl,  tetris, segas1x_bootleg_state,    altbeastbl, ROT0,   "bootleg (Datsu)", "Altered Beast (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1988, mutantwarr,  altbeast,  altbeastbl,  tetris, segas1x_bootleg_state,    altbeastbl, ROT0,   "bootleg (Datsu)", "Mutant Warrior (Altered Beast - Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, eswatbl,     eswat,     eswatbl,     eswat, segas1x_bootleg_state,     eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1988, tetrisbl,    tetris,    tetrisbl,    tetris, segas1x_bootleg_state,    dduxbl,     ROT0,   "bootleg", "Tetris (bootleg)", 0 )
+GAME( 1989, bayrouteb1,  bayroute,  bayrouteb1,    bayroute, segas1x_bootleg_state,  bayrouteb1, ROT0,   "bootleg (Datsu)", "Bay Route (encrypted, protected bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // broken sprites (due to missing/wrong irq code?)
+GAME( 1989, bayrouteb2,  bayroute,  bayrouteb2,    bayroute, segas1x_bootleg_state,  bayrouteb2, ROT0,   "bootleg (Datsu)", "Bay Route (Datsu bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1989, goldnaxeb1,  goldnaxe,  goldnaxeb1,    goldnaxe, segas1x_bootleg_state,  goldnaxeb1, ROT0,   "bootleg", "Golden Axe (encrypted bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, goldnaxeb2,  goldnaxe,  goldnaxeb2,    goldnaxe, segas1x_bootleg_state,  goldnaxeb2, ROT0,   "bootleg", "Golden Axe (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, tturfbl,     tturf,     tturfbl,       tturf,    segas1x_bootleg_state,  tturfbl,    ROT0,   "bootleg (Datsu)", "Tough Turf (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, dduxbl,      ddux,      dduxbl,        ddux,     segas1x_bootleg_state,  dduxbl,     ROT0,   "bootleg (Datsu)", "Dynamite Dux (Datsu bootleg)", MACHINE_NOT_WORKING )
+GAME( 1988, altbeastbl,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  altbeastbl, ROT0,   "bootleg (Datsu)", "Altered Beast (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, mutantwarr,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  altbeastbl, ROT0,   "bootleg (Datsu)", "Mutant Warrior (Altered Beast - Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, eswatbl,     eswat,     eswatbl,       eswat,    segas1x_bootleg_state,  eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, tetrisbl,    tetris,    tetrisbl,      tetris,   segas1x_bootleg_state,  dduxbl,     ROT0,   "bootleg", "Tetris (bootleg)", 0 )
 
 /* Tetris-based hardware */
-GAME( 1991, beautyb,     0,         beautyb,     tetris, segas1x_bootleg_state,    beautyb,    ROT0,   "AMT", "Beauty Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1991, iqpipe,      0,         beautyb,     tetris, segas1x_bootleg_state,    beautyb,    ROT0,   "AMT", "IQ Pipe", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, beautyb,     0,         beautyb,       tetris,   segas1x_bootleg_state,  beautyb,    ROT0,   "AMT", "Beauty Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, iqpipe,      0,         beautyb,       tetris,   segas1x_bootleg_state,  beautyb,    ROT0,   "AMT", "IQ Pipe", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 /* System 18 bootlegs */
-GAME( 1990, astormbl,    astorm,    astormbl,    astormbl, segas1x_bootleg_state,  astormbl,   ROT0,   "bootleg", "Alien Storm (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1990, astormb2,    astorm,    astormbl,    astormbl, segas1x_bootleg_state,  astormbl,   ROT0,   "bootleg", "Alien Storm (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1990, mwalkbl,     mwalk,     mwalkbl,     mwalkbl, segas1x_bootleg_state,   mwalkbl,    ROT0,   "bootleg", "Michael Jackson's Moonwalker (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, shdancbl,    shdancer,  shdancbl,    shdancbl, segas1x_bootleg_state,  shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, shdancbla,   shdancer,  shdancbla,   shdancbl, segas1x_bootleg_state,  shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1990, ddcrewbl,    ddcrew,    ddcrewbl,    ddcrewbl, segas1x_bootleg_state,  ddcrewbl,   ROT0,   "bootleg", "D. D. Crew (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1990, astormbl,    astorm,    astormbl,      astormbl, segas1x_bootleg_state,  astormbl,   ROT0,   "bootleg", "Alien Storm (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1990, astormb2,    astorm,    astormbl,      astormbl, segas1x_bootleg_state,  astormbl,   ROT0,   "bootleg", "Alien Storm (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1990, mwalkbl,     mwalk,     mwalkbl,       mwalkbl,  segas1x_bootleg_state,  mwalkbl,    ROT0,   "bootleg", "Michael Jackson's Moonwalker (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, shdancbl,    shdancer,  shdancbl,      shdancbl, segas1x_bootleg_state,  shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, shdancbla,   shdancer,  shdancbla,     shdancbl, segas1x_bootleg_state,  shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, ddcrewbl,    ddcrew,    ddcrewbl,      ddcrewbl, segas1x_bootleg_state,  ddcrewbl,   ROT0,   "bootleg", "D. D. Crew (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

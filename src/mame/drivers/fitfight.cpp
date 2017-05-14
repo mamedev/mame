@@ -723,7 +723,7 @@ void fitfight_state::machine_reset()
 	m_fof_700000_data = 0;
 }
 
-static MACHINE_CONFIG_START( fitfight, fitfight_state )
+static MACHINE_CONFIG_START( fitfight )
 
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(fitfight_main_map)
@@ -755,11 +755,11 @@ static MACHINE_CONFIG_START( fitfight, fitfight_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1333333, OKIM6295_PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
+	MCFG_OKIM6295_ADD("oki", 1333333, PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bbprot, fitfight_state )
+static MACHINE_CONFIG_START( bbprot )
 
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(bbprot_main_map)
@@ -782,7 +782,7 @@ static MACHINE_CONFIG_START( bbprot, fitfight_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1333333, OKIM6295_PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
+	MCFG_OKIM6295_ADD("oki", 1333333, PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1021,7 +1021,7 @@ DRIVER_INIT_MEMBER(fitfight_state,hotmindff)
 
 /* GAME */
 
-GAME( 199?, fitfight, 0, fitfight, fitfight, fitfight_state, fitfight, ROT0, "bootleg", "Fit of Fighting", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, histryma, 0, fitfight, histryma, fitfight_state, histryma, ROT0, "bootleg", "The History of Martial Arts", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, bbprot,   0, bbprot,   bbprot, fitfight_state,   bbprot,   ROT0, "<unknown>", "unknown fighting game 'BB' (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, hotmindff,  hotmind, fitfight,   fitfight, fitfight_state,   hotmindff,   ROT0, "Playmark", "Hot Mind (Fit of Fighting hardware)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // need to fix scroll offsets + inputs
+GAME( 199?, fitfight,  0,       fitfight, fitfight, fitfight_state, fitfight,  ROT0, "bootleg",   "Fit of Fighting",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, histryma,  0,       fitfight, histryma, fitfight_state, histryma,  ROT0, "bootleg",   "The History of Martial Arts",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, bbprot,    0,       bbprot,   bbprot,   fitfight_state, bbprot,    ROT0, "<unknown>", "unknown fighting game 'BB' (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, hotmindff, hotmind, fitfight, fitfight, fitfight_state, hotmindff, ROT0, "Playmark",  "Hot Mind (Fit of Fighting hardware)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // need to fix scroll offsets + inputs

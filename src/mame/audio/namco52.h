@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef NAMCO52_H
-#define NAMCO52_H
+#ifndef MAME_AUDIO_NAMCO52_H
+#define MAME_AUDIO_NAMCO52_H
 
 #include "sound/discrete.h"
 #include "cpu/mb88xx/mb88xx.h"
@@ -33,8 +33,8 @@ public:
 	static void set_discrete(device_t &device, const char *tag) { downcast<namco_52xx_device &>(device).m_discrete.set_tag(tag); }
 	static void set_basenote(device_t &device, int node) { downcast<namco_52xx_device &>(device).m_basenode = node; }
 	static void set_extclock(device_t &device, attoseconds_t clk) { downcast<namco_52xx_device &>(device).m_extclock = clk; }
-	template<class _Object> static devcb_base &set_romread_callback(device_t &device, _Object object) { return downcast<namco_52xx_device &>(device).m_romread.set_callback(object); }
-	template<class _Object> static devcb_base &set_si_callback(device_t &device, _Object object) { return downcast<namco_52xx_device &>(device).m_si.set_callback(object); }
+	template <class Object> static devcb_base &set_romread_callback(device_t &device, Object &&cb) { return downcast<namco_52xx_device &>(device).m_romread.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_si_callback(device_t &device, Object &&cb) { return downcast<namco_52xx_device &>(device).m_si.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER(write);
 
@@ -63,6 +63,7 @@ private:
 
 	int m_basenode;
 	attoseconds_t m_extclock;
+	emu_timer *m_extclock_pulse_timer;
 	devcb_read8 m_romread;
 	devcb_read8 m_si;
 
@@ -70,7 +71,7 @@ private:
 	uint32_t m_address;
 };
 
-extern const device_type NAMCO_52XX;
+DECLARE_DEVICE_TYPE(NAMCO_52XX, namco_52xx_device)
 
 
 
@@ -78,4 +79,4 @@ extern const device_type NAMCO_52XX;
 #define NAMCO_52XX_P_DATA(base)     (base)
 
 
-#endif  /* NAMCO52_H */
+#endif  // MAME_AUDIO_NAMCO52_H

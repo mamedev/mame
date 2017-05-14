@@ -31,20 +31,23 @@ class missb2_state : public bublbobl_state
 {
 public:
 	missb2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: bublbobl_state(mconfig, type, tag),
-			m_bgvram(*this, "bgvram"),
-			m_bgpalette(*this, "bgpalette")
-			{ }
+		: bublbobl_state(mconfig, type, tag)
+		, m_bgvram(*this, "bgvram")
+		, m_bgpalette(*this, "bgpalette")
+	{ }
 
-	required_shared_ptr<uint8_t> m_bgvram;
-	required_device<palette_device> m_bgpalette;
 	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_DRIVER_INIT(missb2);
 	DECLARE_MACHINE_START(missb2);
 	DECLARE_MACHINE_RESET(missb2);
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+protected:
 	void configure_banks();
+
+	required_shared_ptr<uint8_t> m_bgvram;
+	required_device<palette_device> m_bgpalette;
 };
 
 
@@ -437,7 +440,7 @@ MACHINE_RESET_MEMBER(missb2_state,missb2)
 	m_sound_status = 0;
 }
 
-static MACHINE_CONFIG_START( missb2, missb2_state )
+static MACHINE_CONFIG_START( missb2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
@@ -483,7 +486,7 @@ static MACHINE_CONFIG_START( missb2, missb2_state )
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(missb2_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_CONFIG_END
 
@@ -581,4 +584,4 @@ DRIVER_INIT_MEMBER(missb2_state,missb2)
 /* Game Drivers */
 
 GAME( 1996, missb2,   0,      missb2,   missb2, missb2_state, missb2, ROT0,  "Alpha Co.", "Miss Bubble II",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bublpong, missb2, bublpong, missb2, missb2_state, missb2, ROT0,  "Top Ltd.", "Bubble Pong Pong",  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bublpong, missb2, bublpong, missb2, missb2_state, missb2, ROT0,  "Top Ltd.",  "Bubble Pong Pong", MACHINE_SUPPORTS_SAVE )

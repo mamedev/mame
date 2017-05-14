@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_VIDEO_K054000_H
+#define MAME_VIDEO_K054000_H
 
 #pragma once
-#ifndef __K054000_H__
-#define __K054000_H__
+
 
 #define MCFG_K054000_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, K054000, 0)
@@ -29,9 +30,6 @@ private:
 	uint8_t    m_regs[0x20];
 };
 
-extern const device_type K054000;
+DECLARE_DEVICE_TYPE(K054000, k054000_device)
 
-
-
-
-#endif
+#endif // MAME_VIDEO_K054000_H

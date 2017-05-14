@@ -10,8 +10,8 @@
  */
 
 #include "emu.h"
-#include "dma.h"
 #include "mdec.h"
+#include "dma.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -28,10 +28,10 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 	}
 }
 
-const device_type PSX_MDEC = device_creator<psxmdec_device>;
+DEFINE_DEVICE_TYPE(PSX_MDEC, psxmdec_device, "psxmdec", "Sony PSX MDEC")
 
 psxmdec_device::psxmdec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PSX_MDEC, "Sony PSX MDEC", tag, owner, clock, "psxmdec", __FILE__), n_decoded(0), n_offset(0), n_0_command(0), n_0_address(0), n_0_size(0), n_1_command(0), n_1_status(0)
+	: device_t(mconfig, PSX_MDEC, tag, owner, clock), n_decoded(0), n_offset(0), n_0_command(0), n_0_address(0), n_0_size(0), n_1_command(0), n_1_status(0)
 {
 }
 
@@ -94,7 +94,7 @@ static inline uint16_t psxreadword( uint32_t *p_n_psxram, uint32_t n_address )
 	return *( (uint16_t *)( (uint8_t *)p_n_psxram + WORD_XOR_LE( n_address ) ) );
 }
 
-static const uint32_t m_p_n_mdec_zigzag[ DCTSIZE2 ] =
+const uint32_t psxmdec_device::m_p_n_mdec_zigzag[ DCTSIZE2 ] =
 {
 		0,  1,  8, 16,  9,  2,  3, 10,
 	17, 24, 32, 25, 18, 11,  4,  5,

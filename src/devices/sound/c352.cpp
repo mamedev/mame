@@ -19,11 +19,12 @@
 #include "emu.h"
 #include "c352.h"
 
-#define VERBOSE (0)
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 // device type definition
-const device_type C352 = device_creator<c352_device>;
+DEFINE_DEVICE_TYPE(C352, c352_device, "c352", "Namco C352")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -34,9 +35,10 @@ const device_type C352 = device_creator<c352_device>;
 //-------------------------------------------------
 
 c352_device::c352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, C352, "C352", tag, owner, clock, "c352", __FILE__),
-		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 24)
+	: device_t(mconfig, C352, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 24)
+	, m_stream(nullptr)
 {
 }
 

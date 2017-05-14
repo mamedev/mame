@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __CHANF_SLOT_H
-#define __CHANF_SLOT_H
+#ifndef MAME_BUS_CHANF_SLOT_H
+#define MAME_BUS_CHANF_SLOT_H
 
 #include "softlist_dev.h"
 
@@ -29,14 +29,13 @@ class device_channelf_cart_interface : public device_slot_card_interface
 {
 public:
 	// device_channelf_cart_interface/destruction
-	device_channelf_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_channelf_cart_interface();
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
-	virtual DECLARE_WRITE8_MEMBER(write_bank) {}
+	virtual DECLARE_WRITE8_MEMBER(write_ram) { }
+	virtual DECLARE_WRITE8_MEMBER(write_bank)  {}
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -48,6 +47,8 @@ public:
 	void save_ram() { device().save_item(NAME(m_ram)); }
 
 protected:
+	device_channelf_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -105,7 +106,7 @@ protected:
 
 
 // device type definition
-extern const device_type CHANF_CART_SLOT;
+DECLARE_DEVICE_TYPE(CHANF_CART_SLOT, channelf_cart_slot_device)
 
 
 /***************************************************************************
@@ -117,4 +118,5 @@ extern const device_type CHANF_CART_SLOT;
 #define MCFG_CHANNELF_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, CHANF_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-#endif
+
+#endif // MAME_BUS_CHANF_SLOT_H

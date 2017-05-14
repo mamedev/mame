@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#pragma once
+#ifndef MAME_BUS_SCSI_ACB4070_H
+#define MAME_BUS_SCSI_ACB4070_H
 
-#ifndef __ACB4070__
-#define __ACB4070__
+#pragma once
 
 #include "scsihd.h"
 
@@ -42,6 +42,6 @@ private:
 };
 
 // device type definition
-extern const device_type ACB4070;
+DECLARE_DEVICE_TYPE(ACB4070, acb4070_device)
 
-#endif
+#endif // MAME_BUS_SCSI_ACB4070_H

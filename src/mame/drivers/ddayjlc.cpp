@@ -510,7 +510,7 @@ PALETTE_INIT_MEMBER(ddayjlc_state, ddayjlc)
 	}
 }
 
-static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
+static MACHINE_CONFIG_START( ddayjlc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/3)

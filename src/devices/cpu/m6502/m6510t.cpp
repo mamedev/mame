@@ -11,9 +11,9 @@
 #include "emu.h"
 #include "m6510t.h"
 
-const device_type M6510T = device_creator<m6510t_device>;
+DEFINE_DEVICE_TYPE(M6510T, m6510t_device, "m6510t", "M6510T")
 
 m6510t_device::m6510t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6510_device(mconfig, M6510T, "M6510T", tag, owner, clock, "m6510t", __FILE__)
+	m6510_device(mconfig, M6510T, tag, owner, clock)
 {
 }

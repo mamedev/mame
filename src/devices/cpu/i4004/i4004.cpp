@@ -8,8 +8,8 @@
  *
  *****************************************************************************/
 #include "emu.h"
-#include "debugger.h"
 #include "i4004.h"
+#include "debugger.h"
 
 
 static const uint8_t kbp_table[] = { 0x00,0x01,0x02,0x0f,0x03,0x0f,0x0f,0x0f,0x04,0x0f,0x0f,0x0f,0x0f,0x0f,0x0f,0x0f };
@@ -21,11 +21,11 @@ static const uint8_t kbp_table[] = { 0x00,0x01,0x02,0x0f,0x03,0x0f,0x0f,0x0f,0x0
 #define GET_PC                  (m_ADDR[m_pc_pos])
 
 
-const device_type I4004 = device_creator<i4004_cpu_device>;
+DEFINE_DEVICE_TYPE(I4004, i4004_cpu_device, "i4004", "Intel 4004")
 
 
 i4004_cpu_device::i4004_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, I4004, "Intel I4004", tag, owner, clock, "i4004", __FILE__)
+	: cpu_device(mconfig, I4004, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 12, 0), m_A(0), m_C(0), m_TEST(0), m_flags(0), m_program(nullptr), m_direct(nullptr), m_data(nullptr), m_io(nullptr), m_icount(0), m_pc_pos(0), m_addr_mask(0)

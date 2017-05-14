@@ -43,7 +43,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( inderp )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( inderp, inderp_state )
+static MACHINE_CONFIG_START( inderp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
@@ -78,5 +78,5 @@ ROM_START(centauri2)
 ROM_END
 
 
-GAME( 1979, centauri,  0,        inderp, inderp, driver_device, 0, ROT0, "Inder", "Centaur (Inder)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, centauri2, centauri, inderp, inderp, driver_device, 0, ROT0, "Inder", "Centaur (alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, centauri,  0,        inderp, inderp, inderp_state, 0, ROT0, "Inder", "Centaur (Inder)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, centauri2, centauri, inderp, inderp, inderp_state, 0, ROT0, "Inder", "Centaur (alternate set)", MACHINE_IS_SKELETON_MECHANICAL )

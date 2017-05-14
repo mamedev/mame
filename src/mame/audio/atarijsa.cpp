@@ -84,10 +84,10 @@ ALL: the LPF (low pass filter) bit which selectively places a lowpass filter in 
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ATARI_JSA_I = device_creator<atari_jsa_i_device>;
-const device_type ATARI_JSA_II = device_creator<atari_jsa_ii_device>;
-const device_type ATARI_JSA_III = device_creator<atari_jsa_iii_device>;
-const device_type ATARI_JSA_IIIS = device_creator<atari_jsa_iiis_device>;
+DEFINE_DEVICE_TYPE(ATARI_JSA_I,    atari_jsa_i_device,    "atjsa1",  "Atari JSA I Sound Board")
+DEFINE_DEVICE_TYPE(ATARI_JSA_II,   atari_jsa_ii_device,   "atjsa2",  "Atari JSA II Sound Board")
+DEFINE_DEVICE_TYPE(ATARI_JSA_III,  atari_jsa_iii_device,  "atjsa3",  "Atari JSA III Sound Board")
+DEFINE_DEVICE_TYPE(ATARI_JSA_IIIS, atari_jsa_iiis_device, "atjsa3s", "Atari JSA IIIs Sound Board")
 
 
 
@@ -205,7 +205,7 @@ MACHINE_CONFIG_FRAGMENT( jsa_ii_config )
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(atari_jsa_base_device, ym2151_port_w))
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60, 0)
 
-	MCFG_OKIM6295_ADD("oki1", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", JSA_MASTER_CLOCK/3, PIN7_HIGH)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.75, 0)
 MACHINE_CONFIG_END
 
@@ -228,7 +228,7 @@ MACHINE_CONFIG_DERIVED( jsa_iiis_config, jsa_iii_config )
 	MCFG_DEVICE_MODIFY("ym2151")
 	MCFG_MIXER_ROUTE(1, DEVICE_SELF_OWNER, 0.60, 1)
 
-	MCFG_OKIM6295_ADD("oki2", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", JSA_MASTER_CLOCK/3, PIN7_HIGH)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.75, 1)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, jsa3_oki2_map)
 MACHINE_CONFIG_END
@@ -285,8 +285,8 @@ INPUT_PORTS_END
 //  atari_jsa_base_device - constructor
 //-------------------------------------------------
 
-atari_jsa_base_device::atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int channels)
-	: device_t(mconfig, devtype, name, tag, owner, clock, shortname, __FILE__),
+atari_jsa_base_device::atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels)
+	: device_t(mconfig, devtype, tag, owner, clock),
 		device_mixer_interface(mconfig, *this, channels),
 		m_soundcomm(*this, "soundcomm"),
 		m_jsacpu(*this, "cpu"),
@@ -412,8 +412,8 @@ WRITE_LINE_MEMBER( atari_jsa_base_device::main_int_write_line )
 //  atari_jsa_oki_base_device: Constructor
 //-------------------------------------------------
 
-atari_jsa_oki_base_device::atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int channels)
-	: atari_jsa_base_device(mconfig, devtype, name, tag, owner, clock, shortname, channels),
+atari_jsa_oki_base_device::atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels)
+	: atari_jsa_base_device(mconfig, devtype, tag, owner, clock, channels),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
 		m_oki1_region(*this, "oki1"),
@@ -629,7 +629,7 @@ void atari_jsa_oki_base_device::update_all_volumes()
 //-------------------------------------------------
 
 atari_jsa_i_device::atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: atari_jsa_base_device(mconfig, ATARI_JSA_I, "Atari JSA I Sound Board", tag, owner, clock, "atjsa1", 2),
+	: atari_jsa_base_device(mconfig, ATARI_JSA_I, tag, owner, clock, 2),
 		m_pokey(*this, "pokey"),
 		m_tms5220(*this, "tms"),
 		m_jsai(*this, "JSAI"),
@@ -844,7 +844,7 @@ void atari_jsa_i_device::update_all_volumes()
 //-------------------------------------------------
 
 atari_jsa_ii_device::atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: atari_jsa_oki_base_device(mconfig, ATARI_JSA_II, "Atari JSA II Sound Board", tag, owner, clock, "atjsa2", 1)
+	: atari_jsa_oki_base_device(mconfig, ATARI_JSA_II, tag, owner, clock, 1)
 	, m_jsaii(*this, "JSAII")
 {
 }
@@ -908,13 +908,12 @@ ioport_constructor atari_jsa_ii_device::device_input_ports() const
 //-------------------------------------------------
 
 atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: atari_jsa_oki_base_device(mconfig, ATARI_JSA_III, "Atari JSA III Sound Board", tag, owner, clock, "atjsa3", 1)
-	, m_jsaiii(*this, "JSAIII")
+	: atari_jsa_iii_device(mconfig, ATARI_JSA_III, tag, owner, clock, 1)
 {
 }
 
-atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int channels)
-	: atari_jsa_oki_base_device(mconfig, devtype, name, tag, owner, clock, shortname, channels)
+atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels)
+	: atari_jsa_oki_base_device(mconfig, devtype, tag, owner, clock, channels)
 	, m_jsaiii(*this, "JSAIII")
 {
 }
@@ -977,7 +976,7 @@ ioport_constructor atari_jsa_iii_device::device_input_ports() const
 //-------------------------------------------------
 
 atari_jsa_iiis_device::atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: atari_jsa_iii_device(mconfig, ATARI_JSA_IIIS, "Atari JSA IIIs Sound Board", tag, owner, clock, "atjsa3s", 2)
+	: atari_jsa_iii_device(mconfig, ATARI_JSA_IIIS, tag, owner, clock, 2)
 {
 }
 

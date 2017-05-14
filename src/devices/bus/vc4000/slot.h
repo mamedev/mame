@@ -27,7 +27,6 @@ class device_vc4000_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_vc4000_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vc4000_cart_interface();
 
 	// reading and writing
@@ -46,6 +45,8 @@ public:
 	void save_ram() { device().save_item(NAME(m_ram)); }
 
 protected:
+	device_vc4000_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -64,12 +65,9 @@ public:
 	vc4000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vc4000_cart_slot_device();
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual void call_unload() override {}
+	virtual void call_unload() override { }
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_type() { return m_type; }
@@ -95,15 +93,15 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	vc4000_cart_slot_device(
 			const machine_config &mconfig,
 			device_type type,
-			const char *name,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock,
-			const char *shortname,
-			const char *source);
+			uint32_t clock);
 
 	int m_type;
 	device_vc4000_cart_interface *m_cart;
@@ -120,8 +118,8 @@ public:
 };
 
 // device type definition
-extern const device_type VC4000_CART_SLOT;
-extern const device_type H21_CART_SLOT;
+DECLARE_DEVICE_TYPE(VC4000_CART_SLOT, vc4000_cart_slot_device)
+DECLARE_DEVICE_TYPE(H21_CART_SLOT,    h21_cart_slot_device)
 
 
 /***************************************************************************

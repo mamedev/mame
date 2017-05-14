@@ -362,7 +362,7 @@ void mgolf_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( mgolf, mgolf_state )
+static MACHINE_CONFIG_START( mgolf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16) /* ? */
@@ -409,4 +409,4 @@ ROM_START( mgolf )
 ROM_END
 
 
-GAME( 1978, mgolf, 0, mgolf, mgolf, driver_device, 0, ROT270, "Atari", "Atari Mini Golf (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, mgolf, 0, mgolf, mgolf, mgolf_state, 0, ROT270, "Atari", "Atari Mini Golf (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

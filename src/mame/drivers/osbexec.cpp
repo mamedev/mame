@@ -47,7 +47,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<mb8877_t>  m_mb8877;
+	required_device<mb8877_device>  m_mb8877;
 	required_device<ram_device> m_messram;
 	required_device<pia6821_device> m_pia_0;
 	required_device<pia6821_device> m_pia_1;
@@ -218,12 +218,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( osbexec_io, AS_IO, 8, osbexec_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read, write)               /* 6821 PIA @ UD12 */
-	AM_RANGE( 0x04, 0x07 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("ctc", pit8253_device, read, write)  /* 8253 @UD1 */
-	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("mb8877", wd_fdc_t, read, write )                /* MB8877 @ UB17 input clock = 1MHz */
-	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("sio", z80sio2_device, ba_cd_r, ba_cd_w ) /* SIO @ UD4 */
-	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_1", pia6821_device, read, write)               /* 6821 PIA @ UD8 */
-	AM_RANGE( 0x14, 0x17 ) AM_SELECT( 0xff00 ) AM_READ(osbexec_kbd_r )                    /* KBD */
+	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read, write)       /* 6821 PIA @ UD12 */
+	AM_RANGE( 0x04, 0x07 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("ctc", pit8253_device, read, write)          /* 8253 @UD1 */
+	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("mb8877", wd_fdc_device_base, read, write )  /* MB8877 @ UB17 input clock = 1MHz */
+	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("sio", z80sio2_device, ba_cd_r, ba_cd_w )    /* SIO @ UD4 */
+	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_1", pia6821_device, read, write)       /* 6821 PIA @ UD8 */
+	AM_RANGE( 0x14, 0x17 ) AM_SELECT( 0xff00 ) AM_READ(osbexec_kbd_r )                                      /* KBD */
 	AM_RANGE( 0x18, 0x1b ) AM_MIRROR( 0xff00 ) AM_READ(osbexec_rtc_r )                                      /* "RTC" @ UE13/UF13 */
 	/* ?? - vid ? */
 ADDRESS_MAP_END
@@ -557,7 +557,7 @@ static const z80_daisy_config osbexec_daisy_config[] =
 };
 
 
-static MACHINE_CONFIG_START( osbexec, osbexec_state )
+static MACHINE_CONFIG_START( osbexec )
 	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/6 )
 	MCFG_CPU_PROGRAM_MAP( osbexec_mem)
 	MCFG_CPU_IO_MAP( osbexec_io)
@@ -638,5 +638,5 @@ ROM_START( osbexec )
 	ROM_LOAD( "execv12.ud18", 0x0000, 0x2000, CRC(70798c2f) SHA1(2145a72da563bed1d6d455c77e48cc011a5f1153) )    /* Checksum C6B2 */
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME        FLAGS */
-COMP( 1982, osbexec,    0,      0,      osbexec,    osbexec, osbexec_state,    osbexec,    "Osborne",  "Executive",    MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT      COMPANY     FULLNAME        FLAGS
+COMP( 1982, osbexec,    0,      0,      osbexec,    osbexec, osbexec_state, osbexec,  "Osborne",  "Executive",    MACHINE_NOT_WORKING )

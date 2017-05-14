@@ -149,13 +149,13 @@ int configuration_manager::load_xml(emu_file &file, config_type which_type)
 		return 0;
 
 	/* strip off all the path crap from the source filename */
-	const char *srcfile = strrchr(machine().system().source_file, '/');
+	const char *srcfile = strrchr(machine().system().type.source(), '/');
 	if (!srcfile)
-		srcfile = strrchr(machine().system().source_file, '\\');
+		srcfile = strrchr(machine().system().type.source(), '\\');
 	if (!srcfile)
-		srcfile = strrchr(machine().system().source_file, ':');
+		srcfile = strrchr(machine().system().type.source(), ':');
 	if (!srcfile)
-		srcfile = machine().system().source_file;
+		srcfile = machine().system().type.source();
 	else
 		srcfile++;
 

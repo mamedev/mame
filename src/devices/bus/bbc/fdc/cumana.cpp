@@ -17,8 +17,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_CUMANA1 = device_creator<bbc_cumana1_device>;
-const device_type BBC_CUMANA2 = device_creator<bbc_cumana2_device>;
+DEFINE_DEVICE_TYPE(BBC_CUMANA1, bbc_cumana1_device, "bbc_cumana1", "Cumana QFS 8877A FDC")
+DEFINE_DEVICE_TYPE(BBC_CUMANA2, bbc_cumana2_device, "bbc_cumana2", "Cumana QFS Issue 2 8877A FDC")
 
 
 //-------------------------------------------------
@@ -99,8 +99,8 @@ const tiny_rom_entry *bbc_cumana2_device::device_rom_region() const
 //  bbc_cumanafdc_device - constructor
 //-------------------------------------------------
 
-bbc_cumanafdc_device::bbc_cumanafdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+bbc_cumanafdc_device::bbc_cumanafdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_dfs_rom(*this, "dfs_rom"),
 	m_fdc(*this, "mb8877a"),
@@ -110,13 +110,13 @@ bbc_cumanafdc_device::bbc_cumanafdc_device(const machine_config &mconfig, device
 }
 
 bbc_cumana1_device::bbc_cumana1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	bbc_cumanafdc_device(mconfig, BBC_CUMANA1, "Cumana QFS 8877A FDC", tag, owner, clock, "bbc_cumana1", __FILE__)
+	bbc_cumanafdc_device(mconfig, BBC_CUMANA1, tag, owner, clock)
 {
 	m_invert = true;
 }
 
 bbc_cumana2_device::bbc_cumana2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	bbc_cumanafdc_device(mconfig, BBC_CUMANA2, "Cumana QFS Issue 2 8877A FDC", tag, owner, clock, "bbc_cumana2", __FILE__)
+	bbc_cumanafdc_device(mconfig, BBC_CUMANA2, tag, owner, clock)
 {
 	m_invert = false;
 }
@@ -133,7 +133,7 @@ void bbc_cumanafdc_device::device_start()
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
 	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DELEGATE(bbc_cumanafdc_device, ctrl_r), WRITE8_DELEGATE(bbc_cumanafdc_device, ctrl_w));
-	space.install_readwrite_handler(0xfe84, 0xfe9f, READ8_DEVICE_DELEGATE(m_fdc, mb8877_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, mb8877_t, write));
+	space.install_readwrite_handler(0xfe84, 0xfe9f, READ8_DEVICE_DELEGATE(m_fdc, mb8877_device, read), WRITE8_DEVICE_DELEGATE(m_fdc, mb8877_device, write));
 }
 
 //-------------------------------------------------

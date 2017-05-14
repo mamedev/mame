@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-#pragma once
+#ifndef MAME_BUS_TVC_HBF_H
+#define MAME_BUS_TVC_HBF_H
 
-#ifndef __TVC_HBF_H__
-#define __TVC_HBF_H__
+#pragma once
 
 #include "tvc.h"
 #include "machine/wd_fdc.h"
@@ -44,7 +44,7 @@ protected:
 
 private:
 	// internal state
-	required_device<fd1793_t>   m_fdc;
+	required_device<fd1793_device>   m_fdc;
 
 	uint8_t *     m_rom;
 	uint8_t *     m_ram;
@@ -53,6 +53,6 @@ private:
 
 
 // device type definition
-extern const device_type TVC_HBF;
+DECLARE_DEVICE_TYPE(TVC_HBF, tvc_hbf_device)
 
-#endif  /* __TVC_HBF_H__ */
+#endif // MAME_BUS_TVC_HBF_H

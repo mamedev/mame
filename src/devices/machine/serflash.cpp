@@ -9,24 +9,28 @@
 #include "machine/serflash.h"
 
 
-ALLOW_SAVE_TYPE(flash_state_t);
+ALLOW_SAVE_TYPE(serflash_device::flash_state_t);
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 // device type definition
-const device_type SERFLASH = device_creator<serflash_device>;
+DEFINE_DEVICE_TYPE(SERFLASH, serflash_device, "serflash", "Serial Flash")
 
 //-------------------------------------------------
 //  serflash_device - constructor
 //-------------------------------------------------
 
 serflash_device::serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SERFLASH, "Serial Flash", tag, owner, clock, "serflash", __FILE__),
-		device_nvram_interface(mconfig, *this),
-		m_length(0), m_region(nullptr), m_flash_state(), m_flash_enab(0), m_flash_cmd_seq(0), m_flash_cmd_prev(0), m_flash_addr_seq(0), m_flash_read_seq(0), m_flash_row(0),
-	m_flash_col(0), m_flash_page_addr(0), m_flash_page_index(0), m_last_flash_cmd(0), m_flash_addr(0)
+	: device_t(mconfig, SERFLASH, tag, owner, clock)
+	, device_nvram_interface(mconfig, *this)
+	, m_length(0)
+	, m_region(nullptr)
+	, m_flash_state()
+	, m_flash_enab(0)
+	, m_flash_cmd_seq(0), m_flash_cmd_prev(0), m_flash_addr_seq(0), m_flash_read_seq(0)
+	, m_flash_row(0), m_flash_col(0), m_flash_page_addr(0), m_flash_page_index(0), m_last_flash_cmd(0), m_flash_addr(0)
 {
 }
 
@@ -38,8 +42,8 @@ serflash_device::serflash_device(const machine_config &mconfig, const char *tag,
 
 void serflash_device::device_start()
 {
-	m_length = machine().root_device().memregion( tag() )->bytes();
-	m_region = machine().root_device().memregion( tag() )->base();
+	m_length = machine().root_device().memregion(tag())->bytes();
+	m_region = machine().root_device().memregion(tag())->base();
 
 	m_flashwritemap.resize(m_length / FLASH_PAGE_SIZE);
 	memset(&m_flashwritemap[0], 0, m_length / FLASH_PAGE_SIZE);

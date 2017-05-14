@@ -6,8 +6,10 @@
 
 */
 
-#ifndef _TP0320_H_
-#define _TP0320_H_
+#ifndef MAME_CPU_TMS1000_TP0320_H
+#define MAME_CPU_TMS1000_TP0320_H
+
+#pragma once
 
 #include "tms0980.h"
 
@@ -30,6 +32,6 @@ protected:
 };
 
 
-extern const device_type TP0320;
+DECLARE_DEVICE_TYPE(TP0320, tp0320_cpu_device)
 
-#endif /* _TP0320_H_ */
+#endif // MAME_CPU_TMS1000_TP0320_H

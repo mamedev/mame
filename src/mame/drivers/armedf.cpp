@@ -1257,7 +1257,7 @@ static MACHINE_CONFIG_FRAGMENT( terraf_sound )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( terraf, armedf_state )
+static MACHINE_CONFIG_START( terraf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz?
@@ -1292,7 +1292,7 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 	MCFG_FRAGMENT_ADD(terraf_sound)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( terrafjb, armedf_state )
+static MACHINE_CONFIG_START( terrafjb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
@@ -1348,7 +1348,7 @@ static MACHINE_CONFIG_DERIVED( terrafb, terraf )
 	MCFG_DEVICE_REMOVE("nb1414m4")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kozure, armedf_state )
+static MACHINE_CONFIG_START( kozure )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
@@ -1382,7 +1382,7 @@ static MACHINE_CONFIG_START( kozure, armedf_state )
 	MCFG_FRAGMENT_ADD(terraf_sound)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( armedf, armedf_state )
+static MACHINE_CONFIG_START( armedf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
@@ -1430,7 +1430,7 @@ static MACHINE_CONFIG_START( armedf, armedf_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cclimbr2, armedf_state )
+static MACHINE_CONFIG_START( cclimbr2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
@@ -1480,7 +1480,7 @@ static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( legion, armedf_state )
+static MACHINE_CONFIG_START( legion )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
@@ -1530,7 +1530,7 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( legionjb, armedf_state )
+static MACHINE_CONFIG_START( legionjb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
@@ -1578,7 +1578,7 @@ static MACHINE_CONFIG_START( legionjb, armedf_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
+static MACHINE_CONFIG_START( bigfghtr )
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // verified
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_map)
@@ -2247,5 +2247,5 @@ GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, armedf_state,   cclimbr2, RO
 GAME( 1988, armedf,   0,        armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu",                    "Armed Formation", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, armedf_state,   armedf,   ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, armedf_state,   armedf,   ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, bigfghtr_state, armedf,   ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, bigfghtr_state, armedf,   ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_SUPPORTS_SAVE )

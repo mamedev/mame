@@ -1,11 +1,11 @@
 #include "emu.h"
 #include "h8_dma.h"
 
-const device_type H8_DMA         = device_creator<h8_dma_device>;
-const device_type H8_DMA_CHANNEL = device_creator<h8_dma_channel_device>;
+DEFINE_DEVICE_TYPE(H8_DMA,         h8_dma_device,         "h8_dma",         "H8 DMA controller")
+DEFINE_DEVICE_TYPE(H8_DMA_CHANNEL, h8_dma_channel_device, "h8_dma_channel", "H8 DMA channel")
 
 h8_dma_device::h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, H8_DMA, "H8 DMA controller", tag, owner, clock, "h8_dma", __FILE__),
+	device_t(mconfig, H8_DMA, tag, owner, clock),
 	dmach0(*this, "0"),
 	dmach1(*this, "1")
 {
@@ -115,7 +115,7 @@ WRITE16_MEMBER(h8_dma_device::dmabcr_w)
 
 
 h8_dma_channel_device::h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, H8_DMA_CHANNEL, "H8 DMA channel", tag, owner, clock, "h8_dma_channel", __FILE__),
+	device_t(mconfig, H8_DMA_CHANNEL, tag, owner, clock),
 	dmac(*this, "^"),
 	cpu(*this, "^^")
 {

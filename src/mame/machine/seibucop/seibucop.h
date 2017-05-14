@@ -274,6 +274,6 @@ private:
 	void dma_zsorting(uint16_t data);
 };
 
-extern const device_type RAIDEN2COP;
+DECLARE_DEVICE_TYPE(RAIDEN2COP, raiden2cop_device)
 
 #endif  /* RAIDEN2COP_H */

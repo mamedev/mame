@@ -210,7 +210,7 @@
 #define DRAM_PAR_TAG  ":dram"
 
 geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock, "geneve_mapper", __FILE__), m_gromwaddr_LSB(false),
+	: device_t(mconfig, GENEVE_MAPPER, tag, owner, clock), m_gromwaddr_LSB(false),
 	m_gromraddr_LSB(false),
 	m_grom_address(0),
 	m_video_waitstates(false),
@@ -1507,13 +1507,11 @@ void geneve_mapper_device::device_reset()
 	}
 }
 
-const device_type GENEVE_MAPPER = device_creator<geneve_mapper_device>;
+DEFINE_DEVICE_TYPE(GENEVE_MAPPER, geneve_mapper_device, "geneve_mapper", "Geneve Gate Array")
 
 /****************************************************************************
     Keyboard support
 ****************************************************************************/
-
-static const char *const KEYNAMES[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
 static const uint8_t MF1_CODE[0xe] =
 {
@@ -1544,8 +1542,10 @@ static const uint8_t MF1_CODE[0xe] =
 };
 
 geneve_keyboard_device::geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, GENEVE_KEYBOARD, "Geneve XT-style keyboard", tag, owner, clock, "geneve_keyboard", __FILE__),
-	m_interrupt(*this), m_key_reset(false), m_key_queue_length(0), m_key_queue_head(0), m_key_in_buffer(false), m_key_numlock_state(false), m_key_ctrl_state(0), m_key_alt_state(0),
+	: device_t(mconfig, GENEVE_KEYBOARD, tag, owner, clock),
+	m_interrupt(*this),
+	m_keys(*this, "KEY%u", 0),
+	m_key_reset(false), m_key_queue_length(0), m_key_queue_head(0), m_key_in_buffer(false), m_key_numlock_state(false), m_key_ctrl_state(0), m_key_alt_state(0),
 	m_key_real_shift_state(0), m_key_fake_shift_state(false), m_key_fake_unshift_state(false), m_key_autorepeat_key(0), m_key_autorepeat_timer(0), m_keep_keybuf(false),
 	m_keyboard_clock(false), m_timer(nullptr)
 {
@@ -1577,7 +1577,7 @@ void geneve_keyboard_device::poll()
 	/* Poll keyboard */
 	for (i = 0; (i < 4) && (m_key_queue_length <= (KEYQUEUESIZE-MAXKEYMSGLENGTH)); i++)
 	{
-		keystate = ioport(KEYNAMES[2*i])->read() | (ioport(KEYNAMES[2*i + 1])->read() << 16);
+		keystate = m_keys[2*i]->read() | (m_keys[2*i + 1]->read() << 16);
 		key_transitions = keystate ^ m_key_state_save[i];
 		if (key_transitions)
 		{
@@ -2008,4 +2008,4 @@ ioport_constructor geneve_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME( genkeys );
 }
 
-const device_type GENEVE_KEYBOARD = device_creator<geneve_keyboard_device>;
+DEFINE_DEVICE_TYPE(GENEVE_KEYBOARD, geneve_keyboard_device, "geneve_keyboard", "Geneve XT-style keyboard")

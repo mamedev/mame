@@ -36,7 +36,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_EASY_CALC_RESULT = device_creator<c64_easy_calc_result_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_EASY_CALC_RESULT, c64_easy_calc_result_cartridge_device, "c64_easy_calc_result", "C64 Easy Calc Result cartridge")
 
 
 
@@ -49,7 +49,7 @@ const device_type C64_EASY_CALC_RESULT = device_creator<c64_easy_calc_result_car
 //-------------------------------------------------
 
 c64_easy_calc_result_cartridge_device::c64_easy_calc_result_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_EASY_CALC_RESULT, "C64 Easy Calc Result cartridge", tag, owner, clock, "c64_easy_calc_result", __FILE__),
+	device_t(mconfig, C64_EASY_CALC_RESULT, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this), m_bank(0)
 {
 }

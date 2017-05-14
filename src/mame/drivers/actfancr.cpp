@@ -290,7 +290,7 @@ MACHINE_RESET_MEMBER(actfancr_state,triothep)
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( actfancr, actfancr_state )
+static MACHINE_CONFIG_START( actfancr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, 21477200/3) /* Should be accurate */
@@ -340,11 +340,11 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_OKIM6295_ADD("oki", 1024188, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1024188, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( triothep, actfancr_state )
+static MACHINE_CONFIG_START( triothep )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",H6280,XTAL_21_4772MHz/3) /* XIN=21.4772Mhz, verified on pcb */
@@ -397,7 +397,7 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
 
@@ -571,8 +571,8 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1989, actfancr, 0,        actfancr, actfancr, driver_device, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, actfancr1,actfancr, actfancr, actfancr, driver_device, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, actfancrj,actfancr, actfancr, actfancr, driver_device, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, triothep, 0,        triothep, triothep, driver_device, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, triothepj,triothep, triothep, triothep, driver_device, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancr, 0,        actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancr1,actfancr, actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancrj,actfancr, actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, triothep, 0,        triothep, triothep, actfancr_state, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, triothepj,triothep, triothep, triothep, actfancr_state, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", MACHINE_SUPPORTS_SAVE )

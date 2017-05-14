@@ -1,14 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+#ifndef MAME_BUS_KC_D002_H
+#define MAME_BUS_KC_D002_H
+
 #pragma once
 
-#ifndef __KC_D002_H__
-#define __KC_D002_H__
-
 #include "kc.h"
-#include "ram.h"
-#include "rom.h"
-#include "d004.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -49,11 +46,11 @@ private:
 	kcexp_slot_device *m_slot;
 
 	// internal state
-	kcexp_slot_device *m_expansions[5];
+	required_device_array<kcexp_slot_device, 5> m_expansions;
 };
 
 
 // device type definition
-extern const device_type KC_D002;
+DECLARE_DEVICE_TYPE(KC_D002, kc_d002_device)
 
-#endif  /* __KC_D002_H__ */
+#endif // MAME_BUS_KC_D002_H

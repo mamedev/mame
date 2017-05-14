@@ -28,7 +28,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_ZIPDRIVE = device_creator<a2bus_zipdrive_device>;
+DEFINE_DEVICE_TYPE(A2BUS_ZIPDRIVE, a2bus_zipdrive_device, "a2zipdrv", "Zip Technologies ZipDrive")
 
 #define ZIPDRIVE_ROM_REGION  "zipdrive_rom"
 #define ZIPDRIVE_ATA_TAG     "zipdrive_ata"
@@ -69,15 +69,15 @@ const tiny_rom_entry *a2bus_zipdrivebase_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_zipdrivebase_device::a2bus_zipdrivebase_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_zipdrivebase_device::a2bus_zipdrivebase_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ata(*this, ZIPDRIVE_ATA_TAG), m_rom(nullptr), m_lastdata(0)
 {
 }
 
 a2bus_zipdrive_device::a2bus_zipdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_zipdrivebase_device(mconfig, A2BUS_ZIPDRIVE, "Zip Technologies ZipDrive", tag, owner, clock, "a2zipdrv", __FILE__)
+	a2bus_zipdrivebase_device(mconfig, A2BUS_ZIPDRIVE, tag, owner, clock)
 {
 }
 

@@ -326,7 +326,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atetris, atetris_state )
+static MACHINE_CONFIG_START( atetris )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/8)
@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( atetris, atetris_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( atetrisb2, atetris_state )
+static MACHINE_CONFIG_START( atetrisb2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,BOOTLEG_CLOCK/8)
@@ -563,10 +563,10 @@ DRIVER_INIT_MEMBER(atetris_state,atetris)
  *
  *************************************/
 
-GAME( 1988, atetris,  0,       atetris,   atetris, atetris_state,  atetris, ROT0,   "Atari Games", "Tetris (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisa, atetris, atetris,   atetris, atetris_state,  atetris, ROT0,   "Atari Games", "Tetris (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb, atetris, atetris,   atetris, atetris_state,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb2,atetris, atetrisb2, atetris, atetris_state,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetrisb3,atetris, atetrisb3, atetris, atetris_state,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 3)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetris,  0,       atetris,   atetris,  atetris_state, atetris, ROT0,   "Atari Games", "Tetris (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisa, atetris, atetris,   atetris,  atetris_state, atetris, ROT0,   "Atari Games", "Tetris (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb, atetris, atetris,   atetris,  atetris_state, atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb2,atetris, atetrisb2, atetris,  atetris_state, atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetrisb3,atetris, atetrisb3, atetris,  atetris_state, atetris, ROT0,   "bootleg",     "Tetris (bootleg set 3)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, atetrisc, atetris, atetris,   atetrisc, atetris_state, atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, atetrisc2,atetris, atetris,   atetrisc, atetris_state, atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", MACHINE_SUPPORTS_SAVE )

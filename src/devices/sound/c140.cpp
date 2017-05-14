@@ -67,7 +67,7 @@ struct voice_registers
 
 
 // device type definition
-const device_type C140 = device_creator<c140_device>;
+DEFINE_DEVICE_TYPE(C140, c140_device, "c140", "Namco C140")
 
 
 //**************************************************************************
@@ -87,11 +87,11 @@ static inline int limit(int32_t in)
 //-------------------------------------------------
 
 c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, C140, "C140", tag, owner, clock, "c140", __FILE__)
+	: device_t(mconfig, C140, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_sample_rate(0)
 	, m_stream(nullptr)
-	, m_banking_type(0)
+	, m_banking_type(C140_TYPE::SYSTEM2)
 	, m_mixer_buffer_left(nullptr)
 	, m_mixer_buffer_right(nullptr)
 	, m_baserate(0)
@@ -128,7 +128,7 @@ void c140_device::device_start()
 
 	memset(m_REG,0,sizeof(m_REG));
 
-	for(int i = 0; i < C140_MAX_VOICE; i++)
+	for(int i = 0; i < MAX_VOICE; i++)
 	{
 		init_voice(&m_voi[i]);
 	}
@@ -139,7 +139,7 @@ void c140_device::device_start()
 
 	save_item(NAME(m_REG));
 
-	for (int i = 0; i < C140_MAX_VOICE; i++)
+	for (int i = 0; i < MAX_VOICE; i++)
 	{
 		save_item(NAME(m_voi[i].ptoffset), i);
 		save_item(NAME(m_voi[i].pos), i);
@@ -187,7 +187,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	memset(m_mixer_buffer_right.get(), 0, samples * sizeof(int16_t));
 
 	/* get the number of voices to update */
-	voicecnt = (m_banking_type == C140_TYPE_ASIC219) ? 16 : 24;
+	voicecnt = (m_banking_type == C140_TYPE::ASIC219) ? 16 : 24;
 
 	//--- audio update
 	for( i=0;i<voicecnt;i++ )
@@ -206,8 +206,8 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			delta=(long)((float)frequency * pbase);
 
 			/* Calculate left/right channel volumes */
-			lvol=(vreg->volume_left*32)/C140_MAX_VOICE; //32ch -> 24ch
-			rvol=(vreg->volume_right*32)/C140_MAX_VOICE;
+			lvol=(vreg->volume_left*32)/MAX_VOICE; //32ch -> 24ch
+			rvol=(vreg->volume_right*32)/MAX_VOICE;
 
 			/* Set mixer outputs base pointers */
 			lmix = m_mixer_buffer_left.get();
@@ -229,7 +229,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			dltdt=v->dltdt;
 
 			/* Switch on data type - compressed PCM is only for C140 */
-			if ((v->mode&8) && (m_banking_type != C140_TYPE_ASIC219))
+			if ((v->mode&8) && (m_banking_type != C140_TYPE::ASIC219))
 			{
 				//compressed PCM (maybe correct...)
 				/* Loop for enough to fill sample buffer as requested */
@@ -305,7 +305,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 					{
 						prevdt=lastdt;
 
-						if (m_banking_type == C140_TYPE_ASIC219)
+						if (m_banking_type == C140_TYPE::ASIC219)
 						{
 							lastdt = pSampleData[BYTE_XOR_BE(pos)];
 
@@ -376,7 +376,7 @@ WRITE8_MEMBER( c140_device::c140_w )
 	offset&=0x1ff;
 
 	// mirror the bank registers on the 219, fixes bkrtmaq (and probably xday2 based on notes in the HLE)
-	if ((offset >= 0x1f8) && (m_banking_type == C140_TYPE_ASIC219))
+	if ((offset >= 0x1f8) && (m_banking_type == C140_TYPE::ASIC219))
 	{
 		offset -= 8;
 	}
@@ -401,7 +401,7 @@ WRITE8_MEMBER( c140_device::c140_w )
 				v->mode = data;
 
 				// on the 219 asic, addresses are in words
-				if (m_banking_type == C140_TYPE_ASIC219)
+				if (m_banking_type == C140_TYPE::ASIC219)
 				{
 					v->sample_loop = (vreg->loop_msb*256 + vreg->loop_lsb)*2;
 					v->sample_start = (vreg->start_msb*256 + vreg->start_lsb)*2;
@@ -470,18 +470,18 @@ long c140_device::find_sample(long adrs, long bank, int voice)
 
 	switch (m_banking_type)
 	{
-		case C140_TYPE_SYSTEM2:
+		case C140_TYPE::SYSTEM2:
 			// System 2 banking
 			newadr = ((adrs&0x200000)>>2)|(adrs&0x7ffff);
 			break;
 
-		case C140_TYPE_SYSTEM21:
+		case C140_TYPE::SYSTEM21:
 			// System 21 banking.
 			// similar to System 2's.
 			newadr = ((adrs&0x300000)>>1)+(adrs&0x7ffff);
 			break;
 
-		case C140_TYPE_ASIC219:
+		case C140_TYPE::ASIC219:
 			// ASIC219's banking is fairly simple
 			newadr = ((m_REG[asic219banks[voice/4]]&0x3) * 0x20000) + adrs;
 			break;

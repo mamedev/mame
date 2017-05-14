@@ -136,7 +136,7 @@ private:
 	optional_shared_ptr<uint8_t> m_vram;
 	optional_shared_ptr<uint16_t> m_vram16;
 	optional_shared_ptr<uint8_t> m_fontram;
-	required_device<fd1797_t> m_fdc;
+	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 };
@@ -156,7 +156,7 @@ static ADDRESS_MAP_START(pg675_mem, AS_PROGRAM, 8, pg685_state)
 	AM_RANGE(0xf9f06, 0xf9f07) AM_DEVREADWRITE("mainpic", pic8259_device, read, write)
 	AM_RANGE(0xf9f08, 0xf9f08) AM_DEVREADWRITE("mainuart", i8251_device, data_r, data_w)
 	AM_RANGE(0xf9f09, 0xf9f09) AM_DEVREADWRITE("mainuart", i8251_device, status_r, control_w)
-	AM_RANGE(0xf9f20, 0xf9f23) AM_DEVREADWRITE("fdc", fd1797_t, read, write)
+	AM_RANGE(0xf9f20, 0xf9f23) AM_DEVREADWRITE("fdc", fd1797_device, read, write)
 	AM_RANGE(0xf9f24, 0xf9f24) AM_READWRITE(f9f24_r, f9f24_w)
 	AM_RANGE(0xf9f28, 0xf9f2b) AM_DEVREADWRITE("modppi1", i8255_device, read, write)
 	AM_RANGE(0xf9f2c, 0xf9f2f) AM_DEVREADWRITE("modppi2", i8255_device, read, write)
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START(pg685oua12_mem, AS_PROGRAM, 16, pg685_state)
 	AM_RANGE(0xf9f06, 0xf9f07) AM_DEVREADWRITE8("mainpic", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0xf9f08, 0xf9f09) AM_DEVREADWRITE8("mainuart", i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xf9f08, 0xf9f09) AM_DEVREADWRITE8("mainuart", i8251_device, status_r, control_w, 0xff00)
-	AM_RANGE(0xf9f20, 0xf9f23) AM_DEVREADWRITE8("fdc", fd1797_t, read, write, 0xffff)
+	AM_RANGE(0xf9f20, 0xf9f23) AM_DEVREADWRITE8("fdc", fd1797_device, read, write, 0xffff)
 	AM_RANGE(0xf9f24, 0xf9f25) AM_READWRITE8(f9f24_r, f9f24_w, 0x00ff)
 	AM_RANGE(0xf9f28, 0xf9f2b) AM_DEVREADWRITE8("modppi1", i8255_device, read, write, 0xffff)
 	AM_RANGE(0xf9f2c, 0xf9f2f) AM_DEVREADWRITE8("modppi2", i8255_device, read, write, 0xffff)
@@ -401,7 +401,7 @@ static MACHINE_CONFIG_FRAGMENT(pg685_module)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pg675, pg685_state )
+static MACHINE_CONFIG_START( pg675 )
 	// main cpu
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(pg675_mem)
@@ -448,7 +448,7 @@ static MACHINE_CONFIG_START( pg675, pg685_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pg685, pg685_state )
+static MACHINE_CONFIG_START( pg685 )
 	// main cpu
 	MCFG_CPU_ADD("maincpu", V20, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(pg685_mem)
@@ -497,7 +497,7 @@ static MACHINE_CONFIG_START( pg685, pg685_state )
 	MCFG_WD2010_OUT_INTRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir3_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pg685oua12, pg685_state )
+static MACHINE_CONFIG_START( pg685oua12 )
 	// main cpu
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(pg685oua12_mem)
@@ -573,7 +573,7 @@ ROM_END
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS          INIT        COMPANY FULLNAME                  FLAGS                */
-COMP( 198?, pg675,      0,        0,      pg675,      pg685,      driver_device,    0,       "Siemens", "Simatic PG675", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 198?, pg685,      0,        0,      pg685,      pg685,      driver_device,    0,       "Siemens", "Simatic PG685 OUA11", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 198?, pg685oua12, pg685,    0,      pg685oua12, pg685,      driver_device,    0,       "Siemens", "Simatic PG685 OUA12", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS          INIT     COMPANY    FULLNAME               FLAGS
+COMP( 198?, pg675,      0,        0,      pg675,      pg685,      pg685_state,   0,       "Siemens", "Simatic PG675",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 198?, pg685,      0,        0,      pg685,      pg685,      pg685_state,   0,       "Siemens", "Simatic PG685 OUA11", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 198?, pg685oua12, pg685,    0,      pg685oua12, pg685,      pg685_state,   0,       "Siemens", "Simatic PG685 OUA12", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

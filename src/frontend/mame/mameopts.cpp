@@ -81,7 +81,7 @@ void mame_options::parse_standard_inis(emu_options &options, std::ostream &error
 	}
 
 	// next parse "source/<sourcefile>.ini"
-	std::string sourcename = core_filename_extract_base(cursystem->source_file, true).insert(0, "source" PATH_SEPARATOR);
+	std::string sourcename = core_filename_extract_base(cursystem->type.source(), true).insert(0, "source" PATH_SEPARATOR);
 	parse_one_ini(options, sourcename.c_str(), OPTION_PRIORITY_SOURCE_INI, &error_stream);
 
 	// then parse the grandparent, parent, and system-specific INIs

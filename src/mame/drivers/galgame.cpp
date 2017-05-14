@@ -318,7 +318,7 @@ void galaxygame_state::machine_reset()
 	m_interrupt = 0;
 }
 
-static MACHINE_CONFIG_START( galaxygame, galaxygame_state )
+static MACHINE_CONFIG_START( galaxygame )
 
 	MCFG_CPU_ADD("maincpu", T11, 3000000 )
 	MCFG_CPU_PROGRAM_MAP(galaxygame_map)

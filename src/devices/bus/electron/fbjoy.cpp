@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ELECTRON_FBJOY = device_creator<electron_fbjoy_device>;
+DEFINE_DEVICE_TYPE(ELECTRON_FBJOY, electron_fbjoy_device, "electron_fbjoy", "First Byte Joystick Interface")
 
 
 static INPUT_PORTS_START( fbjoy )
@@ -47,9 +47,9 @@ ioport_constructor electron_fbjoy_device::device_input_ports() const
 //-------------------------------------------------
 
 electron_fbjoy_device::electron_fbjoy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELECTRON_FBJOY, "First Byte Joystick Interface", tag, owner, clock, "electron_fbjoy", __FILE__),
-	device_electron_expansion_interface(mconfig, *this),
-	m_joy(*this, "JOY")
+	: device_t(mconfig, ELECTRON_FBJOY, tag, owner, clock)
+	, device_electron_expansion_interface(mconfig, *this)
+	, m_joy(*this, "JOY")
 {
 }
 

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-#pragma once
+#ifndef MAME_BUS_Z88_FLASH_H
+#define MAME_BUS_Z88_FLASH_H
 
-#ifndef __Z88_FLASH_H__
-#define __Z88_FLASH_H__
+#pragma once
 
 #include "z88.h"
 #include "machine/intelfsh.h"
@@ -39,7 +39,6 @@ private:
 };
 
 // device type definition
-extern const device_type Z88_1024K_FLASH;
+DECLARE_DEVICE_TYPE(Z88_1024K_FLASH, z88_1024k_flash_device)
 
-
-#endif  /* __Z88_FLASH_H__ */
+#endif // MAME_BUS_Z88_FLASH_H

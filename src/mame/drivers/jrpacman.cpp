@@ -275,7 +275,7 @@ INTERRUPT_GEN_MEMBER(jrpacman_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( jrpacman, jrpacman_state )
+static MACHINE_CONFIG_START( jrpacman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */

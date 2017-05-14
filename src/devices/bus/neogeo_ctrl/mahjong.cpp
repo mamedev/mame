@@ -13,8 +13,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEOGEO_MJCTRL_AC = device_creator<neogeo_mjctrl_ac_device>;
-const device_type NEOGEO_MJCTRL    = device_creator<neogeo_mjctrl_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_MJCTRL_AC, neogeo_mjctrl_ac_device, "neogeo_mj_ac", "SNK Neo Geo Arcade Mahjong panel")
+DEFINE_DEVICE_TYPE(NEOGEO_MJCTRL,    neogeo_mjctrl_device,    "neogeo_mj",    "SNK Neo Geo Mahjong controller")
 
 
 static INPUT_PORTS_START( neogeo_mj_ac )
@@ -94,21 +94,21 @@ ioport_constructor neogeo_mjctrl_device::device_input_ports() const
 //  neogeo_joystick_device - constructor
 //-------------------------------------------------
 
-neogeo_mjctrl_ac_device::neogeo_mjctrl_ac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+neogeo_mjctrl_ac_device::neogeo_mjctrl_ac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_neogeo_control_port_interface(mconfig, *this)
 	, m_mjpanel(*this, "MJ.%u", 0)
 {
 }
 
 neogeo_mjctrl_ac_device::neogeo_mjctrl_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: neogeo_mjctrl_ac_device(mconfig, NEOGEO_MJCTRL_AC, "SNK Neo Geo Arcade Mahjong panel", tag, owner, clock, "neogeo_mjac", __FILE__)
+	: neogeo_mjctrl_ac_device(mconfig, NEOGEO_MJCTRL_AC, tag, owner, clock)
 {
 }
 
-neogeo_mjctrl_device::neogeo_mjctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					neogeo_mjctrl_ac_device(mconfig, NEOGEO_MJCTRL, "SNK Neo Geo Mahjong controller", tag, owner, clock, "neogeo_mjctrl", __FILE__),
-					m_ss(*this, "START_SELECT")
+neogeo_mjctrl_device::neogeo_mjctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: neogeo_mjctrl_ac_device(mconfig, NEOGEO_MJCTRL, tag, owner, clock)
+	, m_ss(*this, "START_SELECT")
 {
 }
 

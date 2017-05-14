@@ -9,10 +9,10 @@
 #include "emu.h"
 #include "dm9334.h"
 
-const device_type DM9334 = device_creator<dm9334_device>;
+DEFINE_DEVICE_TYPE(DM9334, dm9334_device, "dm9934", "NS [DM]9934 8-bit Addressable Latch")
 
 dm9334_device::dm9334_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DM9334, "National Semiconductor 9334/DM9334 8-Bit Addressable Latch", tag, owner, clock, "dm9334", __FILE__)
+	: device_t(mconfig, DM9334, tag, owner, clock)
 	, m_out_func(*this)
 	, m_q0_func(*this)
 	, m_q1_func(*this)

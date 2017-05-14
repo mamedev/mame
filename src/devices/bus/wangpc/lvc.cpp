@@ -47,7 +47,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_LVC = device_creator<wangpc_lvc_device>;
+DEFINE_DEVICE_TYPE(WANGPC_LVC, wangpc_lvc_device, "wangpc_lvc", "Wang PC Low Resolution Video Card")
 
 
 //-------------------------------------------------
@@ -170,7 +170,7 @@ inline void wangpc_lvc_device::set_irq(int state)
 //-------------------------------------------------
 
 wangpc_lvc_device::wangpc_lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WANGPC_LVC, "Wang PC Low Resolution Video Card", tag, owner, clock, "wangpc_lvc", __FILE__),
+	device_t(mconfig, WANGPC_LVC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),
 	m_video_ram(*this, "video_ram"),

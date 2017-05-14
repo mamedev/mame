@@ -575,7 +575,7 @@ static ADDRESS_MAP_START(ibmpcjx_io, AS_IO, 8, pcjr_state)
 	AM_IMPORT_FROM( ibmpcjr_io )
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
+static MACHINE_CONFIG_START( ibmpcjr )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 4900000)
 	MCFG_CPU_PROGRAM_MAP(ibmpcjr_map)
@@ -713,7 +713,7 @@ ROM_START( ibmpcjx )
 	ROM_LOAD("kanji.rom",     0x00000, 0x38000, BAD_DUMP CRC(eaa6e3c3) SHA1(35554587d02d947fae8446964b1886fff5c9d67f)) // hand-made rom
 ROM_END
 
-/*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY            FULLNAME */
+//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT    STATE          INIT        COMPANY                            FULLNAME     FLAGS
 // pcjr
 COMP( 1983, ibmpcjr,    ibm5150,    0,          ibmpcjr,    ibmpcjr, pcjr_state,    pcjr,       "International Business Machines", "IBM PC Jr", MACHINE_IMPERFECT_COLORS )
 COMP( 1985, ibmpcjx,    ibm5150,    0,          ibmpcjx,    ibmpcjr, pcjr_state,    pcjr,       "International Business Machines", "IBM PC JX", MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING)

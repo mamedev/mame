@@ -72,14 +72,14 @@ const int WAITING_FOR_TRIG  = 0x100;
 //**************************************************************************
 
 // device type definition
-const device_type Z80CTC = device_creator<z80ctc_device>;
+DEFINE_DEVICE_TYPE(Z80CTC, z80ctc_device, "z80ctc", "Z80 CTC")
 
 //-------------------------------------------------
 //  z80ctc_device - constructor
 //-------------------------------------------------
 
 z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, Z80CTC, "Z80 CTC", tag, owner, clock, "z80ctc", __FILE__),
+	: device_t(mconfig, Z80CTC, tag, owner, clock),
 		device_z80daisy_interface(mconfig, *this),
 		m_intr_cb(*this),
 		m_zc0_cb(*this),

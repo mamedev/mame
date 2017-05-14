@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_DEVICES_MACHINE_GENPC_H
-#define MAME_DEVICES_MACHINE_GENPC_H
+#ifndef MAME_MACHINE_GENPC_H
+#define MAME_MACHINE_GENPC_H
 
 #include "imagedev/cassette.h"
 #include "machine/am9517a.h"
@@ -42,7 +42,7 @@ public:
 
 	DECLARE_ADDRESS_MAP(map, 8);
 protected:
-	ibm5160_mb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	ibm5160_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -120,7 +120,7 @@ private:
 
 
 // device type definition
-extern const device_type IBM5160_MOTHERBOARD;
+DECLARE_DEVICE_TYPE(IBM5160_MOTHERBOARD, ibm5160_mb_device)
 
 
 #define MCFG_IBM5150_MOTHERBOARD_ADD(_tag, _cputag) \
@@ -140,7 +140,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 
 protected:
-	ibm5150_mb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	ibm5150_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 
@@ -153,7 +153,7 @@ public:
 
 
 // device type definition
-extern const device_type IBM5150_MOTHERBOARD;
+DECLARE_DEVICE_TYPE(IBM5150_MOTHERBOARD, ibm5150_mb_device)
 
 
 #define MCFG_EC1841_MOTHERBOARD_ADD(_tag, _cputag) \
@@ -178,7 +178,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 };
 
-extern const device_type EC1841_MOTHERBOARD;
+DECLARE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device)
 
 #define MCFG_PCNOPPI_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, PCNOPPI_MOTHERBOARD, 0) \
@@ -194,12 +194,12 @@ public:
 	DECLARE_ADDRESS_MAP(map, 8);
 
 protected:
-	pc_noppi_mb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	pc_noppi_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 };
 
-extern const device_type PCNOPPI_MOTHERBOARD;
+DECLARE_DEVICE_TYPE(PCNOPPI_MOTHERBOARD, pc_noppi_mb_device)
 
-#endif // MAME_DEVICES_MACHINE_GENPC_H
+#endif // MAME_MACHINE_GENPC_H

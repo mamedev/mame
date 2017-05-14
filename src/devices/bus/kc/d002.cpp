@@ -11,6 +11,11 @@
 #include "emu.h"
 #include "d002.h"
 
+#include "ram.h"
+#include "rom.h"
+#include "d004.h"
+
+
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
@@ -98,7 +103,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type KC_D002 = device_creator<kc_d002_device>;
+DEFINE_DEVICE_TYPE(KC_D002, kc_d002_device, "kc_d002", "D002 Bus Driver")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -109,9 +114,11 @@ const device_type KC_D002 = device_creator<kc_d002_device>;
 //-------------------------------------------------
 
 kc_d002_device::kc_d002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, KC_D002, "D002 Bus Driver", tag, owner, clock, "kc_d002", __FILE__),
-		device_kcexp_interface( mconfig, *this ), m_slot(nullptr)
-	{
+	: device_t(mconfig, KC_D002, tag, owner, clock)
+	, device_kcexp_interface(mconfig, *this)
+	, m_slot(nullptr)
+	, m_expansions(*this, { "m0", "m4", "m8", "mc", "exp" })
+{
 }
 
 //-------------------------------------------------
@@ -121,12 +128,6 @@ kc_d002_device::kc_d002_device(const machine_config &mconfig, const char *tag, d
 void kc_d002_device::device_start()
 {
 	m_slot = dynamic_cast<kcexp_slot_device *>(owner());
-
-	m_expansions[0] = downcast<kcexp_slot_device *>(subdevice("m0"));
-	m_expansions[1] = downcast<kcexp_slot_device *>(subdevice("m4"));
-	m_expansions[2] = downcast<kcexp_slot_device *>(subdevice("m8"));
-	m_expansions[3] = downcast<kcexp_slot_device *>(subdevice("mc"));
-	m_expansions[4] = downcast<kcexp_slot_device *>(subdevice("exp"));
 }
 
 //-------------------------------------------------

@@ -13,9 +13,9 @@
 
 
 #include "emu.h"
-#include "sound/samples.h"
-#include "includes/snk6502.h"
-#include "sound/discrete.h"
+#include "audio/snk6502.h"
+
+#include "sound/sn76477.h"
 
 
 #ifndef M_LN2
@@ -128,10 +128,10 @@ DISCRETE_SOUND_START( fantasy )
 DISCRETE_SOUND_END
 
 
-const device_type SNK6502 = device_creator<snk6502_sound_device>;
+DEFINE_DEVICE_TYPE(SNK6502, snk6502_sound_device, "snk6502_sound", "SNK6502 Audio Custom")
 
 snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SNK6502, "SNK6502 Audio Custom", tag, owner, clock, "snk6502_sound", __FILE__),
+	: device_t(mconfig, SNK6502, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		//m_tone_channels[CHANNELS],
 		m_tone_clock_expire(0),
@@ -711,8 +711,6 @@ WRITE8_MEMBER( snk6502_sound_device::fantasy_sound_w )
 		/* select tune in ROM based on sound command byte */
 		m_tone_channels[2].base = 0x1000 + ((data & 0x70) << 4);
 		m_tone_channels[2].mask = 0xff;
-		snk6502_state *drvstate = space.machine().driver_data<snk6502_state>();
-		drvstate->flipscreen_w(space, 0, data);
 		break;
 	}
 }

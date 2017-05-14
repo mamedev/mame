@@ -32,8 +32,11 @@
 // * RET 0,P is executed to end ISR: return program counter is popped off the stack and IM is cleared
 
 #include "emu.h"
-#include "debugger.h"
 #include "hphybrid.h"
+#include "debugger.h"
+
+#include "hphybrid_defs.h"
+
 
 enum {
 	HPHYBRID_A,
@@ -101,8 +104,8 @@ enum {
 // Part of r32-r37 that is actually output as address extension (6 bits of "BSC": block select code)
 #define BSC_REG_MASK    0x3f
 
-const device_type HP_5061_3001 = device_creator<hp_5061_3001_cpu_device>;
-const device_type HP_5061_3011 = device_creator<hp_5061_3011_cpu_device>;
+DEFINE_DEVICE_TYPE(HP_5061_3001, hp_5061_3001_cpu_device, "5061_3001", "HP-5061-3001")
+DEFINE_DEVICE_TYPE(HP_5061_3011, hp_5061_3011_cpu_device, "5061_3011", "HP-5061-3011")
 
 WRITE_LINE_MEMBER(hp_hybrid_cpu_device::dmar_w)
 {
@@ -141,8 +144,8 @@ uint8_t hp_hybrid_cpu_device::pa_r(void) const
 	return CURRENT_PA;
 }
 
-hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname , uint8_t addrwidth)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_pa_changed_func(*this)
 	, m_program_config("program", ENDIANNESS_BIG, 16, addrwidth, -1)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 6, -1)
@@ -1121,7 +1124,7 @@ void hp_hybrid_cpu_device::WIO(uint8_t pa , uint8_t ic , uint16_t v)
 }
 
 hp_5061_3001_cpu_device::hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp_hybrid_cpu_device(mconfig, HP_5061_3001, "HP-5061-3001", tag, owner, clock, "5061_3001", 22)
+	: hp_hybrid_cpu_device(mconfig, HP_5061_3001, tag, owner, clock, 22)
 	, m_boot_mode(false)
 {
 }
@@ -1685,7 +1688,7 @@ void hp_5061_3001_cpu_device::enter_isr(void)
 }
 
 hp_5061_3011_cpu_device::hp_5061_3011_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp_hybrid_cpu_device(mconfig, HP_5061_3011, "HP-5061-3011", tag, owner, clock, "5061_3011", 16)
+	: hp_hybrid_cpu_device(mconfig, HP_5061_3011, tag, owner, clock, 16)
 {
 }
 

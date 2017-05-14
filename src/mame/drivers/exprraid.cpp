@@ -499,7 +499,7 @@ void exprraid_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( exprraid, exprraid_state )
+static MACHINE_CONFIG_START( exprraid )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO16, XTAL_12MHz / 8)

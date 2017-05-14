@@ -13,14 +13,14 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type I82439TX = device_creator<i82439tx_device>;
+DEFINE_DEVICE_TYPE(I82439TX, i82439tx_device, "i82439tx", "Intel 82439TX")
 
 
 i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: northbridge_device(mconfig, I82439TX, "Intel 82439TX", tag, owner, clock, "i82439tx", __FILE__),
-	pci_device_interface( mconfig, *this ),
-	m_cpu_tag( nullptr ),
-	m_region_tag( nullptr ),
+	: northbridge_device(mconfig, I82439TX, tag, owner, clock),
+	pci_device_interface(mconfig, *this),
+	m_cpu_tag(nullptr),
+	m_region_tag(nullptr),
 	m_space(nullptr),
 	m_rom(nullptr)
 {

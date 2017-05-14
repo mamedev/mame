@@ -5,10 +5,10 @@
 #include "emu.h"
 #include "315-5641.h"
 
-const device_type SEGA_315_5641_PCM = device_creator<sega_315_5641_pcm_device>;
+DEFINE_DEVICE_TYPE(SEGA_315_5641_PCM, sega_315_5641_pcm_device, "315_5641_pcm", "Sega 315-5641 PCM")
 
 sega_315_5641_pcm_device::sega_315_5641_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7759_device(mconfig, SEGA_315_5641_PCM, "315-5641 PCM", tag, owner, clock, "315_5641_pcm", __FILE__), m_fifo_read(0), m_fifo_write(0)
+	: upd7759_device(mconfig, SEGA_315_5641_PCM, tag, owner, clock), m_fifo_read(0), m_fifo_write(0)
 {
 }
 

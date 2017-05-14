@@ -18,45 +18,37 @@
 */
 
 #include "emu.h"
+#include "i386.h"
+
 #include "debugger.h"
 #include "i386priv.h"
-#include "i386.h"
 
 #include "debug/debugcpu.h"
 
 /* seems to be defined on mingw-gcc */
 #undef i386
 
-const device_type I386 = device_creator<i386_device>;
-const device_type I386SX = device_creator<i386SX_device>;
-const device_type I486 = device_creator<i486_device>;
-const device_type I486DX4 = device_creator<i486dx4_device>;
-const device_type PENTIUM = device_creator<pentium_device>;
-const device_type MEDIAGX = device_creator<mediagx_device>;
-const device_type PENTIUM_PRO = device_creator<pentium_pro_device>;
-const device_type PENTIUM_MMX = device_creator<pentium_mmx_device>;
-const device_type PENTIUM2 = device_creator<pentium2_device>;
-const device_type PENTIUM3 = device_creator<pentium3_device>;
-const device_type PENTIUM4 = device_creator<pentium4_device>;
+DEFINE_DEVICE_TYPE(I386,        i386_device,        "i386",        "I386")
+DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "I386SX")
+DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "I486")
+DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "I486DX4")
+DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Pentium")
+DEFINE_DEVICE_TYPE(MEDIAGX,     mediagx_device,     "mediagx",     "Cyrix MediaGX")
+DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Pentium Pro")
+DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Pentium MMX")
+DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Pentium II")
+DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Pentium III")
+DEFINE_DEVICE_TYPE(PENTIUM4,    pentium4_device,    "pentium4",    "Pentium 4")
 
 
 i386_device::i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, I386, "I386", tag, owner, clock, "i386", __FILE__)
-	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_io_config("io", ENDIANNESS_LITTLE, 32, 16, 0)
-	, m_smiact(*this)
+	: i386_device(mconfig, I386, tag, owner, clock, 32, 32, 32)
 {
-	m_program_config.m_logaddr_width = 32;
-	m_program_config.m_page_shift = 12;
-
-	// 32 unified
-	set_vtlb_dynamic_entries(32);
 }
 
 
-i386_device::i386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int program_data_width, int program_addr_width, int io_data_width)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+i386_device::i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
@@ -69,73 +61,71 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	set_vtlb_dynamic_entries(32);
 }
 
-i386SX_device::i386SX_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i386_device(mconfig, I386SX, "I386SX", tag, owner, clock, "i386sx", __FILE__, 16, 24, 16)
+i386sx_device::i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i386_device(mconfig, I386SX, tag, owner, clock, 16, 24, 16)
 {
 }
 
 i486_device::i486_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i386_device(mconfig, I486, "I486", tag, owner, clock, "i486", __FILE__)
+	: i486_device(mconfig, I486, tag, owner, clock)
 {
 }
 
-i486_device::i486_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: i386_device(mconfig, type, name, tag, owner, clock, shortname, source)
+i486_device::i486_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: i386_device(mconfig, type, tag, owner, clock, 32, 32, 32)
 {
 }
 
 i486dx4_device::i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i486_device(mconfig, I486DX4, "I486DX4", tag, owner, clock, "i486dx4", __FILE__)
+	: i486_device(mconfig, I486DX4, tag, owner, clock)
 {
 }
 
 pentium_device::pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i386_device(mconfig, PENTIUM, "PENTIUM", tag, owner, clock, "pentium", __FILE__)
+	: pentium_device(mconfig, PENTIUM, tag, owner, clock)
 {
-	// 64 dtlb small, 8 dtlb large, 32 itlb
-	set_vtlb_dynamic_entries(96);
 }
 
-pentium_device::pentium_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: i386_device(mconfig, type, name, tag, owner, clock, shortname, source)
+pentium_device::pentium_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: i386_device(mconfig, type, tag, owner, clock, 32, 32, 32)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb
 	set_vtlb_dynamic_entries(96);
 }
 
 mediagx_device::mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i386_device(mconfig, MEDIAGX, "MEDIAGX", tag, owner, clock, "mediagx", __FILE__)
+	: i386_device(mconfig, MEDIAGX, tag, owner, clock, 32, 32, 32)
 {
 }
 
 pentium_pro_device::pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM_PRO, "Pentium Pro", tag, owner, clock, "pentium_pro", __FILE__)
+	: pentium_device(mconfig, PENTIUM_PRO, tag, owner, clock)
 {
 }
 
 pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM_MMX, "Pentium MMX", tag, owner, clock, "pentium_mmx", __FILE__)
+	: pentium_device(mconfig, PENTIUM_MMX, tag, owner, clock)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
 }
 
 pentium2_device::pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM2, "Pentium II", tag, owner, clock, "pentium2", __FILE__)
+	: pentium_device(mconfig, PENTIUM2, tag, owner, clock)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
 }
 
 pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM3, "Pentium III", tag, owner, clock, "pentium3", __FILE__)
+	: pentium_device(mconfig, PENTIUM3, tag, owner, clock)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
 }
 
 pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM4, "Pentium 4", tag, owner, clock, "pentium4", __FILE__)
+	: pentium_device(mconfig, PENTIUM4, tag, owner, clock)
 {
 	// 128 dtlb, 64 itlb
 	set_vtlb_dynamic_entries(196);

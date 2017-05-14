@@ -259,7 +259,7 @@ static GFXDECODE_START( cball )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( cball, cball_state )
+static MACHINE_CONFIG_START( cball )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 16) /* ? */
@@ -304,4 +304,4 @@ ROM_START( cball )
 ROM_END
 
 
-GAME( 1976, cball, 0, cball, cball, driver_device, 0, ROT0, "Atari", "Cannonball (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, cball, 0, cball, cball, cball_state, 0, ROT0, "Atari", "Cannonball (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

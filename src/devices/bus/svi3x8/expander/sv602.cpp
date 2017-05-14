@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV602 = device_creator<sv602_device>;
+DEFINE_DEVICE_TYPE(SV602, sv602_device, "sv602", "SV-602 Single Slot Expander")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -44,7 +44,7 @@ machine_config_constructor sv602_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 sv602_device::sv602_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SV602, "SV-602 Single Slot Expander", tag, owner, clock, "sv602", __FILE__),
+	device_t(mconfig, SV602, tag, owner, clock),
 	device_svi_expander_interface(mconfig, *this),
 	m_slotbus(*this, "slotbus")
 {

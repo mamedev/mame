@@ -35,7 +35,7 @@ static int tables_computed = 0;
 
 
 // device type definition
-const device_type OKIM6258 = device_creator<okim6258_device>;
+DEFINE_DEVICE_TYPE(OKIM6258, okim6258_device, "okim6258", "OKI MSM6258 ADPCM")
 
 
 //**************************************************************************
@@ -47,7 +47,7 @@ const device_type OKIM6258 = device_creator<okim6258_device>;
 //-------------------------------------------------
 
 okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, OKIM6258, "OKI6258", tag, owner, clock, "okim6258", __FILE__),
+	: device_t(mconfig, OKIM6258, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_status(0),
 		m_master_clock(0),
@@ -70,7 +70,7 @@ okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag,
 
 ***********************************************************************************************/
 
-static void compute_tables(void)
+static void compute_tables()
 {
 	/* nibble to bit map */
 	static const int nbl2bit[16][4] =
@@ -121,7 +121,7 @@ void okim6258_device::device_start()
 	m_signal = -2;
 	m_step = 0;
 
-	okim6258_state_save_register();
+	state_save_register();
 }
 
 
@@ -186,7 +186,7 @@ void okim6258_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 
 ***********************************************************************************************/
 
-void okim6258_device::okim6258_state_save_register()
+void okim6258_device::state_save_register()
 {
 	save_item(NAME(m_status));
 	save_item(NAME(m_master_clock));
@@ -269,7 +269,7 @@ int okim6258_device::get_vclk()
 
 ***********************************************************************************************/
 
-READ8_MEMBER( okim6258_device::okim6258_status_r )
+READ8_MEMBER( okim6258_device::status_r )
 {
 	m_stream->update();
 
@@ -282,7 +282,7 @@ READ8_MEMBER( okim6258_device::okim6258_status_r )
      okim6258_data_w -- write to the control port of an OKIM6258-compatible chip
 
 ***********************************************************************************************/
-WRITE8_MEMBER( okim6258_device::okim6258_data_w )
+WRITE8_MEMBER( okim6258_device::data_w )
 {
 	/* update the stream */
 	m_stream->update();
@@ -298,7 +298,7 @@ WRITE8_MEMBER( okim6258_device::okim6258_data_w )
 
 ***********************************************************************************************/
 
-WRITE8_MEMBER( okim6258_device::okim6258_ctrl_w )
+WRITE8_MEMBER( okim6258_device::ctrl_w )
 {
 	m_stream->update();
 

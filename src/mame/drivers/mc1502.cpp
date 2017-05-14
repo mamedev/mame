@@ -241,7 +241,7 @@ static INPUT_PORTS_START( mc1502 )
 	PORT_INCLUDE( mc7007_3_keyboard )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mc1502, mc1502_state )
+static MACHINE_CONFIG_START( mc1502 )
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_16MHz/3)
 	MCFG_CPU_PROGRAM_MAP(mc1502_map)
 	MCFG_CPU_IO_MAP(mc1502_io)
@@ -398,6 +398,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT                COMPANY       FULLNAME */
-COMP ( 1989,    mc1502,     0,          0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika MS 1502", 0)
-COMP ( 1988,    pk88,       0,          0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika PK-88", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//     YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       STATE         INIT      COMPANY               FULLNAME               FLAGS
+COMP ( 1989, mc1502, 0,      0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika MS 1502", 0 )
+COMP ( 1988, pk88,   0,      0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika PK-88",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

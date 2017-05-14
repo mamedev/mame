@@ -18,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EPSON_PF10 = device_creator<epson_pf10_device>;
+DEFINE_DEVICE_TYPE(EPSON_PF10, epson_pf10_device, "epson_pf10_device", "EPSON PF-10 Portable Floppy Unit")
 
 
 //-------------------------------------------------
@@ -93,7 +93,7 @@ machine_config_constructor epson_pf10_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 epson_pf10_device::epson_pf10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, EPSON_PF10, "EPSON PF-10 Portable Floppy Unit", tag, owner, clock, "epson_pf10", __FILE__),
+	device_t(mconfig, EPSON_PF10, tag, owner, clock),
 	device_epson_sio_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),
 	m_fdc(*this, "upd765a"),

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ISA_WD1002A_WX1_H
+#define MAME_BUS_ISA_WD1002A_WX1_H
 
-#ifndef __ISA_WD1002A_WX1__
-#define __ISA_WD1002A_WX1__
+#pragma once
 
 #include "isa.h"
 
@@ -39,7 +39,7 @@ protected:
 
 
 // device type definition
-extern const device_type ISA8_WD1002A_WX1;
+DECLARE_DEVICE_TYPE(ISA8_WD1002A_WX1, isa8_wd1002a_wx1_device)
 
 
-#endif
+#endif // MAME_BUS_ISA_WD1002A_WX1_H

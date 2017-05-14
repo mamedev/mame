@@ -246,7 +246,7 @@ static GFXDECODE_START( clpoker )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( clpoker, clpoker_state )
+static MACHINE_CONFIG_START( clpoker )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 3) // Z0840004PSC, divider not verified
 	MCFG_CPU_PROGRAM_MAP(prg_map)
@@ -308,4 +308,4 @@ ROM_START( clpoker )
 ROM_END
 
 
-GAME( 1994, clpoker,  0, clpoker, clpoker, driver_device, 0, ROT0, "Chain Leisure", "Poker Genius", MACHINE_SUPPORTS_SAVE ) // Year taken from string in main CPU ROM
+GAME( 1994, clpoker,  0, clpoker, clpoker, clpoker_state, 0, ROT0, "Chain Leisure", "Poker Genius", MACHINE_SUPPORTS_SAVE ) // Year taken from string in main CPU ROM

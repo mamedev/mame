@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COLECOVISION_CARTRIDGE_SLOT = device_creator<colecovision_cartridge_slot_device>;
+DEFINE_DEVICE_TYPE(COLECOVISION_CARTRIDGE_SLOT, colecovision_cartridge_slot_device, "coleco_cartridge_port", "ColecoVision cartridge port")
 
 
 
@@ -54,9 +54,10 @@ void device_colecovision_cartridge_interface::rom_alloc(size_t size)
 //-------------------------------------------------
 
 colecovision_cartridge_slot_device::colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COLECOVISION_CARTRIDGE_SLOT, "ColecoVision cartridge port", tag, owner, clock, "coleco_cartridge_port", __FILE__),
+	device_t(mconfig, COLECOVISION_CARTRIDGE_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	device_image_interface(mconfig, *this), m_card(nullptr)
+	device_image_interface(mconfig, *this),
+	m_card(nullptr)
 {
 }
 

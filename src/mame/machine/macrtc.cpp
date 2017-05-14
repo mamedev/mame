@@ -33,7 +33,7 @@ enum
 //**************************************************************************
 
 // device type definition
-const device_type RTC3430042 = device_creator<rtc3430042_device>;
+DEFINE_DEVICE_TYPE(RTC3430042, rtc3430042_device, "rtc3430042", "Apple 343-0042 clock/PRAM")
 
 
 //-------------------------------------------------
@@ -41,7 +41,7 @@ const device_type RTC3430042 = device_creator<rtc3430042_device>;
 //-------------------------------------------------
 
 rtc3430042_device::rtc3430042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RTC3430042, "Apple 343-0042 clock/PRAM", tag, owner, clock, "rtc3430042", __FILE__),
+	: device_t(mconfig, RTC3430042, tag, owner, clock),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this)
 {

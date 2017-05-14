@@ -29,11 +29,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_VIDEO_UPD3301_H
+#define MAME_VIDEO_UPD3301_H
+
 #pragma once
-
-#ifndef __UPD3301__
-#define __UPD3301__
-
 
 
 
@@ -48,7 +47,7 @@
 	upd3301_device::static_set_character_width(*device, _value);
 
 #define MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	upd3301_device::static_set_display_callback(*device, upd3301_draw_character_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	upd3301_device::static_set_display_callback(*device, upd3301_device::draw_character_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_UPD3301_DRQ_CALLBACK(_write) \
 	devcb = &upd3301_device::set_drq_wr_callback(*device, DEVCB_##_write);
@@ -68,8 +67,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)> upd3301_draw_character_delegate;
-
 
 // ======================> upd3301_device
 
@@ -77,16 +74,18 @@ class upd3301_device :  public device_t,
 						public device_video_interface
 {
 public:
+	typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int sx, uint8_t cc, uint8_t lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)> draw_character_delegate;
+
 	// construction/destruction
 	upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_character_width(device_t &device, int value) { downcast<upd3301_device &>(device).m_width = value; }
-	static void static_set_display_callback(device_t &device, upd3301_draw_character_delegate callback) { downcast<upd3301_device &>(device).m_display_cb = callback; }
+	static void static_set_display_callback(device_t &device, draw_character_delegate &&cb) { downcast<upd3301_device &>(device).m_display_cb = std::move(cb); }
 
-	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_drq.set_callback(object); }
-	template<class _Object> static devcb_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_int.set_callback(object); }
-	template<class _Object> static devcb_base &set_hrtc_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_hrtc.set_callback(object); }
-	template<class _Object> static devcb_base &set_vrtc_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_vrtc.set_callback(object); }
+	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<upd3301_device &>(device).m_write_drq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_int_wr_callback(device_t &device, Object &&cb) { return downcast<upd3301_device &>(device).m_write_int.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_hrtc_wr_callback(device_t &device, Object &&cb) { return downcast<upd3301_device &>(device).m_write_hrtc.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_vrtc_wr_callback(device_t &device, Object &&cb) { return downcast<upd3301_device &>(device).m_write_vrtc.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -127,7 +126,7 @@ private:
 	devcb_write_line   m_write_hrtc;
 	devcb_write_line   m_write_vrtc;
 
-	upd3301_draw_character_delegate m_display_cb;
+	draw_character_delegate m_display_cb;
 	int m_width;
 
 	// screen drawing
@@ -186,8 +185,6 @@ private:
 
 
 // device type definition
-extern const device_type UPD3301;
+DECLARE_DEVICE_TYPE(UPD3301, upd3301_device)
 
-
-
-#endif
+#endif // MAME_VIDEO_UPD3301_H

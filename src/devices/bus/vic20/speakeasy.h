@@ -7,10 +7,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VIC20_SPEAKEASY_H
+#define MAME_BUS_VIC20_SPEAKEASY_H
 
-#ifndef __VIC20_SPEAKEASY__
-#define __VIC20_SPEAKEASY__
+#pragma once
 
 #include "exp.h"
 #include "sound/votrax.h"
@@ -21,14 +21,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vic20_speakeasy_t
+// ======================> vic20_speakeasy_device
 
-class vic20_speakeasy_t :  public device_t,
+class vic20_speakeasy_device :  public device_t,
 						   public device_vic20_expansion_card_interface
 {
 public:
 	// construction/destruction
-	vic20_speakeasy_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vic20_speakeasy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -47,8 +47,6 @@ private:
 
 
 // device type definition
-extern const device_type VIC20_SPEAKEASY;
+DECLARE_DEVICE_TYPE(VIC20_SPEAKEASY, vic20_speakeasy_device)
 
-
-
-#endif
+#endif // MAME_BUS_VIC20_SPEAKEASY_H

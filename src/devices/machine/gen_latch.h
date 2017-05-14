@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_GEN_LATCH_H
+#define MAME_MACHINE_GEN_LATCH_H
 
-#ifndef MAME_DEVICES_MACHINE_GEN_LATCH_H
-#define MAME_DEVICES_MACHINE_GEN_LATCH_H
+#pragma once
 
 
 
@@ -17,8 +17,8 @@
 //  DEVICE TYPE DECLARATIONS
 //**************************************************************************
 
-extern const device_type GENERIC_LATCH_8;
-extern const device_type GENERIC_LATCH_16;
+DECLARE_DEVICE_TYPE(GENERIC_LATCH_8, generic_latch_8_device)
+DECLARE_DEVICE_TYPE(GENERIC_LATCH_16, generic_latch_16_device)
 
 
 //**************************************************************************
@@ -45,11 +45,12 @@ class generic_latch_base_device : public device_t
 {
 protected:
 	// construction/destruction
-	generic_latch_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
+	generic_latch_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 public:
 	// static configuration
-	template<class _Object> static devcb_base &set_data_pending_callback(device_t &device, _Object object) { return downcast<generic_latch_base_device &>(device).m_data_pending_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_data_pending_callback(device_t &device, Object &&cb)
+	{ return downcast<generic_latch_base_device &>(device).m_data_pending_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ_LINE_MEMBER(pending_r);
 
@@ -90,7 +91,7 @@ protected:
 	void sync_callback(void *ptr, s32 param);
 
 private:
-	u8                      m_latched_value;
+	u8 m_latched_value;
 };
 
 
@@ -118,17 +119,8 @@ protected:
 	void sync_callback(void *ptr, s32 param);
 
 private:
-	u16                     m_latched_value;
+	u16 m_latched_value;
 };
 
 
-//**************************************************************************
-//  TEMPALTE INSTANTIATIONS
-//**************************************************************************
-
-extern template class device_finder<generic_latch_8_device, false>;
-extern template class device_finder<generic_latch_8_device, true>;
-extern template class device_finder<generic_latch_16_device, false>;
-extern template class device_finder<generic_latch_16_device, true>;
-
-#endif  // MAME_DEVICES_MACHINE_GEN_LATCH_H
+#endif  // MAME_MACHINE_GEN_LATCH_H

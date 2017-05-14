@@ -86,7 +86,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( segam1, segam1_state )
+static MACHINE_CONFIG_START( segam1 )
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
 	MCFG_CPU_PROGRAM_MAP(segam1_map)
@@ -140,5 +140,5 @@ ROM_START( unkm1 ) // 1992.01.31 string
 	// dumps of the X-Board part, and the LINK PCB are missing.
 ROM_END
 
-GAME( 199?, bingpty,    0,        segam1,    segam1, driver_device,    0, ROT0,  "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1992, unkm1,      0,        segam1,    segam1, driver_device,    0, ROT0,  "Sega", "Unknown Sega gambling game (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, bingpty,    0,        segam1,    segam1, segam1_state,    0, ROT0,  "Sega", "Bingo Party Multicart (Rev B) (M1 Satellite board)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1992, unkm1,      0,        segam1,    segam1, segam1_state,    0, ROT0,  "Sega", "Unknown Sega gambling game (M1 Satellite board)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

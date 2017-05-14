@@ -12,10 +12,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_AKIKO_H
+#define MAME_MACHINE_AKIKO_H
 
-#ifndef __AKIKO_H__
-#define __AKIKO_H__
+#pragma once
 
 #include "cdrom.h"
 #include "sound/cdda.h"
@@ -57,26 +57,25 @@ class akiko_device : public device_t
 {
 public:
 	akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~akiko_device() {}
 
 	// callbacks
-	template<class _Object> static devcb_base &set_mem_r_callback(device_t &device, _Object object)
-		{ return downcast<akiko_device &>(device).m_mem_r.set_callback(object); }
+	template <class Object> static devcb_base &set_mem_r_callback(device_t &device, Object &&cb)
+	{ return downcast<akiko_device &>(device).m_mem_r.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_mem_w_callback(device_t &device, _Object object)
-		{ return downcast<akiko_device &>(device).m_mem_w.set_callback(object); }
+	template <class Object> static devcb_base &set_mem_w_callback(device_t &device, Object &&cb)
+	{ return downcast<akiko_device &>(device).m_mem_w.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_int_w_callback(device_t &device, _Object object)
-		{ return downcast<akiko_device &>(device).m_int_w.set_callback(object); }
+	template <class Object> static devcb_base &set_int_w_callback(device_t &device, Object &&cb)
+	{ return downcast<akiko_device &>(device).m_int_w.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_scl_handler(device_t &device, _Object object)
-		{ return downcast<akiko_device &>(device).m_scl_w.set_callback(object); }
+	template <class Object> static devcb_base &set_scl_handler(device_t &device, Object &&cb)
+	{ return downcast<akiko_device &>(device).m_scl_w.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_sda_read_handler(device_t &device, _Object object)
-		{ return downcast<akiko_device &>(device).m_sda_r.set_callback(object); }
+	template <class Object> static devcb_base &set_sda_read_handler(device_t &device, Object &&cb)
+	{ return downcast<akiko_device &>(device).m_sda_r.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_sda_write_handler(device_t &device, _Object object)
-		{ return downcast<akiko_device &>(device).m_sda_w.set_callback(object); }
+	template <class Object> static devcb_base &set_sda_write_handler(device_t &device, Object &&cb)
+	{ return downcast<akiko_device &>(device).m_sda_w.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
@@ -90,7 +89,7 @@ protected:
 
 private:
 	// 1X CDROM sector time in msec (300KBps)
-	static const int CD_SECTOR_TIME = (1000/((150*1024)/2048));
+	static constexpr int CD_SECTOR_TIME = (1000/((150*1024)/2048));
 
 	// chunky to planar converter
 	uint32_t m_c2p_input_buffer[8];
@@ -164,6 +163,6 @@ private:
 };
 
 // device type definition
-extern const device_type AKIKO;
+DECLARE_DEVICE_TYPE(AKIKO, akiko_device)
 
-#endif
+#endif // MAME_MACHINE_AKIKO_H

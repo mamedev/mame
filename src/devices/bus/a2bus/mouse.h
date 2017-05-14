@@ -11,6 +11,8 @@
 #ifndef MAME_DEVICES_A2BUS_MOUSE_H
 #define MAME_DEVICES_A2BUS_MOUSE_H
 
+#pragma once
+
 #include "a2bus.h"
 #include "machine/6821pia.h"
 #include "cpu/m6805/m68705.h"
@@ -25,7 +27,6 @@ class a2bus_mouse_device:
 {
 public:
 	// construction/destruction
-	a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a2bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
@@ -45,6 +46,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_port_c_w);
 
 protected:
+	a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

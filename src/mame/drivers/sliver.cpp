@@ -503,7 +503,7 @@ TIMER_DEVICE_CALLBACK_MEMBER ( sliver_state::obj_irq_cb )
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( sliver, sliver_state )
+static MACHINE_CONFIG_START( sliver )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(sliver_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sliver_state, irq4_line_hold)
@@ -529,7 +529,7 @@ static MACHINE_CONFIG_START( sliver, sliver_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
@@ -584,5 +584,5 @@ ROM_START( slivera )
 ROM_END
 
 
-GAME( 1996, sliver,  0,        sliver, sliver, driver_device, 0, ROT0,  "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, slivera, sliver,   sliver, sliver, driver_device, 0, ROT0,  "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sliver,  0,        sliver, sliver, sliver_state, 0, ROT0,  "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, slivera, sliver,   sliver, sliver, sliver_state, 0, ROT0,  "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

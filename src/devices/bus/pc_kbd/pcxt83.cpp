@@ -33,7 +33,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC_KBD_IBM_PC_XT_83 = device_creator<ibm_pc_xt_83_keyboard_device>;
+DEFINE_DEVICE_TYPE(PC_KBD_IBM_PC_XT_83, ibm_pc_xt_83_keyboard_device, "kb_pcxt83", "IBM PC/XT Keyboard")
 
 
 //-------------------------------------------------
@@ -241,7 +241,7 @@ ioport_constructor ibm_pc_xt_83_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 ibm_pc_xt_83_keyboard_device::ibm_pc_xt_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC_KBD_IBM_PC_XT_83, "IBM PC/XT Keyboard", tag, owner, clock, "kb_pcxt83", __FILE__),
+	: device_t(mconfig, PC_KBD_IBM_PC_XT_83, tag, owner, clock),
 		device_pc_kbd_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),
 		m_md(*this, "MD%02u", 0),
