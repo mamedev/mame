@@ -1252,14 +1252,14 @@ void spc700_device::state_string_export(const device_state_entry &entry, std::st
 	{
 		case STATE_GENFLAGS:
 			str = string_format("%c%c%c%c%c%c%c%c",
-				(m_flag_n & 0x80)        ? 'N':'.',
-				((m_flag_v & 0x80) >> 1) ? 'V':'.',
-				(m_flag_p>>3)            ? 'P':'.',
-				(m_flag_b)               ? 'B':'.',
-				(m_flag_h & HFLAG_SET)   ? 'H':'.',
-				( m_flag_i)              ? 'I':'.',
-				(((!m_flag_z) << 1) & 1) ? 'Z':'.',
-				((m_flag_c >> 8)&1)      ? 'C':'.'
+				(FLAG_N & 0x80)      ? 'N':'.',
+				(FLAG_V & 0x80)      ? 'V':'.',
+				(FLAG_P)             ? 'P':'.',
+				(FLAG_B)             ? 'B':'.',
+				(FLAG_H & HFLAG_SET) ? 'H':'.',
+				(FLAG_I)             ? 'I':'.',
+				(!FLAG_Z)            ? 'Z':'.',
+				(FLAG_C & 0x100)     ? 'C':'.'
 			);
 			break;
 	}
@@ -1282,14 +1282,14 @@ void spc700_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case SPC700_P:
-			m_debugger_temp = ((m_flag_n & 0x80)          |
-					((m_flag_v & 0x80) >> 1)    |
-					m_flag_p>>3             |
-					m_flag_b                    |
-					(m_flag_h & HFLAG_SET)  |
-					m_flag_i                    |
-					((!m_flag_z) << 1)      |
-					((m_flag_c >> 8)&1));
+			m_debugger_temp = ((FLAG_N & 0x80)          |
+					((FLAG_V & 0x80) >> 1)    |
+					FLAG_P>>3             |
+					FLAG_B                    |
+					(FLAG_H & HFLAG_SET)  |
+					FLAG_I                    |
+					((!FLAG_Z) << 1)      |
+					((FLAG_C >> 8)&1));
 			break;
 
 		case STATE_GENSP:
