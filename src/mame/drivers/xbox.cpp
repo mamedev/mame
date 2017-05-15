@@ -150,11 +150,11 @@ void xbox_state::machine_reset()
 	uint16_t *id;
 
 	// set some needed parameters
-	devh = machine().device<ata_mass_storage_device>("ide:0:hdd");
+	devh = machine().device<ata_mass_storage_device>(":pci:09.0:ide:0:hdd");
 	id = devh->identify_device_buffer();
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
 	id[128] |= 2; // bits 2-1=01 drive already unlocked
-	devc = machine().device<atapi_cdrom_device>("ide:1:cdrom");
+	devc = machine().device<atapi_cdrom_device>(":pci:09.0:ide:1:cdrom");
 	id = devc->identify_device_buffer();
 	id[64] |= (1 << 1);
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
@@ -206,10 +206,10 @@ ROM_START( xbox )
 	ROM_LOAD_BIOS(2, "4034_1024k.bin", 0x000000, 0x100000, CRC(0d6fc88f) SHA1(ab676b712204fb1728bf89f9cd541a8f5a64ab97)) \
 	ROM_SYSTEM_BIOS(3, "bios3", "Chihiro Bios 4817 1024k") \
 	ROM_LOAD_BIOS(3, "4817_1024k.bin", 0x000000, 0x100000, CRC(3f30863a) SHA1(dc955bd4d3ca71e01214a49e5d0aba615270c03c))
-	ROM_COPY( "mcpx", 1, 0x3fe00, 0x1ff)
-	ROM_COPY( "mcpx", 1, 0x7fe00, 0x1ff)
-	ROM_COPY( "mcpx", 1, 0xbfe00, 0x1ff)
-	ROM_COPY( "mcpx", 1, 0xffe00, 0x1ff)
+	ROM_COPY( "mcpx", 0, 0x3fe00, 0x200)
+	ROM_COPY( "mcpx", 0, 0x7fe00, 0x200)
+	ROM_COPY( "mcpx", 0, 0xbfe00, 0x200)
+	ROM_COPY( "mcpx", 0, 0xffe00, 0x200)
 
 
 	ROM_REGION( 0x1000000, "tbp", 0 ) // To Be Processed, of course
