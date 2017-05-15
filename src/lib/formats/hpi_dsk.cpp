@@ -57,8 +57,11 @@ constexpr unsigned CELL_SIZE	= 1200;	// Bit cell size (1 µs)
 constexpr uint8_t  ID_AM        = 0x70;	// ID address mark
 constexpr uint8_t  DATA_AM		= 0x50;	// Data address mark
 constexpr uint8_t  AM_CLOCK		= 0x0e;	// Clock pattern of AM
+constexpr uint32_t ID_CD_PATTERN= 0x55552a54;	// C/D pattern of 0xff + ID_AM
+constexpr uint32_t DATA_CD_PATTERN = 0x55552a44;	// C/D pattern of 0xff + DATA_AM
 constexpr unsigned GAP1_SIZE	= 17;	// Size of gap 1 (+1)
 constexpr unsigned GAP2_SIZE	= 35;	// Size of gap 2 (+1)
+constexpr unsigned ID_DATA_OFFSET = 30 * 16;	// Nominal distance (in cells) between ID & DATA AM
 // Size of image file (holding 77 cylinders)
 constexpr unsigned HPI_IMAGE_SIZE = HPI_TRACKS * HPI_HEADS * HPI_SECTORS * HPI_SECTOR_SIZE;
 constexpr unsigned HPI_RED_TRACKS = 75;	// Reduced number of tracks
@@ -132,8 +135,23 @@ bool hpi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 bool hpi_format::save(io_generic *io, floppy_image *image)
 {
-	// TODO: 
-	return false;
+	for (unsigned cyl = 0; cyl < HPI_TRACKS; cyl++) {
+		for (unsigned head = 0; head < HPI_HEADS; head++) {
+			uint8_t bitstream[ 21000 ];
+			int bitstream_size;
+			generate_bitstream_from_track(cyl , head , CELL_SIZE , bitstream , bitstream_size , image , 0);
+			int pos = 0;
+			unsigned track_no , head_no , sector_no;
+			uint8_t sector_data[ HPI_SECTOR_SIZE ];
+			while (get_next_sector(bitstream , bitstream_size , pos , track_no , head_no , sector_no , sector_data)) {
+				if (track_no == cyl && head_no == head && sector_no < HPI_SECTORS) {
+					unsigned offset_in_image = chs_to_lba(cyl, head, sector_no) * HPI_SECTOR_SIZE;
+					io_generic_write(io, sector_data, offset_in_image, HPI_SECTOR_SIZE);
+				}
+			}
+		}
+	}
+	return true;
 }
 
 const char *hpi_format::name() const
@@ -153,8 +171,7 @@ const char *hpi_format::extensions() const
 
 bool hpi_format::supports_save() const
 {
-	// TODO: 
-	return false;
+	return true;
 }
 
 void hpi_format::interleaved_sectors(unsigned il_factor , sector_list_t& sector_list)
@@ -286,6 +303,92 @@ void hpi_format::fill_with_gap3(std::vector<uint32_t> &buffer)
 unsigned hpi_format::chs_to_lba(unsigned cylinder , unsigned head , unsigned sector)
 {
 	return sector + (head + cylinder * HPI_HEADS) * HPI_SECTORS;
+}
+
+std::vector<uint8_t> hpi_format::get_next_id_n_block(const uint8_t *bitstream , int bitstream_size , int& pos , int& start_pos)
+{
+	std::vector<uint8_t> res;
+	uint32_t sr = 0;
+	// Look for either sync + ID AM or sync + DATA AM
+	while (pos < bitstream_size && sr != ID_CD_PATTERN && sr != DATA_CD_PATTERN) {
+		bool bit = BIT(bitstream[ pos >> 3 ] , 7 - (pos & 7));
+		pos++;
+		sr = (sr << 1) | bit;
+	}
+	if (pos == bitstream_size) {
+		// End of track reached
+		return res;
+	}
+	start_pos = pos;
+	// ID blocks: Track no. + sector/head no. + CRC
+	// Data blocks: Sector data + CRC
+	unsigned to_dump;
+	if (sr == ID_CD_PATTERN) {
+		to_dump = 4;
+		res.push_back(ID_AM);
+	} else {
+		to_dump = HPI_SECTOR_SIZE + 2;
+		res.push_back(DATA_AM);
+	}
+	// Align to data cells
+	pos++;
+	for (unsigned i = 0; i < to_dump && pos < bitstream_size; i++) {
+		uint8_t byte = 0;
+		unsigned j;
+		for (j = 0; j < 8 && pos < bitstream_size; j++) {
+			bool bit = BIT(bitstream[ pos >> 3 ] , 7 - (pos & 7));
+			pos += 2;
+			byte >>= 1;
+			if (bit) {
+				byte |= 0x80;
+			}
+		}
+		if (j == 8) {
+			res.push_back(byte);
+		}
+	}
+	return res;
+}
+
+bool hpi_format::get_next_sector(const uint8_t *bitstream , int bitstream_size , int& pos , unsigned& track , unsigned& head , unsigned& sector , uint8_t *sector_data)
+{
+	std::vector<uint8_t> block;
+	while (true) {
+		// Scan for ID block first
+		int id_pos;
+		while (true) {
+			if (block.size() == 0) {
+				block = get_next_id_n_block(bitstream , bitstream_size , pos , id_pos);
+				if (block.size() == 0) {
+					return false;
+				}
+			}
+			if (block[ 0 ] == ID_AM && block.size() >= 3) {
+				track = block[ 1 ];
+				head = block[ 2 ] >> 7;
+				sector = block[ 2 ] & 0x7f;
+				break;
+			} else {
+				block.clear();
+			}
+		}
+		// Then for DATA block
+		int data_pos;
+		block = get_next_id_n_block(bitstream , bitstream_size , pos , data_pos);
+		if (block.size() == 0) {
+			return false;
+		}
+		if (block[ 0 ] == DATA_AM && block.size() >= (HPI_SECTOR_SIZE + 1) && abs((data_pos - id_pos) - ID_DATA_OFFSET) <= 16) {
+			break;
+		}
+	}
+
+	for (unsigned i = 0; i < HPI_SECTOR_SIZE; i += 2) {
+		sector_data[ i ] = block[ i + 2 ];
+		sector_data[ i + 1 ] = block[ i + 1 ];
+	}
+
+	return true;
 }
 
 // This table comes straight from hp9895 firmware (it's @ 0x0f90)
