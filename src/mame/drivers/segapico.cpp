@@ -162,7 +162,7 @@ class pico_state : public pico_base_state
 {
 public:
 	pico_state(const machine_config &mconfig, device_type type, const char *tag)
-	: pico_base_state(mconfig, type, tag),
+		: pico_base_state(mconfig, type, tag),
 	m_picocart(*this, "picoslot") { }
 
 	required_device<pico_cart_slot_device> m_picocart;
@@ -470,9 +470,9 @@ DRIVER_INIT_MEMBER(pico_base_state, picoj)
 }
 
 
-CONS( 1994, pico,       0,         0,      picopal,         pico, pico_base_state,   pico,    "Sega",   "Pico (Europe, PAL)", MACHINE_NOT_WORKING)
-CONS( 1994, picou,      pico,      0,      pico,            pico, pico_base_state,   picou,   "Sega",   "Pico (USA, NTSC)", MACHINE_NOT_WORKING)
-CONS( 1993, picoj,      pico,      0,      pico,            pico, pico_base_state,   picoj,   "Sega",   "Pico (Japan, NTSC)", MACHINE_NOT_WORKING)
+CONS( 1994, pico,       0,         0,      picopal,         pico, pico_state,   pico,    "Sega",   "Pico (Europe, PAL)", MACHINE_NOT_WORKING)
+CONS( 1994, picou,      pico,      0,      pico,            pico, pico_state,   picou,   "Sega",   "Pico (USA, NTSC)", MACHINE_NOT_WORKING)
+CONS( 1993, picoj,      pico,      0,      pico,            pico, pico_state,   picoj,   "Sega",   "Pico (Japan, NTSC)", MACHINE_NOT_WORKING)
 
 /*
 

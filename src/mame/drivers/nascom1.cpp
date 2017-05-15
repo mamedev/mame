@@ -96,8 +96,8 @@ class nascom1_state : public nascom_state
 {
 public:
 	nascom1_state(const machine_config &mconfig, device_type type, const char *tag) :
-	nascom_state(mconfig, type, tag)
-	{}
+		nascom_state(mconfig, type, tag)
+	{ }
 
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -108,12 +108,12 @@ class nascom2_state : public nascom_state
 {
 public:
 	nascom2_state(const machine_config &mconfig, device_type type, const char *tag) :
-	nascom_state(mconfig, type, tag),
-	m_nasbus(*this, "nasbus"),
-	m_socket1(*this, "socket1"),
-	m_socket2(*this, "socket2"),
-	m_lsw1(*this, "lsw1")
-	{}
+		nascom_state(mconfig, type, tag),
+		m_nasbus(*this, "nasbus"),
+		m_socket1(*this, "socket1"),
+		m_socket2(*this, "socket2"),
+		m_lsw1(*this, "lsw1")
+	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
@@ -778,6 +778,6 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS          INIT      COMPANY                  FULLNAME           FLAGS
-COMP( 1977, nascom1,  0,        0,      nascom1,  nascom1,  nascom_state,  nascom,   "Nascom Microcomputers", "Nascom 1",        MACHINE_NO_SOUND_HW )
+COMP( 1977, nascom1,  0,        0,      nascom1,  nascom1,  nascom1_state, nascom,   "Nascom Microcomputers", "Nascom 1",        MACHINE_NO_SOUND_HW )
 COMP( 1979, nascom2,  0,        0,      nascom2,  nascom2,  nascom2_state, nascom2,  "Nascom Microcomputers", "Nascom 2",        MACHINE_NO_SOUND_HW )
 COMP( 1980, nascom2c, nascom2,  0,      nascom2c, nascom2c, nascom2_state, nascom2c, "Nascom Microcomputers", "Nascom 2 (CP/M)", MACHINE_NO_SOUND_HW )
