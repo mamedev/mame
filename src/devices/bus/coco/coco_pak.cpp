@@ -151,6 +151,11 @@ coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, co
 {
 }
 
+coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: coco_pak_device(mconfig, type, tag, owner, clock)
+{
+}
+
 /*-------------------------------------------------
     device_reset - device-specific startup
 -------------------------------------------------*/

@@ -39,7 +39,7 @@ DEFINE_DEVICE_TYPE(COCO_PAK_GMC, coco_pak_gmc_device, "cocopakgmc", "CoCo Games 
 //-------------------------------------------------
 
 coco_pak_gmc_device::coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: coco_pak_banked_device(mconfig, tag, owner, clock),
+		: coco_pak_banked_device(mconfig, COCO_PAK_GMC, tag, owner, clock),
 		m_psg(*this, SN76489AN_TAG)
 {
 }
