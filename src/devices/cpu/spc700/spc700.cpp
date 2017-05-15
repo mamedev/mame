@@ -897,7 +897,7 @@ void spc700_device::SET_FLAG_I(uint32_t value)
 			CLK(BCLK);                                                      \
 			DST     = EA_##MODE();                                          \
 			FLAG_NZ = read_8_##MODE(DST);                                   \
-			FLAG_C  = FLAG_NZ << 8;                                         \
+			FLAG_C  = FLAG_N << 8;                                          \
 			FLAG_NZ >>= 1;                                                  \
 			write_8_##MODE(DST, FLAG_NZ)
 
