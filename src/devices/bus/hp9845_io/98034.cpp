@@ -135,9 +135,9 @@ READ16_MEMBER(hp98034_io_card_device::reg_r)
 	update_flg();
 	// PPU pauses for an instant to let NP see FLG=0 immediately
 	// There's a bug in Mass Memory opt. ROM because the PPU
-        // doesn't wait for FLG from 98034 in a few (common) cases.
-        // A magic combination of relative speeds between PPU and
-        // NP always hides this bug in the real hw.
+	// doesn't wait for FLG from 98034 in a few (common) cases.
+	// A magic combination of relative speeds between PPU and
+	// NP always hides this bug in the real hw.
 	space.device().execute().spin_until_time(attotime::from_usec(5));
 
 	LOG("read R%u=%04x\n" , offset + 4 , res);
@@ -160,7 +160,7 @@ WRITE16_MEMBER(hp98034_io_card_device::reg_w)
 
 	update_flg();
 	// PPU pauses for an instant to let NP see FLG=0 immediately
-        // (see above)
+	// (see above)
 	space.device().execute().spin_until_time(attotime::from_usec(5));
 	LOG(("write R%u=%04x\n" , offset + 4 , data));
 }
