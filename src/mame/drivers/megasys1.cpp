@@ -4091,7 +4091,7 @@ ROM_END
 void megasys1_state::rodland_gfx_unmangle(const char *region)
 {
 	uint8_t *rom = memregion(region)->base();
-	int size = memregion(region)->bytes();
+	uint32_t size = memregion(region)->bytes();
 	int i;
 
 	/* data lines swap: 76543210 -> 64537210 */
@@ -4120,7 +4120,7 @@ void megasys1_state::rodland_gfx_unmangle(const char *region)
 void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 {
 	uint8_t *rom = memregion(region)->base();
-	int size = memregion(region)->bytes();
+	uint32_t size = memregion(region)->bytes();
 	int i;
 
 	/* data lines swap: 76543210 -> 43576210 */
@@ -4144,7 +4144,7 @@ void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 void megasys1_state::stdragona_gfx_unmangle(const char *region)
 {
 	uint8_t *rom = memregion(region)->base();
-	int size = memregion(region)->bytes();
+	uint32_t size = memregion(region)->bytes();
 	int i;
 
 	/* data lines swap: 76543210 -> 37564210 */
