@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "i8089.h"
 #include "i8089_channel.h"
 
 #define UNIMPLEMENTED logerror("%s('%s'): unimplemented opcode: %s\n", shortname(), tag(), __FUNCTION__);

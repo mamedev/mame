@@ -13,8 +13,6 @@
 
 #pragma once
 
-#include "i8089.h"
-
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -218,6 +216,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(I8089_CHANNEL, i8089_channel_device)
-
 
 #endif // MAME_CPU_I8080_I8089_CHANNEL_H

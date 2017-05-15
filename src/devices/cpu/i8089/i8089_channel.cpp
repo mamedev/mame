@@ -10,6 +10,9 @@
 
 #include "emu.h"
 #include "i8089_channel.h"
+
+#include "i8089.h"
+
 #include "debugger.h"
 
 

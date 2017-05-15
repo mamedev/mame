@@ -393,5 +393,5 @@ ROM_START( silkroada )
 ROM_END
 
 
-GAME( 1999, silkroad,         0, silkroad, silkroad, driver_device, 0, ROT0, "Unico", "The Legend of Silkroad", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, silkroada, silkroad, silkroad, silkroad, driver_device, 0, ROT0, "Unico", "The Legend of Silkroad (larger ROMs)", MACHINE_SUPPORTS_SAVE ) // same content but fewer GFX roms of a larger size
+GAME( 1999, silkroad,  0,        silkroad, silkroad, silkroad_state, 0, ROT0, "Unico", "The Legend of Silkroad",               MACHINE_SUPPORTS_SAVE )
+GAME( 1999, silkroada, silkroad, silkroad, silkroad, silkroad_state, 0, ROT0, "Unico", "The Legend of Silkroad (larger ROMs)", MACHINE_SUPPORTS_SAVE ) // same content but fewer GFX roms of a larger size
