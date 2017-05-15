@@ -24,13 +24,15 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	
 private:
-		// internal state
+	
+
+	// internal state
 	required_device<mos6551_device> m_uart;
 };
 

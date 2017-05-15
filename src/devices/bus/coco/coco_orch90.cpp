@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    orch90.c
+    coco_orch90.cpp
 
     Code for emulating the CoCo Orch-90 (Orchestra 90) sound cartridge
 
@@ -50,13 +50,17 @@ coco_orch90_device::coco_orch90_device(const machine_config &mconfig, const char
 {
 }
 
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void coco_orch90_device::device_start()
 {
+	install_write_handler(0xFF7A, 0xFF7A, write8_delegate(FUNC(coco_orch90_device::write_left), this));
+	install_write_handler(0xFF7B, 0xFF7B, write8_delegate(FUNC(coco_orch90_device::write_right), this));
 }
+
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -68,20 +72,22 @@ machine_config_constructor coco_orch90_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( coco_orch90 );
 }
 
-/*-------------------------------------------------
-    write
--------------------------------------------------*/
 
-WRITE8_MEMBER(coco_orch90_device::write)
+//-------------------------------------------------
+//  write_left
+//-------------------------------------------------
+
+WRITE8_MEMBER(coco_orch90_device::write_left)
 {
-	switch(offset)
-	{
-		case 0x3A:
-			m_ldac->write(data);
-			break;
+	m_ldac->write(data);
+}
 
-		case 0x3B:
-			m_rdac->write(data);
-			break;
-	}
+
+//-------------------------------------------------
+//  write_right
+//-------------------------------------------------
+
+WRITE8_MEMBER(coco_orch90_device::write_right)
+{
+	m_rdac->write(data);
 }

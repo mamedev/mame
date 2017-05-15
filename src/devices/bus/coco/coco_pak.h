@@ -37,7 +37,6 @@ protected:
 
 	// internal state
 	device_image_interface *m_cart;
-	cococart_slot_device *m_owner;
 
 	optional_ioport m_autostart;
 };
@@ -59,7 +58,8 @@ protected:
 
 	// device-level overrides
 	virtual void device_reset() override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+
 private:
 	void banked_pak_set_bank(uint32_t bank);
 };

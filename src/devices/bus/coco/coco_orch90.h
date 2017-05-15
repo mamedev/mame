@@ -19,19 +19,23 @@ class coco_orch90_device :
 		public device_cococart_interface
 {
 public:
-		// construction/destruction
-		coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// construction/destruction
+	coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override;
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
+
 protected:
-		// device-level overrides
-		virtual void device_start() override;
-		virtual DECLARE_WRITE8_MEMBER(write) override;
+	// device-level overrides
+	virtual void device_start() override;
+
 private:
-		// internal state
-		required_device<dac_byte_interface> m_ldac;
-		required_device<dac_byte_interface> m_rdac;
+	WRITE8_MEMBER(write_left);
+	WRITE8_MEMBER(write_right);
+
+	// internal state
+	required_device<dac_byte_interface> m_ldac;
+	required_device<dac_byte_interface> m_rdac;
 };
 
 

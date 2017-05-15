@@ -194,6 +194,9 @@ static MACHINE_CONFIG_START( dragon_base )
 	// sound hardware
 	MCFG_FRAGMENT_ADD( coco_sound )
 
+	// floating space
+	MCFG_FRAGMENT_ADD( coco_floating )
+
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("dragon_cart_list", "dragon_cart")
 	MCFG_SOFTWARE_LIST_ADD("dragon_cass_list", "dragon_cass")

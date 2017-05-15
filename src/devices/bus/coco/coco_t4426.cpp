@@ -205,11 +205,11 @@ void coco_t4426_device::device_reset()
 }
 
 /*-------------------------------------------------
-    read
+    scs_read
  The 4426 cartridge PIA is located at ff44-ff47
 -------------------------------------------------*/
 
-READ8_MEMBER(coco_t4426_device::read)
+READ8_MEMBER(coco_t4426_device::scs_read)
 {
 	uint8_t result = 0x00;
 
@@ -223,11 +223,11 @@ READ8_MEMBER(coco_t4426_device::read)
 }
 
 /*-------------------------------------------------
-    write
+    scs_write
  The 4426 cartridge PIA is located at ff44-ff47
 -------------------------------------------------*/
 
-WRITE8_MEMBER(coco_t4426_device::write)
+WRITE8_MEMBER(coco_t4426_device::scs_write)
 {
 	LOG("%s(%02x)\n", FUNCNAME, data);
 	LOGSETUP(" * Offs:%02x <- %02x\n", offset, data);

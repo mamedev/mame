@@ -2,14 +2,44 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    cococart.c
+    cococart.cpp
 
-    CoCo/Dragon cartridge management
+    CoCo/Dragon cartridge slot - typically used for "Program Paks"
+    (which are simple ROMs) but in practice is the main extensibility
+    mechanism for CoCo hardware
+
+    CoCo Pinout listing (not sure if the Dragon was the same)
+       ---  -------            ---  -------
+         1  -12V                21  A2
+         2  +12V                22  A3
+         3  HALT                23  A4
+         4  NMI                 24  A5
+         5  RESET               25  A6
+         6  EIN                 26  A7
+         7  QIN                 27  A8
+         8  CART                28  A9
+         9  +5V                 29  A10
+        10  D0                  30  A11
+        11  D1                  31  A12
+        12  D2                  32  CTS
+        13  D3                  33  GND
+        14  D4                  34  GND
+        15  D5                  35  SND
+        16  D6                  36  SCS
+        17  D7                  37  A13
+        18  R/!W                38  A14
+        19  A0                  39  A15
+        20  A1                  40  SLENB
+
+	Notes:
+		CTS - ROM read $C000-$FEFF ($FDFF on CoCo 3)
+		SCS - Spare Chip Select:  IO space between $FF40-5F
 
 *********************************************************************/
 
 #include "emu.h"
 #include "cococart.h"
+
 
 /***************************************************************************
     PARAMETERS
@@ -18,13 +48,11 @@
 #define LOG_LINE                0
 
 
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(COCOCART_SLOT, cococart_slot_device, "cococart_slot", "CoCo Cartridge Slot")
-
 
 
 //**************************************************************************
@@ -113,28 +141,27 @@ void cococart_slot_device::device_timer(emu_timer &timer, device_timer_id id, in
 }
 
 
-
 //-------------------------------------------------
-//  coco_cartridge_r
+//  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(cococart_slot_device::read)
+READ8_MEMBER(cococart_slot_device::scs_read)
 {
 	uint8_t result = 0x00;
 	if (m_cart)
-		result = m_cart->read(space, offset);
+		result = m_cart->scs_read(space, offset);
 	return result;
 }
 
 
 //-------------------------------------------------
-//  coco_cartridge_w
+//  scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(cococart_slot_device::write)
+WRITE8_MEMBER(cococart_slot_device::scs_write)
 {
 	if (m_cart)
-		m_cart->write(space, offset, data);
+		m_cart->scs_write(space, offset, data);
 }
 
 
@@ -158,11 +185,10 @@ const char *cococart_slot_device::line_value_string(line_value value)
 			s = "Q";
 			break;
 		default:
-			fatalerror("Invalid value\n");
+			throw false && "Invalid value";
 	}
 	return s;
 }
-
 
 
 //-------------------------------------------------
@@ -205,7 +231,6 @@ void cococart_slot_device::set_line(const char *line_name, coco_cartridge_line &
 }
 
 
-
 //-------------------------------------------------
 //  set_line_timer()
 //-------------------------------------------------
@@ -222,7 +247,6 @@ void cococart_slot_device::set_line_timer(coco_cartridge_line &line, cococart_sl
 }
 
 
-
 //-------------------------------------------------
 //  twiddle_line_if_q
 //-------------------------------------------------
@@ -235,7 +259,6 @@ void cococart_slot_device::twiddle_line_if_q(coco_cartridge_line &line)
 		set_line_timer(line, line_value::Q);
 	}
 }
-
 
 
 //-------------------------------------------------
@@ -279,7 +302,6 @@ void cococart_slot_device::set_line_value(cococart_slot_device::line which, coco
 }
 
 
-
 //-------------------------------------------------
 //  get_line_value
 //-------------------------------------------------
@@ -321,17 +343,15 @@ uint8_t* cococart_slot_device::get_cart_base()
 }
 
 
-
 //-------------------------------------------------
 //  set_cart_base_update
 //-------------------------------------------------
 
 void cococart_slot_device::set_cart_base_update(cococart_base_update_delegate update)
 {
-	if (m_cart != nullptr)
+	if (m_cart)
 		m_cart->set_cart_base_update(update);
 }
-
 
 
 //-------------------------------------------------
@@ -363,7 +383,6 @@ image_init_result cococart_slot_device::call_load()
 }
 
 
-
 //-------------------------------------------------
 //  get_default_card_software
 //-------------------------------------------------
@@ -375,9 +394,9 @@ std::string cococart_slot_device::get_default_card_software(get_default_card_sof
 
 
 
-
 //**************************************************************************
-//  DEVICE COCO CART  INTERFACE
+//  DEVICE COCO CART INTERFACE - Implemented by devices that plug into
+//  CoCo cartridge slots
 //**************************************************************************
 
 //-------------------------------------------------
@@ -390,7 +409,6 @@ device_cococart_interface::device_cococart_interface(const machine_config &mconf
 }
 
 
-
 //-------------------------------------------------
 //  ~device_cococart_interface - destructor
 //-------------------------------------------------
@@ -400,26 +418,25 @@ device_cococart_interface::~device_cococart_interface()
 }
 
 
-
 //-------------------------------------------------
-//  read
+//  scs_read - Signifies a read where the SCS pin
+//	on the cartridge slot was asserted ($FF40-5F)
 //-------------------------------------------------
 
-READ8_MEMBER(device_cococart_interface::read)
+READ8_MEMBER(device_cococart_interface::scs_read)
 {
 	return 0x00;
 }
 
 
-
 //-------------------------------------------------
-//  write
+//  scs_write - Signifies a write where the SCS pin
+//	on the cartridge slot was asserted ($FF40-5F)
 //-------------------------------------------------
 
-WRITE8_MEMBER(device_cococart_interface::write)
+WRITE8_MEMBER(device_cococart_interface::scs_write)
 {
 }
-
 
 
 //-------------------------------------------------
@@ -429,7 +446,6 @@ WRITE8_MEMBER(device_cococart_interface::write)
 void device_cococart_interface::set_sound_enable(bool sound_enable)
 {
 }
-
 
 
 //-------------------------------------------------
@@ -442,7 +458,6 @@ uint8_t* device_cococart_interface::get_cart_base()
 }
 
 
-
 //-------------------------------------------------
 //  set_cart_base_update
 //-------------------------------------------------
@@ -453,7 +468,6 @@ void device_cococart_interface::set_cart_base_update(cococart_base_update_delega
 }
 
 
-
 //-------------------------------------------------
 //  cart_base_changed
 //-------------------------------------------------
@@ -462,4 +476,54 @@ void device_cococart_interface::cart_base_changed(void)
 {
 	if (!m_update.isnull())
 		m_update(get_cart_base());
+}
+
+
+//-------------------------------------------------
+//	cartridge_space
+//-------------------------------------------------
+
+address_space &device_cococart_interface::cartridge_space()
+{
+	// sanity check - our parent should always be a cococart_slot_device
+	assert(dynamic_cast<cococart_slot_device *>(device().owner()));
+
+	// get my owner's owner - it had better implement device_cococart_host_interface
+	device_cococart_host_interface *host = dynamic_cast<device_cococart_host_interface *>(device().owner()->owner());
+	assert(host);
+	return host->cartridge_space();
+}
+
+
+//-------------------------------------------------
+//	install_read_handler
+//-------------------------------------------------
+
+void device_cococart_interface::install_read_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler)
+{
+	address_space &space(cartridge_space());
+	space.install_read_handler(addrstart, addrend, rhandler);
+}
+
+
+//-------------------------------------------------
+//	install_write_handler
+//-------------------------------------------------
+
+void device_cococart_interface::install_write_handler(uint16_t addrstart, uint16_t addrend, write8_delegate whandler)
+{
+	address_space &space(cartridge_space());
+	space.install_write_handler(addrstart, addrend, whandler);
+}
+
+
+//-------------------------------------------------
+//	install_readwrite_handler
+//-------------------------------------------------
+
+void device_cococart_interface::install_readwrite_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler, write8_delegate whandler)
+{
+	address_space &space(cartridge_space());
+	space.install_read_handler(addrstart, addrend, rhandler);
+	space.install_write_handler(addrstart, addrend, whandler);
 }

@@ -92,6 +92,7 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_cococart(*this, CARTRIDGE_TAG),
 	m_ram(*this, RAM_TAG),
 	m_cassette(*this, "cassette"),
+	m_floating(*this, FLOATING_TAG),
 	m_rs232(*this, RS232_TAG),
 	m_vhd_0(*this, VHD0_TAG),
 	m_vhd_1(*this, VHD1_TAG),
@@ -99,7 +100,8 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_beckerportconfig(*this, BECKERPORT_TAG),
 	m_keyboard(*this, "row%u", 0),
 	m_joystick_type_control(*this, CTRL_SEL_TAG),
-	m_joystick_hires_control(*this, HIRES_INTF_TAG)
+	m_joystick_hires_control(*this, HIRES_INTF_TAG),
+	m_in_floating_bus_read(false)
 {
 }
 
@@ -290,6 +292,31 @@ uint8_t coco_state::floating_bus_read(void)
 	return result;
 }
 
+
+//-------------------------------------------------
+//  floating_space_read
+//-------------------------------------------------
+
+uint8_t coco_state::floating_space_read(offs_t offset)
+{
+	// The "floating space" is intended to be a catch all for address space
+	// not handled by the normal CoCo infrastructure, but may be read directly
+	// by cartridge hardware and other miscellany
+	//
+	// Most of the time, the read below will result in floating_bus_read() being
+	// invoked
+	return m_floating->read8(m_floating->space(address_spacenum::AS_0), offset);
+}
+
+
+//-------------------------------------------------
+//  floating_space_write
+//-------------------------------------------------
+
+void coco_state::floating_space_write(offs_t offset, uint8_t data)
+{
+	m_floating->write8(m_floating->space(address_spacenum::AS_0), offset, data);
+}
 
 
 /***************************************************************************
@@ -1130,7 +1157,7 @@ READ8_MEMBER( coco_state::ff60_read )
 	}
 	else
 	{
-		result = floating_bus_read();
+		result = floating_space_read(0xFF60 + offset);
 	}
 
 	return result;
@@ -1153,6 +1180,10 @@ WRITE8_MEMBER( coco_state::ff60_write )
 		/* writes to $FF86 will switch the VHD */
 		m_vhd_select = data;
 	}
+	else
+	{
+		floating_space_write(0xFF60 + offset, data);
+	}
 }
 
 
@@ -1172,9 +1203,8 @@ READ8_MEMBER( coco_state::ff40_read )
 		return m_beckerport->read(space, offset-1, mem_mask);
 	}
 
-	return m_cococart->read(space, offset, mem_mask);
+	return m_cococart->scs_read(space, offset, mem_mask);
 }
-
 
 
 //-------------------------------------------------
@@ -1188,9 +1218,8 @@ WRITE8_MEMBER( coco_state::ff40_write )
 		return m_beckerport->write(space, offset-1, data, mem_mask);
 	}
 
-	m_cococart->write(space, offset, data, mem_mask);
+	m_cococart->scs_write(space, offset, data, mem_mask);
 }
-
 
 
 //-------------------------------------------------
@@ -1201,6 +1230,17 @@ void coco_state::cart_w(bool state)
 {
 	m_pia_1->cb1_w(state);
 }
+
+
+//-------------------------------------------------
+//  cartridge_space
+//-------------------------------------------------
+
+address_space &coco_state::cartridge_space()
+{
+	return m_floating->space(address_spacenum::AS_0);
+}
+
 
 /***************************************************************************
   DISASSEMBLY OVERRIDE (OS9 syscalls)

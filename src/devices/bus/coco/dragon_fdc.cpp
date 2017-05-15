@@ -96,8 +96,8 @@ namespace
 		dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 		// device-level overrides
-		virtual DECLARE_READ8_MEMBER(read) override;
-		virtual DECLARE_WRITE8_MEMBER(write) override;
+		virtual DECLARE_READ8_MEMBER(scs_read) override;
+		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
 		virtual machine_config_constructor device_mconfig_additions() const override;
 		virtual void update_lines() override;
 
@@ -215,10 +215,10 @@ void dragon_fdc_device_base::dskreg_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  read
+//  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(dragon_fdc_device_base::read)
+READ8_MEMBER(dragon_fdc_device_base::scs_read)
 {
 	uint8_t result = 0;
 	switch (offset & 0xEF)
@@ -242,10 +242,10 @@ READ8_MEMBER(dragon_fdc_device_base::read)
 
 
 //-------------------------------------------------
-//  write
+//  scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(dragon_fdc_device_base::write)
+WRITE8_MEMBER(dragon_fdc_device_base::scs_write)
 {
 	switch (offset & 0xEF)
 	{

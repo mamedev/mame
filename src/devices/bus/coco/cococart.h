@@ -88,9 +88,9 @@ public:
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	// reading and writing to $FF40-$FF7F
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	// reading and writing to $FF40-$FF5F
+	DECLARE_READ8_MEMBER(scs_read);
+	DECLARE_WRITE8_MEMBER(scs_write);
 
 	// manipulation of cartridge lines
 	void set_line_value(line line, line_value value);
@@ -102,7 +102,7 @@ public:
 	// cart base
 	uint8_t* get_cart_base();
 	void set_cart_base_update(cococart_base_update_delegate update);
-
+		
 private:
 	// TIMER_POOL: Must be power of two
 	static constexpr int TIMER_POOL = 2;
@@ -148,6 +148,17 @@ private:
 extern const device_type COCOCART_SLOT;
 DECLARE_DEVICE_TYPE(COCOCART_SLOT, cococart_slot_device)
 
+
+// ======================> device_cococart_host_interface
+
+// this is implemented by the CoCo root device itself and the Multi-Pak interface
+class device_cococart_host_interface
+{
+public:
+	virtual address_space &cartridge_space() = 0;
+};
+
+
 // ======================> device_cococart_interface
 
 class device_cococart_interface : public device_slot_card_interface
@@ -156,8 +167,8 @@ public:
 	// construction/destruction
 	virtual ~device_cococart_interface();
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(scs_read);
+	virtual DECLARE_WRITE8_MEMBER(scs_write);
 	virtual void set_sound_enable(bool sound_enable);
 
 	virtual uint8_t* get_cart_base();
@@ -168,9 +179,18 @@ protected:
 
 	void cart_base_changed(void);
 
+	// CoCo cartridges can read directly from the address bus.  This is used by a number of
+	// cartridges (e.g. - Orch-90, Multi-Pak interface) for their control registers, independently
+	// of the SCS or CTS lines
+	address_space &cartridge_space();
+	void install_read_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler);
+	void install_write_handler(uint16_t addrstart, uint16_t addrend, write8_delegate whandler);
+	void install_readwrite_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler, write8_delegate whandler);
+
 private:
 	cococart_base_update_delegate m_update;
 };
+
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

@@ -57,6 +57,7 @@
 #include "coco_multi.h"
 #include "coco_232.h"
 #include "coco_orch90.h"
+#include "coco_ssc.h"
 #include "coco_gmc.h"
 #include "coco_pak.h"
 #include "coco_fdc.h"
@@ -75,6 +76,7 @@
 static SLOT_INTERFACE_START(coco_cart_slot1_3)
 	SLOT_INTERFACE("rs232", COCO_232)
 	SLOT_INTERFACE("orch90", COCO_ORCH90)
+	SLOT_INTERFACE("ssc", COCO_SSC)
 	SLOT_INTERFACE("games_master", COCO_PAK_GMC)
 	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
 	SLOT_INTERFACE("pak", COCO_PAK)
@@ -84,6 +86,7 @@ static SLOT_INTERFACE_START(coco_cart_slot4)
 	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
 	SLOT_INTERFACE("rs232", COCO_232)
 	SLOT_INTERFACE("orch90", COCO_ORCH90)
+	SLOT_INTERFACE("ssc", COCO_SSC)
 	SLOT_INTERFACE("games_master", COCO_PAK_GMC)
 	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
 	SLOT_INTERFACE("pak", COCO_PAK)
@@ -141,8 +144,7 @@ coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const 
 void coco_multipak_device::device_start()
 {
 	// install $FF7F handler
-	write8_delegate wh = write8_delegate(FUNC(coco_multipak_device::ff7f_write), this);
-	machine().device(":maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xFF7F, 0xFF7F, wh);
+	install_write_handler(0xFF7F, 0xFF7F, write8_delegate(FUNC(coco_multipak_device::ff7f_write), this));
 
 	// initial state
 	m_select = 0xFF;
@@ -330,22 +332,22 @@ uint8_t* coco_multipak_device::get_cart_base()
 
 
 //-------------------------------------------------
-//  read
+//  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_multipak_device::read)
+READ8_MEMBER(coco_multipak_device::scs_read)
 {
-	return active_scs_slot().read(space, offset);
+	return active_scs_slot().scs_read(space, offset);
 }
 
 
 //-------------------------------------------------
-//  write
+//  scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_multipak_device::write)
+WRITE8_MEMBER(coco_multipak_device::scs_write)
 {
-	active_scs_slot().write(space, offset, data);
+	active_scs_slot().scs_write(space, offset, data);
 }
 
 
@@ -365,3 +367,13 @@ WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_halt_w) { update_line(3, coc
 WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_cart_w) { update_line(4, cococart_slot_device::line::CART); }
 WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_nmi_w)  { update_line(4, cococart_slot_device::line::NMI); }
 WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_halt_w) { update_line(4, cococart_slot_device::line::HALT); }
+
+
+//-------------------------------------------------
+//  cartridge_space
+//-------------------------------------------------
+
+address_space &coco_multipak_device::cartridge_space()
+{
+	return device_cococart_interface::cartridge_space();
+}

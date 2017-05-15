@@ -55,16 +55,16 @@ machine_config_constructor coco_pak_gmc_device::device_mconfig_additions() const
 }
 
 //-------------------------------------------------
-//    write
+//    scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_pak_gmc_device::write)
+WRITE8_MEMBER(coco_pak_gmc_device::scs_write)
 {
 	switch(offset)
 	{
 		case 0:
 			/* set the bank */
-			coco_pak_banked_device::write(space,offset,data,mem_mask);
+			coco_pak_banked_device::scs_write(space, offset, data, mem_mask);
 			break;
 		case 1:
 			m_psg->write(data);

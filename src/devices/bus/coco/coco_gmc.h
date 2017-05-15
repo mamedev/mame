@@ -20,7 +20,8 @@ public:
 
 protected:
 		// device-level overrides
-		virtual DECLARE_WRITE8_MEMBER(write) override;
+		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+
 private:
 		required_device<sn76489a_device> m_psg;
 };

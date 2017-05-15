@@ -23,9 +23,10 @@
 
 // ======================> coco_multipak_device
 
-class coco_multipak_device :
-	public device_t,
-	public device_cococart_interface
+class coco_multipak_device
+	: public device_t
+	, public device_cococart_interface
+	, public device_cococart_host_interface
 {
 public:
 	// construction/destruction
@@ -51,12 +52,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(multi_slot4_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(multi_slot4_halt_w);
 
+	virtual address_space &cartridge_space() override;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual READ8_MEMBER(scs_read) override;
+	virtual WRITE8_MEMBER(scs_write) override;
 	virtual void set_sound_enable(bool sound_enable) override;
 
 private:

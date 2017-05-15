@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    coco_232.c
+    coco_232.cpp
 
     Code for emulating the CoCo RS-232 PAK
 
@@ -48,13 +48,18 @@ coco_232_device::coco_232_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void coco_232_device::device_start()
 {
+	install_readwrite_handler(0xFF68, 0xFF6F,
+		read8_delegate(FUNC(mos6551_device::read), (mos6551_device *)m_uart),
+		write8_delegate(FUNC(mos6551_device::write), (mos6551_device *)m_uart));
 }
+
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -64,29 +69,4 @@ void coco_232_device::device_start()
 machine_config_constructor coco_232_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( coco_rs232 );
-}
-
-/*-------------------------------------------------
-    read
--------------------------------------------------*/
-
-READ8_MEMBER(coco_232_device::read)
-{
-	uint8_t result = 0x00;
-
-	if ((offset >= 0x28) && (offset <= 0x2F))
-		result = m_uart->read(space, offset - 0x28);
-
-	return result;
-}
-
-
-/*-------------------------------------------------
-    write
--------------------------------------------------*/
-
-WRITE8_MEMBER(coco_232_device::write)
-{
-	if ((offset >= 0x28) && (offset <= 0x2F))
-		m_uart->write(space, offset - 0x28, data);
 }

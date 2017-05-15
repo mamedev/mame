@@ -55,7 +55,7 @@ DEFINE_DEVICE_TYPE(COCO_PAK, coco_pak_device, "cocopak", "CoCo Program PAK")
 coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
-	, m_cart(nullptr), m_owner(nullptr), m_autostart(*this, CART_AUTOSTART_TAG)
+	, m_cart(nullptr), m_autostart(*this, CART_AUTOSTART_TAG)
 {
 }
 
@@ -115,7 +115,7 @@ void coco_pak_device::device_reset()
 			: cococart_slot_device::line_value::CLEAR;
 
 		// normal CoCo PAKs tie their CART line to Q - the system clock
-		m_owner->set_line_value(cococart_slot_device::line::CART, cart_line);
+		dynamic_cast<cococart_slot_device *>(owner())->set_line_value(cococart_slot_device::line::CART, cart_line);
 	}
 }
 
@@ -188,16 +188,17 @@ void coco_pak_banked_device::banked_pak_set_bank(uint32_t bank)
 	}
 }
 
-/*-------------------------------------------------
-    write
--------------------------------------------------*/
 
-WRITE8_MEMBER(coco_pak_banked_device::write)
+//-------------------------------------------------
+//  scs_write
+//-------------------------------------------------
+
+WRITE8_MEMBER(coco_pak_banked_device::scs_write)
 {
 	switch(offset)
 	{
 		case 0:
-			/* set the bank */
+			// set the bank
 			banked_pak_set_bank(data);
 			break;
 	}

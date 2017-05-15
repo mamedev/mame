@@ -83,8 +83,8 @@ protected:
 	};
 
 	// device-level overrides
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual DECLARE_READ8_MEMBER(scs_read) override;
+	virtual DECLARE_WRITE8_MEMBER(scs_write) override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// methods
@@ -267,12 +267,11 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 			data);
 	}
 
-	/* An email from John Kowalski informed me that if the DS3 is
-	 * high, and one of the other drive bits is selected (DS0-DS2), then the
-	 * second side of DS0, DS1, or DS2 is selected.  If multiple bits are
-	 * selected in other situations, then both drives are selected, and any
-	 * read signals get yucky.
-	 */
+	// An email from John Kowalski informed me that if the DS3 is
+	// high, and one of the other drive bits is selected (DS0-DS2), then the
+	// second side of DS0, DS1, or DS2 is selected.  If multiple bits are
+	// selected in other situations, then both drives are selected, and any
+	// read signals get yucky.
 
 	if (data & 0x04)
 		drive = 2;
@@ -307,14 +306,14 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  read
+//  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_fdc_device_base::read)
+READ8_MEMBER(coco_fdc_device_base::scs_read)
 {
 	uint8_t result = 0;
 
-	switch(offset & 0xEF)
+	switch(offset & 0x1F)
 	{
 		case 8:
 			result = m_wd17xx->status_r(space, 0);
@@ -330,39 +329,15 @@ READ8_MEMBER(coco_fdc_device_base::read)
 			break;
 	}
 
-	/* other stuff for RTCs */
-	switch(offset)
-	{
-		case 0x10:  /* FF50 */
-			if (real_time_clock() == rtc_type::DISTO)
-				result = m_disto_msm6242->read(space,m_msm6242_rtc_address);
-			break;
-
-		case 0x38:  /* FF78 */
-			if (real_time_clock() == rtc_type::CLOUD9)
-				m_ds1315->read_0(space, offset);
-			break;
-
-		case 0x39:  /* FF79 */
-			if (real_time_clock() == rtc_type::CLOUD9)
-				m_ds1315->read_1(space, offset);
-			break;
-
-		case 0x3C:  /* FF7C */
-			if (real_time_clock() == rtc_type::CLOUD9)
-				result = m_ds1315->read_data(space, offset);
-			break;
-	}
 	return result;
 }
 
 
-
 //-------------------------------------------------
-//  write
+//  scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_fdc_device_base::write)
+WRITE8_MEMBER(coco_fdc_device_base::scs_write)
 {
 	switch(offset & 0x1F)
 	{
@@ -380,24 +355,10 @@ WRITE8_MEMBER(coco_fdc_device_base::write)
 			m_wd17xx->sector_w(space, 0, data);
 			break;
 		case 11:
-			//printf("data w %02x\n", data);
 			m_wd17xx->data_w(space, 0, data);
 			break;
 	};
 
-	/* other stuff for RTCs */
-	switch(offset)
-	{
-		case 0x10:  /* FF50 */
-			if (real_time_clock() == rtc_type::DISTO)
-				m_disto_msm6242->write(space,m_msm6242_rtc_address, data);
-			break;
-
-		case 0x11:  /* FF51 */
-			if (real_time_clock() == rtc_type::DISTO)
-				m_msm6242_rtc_address = data & 0x0f;
-			break;
-	}
 }
 
 
