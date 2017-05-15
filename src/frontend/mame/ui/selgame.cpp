@@ -872,6 +872,16 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
+            if ((ui_swinfo->driver->flags & MACHINE_TYPE_ARCADE) == 0)
+            {
+                for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
+                    if (!swlistdev.get_info().empty())
+                    {
+                        menu::stack_push<menu_select_software>(ui(), container(), ui_swinfo->driver);
+                        return;
+                    }
+            }
+
 			// if everything looks good, schedule the new driver
 			s_bios biosname;
 			if (!mopt.skip_bios_menu() && has_multiple_bios(ui_swinfo->driver, biosname))
@@ -931,7 +941,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 			}
 
 			std::string error_string;
-			std::string string_list = std::string(ui_swinfo->listname).append(":").append(ui_swinfo->shortname).append(":").append(ui_swinfo->part).append(":").append(ui_swinfo->instance);
+			std::string string_list = string_format("%s:%s:%s:%s", ui_swinfo->listname, ui_swinfo->shortname, ui_swinfo->part, ui_swinfo->instance);
 			mopt.set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 			std::string snap_list = std::string(ui_swinfo->listname).append(PATH_SEPARATOR).append(ui_swinfo->shortname);
 			mopt.set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
@@ -1407,7 +1417,7 @@ bool menu_select_game::load_available_machines()
 	file.gets(rbuf, MAX_CHAR_INFO);
 	file.gets(rbuf, MAX_CHAR_INFO);
 	readbuf = chartrimcarriage(rbuf);
-	std::string a_rev = std::string(UI_VERSION_TAG).append(bare_build_version);
+	std::string a_rev = string_format("%s%s", UI_VERSION_TAG, bare_build_version);
 
 	// version not matching ? exit
 	if (a_rev != readbuf)
