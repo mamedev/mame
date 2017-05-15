@@ -161,7 +161,7 @@ private:
 
 	void initialize_palette();
 
-	static constexpr int bckgnd[] = { 2, 0, 4, 1 };
+	static constexpr int bckgnd[4] = { 2, 0, 4, 1 };
 
 	devcb_read_line        m_read_inlace;
 	devcb_read_line        m_read_rdata;

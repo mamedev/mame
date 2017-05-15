@@ -36,7 +36,7 @@
 #define CDP1864_CYCLES_DMA_ACTIVE   8*8
 #define CDP1864_CYCLES_DMA_WAIT     6*8
 
-constexpr int cdp1864_device::bckgnd[];
+constexpr int cdp1864_device::bckgnd[4];
 
 
 

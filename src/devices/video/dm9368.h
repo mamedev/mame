@@ -62,7 +62,7 @@ private:
 	int m_rbi;
 	int m_rbo;
 
-	static const uint8_t m_segment_data[];
+	static const uint8_t s_segment_data[16];
 };
 
 
