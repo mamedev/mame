@@ -11,6 +11,12 @@
 
 #pragma once
 
+#ifdef _MSC_VER
+// MSVC seems to want to actually instantiate templates when it gets an extern template declaration, effectively defeating the purpose of extern template declatations altogether
+// In this case it causes a problem because the required_device template can't be instantiated for the incomplete i8089_channel_device type
+#include "i8089_channel.h"
+#endif
+
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -149,12 +155,6 @@ private:
 
 
 // device type definition
-#ifndef _MSC_VER
 DECLARE_DEVICE_TYPE(I8089, i8089_device)
-#else
-// MSVC seems to want to actually instantiate templates when it gets an extern template declaration, effectively defeating the purpose of extern template declatations altogether
-// In this case it causes a problem because the required_device template can't be instantiated for the incomplete i8089_channel_device type
-extern device_type const I8089;
-#endif
 
 #endif // MAME_CPU_I8089_I8089_H
