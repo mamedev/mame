@@ -1092,7 +1092,7 @@ void spc700_device::SET_FLAG_I(uint32_t value)
 			CLK(BCLK);                                                      \
 			DST     = EA_##MODE();                                          \
 			FLAG_NZ = read_8_##MODE(DST) | (FLAG_C & 0x100);                \
-			FLAG_C  = FLAG_NZ << 8;                                         \
+			FLAG_C  = FLAG_N << 8;                                          \
 			FLAG_NZ >>= 1;                                                  \
 			write_8_##MODE(DST, FLAG_NZ)
 
@@ -1173,7 +1173,7 @@ void spc700_device::SET_FLAG_I(uint32_t value)
 			CLK(BCLK);                                                      \
 			DST     = EA_##MODE();                                          \
 			FLAG_NZ = read_8_##MODE(DST);                                   \
-			write_8_##MODE(DST, FLAG_NZ & ~REG_A);                          \
+			write_8_##MODE(DST, FLAG_N & ~REG_A);                           \
 			FLAG_NZ &= REG_A
 
 /* Test and Set Bits */
@@ -1181,7 +1181,7 @@ void spc700_device::SET_FLAG_I(uint32_t value)
 			CLK(BCLK);                                                      \
 			DST     = EA_##MODE();                                          \
 			FLAG_NZ = read_8_##MODE(DST);                                   \
-			write_8_##MODE(DST, FLAG_NZ | REG_A);                           \
+			write_8_##MODE(DST, FLAG_N | REG_A);                            \
 			FLAG_NZ &= REG_A
 
 /* Exchange high and low nybbles of accumulator */
