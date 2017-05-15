@@ -48,7 +48,7 @@
 #include "hpi_dsk.h"
 
 // Debugging
-#define VERBOSE 1
+#define VERBOSE 0
 #define LOG(...)  do { if (VERBOSE) printf(__VA_ARGS__); } while (false)
 
 constexpr unsigned IL_OFFSET	= 0x12;	// Position of interleave factor in HPI image (2 bytes, big-endian)
