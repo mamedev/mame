@@ -2068,7 +2068,7 @@ void hdc92x4_device::format_track()
 			cont = WAIT;
 			break;
 		case TRACKDONE:
-			if (FORMAT_TRACK && TRACE_SUBSTATES) logerror("Track writing done\n");
+			if (TRACE_FORMAT && TRACE_SUBSTATES) logerror("Track writing done\n");
 			cont = SUCCESS;
 			break;
 		}

@@ -884,7 +884,7 @@ uint8_t xt_hdc_device::data_r()
 			data_cnt = 0;
 		}
 		data = buffer[data_cnt++];
-		if(data_cnt >= ((sector_cnt[drv] * 512) ? (sector_cnt[drv] * 512) : (256 * 512)))
+		if(data_cnt >= ((sector_cnt[drv]!=0) ? (sector_cnt[drv] * 512) : (256 * 512)))
 		{
 			data_cnt = 0;
 			pc_hdc_result(1);

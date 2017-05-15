@@ -1258,7 +1258,7 @@ void spc700_device::state_string_export(const device_state_entry &entry, std::st
 				(m_flag_b)               ? 'B':'.',
 				(m_flag_h & HFLAG_SET)   ? 'H':'.',
 				( m_flag_i)              ? 'I':'.',
-				((!m_flag_z) << 1)       ? 'Z':'.',
+				(((!m_flag_z) << 1) & 1) ? 'Z':'.',
 				((m_flag_c >> 8)&1)      ? 'C':'.'
 			);
 			break;

@@ -2720,7 +2720,7 @@ void n64_state::n64_machine_stop()
 	device_image_interface *image = dynamic_cast<device_image_interface *>(periphs->m_nvram_image);
 
 	uint8_t data[0x30800];
-	if (m_sram != nullptr)
+	if (m_sram == nullptr)
 	{
 		memset(data, 0, 0x20000);
 	}
