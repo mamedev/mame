@@ -37,10 +37,11 @@
         (when i.e. first boss goes to bottom of the screen and become unreachable)
     - (btanb) Throw is made by quickly double jumping (!)
     Heated Barrel
+	- (btanb) if player moves in diagonal a bogus projectile is fired.
     - gives random value to hi-score if you continue (only the first time, not a bug?);
     - (fixed) throws random address exceptions at level 3 and above, a RAM address arrives corrupt in the snippet at 0x136a;
     - (fixed) some corrupt sprites, probably a non-fatal version of the one above;
-    - stage 2 boss attacks only in vertical (regressed with the 130e / 3b30 / 42c2 command merge);
+    - (fixed) stage 2 boss attacks only in vertical (regressed with the 130e / 3b30 / 42c2 command merge);
     - (fixed) level 3+ boss movements looks wrong;
     - stage 3 "homing" missiles doesn't seem to like our 6200 hookup here, except it's NOT 6200!?
     - (fixed) barrels seen in later levels seems to fail an axis aligned bounding box, not unlike Legionnaire.
