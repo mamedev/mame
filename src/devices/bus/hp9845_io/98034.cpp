@@ -162,7 +162,7 @@ WRITE16_MEMBER(hp98034_io_card_device::reg_w)
 	// PPU pauses for an instant to let NP see FLG=0 immediately
 	// (see above)
 	space.device().execute().spin_until_time(attotime::from_usec(5));
-	LOG(("write R%u=%04x\n" , offset + 4 , data));
+	LOG("write R%u=%04x\n" , offset + 4 , data);
 }
 
 WRITE8_MEMBER(hp98034_io_card_device::dc_w)
