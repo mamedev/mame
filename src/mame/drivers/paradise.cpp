@@ -789,10 +789,16 @@ static MACHINE_CONFIG_DERIVED( penky, paradise )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(torus_map)
+	MCFG_CPU_IO_MAP(torus_io_map)
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( penkyi, penky )
 
+	// TODO add ticket dispenser
+
+	MCFG_DEVICE_REMOVE("oki2")
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -1377,7 +1383,7 @@ GAME( 199?,  para2dx,  0,         paradise, para2dx,  paradise_state, paradise, 
 GAME( 1995,  tgtball,  0,         tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995,  tgtballa, tgtball,   tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball", MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  penky,    0,         penky,    penky,    paradise_state, tgtball,  ROT0,  "Yun Sung", "Penky", MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  penkyi,   penky,     penky,    penkyi,   paradise_state, tgtball,  ROT0,  "Yun Sung (Impeuropex license)", "Penky (Italian)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  penkyi,   penky,     penkyi,   penkyi,   paradise_state, tgtball,  ROT0,  "Yun Sung (Impeuropex license)", "Penky (Italian)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  torus,    0,         torus,    torus,    paradise_state, torus,    ROT90, "Yun Sung", "Torus", MACHINE_SUPPORTS_SAVE )
 GAME( 1998,  madball,  0,         madball,  madball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0", MACHINE_SUPPORTS_SAVE )
 GAME( 1997,  madballn, madball,   madball,  madball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0 (With Nudity)", MACHINE_SUPPORTS_SAVE )
