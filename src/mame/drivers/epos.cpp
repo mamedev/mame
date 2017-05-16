@@ -472,7 +472,7 @@ static MACHINE_CONFIG_START( epos ) /* EPOS TRISTAR 8000 PCB */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_11MHz/4) /* should be a divisor of 16? - clock not confirmed - schematics show 8912 */
+	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_11MHz/16) /*  0.6875 MHz??? - clock not confirmed (similar to the clock listed below) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
