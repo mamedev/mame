@@ -886,14 +886,14 @@ ROM_END
 
 
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      STATE        INIT  COMPANY     FULLNAME, FLAGS
-CONS( 1989, ktopgun,   0,      0,      ktopgun,   ktopgun,   ktopgun_state,  0, "Konami",   "Top Gun (handheld)",                      MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kcontra,   0,      0,      kcontra,   kcontra,   kcontra_state,  0, "Konami",   "Contra (handheld)",                       MACHINE_SUPPORTS_SAVE )
-CONS( 1989, ktmnt,     0,      0,      ktmnt,     ktmnt,     ktmnt_state,    0, "Konami",   "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kgradius,  0,      0,      kgradius,  kgradius,  kgradius_state, 0, "Konami",   "Gradius (handheld)",                      MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kloneran,  0,      0,      kloneran,  kloneran,  kloneran_state, 0, "Konami",   "Lone Ranger (handheld)",                  MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT CMP MACHINE    INPUT      STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1989, ktopgun,   0,      0, ktopgun,   ktopgun,   ktopgun_state,  0, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kcontra,   0,      0, kcontra,   kcontra,   kcontra_state,  0, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, ktmnt,     0,      0, ktmnt,     ktmnt,     ktmnt_state,    0, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kgradius,  0,      0, kgradius,  kgradius,  kgradius_state, 0, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kloneran,  0,      0, kloneran,  kloneran,  kloneran_state, 0, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, gnw_dm53,  0,      0,      dm53,      dm53,      dm53_state,     0, "Nintendo", "Game & Watch: Mickey & Donald",        MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_jr55,  0,      0,      jr55,      jr55,      jr55_state,     0, "Nintendo", "Game & Watch: Donkey Kong II",         MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_ml102, 0,      0,      ml102,     ml102,     ml102_state,    0, "Nintendo", "Game & Watch: Mario's Cement Factory", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // GNW: missing svg screen
-CONS( 1984, gnw_bx301, 0,      0,      bx301,     bx301,     bx301_state,    0, "Nintendo", "Game & Watch: Boxing",                 MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gnw_dm53,  0,      0, dm53,      dm53,      dm53_state,     0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_jr55,  0,      0, jr55,      jr55,      jr55_state,     0, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_ml102, 0,      0, ml102,     ml102,     ml102_state,    0, "Nintendo", "Game & Watch: Mario's Cement Factory", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // GNW: missing svg screen
+CONS( 1984, gnw_bx301, 0,      0, bx301,     bx301,     bx301_state,    0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )

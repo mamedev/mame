@@ -30,7 +30,10 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram") { }
+		m_generic_paletteram_8(*this, "paletteram"),
+		m_pia_0(*this, "pia_0"),
+		m_pia_1(*this, "pia_1"),
+		m_pia_2(*this, "pia_2") { }
 
 	enum
 	{
@@ -120,6 +123,9 @@ public:
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_generic_paletteram_8;
+	required_device<pia6821_device> m_pia_0;
+	required_device<pia6821_device> m_pia_1;
+	required_device<pia6821_device> m_pia_2;
 };
 
 
@@ -129,10 +135,12 @@ public:
 	blaster_state(const machine_config &mconfig, device_type type, const char *tag)
 		: williams_state(mconfig, type, tag),
 		m_soundcpu_b(*this, "soundcpu_b"),
+		m_pia_2b(*this, "pia_2b"),
 		m_blaster_palette_0(*this, "blaster_pal0"),
 		m_blaster_scanline_control(*this, "blaster_scan") { }
 
 	optional_device<cpu_device> m_soundcpu_b;
+	optional_device<pia6821_device> m_pia_2b;
 	required_shared_ptr<uint8_t> m_blaster_palette_0;
 	required_shared_ptr<uint8_t> m_blaster_scanline_control;
 

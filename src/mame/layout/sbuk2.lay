@@ -65,14 +65,14 @@
 		</text>
 	</element>
 
-	<element name="BET5/BLACK">
+	<element name="BET5">
 		<rect state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
-		<text string="BET 5">
+		<text string="BET 5/BLACK">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
@@ -168,7 +168,7 @@
 			<bounds x="0.68" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 		<bezel name="lamp5" element="BET2" inputtag="P1" inputmask="0x20">
-			<bounds x="1.19" y="3.28" width="0.31" height="0.24" />
+			<bounds x="1.09" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 		<bezel name="lamp4" element="BET3" inputtag="P1" inputmask="0x10">
 			<bounds x="1.51" y="3.28" width="0.31" height="0.24" />

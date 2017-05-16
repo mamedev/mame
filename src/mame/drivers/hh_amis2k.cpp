@@ -343,4 +343,5 @@ ROM_START( wildfire )
 ROM_END
 
 
-CONS( 1979, wildfire, 0, 0, wildfire, wildfire, wildfire_state, 0, "Parker Brothers", "Wildfire (patent)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: pretty sure that it matches the commercial release
+//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1979, wildfire, 0,      0, wildfire, wildfire, wildfire_state, 0, "Parker Brothers", "Wildfire (patent)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: pretty sure that it matches the commercial release
