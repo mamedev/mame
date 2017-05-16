@@ -40,6 +40,9 @@
 #define AY_TAG "cocossc_ay"
 #define SP0256_TAG "sp0256"
 
+#define SP0256_GAIN 1.75
+#define AY8913_GAIN 2.0
+
 #define C_A8   0x01
 #define C_BC1  0x01
 #define C_A9   0x02
@@ -124,7 +127,7 @@ AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(PIC_TAG, 0)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT(coco_ssc)
-MCFG_CPU_ADD(PIC_TAG, TMS7040, XTAL_3_579545MHz / 2)
+	MCFG_CPU_ADD(PIC_TAG, TMS7040, DERIVED_CLOCK(1, 2))
 MCFG_CPU_PROGRAM_MAP(ssc_rom)
 MCFG_CPU_IO_MAP(ssc_io_map)
 
@@ -132,32 +135,37 @@ MCFG_RAM_ADD("staticram")
 MCFG_RAM_DEFAULT_SIZE("2K")
 MCFG_RAM_DEFAULT_VALUE(0x00)
 
-MCFG_SPEAKER_STANDARD_MONO("sscmono")
+	MCFG_SPEAKER_STANDARD_MONO("ssc_speech")
+	MCFG_SPEAKER_STANDARD_MONO("ssc_psg")
 
 MCFG_SOUND_ADD(SP0256_TAG, SP0256, XTAL_3_12MHz)
-MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sscmono", 1.75)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_speech", SP0256_GAIN)
 MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE(PIC_TAG, TMS7000_INT1_LINE))
 
-#ifdef SAC_ON
-MCFG_SOUND_ADD(AY_TAG, AY8913, XTAL_3_579545MHz / 4)
+#ifdef SAC_NETLIST_ON /* NETLIST sersion */
+	MCFG_SOUND_ADD(AY_TAG, AY8913, DERIVED_CLOCK(1, 2))
 MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
 MCFG_AY8910_RES_LOADS(820, 820, 820)
 MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
 MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
 MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)
 
-MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, XTAL_3_579545MHz / 4)
+	MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, DERIVED_CLOCK(1, 2))
 MCFG_NETLIST_SETUP(nl_sac)
-MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sscmono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_psg", AY8910_GAIN)
 MCFG_NETLIST_STREAM_INPUT("snd_nl", 0, "R20.R")
 MCFG_NETLIST_STREAM_INPUT("snd_nl", 1, "R20.R")
 MCFG_NETLIST_STREAM_INPUT("snd_nl", 2, "R20.R")
 
 MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "R20.1")
 MCFG_NETLIST_LOGIC_OUTPUT("", "cocossc", "sac", coco_ssc_device, sac_cb, "cocossc_tag")
-#else
-MCFG_SOUND_ADD(AY_TAG, AY8913, XTAL_3_579545MHz / 4)
-MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sscmono", 2.0)
+#else /* sound stream filter version */
+	MCFG_SOUND_ADD(AY_TAG, AY8913, DERIVED_CLOCK(1, 2))
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "coco_sac_tag", AY8913_GAIN)
+
+	MCFG_COCOSSC_SAC_ADD("coco_sac_tag", DERIVED_CLOCK(1, 2))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_psg", 1.0)
 #endif
 
 MACHINE_CONFIG_END
@@ -190,7 +198,8 @@ coco_ssc_device::coco_ssc_device(const machine_config &mconfig, const char *tag,
 		m_tms7040(*this, PIC_TAG),
 		m_staticram(*this, "staticram"),
 		m_ay(*this, AY_TAG),
-		m_spo(*this, SP0256_TAG)
+		m_spo(*this, SP0256_TAG),
+		m_sac(*this, "coco_sac_tag")
 {
 }
 
@@ -239,29 +248,24 @@ const tiny_rom_entry *coco_ssc_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  coco_cartridge_set_line
+//  set_sound_enable
 //-------------------------------------------------
 
-void coco_ssc_device::cart_set_line(cococart_slot_device::line which, cococart_slot_device::line_value value)
+void coco_ssc_device::set_sound_enable(bool sound_enable)
 {
-
-	switch (which)
+	if( sound_enable )
 	{
-		case cococart_slot_device::line::SOUND_ENABLE:
-			if( value == cococart_slot_device::line_value::ASSERT )
-			{
-				logerror( "coco_ssc_device::cart_set_line sound enable assert\n" );
-				m_ay->set_volume(ALL_8910_CHANNELS,100);
-			}
-			else
-			{
-				logerror( "coco_ssc_device::cart_set_line sound enable clear\n" );
-				m_ay->set_volume(ALL_8910_CHANNELS,0);
-			}
-			break;
-		default:
-			logerror( "coco_ssc_device::cart_set_line something else\n" );
-			break;
+		m_ay->set_output_gain(0, 1);
+		m_ay->set_output_gain(1, 1);
+		m_ay->set_output_gain(2, 1);
+		m_spo->set_output_gain(0, 1);
+	}
+	else
+	{
+		m_ay->set_output_gain(0, 0.0);
+		m_ay->set_output_gain(1, 0.0);
+		m_ay->set_output_gain(2, 0.0);
+		m_spo->set_output_gain(0, 0.0);
 	}
 }
 
@@ -291,6 +295,11 @@ READ8_MEMBER(coco_ssc_device::ff7d_read)
 			if( m_spo->sby_r() )
 			{
 				data |= 0x40;
+			}
+
+			if( ! m_sac->sound_activity_circuit_output() )
+			{
+				data |= 0x20;
 			}
 
 			break;
@@ -323,13 +332,19 @@ WRITE8_MEMBER(coco_ssc_device::ff7d_write)
 			break;
 
 		case 0x01:
+
+			if (LOG_SSC)
+			{
+				logerror( "[0x%04x] ff7e write: %02x\n", space.device().safe_pc(), data );
+			}
+
 			tms7000_porta = data;
 			m_tms7040->set_input_line(TMS7000_INT3_LINE, ASSERT_LINE);
 			break;
 	}
 }
 
-#ifdef SAC_ON
+#ifdef SAC_NETLIST_ON
 //-------------------------------------------------
 //  Callback for Sound Activity Circuit
 //-------------------------------------------------
@@ -462,3 +477,73 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_d_w)
 
 	tms7000_portd = data;
 }
+
+#ifndef SAC_NETLIST_ON
+// device type definition
+DEFINE_DEVICE_TYPE(COCOSSC_SAC, cocossc_sac_device, "cocossc_sac", "CoCo SSC Sound Activity Circuit");
+
+//-------------------------------------------------
+//  cocossc_sac_device - constructor
+//-------------------------------------------------
+
+cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, COCOSSC_SAC, tag, owner, clock),
+		device_sound_interface(mconfig, *this),
+		m_stream(nullptr),
+		m_index(0)
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void cocossc_sac_device::device_start()
+{
+	m_stream = stream_alloc(1, 1, machine().sample_rate());
+}
+
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void cocossc_sac_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	stream_sample_t *src = inputs[0];
+	stream_sample_t *dst = outputs[0];
+
+	double n = samples;
+
+	while (samples--)
+	{
+		m_rms[m_index] += ( (double)*src * (double)*src );
+		*dst++ = (*src++);
+	}
+
+	m_rms[m_index] = m_rms[m_index] / n;
+	m_rms[m_index] = sqrt(m_rms[m_index]);
+
+	m_index++;
+	m_index &= 0x07;
+}
+
+
+//-------------------------------------------------
+//  sound_activity_circuit_output - making sound
+//-------------------------------------------------
+
+bool cocossc_sac_device::sound_activity_circuit_output()
+{
+	double average = m_rms[0] + m_rms[2] + m_rms[3] + m_rms[4] + m_rms[5] + m_rms[6] + m_rms[7];
+
+	average /= 8.0;
+
+	if( average > 10400.0 )
+		return true;
+
+	return false;
+}
+
+#endif

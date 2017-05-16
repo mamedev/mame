@@ -2,8 +2,8 @@
 // copyright-holders:tim lindner
 #pragma once
 
-#ifndef __COCO_SSC_H__
-#define __COCO_SSC_H__
+#ifndef MAME_DEVICES_BUS_COCO_COCO_SSC_H
+#define MAME_DEVICES_BUS_COCO_COCO_SSC_H
 
 #include "machine/ram.h"
 #include "sound/ay8910.h"
@@ -12,11 +12,13 @@
 #include "netlist/devices/net_lib.h"
 #include "cococart.h"
 
-// #define SAC_ON
+// #define SAC_NETLIST_ON
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+class cocossc_sac_device;
 
 // ======================> coco_ssc_device
 
@@ -31,7 +33,6 @@ public:
 		// optional information overrides
 		virtual const tiny_rom_entry *device_rom_region() const override;
 		virtual machine_config_constructor device_mconfig_additions() const override;
-		void cart_set_line(cococart_slot_device::line which, cococart_slot_device::line_value value);
 
 		virtual void device_reset() override;
 
@@ -42,7 +43,7 @@ public:
 		DECLARE_READ8_MEMBER(ssc_port_d_r);
 		DECLARE_WRITE8_MEMBER(ssc_port_d_w);
 
-#ifdef SAC_ON
+#ifdef SAC_NETLIST_ON
 		NETDEV_LOGIC_CALLBACK_MEMBER(sac_cb);
 #endif
 protected:
@@ -50,6 +51,7 @@ protected:
 		virtual void device_start() override;
 		virtual DECLARE_READ8_MEMBER(ff7d_read);
 		virtual DECLARE_WRITE8_MEMBER(ff7d_write);
+		virtual void set_sound_enable(bool sound_enable) override;
 private:
 		uint8_t reset_line;
 		uint8_t tms7000_porta;
@@ -60,10 +62,52 @@ private:
 		required_device<ram_device> m_staticram;
 		required_device<ay8910_device> m_ay;
 		required_device<sp0256_device> m_spo;
+		required_device<cocossc_sac_device> m_sac;
 };
 
 
 // device type definition
 extern const device_type COCO_SSC;
 
-#endif  /* __COCO_SSC_H__ */
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_COCOSSC_SAC_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, COCOSSC_SAC, _clock)
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+#ifndef SAC_NETLIST_ON
+// ======================> Color Computer Sound Activity Circuit filter
+
+class cocossc_sac_device : public device_t,
+								public device_sound_interface
+{
+public:
+	cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	~cocossc_sac_device() { }
+	bool sound_activity_circuit_output();
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+private:
+	sound_stream*  m_stream;
+	double m_rms[8];
+	int m_index;
+};
+
+extern const device_type COCOSSC_SAC;
+
+#endif // SAC_NETLIST_ON
+
+#endif  // MAME_DEVICES_BUS_COCO_COCO_SSC_H

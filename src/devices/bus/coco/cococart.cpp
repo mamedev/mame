@@ -8,7 +8,7 @@
     (which are simple ROMs) but in practice is the main extensibility
     mechanism for CoCo hardware
 
-    CoCo Pinout listing (not sure if the Dragon was the same)
+    CoCo and Dragon pinout listing
        ---  -------            ---  -------
          1  -12V                21  A2
          2  +12V                22  A3
