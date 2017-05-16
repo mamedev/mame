@@ -54,67 +54,6 @@
 #define C_ACS  0x40
 #define C_BSY  0x80
 
-#ifdef SAC_ON
-//-------------------------------------------------
-//  nl_ssc - Sound Activity Circuit net list
-//-------------------------------------------------
-
-static NETLIST_START(nl_sac)
-
-	/* Standard stuff */
-
- 	SOLVER(Solver, 48000)
-	ANALOG_INPUT(V5, 5)
-	ANALOG_INPUT(VN5, -5)
-	// PARAM(Solver.ACCURACY, 1e-6)
-// 	PARAM(Solver.GS_LOOPS, 6)
-// 	PARAM(Solver.SOR_FACTOR, 1.0)
-
-	RES(R20,    820)
-	RES(R6,   10000)z
-	RES(R7,    9100)
-	RES(R5,  100000)
-	RES(R2,   10000)
-	RES(R1,  100000)
-RES(R9, 56000)
-RES(R8, 10000)
-RES(R3, 2400000)
-RES(R4, 4700)
-
-CAP(C9, CAP_U(1.0))
-CAP(C25, CAP_U(1.5))
-
-DIODE(D2, "1N4148")
-DIODE(D1, "1N4148")
-DIODE(D3, "1N4148")
-
-LM324_DIP(IC1)
-
-NET_C(R20.2, GND)
-NET_C(IC1.5, R20.1)
-NET_C(IC1.7, IC1.6, C9.1)
-NET_C(IC1.11, VN5)
-NET_C(C9.2, R6.1)
-NET_C(R6.2, IC1.2, R5.1)
-NET_C(IC1.3, R7.1)
-NET_C(R7.2, GND)
-NET_C(IC1.1, R5.2, R2.1)
-NET_C(R2.2, IC1.13, D2.A, R1.1)
-NET_C(IC1.4, V5)
-NET_C(IC1.12, GND)
-NET_C(IC1.14, D2.K, D1.A)
-NET_C(R1.2, D1.K, C25.1, IC1.9)
-NET_C(C25.2, GND)
-NET_C(V5, R9.1)
-NET_C(R9.2, IC1.10, R3.1, R8.1)
-NET_C(R8.2, GND)
-NET_C(R3.2, IC1.8, D3.A)
-NET_C(D3.K, R4.1)
-NET_C(R4.2, GND)
-NETLIST_END()
-
-#endif
-
 static ADDRESS_MAP_START(ssc_io_map, AS_IO, 8, coco_ssc_device)
 	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(ssc_port_a_r)
 	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(ssc_port_b_w)
@@ -140,34 +79,14 @@ static MACHINE_CONFIG_FRAGMENT(coco_ssc)
 
 	MCFG_SOUND_ADD(SP0256_TAG, SP0256, XTAL_3_12MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_speech", SP0256_GAIN)
-MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE(PIC_TAG, TMS7000_INT1_LINE))
+	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE(PIC_TAG, TMS7000_INT1_LINE))
 
-#ifdef SAC_NETLIST_ON /* NETLIST sersion */
-	MCFG_SOUND_ADD(AY_TAG, AY8913, DERIVED_CLOCK(1, 2))
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
-	MCFG_AY8910_RES_LOADS(820, 820, 820)
-	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)
-
-	MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, DERIVED_CLOCK(1, 2))
-	MCFG_NETLIST_SETUP(nl_sac)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_psg", AY8910_GAIN)
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 0, "R20.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 1, "R20.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 2, "R20.R")
-
-	MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "R20.1")
-	MCFG_NETLIST_LOGIC_OUTPUT("", "cocossc", "sac", coco_ssc_device, sac_cb, "cocossc_tag")
-#else /* sound stream filter version */
 	MCFG_SOUND_ADD(AY_TAG, AY8913, XTAL_3_579545MHz / 4)	// perhaps should be DERIVED_CLOCK(1, 2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "coco_sac_tag", AY8913_GAIN)
 
 	MCFG_COCOSSC_SAC_ADD("coco_sac_tag", DERIVED_CLOCK(1, 2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_psg", 1.0)
-#endif
-
 MACHINE_CONFIG_END
 
 ROM_START(coco_ssc)
@@ -344,16 +263,6 @@ WRITE8_MEMBER(coco_ssc_device::ff7d_write)
 	}
 }
 
-#ifdef SAC_NETLIST_ON
-//-------------------------------------------------
-//  Callback for Sound Activity Circuit
-//-------------------------------------------------
-
-NETDEV_LOGIC_CALLBACK_MEMBER(coco_ssc_device::sac_cb)
-{
-	logerror( "sac_cb: %d\n", data );
-}
-#endif
 
 //-------------------------------------------------
 //  Handlers for secondary CPU ports
@@ -478,7 +387,6 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_d_w)
 	tms7000_portd = data;
 }
 
-#ifndef SAC_NETLIST_ON
 // device type definition
 DEFINE_DEVICE_TYPE(COCOSSC_SAC, cocossc_sac_device, "cocossc_sac", "CoCo SSC Sound Activity Circuit");
 
@@ -545,5 +453,3 @@ bool cocossc_sac_device::sound_activity_circuit_output()
 
 	return false;
 }
-
-#endif

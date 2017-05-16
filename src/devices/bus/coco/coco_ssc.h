@@ -43,9 +43,6 @@ public:
 		DECLARE_READ8_MEMBER(ssc_port_d_r);
 		DECLARE_WRITE8_MEMBER(ssc_port_d_w);
 
-#ifdef SAC_NETLIST_ON
-		NETDEV_LOGIC_CALLBACK_MEMBER(sac_cb);
-#endif
 protected:
 		// device-level overrides
 		virtual void device_start() override;
@@ -82,7 +79,6 @@ extern const device_type COCO_SSC;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-#ifndef SAC_NETLIST_ON
 // ======================> Color Computer Sound Activity Circuit filter
 
 class cocossc_sac_device : public device_t,
@@ -107,7 +103,5 @@ private:
 };
 
 extern const device_type COCOSSC_SAC;
-
-#endif // SAC_NETLIST_ON
 
 #endif  // MAME_DEVICES_BUS_COCO_COCO_SSC_H
