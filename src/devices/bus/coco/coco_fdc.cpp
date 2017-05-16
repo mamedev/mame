@@ -329,6 +329,29 @@ READ8_MEMBER(coco_fdc_device_base::scs_read)
 			break;
 	}
 
+	/* other stuff for RTCs */
+	switch (offset)
+	{
+	case 0x10:  /* FF50 */
+		if (real_time_clock() == rtc_type::DISTO)
+			result = m_disto_msm6242->read(space, m_msm6242_rtc_address);
+		break;
+
+	case 0x38:  /* FF78 */
+		if (real_time_clock() == rtc_type::CLOUD9)
+			m_ds1315->read_0(space, offset);
+		break;
+
+	case 0x39:  /* FF79 */
+		if (real_time_clock() == rtc_type::CLOUD9)
+			m_ds1315->read_1(space, offset);
+		break;
+
+	case 0x3C:  /* FF7C */
+		if (real_time_clock() == rtc_type::CLOUD9)
+			result = m_ds1315->read_data(space, offset);
+		break;
+	}
 	return result;
 }
 
@@ -359,6 +382,19 @@ WRITE8_MEMBER(coco_fdc_device_base::scs_write)
 			break;
 	};
 
+	/* other stuff for RTCs */
+	switch(offset)
+	{
+		case 0x10:  /* FF50 */
+			if (real_time_clock() == rtc_type::DISTO)
+				m_disto_msm6242->write(space,m_msm6242_rtc_address, data);
+			break;
+
+		case 0x11:  /* FF51 */
+			if (real_time_clock() == rtc_type::DISTO)
+				m_msm6242_rtc_address = data & 0x0f;
+			break;
+	}
 }
 
 
