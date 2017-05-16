@@ -56,10 +56,10 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_ioga_device)
 	AM_RANGE(0xb0, 0xbf) AM_READWRITE16(softint_vector_r, softint_vector_w, 0xffffffff)
 ADDRESS_MAP_END
 
-const device_type INTERPRO_IOGA = device_creator<interpro_ioga_device>;
+DEFINE_DEVICE_TYPE(INTERPRO_IOGA, interpro_ioga_device, "ioga", "InterPro IOGA")
 
 interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, INTERPRO_IOGA, "InterPro IOGA", tag, owner, clock, "ioga", __FILE__),
+	: device_t(mconfig, INTERPRO_IOGA, tag, owner, clock),
 	m_out_nmi_func(*this),
 	m_out_int_func(*this),
 	m_memory_space(nullptr),

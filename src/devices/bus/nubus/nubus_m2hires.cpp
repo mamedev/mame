@@ -36,7 +36,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_M2HIRES = device_creator<nubus_m2hires_device>;
+DEFINE_DEVICE_TYPE(NUBUS_M2HIRES, nubus_m2hires_device, "nb_m2hr", "Macintosh II Hi-Resolution video card")
 
 
 //-------------------------------------------------
@@ -67,20 +67,17 @@ const tiny_rom_entry *nubus_m2hires_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_m2hires_device::nubus_m2hires_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, NUBUS_M2HIRES, "Macintosh II Hi-Resolution video card", tag, owner, clock, "nb_m2hr", __FILE__),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+	nubus_m2hires_device(mconfig, NUBUS_M2HIRES, tag, owner, clock)
 {
-	m_assembled_tag = std::string(tag).append(":").append(M2HIRES_SCREEN_NAME);
-	m_screen_tag = m_assembled_tag.c_str();
 }
 
-nubus_m2hires_device::nubus_m2hires_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+nubus_m2hires_device::nubus_m2hires_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	device_nubus_card_interface(mconfig, *this),
+	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
+	m_assembled_tag(util::string_format("%s:%s", tag, M2HIRES_SCREEN_NAME))
 {
-	m_assembled_tag = std::string(tag).append(":").append(M2HIRES_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 

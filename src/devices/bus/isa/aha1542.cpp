@@ -134,7 +134,7 @@
 #define CMD_EXTBIOS     0x28    // return extended BIOS information
 #define CMD_MBENABLE    0x29    // set mailbox interface enable
 
-const device_type AHA1542 = device_creator<aha1542_device>;
+DEFINE_DEVICE_TYPE(AHA1542, aha1542_device, "aha1542", "AHA1542 SCSI Controller")
 
 #define Z84C0010_TAG "u5"
 
@@ -185,7 +185,7 @@ machine_config_constructor aha1542_device::device_mconfig_additions() const
 }
 
 aha1542_device::aha1542_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, AHA1542, "AHA1542 SCSI Controller", tag, owner, clock, "aha1542", __FILE__    ),
+	device_t(mconfig, AHA1542, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this)
 {
 }

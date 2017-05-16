@@ -78,10 +78,10 @@ this seems to be the only zoom feature actually used in the games.
 *****************************************************************************/
 
 
-const device_type TC0080VCO = device_creator<tc0080vco_device>;
+DEFINE_DEVICE_TYPE(TC0080VCO, tc0080vco_device, "tc0080vco", "Taito TC0080VCO")
 
 tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0080VCO, "Taito TC0080VCO", tag, owner, clock, "tc0080vco", __FILE__),
+	: device_t(mconfig, TC0080VCO, tag, owner, clock),
 	m_ram(nullptr),
 	m_bg0_ram_0(nullptr),
 	m_bg0_ram_1(nullptr),

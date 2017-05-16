@@ -190,7 +190,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( klax, klax_state )
+static MACHINE_CONFIG_START( klax )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -226,7 +226,7 @@ static MACHINE_CONFIG_START( klax, klax_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/4/4, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/4/4, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -438,10 +438,10 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, klax,  0,    klax, klax, driver_device, 0, ROT0, "Atari Games", "Klax (set 1)", 0 )
-GAME( 1989, klax2, klax, klax, klax, driver_device, 0, ROT0, "Atari Games", "Klax (set 2)", 0 )
-GAME( 1989, klax3, klax, klax, klax, driver_device, 0, ROT0, "Atari Games", "Klax (set 3)", 0 )
-GAME( 1989, klaxj, klax, klax, klax, driver_device, 0, ROT0, "Atari Games", "Klax (Japan)", 0 )
-GAME( 1989, klaxd, klax, klax, klax, driver_device, 0, ROT0, "Atari Games", "Klax (Germany)", 0 )
+GAME( 1989, klax,  0,    klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (set 1)", 0 )
+GAME( 1989, klax2, klax, klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (set 2)", 0 )
+GAME( 1989, klax3, klax, klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (set 3)", 0 )
+GAME( 1989, klaxj, klax, klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (Japan)", 0 )
+GAME( 1989, klaxd, klax, klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (Germany)", 0 )
 
-GAME( 1989, klax2bl, klax, klax2bl, klax, driver_device, 0, ROT0, "bootleg", "Klax (set 2, bootleg)", MACHINE_NOT_WORKING )
+GAME( 1989, klax2bl, klax, klax2bl, klax, klax_state, 0, ROT0, "bootleg", "Klax (set 2, bootleg)", MACHINE_NOT_WORKING )

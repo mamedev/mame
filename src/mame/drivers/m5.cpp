@@ -1051,7 +1051,7 @@ static ADDRESS_MAP_START( brno_io, AS_IO, 8, brno_state )
 	AM_RANGE(0x68, 0x6b) AM_READWRITE(ramsel_r, ramsel_w)                                           //  CASEN 0=access to ramdisk enabled, 0xff=ramdisk access disabled(data protection), &80=ROM2+48k RAM, &81=ROM2+4k RAM
 	AM_RANGE(0x6c, 0x6f) AM_READWRITE(romsel_r, romsel_w)                                           //  RAMEN 0=rom enable; 0xff=rom+sord ram disabled (ramdisk visible)
 //  AM_RANGE(0x70, 0x73) AM_MIRROR(0x04) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)     //  PIO
-	AM_RANGE(0x78, 0x7b) AM_DEVREADWRITE(WD2797_TAG, wd_fdc_t, read, write)                         //  WD2797 registers -> 78 - status/cmd, 79 - track #, 7a - sector #, 7b - data
+	AM_RANGE(0x78, 0x7b) AM_DEVREADWRITE(WD2797_TAG, wd_fdc_device_base, read, write)               //  WD2797 registers -> 78 - status/cmd, 79 - track #, 7a - sector #, 7b - data
 	AM_RANGE(0x7c, 0x7c) AM_READWRITE(fd_r, fd_w)                                                   //  drive select
 ADDRESS_MAP_END
 
@@ -1396,7 +1396,7 @@ void brno_state::machine_reset()
 //  MACHINE_CONFIG( m5 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( m5, m5_state )
+static MACHINE_CONFIG_START( m5 )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_14_31818MHz/4)
 	MCFG_CPU_PROGRAM_MAP(m5_mem)
@@ -1487,7 +1487,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( brno, m5, brno_state )
+static MACHINE_CONFIG_DERIVED( brno, m5 )
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY(Z80_TAG)
@@ -1606,7 +1606,7 @@ DRIVER_INIT_MEMBER(brno_state,brno)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME            FLAGS
-COMP( 1983, m5,     0,      0,      ntsc,   m5, m5_state,       ntsc,   "Sord",     "m.5 (Japan)",      0 )
-COMP( 1983, m5p,    m5,     0,      pal,    m5, m5_state,       pal,    "Sord",     "m.5 (Europe)",     0 )
-COMP( 1983, m5p_brno,   m5,     0,      brno,   m5, brno_state,     brno,   "Sord",     "m.5 (Europe) BRNO mod",    0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  STATE       INIT    COMPANY     FULLNAME                 FLAGS
+COMP( 1983, m5,       0,      0,      ntsc,    m5,    m5_state,   ntsc,   "Sord",     "m.5 (Japan)",           0 )
+COMP( 1983, m5p,      m5,     0,      pal,     m5,    m5_state,   pal,    "Sord",     "m.5 (Europe)",          0 )
+COMP( 1983, m5p_brno, m5,     0,      brno,    m5,    brno_state, brno,   "Sord",     "m.5 (Europe) BRNO mod", 0 )

@@ -50,13 +50,12 @@
 // The HP manual of Nanoprocessor is available here:
 // http://www.hp9845.net/9845/downloads/manuals/Nanoprocessor.pdf
 // Thanks to anyone who made the manual available.
-#ifndef _NANOPROCESSOR_H_
-#define _NANOPROCESSOR_H_
+#ifndef MAME_CPU_NANOPROCESSOR_NANOPROCESSOR_H
+#define MAME_CPU_NANOPROCESSOR_NANOPROCESSOR_H
 
-#define HP_NANO_REGS    16  // Number of GP registers
-#define HP_NANO_PC_MASK 0x7ff   // Mask of PC meaningful bits: 11 bits available
-#define HP_NANO_DC_NO   8   // Number of direct control lines (DC7 is typically used as interrupt mask)
-#define HP_NANO_IE_DC   7   // DC line used as interrupt enable/mask (DC7)
+#pragma once
+
+constexpr unsigned HP_NANO_IE_DC   = 7;   // DC line used as interrupt enable/mask (DC7)
 
 // DC changed callback
 // The callback receives a 8-bit word holding the state of all DC lines.
@@ -75,12 +74,8 @@ class hp_nanoprocessor_device : public cpu_device
 public:
 	hp_nanoprocessor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_dc_changed_func(device_t &device, _Object object) { return downcast<hp_nanoprocessor_device &>(device).m_dc_changed_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_dc_func(device_t &device, _Object object) { return downcast<hp_nanoprocessor_device &>(device).m_read_dc_func.set_callback(object); }
-
-	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	template <class Object> static devcb_base &set_dc_changed_func(device_t &device, Object &&cb) { return downcast<hp_nanoprocessor_device &>(device).m_dc_changed_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_dc_func(device_t &device, Object &&cb) { return downcast<hp_nanoprocessor_device &>(device).m_read_dc_func.set_callback(std::forward<Object>(cb)); }
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 2; }
@@ -88,8 +83,6 @@ public:
 	virtual uint32_t execute_max_cycles() const override { return 3; }
 	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
-	virtual void execute_run() override;
-	virtual void execute_set_input(int linenum, int state) override;
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override {
@@ -105,6 +98,10 @@ public:
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
+	static constexpr unsigned HP_NANO_REGS    = 16;  // Number of GP registers
+	static constexpr unsigned HP_NANO_PC_MASK = 0x7ff;   // Mask of PC meaningful bits: 11 bits available
+	static constexpr unsigned HP_NANO_DC_NO   = 8;   // Number of direct control lines (DC7 is typically used as interrupt mask)
+
 	devcb_write8 m_dc_changed_func;
 	devcb_read8 m_read_dc_func;
 	int m_icount;
@@ -123,6 +120,13 @@ private:
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_io;
+
+	// device_t overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void execute_run() override;
+	virtual void execute_set_input(int linenum, int state) override;
 
 	void execute_one(uint8_t opcode);
 	uint16_t pa_offset(unsigned off) const;

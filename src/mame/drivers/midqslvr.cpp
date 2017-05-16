@@ -407,7 +407,7 @@ void midqslvr_state::machine_reset()
 	membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
 }
 
-static MACHINE_CONFIG_START( midqslvr, midqslvr_state )
+static MACHINE_CONFIG_START( midqslvr )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 333000000) // actually Celeron 333
 	MCFG_CPU_PROGRAM_MAP(midqslvr_map)
 	MCFG_CPU_IO_MAP(midqslvr_io)
@@ -498,11 +498,11 @@ ROM_START( ultarctcup )
 ROM_END
 
 // there are almost certainly multiple versions of these; updates were offered on floppy disk.  The version numbers for the existing CHDs are unknown.
-GAME(1999, hydrthnd,    0,        midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Hydro Thunder", MACHINE_IS_SKELETON)
+GAME(1999, hydrthnd,    0,        midqslvr, at_keyboard, midqslvr_state, 0, ROT0, "Midway Games", "Hydro Thunder", MACHINE_IS_SKELETON)
 
-GAME(2000, offrthnd,    0,        midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Offroad Thunder", MACHINE_IS_SKELETON)
+GAME(2000, offrthnd,    0,        midqslvr, at_keyboard, midqslvr_state, 0, ROT0, "Midway Games", "Offroad Thunder", MACHINE_IS_SKELETON)
 
-GAME(2001, arctthnd,    0,        midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Arctic Thunder (v1.002)", MACHINE_IS_SKELETON)
+GAME(2001, arctthnd,    0,        midqslvr, at_keyboard, midqslvr_state, 0, ROT0, "Midway Games", "Arctic Thunder (v1.002)", MACHINE_IS_SKELETON)
 
-GAME(2001, ultarctc,    0,        midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Ultimate Arctic Thunder", MACHINE_IS_SKELETON)
-GAME(2004, ultarctcup,  ultarctc, midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", MACHINE_IS_SKELETON)
+GAME(2001, ultarctc,    0,        midqslvr, at_keyboard, midqslvr_state, 0, ROT0, "Midway Games", "Ultimate Arctic Thunder", MACHINE_IS_SKELETON)
+GAME(2004, ultarctcup,  ultarctc, midqslvr, at_keyboard, midqslvr_state, 0, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", MACHINE_IS_SKELETON)

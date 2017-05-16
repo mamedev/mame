@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#pragma once
+#ifndef MAME_CPU_M6502_M5074X_H
+#define MAME_CPU_M6502_M5074X_H
 
-#ifndef __M5074X_H__
-#define __M5074X_H__
+#pragma once
 
 #include "m740.h"
 
@@ -71,9 +71,6 @@ class m5074x_device :  public m740_device
 	};
 
 public:
-	// construction/destruction
-	m5074x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map, const char *shortname, const char *source);
-
 	const address_space_config m_program_config;
 
 	template<class _Object> static devcb_base &set_p0_rd_callback(device_t &device, _Object object) { return downcast<m5074x_device &>(device).read_p0.set_callback(object); }
@@ -96,6 +93,9 @@ public:
 	bool are_port_bits_output(uint8_t port, uint8_t mask) { return ((m_ddrs[port] & mask) == mask) ? true : false; }
 
 protected:
+	// construction/destruction
+	m5074x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -123,17 +123,21 @@ class m50740_device : public m5074x_device
 {
 public:
 	m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	m50740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+
+protected:
+	m50740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class m50741_device : public m5074x_device
 {
 public:
 	m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	m50741_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+
+protected:
+	m50741_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type M50740;
-extern const device_type M50741;
+DECLARE_DEVICE_TYPE(M50740, m50740_device)
+DECLARE_DEVICE_TYPE(M50741, m50741_device)
 
-#endif
+#endif // MAME_CPU_M6502_M5074X_H

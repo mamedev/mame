@@ -110,7 +110,7 @@ public:
 	required_device<i8251_device> m_uart;
 	required_device<mm58274c_device> m_rtc;
 	required_device<cassette_image_device> m_cassette;
-	required_device<compis_graphics_slot_t> m_graphics;
+	required_device<compis_graphics_slot_device> m_graphics;
 	required_device<isbx_slot_device> m_isbx0;
 	required_device<isbx_slot_device> m_isbx1;
 	required_device<ram_device> m_ram;
@@ -415,7 +415,7 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
 	AM_RANGE(0x0000, 0x0007) /* PCS0 */ AM_MIRROR(0x78) AM_DEVREADWRITE8(I8255_TAG, i8255_device, read, write, 0xff00)
 	AM_RANGE(0x0080, 0x0087) /* PCS1 */ AM_MIRROR(0x78) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0x0100, 0x011f) /* PCS2 */ AM_MIRROR(0x60) AM_DEVREADWRITE8(MM58174A_TAG, mm58274c_device, read, write, 0x00ff)
-	AM_RANGE(0x0180, 0x01ff) /* PCS3 */ AM_DEVREADWRITE(GRAPHICS_TAG, compis_graphics_slot_t, pcs3_r, pcs3_w)
+	AM_RANGE(0x0180, 0x01ff) /* PCS3 */ AM_DEVREADWRITE(GRAPHICS_TAG, compis_graphics_slot_device, pcs3_r, pcs3_w)
 	//AM_RANGE(0x0200, 0x0201) /* PCS4 */ AM_MIRROR(0x7e)
 	AM_RANGE(0x0280, 0x028f) /* PCS5 */ AM_MIRROR(0x70) AM_DEVICE(I80130_TAG, i80130_device, io_map)
 	AM_RANGE(0x0300, 0x030f) AM_READWRITE(pcs6_0_1_r, pcs6_0_1_w)
@@ -742,7 +742,7 @@ void compis_state::machine_reset()
 //  MACHINE_CONFIG( compis )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( compis, compis_state )
+static MACHINE_CONFIG_START( compis )
 	// basic machine hardware
 	MCFG_CPU_ADD(I80186_TAG, I80186, XTAL_15_36MHz)
 	MCFG_CPU_PROGRAM_MAP(compis_mem)
@@ -885,6 +885,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT                         COMPANY             FULLNAME        FLAGS
-COMP(1985,  compis,     0,      0,     compis,  compis, driver_device, 0, "Telenova", "Compis" , MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP(1986,  compis2,    compis, 0,     compis2, compis, driver_device, 0, "Telenova", "Compis II" , MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY     FULLNAME     FLAGS
+COMP( 1985, compis,  0,      0,      compis,  compis, compis_state, 0,    "Telenova", "Compis",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1986, compis2, compis, 0,      compis2, compis, compis_state, 0,    "Telenova", "Compis II", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

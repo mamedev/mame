@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
+// copyright-holders:Fabio Priuli, Acho A. Tang, R. Belmont
 /*
 Konami 007121
 ------
@@ -119,10 +119,10 @@ control registers
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-const device_type K007121 = device_creator<k007121_device>;
+DEFINE_DEVICE_TYPE(K007121, k007121_device, "k007121", "K007121 Sprite/Tilemap Controller")
 
 k007121_device::k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K007121, "K007121 Sprite/Tilemap Controller", tag, owner, clock, "k007121", __FILE__)
+	: device_t(mconfig, K007121, tag, owner, clock)
 	, m_flipscreen(0)
 	, m_palette(*this, finder_base::DUMMY_TAG)
 {

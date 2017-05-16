@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_WANGPC_MVC_H
+#define MAME_BUS_WANGPC_MVC_H
 
-#ifndef __WANGPC_MVC__
-#define __WANGPC_MVC__
+#pragma once
 
 #include "wangpc.h"
 #include "video/mc6845.h"
@@ -61,7 +61,6 @@ private:
 
 
 // device type definition
-extern const device_type WANGPC_MVC;
+DECLARE_DEVICE_TYPE(WANGPC_MVC, wangpc_mvc_device)
 
-
-#endif
+#endif // MAME_BUS_WANGPC_MVC_H

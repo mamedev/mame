@@ -803,7 +803,7 @@ MACHINE_START_MEMBER(exidy_state,teetert)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( base, exidy_state )
+static MACHINE_CONFIG_START( base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)
@@ -1115,6 +1115,11 @@ ROM_START( mtrap )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "mtl11d.bin",  0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
+
+	ROM_REGION( 0x140, "proms", 0 ) // were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. They also match the teetert ones.
+	ROM_LOAD( "74s288.6c",  0x0000, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Mouse Trap manual
+	ROM_LOAD( "24s10n.1c",   0x0020, 0x0100, BAD_DUMP CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 6301 according to the Mouse Trap manual
+	ROM_LOAD( "74s288.3d",   0x0120, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
 ROM_END
 
 
@@ -1140,6 +1145,11 @@ ROM_START( mtrap2 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "mtl11d.bin",  0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
+
+	ROM_REGION( 0x140, "proms", 0 ) // were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. They also match the teetert ones.
+	ROM_LOAD( "74s288.6c",  0x0000, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Mouse Trap manual
+	ROM_LOAD( "24s10n.1c",   0x0020, 0x0100, BAD_DUMP CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 6301 according to the Mouse Trap manual
+	ROM_LOAD( "74s288.3d",   0x0120, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
 ROM_END
 
 
@@ -1165,6 +1175,11 @@ ROM_START( mtrap3 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "mtl11d.bin",  0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
+
+	ROM_REGION( 0x140, "proms", 0 ) // were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. They also match the teetert ones.
+	ROM_LOAD( "74s288.6c",  0x0000, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Mouse Trap manual
+	ROM_LOAD( "24s10n.1c",   0x0020, 0x0100, BAD_DUMP CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 6301 according to the Mouse Trap manual
+	ROM_LOAD( "74s288.3d",   0x0120, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
 ROM_END
 
 
@@ -1190,6 +1205,11 @@ ROM_START( mtrap4 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "mtl11d.bin",   0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
+
+	ROM_REGION( 0x140, "proms", 0 ) // were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. They also match the teetert ones.
+	ROM_LOAD( "74s288.6c",  0x0000, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Mouse Trap manual
+	ROM_LOAD( "24s10n.1c",   0x0020, 0x0100, BAD_DUMP CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 6301 according to the Mouse Trap manual
+	ROM_LOAD( "74s288.3d",   0x0120, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
 ROM_END
 
 ROM_START( mtrapb )
@@ -1212,8 +1232,46 @@ ROM_START( mtrapb )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "2516.j6",   0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
+
+	ROM_REGION( 0x140, "proms", 0 ) // were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. They also match the teetert ones.
+	ROM_LOAD( "74s288.6c",  0x0000, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Mouse Trap manual
+	ROM_LOAD( "24s10n.1c",   0x0020, 0x0100, BAD_DUMP CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) ) // 6301 according to the Mouse Trap manual
+	ROM_LOAD( "74s288.3d",   0x0120, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Mouse Trap manual
 ROM_END
 
+/*
+This bootleg was manufactured in Italy. 2 different PCBs were dumped and dumps match.
+main PCB is marked: "900T.C"
+piggyback PCB is marked: "LC" (it's Italian for "Lato Componenti" = Component Side)
+piggyback PCB fits into main PCB @ 8l
+*/
+
+ROM_START( mtrapb2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ms11.2p",   0xa000, 0x1000, CRC(2879cb8d) SHA1(738bd3cd968fd733adcfe0fb5efdb2e2fcfb344e) )
+	ROM_LOAD( "ms10.2m",   0xb000, 0x1000, CRC(d7378af9) SHA1(44c8ba4c84f51306e5bdd64e6c255d1c1018db72) )
+	ROM_LOAD( "ms9.2l",    0xc000, 0x1000, CRC(be667e64) SHA1(c5f686e3c403691f14992354af690dc89e1722f7) )
+	ROM_LOAD( "ms8.2k",    0xd000, 0x1000, CRC(de0442f8) SHA1(61774921adf016b3a2ae18baa79af60dca2d9e45) )
+	ROM_LOAD( "ms6.2f",    0xe000, 0x1000, CRC(cdf8c6a8) SHA1(932ae9c0ea5700bd79862efa94742136d8e15641) )
+	ROM_LOAD( "ms6.2f",    0xf000, 0x1000, CRC(77d3f2e6) SHA1(2c21dd7ee326ccb41d3c64eec90a19198382edea) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "ms1a.10j",  0x6000, 0x2000, CRC(d4160aa8) SHA1(d3bae8fa54e71c397ec60f998a012e088588a2e4) )
+
+	ROM_REGION( 0x4000, "cvsdcpu", 0 ) /* 16k for digital sound processor */
+	ROM_LOAD( "ms2a.8d",   0x0000,0x1000,CRC(13db8ed3) SHA1(939352323bdcd7df25db5eb2e30f269bcaebe6af) )
+	ROM_LOAD( "ms3a.8e",   0x1000,0x1000,CRC(31bdfe5c) SHA1(b10bfe9e56dd617c5b4cd8b5bfec9c7f537b1086) )
+	ROM_LOAD( "ms4a.8f",   0x2000,0x1000,CRC(1502d0e8) SHA1(8ef51ad4601299016f1821a5c65bec0199dd5474) )
+	ROM_LOAD( "ms5a.8h",   0x3000,0x1000,CRC(658482a6) SHA1(c0d770fbeaa7cb3e0eef47d8caa0f8a78841692e) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "ms11d.6j",  0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
+
+	ROM_REGION( 0x140, "proms", 0 )
+	ROM_LOAD( "74s288.6c", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "24s10n.1c", 0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
+	ROM_LOAD( "74s288.3d", 0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
+ROM_END
 
 ROM_START( venture )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1584,33 +1642,34 @@ DRIVER_INIT_MEMBER(exidy_state,fax)
 
 GAME( 1979, sidetrac, 0,       sidetrac, sidetrac, exidy_state, sidetrac, ROT0, "Exidy",   "Side Trak", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "Side Track" on title screen, but cabinet/flyers/documentation clearly indicates otherwise, "Side Trak" it is
 
-GAME( 1980, targ,     0,       targ,     targ, exidy_state,     targ,     ROT0, "Exidy",   "Targ", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, targc,    targ,    targ,     targ, exidy_state,     targ,     ROT0, "Exidy",   "Targ (cocktail?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, targ,     0,       targ,     targ,     exidy_state, targ,     ROT0, "Exidy",   "Targ", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, targc,    targ,    targ,     targ,     exidy_state, targ,     ROT0, "Exidy",   "Targ (cocktail?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, spectar,  0,       spectar,  spectar, exidy_state,  spectar,  ROT0, "Exidy",   "Spectar (revision 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spectar1, spectar, spectar,  spectar, exidy_state,  spectar,  ROT0, "Exidy",   "Spectar (revision 1?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallys,   spectar, rallys,   rallys, exidy_state,   rallys,   ROT0, "bootleg (Novar)", "Rallys (bootleg of Spectar, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallysa,  spectar, rallys,   rallys, exidy_state,   rallys,   ROT0, "bootleg (Musik Box Brescia)", "Rallys (bootleg of Spectar, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, panzer,   spectar, rallys,   rallys, exidy_state,   rallys,   ROT0, "bootleg (Proel)", "Panzer (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spectar,  0,       spectar,  spectar,  exidy_state, spectar,  ROT0, "Exidy",   "Spectar (revision 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spectar1, spectar, spectar,  spectar,  exidy_state, spectar,  ROT0, "Exidy",   "Spectar (revision 1?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallys,   spectar, rallys,   rallys,   exidy_state, rallys,   ROT0, "bootleg (Novar)", "Rallys (bootleg of Spectar, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallysa,  spectar, rallys,   rallys,   exidy_state, rallys,   ROT0, "bootleg (Musik Box Brescia)", "Rallys (bootleg of Spectar, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, panzer,   spectar, rallys,   rallys,   exidy_state, rallys,   ROT0, "bootleg (Proel)", "Panzer (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, phantoma, spectar, rallys,   phantoma, exidy_state, phantoma, ROT0, "bootleg (Jeutel)", "Phantomas (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, phantom,  spectar, rallys,   phantoma, exidy_state, phantoma, ROT0, "bootleg (Proel)", "Phantom (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, mtrap,    0,       mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (version 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mtrap2,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (version 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mtrap3,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (version 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mtrap4,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (version 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mtrapb,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "bootleg", "Mouse Trap (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrap,    0,       mtrap,    mtrap,    exidy_state, mtrap,    ROT0, "Exidy",   "Mouse Trap (version 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrap2,   mtrap,   mtrap,    mtrap,    exidy_state, mtrap,    ROT0, "Exidy",   "Mouse Trap (version 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrap3,   mtrap,   mtrap,    mtrap,    exidy_state, mtrap,    ROT0, "Exidy",   "Mouse Trap (version 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrap4,   mtrap,   mtrap,    mtrap,    exidy_state, mtrap,    ROT0, "Exidy",   "Mouse Trap (version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrapb,   mtrap,   mtrap,    mtrap,    exidy_state, mtrap,    ROT0, "bootleg", "Mouse Trap (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrapb2,  mtrap,   mtrap,    mtrap,    exidy_state, mtrap,    ROT0, "bootleg", "Mouse Trap (version 4, bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, venture,  0,       venture,  venture, exidy_state,  venture,  ROT0, "Exidy",   "Venture (version 5 set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, venture2, venture, venture,  venture, exidy_state,  venture,  ROT0, "Exidy",   "Venture (version 5 set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, venture4, venture, venture,  venture, exidy_state,  venture,  ROT0, "Exidy",   "Venture (version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, venture,  0,       venture,  venture,  exidy_state, venture,  ROT0, "Exidy",   "Venture (version 5 set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, venture2, venture, venture,  venture,  exidy_state, venture,  ROT0, "Exidy",   "Venture (version 5 set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, venture4, venture, venture,  venture,  exidy_state, venture,  ROT0, "Exidy",   "Venture (version 4)", MACHINE_SUPPORTS_SAVE )
+                                                   
+GAME( 1982, teetert,  0,       teetert,  teetert,  exidy_state, teetert,  ROT0, "Exidy",   "Teeter Torture (prototype)", MACHINE_SUPPORTS_SAVE )
+                                                   
+GAME( 1982, pepper2,  0,       pepper2,  pepper2,  exidy_state, pepper2,  ROT0, "Exidy",   "Pepper II (version 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pepper27, pepper2, pepper2,  pepper2,  exidy_state, pepper2,  ROT0, "Exidy",   "Pepper II (version 7)", MACHINE_SUPPORTS_SAVE )
+                                                   
+GAME( 1982, hardhat,  0,       pepper2,  pepper2,  exidy_state, pepper2,  ROT0, "Exidy",   "Hard Hat", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, teetert,  0,       teetert,  teetert, exidy_state,  teetert,  ROT0, "Exidy",   "Teeter Torture (prototype)", MACHINE_SUPPORTS_SAVE )
-
-GAME( 1982, pepper2,  0,       pepper2,  pepper2, exidy_state,  pepper2,  ROT0, "Exidy",   "Pepper II (version 8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pepper27, pepper2, pepper2,  pepper2, exidy_state,  pepper2,  ROT0, "Exidy",   "Pepper II (version 7)", MACHINE_SUPPORTS_SAVE )
-
-GAME( 1982, hardhat,  0,       pepper2,  pepper2, exidy_state,  pepper2,  ROT0, "Exidy",   "Hard Hat", MACHINE_SUPPORTS_SAVE )
-
-GAME( 1983, fax,      0,       fax,      fax, exidy_state,      fax,      ROT0, "Exidy",   "FAX", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, fax2,     fax,     fax,      fax, exidy_state,      fax,      ROT0, "Exidy",   "FAX 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, fax,      0,       fax,      fax,      exidy_state, fax,      ROT0, "Exidy",   "FAX", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, fax2,     fax,     fax,      fax,      exidy_state, fax,      ROT0, "Exidy",   "FAX 2", MACHINE_SUPPORTS_SAVE )

@@ -637,7 +637,7 @@ static ADDRESS_MAP_START( microvision_8021_io, AS_IO, 8, microvision_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( microvision, microvision_state )
+static MACHINE_CONFIG_START( microvision )
 	MCFG_CPU_ADD("maincpu1", I8021, 2000000)    // approximately
 	MCFG_CPU_IO_MAP(microvision_8021_io)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(microvision_state, i8021_p1_write))
@@ -695,4 +695,4 @@ ROM_START( microvsn )
 ROM_END
 
 
-CONS( 1979, microvsn, 0, 0, microvision, microvision, driver_device, 0, "Milton Bradley", "MicroVision", MACHINE_NOT_WORKING )
+CONS( 1979, microvsn, 0, 0, microvision, microvision, microvision_state, 0, "Milton Bradley", "MicroVision", MACHINE_NOT_WORKING )

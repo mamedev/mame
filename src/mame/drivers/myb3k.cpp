@@ -22,24 +22,28 @@ class myb3k_state : public driver_device
 {
 public:
 	myb3k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_fdc(*this, "fdc"),
-	m_crtc(*this, "crtc"),
-	m_floppy0(*this, "fdc:0"),
-	m_floppy1(*this, "fdc:1"),
-	m_p_vram(*this, "p_vram"),
-	m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_fdc(*this, "fdc")
+		, m_crtc(*this, "crtc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+		, m_p_vram(*this, "p_vram")
+		, m_palette(*this, "palette")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<mb8877_t> m_fdc;
-	required_device<mc6845_device> m_crtc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
 	DECLARE_WRITE8_MEMBER(myb3k_6845_address_w);
 	DECLARE_WRITE8_MEMBER(myb3k_6845_data_w);
 	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
 	DECLARE_WRITE8_MEMBER(myb3k_fdc_output_w);
+	uint32_t screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<mb8877_device> m_fdc;
+	required_device<mc6845_device> m_crtc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	required_shared_ptr<uint8_t> m_p_vram;
 	required_device<palette_device> m_palette;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
@@ -47,7 +51,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void myb3k_state::video_start()
@@ -158,7 +161,7 @@ static ADDRESS_MAP_START(myb3k_io, AS_IO, 8, myb3k_state)
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1c, 0x1c) AM_WRITE(myb3k_6845_address_w)
 	AM_RANGE(0x1d, 0x1d) AM_WRITE(myb3k_6845_data_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("fdc", mb8877_t, read, write) //FDC, almost likely wd17xx
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("fdc", mb8877_device, read, write) //FDC, almost likely wd17xx
 	AM_RANGE(0x24, 0x24) AM_WRITE(myb3k_fdc_output_w)
 //  AM_RANGE(0x520,0x524) mirror of above
 ADDRESS_MAP_END
@@ -247,7 +250,7 @@ static SLOT_INTERFACE_START( myb3k_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( myb3k, myb3k_state )
+static MACHINE_CONFIG_START( myb3k )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 4000000) /* unknown clock*/
 	MCFG_CPU_PROGRAM_MAP(myb3k_map)
@@ -283,5 +286,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1982, myb3k,  0,      0,       myb3k,     myb3k, driver_device,    0,     "Panasonic",   "MyBrain 3000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE           INIT   COMPANY        FULLNAME        FLAGS
+COMP( 1982, myb3k,  0,      0,       myb3k,     myb3k, myb3k_state,    0,     "Panasonic",   "MyBrain 3000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

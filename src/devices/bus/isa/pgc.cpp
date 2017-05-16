@@ -166,7 +166,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_PGC = device_creator<isa8_pgc_device>;
+DEFINE_DEVICE_TYPE(ISA8_PGC, isa8_pgc_device, "isa_ibm_pgc", "IBM Professional Graphics Controller")
 
 
 //-------------------------------------------------
@@ -206,20 +206,17 @@ ioport_constructor isa8_pgc_device::device_input_ports() const
 //-------------------------------------------------
 
 isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISA8_PGC, "IBM Professional Graphics Controller", tag, owner, clock, "isa_ibm_pgc", __FILE__),
-	device_isa8_card_interface(mconfig, *this),
-	m_cpu(*this, "maincpu"),
-	m_screen(*this, PGC_SCREEN_NAME),
-	m_palette(*this, "palette"), m_commarea(nullptr), m_vram(nullptr), m_eram(nullptr), m_bitmap(nullptr)
+	isa8_pgc_device(mconfig, ISA8_PGC, tag, owner, clock)
 {
 }
 
-isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),
 	m_screen(*this, PGC_SCREEN_NAME),
-	m_palette(*this, "palette"), m_commarea(nullptr), m_vram(nullptr), m_eram(nullptr), m_bitmap(nullptr)
+	m_palette(*this, "palette"),
+	m_commarea(nullptr), m_vram(nullptr), m_eram(nullptr), m_bitmap(nullptr)
 {
 }
 

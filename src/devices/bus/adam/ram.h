@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ADAM_RAM_H
+#define MAME_BUS_ADAM_RAM_H
 
-#ifndef __ADAM_RAM__
-#define __ADAM_RAM__
+#pragma once
 
 #include "exp.h"
 
@@ -42,8 +42,6 @@ private:
 
 
 // device type definition
-extern const device_type ADAM_RAM;
+DECLARE_DEVICE_TYPE(ADAM_RAM, adam_ram_expansion_device)
 
-
-
-#endif
+#endif // MAME_BUS_ADAM_RAM_H

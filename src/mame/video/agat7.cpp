@@ -19,6 +19,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "video/agat7.h"
 
 #include "screen.h"
@@ -32,7 +33,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type AGAT7VIDEO = device_creator<agat7video_device>;
+DEFINE_DEVICE_TYPE(AGAT7VIDEO, agat7video_device, "agat7video", "Agat-7 Video")
 
 MACHINE_CONFIG_FRAGMENT(agat7video)
 	MCFG_SCREEN_ADD("a7screen", RASTER)
@@ -63,7 +64,7 @@ machine_config_constructor agat7video_device::device_mconfig_additions() const
 //**************************************************************************
 
 agat7video_device::agat7video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, AGAT7VIDEO, "Agat-7 video", tag, owner, clock, "agat7video", __FILE__),
+	device_t(mconfig, AGAT7VIDEO, tag, owner, clock),
 	m_palette(*this, "a7palette")
 {
 }

@@ -6,12 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_WD11C00_17_H
+#define MAME_MACHINE_WD11C00_17_H
+
 #pragma once
-
-#ifndef __WD11C00_17__
-#define __WD11C00_17__
-
-
 
 
 
@@ -64,17 +62,17 @@ public:
 	// construction/destruction
 	wd11c00_17_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_irq5_callback(device_t &device, _Object object) { return downcast<wd11c00_17_device &>(device).m_out_irq5_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_drq3_callback(device_t &device, _Object object) { return downcast<wd11c00_17_device &>(device).m_out_drq3_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_mr_callback(device_t &device, _Object object) { return downcast<wd11c00_17_device &>(device).m_out_mr_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_busy_callback(device_t &device, _Object object) { return downcast<wd11c00_17_device &>(device).m_out_busy_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_req_callback(device_t &device, _Object object) { return downcast<wd11c00_17_device &>(device).m_out_req_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_ra3_callback(device_t &device, _Object object) { return downcast<wd11c00_17_device &>(device).m_out_ra3_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_rd322_callback(device_t &device, _Object object) { return downcast<wd11c00_17_device &>(device).m_in_rd322_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_ramcs_callback(device_t &device, _Object object) { return downcast<wd11c00_17_device &>(device).m_in_ramcs_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_ramwr_callback(device_t &device, _Object object) { return downcast<wd11c00_17_device &>(device).m_out_ramwr_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_cs1010_callback(device_t &device, _Object object) { return downcast<wd11c00_17_device &>(device).m_in_cs1010_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_cs1010_callback(device_t &device, _Object object) { return downcast<wd11c00_17_device &>(device).m_out_cs1010_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_irq5_callback(device_t &device, Object &&cb) { return downcast<wd11c00_17_device &>(device).m_out_irq5_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_drq3_callback(device_t &device, Object &&cb) { return downcast<wd11c00_17_device &>(device).m_out_drq3_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_mr_callback(device_t &device, Object &&cb) { return downcast<wd11c00_17_device &>(device).m_out_mr_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_busy_callback(device_t &device, Object &&cb) { return downcast<wd11c00_17_device &>(device).m_out_busy_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_req_callback(device_t &device, Object &&cb) { return downcast<wd11c00_17_device &>(device).m_out_req_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_ra3_callback(device_t &device, Object &&cb) { return downcast<wd11c00_17_device &>(device).m_out_ra3_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_rd322_callback(device_t &device, Object &&cb) { return downcast<wd11c00_17_device &>(device).m_in_rd322_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_ramcs_callback(device_t &device, Object &&cb) { return downcast<wd11c00_17_device &>(device).m_in_ramcs_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_ramwr_callback(device_t &device, Object &&cb) { return downcast<wd11c00_17_device &>(device).m_out_ramwr_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_cs1010_callback(device_t &device, Object &&cb) { return downcast<wd11c00_17_device &>(device).m_in_cs1010_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_cs1010_callback(device_t &device, Object &&cb) { return downcast<wd11c00_17_device &>(device).m_out_cs1010_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
@@ -136,6 +134,6 @@ private:
 
 
 // device type definition
-extern const device_type WD11C00_17;
+DECLARE_DEVICE_TYPE(WD11C00_17, wd11c00_17_device)
 
-#endif
+#endif // MAME_MACHINE_WD11C00_17_H

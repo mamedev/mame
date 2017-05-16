@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SG1000_EXP_FM_UNIT_H
+#define MAME_BUS_SG1000_EXP_FM_UNIT_H
 
-#ifndef __SEGA_FM_UNIT__
-#define __SEGA_FM_UNIT__
+#pragma once
 
 
 #include "sound/ym2413.h"
@@ -52,7 +52,6 @@ private:
 
 
 // device type definition
-extern const device_type SEGA_FM_UNIT;
+DECLARE_DEVICE_TYPE(SEGA_FM_UNIT, sega_fm_unit_device)
 
-
-#endif
+#endif // MAME_BUS_SG1000_EXP_FM_UNIT_H

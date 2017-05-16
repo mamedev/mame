@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_AMDRUM = device_creator<cpc_amdrum_device>;
+DEFINE_DEVICE_TYPE(CPC_AMDRUM, cpc_amdrum_device, "cpc_amdrum", "Amdrum")
 
 
 static MACHINE_CONFIG_FRAGMENT( cpc_amdrum )
@@ -38,7 +38,7 @@ machine_config_constructor cpc_amdrum_device::device_mconfig_additions() const
 //**************************************************************************
 
 cpc_amdrum_device::cpc_amdrum_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CPC_AMDRUM, "Amdrum", tag, owner, clock, "cpc_amdrum", __FILE__),
+	device_t(mconfig, CPC_AMDRUM, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_slot(nullptr),
 	m_dac(*this,"dac")

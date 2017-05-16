@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ABCKB_ABC800KB_H
+#define MAME_BUS_ABCKB_ABC800KB_H
 
-#ifndef __ABC800_KEYBOARD__
-#define __ABC800_KEYBOARD__
+#pragma once
 
 
 #include "cpu/mcs48/mcs48.h"
@@ -71,8 +71,6 @@ private:
 
 
 // device type definition
-extern const device_type ABC800_KEYBOARD;
+DECLARE_DEVICE_TYPE(ABC800_KEYBOARD, abc800_keyboard_device)
 
-
-
-#endif
+#endif // MAME_BUS_ABCKB_ABC800KB_H

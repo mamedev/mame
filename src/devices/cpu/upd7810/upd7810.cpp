@@ -369,20 +369,22 @@ STOP            01001000  10111011          12  stop
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "upd7810.h"
+
+#include "debugger.h"
+
 #include "upd7810_macros.h"
 
 
-const device_type UPD7810 = device_creator<upd7810_device>;
-const device_type UPD7807 = device_creator<upd7807_device>;
-const device_type UPD7801 = device_creator<upd7801_device>;
-const device_type UPD78C05 = device_creator<upd78c05_device>;
-const device_type UPD78C06 = device_creator<upd78c06_device>;
+DEFINE_DEVICE_TYPE(UPD7810,  upd7810_device,  "upd7810",  "uPD7810")
+DEFINE_DEVICE_TYPE(UPD7807,  upd7807_device,  "upd7807",  "uPD7807")
+DEFINE_DEVICE_TYPE(UPD7801,  upd7801_device,  "upd7801",  "uPD7801")
+DEFINE_DEVICE_TYPE(UPD78C05, upd78c05_device, "upd78c05", "uPD78C05")
+DEFINE_DEVICE_TYPE(UPD78C06, upd78c06_device, "upd78c06", "uPD78C06")
 
 
-upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_to_func(*this)
 	, m_co0_func(*this)
 	, m_co1_func(*this)
@@ -412,7 +414,7 @@ upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, 
 }
 
 upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD7810, "uPD7810", tag, owner, clock, "upd7810", __FILE__)
+	: upd7810_device(mconfig, UPD7810, tag, owner, clock)
 {
 	m_opXX = s_opXX_7810;
 	m_op48 = s_op48;
@@ -425,7 +427,7 @@ upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, d
 }
 
 upd7807_device::upd7807_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD7807, "uPD7807", tag, owner, clock, "upd7807", __FILE__)
+	: upd7810_device(mconfig, UPD7807, tag, owner, clock)
 {
 	m_opXX = s_opXX_7807;
 	m_op48 = s_op48;
@@ -438,7 +440,7 @@ upd7807_device::upd7807_device(const machine_config &mconfig, const char *tag, d
 }
 
 upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD7801, "uPD7801", tag, owner, clock, "upd7801", __FILE__)
+	: upd7810_device(mconfig, UPD7801, tag, owner, clock)
 {
 	m_op48 = s_op48_7801;
 	m_op4C = s_op4C_7801;
@@ -451,7 +453,7 @@ upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, d
 }
 
 upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD78C05, "uPD78C05", tag, owner, clock, "upd78c05", __FILE__)
+	: upd78c05_device(mconfig, UPD78C05, tag, owner, clock)
 {
 	m_op48 = s_op48_78c05;
 	m_op4C = s_op4C_78c05;
@@ -463,13 +465,13 @@ upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag,
 	m_opXX = s_opXX_78c05;
 }
 
-upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: upd7810_device(mconfig, type, name, tag, owner, clock, shortname, source)
+upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: upd7810_device(mconfig, type, tag, owner, clock)
 {
 }
 
 upd78c06_device::upd78c06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd78c05_device(mconfig, UPD78C06, "uPD78C06", tag, owner, clock, "upd78c06", __FILE__)
+	: upd78c05_device(mconfig, UPD78C06, tag, owner, clock)
 {
 	m_op48 = s_op48_78c06;
 	m_op4C = s_op4C_78c06;

@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_FCKEYBOARD = device_creator<nes_fckeybrd_device>;
+DEFINE_DEVICE_TYPE(NES_FCKEYBOARD, nes_fckeybrd_device, "nes_fckeybrd", "Nintendo Family Computer Keyboard Component")
 
 
 static INPUT_PORTS_START( fc_keyboard )
@@ -146,7 +146,7 @@ machine_config_constructor nes_fckeybrd_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 nes_fckeybrd_device::nes_fckeybrd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NES_FCKEYBOARD, "Nintendo Family Computer Keyboard Component", tag, owner, clock, "nes_fckeybrd", __FILE__)
+	: device_t(mconfig, NES_FCKEYBOARD, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_cassette(*this, "tape")
 	, m_kbd(*this, "FCKEY.%u", 0)

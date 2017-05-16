@@ -6,13 +6,13 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+
 /* mingw-gcc defines this */
 #ifdef i386
 #undef i386
 #endif /* i386 */
 
-
-#include "emu.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/lpci/pci.h"
 #include "bus/lpci/vt82c505.h"
@@ -22,10 +22,12 @@
 #include "machine/at.h"
 #include "machine/cs8221.h"
 #include "machine/ds128x.h"
+#include "machine/idectrl.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/vt82c496.h"
 #include "machine/wd7600.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class at_state : public driver_device
@@ -36,7 +38,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
 		m_ram(*this, RAM_TAG)
-		{ }
+	{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
@@ -61,7 +63,7 @@ public:
 		m_wd7600(*this, "wd7600"),
 		m_isabus(*this, "isabus"),
 		m_speaker(*this, "speaker")
-		{ }
+	{ }
 
 public:
 	required_device<cpu_device> m_maincpu;
@@ -282,7 +284,7 @@ static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("vt82c505", VT82C505)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ibm5170, at_state )
+static MACHINE_CONFIG_START( ibm5170 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz/2 /*6000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
@@ -366,7 +368,7 @@ static MACHINE_CONFIG_DERIVED( k286i, ibm5162 )
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa8", pc_isa16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( at386, at_state )
+static MACHINE_CONFIG_START( at386 )
 	MCFG_CPU_ADD("maincpu", I386, 12000000)
 	MCFG_CPU_PROGRAM_MAP(at32_map)
 	MCFG_CPU_IO_MAP(at32_io)
@@ -426,7 +428,7 @@ static MACHINE_CONFIG_DERIVED( ct386sx, at386sx )
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "maincpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( megapc, megapc_state )
+static MACHINE_CONFIG_START( megapc )
 	MCFG_CPU_ADD("maincpu", I386SX, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(megapc_map)
 	MCFG_CPU_IO_MAP(megapc_io)
@@ -511,7 +513,7 @@ static MACHINE_CONFIG_DERIVED( megapcpl, megapc )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( megapcpla, at_state )
+static MACHINE_CONFIG_START( megapcpla )
 	MCFG_CPU_ADD("maincpu", I486, 66000000 / 2)  // 486SLC
 	MCFG_CPU_PROGRAM_MAP(at32l_map)
 	MCFG_CPU_IO_MAP(at32_io)
@@ -545,7 +547,7 @@ static MACHINE_CONFIG_START( megapcpla, at_state )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","megapc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ficpio2, at_state )
+static MACHINE_CONFIG_START( ficpio2 )
 	MCFG_CPU_ADD("maincpu", I486, 25000000)
 	MCFG_CPU_PROGRAM_MAP(ficpio_map)
 	MCFG_CPU_IO_MAP(ficpio_io)

@@ -273,7 +273,7 @@ WRITE16_MEMBER(feversoc_state::feversoc_irq_ack)
 	m_maincpu->set_input_line(8, CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( feversoc, feversoc_state )
+static MACHINE_CONFIG_START( feversoc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",SH2,MASTER_CLOCK)
@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( feversoc, feversoc_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, OKIM6295_PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
+	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")

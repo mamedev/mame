@@ -28,14 +28,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CGENIE_FDC = device_creator<cgenie_fdc_device>;
+DEFINE_DEVICE_TYPE(CGENIE_FDC, cgenie_fdc_device, "cgenie_fdc", "Colour Genie FDC")
 
 DEVICE_ADDRESS_MAP_START( mmio, 8, cgenie_fdc_device )
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x10) AM_READWRITE(irq_r, select_w)
-	AM_RANGE(0xec, 0xec) AM_MIRROR(0x10) AM_DEVREAD("fd1793", fd1793_t, status_r) AM_WRITE(command_w)
-	AM_RANGE(0xed, 0xed) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_t, track_r, track_w)
-	AM_RANGE(0xee, 0xee) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_t, sector_r, sector_w)
-	AM_RANGE(0xef, 0xef) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_t, data_r, data_w)
+	AM_RANGE(0xec, 0xec) AM_MIRROR(0x10) AM_DEVREAD("fd1793", fd1793_device, status_r) AM_WRITE(command_w)
+	AM_RANGE(0xed, 0xed) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_device, track_r, track_w)
+	AM_RANGE(0xee, 0xee) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_device, sector_r, sector_w)
+	AM_RANGE(0xef, 0xef) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_device, data_r, data_w)
 ADDRESS_MAP_END
 
 FLOPPY_FORMATS_MEMBER( cgenie_fdc_device::floppy_formats )
@@ -105,8 +105,8 @@ machine_config_constructor cgenie_fdc_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CGENIE_FDC, "Floppy Disc Controller", tag, owner, clock, "cgenie_fdc", __FILE__),
-	device_expansion_interface(mconfig, *this),
+	device_t(mconfig, CGENIE_FDC, tag, owner, clock),
+	device_cg_exp_interface(mconfig, *this),
 	m_fdc(*this, "fd1793"),
 	m_floppy0(*this, "fd1793:0"),
 	m_floppy1(*this, "fd1793:1"),

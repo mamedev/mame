@@ -3,9 +3,9 @@
 #include "emu.h"
 #include "i82875p.h"
 
-const device_type I82875P_HOST     = device_creator<i82875p_host_device>;
-const device_type I82875P_AGP      = device_creator<i82875p_agp_device>;
-const device_type I82875P_OVERFLOW = device_creator<i82875p_overflow_device>;
+DEFINE_DEVICE_TYPE(I82875P_HOST,     i82875p_host_device,     "i82875p_host",     "Intel 82875P Northbridge")
+DEFINE_DEVICE_TYPE(I82875P_AGP,      i82875p_agp_device,      "i82875p_agp",      "Intel 82875P AGP Bridge")
+DEFINE_DEVICE_TYPE(I82875P_OVERFLOW, i82875p_overflow_device, "i82875p_overflow", "Intel 82875P Configuration Overflow")
 
 DEVICE_ADDRESS_MAP_START(agp_translation_map, 32, i82875p_host_device)
 ADDRESS_MAP_END
@@ -43,7 +43,7 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i82875p_host_device)
 ADDRESS_MAP_END
 
 i82875p_host_device::i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, I82875P_HOST, "I82875P Northbridge", tag, owner, clock, "i82875p_host", __FILE__)
+	: pci_host_device(mconfig, I82875P_HOST, tag, owner, clock)
 {
 }
 
@@ -428,7 +428,7 @@ void i82875p_host_device::map_extra(uint64_t memory_window_start, uint64_t memor
 
 
 i82875p_agp_device::i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: agp_bridge_device(mconfig, I82875P_AGP, "I82875P AGP Bridge", tag, owner, clock, "i82875p_agp", __FILE__)
+	: agp_bridge_device(mconfig, I82875P_AGP, tag, owner, clock)
 {
 }
 
@@ -451,7 +451,7 @@ ADDRESS_MAP_END
 
 
 i82875p_overflow_device::i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, I82875P_OVERFLOW, "I82875P Configuration Overflow", tag, owner, clock, "i82875p_overflow", __FILE__)
+	: pci_device(mconfig, I82875P_OVERFLOW, tag, owner, clock)
 {
 }
 

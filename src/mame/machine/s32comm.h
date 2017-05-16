@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ariane Fugmann
+#ifndef MAME_MACHINE_S32COMM_H
+#define MAME_MACHINE_S32COMM_H
+
 #pragma once
 
-#ifndef __S32COMM_H__
-#define __S32COMM_H__
-
-#define __S32COMM_SIMULATION__
+#define S32COMM_SIMULATION
 
 #define MCFG_S32COMM_ADD(_tag ) \
 	MCFG_DEVICE_ADD(_tag, S32COMM, 0)
@@ -45,7 +45,7 @@ public:
 
 	// IRQ logic - 5 = VINT, 7 = DLC
 	void check_vint_irq();
-#ifdef __S32COMM_SIMULATION__
+#ifdef S32COMM_SIMULATION
 	void set_linktype(uint16_t linktype);
 #endif
 
@@ -66,7 +66,7 @@ private:
 	char m_remotehost[256];
 	uint8_t m_buffer[0x800];
 
-#ifdef __S32COMM_SIMULATION__
+#ifdef S32COMM_SIMULATION
 	uint8_t m_linkenable;
 	uint16_t m_linktimer;
 	uint8_t m_linkalive;
@@ -84,6 +84,6 @@ private:
 };
 
 // device type definition
-extern const device_type S32COMM;
+DECLARE_DEVICE_TYPE(S32COMM, s32comm_device)
 
-#endif  /* __S32COMM_H__ */
+#endif // MAME_MACHINE_S32COMM_H

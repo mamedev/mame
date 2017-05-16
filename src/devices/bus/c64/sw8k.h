@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_SW8K_H
+#define MAME_BUS_C64_SW8K_H
 
-#ifndef __C64_SW8K__
-#define __C64_SW8K__
+#pragma once
 
 
 #include "exp.h"
@@ -49,6 +49,7 @@ private:
 
 // device type definition
 extern const device_type C64_SW8K;
+DECLARE_DEVICE_TYPE(C64_SW8K, c64_switchable_8k_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_SW8K_H

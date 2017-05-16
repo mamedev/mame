@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CR511B = device_creator<cr511b_device>;
+DEFINE_DEVICE_TYPE(CR511B, cr511b_device, "cr511b", "CR-511-B CD-ROM drive")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -47,7 +47,7 @@ machine_config_constructor cr511b_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 cr511b_device::cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CR511B, "CR-511-B CD-ROM drive", tag, owner, clock, "cr511b", __FILE__),
+	device_t(mconfig, CR511B, tag, owner, clock),
 	m_cdrom(*this, "cdrom"),
 	m_cdda(*this, "cdda"),
 	m_stch_handler(*this),

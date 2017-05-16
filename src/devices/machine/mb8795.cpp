@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "mb8795.h"
 
-const device_type MB8795 = device_creator<mb8795_device>;
+DEFINE_DEVICE_TYPE(MB8795, mb8795_device, "mb8795", "Fujitsu MB8795")
 
 DEVICE_ADDRESS_MAP_START(map, 8, mb8795_device)
 	AM_RANGE(0x0, 0x0) AM_READWRITE(txstat_r, txstat_w)
@@ -19,9 +19,11 @@ DEVICE_ADDRESS_MAP_START(map, 8, mb8795_device)
 ADDRESS_MAP_END
 
 mb8795_device::mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MB8795, "Fujitsu MB8795", tag, owner, clock, "mb8795", __FILE__),
-	device_network_interface(mconfig, *this, 10), txstat(0), txmask(0), rxstat(0), rxmask(0), txmode(0), rxmode(0), txlen(0), rxlen(0), txcount(0), drq_tx(false),
-	drq_rx(false), irq_tx(false), irq_rx(false), timer_tx(nullptr), timer_rx(nullptr),
+	device_t(mconfig, MB8795, tag, owner, clock),
+	device_network_interface(mconfig, *this, 10),
+	txstat(0), txmask(0), rxstat(0), rxmask(0), txmode(0), rxmode(0), txlen(0), rxlen(0), txcount(0),
+	drq_tx(false), drq_rx(false), irq_tx(false), irq_rx(false),
+	timer_tx(nullptr), timer_rx(nullptr),
 	irq_tx_cb(*this),
 	irq_rx_cb(*this),
 	drq_tx_cb(*this),

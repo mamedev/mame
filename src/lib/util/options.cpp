@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    options.c
+    options.cpp
 
     Core options code code
 
@@ -43,6 +43,26 @@ const char *const core_options::s_option_unadorned[MAX_UNADORNED_OPTIONS] =
 	"<UNADORNED15>"
 };
 
+
+//**************************************************************************
+//  UTILITY
+//**************************************************************************
+
+namespace
+{
+	void trim_spaces_and_quotes(std::string &data)
+	{
+		// trim any whitespace
+		strtrimspace(data);
+
+		// trim quotes
+		if (data.find_first_of('"') == 0 && data.find_last_of('"') == data.length() - 1)
+		{
+			data.erase(0, 1);
+			data.erase(data.length() - 1, 1);
+		}
+	}
+};
 
 
 //**************************************************************************
@@ -343,6 +363,25 @@ bool core_options::parse_command_line(std::vector<std::string> &args, int priori
 	error_string.clear();
 	m_command.clear();
 
+	// we want to identify commands first
+	for (size_t arg = 1; arg < args.size(); arg++)
+	{
+		if (!args[arg].empty() && args[arg][0] == '-')
+		{
+			auto curentry = m_entrymap.find(&args[arg][1]);
+			if (curentry != m_entrymap.end() && curentry->second->type() == OPTION_COMMAND)
+			{
+				// can only have one command
+				if (!m_command.empty())
+				{
+					error_string.append(string_format("Error: multiple commands specified -%s and %s\n", m_command, args[arg]));
+					return false;
+				}
+				m_command = curentry->second->name();
+			}
+		}
+	}
+
 	// iterate through arguments
 	int unadorned_index = 0;
 	size_t new_argc = 1;
@@ -352,6 +391,14 @@ bool core_options::parse_command_line(std::vector<std::string> &args, int priori
 		const char *curarg = args[arg].c_str();
 		bool is_unadorned = (curarg[0] != '-');
 		const char *optionname = is_unadorned ? core_options::unadorned(unadorned_index++) : &curarg[1];
+
+		// special case - collect unadorned arguments after commands into a special place
+		if (is_unadorned && !m_command.empty())
+		{
+			m_command_arguments.push_back(std::move(args[arg]));
+			args[arg].clear();
+			continue;
+		}
 
 		// find our entry; if not found, continue
 		auto curentry = m_entrymap.find(optionname);
@@ -375,18 +422,9 @@ bool core_options::parse_command_line(std::vector<std::string> &args, int priori
 			continue;
 		}
 
-		// process commands first
+		// at this point, we've already processed commands
 		if (curentry->second->type() == OPTION_COMMAND)
-		{
-			// can only have one command
-			if (!m_command.empty())
-			{
-				error_string.append(string_format("Error: multiple commands specified -%s and %s\n", m_command, curarg));
-				return false;
-			}
-			m_command = curentry->second->name();
 			continue;
-		}
 
 		// get the data for this argument, special casing booleans
 		std::string newdata;
@@ -478,7 +516,9 @@ bool core_options::parse_ini_file(util::core_file &inifile, int priority, bool i
 		}
 
 		// set the new data
-		validate_and_set_data(*curentry->second, optiondata, priority, error_string);
+		std::string data = optiondata;
+		trim_spaces_and_quotes(data);
+		validate_and_set_data(*curentry->second, std::move(data), priority, error_string);
 	}
 	return true;
 }
@@ -832,16 +872,6 @@ void core_options::copyfrom(const core_options &src)
 
 bool core_options::validate_and_set_data(core_options::entry &curentry, std::string &&data, int priority, std::string &error_string)
 {
-	// trim any whitespace
-	strtrimspace(data);
-
-	// trim quotes
-	if (data.find_first_of('"') == 0 && data.find_last_of('"') == data.length() - 1)
-	{
-		data.erase(0, 1);
-		data.erase(data.length() - 1, 1);
-	}
-
 	// let derived classes override how we set this data
 	if (override_set_value(curentry.name(), data))
 		return true;

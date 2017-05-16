@@ -342,7 +342,7 @@ static GFXDECODE_START( kcgd )
 	GFXDECODE_ENTRY("maincpu", 0112236, kcgd_charlayout, 0, 1)
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( kcgd, kcgd_state )
+static MACHINE_CONFIG_START( kcgd )
 	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL_30_8MHz/4)
 	MCFG_CPU_PROGRAM_MAP(kcgd_mem)
 	MCFG_T11_INITIAL_MODE(0100000)
@@ -381,5 +381,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY     FULLNAME       FLAGS */
-COMP( 1987, dvk_kcgd, 0,      0,       kcgd,      0,       driver_device,     0,     "USSR",     "DVK KCGD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE        INIT   COMPANY     FULLNAME       FLAGS */
+COMP( 1987, dvk_kcgd, 0,      0,       kcgd,      0,       kcgd_state,  0,     "USSR",     "DVK KCGD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

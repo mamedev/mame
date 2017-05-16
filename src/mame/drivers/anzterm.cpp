@@ -408,7 +408,7 @@ ADDRESS_MAP_START( anzterm, AS_PROGRAM, 8, anzterm_state )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( anzterm, anzterm_state )
+MACHINE_CONFIG_START( anzterm )
 	MCFG_CPU_ADD("maincpu", M6809, 15974400/4)
 	MCFG_CPU_PROGRAM_MAP(anzterm)
 
@@ -478,4 +478,4 @@ ROM_START( anzterm )
 	ROM_LOAD( "ebb-fea-v96-9-23-83-f43a.u11", 0x4000, 0x1000, CRC(0e572470) SHA1(966e5eeb0114589a7cab3c29a1db48cdd8634be5) )
 ROM_END
 
-COMP( 1986?, anzterm, 0, 0, anzterm, anzterm, driver_device, 0, "Burroughs", "EF315-I220 Teller Terminal (ANZ)", MACHINE_IS_SKELETON ) // year comes from sticker on bottom of case, it's more likely a 1983 revision
+COMP( 1986?, anzterm, 0, 0, anzterm, anzterm, anzterm_state, 0, "Burroughs", "EF315-I220 Teller Terminal (ANZ)", MACHINE_IS_SKELETON ) // year comes from sticker on bottom of case, it's more likely a 1983 revision

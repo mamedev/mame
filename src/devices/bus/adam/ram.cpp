@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_RAM = device_creator<adam_ram_expansion_device>;
+DEFINE_DEVICE_TYPE(ADAM_RAM, adam_ram_expansion_device, "adam_ram", "Adam 64KB RAM expansion")
 
 
 
@@ -28,7 +28,7 @@ const device_type ADAM_RAM = device_creator<adam_ram_expansion_device>;
 //-------------------------------------------------
 
 adam_ram_expansion_device::adam_ram_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ADAM_RAM, "Adam 64KB RAM expansion", tag, owner, clock, "adam_ram", __FILE__),
+	device_t(mconfig, ADAM_RAM, tag, owner, clock),
 	device_adam_expansion_slot_card_interface(mconfig, *this),
 	m_ram(*this, "ram")
 {

@@ -340,8 +340,8 @@ Notes:
  *
  *************************************/
 
-harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 /*  device_video_interface(mconfig, *this, false), */
 			m_maincpu(*this, "maincpu"),
 			m_gsp(*this, "gsp"),
@@ -1635,7 +1635,7 @@ static MACHINE_CONFIG_FRAGMENT( harddriv )
 	MCFG_FRAGMENT_ADD( driver_msp )
 	/* basic machine hardware */        /* original driver board with MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
-	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD_DEVICE, 0)      /* driver sound board */
+	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( harddrivc )
@@ -1643,7 +1643,7 @@ static MACHINE_CONFIG_FRAGMENT( harddrivc )
 
 	/* basic machine hardware */        /* multisync board with MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
-	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD_DEVICE, 0)      /* driver sound board */
+	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( racedriv )
@@ -1652,7 +1652,7 @@ static MACHINE_CONFIG_FRAGMENT( racedriv )
 	/* basic machine hardware */        /* original driver board without MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
 	MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
-	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD_DEVICE, 0)      /* driver sound board */
+	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( racedrivc )
@@ -1662,7 +1662,7 @@ static MACHINE_CONFIG_FRAGMENT( racedrivc )
 	/* basic machine hardware */        /* multisync board without MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
 	MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
-	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD_DEVICE, 0)      /* driver sound board */
+	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
 
@@ -1673,7 +1673,7 @@ static MACHINE_CONFIG_FRAGMENT( racedrivc_panorama_side )
 	/* basic machine hardware */        /* multisync board without MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
 //  MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
-//  MCFG_DEVICE_ADD("sound_board", HARDDRIV_SOUND_BOARD_DEVICE, 0)      /* driver sound board */
+//  MCFG_DEVICE_ADD("sound_board", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
 WRITE_LINE_MEMBER(harddriv_state::sound_int_write_line)
@@ -1749,10 +1749,10 @@ static MACHINE_CONFIG_FRAGMENT( hdrivair )
 	MCFG_FRAGMENT_ADD( dsk2 )           /* DSK II board */
 MACHINE_CONFIG_END
 
-const device_type HARDDRIV_BOARD_DEVICE = device_creator<harddriv_board_device_state>;
+DEFINE_DEVICE_TYPE(HARDDRIV_BOARD, harddriv_board_device_state, "harddriv_board", "Hard Drivin' Board Device")
 
 harddriv_board_device_state::harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, HARDDRIV_BOARD_DEVICE, "Hard Drivin' Board Device", tag, owner, clock, "harddriv_board_device", __FILE__)
+	: harddriv_state(mconfig, HARDDRIV_BOARD, tag, owner, clock)
 {
 }
 
@@ -1775,10 +1775,10 @@ void harddrivc_board_device_state::device_start()
 	harddriv_state::device_start();
 }
 
-const device_type HARDDRIVC_BOARD_DEVICE = device_creator<harddrivc_board_device_state>;
+DEFINE_DEVICE_TYPE(HARDDRIVC_BOARD, harddrivc_board_device_state, "harddrivc_board", "Hard Drivin' C Board Device")
 
 harddrivc_board_device_state::harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, HARDDRIVC_BOARD_DEVICE, "Hard Drivin' C Board Device", tag, owner, clock, "harddrivc_board_device", __FILE__)
+	: harddriv_state(mconfig, HARDDRIVC_BOARD, tag, owner, clock)
 {
 }
 
@@ -1802,21 +1802,21 @@ void racedrivb1_board_device_state::device_start()
 	harddriv_state::device_start();
 }
 
-const device_type RACEDRIV_BOARD_DEVICE = device_creator<racedriv_board_device_state>;
-const device_type RACEDRIVB1_BOARD_DEVICE = device_creator<racedrivb1_board_device_state>;
+DEFINE_DEVICE_TYPE(RACEDRIV_BOARD, racedriv_board_device_state, "racedriv_board", "Race Drivin' Board Device")
+DEFINE_DEVICE_TYPE(RACEDRIVB1_BOARD, racedrivb1_board_device_state, "racedrivb1_board", "Race Drivin' B1 Board Device")
 
 racedriv_board_device_state::racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, RACEDRIV_BOARD_DEVICE, "Race Drivin' Board Device", tag, owner, clock, "racedriv_board_device", __FILE__)
+	: racedriv_board_device_state(mconfig, RACEDRIV_BOARD, tag, owner, clock)
 {
 }
 
-racedriv_board_device_state::racedriv_board_device_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: harddriv_state(mconfig, type, name, tag, owner, clock, shortname, source)
+racedriv_board_device_state::racedriv_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: harddriv_state(mconfig, type, tag, owner, clock)
 {
 }
 
 racedrivb1_board_device_state::racedrivb1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: racedriv_board_device_state(mconfig, RACEDRIVB1_BOARD_DEVICE, "Race Drivin' B1 Board Device", tag, owner, clock, "racedrivb1_board_device", __FILE__)
+	: racedriv_board_device_state(mconfig, RACEDRIVB1_BOARD, tag, owner, clock)
 {
 }
 
@@ -1848,27 +1848,27 @@ void racedrivc_panorama_side_board_device_state::device_start()
 
 
 
-const device_type RACEDRIVC_BOARD_DEVICE = device_creator<racedrivc_board_device_state>;
-const device_type RACEDRIVC1_BOARD_DEVICE = device_creator<racedrivc1_board_device_state>;
-const device_type RACEDRIVC_PANORAMA_SIDE_BOARD_DEVICE = device_creator<racedrivc_panorama_side_board_device_state>;
+DEFINE_DEVICE_TYPE(RACEDRIVC_BOARD, racedrivc_board_device_state, "racedrivc_board", "Race Drivin' C Board Device")
+DEFINE_DEVICE_TYPE(RACEDRIVC1_BOARD, racedrivc1_board_device_state, "racedrivc1_board", "Race Drivin' C1 Board Device")
+DEFINE_DEVICE_TYPE(RACEDRIVC_PANORAMA_SIDE_BOARD, racedrivc_panorama_side_board_device_state, "racedrivc_panorama_side_board", "Race Drivin' C Panorama Board Device")
 
 racedrivc_board_device_state::racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, RACEDRIVC_BOARD_DEVICE, "Race Drivin' C Board Device", tag, owner, clock, "racedrivc_board_device", __FILE__)
+	: racedrivc_board_device_state(mconfig, RACEDRIVC_BOARD, tag, owner, clock)
 {
 }
 
-racedrivc_board_device_state::racedrivc_board_device_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: harddriv_state(mconfig, type, name, tag, owner, clock, shortname, source)
+racedrivc_board_device_state::racedrivc_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: harddriv_state(mconfig, type, tag, owner, clock)
 {
 }
 
 racedrivc1_board_device_state::racedrivc1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: racedrivc_board_device_state(mconfig, RACEDRIVC1_BOARD_DEVICE, "Race Drivin' C1 Board Device", tag, owner, clock, "racedrivc1_board_device", __FILE__)
+	: racedrivc_board_device_state(mconfig, RACEDRIVC1_BOARD, tag, owner, clock)
 {
 }
 
 racedrivc_panorama_side_board_device_state::racedrivc_panorama_side_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: racedrivc_board_device_state(mconfig, RACEDRIVC_PANORAMA_SIDE_BOARD_DEVICE, "Race Drivin' C Panorama Board Device", tag, owner, clock, "racedrivc_panorama_side_board_device", __FILE__)
+	: racedrivc_board_device_state(mconfig, RACEDRIVC_PANORAMA_SIDE_BOARD, tag, owner, clock)
 {
 }
 
@@ -1891,10 +1891,10 @@ void stunrun_board_device_state::device_start()
 	harddriv_state::device_start();
 }
 
-const device_type STUNRUN_BOARD_DEVICE = device_creator<stunrun_board_device_state>;
+DEFINE_DEVICE_TYPE(STUNRUN_BOARD, stunrun_board_device_state, "stunrun_board", "Stun Runner Board Device")
 
 stunrun_board_device_state::stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, STUNRUN_BOARD_DEVICE, "Stun Runner Board Device", tag, owner, clock, "stunrun_board_device", __FILE__)
+	: harddriv_state(mconfig, STUNRUN_BOARD, tag, owner, clock)
 {
 }
 
@@ -1923,27 +1923,27 @@ void steeltalp_board_device_state::device_start()
 	harddriv_state::device_start();
 }
 
-const device_type STEELTAL_BOARD_DEVICE = device_creator<steeltal_board_device_state>;
-const device_type STEELTAL1_BOARD_DEVICE = device_creator<steeltal1_board_device_state>;
-const device_type STEELTALP_BOARD_DEVICE = device_creator<steeltalp_board_device_state>;
+DEFINE_DEVICE_TYPE(STEELTAL_BOARD, steeltal_board_device_state, "steeltal_board", "Steel Talons Board Device")
+DEFINE_DEVICE_TYPE(STEELTAL1_BOARD, steeltal1_board_device_state, "steeltal1_board", "Steel Talons 1 Board Device")
+DEFINE_DEVICE_TYPE(STEELTALP_BOARD, steeltalp_board_device_state, "steeltalp_board", "Steel Talons P Board Device")
 
 steeltal_board_device_state::steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, STEELTAL_BOARD_DEVICE, "Steel Talons Board Device", tag, owner, clock, "steeltal_board_device", __FILE__)
+	: steeltal_board_device_state(mconfig, STEELTAL_BOARD, tag, owner, clock)
 {
 }
 
-steeltal_board_device_state::steeltal_board_device_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: harddriv_state(mconfig, type, name, tag, owner, clock, shortname, source)
+steeltal_board_device_state::steeltal_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: harddriv_state(mconfig, type, tag, owner, clock)
 {
 }
 
 steeltal1_board_device_state::steeltal1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: steeltal_board_device_state(mconfig, STEELTAL1_BOARD_DEVICE, "Steel Talons 1 Board Device", tag, owner, clock, "steeltal1_board_device", __FILE__)
+	: steeltal_board_device_state(mconfig, STEELTAL1_BOARD, tag, owner, clock)
 {
 }
 
 steeltalp_board_device_state::steeltalp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: steeltal_board_device_state(mconfig, STEELTALP_BOARD_DEVICE, "Steel Talons P Board Device", tag, owner, clock, "steeltalp_board_device", __FILE__)
+	: steeltal_board_device_state(mconfig, STEELTALP_BOARD, tag, owner, clock)
 {
 }
 
@@ -1960,10 +1960,10 @@ void strtdriv_board_device_state::device_start()
 	harddriv_state::device_start();
 }
 
-const device_type STRTDRIV_BOARD_DEVICE = device_creator<strtdriv_board_device_state>;
+DEFINE_DEVICE_TYPE(STRTDRIV_BOARD, strtdriv_board_device_state, "strtdriv_board", "Street Drivin' Board Device")
 
 strtdriv_board_device_state::strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, STRTDRIV_BOARD_DEVICE, "Street Drivin' Board Device", tag, owner, clock, "strtdriv_board_device", __FILE__)
+	: harddriv_state(mconfig, STRTDRIV_BOARD, tag, owner, clock)
 {
 }
 
@@ -1986,21 +1986,21 @@ void hdrivairp_board_device_state::device_start()
 	harddriv_state::device_start();
 }
 
-const device_type HDRIVAIR_BOARD_DEVICE = device_creator<hdrivair_board_device_state>;
-const device_type HDRIVAIRP_BOARD_DEVICE = device_creator<hdrivairp_board_device_state>;
+DEFINE_DEVICE_TYPE(HDRIVAIR_BOARD, hdrivair_board_device_state, "hdrivair_board", "Hard Drivin' Airborne Board Device")
+DEFINE_DEVICE_TYPE(HDRIVAIRP_BOARD, hdrivairp_board_device_state, "hdrivairp_board", "Hard Drivin' Airborne P Board Device")
 
 hdrivair_board_device_state::hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: harddriv_state(mconfig, HDRIVAIR_BOARD_DEVICE, "Hard Drivin' Airborne Board Device", tag, owner, clock, "hdrivair_board_device", __FILE__)
+	: hdrivair_board_device_state(mconfig, HDRIVAIR_BOARD, tag, owner, clock)
 {
 }
 
-hdrivair_board_device_state::hdrivair_board_device_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: harddriv_state(mconfig, type, name, tag, owner, clock, shortname, source)
+hdrivair_board_device_state::hdrivair_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: harddriv_state(mconfig, type, tag, owner, clock)
 {
 }
 
 hdrivairp_board_device_state::hdrivairp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hdrivair_board_device_state(mconfig, HDRIVAIRP_BOARD_DEVICE, "Hard Drivin' Airborne P Board Device", tag, owner, clock, "hrdrvairp_board_device", __FILE__)
+	: hdrivair_board_device_state(mconfig, HDRIVAIRP_BOARD, tag, owner, clock)
 {
 }
 
@@ -2011,56 +2011,56 @@ machine_config_constructor hdrivair_board_device_state::device_mconfig_additions
 
 
 
-static MACHINE_CONFIG_START( harddriv_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", HARDDRIV_BOARD_DEVICE, 0)
+static MACHINE_CONFIG_START( harddriv_machine )
+	MCFG_DEVICE_ADD("mainpcb", HARDDRIV_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( harddrivc_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", HARDDRIVC_BOARD_DEVICE, 0)
+static MACHINE_CONFIG_START( harddrivc_machine )
+	MCFG_DEVICE_ADD("mainpcb", HARDDRIVC_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( racedriv_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", RACEDRIV_BOARD_DEVICE, 0)
+static MACHINE_CONFIG_START( racedriv_machine )
+	MCFG_DEVICE_ADD("mainpcb", RACEDRIV_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( racedrivb1_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", RACEDRIVB1_BOARD_DEVICE, 0)
+static MACHINE_CONFIG_START( racedrivb1_machine )
+	MCFG_DEVICE_ADD("mainpcb", RACEDRIVB1_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( racedrivc_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", RACEDRIVC_BOARD_DEVICE, 0)
+static MACHINE_CONFIG_START( racedrivc_machine )
+	MCFG_DEVICE_ADD("mainpcb", RACEDRIVC_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( racedrivc1_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", RACEDRIVC1_BOARD_DEVICE, 0)
+static MACHINE_CONFIG_START( racedrivc1_machine )
+	MCFG_DEVICE_ADD("mainpcb", RACEDRIVC1_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( stunrun_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", STUNRUN_BOARD_DEVICE, 0)
+static MACHINE_CONFIG_START( stunrun_machine )
+	MCFG_DEVICE_ADD("mainpcb", STUNRUN_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( strtdriv_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", STRTDRIV_BOARD_DEVICE, 0)
+static MACHINE_CONFIG_START( strtdriv_machine )
+	MCFG_DEVICE_ADD("mainpcb", STRTDRIV_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hdrivair_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", HDRIVAIR_BOARD_DEVICE, 0)
+static MACHINE_CONFIG_START( hdrivair_machine )
+	MCFG_DEVICE_ADD("mainpcb", HDRIVAIR_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hdrivairp_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", HDRIVAIRP_BOARD_DEVICE, 0)
+static MACHINE_CONFIG_START( hdrivairp_machine )
+	MCFG_DEVICE_ADD("mainpcb", HDRIVAIRP_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( steeltal_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", STEELTAL_BOARD_DEVICE, 0)
+static MACHINE_CONFIG_START( steeltal_machine )
+	MCFG_DEVICE_ADD("mainpcb", STEELTAL_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( steeltal1_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", STEELTAL1_BOARD_DEVICE, 0)
+static MACHINE_CONFIG_START( steeltal1_machine )
+	MCFG_DEVICE_ADD("mainpcb", STEELTAL1_BOARD, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( steeltalp_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", STEELTALP_BOARD_DEVICE, 0)
+static MACHINE_CONFIG_START( steeltalp_machine )
+	MCFG_DEVICE_ADD("mainpcb", STEELTALP_BOARD, 0)
 MACHINE_CONFIG_END
 
 WRITE_LINE_MEMBER(harddriv_new_state::tx_a)
@@ -2070,10 +2070,10 @@ WRITE_LINE_MEMBER(harddriv_new_state::tx_a)
 	m_rightpcb->get_duart()->rx_a_w(state);
 }
 
-static MACHINE_CONFIG_START( racedriv_panorama_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", RACEDRIV_BOARD_DEVICE, 0)
-	MCFG_DEVICE_ADD("leftpcb", RACEDRIVC_PANORAMA_SIDE_BOARD_DEVICE, 0)
-	MCFG_DEVICE_ADD("rightpcb", RACEDRIVC_PANORAMA_SIDE_BOARD_DEVICE, 0)
+static MACHINE_CONFIG_START( racedriv_panorama_machine )
+	MCFG_DEVICE_ADD("mainpcb", RACEDRIV_BOARD, 0)
+	MCFG_DEVICE_ADD("leftpcb", RACEDRIVC_PANORAMA_SIDE_BOARD, 0)
+	MCFG_DEVICE_ADD("rightpcb", RACEDRIVC_PANORAMA_SIDE_BOARD, 0)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
 	MCFG_DEVICE_MODIFY("mainpcb:duartn68681")
@@ -5240,64 +5240,64 @@ void harddriv_state::init_hdrivairp(void)
  *
  *************************************/
 
-GAME( 1988, harddriv,   0,        harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 7)", 0 )
-GAME( 1988, harddrivb,  harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 7)", 0 )
-GAME( 1988, harddrivg,  harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 7)", 0 )
-GAME( 1988, harddrivj,  harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, Japan, rev 7)", 0 )
-GAME( 1988, harddrivb6, harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 6)", 0 )
-GAME( 1988, harddrivj6, harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, Japan, rev 6)", 0 )
-GAME( 1988, harddrivb5, harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 5)", 0 )
-GAME( 1988, harddrivg4, harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 4)", 0 )
-GAME( 1988, harddriv3,  harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 3)", 0 )
-GAME( 1988, harddriv2,  harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 2)", 0 )
-GAME( 1988, harddriv1,  harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 1)", 0 )
+GAME( 1988, harddriv,     0,        harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 7)", 0 )
+GAME( 1988, harddrivb,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 7)", 0 )
+GAME( 1988, harddrivg,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 7)", 0 )
+GAME( 1988, harddrivj,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, Japan, rev 7)", 0 )
+GAME( 1988, harddrivb6,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 6)", 0 )
+GAME( 1988, harddrivj6,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, Japan, rev 6)", 0 )
+GAME( 1988, harddrivb5,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 5)", 0 )
+GAME( 1988, harddrivg4,   harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 4)", 0 )
+GAME( 1988, harddriv3,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 3)", 0 )
+GAME( 1988, harddriv2,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 2)", 0 )
+GAME( 1988, harddriv1,    harddriv, harddriv_machine,   harddriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 1)", 0 )
 
-GAME( 1990, harddrivc,  harddriv, harddrivc_machine, racedrivc, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (compact, rev 2)", 0 )
-GAME( 1990, harddrivcg, harddriv, harddrivc_machine, racedrivc, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (compact, German, rev 2)", 0 )
-GAME( 1990, harddrivcb, harddriv, harddrivc_machine, racedrivc, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (compact, British, rev 2)", 0 )
-GAME( 1990, harddrivc1, harddriv, harddrivc_machine, racedrivc, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (compact, rev 1)", 0 )
+GAME( 1990, harddrivc,    harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (compact, rev 2)", 0 )
+GAME( 1990, harddrivcg,   harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (compact, German, rev 2)", 0 )
+GAME( 1990, harddrivcb,   harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (compact, British, rev 2)", 0 )
+GAME( 1990, harddrivc1,   harddriv, harddrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin' (compact, rev 1)", 0 )
 
-GAME( 1989, stunrun,   0,        stunrun_machine,  stunrun, driver_device,  0,  ROT0, "Atari Games", "S.T.U.N. Runner (rev 6)", 0 )
-GAME( 1989, stunrunj,  stunrun,  stunrun_machine,  stunrun, driver_device,  0,  ROT0, "Atari Games", "S.T.U.N. Runner (rev 7, Japan)", 0 )
-GAME( 1989, stunrun5,  stunrun,  stunrun_machine,  stunrun, driver_device,  0,  ROT0, "Atari Games", "S.T.U.N. Runner (rev 5)", 0 )
-GAME( 1989, stunrune,  stunrun,  stunrun_machine,  stunrun, driver_device,  0,  ROT0, "Atari Games", "S.T.U.N. Runner (rev 5, Europe)", 0 )
-GAME( 1989, stunrun4,  stunrun,  stunrun_machine,  stunrun, driver_device,  0,  ROT0, "Atari Games", "S.T.U.N. Runner (rev 4)", 0 )
-GAME( 1989, stunrun3,  stunrun,  stunrun_machine,  stunrun, driver_device,  0,  ROT0, "Atari Games", "S.T.U.N. Runner (rev 3)", 0 )
-GAME( 1989, stunrun3e, stunrun,  stunrun_machine,  stunrun, driver_device,  0,  ROT0, "Atari Games", "S.T.U.N. Runner (rev 3, Europe)", 0 )
-GAME( 1989, stunrun2,  stunrun,  stunrun_machine,  stunrun, driver_device,  0,  ROT0, "Atari Games", "S.T.U.N. Runner (rev 2)", 0 )
-GAME( 1989, stunrun2e, stunrun,  stunrun_machine,  stunrun, driver_device,  0,  ROT0, "Atari Games", "S.T.U.N. Runner (rev 2, Europe)", 0 )
-GAME( 1989, stunrun0,  stunrun,  stunrun_machine,  stunrun, driver_device,  0,  ROT0, "Atari Games", "S.T.U.N. Runner (rev 0)", 0 )
-GAME( 1989, stunrunp,  stunrun,  stunrun_machine,  stunrun, driver_device,  0,  ROT0, "Atari Games", "S.T.U.N. Runner (upright prototype)", 0 )
+GAME( 1989, stunrun,      0,        stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 6)", 0 )
+GAME( 1989, stunrunj,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 7, Japan)", 0 )
+GAME( 1989, stunrun5,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 5)", 0 )
+GAME( 1989, stunrune,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 5, Europe)", 0 )
+GAME( 1989, stunrun4,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 4)", 0 )
+GAME( 1989, stunrun3,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 3)", 0 )
+GAME( 1989, stunrun3e,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 3, Europe)", 0 )
+GAME( 1989, stunrun2,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 2)", 0 )
+GAME( 1989, stunrun2e,    stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 2, Europe)", 0 )
+GAME( 1989, stunrun0,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (rev 0)", 0 )
+GAME( 1989, stunrunp,     stunrun,  stunrun_machine,    stunrun,   harddriv_new_state, 0, ROT0, "Atari Games", "S.T.U.N. Runner (upright prototype)", 0 )
 
-GAME( 1990, racedriv,   0,        racedriv_machine, racedriv, driver_device, 0,   ROT0, "Atari Games", "Race Drivin' (cockpit, rev 5)", 0 )
-GAME( 1990, racedrivb,  racedriv, racedriv_machine, racedriv, driver_device, 0,   ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 5)", 0 )
-GAME( 1990, racedrivg,  racedriv, racedriv_machine, racedriv, driver_device, 0,   ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 5)", 0 )
-GAME( 1990, racedriv4,  racedriv, racedriv_machine, racedriv, driver_device, 0,   ROT0, "Atari Games", "Race Drivin' (cockpit, rev 4)", 0 )
-GAME( 1990, racedrivb4, racedriv, racedriv_machine, racedriv, driver_device, 0,   ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 4)", 0 )
-GAME( 1990, racedrivg4, racedriv, racedriv_machine, racedriv, driver_device, 0,   ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 4)", 0 )
-GAME( 1990, racedriv3,  racedriv, racedriv_machine, racedriv, driver_device, 0,   ROT0, "Atari Games", "Race Drivin' (cockpit, rev 3)", 0 )
-GAME( 1990, racedriv2,  racedriv, racedriv_machine, racedriv, driver_device, 0,   ROT0, "Atari Games", "Race Drivin' (cockpit, rev 2)", 0 )
-GAME( 1990, racedriv1,  racedriv, racedrivb1_machine, racedriv, driver_device, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 1)", 0 )
-GAME( 1990, racedrivb1, racedriv, racedrivb1_machine, racedriv, driver_device, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 1)", 0 )
-GAME( 1990, racedrivg1, racedriv, racedrivb1_machine, racedriv, driver_device, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 2)", 0 )
+GAME( 1990, racedriv,     0,        racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 5)", 0 )
+GAME( 1990, racedrivb,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 5)", 0 )
+GAME( 1990, racedrivg,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 5)", 0 )
+GAME( 1990, racedriv4,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 4)", 0 )
+GAME( 1990, racedrivb4,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 4)", 0 )
+GAME( 1990, racedrivg4,   racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 4)", 0 )
+GAME( 1990, racedriv3,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 3)", 0 )
+GAME( 1990, racedriv2,    racedriv, racedriv_machine,   racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 2)", 0 )
+GAME( 1990, racedriv1,    racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 1)", 0 )
+GAME( 1990, racedrivb1,   racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 1)", 0 )
+GAME( 1990, racedrivg1,   racedriv, racedrivb1_machine, racedriv,  harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 2)", 0 )
 
-GAME( 1990, racedrivc,   racedriv, racedrivc_machine, racedrivc, driver_device, 0, ROT0, "Atari Games", "Race Drivin' (compact, rev 5)", 0 )
-GAME( 1990, racedrivcb,  racedriv, racedrivc_machine, racedrivc, driver_device, 0, ROT0, "Atari Games", "Race Drivin' (compact, British, rev 5)", 0 )
-GAME( 1990, racedrivcg,  racedriv, racedrivc_machine, racedrivc, driver_device, 0, ROT0, "Atari Games", "Race Drivin' (compact, German, rev 5)", 0 )
-GAME( 1990, racedrivc4,  racedriv, racedrivc_machine, racedrivc, driver_device, 0, ROT0, "Atari Games", "Race Drivin' (compact, rev 4)", 0 )
-GAME( 1990, racedrivcb4, racedriv, racedrivc_machine, racedrivc, driver_device, 0, ROT0, "Atari Games", "Race Drivin' (compact, British, rev 4)", 0 )
-GAME( 1990, racedrivcg4, racedriv, racedrivc_machine, racedrivc, driver_device, 0, ROT0, "Atari Games", "Race Drivin' (compact, German, rev 4)", 0 )
-GAME( 1990, racedrivc2,  racedriv, racedrivc1_machine, racedrivc, driver_device, 0,ROT0, "Atari Games", "Race Drivin' (compact, rev 2)", 0 )
-GAME( 1990, racedrivc1,  racedriv, racedrivc1_machine, racedrivc, driver_device, 0,ROT0, "Atari Games", "Race Drivin' (compact, rev 1)", 0 )
+GAME( 1990, racedrivc,    racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, rev 5)", 0 )
+GAME( 1990, racedrivcb,   racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, British, rev 5)", 0 )
+GAME( 1990, racedrivcg,   racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, German, rev 5)", 0 )
+GAME( 1990, racedrivc4,   racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, rev 4)", 0 )
+GAME( 1990, racedrivcb4,  racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, British, rev 4)", 0 )
+GAME( 1990, racedrivcg4,  racedriv, racedrivc_machine,  racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, German, rev 4)", 0 )
+GAME( 1990, racedrivc2,   racedriv, racedrivc1_machine, racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, rev 2)", 0 )
+GAME( 1990, racedrivc1,   racedriv, racedrivc1_machine, racedrivc, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' (compact, rev 1)", 0 )
 
-GAMEL( 1990, racedrivpan, racedriv, racedriv_panorama_machine, racedriv_pan, driver_device, 0, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", 0, layout_racedrivpan )
+GAMEL( 1990, racedrivpan, racedriv, racedriv_panorama_machine, racedriv_pan, harddriv_new_state, 0, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", 0, layout_racedrivpan )
 
-GAME( 1991, steeltal,  0,        steeltal_machine, steeltal, driver_device, 0, ROT0, "Atari Games", "Steel Talons (rev 2)", 0 )
-GAME( 1991, steeltalg, steeltal, steeltal_machine, steeltal, driver_device, 0, ROT0, "Atari Games", "Steel Talons (German, rev 2)", 0 )
-GAME( 1991, steeltal1, steeltal, steeltal1_machine, steeltal, driver_device, 0,ROT0, "Atari Games", "Steel Talons (rev 1)", 0 )
-GAME( 1991, steeltalp, steeltal, steeltalp_machine, steeltal, driver_device, 0,ROT0, "Atari Games", "Steel Talons (prototype)", MACHINE_NOT_WORKING )
+GAME( 1991, steeltal,     0,        steeltal_machine,  steeltal,   harddriv_new_state, 0, ROT0, "Atari Games", "Steel Talons (rev 2)", 0 )
+GAME( 1991, steeltalg,    steeltal, steeltal_machine,  steeltal,   harddriv_new_state, 0, ROT0, "Atari Games", "Steel Talons (German, rev 2)", 0 )
+GAME( 1991, steeltal1,    steeltal, steeltal1_machine, steeltal,   harddriv_new_state, 0, ROT0, "Atari Games", "Steel Talons (rev 1)", 0 )
+GAME( 1991, steeltalp,    steeltal, steeltalp_machine, steeltal,   harddriv_new_state, 0, ROT0, "Atari Games", "Steel Talons (prototype)", MACHINE_NOT_WORKING )
 
-GAME( 1993, strtdriv, 0,        strtdriv_machine, strtdriv, driver_device, 0, ROT0, "Atari Games", "Street Drivin' (prototype)", 0 )
+GAME( 1993, strtdriv,     0,        strtdriv_machine,  strtdriv,   harddriv_new_state, 0, ROT0, "Atari Games", "Street Drivin' (prototype)", 0 )
 
-GAME( 1993, hdrivair,  0,        hdrivair_machine, hdrivair, driver_device, 0, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, hdrivairp, hdrivair, hdrivairp_machine, hdrivair, driver_device, 0,ROT0, "Atari Games", "Hard Drivin's Airborne (prototype, early rev)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, hdrivair,     0,        hdrivair_machine,  hdrivair,   harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype)", MACHINE_IMPERFECT_SOUND )
+GAME( 1993, hdrivairp,    hdrivair, hdrivairp_machine, hdrivair,   harddriv_new_state, 0, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype, early rev)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

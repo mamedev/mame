@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __NES_WAIXING_H
-#define __NES_WAIXING_H
+#ifndef MAME_BUS_NES_WAIXING_H
+#define MAME_BUS_NES_WAIXING_H
+
+#pragma once
 
 #include "mmc3.h"
 
@@ -12,11 +14,8 @@ class nes_waixing_a_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_waixing_a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	nes_waixing_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_l) override;
 	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 	virtual DECLARE_WRITE8_MEMBER(waixing_write);
@@ -26,7 +25,13 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
+	nes_waixing_a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+
 	void set_mirror(uint8_t nt);
+
 	uint8_t mapper_ram[0x400];
 };
 
@@ -109,6 +114,7 @@ public:
 	virtual void chr_cb(int start, int bank, int source) override;
 
 	virtual void pcb_reset() override;
+
 private:
 	virtual void set_prg(int prg_base, int prg_mask) override;
 };
@@ -139,14 +145,17 @@ class nes_waixing_h_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_waixing_h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	nes_waixing_h_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 	virtual void chr_cb(int start, int bank, int source) override;
 
 	// This PCB does not have 1K of internal RAM, so it's not derived from nes_waixing_a_device!!
+
+protected:
+	nes_waixing_h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 };
 
 
@@ -185,13 +194,14 @@ public:
 	// construction/destruction
 	nes_waixing_j_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	virtual void set_prg(int prg_base, int prg_mask) override;
 	uint8_t m_reg[4];
 };
@@ -225,8 +235,6 @@ public:
 	// construction/destruction
 	nes_waixing_sec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 	virtual void prg_cb(int start, int bank) override;
 	virtual void chr_cb(int start, int bank, int source) override;
@@ -234,6 +242,9 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	uint8_t m_reg;
 };
 
@@ -246,14 +257,15 @@ public:
 	// construction/destruction
 	nes_waixing_sgz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	uint16_t m_irq_count, m_irq_count_latch;
 	int m_irq_enable, m_irq_enable_latch;
 
@@ -269,13 +281,14 @@ public:
 	// construction/destruction
 	nes_waixing_sgzlz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 
 	virtual void pcb_reset() override;
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	uint8_t m_reg[4];
 };
 
@@ -288,13 +301,14 @@ public:
 	// construction/destruction
 	nes_waixing_ffv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 
 	virtual void pcb_reset() override;
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	uint8_t m_reg[2];
 };
 
@@ -307,11 +321,13 @@ public:
 	// construction/destruction
 	nes_waixing_wxzs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 
@@ -323,11 +339,13 @@ public:
 	// construction/destruction
 	nes_waixing_dq8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 
@@ -339,11 +357,13 @@ public:
 	// construction/destruction
 	nes_waixing_wxzs2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 
@@ -355,42 +375,39 @@ public:
 	// construction/destruction
 	nes_waixing_fs304_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 
 	virtual void pcb_reset() override;
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	uint8_t m_reg[4];
 };
 
 
-
-
-
 // device type definition
-extern const device_type NES_WAIXING_A;
-extern const device_type NES_WAIXING_A1;
-extern const device_type NES_WAIXING_B;
-extern const device_type NES_WAIXING_C;
-extern const device_type NES_WAIXING_D;
-extern const device_type NES_WAIXING_E;
-extern const device_type NES_WAIXING_F;
-extern const device_type NES_WAIXING_G;
-extern const device_type NES_WAIXING_H;
-extern const device_type NES_WAIXING_H1;
-extern const device_type NES_WAIXING_I;
-extern const device_type NES_WAIXING_J;
-extern const device_type NES_WAIXING_SH2;
-extern const device_type NES_WAIXING_SEC;
-extern const device_type NES_WAIXING_SGZ;
-extern const device_type NES_WAIXING_SGZLZ;
-extern const device_type NES_WAIXING_FFV;
-extern const device_type NES_WAIXING_WXZS;
-extern const device_type NES_WAIXING_DQ8;
-extern const device_type NES_WAIXING_WXZS2;
-extern const device_type NES_WAIXING_FS304;
+DECLARE_DEVICE_TYPE(NES_WAIXING_A,     nes_waixing_a_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_A1,    nes_waixing_a1_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_B,     nes_waixing_b_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_C,     nes_waixing_c_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_D,     nes_waixing_d_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_E,     nes_waixing_e_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_F,     nes_waixing_f_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_G,     nes_waixing_g_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_H,     nes_waixing_h_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_H1,    nes_waixing_h1_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_I,     nes_waixing_i_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_J,     nes_waixing_j_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_SH2,   nes_waixing_sh2_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_SEC,   nes_waixing_sec_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_SGZ,   nes_waixing_sgz_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_SGZLZ, nes_waixing_sgzlz_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_FFV,   nes_waixing_ffv_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_WXZS,  nes_waixing_wxzs_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_DQ8,   nes_waixing_dq8_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_WXZS2, nes_waixing_wxzs2_device)
+DECLARE_DEVICE_TYPE(NES_WAIXING_FS304, nes_waixing_fs304_device)
 
-
-#endif
+#endif // MAME_BUS_NES_WAIXING_H

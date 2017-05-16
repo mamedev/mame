@@ -712,7 +712,7 @@ static GFXDECODE_START( bombsa )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( psychic5, psychic5_state )
+static MACHINE_CONFIG_START( psychic5 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
@@ -766,7 +766,7 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bombsa, psychic5_state )
+static MACHINE_CONFIG_START( bombsa )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2 ) /* 6 MHz */
@@ -972,6 +972,6 @@ ROM_START( bombsa )
 ROM_END
 
 
-GAME( 1987, psychic5,  0,        psychic5, psychic5, driver_device, 0, ROT270, "Jaleco / NMK", "Psychic 5 (World)", MACHINE_SUPPORTS_SAVE ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
-GAME( 1987, psychic5j, psychic5, psychic5, psychic5, driver_device, 0, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bombsa,    0,        bombsa,   bombsa,   driver_device, 0, ROT270, "Jaleco", "Bombs Away (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, psychic5,  0,        psychic5, psychic5, psychic5_state, 0, ROT270, "Jaleco / NMK", "Psychic 5 (World)", MACHINE_SUPPORTS_SAVE ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
+GAME( 1987, psychic5j, psychic5, psychic5, psychic5, psychic5_state, 0, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bombsa,    0,        bombsa,   bombsa,   psychic5_state, 0, ROT270, "Jaleco", "Bombs Away (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )

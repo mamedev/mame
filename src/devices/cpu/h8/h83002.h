@@ -11,8 +11,10 @@
 
 ***************************************************************************/
 
-#ifndef __H83002_H__
-#define __H83002_H__
+#ifndef MAME_CPU_H8_H83002_H
+#define MAME_CPU_H8_H83002_H
+
+#pragma once
 
 #include "h8h.h"
 #include "h8_adc.h"
@@ -82,6 +84,6 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 };
 
-extern const device_type H83002;
+DECLARE_DEVICE_TYPE(H83002, h83002_device)
 
-#endif
+#endif // MAME_CPU_H8_H83002_H

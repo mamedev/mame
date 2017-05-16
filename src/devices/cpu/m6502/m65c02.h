@@ -8,16 +8,16 @@
     not the bitwise ones)
 
 ***************************************************************************/
+#ifndef MAME_CPU_M6502_M65C02_H
+#define MAME_CPU_M6502_M65C02_H
 
-#ifndef __M65C02_H__
-#define __M65C02_H__
+#pragma once
 
 #include "m6502.h"
 
 class m65c02_device : public m6502_device {
 public:
 	m65c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	m65c02_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	static const disasm_entry disasm_entries[0x100];
 
@@ -26,6 +26,8 @@ public:
 	virtual void do_exec_partial() override;
 
 protected:
+	m65c02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 #define O(o) void o ## _full(); void o ## _partial()
 
 	// 65c02 opcodes
@@ -71,6 +73,6 @@ enum {
 	M65C02_SET_OVERFLOW = m6502_device::V_LINE
 };
 
-extern const device_type M65C02;
+DECLARE_DEVICE_TYPE(M65C02, m65c02_device)
 
-#endif
+#endif // MAME_CPU_M6502_M65C02_H

@@ -17,8 +17,8 @@
 
 
 // device type definition
-const device_type I8244 = device_creator<i8244_device>;
-const device_type I8245 = device_creator<i8245_device>;
+DEFINE_DEVICE_TYPE(I8244, i8244_device, "i8244", "Intel 8244")
+DEFINE_DEVICE_TYPE(I8245, i8245_device, "i8245", "Intel 8245")
 
 
 // Kevtris verified that the data below matches a dump
@@ -105,20 +105,13 @@ static const uint8_t bgr2rgb[8] =
 //-------------------------------------------------
 
 i8244_device::i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, I8244, "I8244", tag, owner, clock, "i8244", __FILE__)
-	, device_sound_interface(mconfig, *this)
-	, device_video_interface(mconfig, *this)
-	, m_irq_func(*this)
-	, m_postprocess_func(*this)
-	, m_start_vpos(START_Y)
-	, m_start_vblank(START_Y + SCREEN_HEIGHT)
-	, m_screen_lines(LINES)
+	: i8244_device(mconfig, I8244, tag, owner, clock, i8244_device::LINES)
 {
 }
 
 
-i8244_device::i8244_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int lines, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+i8244_device::i8244_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int lines)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, m_irq_func(*this)
@@ -131,7 +124,7 @@ i8244_device::i8244_device(const machine_config &mconfig, device_type type, cons
 
 
 i8245_device::i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8244_device(mconfig, I8245, "I8245", tag, owner, clock, i8245_device::LINES, "i8245", __FILE__)
+	: i8244_device(mconfig, I8245, tag, owner, clock, i8245_device::LINES)
 {
 }
 

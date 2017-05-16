@@ -11,30 +11,20 @@
 
 *************************************************************************/
 
-#pragma once
+#ifndef MAME_INCLUDES_SLAPSTIC_H
+#define MAME_INCLUDES_SLAPSTIC_H
 
-#ifndef __SLAPSTIC__
-#define __SLAPSTIC__
+#pragma once
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/m68000/m68000.h"
 
 
-extern const device_type SLAPSTIC;
+DECLARE_DEVICE_TYPE(SLAPSTIC, atari_slapstic_device)
 
 #define MCFG_SLAPSTIC_ADD(_tag, _chip) \
 	MCFG_DEVICE_ADD(_tag, SLAPSTIC, 0) \
 	MCFG_SLAPSTIC_NUM(_chip)
-
-
-/*************************************
- *
- *  Debugging
- *
- *************************************/
-
-#define LOG_SLAPSTIC    (0)
-
 
 
 /*************************************
@@ -179,16 +169,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_validity_check(validity_checker &valid) const override;
-
-
-private:
-
-
-
-
 };
 
-
-
-
-#endif
+#endif // MAME_INCLUDES_SLAPSTIC_H

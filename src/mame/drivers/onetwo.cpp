@@ -355,7 +355,7 @@ void onetwo_state::machine_start()
 
 }
 
-static MACHINE_CONFIG_START( onetwo, onetwo_state )
+static MACHINE_CONFIG_START( onetwo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK)   /* 4 MHz */
@@ -391,7 +391,7 @@ static MACHINE_CONFIG_START( onetwo, onetwo_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1056000*2, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000*2, PIN7_LOW) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -439,5 +439,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1997, onetwo,       0, onetwo, onetwo, driver_device, 0, ROT0, "Barko", "One + Two", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, onetwoe, onetwo, onetwo, onetwo, driver_device, 0, ROT0, "Barko", "One + Two (earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, onetwo,       0, onetwo, onetwo, onetwo_state, 0, ROT0, "Barko", "One + Two", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, onetwoe, onetwo, onetwo, onetwo, onetwo_state, 0, ROT0, "Barko", "One + Two (earlier)", MACHINE_SUPPORTS_SAVE )

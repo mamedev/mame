@@ -11,8 +11,10 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_DEVICES_VIDEO_DL1416_H
-#define MAME_DEVICES_VIDEO_DL1416_H
+#ifndef MAME_VIDEO_DL1416_H
+#define MAME_VIDEO_DL1416_H
+
+#pragma once
 
 
 /***************************************************************************
@@ -42,8 +44,8 @@ extern device_type const DL1416T;
 class dl1414_device : public device_t
 {
 public:
-	template<typename Object> static devcb_base &set_update_handler(device_t &device, Object &&object)
-	{ return downcast<dl1414_device &>(device).m_update_cb.set_callback(std::forward<Object>(object)); }
+	template <typename Object> static devcb_base &set_update_handler(device_t &device, Object &&cb)
+	{ return downcast<dl1414_device &>(device).m_update_cb.set_callback(std::forward<Object>(cb)); }
 
 	// signal-level interface
 	DECLARE_WRITE_LINE_MEMBER(wr_w); // write strobe (rising edge)
@@ -58,12 +60,9 @@ protected:
 	dl1414_device(
 			machine_config const &mconfig,
 			device_type type,
-			char const *name,
 			char const *tag,
 			device_t *owner,
-			uint32_t clock,
-			char const *shortname,
-			char const *source);
+			uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -95,12 +94,9 @@ protected:
 	dl1416_device(
 			machine_config const &mconfig,
 			device_type type,
-			char const *name,
 			char const *tag,
 			device_t *owner,
-			uint32_t clock,
-			char const *shortname,
-			char const *source);
+			uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -112,4 +108,4 @@ private:
 	bool m_cu_in;
 };
 
-#endif // MAME_DEVICES_VIDEO_DL1416_H
+#endif // MAME_VIDEO_DL1416_H

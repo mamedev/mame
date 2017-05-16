@@ -547,7 +547,7 @@ INTERRUPT_GEN_MEMBER(rbmk_state::mcu_irq)
 	m_mcu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( rbmk, rbmk_state )
+static MACHINE_CONFIG_START( rbmk )
 	MCFG_CPU_ADD("maincpu", M68000, 22000000 /2)
 	MCFG_CPU_PROGRAM_MAP(rbmk_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
@@ -576,7 +576,7 @@ static MACHINE_CONFIG_START( rbmk, rbmk_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 
@@ -609,4 +609,4 @@ ROM_START( rbmk )
 ROM_END
 
 
-GAME( 1998, rbmk, 0, rbmk, rbmk, driver_device,0, ROT0,  "GMS", "Real Battle Mahjong King", MACHINE_NOT_WORKING )
+GAME( 1998, rbmk, 0, rbmk, rbmk, rbmk_state, 0, ROT0,  "GMS", "Real Battle Mahjong King", MACHINE_NOT_WORKING )

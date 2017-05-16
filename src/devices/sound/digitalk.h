@@ -1,17 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef _DIGITALKER_H_
-#define _DIGITALKER_H_
+#ifndef MAME_SOUND_DIGITALK_H
+#define MAME_SOUND_DIGITALK_H
+
+#pragma once
 
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_DIGITALKER_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, DIGITALKER, _clock)
-#define MCFG_DIGITALKER_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, DIGITALKER, _clock)
+#define MCFG_DIGITALKER_ADD(tag, clock) \
+		MCFG_DEVICE_ADD((tag), DIGITALKER, (clock))
+
+#define MCFG_DIGITALKER_REPLACE(tag, clock) \
+		MCFG_DEVICE_REPLACE((tag), DIGITALKER, (clock))
 
 
 //**************************************************************************
@@ -20,17 +23,17 @@
 
 // ======================> digitalker_device
 
-class digitalker_device : public device_t,
-							public device_sound_interface
+class digitalker_device : public device_t, public device_sound_interface
 {
 public:
 	digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~digitalker_device() { }
 
 	void digitalker_0_cs_w(int line);
 	void digitalker_0_cms_w(int line);
 	void digitalker_0_wr_w(int line);
 	int digitalker_0_intr_r();
+
+	DECLARE_WRITE8_MEMBER(digitalker_data_w);
 
 protected:
 	// device-level overrides
@@ -38,9 +41,6 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-
-public:
-	DECLARE_WRITE8_MEMBER(digitalker_data_w);
 
 private:
 	void digitalker_write(uint8_t *adr, uint8_t vol, int8_t dac);
@@ -58,7 +58,6 @@ private:
 	int digitalker_intr_r();
 	void digitalker_register_for_save();
 
-private:
 	required_region_ptr<uint8_t> m_rom;
 	sound_stream *m_stream;
 
@@ -95,7 +94,6 @@ private:
 	int16_t m_dac[128];
 };
 
-extern const device_type DIGITALKER;
+DECLARE_DEVICE_TYPE(DIGITALKER, digitalker_device)
 
-
-#endif
+#endif // MAME_SOUND_DIGITALK_H

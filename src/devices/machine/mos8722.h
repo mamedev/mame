@@ -33,10 +33,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MOS8722_H
+#define MAME_MACHINE_MOS8722_H
 
-#ifndef __MOS8722__
-#define __MOS8722__
+#pragma once
 
 
 
@@ -74,11 +74,11 @@ public:
 	// construction/destruction
 	mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_z80en_wr_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_write_z80en.set_callback(object); }
-	template<class _Object> static devcb_base &set_fsdir_wr_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_write_fsdir.set_callback(object); }
-	template<class _Object> static devcb_base &set_game_rd_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_read_game.set_callback(object); }
-	template<class _Object> static devcb_base &set_exrom_rd_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_read_exrom.set_callback(object); }
-	template<class _Object> static devcb_base &set_sense40_rd_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_read_sense40.set_callback(object); }
+	template <class Object> static devcb_base &set_z80en_wr_callback(device_t &device, Object &&cb) { return downcast<mos8722_device &>(device).m_write_z80en.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_fsdir_wr_callback(device_t &device, Object &&cb) { return downcast<mos8722_device &>(device).m_write_fsdir.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_game_rd_callback(device_t &device, Object &&cb) { return downcast<mos8722_device &>(device).m_read_game.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_exrom_rd_callback(device_t &device, Object &&cb) { return downcast<mos8722_device &>(device).m_read_exrom.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sense40_rd_callback(device_t &device, Object &&cb) { return downcast<mos8722_device &>(device).m_read_sense40.set_callback(std::forward<Object>(cb)); }
 
 
 	uint8_t read(offs_t offset, uint8_t data);
@@ -146,8 +146,6 @@ private:
 
 
 // device type definition
-extern const device_type MOS8722;
+DECLARE_DEVICE_TYPE(MOS8722, mos8722_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_MOS8722_H

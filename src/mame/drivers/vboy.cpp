@@ -1345,7 +1345,7 @@ static SLOT_INTERFACE_START(vboy_cart)
 	SLOT_INTERFACE_INTERNAL("vb_eeprom", VBOY_ROM_EEPROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( vboy, vboy_state )
+static MACHINE_CONFIG_START( vboy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", V810, XTAL_20MHz )
@@ -1397,5 +1397,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-CONS( 1995, vboy,   0,      0,       vboy,      vboy, driver_device,    0,    "Nintendo", "Virtual Boy", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY     FULLNAME       FLAGS */
+CONS( 1995, vboy,   0,      0,       vboy,      vboy,  vboy_state, 0,    "Nintendo", "Virtual Boy", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

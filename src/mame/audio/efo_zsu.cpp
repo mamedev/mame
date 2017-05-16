@@ -41,37 +41,37 @@
 #include "speaker.h"
 
 
-const device_type EFO_ZSU = device_creator<efo_zsu_device>;
-const device_type EFO_ZSU1 = device_creator<efo_zsu1_device>;
-const device_type CEDAR_MAGNET_SOUND = device_creator<cedar_magnet_sound_device>;
+DEFINE_DEVICE_TYPE(EFO_ZSU,            efo_zsu_device,            "efo_zsu",      "ZSU Sound Control Unit")
+DEFINE_DEVICE_TYPE(EFO_ZSU1,           efo_zsu1_device,           "efo_zsu1",     "ZSU1 Sound Control Unit")
+DEFINE_DEVICE_TYPE(CEDAR_MAGNET_SOUND, cedar_magnet_sound_device, "gedmag_sound", "Cedar Sound")
 
 
-efo_zsu_device::efo_zsu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_ctc0(*this, "ctc0"),
-	m_ctc1(*this, "ctc1"),
-	m_soundlatch(*this, "soundlatch"),
-	m_fifo(*this, "fifo"),
-	m_adpcm(*this, "adpcm")
+efo_zsu_device::efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_ctc0(*this, "ctc0")
+	, m_ctc1(*this, "ctc1")
+	, m_soundlatch(*this, "soundlatch")
+	, m_fifo(*this, "fifo")
+	, m_adpcm(*this, "adpcm")
 {
 }
 
 
 efo_zsu_device::efo_zsu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: efo_zsu_device(mconfig, EFO_ZSU, "ZSU Sound Control Unit", tag, owner, clock, "efo_zsu", __FILE__)
+	: efo_zsu_device(mconfig, EFO_ZSU, tag, owner, clock)
 {
 }
 
 
 efo_zsu1_device::efo_zsu1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: efo_zsu_device(mconfig, EFO_ZSU1, "ZSU1 Sound Control Unit", tag, owner, clock, "efo_zsu1", __FILE__)
+	: efo_zsu_device(mconfig, EFO_ZSU1, tag, owner, clock)
 {
 }
 
 
 cedar_magnet_sound_device::cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: efo_zsu_device(mconfig, CEDAR_MAGNET_SOUND, "Cedar Sound", tag, owner, clock, "cedmag_sound", __FILE__),
-	cedar_magnet_board_interface(mconfig, *this, "soundcpu", "ram")
+	: efo_zsu_device(mconfig, CEDAR_MAGNET_SOUND, tag, owner, clock)
+	, cedar_magnet_board_interface(mconfig, *this, "soundcpu", "ram")
 {
 }
 

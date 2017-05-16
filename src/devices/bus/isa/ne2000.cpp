@@ -11,17 +11,17 @@ static MACHINE_CONFIG_FRAGMENT(ne2000_config)
 	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(ne2000_device, ne2000_mem_write))
 MACHINE_CONFIG_END
 
-const device_type NE2000 = device_creator<ne2000_device>;
+DEFINE_DEVICE_TYPE(NE2000, ne2000_device, "ne2000", "NE2000 Network Adapter")
 
 machine_config_constructor ne2000_device::device_mconfig_additions() const {
 	return MACHINE_CONFIG_NAME(ne2000_config);
 }
 
 ne2000_device::ne2000_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
-	: device_t(mconfig, NE2000, "NE2000 Network Adapter", tag, owner, clock, "ne2000", __FILE__),
-		device_isa16_card_interface(mconfig, *this),
-		m_dp8390(*this, "dp8390d"),
-		m_irq(0)
+	: device_t(mconfig, NE2000, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this),
+	m_dp8390(*this, "dp8390d"),
+	m_irq(0)
 {
 }
 

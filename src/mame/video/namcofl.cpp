@@ -3,8 +3,9 @@
 /* video/namcofl.cpp */
 
 #include "emu.h"
-#include "includes/namcoic.h"
 #include "includes/namcofl.h"
+
+#include "machine/namcoic.h"
 
 
 /* nth_word32 is a general-purpose utility function, which allows us to

@@ -27,22 +27,20 @@
 
 **********************************************************************/
 
-#include <math.h>
-
 #include "emu.h"
 #include "mea8000.h"
 
+#include <math.h>
 
-#define VERBOSE 0
-
-/* define to use double instead of int (slow but useful for debugging) */
-#undef FLOAT_MODE
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 /******************* utilitiy function and macros ********************/
 
 
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+ALLOW_SAVE_TYPE( mea8000_device::mea8000_state );
+
 
 /* digital filters work at 8 kHz */
 #define F0 (clock() / 480)
@@ -58,6 +56,8 @@
 /************************* quantization tables ***********************/
 
 
+/* table amplitude [-QUANT,QUANT] */
+#define QUANT 512
 
 /* frequency, in Hz */
 
@@ -111,11 +111,11 @@ static const int pi_table[32] =
 
 
 
-const device_type MEA8000 = device_creator<mea8000_device>;
+DEFINE_DEVICE_TYPE(MEA8000, mea8000_device, "mea8000", "Philips/Signetics MEA 8000 speech synthesizer")
 
 
 mea8000_device::mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MEA8000, "Philips / Signetics MEA 8000 speech synthesizer", tag, owner, clock, "mea8000", __FILE__),
+	: device_t(mconfig, MEA8000, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_write_req(*this),
 	m_stream(nullptr),
@@ -205,7 +205,7 @@ void mea8000_device::init_tables()
 }
 
 
-#ifndef FLOAT_MODE /* uint16_t version */
+#ifndef MEA8000_FLOAT_MODE /* uint16_t version */
 
 
 
@@ -385,18 +385,18 @@ void mea8000_device::decode_frame()
 	m_framelog = fd + 6 /* 64 samples / ms */ + 3;
 	m_framelength = 1 << m_framelog;
 	m_bufpos = 0;
-#ifdef FLOAT_MODE
-	LOG(("mea800_decode_frame: pitch=%i noise=%i  fm1=%gHz bw1=%gHz  fm2=%gHz bw2=%gHz  fm3=%gHz bw3=%gHz  fm4=%gHz bw4=%gHz  ampl=%g fd=%ims\n",
+#ifdef MEA8000_FLOAT_MODE
+	LOG("mea800_decode_frame: pitch=%i noise=%i  fm1=%gHz bw1=%gHz  fm2=%gHz bw2=%gHz  fm3=%gHz bw3=%gHz  fm4=%gHz bw4=%gHz  ampl=%g fd=%ims\n",
 			m_pitch, m_noise,
 			m_f[0].fm, m_f[0].bw, m_f[1].fm, m_f[1].bw,
 			m_f[2].fm, m_f[2].bw, m_f[3].fm, m_f[3].bw,
-			m_ampl/1000., 8 << fd));
+			m_ampl/1000., 8 << fd);
 #else
-	LOG(("mea800_decode_frame: pitch=%i noise=%i  fm1=%iHz bw1=%iHz  fm2=%iHz bw2=%iHz  fm3=%iHz bw3=%iHz  fm4=%iHz bw4=%iHz  ampl=%g fd=%ims\n",
+	LOG("mea800_decode_frame: pitch=%i noise=%i  fm1=%iHz bw1=%iHz  fm2=%iHz bw2=%iHz  fm3=%iHz bw3=%iHz  fm4=%iHz bw4=%iHz  ampl=%g fd=%ims\n",
 			m_pitch, m_noise,
 			m_f[0].fm, m_f[0].bw, m_f[1].fm, m_f[1].bw,
 			m_f[2].fm, m_f[2].bw, m_f[3].fm, m_f[3].bw,
-			m_ampl/1000., 8 << fd));
+			m_ampl/1000., 8 << fd);
 #endif
 }
 
@@ -459,27 +459,27 @@ TIMER_CALLBACK_MEMBER( mea8000_device::timer_expire )
 		if (m_bufpos == 4)
 		{
 			/* we have a successor */
-			LOG(("%f mea8000_timer_expire: new frame\n", machine().time().as_double()));
+			LOG("%f mea8000_timer_expire: new frame\n", machine().time().as_double());
 			decode_frame();
 			start_frame();
 		}
 		else if (m_cont)
 		{
 			/* repeat mode */
-			LOG(("%f mea8000_timer_expire: repeat frame\n", machine().time().as_double()));
+			LOG("%f mea8000_timer_expire: repeat frame\n", machine().time().as_double());
 			start_frame();
 		}
 		/* slow stop */
 		else if (m_state == MEA8000_STARTED)
 		{
 			m_ampl = 0;
-			LOG(("%f mea8000_timer_expire: fade frame\n", machine().time().as_double()));
+			LOG("%f mea8000_timer_expire: fade frame\n", machine().time().as_double());
 			start_frame();
 			m_state = MEA8000_SLOWING;
 		}
 		else if (m_state == MEA8000_SLOWING)
 		{
-			LOG(("%f mea8000_timer_expire: stop frame\n", machine().time().as_double()));
+			LOG("%f mea8000_timer_expire: stop frame\n", machine().time().as_double());
 			stop_frame();
 		}
 		update_req();
@@ -503,7 +503,7 @@ READ8_MEMBER( mea8000_device::read )
 	case 1:
 		/* ready to accept next frame */
 #if 0
-		LOG(("%s %f: mea8000_r ready=%i\n", machine().describe_context(), machine().time().as_double(), accept_byte()));
+		LOG("%s %f: mea8000_r ready=%i\n", machine().describe_context(), machine().time().as_double(), accept_byte());
 #endif
 		return accept_byte() << 7;
 
@@ -522,20 +522,20 @@ WRITE8_MEMBER( mea8000_device::write )
 		{
 			/* got pitch byte before first frame */
 			m_pitch = 2 * data;
-			LOG(("%s %f: mea8000_w pitch %i\n", machine().describe_context(), machine().time().as_double(), m_pitch));
+			LOG("%s %f: mea8000_w pitch %i\n", machine().describe_context(), machine().time().as_double(), m_pitch);
 			m_state = MEA8000_WAIT_FIRST;
 			m_bufpos = 0;
 		}
 		else if (m_bufpos == 4)
 		{
 			/* overflow */
-			LOG(("%s %f: mea8000_w data overflow %02X\n", machine().describe_context(), machine().time().as_double(), data));
+			LOG("%s %f: mea8000_w data overflow %02X\n", machine().describe_context(), machine().time().as_double(), data);
 		}
 		else
 		{
 			/* enqueue frame byte */
-			LOG(("%s %f: mea8000_w data %02X in frame pos %i\n", machine().describe_context(), machine().time().as_double(),
-					data, m_bufpos));
+			LOG("%s %f: mea8000_w data %02X in frame pos %i\n", machine().describe_context(), machine().time().as_double(),
+					data, m_bufpos);
 			m_buf[m_bufpos] = data;
 			m_bufpos++;
 			if (m_bufpos == 4 && m_state == MEA8000_WAIT_FIRST)
@@ -567,9 +567,9 @@ WRITE8_MEMBER( mea8000_device::write )
 		if (stop)
 			stop_frame();
 
-		LOG(( "%s %f: mea8000_w command %02X stop=%i cont=%i roe=%i\n",
+		LOG( "%s %f: mea8000_w command %02X stop=%i cont=%i roe=%i\n",
 				machine().describe_context(), machine().time().as_double(), data,
-				stop, m_cont, m_roe));
+				stop, m_cont, m_roe);
 
 		update_req();
 		break;

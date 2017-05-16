@@ -62,8 +62,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_VULCAN = device_creator<a2bus_vulcan_device>;
-const device_type A2BUS_VULCANGOLD = device_creator<a2bus_vulcangold_device>;
+DEFINE_DEVICE_TYPE(A2BUS_VULCAN,     a2bus_vulcan_device,     "a2vulcan", "Applied Engineering Vulcan IDE controller")
+DEFINE_DEVICE_TYPE(A2BUS_VULCANGOLD, a2bus_vulcangold_device, "a2vulgld", "Applied Engineering Vulcan Gold IDE controller")
 
 #define VULCAN_ROM_REGION  "vulcan_rom"
 #define VULCAN_ATA_TAG     "vulcan_ata"
@@ -114,20 +114,20 @@ const tiny_rom_entry *a2bus_vulcangold_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_vulcanbase_device::a2bus_vulcanbase_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_vulcanbase_device::a2bus_vulcanbase_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ata(*this, VULCAN_ATA_TAG), m_rom(nullptr), m_lastdata(0), m_rombank(0), m_rambank(0), m_last_read_was_0(false)
 {
 }
 
 a2bus_vulcan_device::a2bus_vulcan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_vulcanbase_device(mconfig, A2BUS_VULCAN, "Applied Engineering Vulcan IDE controller", tag, owner, clock, "a2vulcan", __FILE__)
+	a2bus_vulcanbase_device(mconfig, A2BUS_VULCAN, tag, owner, clock)
 {
 }
 
 a2bus_vulcangold_device::a2bus_vulcangold_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_vulcanbase_device(mconfig, A2BUS_VULCANGOLD, "Applied Engineering Vulcan Gold IDE controller", tag, owner, clock, "a2vulgld", __FILE__)
+	a2bus_vulcanbase_device(mconfig, A2BUS_VULCANGOLD, tag, owner, clock)
 {
 }
 

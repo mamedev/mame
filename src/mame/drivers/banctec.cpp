@@ -127,7 +127,7 @@ static GFXDECODE_START( banctec )
 	GFXDECODE_ENTRY( "chargen", 0x00000, banctec_gfx_layout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( banctec, banctec_state )
+static MACHINE_CONFIG_START( banctec )
 	/* basic machine hardware */
 
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL_11_0592MHz)
@@ -173,5 +173,5 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    MONITOR COMPANY   FULLNAME */
-CONS( 1989, banctec, 0,        0,      banctec, 0, driver_device, 0,       "DALE Electronics",  "BancTec ESeries Panel", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME     PARENT    COMPAT  MACHINE  INPUT  STATE           INIT   MONITOR COMPANY      FULLNAME */
+CONS( 1989, banctec, 0,        0,      banctec, 0,     banctec_state,  0,     "DALE Electronics",  "BancTec ESeries Panel", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -5,14 +5,14 @@
     Sega 16-bit sprite hardware
 
 ***************************************************************************/
+#ifndef MAME_VIDEO_SEGA16SP_H
+#define MAME_VIDEO_SEGA16SP_H
 
 #pragma once
 
 #include "video/sprite.h"
 #include "segaic16.h"
 
-#ifndef __SEGA16SP_H__
-#define __SEGA16SP_H__
 
 
 //**************************************************************************
@@ -66,7 +66,7 @@ class sega_16bit_sprite_device : public sprite16_device_ind16
 {
 protected:
 	// construction/destruction
-	sega_16bit_sprite_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, const char *shortname, const char *source);
+	sega_16bit_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner);
 
 public:
 	// live configuration
@@ -161,7 +161,7 @@ public:
 	// construction/destruction
 	sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool xboard_variant, const char *shortname, const char *source);
+	sega_outrun_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool xboard_variant);
 
 protected:
 	// subclass overrides
@@ -242,6 +242,8 @@ protected:
 class sega_yboard_sprite_device : public sega_16bit_sprite_device
 {
 public:
+	typedef segaic16_video_device::rotate_info rotate_info;
+
 	// construction/destruction
 	sega_yboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void set_rotate_ptr(rotate_info* segaic16_rotate) { m_segaic16_rotate = segaic16_rotate; }
@@ -256,14 +258,14 @@ protected:
 
 
 // device type definition
-extern const device_type SEGA_HANGON_SPRITES;
-extern const device_type SEGA_SHARRIER_SPRITES;
-extern const device_type SEGA_OUTRUN_SPRITES;
-extern const device_type SEGA_SYS16A_SPRITES;
-extern const device_type BOOTLEG_SYS16A_SPRITES;
-extern const device_type SEGA_SYS16B_SPRITES;
-extern const device_type SEGA_XBOARD_SPRITES;
-extern const device_type SEGA_YBOARD_SPRITES;
+DECLARE_DEVICE_TYPE(SEGA_HANGON_SPRITES,    sega_hangon_sprite_device)
+DECLARE_DEVICE_TYPE(SEGA_SHARRIER_SPRITES,  sega_sharrier_sprite_device)
+DECLARE_DEVICE_TYPE(SEGA_OUTRUN_SPRITES,    sega_outrun_sprite_device)
+DECLARE_DEVICE_TYPE(SEGA_SYS16A_SPRITES,    sega_sys16a_sprite_device)
+DECLARE_DEVICE_TYPE(BOOTLEG_SYS16A_SPRITES, bootleg_sys16a_sprite_device)
+DECLARE_DEVICE_TYPE(SEGA_SYS16B_SPRITES,    sega_sys16b_sprite_device)
+DECLARE_DEVICE_TYPE(SEGA_XBOARD_SPRITES,    sega_xboard_sprite_device)
+DECLARE_DEVICE_TYPE(SEGA_YBOARD_SPRITES,    sega_yboard_sprite_device)
 
 
-#endif
+#endif // MAME_VIDEO_SEGA16SP_H

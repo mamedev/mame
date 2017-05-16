@@ -217,7 +217,7 @@ void pcat_nit_state::machine_start()
 	membank("rombank")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
+static MACHINE_CONFIG_START( pcat_nit )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
@@ -236,7 +236,7 @@ static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bonanza, pcat_nit_state )
+static MACHINE_CONFIG_START( bonanza )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(bonanza_map)

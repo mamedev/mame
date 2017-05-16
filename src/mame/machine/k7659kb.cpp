@@ -22,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type K7659_KEYBOARD = device_creator<k7659_keyboard_device>;
+DEFINE_DEVICE_TYPE(K7659_KEYBOARD, k7659_keyboard_device, "k7659_keyboard", "K7659 Keyboard")
 
 
 
@@ -214,7 +214,7 @@ ioport_constructor k7659_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 k7659_keyboard_device::k7659_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K7659_KEYBOARD, "K7659 Keyboard", tag, owner, clock, "k7659kb", __FILE__)
+	: device_t(mconfig, K7659_KEYBOARD, tag, owner, clock)
 {}
 
 

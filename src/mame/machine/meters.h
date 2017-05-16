@@ -9,24 +9,23 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
+#ifndef MAME_MACHINE_METERS_H
+#define MAME_MACHINE_METERS_H
+
 #pragma once
-
-#ifndef __METERS_H__
-#define __METERS_H__
-
 
 
 #define MCFG_METERS_NUMBER(_number) \
 	meters_device::static_set_number_meters(*device, _number);
-#define MAXMECHMETERS 8
-
-#define METERREACTTIME 0.025 // number of seconds meter has to be active to tick
 
 class meters_device : public device_t
 {
 public:
+	static constexpr unsigned MAXMECHMETERS = 8;
+
+	static constexpr double METERREACTTIME = 0.025; // number of seconds meter has to be active to tick
+
 	meters_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~meters_device() {}
 
 	static void static_set_number_meters(device_t &device, int number) { downcast<meters_device &>(device).m_number_mtr = number; }
 
@@ -60,6 +59,6 @@ private:
 	int m_number_mtr;
 };
 
-extern const device_type METERS;
+DECLARE_DEVICE_TYPE(METERS, meters_device)
 
-#endif
+#endif // MAME_MACHINE_METERS_H

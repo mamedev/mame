@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CBM2_EXPANSION_SLOT = device_creator<cbm2_expansion_slot_device>;
+DEFINE_DEVICE_TYPE(CBM2_EXPANSION_SLOT, cbm2_expansion_slot_device, "cbm2_expansion_slot", "CBM-II expansion port")
 
 
 
@@ -64,9 +64,10 @@ device_cbm2_expansion_card_interface::~device_cbm2_expansion_card_interface()
 //-------------------------------------------------
 
 cbm2_expansion_slot_device::cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, CBM2_EXPANSION_SLOT, "CBM-II expansion port", tag, owner, clock, "cbm2_expansion_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this), m_card(nullptr)
+	device_t(mconfig, CBM2_EXPANSION_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	device_image_interface(mconfig, *this),
+	m_card(nullptr)
 {
 }
 

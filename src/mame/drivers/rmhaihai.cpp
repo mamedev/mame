@@ -471,7 +471,7 @@ static GFXDECODE_START( themj )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( rmhaihai, rmhaihai_state )
+static MACHINE_CONFIG_START( rmhaihai )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,20000000/4)  /* 5 MHz ??? */
@@ -503,7 +503,7 @@ static MACHINE_CONFIG_START( rmhaihai, rmhaihai_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 500000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

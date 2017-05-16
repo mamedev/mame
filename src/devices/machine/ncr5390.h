@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef NCR5390_H
-#define NCR5390_H
+#ifndef MAME_MACHINE_NCR5390_H
+#define MAME_MACHINE_NCR5390_H
+
+#pragma once
 
 #include "machine/nscsi_bus.h"
 
@@ -17,8 +19,8 @@ public:
 	ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ncr5390_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object) { return downcast<ncr5390_device &>(device).m_drq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ncr5390_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_drq_handler(device_t &device, Object &&cb) { return downcast<ncr5390_device &>(device).m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
@@ -227,6 +229,6 @@ private:
 	devcb_write_line m_drq_handler;
 };
 
-extern const device_type NCR5390;
+DECLARE_DEVICE_TYPE(NCR5390, ncr5390_device)
 
-#endif
+#endif // MAME_MACHINE_NCR5390_H

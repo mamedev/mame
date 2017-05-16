@@ -122,7 +122,7 @@ static const z80_daisy_config bbcbc_daisy_chain[] =
 };
 
 
-static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
+static MACHINE_CONFIG_START( bbcbc )
 	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK / 8 )
 	MCFG_CPU_PROGRAM_MAP(bbcbc_prg)
 	MCFG_CPU_IO_MAP(bbcbc_io)
@@ -189,5 +189,5 @@ ROM_END
 
 ***************************************************************************/
 
-/*   YEAR  NAME   PARENT  COMPAT  MACHINE INPUT  CLASS          INIT  COMPANY                 FULLNAME            FLAGS */
-CONS(1985, bbcbc, 0,      0,      bbcbc,  bbcbc, driver_device, 0,    "Unicard", "BBC Bridge Companion", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
+//   YEAR  NAME   PARENT  COMPAT  MACHINE INPUT  CLASS        INIT  COMPANY    FULLNAME                FLAGS
+CONS(1985, bbcbc, 0,      0,      bbcbc,  bbcbc, bbcbc_state, 0,    "Unicard", "BBC Bridge Companion", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)

@@ -154,9 +154,9 @@
 
 // Timers
 enum {
-		TAPE_TMR_ID,
-		HOLE_TMR_ID,
-		TIMEOUT_TMR_ID
+	TAPE_TMR_ID,
+	HOLE_TMR_ID,
+	TIMEOUT_TMR_ID
 };
 
 // Constants
@@ -210,38 +210,38 @@ enum {
 
 // Commands
 enum {
-		CMD_INDTA_INGAP,        // 00: scan for data first then for gap (see also cmd 10)
-		CMD_UNK_01,             // 01: unknown
-		CMD_FINAL_GAP,          // 02: write final gap
-		CMD_INIT_WRITE,         // 03: write words for tape formatting
-		CMD_STOP,               // 04: stop
-		CMD_UNK_05,             // 05: unknown
-		CMD_SET_TRACK,          // 06: set A/B track
-		CMD_UNK_07,             // 07: unknown
-		CMD_UNK_08,             // 08: unknown
-		CMD_UNK_09,             // 09: unknown
-		CMD_MOVE,               // 0a: move tape
-		CMD_UNK_0b,             // 0b: unknown
-		CMD_INGAP_MOVE,         // 0c: scan for gap then move a bit further (used to gain some margin when inverting tape movement)
-		CMD_UNK_0d,             // 0d: unknown
-		CMD_CLEAR,              // 0e: clear errors/unlatch status bits
-		CMD_UNK_0f,             // 0f: unknown
-		CMD_NOT_INDTA,          // 10: scan for end of data (at the moment it's the same as cmd 00)
-		CMD_UNK_11,             // 11: unknown
-		CMD_UNK_12,             // 12: unknown
-		CMD_UNK_13,             // 13: unknown
-		CMD_UNK_14,             // 14: unknown
-		CMD_UNK_15,             // 15: unknown
-		CMD_WRITE_IRG,          // 16: write inter-record gap
-		CMD_UNK_17,             // 17: unknown
-		CMD_SCAN_RECORDS,       // 18: scan records (count IRGs)
-		CMD_RECORD_WRITE,       // 19: write record words
-		CMD_MOVE_INDTA,         // 1a: move then scan for data
-		CMD_UNK_1b,             // 1b: unknown (for now it seems harmless to handle it as NOP)
-		CMD_MOVE_INGAP,         // 1c: move tape a given distance then scan for gap (as cmd 0c but in reverse order)
-		CMD_START_READ,         // 1d: start record reading
-		CMD_DELTA_MOVE_IRG,     // 1e: move tape a given distance, detect gaps in parallel
-		CMD_END_READ            // 1f: stop reading
+	CMD_INDTA_INGAP,        // 00: scan for data first then for gap (see also cmd 10)
+	CMD_UNK_01,             // 01: unknown
+	CMD_FINAL_GAP,          // 02: write final gap
+	CMD_INIT_WRITE,         // 03: write words for tape formatting
+	CMD_STOP,               // 04: stop
+	CMD_UNK_05,             // 05: unknown
+	CMD_SET_TRACK,          // 06: set A/B track
+	CMD_UNK_07,             // 07: unknown
+	CMD_UNK_08,             // 08: unknown
+	CMD_UNK_09,             // 09: unknown
+	CMD_MOVE,               // 0a: move tape
+	CMD_UNK_0b,             // 0b: unknown
+	CMD_INGAP_MOVE,         // 0c: scan for gap then move a bit further (used to gain some margin when inverting tape movement)
+	CMD_UNK_0d,             // 0d: unknown
+	CMD_CLEAR,              // 0e: clear errors/unlatch status bits
+	CMD_UNK_0f,             // 0f: unknown
+	CMD_NOT_INDTA,          // 10: scan for end of data (at the moment it's the same as cmd 00)
+	CMD_UNK_11,             // 11: unknown
+	CMD_UNK_12,             // 12: unknown
+	CMD_UNK_13,             // 13: unknown
+	CMD_UNK_14,             // 14: unknown
+	CMD_UNK_15,             // 15: unknown
+	CMD_WRITE_IRG,          // 16: write inter-record gap
+	CMD_UNK_17,             // 17: unknown
+	CMD_SCAN_RECORDS,       // 18: scan records (count IRGs)
+	CMD_RECORD_WRITE,       // 19: write record words
+	CMD_MOVE_INDTA,         // 1a: move then scan for data
+	CMD_UNK_1b,             // 1b: unknown (for now it seems harmless to handle it as NOP)
+	CMD_MOVE_INGAP,         // 1c: move tape a given distance then scan for gap (as cmd 0c but in reverse order)
+	CMD_START_READ,         // 1d: start record reading
+	CMD_DELTA_MOVE_IRG,     // 1e: move tape a given distance, detect gaps in parallel
+	CMD_END_READ            // 1f: stop reading
 };
 
 // Bits of status register
@@ -267,7 +267,7 @@ enum {
 // |<-----24"----->|<---12"--->|<---12"--->|<-----24"----->|
 // O               O           O           O
 //
-static const hp_taco_device::tape_pos_t tape_holes[] = {
+const hp_taco_device::tape_pos_t hp_taco_device::tape_holes[] = {
 		(hp_taco_device::tape_pos_t)(23.891 * ONE_INCH_POS),    // 24 - 0.218 / 2
 		(hp_taco_device::tape_pos_t)(24.109 * ONE_INCH_POS),    // 24 + 0.218 / 2
 		(hp_taco_device::tape_pos_t)(35.891 * ONE_INCH_POS),    // 36 - 0.218 / 2
@@ -282,11 +282,11 @@ static const hp_taco_device::tape_pos_t tape_holes[] = {
 };
 
 // Device type definition
-const device_type HP_TACO = device_creator<hp_taco_device>;
+DEFINE_DEVICE_TYPE(HP_TACO, hp_taco_device, "hp_taco", "HP TACO")
 
 // Constructors
-hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
-		: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, type, tag, owner, clock),
 			device_image_interface(mconfig , *this),
 			m_irq_handler(*this),
 			m_flg_handler(*this),
@@ -297,14 +297,8 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, 
 }
 
 hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, HP_TACO, "HP TACO", tag, owner, clock, "hp_taco", __FILE__),
-			device_image_interface(mconfig , *this),
-			m_irq_handler(*this),
-			m_flg_handler(*this),
-			m_sts_handler(*this),
-			m_image_dirty(false)
+		: hp_taco_device(mconfig, HP_TACO, tag, owner, clock)
 {
-		clear_state();
 }
 
 WRITE16_MEMBER(hp_taco_device::reg_w)

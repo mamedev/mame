@@ -58,7 +58,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type HARDBOX = device_creator<hardbox_device>;
+DEFINE_DEVICE_TYPE(HARDBOX, hardbox_device, "hardbox", "SSE HardBox")
 
 
 //-------------------------------------------------
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( hardbox_io, AS_IO, 8, hardbox_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(I8255_0_TAG, i8255_device, read, write)
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(I8255_1_TAG, i8255_device, read, write)
-	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE(CORVUS_HDC_TAG, corvus_hdc_t, read, write)
+	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE(CORVUS_HDC_TAG, corvus_hdc_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -232,8 +232,8 @@ READ8_MEMBER( hardbox_device::ppi1_pc_r )
 	uint8_t status = m_hdc->status_r(space, 0);
 	uint8_t data = 0;
 
-	data |= (status & CONTROLLER_BUSY) ? 0 : 0x10;
-	data |= (status & CONTROLLER_DIRECTION) ? 0 : 0x20;
+	data |= (status & corvus_hdc_device::CONTROLLER_BUSY) ? 0 : 0x10;
+	data |= (status & corvus_hdc_device::CONTROLLER_DIRECTION) ? 0 : 0x20;
 
 	return data;
 }
@@ -348,10 +348,11 @@ ioport_constructor hardbox_device::device_input_ports() const
 //-------------------------------------------------
 
 hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HARDBOX, "HardBox", tag, owner, clock, "hardbox", __FILE__),
-		device_ieee488_interface(mconfig, *this),
-		m_maincpu(*this, Z80_TAG),
-		m_hdc(*this, CORVUS_HDC_TAG), m_ifc(0)
+	: device_t(mconfig, HARDBOX, tag, owner, clock)
+	, device_ieee488_interface(mconfig, *this)
+	, m_maincpu(*this, Z80_TAG)
+	, m_hdc(*this, CORVUS_HDC_TAG)
+	, m_ifc(0)
 {
 }
 

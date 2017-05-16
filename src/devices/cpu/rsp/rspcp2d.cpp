@@ -10,12 +10,17 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "rspcp2d.h"
+
 #include "rsp.h"
 #include "rspcp2.h"
-#include "rspcp2d.h"
+
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
+
+#include "rspdefs.h"
+
 
 using namespace uml;
 

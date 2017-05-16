@@ -309,7 +309,7 @@ static GFXDECODE_START( cham24 )
 	/* none, the ppu generates one */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( cham24, cham24_state )
+static MACHINE_CONFIG_START( cham24 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cham24_map)

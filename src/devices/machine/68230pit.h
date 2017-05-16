@@ -32,10 +32,10 @@
 *
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHIEN_68230PIT_H
+#define MAME_MACHIEN_68230PIT_H
 
-#ifndef __68230PIT_H__
-#define __68230PIT_H__
+#pragma once
 
 
 //**************************************************************************
@@ -110,29 +110,29 @@
 //**************************************************************************
 class pit68230_device :  public device_t//, public device_execute_interface
 {
-	public:
+public:
 	// construction/destruction
-	pit68230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
 	pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template<class _Object> static devcb_base &set_pa_in_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pa_in_cb.set_callback (object); }
-	template<class _Object> static devcb_base &set_pa_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pa_out_cb.set_callback (object); }
-	template<class _Object> static devcb_base &set_pb_in_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pb_in_cb.set_callback (object); }
-	template<class _Object> static devcb_base &set_pb_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pb_out_cb.set_callback (object); }
-	template<class _Object> static devcb_base &set_pc_in_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pc_in_cb.set_callback (object); }
-	template<class _Object> static devcb_base &set_pc_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pc_out_cb.set_callback (object); }
-	template<class _Object> static devcb_base &set_h1_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_h1_out_cb.set_callback (object); }
-	template<class _Object> static devcb_base &set_h2_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_h2_out_cb.set_callback (object); }
-	template<class _Object> static devcb_base &set_h3_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_h3_out_cb.set_callback (object); }
-	template<class _Object> static devcb_base &set_h4_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_h4_out_cb.set_callback (object); }
-	template<class _Object> static devcb_base &set_tirq_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_tirq_out_cb.set_callback (object); }
-	template<class _Object> static devcb_base &set_pirq_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pirq_out_cb.set_callback (object); }
+
+	template <class Object> static devcb_base &set_pa_in_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_pa_in_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pa_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_pa_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pb_in_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_pb_in_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pb_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_pb_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pc_in_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_pc_in_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pc_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_pc_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_h1_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_h1_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_h2_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_h2_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_h3_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_h3_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_h4_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_h4_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_tirq_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_tirq_out_cb.set_callback (std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pirq_out_callback (device_t &device, Object &&cb){ return downcast<pit68230_device &>(device).m_pirq_out_cb.set_callback (std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER (write);
 	DECLARE_READ8_MEMBER (read);
 
 	// TODO: remove these methods and replace it with a call to methods below in force68k.cpp
-	void h1_set (uint8_t state){ if (state) m_psr |= 1; else m_psr &= ~1; }
-	void portb_setbit (uint8_t bit, uint8_t state);
+	void h1_set(uint8_t state) { if (state) m_psr |= 1; else m_psr &= ~1; }
+	void portb_setbit(uint8_t bit, uint8_t state);
 
 	// Bit updaters
 	void pa_update_bit(uint8_t bit, uint8_t state);
@@ -145,34 +145,34 @@ class pit68230_device :  public device_t//, public device_execute_interface
 	DECLARE_WRITE_LINE_MEMBER( h3_w );
 	DECLARE_WRITE_LINE_MEMBER( h4_w );
 
-	DECLARE_WRITE_LINE_MEMBER( pa0_w ){ pa_update_bit(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa1_w ){ pa_update_bit(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa2_w ){ pa_update_bit(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa3_w ){ pa_update_bit(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa4_w ){ pa_update_bit(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa5_w ){ pa_update_bit(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa6_w ){ pa_update_bit(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa7_w ){ pa_update_bit(7, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { pa_update_bit(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { pa_update_bit(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { pa_update_bit(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa3_w ) { pa_update_bit(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa4_w ) { pa_update_bit(4, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa5_w ) { pa_update_bit(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa6_w ) { pa_update_bit(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa7_w ) { pa_update_bit(7, state); }
 
-	DECLARE_WRITE_LINE_MEMBER( pb0_w ){ pb_update_bit(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb1_w ){ pb_update_bit(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb2_w ){ pb_update_bit(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb3_w ){ pb_update_bit(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb4_w ){ pb_update_bit(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb5_w ){ pb_update_bit(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb6_w ){ pb_update_bit(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb7_w ){ pb_update_bit(7, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb0_w ) { pb_update_bit(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb1_w ) { pb_update_bit(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb2_w ) { pb_update_bit(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb3_w ) { pb_update_bit(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb4_w ) { pb_update_bit(4, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb5_w ) { pb_update_bit(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb6_w ) { pb_update_bit(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb7_w ) { pb_update_bit(7, state); }
 
-	DECLARE_WRITE_LINE_MEMBER( pc0_w ){ pc_update_bit(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( pc1_w ){ pc_update_bit(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( pc2_w ){ pc_update_bit(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( pc3_w ){ pc_update_bit(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( pc4_w ){ pc_update_bit(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( pc5_w ){ pc_update_bit(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( pc6_w ){ pc_update_bit(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( pc7_w ){ pc_update_bit(7, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc0_w ) { pc_update_bit(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc1_w ) { pc_update_bit(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc2_w ) { pc_update_bit(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc3_w ) { pc_update_bit(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc4_w ) { pc_update_bit(4, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc5_w ) { pc_update_bit(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc6_w ) { pc_update_bit(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc7_w ) { pc_update_bit(7, state); }
 
- private:
+private:
 	void wr_pitreg_pgcr(uint8_t data);
 	void wr_pitreg_psrr(uint8_t data);
 	void wr_pitreg_paddr(uint8_t data);
@@ -311,10 +311,12 @@ protected:
 
 	void tick_clock();
 
+	pit68230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+
 	// device-level overrides
-	virtual void device_start () override;
-	virtual void device_reset () override;
-	virtual void device_timer (emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// Interrupt methods
 	void trigger_interrupt(int source);
@@ -375,6 +377,6 @@ protected:
 };
 
 // device type definition
-extern const device_type PIT68230;
+DECLARE_DEVICE_TYPE(PIT68230, pit68230_device)
 
-#endif /* __68230PIT_H__ */
+#endif // MAME_MACHIEN_68230PIT_H

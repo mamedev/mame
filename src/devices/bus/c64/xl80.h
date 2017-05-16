@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_XL80_H
+#define MAME_BUS_C64_XL80_H
 
-#ifndef __XL80__
-#define __XL80__
+#pragma once
 
 
 #include "exp.h"
@@ -57,7 +57,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_XL80;
+DECLARE_DEVICE_TYPE(C64_XL80, c64_xl80_device)
 
 
-#endif
+#endif // MAME_BUS_C64_XL80_H

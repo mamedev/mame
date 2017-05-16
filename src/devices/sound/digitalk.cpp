@@ -240,7 +240,7 @@ complete set of waveforms is repeated R times.
 
 // Quantized intensity values, first index is the volume, second the
 // intensity (positive half only, real value goes -8..7)
-static const short pcm_levels[8][8] = {
+static constexpr short pcm_levels[8][8] = {
 	{  473,  945,  1418,  1890,  2363,  2835,  3308,  3781 },
 	{  655, 1310,  1966,  2621,  3276,  3931,  4586,  5242 },
 	{  925, 1851,  2776,  3702,  4627,  5553,  6478,  7404 },
@@ -251,20 +251,20 @@ static const short pcm_levels[8][8] = {
 	{ 4095, 8190, 12285, 16380, 20475, 24570, 28665, 32760 },
 };
 
-static const int delta1[16] = { -4, -4, -1, -1, -2, -2, 0, 0, 0, 0, 2, 2, 1, 1, 4, 4 };
-static const int delta2[16] = { 0, -1, -2, -3, 1, 0, -1, -2, 2, 1, 0, -1, 3, 2, 1, 0 };
+static constexpr int delta1[16] = { -4, -4, -1, -1, -2, -2, 0, 0, 0, 0, 2, 2, 1, 1, 4, 4 };
+static constexpr int delta2[16] = { 0, -1, -2, -3, 1, 0, -1, -2, 2, 1, 0, -1, 3, 2, 1, 0 };
 
 // Frequency quantizations, values are in units of 128us.
-static const int pitch_vals[32] = {
+static constexpr int pitch_vals[32] = {
 	97, 95, 92, 89, 87, 84, 82, 80, 77, 75, 73, 71, 69, 67, 65, 63,
 	61, 60, 58, 56, 55, 53, 52, 50, 49, 48, 46, 45, 43, 42, 41, 40
 };
 
 
-const device_type DIGITALKER = device_creator<digitalker_device>;
+DEFINE_DEVICE_TYPE(DIGITALKER, digitalker_device, "digitalker", "MM54104 Digitalker")
 
 digitalker_device::digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DIGITALKER, "Digitalker", tag, owner, clock, "digitalker", __FILE__),
+	: device_t(mconfig, DIGITALKER, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_rom(*this, DEVICE_SELF),
 		m_stream(nullptr),

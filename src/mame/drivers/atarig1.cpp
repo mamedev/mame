@@ -423,7 +423,7 @@ static const atari_rle_objects_config modesc_pitfight =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarig1, atarig1_state )
+static MACHINE_CONFIG_START( atarig1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
@@ -1315,9 +1315,9 @@ DRIVER_INIT_MEMBER(atarig1_state,pitfightb)
  *
  *************************************/
 
-GAME( 1990, hydra,    0,        hydra,  hydra, atarig1_state,    hydra,    ROT0, "Atari Games", "Hydra", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hydrap,   hydra,    hydrap, hydra, atarig1_state,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/14/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hydrap2,  hydra,    hydrap, hydra, atarig1_state,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/25/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydra,     0,        hydra,     hydra,     atarig1_state, hydra,     ROT0, "Atari Games", "Hydra", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydrap,    hydra,    hydrap,    hydra,     atarig1_state, hydrap,    ROT0, "Atari Games", "Hydra (prototype 5/14/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydrap2,   hydra,    hydrap,    hydra,     atarig1_state, hydrap,    ROT0, "Atari Games", "Hydra (prototype 5/25/90)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, pitfight,  0,        pitfight9, pitfight,  atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 9)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, pitfight7, pitfight, pitfight7, pitfight,  atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 7)", MACHINE_SUPPORTS_SAVE )

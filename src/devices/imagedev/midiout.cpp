@@ -16,14 +16,14 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type MIDIOUT = device_creator<midiout_device>;
+DEFINE_DEVICE_TYPE(MIDIOUT, midiout_device, "midiout", "MIDI Out image device")
 
 /*-------------------------------------------------
     ctor
 -------------------------------------------------*/
 
 midiout_device::midiout_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDIOUT, "MIDI Out image device", tag, owner, clock, "midiout", __FILE__),
+	: device_t(mconfig, MIDIOUT, tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		device_serial_interface(mconfig, *this),
 		m_midi(nullptr)

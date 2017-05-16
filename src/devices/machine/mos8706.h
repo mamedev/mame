@@ -23,10 +23,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MOS8706_H
+#define MAME_MACHINE_MOS8706_H
 
-#ifndef __MOS8706__
-#define __MOS8706__
+#pragma once
 
 
 
@@ -35,8 +35,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MOS8706_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD((_tag), MOS8706, _clock)
+#define MCFG_MOS8706_ADD(tag, clock) \
+	MCFG_DEVICE_ADD((tag), MOS8706, (clock))
 
 
 
@@ -62,8 +62,7 @@ protected:
 
 
 // device type definition
-extern const device_type MOS8706;
+DECLARE_DEVICE_TYPE(MOS8706, mos8706_device)
 
 
-
-#endif
+#endif // MAME_MACHINE_MOS8706_H

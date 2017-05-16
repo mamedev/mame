@@ -99,7 +99,7 @@ private:
 	required_device<i8251_device> m_u0;
 	required_device<i8251_device> m_u1;
 	required_device<i8255_device> m_ppi;
-	required_device<fd1791_t> m_fdc;
+	required_device<fd1791_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_ioport m_vs;
@@ -136,7 +136,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sbrain_subio, AS_IO, 8, sbrain_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(port08_r,port08_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1791_t, read, write)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1791_device, read, write)
 ADDRESS_MAP_END
 
 // bit 0 is wrong, maybe the whole byte is wrong
@@ -317,7 +317,7 @@ uint32_t sbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-static MACHINE_CONFIG_START( sbrain, sbrain_state )
+static MACHINE_CONFIG_START( sbrain )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(sbrain_mem)

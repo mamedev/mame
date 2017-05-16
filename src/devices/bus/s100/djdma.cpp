@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_DJDMA = device_creator<s100_djdma_device>;
+DEFINE_DEVICE_TYPE(S100_DJDMA, s100_djdma_device, "s100_djdma", "Morrow Disk Jockey/DMA")
 
 
 //-------------------------------------------------
@@ -104,7 +104,7 @@ machine_config_constructor s100_djdma_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 s100_djdma_device::s100_djdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, S100_DJDMA, "DJDMA", tag, owner, clock, "djdma", __FILE__),
+	device_t(mconfig, S100_DJDMA, tag, owner, clock),
 	device_s100_card_interface(mconfig, *this)
 {
 }

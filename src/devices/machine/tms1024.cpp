@@ -17,27 +17,28 @@
 #include "machine/tms1024.h"
 
 
-const device_type TMS1024 = device_creator<tms1024_device>;
-const device_type TMS1025 = device_creator<tms1025_device>;
+DEFINE_DEVICE_TYPE(TMS1024, tms1024_device, "tms1024", "TMS1024 I/O Expander")
+DEFINE_DEVICE_TYPE(TMS1025, tms1025_device, "tms1025", "TMS1025 I/O Expander")
 
 //-------------------------------------------------
 //  constructor
 //-------------------------------------------------
 
-tms1024_device::tms1024_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_h(0), m_s(0), m_std(0), m_ms(0),
-	m_read_port{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
-	m_write_port{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+tms1024_device::tms1024_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_h(0), m_s(0), m_std(0), m_ms(0)
+	, m_read_port{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_write_port{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 {
 }
 
 tms1024_device::tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1024_device(mconfig, TMS1024, "TMS1024 I/O Expander", tag, owner, clock, "tms1024", __FILE__)
+	: tms1024_device(mconfig, TMS1024, tag, owner, clock)
 {
 }
 
 tms1025_device::tms1025_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1024_device(mconfig, TMS1025, "TMS1025 I/O Expander", tag, owner, clock, "tms1025", __FILE__)
+	: tms1024_device(mconfig, TMS1025, tag, owner, clock)
 {
 }
 
@@ -107,8 +108,8 @@ WRITE_LINE_MEMBER(tms1024_device::write_std)
 		else
 		{
 			// reset all ports
-			for (int i = TMS1025_PORT1; i <= TMS1025_PORT7; i++)
-				(m_write_port[i])((offs_t)(i), 0);
+			for (int i = PORT1; i <= PORT7; i++)
+				(m_write_port[i])(offs_t(i), 0);
 		}
 	}
 

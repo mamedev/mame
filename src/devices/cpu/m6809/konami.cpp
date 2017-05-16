@@ -77,7 +77,7 @@ March 2013 NPW:
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type KONAMI = device_creator<konami_cpu_device>;
+DEFINE_DEVICE_TYPE(KONAMI, konami_cpu_device, "konami_cpu", "KONAMI CPU")
 
 
 //-------------------------------------------------
@@ -85,8 +85,8 @@ const device_type KONAMI = device_creator<konami_cpu_device>;
 //-------------------------------------------------
 
 konami_cpu_device::konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: m6809_base_device(mconfig, "KONAMI CPU", tag, owner, clock, KONAMI, 1, "konami_cpu", __FILE__),
-			m_set_lines(*this)
+	: m6809_base_device(mconfig, tag, owner, clock, KONAMI, 1)
+	, m_set_lines(*this)
 {
 }
 

@@ -32,23 +32,23 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_CNE_DECATHL = device_creator<nes_cne_decathl_device>;
-const device_type NES_CNE_FSB = device_creator<nes_cne_fsb_device>;
-const device_type NES_CNE_SHLZ = device_creator<nes_cne_shlz_device>;
+DEFINE_DEVICE_TYPE(NES_CNE_DECATHL, nes_cne_decathl_device, "nes_cne_deca", "NES Cart C&E Decathlon PCB")
+DEFINE_DEVICE_TYPE(NES_CNE_FSB,     nes_cne_fsb_device,     "nes_cne_fsb",  "NES Cart C&E Feng Shen Bang PCB")
+DEFINE_DEVICE_TYPE(NES_CNE_SHLZ,    nes_cne_shlz_device,    "nes_cne_shlz", "NES Cart C&E Sheng Huo Lie Zhuan PCB")
 
 
 nes_cne_decathl_device::nes_cne_decathl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_CNE_DECATHL, "NES Cart C&E Decathlon PCB", tag, owner, clock, "nes_cne_deca", __FILE__)
+	: nes_nrom_device(mconfig, NES_CNE_DECATHL, tag, owner, clock)
 {
 }
 
 nes_cne_fsb_device::nes_cne_fsb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_CNE_FSB, "NES Cart C&E Feng Shen Bang PCB", tag, owner, clock, "nes_cne_fsb", __FILE__)
+	: nes_nrom_device(mconfig, NES_CNE_FSB, tag, owner, clock)
 {
 }
 
 nes_cne_shlz_device::nes_cne_shlz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_CNE_SHLZ, "NES Cart C&E Sheng Huo Lie Zhuan PCB", tag, owner, clock, "nes_cne_shlz", __FILE__)
+	: nes_nrom_device(mconfig, NES_CNE_SHLZ, tag, owner, clock)
 {
 }
 

@@ -8,11 +8,11 @@
 #include "bunsetsu.h"
 
 
-const device_type MSX_SLOT_BUNSETSU = device_creator<msx_slot_bunsetsu_device>;
+DEFINE_DEVICE_TYPE(MSX_SLOT_BUNSETSU, msx_slot_bunsetsu_device, "msx_slot_bunsetsu", "MSX Internal BUNSETSU")
 
 
 msx_slot_bunsetsu_device::msx_slot_bunsetsu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_rom_device(mconfig, MSX_SLOT_BUNSETSU, "MSX Internal BUNSETSU", tag, owner, clock, "msx_slot_bunsetsu", __FILE__)
+	: msx_slot_rom_device(mconfig, MSX_SLOT_BUNSETSU, tag, owner, clock)
 	, m_bunsetsu_region(*this, finder_base::DUMMY_TAG, 0x20000)
 	, m_bunsetsu_address(0)
 {

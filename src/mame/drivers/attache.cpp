@@ -912,7 +912,7 @@ void attache_state::machine_reset()
 	m_kb_bitpos = 0;
 }
 
-static MACHINE_CONFIG_START( attache, attache_state )
+static MACHINE_CONFIG_START( attache )
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(attache_map)
 	MCFG_CPU_IO_MAP(attache_io)
@@ -996,5 +996,5 @@ ROM_START( attache )
 	ROM_LOAD("u630.bin",  0x0000, 0x0100, CRC(f7a5c821) SHA1(fea07d9ac7e4e5f4f72aa7b2159deaedbd662ead) )
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY      FULLNAME     FLAGS */
-COMP( 1982, attache, 0,      0,         attache,    attache, driver_device,    0,      "Otrona",   "Attach\xC3\xA9",    MACHINE_IMPERFECT_GRAPHICS)
+//    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY     FULLNAME             FLAGS
+COMP( 1982, attache, 0,      0,         attache,    attache, attache_state,    0,      "Otrona",   "Attach\xC3\xA9",    MACHINE_IMPERFECT_GRAPHICS )

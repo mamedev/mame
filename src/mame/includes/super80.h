@@ -126,7 +126,7 @@ private:
 	required_ioport_array<8> m_io_keyboard;
 	optional_device<mc6845_device> m_crtc;
 	optional_device<z80dma_device> m_dma;
-	optional_device<wd2793_t> m_fdc;
+	optional_device<wd2793_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 };

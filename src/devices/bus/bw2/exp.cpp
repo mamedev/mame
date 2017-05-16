@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type BW2_EXPANSION_SLOT = device_creator<bw2_expansion_slot_device>;
+DEFINE_DEVICE_TYPE(BW2_EXPANSION_SLOT, bw2_expansion_slot_device, "bw2_expansion_slot", "Bondwell 2 expansion port")
 
 
 
@@ -53,7 +53,7 @@ device_bw2_expansion_slot_interface::~device_bw2_expansion_slot_interface()
 //-------------------------------------------------
 
 bw2_expansion_slot_device::bw2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, BW2_EXPANSION_SLOT, "Bondwell 2 expansion port", tag, owner, clock, "bw2_expansion_slot", __FILE__),
+	device_t(mconfig, BW2_EXPANSION_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this), m_cart(nullptr)
 {
 }

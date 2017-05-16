@@ -48,7 +48,7 @@ public:
 
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(portf5_r);
 	DECLARE_READ8_MEMBER(portf6_r);
 	DECLARE_WRITE8_MEMBER(portf6_w);
@@ -183,7 +183,7 @@ void microdec_state::machine_reset()
 	m_term_data = 0;
 }
 
-WRITE8_MEMBER( microdec_state::kbd_put )
+void microdec_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -201,7 +201,7 @@ DRIVER_INIT_MEMBER( microdec_state, microdec )
 	membank("bankw0")->configure_entry(0, &main[0x1000]);
 }
 
-static MACHINE_CONFIG_START( microdec, microdec_state )
+static MACHINE_CONFIG_START( microdec )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(microdec_mem)
@@ -209,7 +209,7 @@ static MACHINE_CONFIG_START( microdec, microdec_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(microdec_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(microdec_state, kbd_put))
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -249,6 +249,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT     CLASS             INIT       COMPANY                  FULLNAME       FLAGS */
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT     CLASS           INIT       COMPANY           FULLNAME               FLAGS
 COMP( 1982, md2,    0,      0,       microdec,  microdec, microdec_state, microdec,  "Morrow Designs", "Micro Decision MD-2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 COMP( 1982, md3,    md2,    0,       microdec,  microdec, microdec_state, microdec,  "Morrow Designs", "Micro Decision MD-3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

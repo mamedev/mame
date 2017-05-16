@@ -789,7 +789,7 @@ void vega_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( vega, vega_state )
+static MACHINE_CONFIG_START( vega )
 	MCFG_CPU_ADD("maincpu", I8035, 4000000)
 	MCFG_CPU_PROGRAM_MAP(vega_map)
 	MCFG_CPU_IO_MAP(vega_io_map)

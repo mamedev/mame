@@ -1133,7 +1133,7 @@ static GFXDECODE_START( srmp3 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( srmp2, srmp2_state )
+static MACHINE_CONFIG_START( srmp2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
@@ -1172,12 +1172,12 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)              /* 8 KHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( srmp3, srmp2_state )
+static MACHINE_CONFIG_START( srmp3 )
 
 	/* basic machine hardware */
 
@@ -1219,7 +1219,7 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)              /* 8 KHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
@@ -1232,7 +1232,7 @@ static MACHINE_CONFIG_DERIVED( rmgoldyh, srmp3 )
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,rmgoldyh)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
+static MACHINE_CONFIG_START( mjyuugi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
@@ -1271,7 +1271,7 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)              /* 8 KHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
@@ -1545,11 +1545,11 @@ ROM_END
 
 
 
-GAME( 1987, srmp1,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 1 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srmp2,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, srmp3,     0,        srmp3,    srmp3, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 3 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, driver_device, 0,       ROT0, "Seta (Alba license)",   "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi, driver_device,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi, driver_device,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ponchin,   0,        mjyuugi,  ponchin, driver_device,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin, driver_device,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srmp1,     0,        srmp2,    srmp2,    srmp2_state,  0,       ROT0, "Seta",              "Super Real Mahjong Part 1 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2_state,  0,       ROT0, "Seta",              "Super Real Mahjong Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, srmp3,     0,        srmp3,    srmp3,    srmp2_state,  0,       ROT0, "Seta",              "Super Real Mahjong Part 3 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, srmp2_state,  0,       ROT0, "Seta (Alba license)",   "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  srmp2_state,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  srmp2_state,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  srmp2_state,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin,  srmp2_state,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 2)", MACHINE_SUPPORTS_SAVE )

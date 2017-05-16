@@ -17,14 +17,14 @@
 //**************************************************************************
 
 // device type definition
-const device_type VSYSTEM_GGA = device_creator<vsystem_gga_device>;
+DEFINE_DEVICE_TYPE(VSYSTEM_GGA, vsystem_gga_device, "vsystem_gga", "Video System C7-01 GGA")
 
 //-------------------------------------------------
 //  vsystem_gga_device - constructor
 //-------------------------------------------------
 
 vsystem_gga_device::vsystem_gga_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, VSYSTEM_GGA, "Video System C7-01 GGA", tag, owner, clock, "vsystem_gga", __FILE__),
+	: device_t(mconfig, VSYSTEM_GGA, tag, owner, clock),
 		device_video_interface(mconfig, *this, false),
 		m_write_cb(*this)
 {

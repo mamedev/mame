@@ -690,7 +690,7 @@ void welltris_state::machine_start()
 	save_item(NAME(m_pending_command));
 }
 
-static MACHINE_CONFIG_START( welltris, welltris_state )
+static MACHINE_CONFIG_START( welltris )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)  /* 10 MHz */
@@ -828,6 +828,6 @@ ROM_END
 
 
 
-GAME( 1991, welltris, 0,        welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, welltrisj,welltris, welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quiz18k,  0,        quiz18k,  quiz18k,  driver_device,  0,        ROT0,   "EIM", "Miyasu Nonki no Quiz 18-Kin", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, welltris,  0,        welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, welltrisj, welltris, welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quiz18k,   0,        quiz18k,  quiz18k,  welltris_state, 0,        ROT0,   "EIM",              "Miyasu Nonki no Quiz 18-Kin",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

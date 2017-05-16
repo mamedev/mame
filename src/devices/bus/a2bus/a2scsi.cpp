@@ -44,7 +44,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_SCSI = device_creator<a2bus_scsi_device>;
+DEFINE_DEVICE_TYPE(A2BUS_SCSI, a2bus_scsi_device, "a2scsi", "Apple II SCSI Card")
 
 #define SCSI_ROM_REGION  "scsi_rom"
 #define SCSI_BUS_TAG     "scsibus"
@@ -106,8 +106,8 @@ const tiny_rom_entry *a2bus_scsi_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_scsi_device::a2bus_scsi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_scsi_device::a2bus_scsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ncr5380(*this, SCSI_5380_TAG),
 	m_scsibus(*this, SCSI_BUS_TAG), m_rom(nullptr), m_rambank(0), m_rombank(0), m_drq(0), m_bank(0), m_816block(false)
@@ -115,10 +115,7 @@ a2bus_scsi_device::a2bus_scsi_device(const machine_config &mconfig, device_type 
 }
 
 a2bus_scsi_device::a2bus_scsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_SCSI, "Apple II SCSI Card", tag, owner, clock, "a2scsi", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_ncr5380(*this, SCSI_5380_TAG),
-	m_scsibus(*this, SCSI_BUS_TAG), m_rom(nullptr), m_rambank(0), m_rombank(0), m_drq(0), m_bank(0), m_816block(false)
+	a2bus_scsi_device(mconfig, A2BUS_SCSI, tag, owner, clock)
 {
 }
 

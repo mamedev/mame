@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_BW2_RAMCARD_H
+#define MAME_BUS_BW2_RAMCARD_H
 
-#ifndef __BW2_RAMCARD__
-#define __BW2_RAMCARD__
+#pragma once
 
 #include "exp.h"
 
@@ -51,8 +51,8 @@ private:
 
 
 // device type definition
-extern const device_type BW2_RAMCARD;
+DECLARE_DEVICE_TYPE(BW2_RAMCARD, bw2_ramcard_device)
 
 
 
-#endif
+#endif // MAME_BUS_BW2_RAMCARD_H

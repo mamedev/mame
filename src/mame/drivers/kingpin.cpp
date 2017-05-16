@@ -127,7 +127,7 @@ static INPUT_PORTS_START( kingpin )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( kingpin, kingpin_state )
+static MACHINE_CONFIG_START( kingpin )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
@@ -210,5 +210,5 @@ ROM_START( maxideal )
 ROM_END
 
 
-GAME( 1983, kingpin,  0, kingpin, kingpin, driver_device, 0, 0, "ACL Manufacturing", "Kingpin", 0)
-GAME( 1983, maxideal, 0, kingpin, kingpin, driver_device, 0, 0, "ACL Manufacturing", "Maxi-Dealer", 0)
+GAME( 1983, kingpin,  0, kingpin, kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "Kingpin",     0 )
+GAME( 1983, maxideal, 0, kingpin, kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "Maxi-Dealer", 0 )

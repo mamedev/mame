@@ -96,7 +96,7 @@ class dl1414t_device : public dl1414_device
 {
 public:
 	dl1414t_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-		: dl1414_device(mconfig, DL1414T, "DL1414T", tag, owner, clock, "dl1414t", __FILE__)
+		: dl1414_device(mconfig, DL1414T, tag, owner, clock)
 	{
 	}
 
@@ -112,7 +112,7 @@ class dl1416b_device : public dl1416_device
 {
 public:
 	dl1416b_device(machine_config const &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: dl1416_device(mconfig, DL1416B, "DL1416B", tag, owner, clock, "dl1416b", __FILE__)
+		: dl1416_device(mconfig, DL1416B, tag, owner, clock)
 	{
 	}
 
@@ -136,7 +136,7 @@ class dl1416t_device : public dl1416_device
 {
 public:
 	dl1416t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: dl1416_device(mconfig, DL1416T, "DL1416T", tag, owner, clock, "dl1416t", __FILE__)
+		: dl1416_device(mconfig, DL1416T, tag, owner, clock)
 	{
 	}
 
@@ -164,9 +164,9 @@ protected:
     DEVICE TYPE GLOBALS
 *****************************************************************************/
 
-device_type const DL1414T = device_creator<dl1414t_device>;
-device_type const DL1416B = device_creator<dl1416b_device>;
-device_type const DL1416T = device_creator<dl1416t_device>;
+DEFINE_DEVICE_TYPE(DL1414T, dl1414t_device, "dl1414t", "DL1414T")
+DEFINE_DEVICE_TYPE(DL1416B, dl1416b_device, "dl1416b", "DL1416B")
+DEFINE_DEVICE_TYPE(DL1416T, dl1416t_device, "dl1416t", "DL1416T")
 
 
 
@@ -177,13 +177,10 @@ device_type const DL1416T = device_creator<dl1416t_device>;
 dl1414_device::dl1414_device(
 		machine_config const &mconfig,
 		device_type type,
-		char const *name,
 		char const *tag,
 		device_t *owner,
-		uint32_t clock,
-		char const *shortname,
-		char const *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_update_cb(*this)
 	, m_digit_ram{ 0x00, 0x00, 0x00, 0x00 }
 	, m_cursor_state{ false, false, false, false }
@@ -199,13 +196,10 @@ dl1414_device::dl1414_device(
 dl1416_device::dl1416_device(
 		machine_config const &mconfig,
 		device_type type,
-		char const *name,
 		char const *tag,
 		device_t *owner,
-		uint32_t clock,
-		char const *shortname,
-		char const *source)
-	: dl1414_device(mconfig, type, name, tag, owner, clock, shortname, source)
+		uint32_t clock)
+	: dl1414_device(mconfig, type, tag, owner, clock)
 	, m_cu_in(true)
 {
 }

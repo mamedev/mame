@@ -23,9 +23,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_DISKII = device_creator<a2bus_diskii_device>;
-const device_type A2BUS_IWM_FDC = device_creator<a2bus_iwmflop_device>;
-const device_type A2BUS_AGAT7_FDC = device_creator<a2bus_agat7flop_device>;
+DEFINE_DEVICE_TYPE(A2BUS_DISKII,    a2bus_diskii_device,    "a2diskii",   "Apple Disk II controller")
+DEFINE_DEVICE_TYPE(A2BUS_IWM_FDC,   a2bus_iwmflop_device,   "a2iwm_flop", "Apple IWM floppy card")
+DEFINE_DEVICE_TYPE(A2BUS_AGAT7_FDC, a2bus_agat7flop_device, "agat7_flop", "Agat-7 140K floppy card")
 
 #define DISKII_ROM_REGION  "diskii_rom"
 #define FDC_TAG            "diskii_fdc"
@@ -100,25 +100,25 @@ const tiny_rom_entry *a2bus_agat7flop_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_floppy_device::a2bus_floppy_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_a2bus_card_interface(mconfig, *this),
-		m_fdc(*this, FDC_TAG), m_rom(nullptr)
+a2bus_floppy_device::a2bus_floppy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_a2bus_card_interface(mconfig, *this),
+	m_fdc(*this, FDC_TAG), m_rom(nullptr)
 {
 }
 
 a2bus_diskii_device::a2bus_diskii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_floppy_device(mconfig, A2BUS_DISKII, "Apple Disk II controller", tag, owner, clock, "a2diskii", __FILE__)
+	a2bus_floppy_device(mconfig, A2BUS_DISKII, tag, owner, clock)
 {
 }
 
 a2bus_iwmflop_device::a2bus_iwmflop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_floppy_device(mconfig, A2BUS_IWM_FDC, "Apple IWM floppy card", tag, owner, clock, "a2iwm_flop", __FILE__)
+	a2bus_floppy_device(mconfig, A2BUS_IWM_FDC, tag, owner, clock)
 {
 }
 
 a2bus_agat7flop_device::a2bus_agat7flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_floppy_device(mconfig, A2BUS_AGAT7_FDC, "Agat-7 140K floppy card", tag, owner, clock, "agat7_flop", __FILE__)
+	a2bus_floppy_device(mconfig, A2BUS_AGAT7_FDC, tag, owner, clock)
 {
 }
 

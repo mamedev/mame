@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_MOCKINGBOARD__
-#define __A2BUS_MOCKINGBOARD__
+#ifndef MAME_BUS_A2BUS_A2MOCKINGBOARD_H
+#define MAME_BUS_A2BUS_A2MOCKINGBOARD_H
 
 #include "a2bus.h"
 #include "machine/6522via.h"
@@ -25,9 +25,6 @@ class a2bus_ayboard_device:
 	public device_a2bus_card_interface
 {
 public:
-	// construction/destruction
-	a2bus_ayboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
@@ -39,6 +36,9 @@ public:
 	DECLARE_WRITE8_MEMBER(via2_out_b);
 
 protected:
+	// construction/destruction
+	a2bus_ayboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -80,17 +80,18 @@ class a2bus_echoplus_device : public a2bus_ayboard_device
 public:
 	a2bus_echoplus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual machine_config_constructor device_mconfig_additions() const override;
+
+protected:
 	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
 	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
 
 	required_device<tms5220_device> m_tms;
-
-	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 // device type definition
-extern const device_type A2BUS_MOCKINGBOARD;
-extern const device_type A2BUS_PHASOR;
-extern const device_type A2BUS_ECHOPLUS;
+DECLARE_DEVICE_TYPE(A2BUS_MOCKINGBOARD, a2bus_mockingboard_device)
+DECLARE_DEVICE_TYPE(A2BUS_PHASOR,       a2bus_phasor_device)
+DECLARE_DEVICE_TYPE(A2BUS_ECHOPLUS,     a2bus_echoplus_device)
 
-#endif  /* __A2BUS_MOCKINGBOARD__ */
+#endif  // MAME_BUS_A2BUS_A2MOCKINGBOARD_H

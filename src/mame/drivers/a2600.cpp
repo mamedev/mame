@@ -570,7 +570,7 @@ static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","a2600_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( a2600, a2600_state )
+static MACHINE_CONFIG_START( a2600 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_NTSC / 3)
 	MCFG_M6502_DISABLE_DIRECT()
@@ -619,7 +619,7 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( a2600p, a2600_state )
+static MACHINE_CONFIG_START( a2600p )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
 	MCFG_CPU_PROGRAM_MAP(a2600_mem)
@@ -675,6 +675,6 @@ ROM_END
 
 #define rom_a2600p rom_a2600
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME */
-CONS( 1977, a2600,  0,      0,      a2600,  a2600, driver_device,   0,      "Atari",    "Atari 2600 (NTSC)" , MACHINE_SUPPORTS_SAVE )
-CONS( 1978, a2600p, a2600,  0,      a2600p, a2600, driver_device,   0,      "Atari",    "Atari 2600 (PAL)",   MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE        INIT    COMPANY     FULLNAME */
+CONS( 1977, a2600,  0,      0,      a2600,  a2600, a2600_state, 0,      "Atari",    "Atari 2600 (NTSC)" , MACHINE_SUPPORTS_SAVE )
+CONS( 1978, a2600p, a2600,  0,      a2600p, a2600, a2600_state, 0,      "Atari",    "Atari 2600 (PAL)",   MACHINE_SUPPORTS_SAVE )

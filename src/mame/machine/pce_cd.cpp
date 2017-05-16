@@ -75,16 +75,16 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 #define PCE_CD_CLOCK    9216000
 
 
-const device_type PCE_CD = device_creator<pce_cd_device>;
+DEFINE_DEVICE_TYPE(PCE_CD, pce_cd_device, "pcecd", "PCE CD Add-on")
 
 
 pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, PCE_CD, "PCE CD Add-on", tag, owner, clock, "pcecd", __FILE__),
-						m_maincpu(*this, ":maincpu"),
-						m_msm(*this, "msm5205"),
-						m_cdda(*this, "cdda"),
-						m_nvram(*this, "bram"),
-						m_cdrom(*this, "cdrom")
+	: device_t(mconfig, PCE_CD, tag, owner, clock)
+	, m_maincpu(*this, ":maincpu")
+	, m_msm(*this, "msm5205")
+	, m_cdda(*this, "cdda")
+	, m_nvram(*this, "bram")
+	, m_cdrom(*this, "cdrom")
 {
 }
 
@@ -249,7 +249,7 @@ static MACHINE_CONFIG_FRAGMENT( pce_cd )
 
 	MCFG_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
 	MCFG_MSM5205_VCLK_CB(WRITELINE(pce_cd_device, msm5205_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 1/48 prescaler, 4bit data */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 1/48 prescaler, 4bit data */
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^:lspeaker", 0.50 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^:rspeaker", 0.50 )
 

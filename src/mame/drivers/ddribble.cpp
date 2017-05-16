@@ -98,13 +98,13 @@ WRITE8_MEMBER(ddribble_state::ddribble_vlm5030_ctrl_w)
 	membank("vlmbank")->set_entry(data & 0x08 ? 1 : 0);
 
 	/* b2 : SSG-C rc filter enable */
-	m_filter3->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
+	m_filter3->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
 
 	/* b1 : SSG-B rc filter enable */
-	m_filter2->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
+	m_filter2->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
 
 	/* b0 : SSG-A rc filter enable */
-	m_filter1->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
+	m_filter1->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
 }
 
 
@@ -256,7 +256,7 @@ void ddribble_state::machine_reset()
 	m_charbank[1] = 0;
 }
 
-static MACHINE_CONFIG_START( ddribble, ddribble_state )
+static MACHINE_CONFIG_START( ddribble )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,  XTAL_18_432MHz/12)  /* verified on pcb */
@@ -379,5 +379,5 @@ ROM_START( ddribblep )
 	ROM_LOAD( "voice_10.d7", 0x10000, 0x10000, CRC(b4c97494) SHA1(93f7c3c93f6f790c3f480e183da0105b5ac3593b) )
 ROM_END
 
-GAME( 1986, ddribble,  0,        ddribble, ddribble, driver_device, 0, ROT0, "Konami", "Double Dribble", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ddribblep, ddribble, ddribble, ddribble, driver_device, 0, ROT0, "Konami", "Double Dribble (prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ddribble,  0,        ddribble, ddribble, ddribble_state, 0, ROT0, "Konami", "Double Dribble", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ddribblep, ddribble, ddribble, ddribble, ddribble_state, 0, ROT0, "Konami", "Double Dribble (prototype?)", MACHINE_SUPPORTS_SAVE )

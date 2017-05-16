@@ -163,7 +163,7 @@ static INPUT_PORTS_START( galeb )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( galeb, galeb_state )
+static MACHINE_CONFIG_START( galeb )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(galeb_mem)
@@ -204,5 +204,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT  COMPANY                 FULLNAME   FLAGS */
-COMP( 1981, galeb,     0,      0,   galeb,  galeb, driver_device,   0, "PEL Varazdin", "Galeb",      0)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY         FULLNAME   FLAGS
+COMP( 1981, galeb, 0,      0,      galeb,   galeb, galeb_state,  0,    "PEL Varazdin", "Galeb",   0 )

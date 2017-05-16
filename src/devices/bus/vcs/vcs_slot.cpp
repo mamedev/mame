@@ -22,7 +22,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VCS_CART_SLOT = device_creator<vcs_cart_slot_device>;
+DEFINE_DEVICE_TYPE(VCS_CART_SLOT, vcs_cart_slot_device, "vcs_cart_slot", "Atari VCS 2600 Cartridge Slot")
 
 
 //-------------------------------------------------
@@ -78,9 +78,9 @@ void device_vcs_cart_interface::ram_alloc(uint32_t size)
 //  vcs_cart_slot_device - constructor
 //-------------------------------------------------
 vcs_cart_slot_device::vcs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, VCS_CART_SLOT, "Atari VCS 2600 Cartridge Slot", tag, owner, clock, "vcs_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)
+	device_t(mconfig, VCS_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)
 {
 }
 

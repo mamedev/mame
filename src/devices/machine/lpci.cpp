@@ -74,13 +74,15 @@
 #include "emu.h"
 #include "machine/lpci.h"
 
-#define LOG_PCI 0
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PCI_BUS_LEGACY = device_creator<pci_bus_legacy_device>;
+DEFINE_DEVICE_TYPE(PCI_BUS_LEGACY, pci_bus_legacy_device, "pci_bus_legacy", "PCI Bus Legacy")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -90,8 +92,8 @@ const device_type PCI_BUS_LEGACY = device_creator<pci_bus_legacy_device>;
 //  pci_bus_legacy_device - constructor
 //-------------------------------------------------
 pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, PCI_BUS_LEGACY, "PCI Bus Legacy", tag, owner, clock, "pci_bus_legacy", __FILE__),
-		m_father(nullptr)
+	device_t(mconfig, PCI_BUS_LEGACY, tag, owner, clock),
+	m_father(nullptr)
 {
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++) {
 		m_devtag[i]= nullptr;
@@ -132,8 +134,7 @@ READ32_MEMBER( pci_bus_legacy_device::read )
 			break;
 	}
 
-	if (LOG_PCI)
-		logerror("read('%s'): offset=%d result=0x%08X\n", tag(), offset, result);
+	LOG("read('%s'): offset=%d result=0x%08X\n", tag(), offset, result);
 
 	return result;
 }
@@ -164,8 +165,7 @@ WRITE32_MEMBER( pci_bus_legacy_device::write )
 {
 	offset %= 2;
 
-	if (LOG_PCI)
-		logerror("write('%s'): offset=%d data=0x%08X\n", tag(), offset, data);
+	LOG("write('%s'): offset=%d data=0x%08X\n", tag(), offset, data);
 
 	switch (offset)
 	{
@@ -185,8 +185,7 @@ WRITE32_MEMBER( pci_bus_legacy_device::write )
 				}
 				else
 					m_devicenum = -1;
-				if (LOG_PCI)
-					logerror("  bus:%d device:%d\n", busnum, devicenum);
+				LOG("  bus:%d device:%d\n", busnum, devicenum);
 			}
 			break;
 
@@ -200,8 +199,7 @@ WRITE32_MEMBER( pci_bus_legacy_device::write )
 					int reg = (m_address >> 0) & 0xfc;
 					(*write)(m_busnumaddr, m_busnumaddr->m_device[m_devicenum], function, reg, data, mem_mask);
 				}
-				if (LOG_PCI)
-					logerror("  function:%d register:%d\n", (m_address >> 8) & 0x07, (m_address >> 0) & 0xfc);
+				LOG("  function:%d register:%d\n", (m_address >> 8) & 0x07, (m_address >> 0) & 0xfc);
 			}
 			break;
 	}

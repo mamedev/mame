@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CBMIEC_C1581_H
+#define MAME_BUS_CBMIEC_C1581_H
 
-#ifndef __C1581__
-#define __C1581__
+#pragma once
 
 #include "cbmiec.h"
 #include "cpu/m6502/m6502.h"
@@ -31,15 +31,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c1581_t
+// ======================> c1581_device
 
-class c1581_t :  public device_t,
-					public device_cbm_iec_interface
+class c1581_device : public device_t, public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
-	c1581_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	c1581_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -57,6 +55,8 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
+	c1581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -77,7 +77,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6526_device> m_cia;
-	required_device<wd1772_t> m_fdc;
+	required_device<wd1772_device> m_fdc;
 	required_device<floppy_image_device> m_floppy;
 	required_ioport m_address;
 
@@ -89,13 +89,13 @@ protected:
 };
 
 
-// ======================> c1563_t
+// ======================> c1563_device
 
-class c1563_t :  public c1581_t
+class c1563_device : public c1581_device
 {
 public:
 	// construction/destruction
-	c1563_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -103,9 +103,8 @@ public:
 
 
 // device type definition
-extern const device_type C1563;
-extern const device_type C1581;
+DECLARE_DEVICE_TYPE(C1563, c1563_device)
+DECLARE_DEVICE_TYPE(C1581, c1581_device)
 
 
-
-#endif
+#endif // MAME_BUS_CBMIEC_C1581_H

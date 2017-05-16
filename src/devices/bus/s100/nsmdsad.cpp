@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_MDS_AD = device_creator<s100_mds_ad_device>;
+DEFINE_DEVICE_TYPE(S100_MDS_AD, s100_mds_ad_device, "s100_nsmdsad", "North Star MDS-A-D")
 
 
 //-------------------------------------------------
@@ -84,7 +84,7 @@ machine_config_constructor s100_mds_ad_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 s100_mds_ad_device::s100_mds_ad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, S100_MDS_AD, "MDS-A-D", tag, owner, clock, "nsmdsad", __FILE__),
+	device_t(mconfig, S100_MDS_AD, tag, owner, clock),
 	device_s100_card_interface(mconfig, *this),
 	m_floppy0(*this, "floppy0"),
 	m_floppy1(*this, "floppy1"),

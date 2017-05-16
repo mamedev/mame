@@ -111,7 +111,7 @@ uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-static MACHINE_CONFIG_START( cdc721, cdc721_state )
+static MACHINE_CONFIG_START( cdc721 )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(cdc721_mem)
@@ -141,4 +141,4 @@ ROM_START( cdc721 )
 	ROM_LOAD( "66315039", 0x0000, 0x1000, CRC(5c9aa968) SHA1(3ec7c5f25562579e6ed3fda7562428ff5e6b9550) ) // chargen
 ROM_END
 
-COMP( 1981, cdc721, 0, 0, cdc721, cdc721, driver_device, 0, "Control Data Corporation",  "CDC721 Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1981, cdc721, 0, 0, cdc721, cdc721, cdc721_state, 0, "Control Data Corporation",  "CDC721 Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

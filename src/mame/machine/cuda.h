@@ -135,6 +135,6 @@ private:
 };
 
 // device type definition
-extern const device_type CUDA;
+DECLARE_DEVICE_TYPE(CUDA, cuda_device)
 
 #endif

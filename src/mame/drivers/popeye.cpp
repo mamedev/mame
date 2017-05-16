@@ -454,7 +454,7 @@ WRITE8_MEMBER(popeye_state::popeye_portB_w)
 	m_dswbit = (data & 0x0e) >> 1;
 }
 
-static MACHINE_CONFIG_START( skyskipr, popeye_state )
+static MACHINE_CONFIG_START( skyskipr )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(skyskipr_map)
@@ -762,9 +762,9 @@ DRIVER_INIT_MEMBER(popeye_state,popeye)
 }
 
 
-GAME( 1981, skyskipr, 0,      skyskipr, skyskipr, popeye_state, skyskipr, ROT0, "Nintendo", "Sky Skipper", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeye,   0,      popeye,   popeye, popeye_state,   popeye,   ROT0, "Nintendo", "Popeye (revision D)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeu,  popeye, popeye,   popeye, popeye_state,   popeye,   ROT0, "Nintendo", "Popeye (revision D not protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyef,  popeye, popeye,   popeyef, popeye_state,  popeye,   ROT0, "Nintendo", "Popeye (revision F)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyebl, popeye, popeyebl, popeye, driver_device,  0,        ROT0, "bootleg",  "Popeye (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, popeyej,  popeye, popeyej,  popeye, popeye_state,   skyskipr, ROT0, "Nintendo", "Popeye (Japan, Sky Skipper hardware)", MACHINE_SUPPORTS_SAVE ) // this is the original Japanese release on the same hardware as Sky Skipper
+GAME( 1981, skyskipr, 0,      skyskipr, skyskipr, popeye_state, skyskipr, ROT0, "Nintendo", "Sky Skipper",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeye,   0,      popeye,   popeye,   popeye_state, popeye,   ROT0, "Nintendo", "Popeye (revision D)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeu,  popeye, popeye,   popeye,   popeye_state, popeye,   ROT0, "Nintendo", "Popeye (revision D not protected)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyef,  popeye, popeye,   popeyef,  popeye_state, popeye,   ROT0, "Nintendo", "Popeye (revision F)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyebl, popeye, popeyebl, popeye,   popeye_state, 0,        ROT0, "bootleg",  "Popeye (bootleg)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, popeyej,  popeye, popeyej,  popeye,   popeye_state, skyskipr, ROT0, "Nintendo", "Popeye (Japan, Sky Skipper hardware)", MACHINE_SUPPORTS_SAVE ) // this is the original Japanese release on the same hardware as Sky Skipper

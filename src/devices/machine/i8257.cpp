@@ -9,22 +9,21 @@
 #include "emu.h"
 #include "i8257.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type I8257 = device_creator<i8257_device>;
+DEFINE_DEVICE_TYPE(I8257, i8257_device, "i8257", "Intel 8257 DMA Controller")
 
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
-
 
 enum
 {
@@ -69,16 +68,13 @@ enum
 
 inline void i8257_device::dma_request(int channel, int state)
 {
-	if (LOG) logerror("I8257 '%s' Channel %u DMA Request: %u\n", tag(), channel, state);
+	LOG("I8257 Channel %u DMA Request: %u\n", channel, state);
 
 	if (state)
-	{
 		m_request |= 1 << channel;
-	}
 	else
-	{
-			m_request &= ~(1 << channel);
-	}
+		m_request &= ~(1 << channel);
+
 	trigger(1);
 }
 
@@ -87,9 +83,9 @@ inline void i8257_device::dma_request(int channel, int state)
 //  is_request_active -
 //-------------------------------------------------
 
-inline bool i8257_device::is_request_active(int channel)
+inline bool i8257_device::is_request_active(int channel) const
 {
-	return (BIT(m_request, channel) && MODE_CHAN_ENABLE(channel)) ? true : false;
+	return BIT(m_request, channel) && MODE_CHAN_ENABLE(channel);
 }
 
 //-------------------------------------------------
@@ -184,7 +180,7 @@ inline void i8257_device::dma_write()
 	case MODE_TRANSFER_VERIFY: {
 		uint8_t v1 = m_in_memr_cb(offset);
 		if(0 && m_temp != v1)
-			logerror("%s: verify error %02x vs. %02x\n", tag(), m_temp, v1);
+			logerror("verify error %02x vs. %02x\n", m_temp, v1);
 		break;
 	}
 
@@ -259,7 +255,7 @@ inline void i8257_device::advance()
 //-------------------------------------------------
 
 i8257_device::i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, I8257, "Intel 8257", tag, owner, clock, "i8257", __FILE__),
+	: device_t(mconfig, I8257, tag, owner, clock),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_reverse_rw(0),
@@ -598,7 +594,7 @@ WRITE8_MEMBER( i8257_device::write )
 	{
 		m_transfer_mode = data;
 
-		if (LOG) logerror("I8257 '%s' Command Register: %02x\n", tag(), m_transfer_mode);
+		LOG("I8257 Command Register: %02x\n", m_transfer_mode);
 	}
 	trigger(1);
 }
@@ -610,7 +606,7 @@ WRITE8_MEMBER( i8257_device::write )
 
 WRITE_LINE_MEMBER( i8257_device::hlda_w )
 {
-	if (LOG) logerror("I8257 '%s' Hold Acknowledge: %u\n", tag(), state);
+	LOG("I8257 Hold Acknowledge: %u\n", state);
 
 	m_hack = state;
 	trigger(1);
@@ -623,7 +619,7 @@ WRITE_LINE_MEMBER( i8257_device::hlda_w )
 
 WRITE_LINE_MEMBER( i8257_device::ready_w )
 {
-	if (LOG) logerror("I8257 '%s' Ready: %u\n", tag(), state);
+	LOG("I8257 Ready: %u\n", state);
 
 	m_ready = state;
 }

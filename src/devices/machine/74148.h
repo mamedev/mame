@@ -40,8 +40,10 @@
 
 *****************************************************************************/
 
-#ifndef TTL74148_H
-#define TTL74148_H
+#ifndef MAME_DEVICES_MACHINE_74148_H
+#define MAME_DEVICES_MACHINE_74148_H
+
+#pragma once
 
 
 typedef device_delegate<void (void)> ttl74148_output_delegate;
@@ -89,11 +91,11 @@ private:
 	int m_last_enable_output;
 };
 
-extern const device_type TTL74148;
+DECLARE_DEVICE_TYPE(TTL74148, ttl74148_device)
 
 
 #define MCFG_74148_OUTPUT_CB(_class, _method) \
 	ttl74148_device::set_output_callback(*device, ttl74148_output_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 
-#endif
+#endif // MAME_DEVICES_MACHINE_74148_H

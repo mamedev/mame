@@ -3,8 +3,8 @@
 //*************************************
 // iteagle fpga device
 //*************************************
-#ifndef ITEAGLE_FPGA_H
-#define ITEAGLE_FPGA_H
+#ifndef MAME_MACHINE_ITEAGLE_FPGA_H
+#define MAME_MACHINE_ITEAGLE_FPGA_H
 
 #include "machine/pci.h"
 #include "machine/nvram.h"
@@ -59,7 +59,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	required_device<nvram_device> m_rtc;
-	required_device<scc85C30_device> m_scc1;
+	required_device<scc85c30_device> m_scc1;
 
 	void set_init_info(int version, int seq_init) {m_version=version; m_seq_init=seq_init;}
 	void set_irq_info(const char *tag, const int irq_num, const int serial_num) {
@@ -158,8 +158,8 @@ private:
 
 };
 
-extern const device_type ITEAGLE_FPGA;
-extern const device_type ITEAGLE_EEPROM;
-extern const device_type ITEAGLE_PERIPH;
+DECLARE_DEVICE_TYPE(ITEAGLE_FPGA, iteagle_fpga_device)
+DECLARE_DEVICE_TYPE(ITEAGLE_EEPROM, iteagle_eeprom_device)
+DECLARE_DEVICE_TYPE(ITEAGLE_PERIPH, iteagle_periph_device)
 
-#endif
+#endif // MAME_MACHINE_ITEAGLE_FPGA_H

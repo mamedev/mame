@@ -858,7 +858,7 @@ ADDRESS_MAP_START(xbox_base_map_io, AS_IO, 32, xbox_base_state)
 #endif
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START(xbox_base, xbox_base_state)
+MACHINE_CONFIG_START(xbox_base)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 733333333) /* Wrong! family 6 model 8 stepping 10 */
 	MCFG_CPU_PROGRAM_MAP(xbox_base_map)

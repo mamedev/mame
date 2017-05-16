@@ -424,6 +424,38 @@ static INPUT_PORTS_START( penky )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( penkyi )
+	PORT_INCLUDE(penky)
+
+	PORT_MODIFY("DSW1")  /* port $2020 */
+	PORT_DIPNAME( 0x03, 0x03, "Time" )          PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "0:30" )
+	PORT_DIPSETTING(    0x01, "0:40" )
+	PORT_DIPSETTING(    0x02, "0:50" )
+	PORT_DIPSETTING(    0x03, "1:00" )
+	PORT_DIPNAME( 0x80, 0x80, "Game Mode" )      PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, "Normal" )
+	PORT_DIPSETTING(    0x00, "Redemption" ) // gives out tickets
+
+	PORT_MODIFY("DSW2")  /* port $2021 */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Points/Tickets" )      PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x0c, "50.000 points/1 ticket" )
+	PORT_DIPSETTING(    0x08, "100.000 points/1 ticket" )
+	PORT_DIPSETTING(    0x04, "150.000 points/1 ticket" )
+	PORT_DIPSETTING(    0x00, "200.000 points/1 ticket" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:6") // Demo sounds in the parent
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( torus )
 	PORT_START("DSW1")  /* port $2020 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
@@ -691,7 +723,7 @@ INTERRUPT_GEN_MEMBER(paradise_state::irq)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( paradise, paradise_state )
+static MACHINE_CONFIG_START( paradise )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)          /* Z8400B - 6mhz Verified */
@@ -716,10 +748,10 @@ static MACHINE_CONFIG_START( paradise, paradise_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_12MHz/12, OKIM6295_PIN7_HIGH)    /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki1", XTAL_12MHz/12, PIN7_HIGH)    /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki2", XTAL_12MHz/12, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -757,10 +789,16 @@ static MACHINE_CONFIG_DERIVED( penky, paradise )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(torus_map)
+	MCFG_CPU_IO_MAP(torus_io_map)
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( penkyi, penky )
 
+	// TODO add ticket dispenser
+
+	MCFG_DEVICE_REMOVE("oki2")
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -1115,6 +1153,32 @@ ROM_START( penky )
 	/* not populated for this game */
 ROM_END
 
+ROM_START( penkyi )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "U128", 0x00000, 0x80000, CRC(17c8c97c) SHA1(8f5a88670f64ae5591b4ac1b6ddd7aa7db60e042) ) // 27C040, but 1st and 2nd half identical
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT) /* 16x16x8 Sprites */
+	ROM_LOAD( "U114", 0x00000, 0x80000, CRC(593e7b15) SHA1(bf2719e86bb23b2f149b6721fd3e8131b388ceca) ) // 27C040
+	ROM_LOAD( "U115", 0x80000, 0x80000, CRC(29449fa2) SHA1(6aae7967952d3ed1a95201b4f467f3b73e8df4f6) ) // 27C040
+
+	ROM_REGION( 0x20000, "gfx2", ROMREGION_INVERT)  /* 8x8x4 Background */
+	ROM_LOAD( "U94", 0x00000, 0x10000, CRC(d45bac24) SHA1(fc869647873f29bb44f4d58333fdb023d99028de) ) // 27C512, half size of the one in the penky set, mostly 0 filled anyway
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT) /* 8x8x8 Foreground */
+	ROM_LOAD( "U92", 0x00000, 0x80000, CRC(31993a6c) SHA1(8cdcae52472768f40dc7cbefaa459982d008deaa) ) // 27C040
+	ROM_LOAD( "U93", 0x80000, 0x80000, CRC(b570dc0c) SHA1(1f55681412db144e2d5cbb7a89783edc5059add7) ) // 27C040
+
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT) /* 8x8x8 Midground */
+	ROM_LOAD( "U110", 0x00000, 0x80000, CRC(c6501e3a) SHA1(f6fa7925a395a226714c4f5536866bc87c1bf0ca) ) // 27C040
+	ROM_LOAD( "U111", 0x80000, 0x80000, CRC(de405c6f) SHA1(715e111438d4cbecc435a519ae370842f5531163) ) // 27C040
+
+	ROM_REGION( 0x80000, "oki1", 0 )    /* Samples */
+	ROM_LOAD( "U85", 0x00000, 0x80000, CRC(452578cd) SHA1(a86ce33df0a5dc9d58233820689d52943844a7ea) )// 27C040, but 1st and 2nd half identical
+
+	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 )    /* Samples (banked) */
+	/* not populated for this game */
+ROM_END
+
 /*
 
 Yun Sung Torus (c) 1996
@@ -1319,6 +1383,7 @@ GAME( 199?,  para2dx,  0,         paradise, para2dx,  paradise_state, paradise, 
 GAME( 1995,  tgtball,  0,         tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995,  tgtballa, tgtball,   tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball", MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  penky,    0,         penky,    penky,    paradise_state, tgtball,  ROT0,  "Yun Sung", "Penky", MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  penkyi,   penky,     penkyi,   penkyi,   paradise_state, tgtball,  ROT0,  "Yun Sung (Impeuropex license)", "Penky (Italian)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  torus,    0,         torus,    torus,    paradise_state, torus,    ROT90, "Yun Sung", "Torus", MACHINE_SUPPORTS_SAVE )
 GAME( 1998,  madball,  0,         madball,  madball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0", MACHINE_SUPPORTS_SAVE )
 GAME( 1997,  madballn, madball,   madball,  madball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0 (With Nudity)", MACHINE_SUPPORTS_SAVE )

@@ -221,7 +221,7 @@ static INPUT_PORTS_START( ktopgun )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ktopgun, ktopgun_state )
+static MACHINE_CONFIG_START( ktopgun )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -290,7 +290,7 @@ static INPUT_PORTS_START( kcontra )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( kcontra, kcontra_state )
+static MACHINE_CONFIG_START( kcontra )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -358,7 +358,7 @@ static INPUT_PORTS_START( ktmnt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ktmnt, ktmnt_state )
+static MACHINE_CONFIG_START( ktmnt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -421,7 +421,7 @@ static INPUT_PORTS_START( kgradius )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( kgradius, kgradius_state )
+static MACHINE_CONFIG_START( kgradius )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -484,7 +484,7 @@ static INPUT_PORTS_START( kloneran )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( kloneran, kloneran_state )
+static MACHINE_CONFIG_START( kloneran )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -547,7 +547,7 @@ static INPUT_PORTS_START( dm53 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( dm53, dm53_state )
+static MACHINE_CONFIG_START( dm53 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -614,7 +614,7 @@ static INPUT_PORTS_START( jr55 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( jr55, jr55_state )
+static MACHINE_CONFIG_START( jr55 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -676,7 +676,7 @@ static INPUT_PORTS_START( ml102 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ml102, ml102_state )
+static MACHINE_CONFIG_START( ml102 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -757,7 +757,7 @@ static INPUT_PORTS_START( bx301 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bx301, bx301_state )
+static MACHINE_CONFIG_START( bx301 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -886,14 +886,14 @@ ROM_END
 
 
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1989, ktopgun,   0,        0, ktopgun,   ktopgun,   driver_device, 0, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kcontra,   0,        0, kcontra,   kcontra,   driver_device, 0, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, ktmnt,     0,        0, ktmnt,     ktmnt,     driver_device, 0, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kgradius,  0,        0, kgradius,  kgradius,  driver_device, 0, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kloneran,  0,        0, kloneran,  kloneran,  driver_device, 0, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      STATE        INIT  COMPANY     FULLNAME, FLAGS
+CONS( 1989, ktopgun,   0,      0,      ktopgun,   ktopgun,   ktopgun_state,  0, "Konami",   "Top Gun (handheld)",                      MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kcontra,   0,      0,      kcontra,   kcontra,   kcontra_state,  0, "Konami",   "Contra (handheld)",                       MACHINE_SUPPORTS_SAVE )
+CONS( 1989, ktmnt,     0,      0,      ktmnt,     ktmnt,     ktmnt_state,    0, "Konami",   "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kgradius,  0,      0,      kgradius,  kgradius,  kgradius_state, 0, "Konami",   "Gradius (handheld)",                      MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kloneran,  0,      0,      kloneran,  kloneran,  kloneran_state, 0, "Konami",   "Lone Ranger (handheld)",                  MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, gnw_dm53,  0,        0, dm53,      dm53,      driver_device, 0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_jr55,  0,        0, jr55,      jr55,      driver_device, 0, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_ml102, 0,        0, ml102,     ml102,     driver_device, 0, "Nintendo", "Game & Watch: Mario's Cement Factory", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // GNW: missing svg screen
-CONS( 1984, gnw_bx301, 0,        0, bx301,     bx301,     driver_device, 0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gnw_dm53,  0,      0,      dm53,      dm53,      dm53_state,     0, "Nintendo", "Game & Watch: Mickey & Donald",        MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_jr55,  0,      0,      jr55,      jr55,      jr55_state,     0, "Nintendo", "Game & Watch: Donkey Kong II",         MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_ml102, 0,      0,      ml102,     ml102,     ml102_state,    0, "Nintendo", "Game & Watch: Mario's Cement Factory", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // GNW: missing svg screen
+CONS( 1984, gnw_bx301, 0,      0,      bx301,     bx301,     bx301_state,    0, "Nintendo", "Game & Watch: Boxing",                 MACHINE_SUPPORTS_SAVE )

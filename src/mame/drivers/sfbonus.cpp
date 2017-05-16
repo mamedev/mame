@@ -1360,7 +1360,7 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8, sfbonus_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
+static MACHINE_CONFIG_START( sfbonus )
 	MCFG_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
 	MCFG_CPU_PROGRAM_MAP(sfbonus_map)
 	MCFG_CPU_IO_MAP(sfbonus_io)
@@ -1387,7 +1387,7 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 
 	/* Parrot 3 seems fine at 1 Mhz, but Double Challenge isn't? */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

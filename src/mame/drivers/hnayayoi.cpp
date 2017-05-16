@@ -534,7 +534,7 @@ void hnayayoi_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( hnayayoi, hnayayoi_state )
+static MACHINE_CONFIG_START( hnayayoi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
@@ -570,7 +570,7 @@ static MACHINE_CONFIG_START( hnayayoi, hnayayoi_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -679,6 +679,6 @@ DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
 }
 
 
-GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, driver_device,  0,        ROT0, "Dyna Electronics", "Hana Yayoi (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, hnayayoi_state, 0,        ROT0, "Dyna Electronics", "Hana Yayoi (Japan)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, hnfubuki, ROT0, "Dynax",            "Hana Fubuki [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, untoucha, 0,        untoucha, untoucha, driver_device,  0,        ROT0, "Dynax",            "Untouchable (Ver. 2.10)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1987, untoucha, 0,        untoucha, untoucha, hnayayoi_state, 0,        ROT0, "Dynax",            "Untouchable (Ver. 2.10)",   MACHINE_SUPPORTS_SAVE )

@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type DMV_KEYBOARD = device_creator<dmv_keyboard_device>;
+DEFINE_DEVICE_TYPE(DMV_KEYBOARD, dmv_keyboard_device, "dmv_keyboard", "Decision Mate V Keyboard")
 
 
 //***************************************************************************
@@ -205,7 +205,7 @@ ioport_constructor dmv_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 dmv_keyboard_device::dmv_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DMV_KEYBOARD, "Decision Mate V Keyboard", tag, owner, clock, "dmv_keyboard", __FILE__)
+	: device_t(mconfig, DMV_KEYBOARD, tag, owner, clock)
 	, m_maincpu(*this, "mcu")
 	, m_keyboard(*this, "COL.%u", 0)
 {

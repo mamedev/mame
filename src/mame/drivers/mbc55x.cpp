@@ -238,7 +238,7 @@ static SLOT_INTERFACE_START( mbc55x_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
+static MACHINE_CONFIG_START( mbc55x )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, I8088, 3600000)
 	MCFG_CPU_PROGRAM_MAP(mbc55x_mem)
@@ -315,5 +315,5 @@ ROM_START( mbc55x )
 ROM_END
 
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT  COMPANY  FULLNAME   FLAGS */
-COMP( 1983, mbc55x,     0,      0,      mbc55x, mbc55x, driver_device, 0,   "Sanyo",  "MBC-55x",  0 /*MACHINE_NO_SOUND*/)
+//    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY   FULLNAME    FLAGS
+COMP( 1983, mbc55x,     0,      0,      mbc55x,  mbc55x, mbc55x_state, 0,    "Sanyo",  "MBC-55x",  0 /*MACHINE_NO_SOUND*/)

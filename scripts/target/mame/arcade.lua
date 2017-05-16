@@ -371,6 +371,7 @@ MACHINES["TTL74153"] = true
 MACHINES["TTL74157"] = true
 --MACHINES["TTL74161"] = true
 --MACHINES["TTL74164"] = true
+MACHINES["TTL74166"] = true
 --MACHINES["TTL74175"] = true
 MACHINES["TTL74181"] = true
 MACHINES["TTL7474"] = true
@@ -537,9 +538,7 @@ MACHINES["RTC65271"] = true
 MACHINES["RTC9701"] = true
 MACHINES["S2636"] = true
 MACHINES["S3520CF"] = true
-MACHINES["S3C2400"] = true
-MACHINES["S3C2410"] = true
-MACHINES["S3C2440"] = true
+MACHINES["S3C24XX"] = true
 --MACHINES["S3C44B0"] = true
 MACHINES["SATURN"] = true
 MACHINES["SCSI"] = true
@@ -1435,6 +1434,7 @@ files {
 	MAME_DIR .. "src/mame/includes/leland.h",
 	MAME_DIR .. "src/mame/machine/leland.cpp",
 	MAME_DIR .. "src/mame/audio/leland.cpp",
+	MAME_DIR .. "src/mame/audio/leland.h",
 	MAME_DIR .. "src/mame/video/leland.cpp",
 }
 
@@ -1651,8 +1651,8 @@ files {
 createMAMEProjects(_target, _subtarget, "dooyong")
 files {
 	MAME_DIR .. "src/mame/drivers/dooyong.cpp",
-	MAME_DIR .. "src/mame/includes/dooyong.h",
 	MAME_DIR .. "src/mame/video/dooyong.cpp",
+	MAME_DIR .. "src/mame/video/dooyong.h",
 	MAME_DIR .. "src/mame/drivers/gundealr.cpp",
 	MAME_DIR .. "src/mame/includes/gundealr.h",
 	MAME_DIR .. "src/mame/video/gundealr.cpp",
@@ -2672,7 +2672,7 @@ files {
 	MAME_DIR .. "src/mame/includes/namcofl.h",
 	MAME_DIR .. "src/mame/video/namcofl.cpp",
 	MAME_DIR .. "src/mame/machine/namcoic.cpp",
-	MAME_DIR .. "src/mame/includes/namcoic.h",
+	MAME_DIR .. "src/mame/machine/namcoic.h",
 	MAME_DIR .. "src/mame/drivers/namcona1.cpp",
 	MAME_DIR .. "src/mame/includes/namcona1.h",
 	MAME_DIR .. "src/mame/video/namcona1.cpp",
@@ -2824,6 +2824,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/gomoku.cpp",
 	MAME_DIR .. "src/mame/includes/gomoku.h",
 	MAME_DIR .. "src/mame/audio/gomoku.cpp",
+	MAME_DIR .. "src/mame/audio/gomoku.h",
 	MAME_DIR .. "src/mame/video/gomoku.cpp",
 	MAME_DIR .. "src/mame/drivers/hyhoo.cpp",
 	MAME_DIR .. "src/mame/includes/hyhoo.h",
@@ -3037,6 +3038,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/phoenix.cpp",
 	MAME_DIR .. "src/mame/includes/phoenix.h",
 	MAME_DIR .. "src/mame/audio/phoenix.cpp",
+	MAME_DIR .. "src/mame/audio/phoenix.h",
 	MAME_DIR .. "src/mame/video/phoenix.cpp",
 	MAME_DIR .. "src/mame/drivers/safarir.cpp",
 	MAME_DIR .. "src/mame/audio/pleiads.cpp",
@@ -3510,6 +3512,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/snk6502.cpp",
 	MAME_DIR .. "src/mame/includes/snk6502.h",
 	MAME_DIR .. "src/mame/audio/snk6502.cpp",
+	MAME_DIR .. "src/mame/audio/snk6502.h",
 	MAME_DIR .. "src/mame/video/snk6502.cpp",
 	MAME_DIR .. "src/mame/drivers/snk.cpp",
 	MAME_DIR .. "src/mame/includes/snk.h",
@@ -3518,6 +3521,7 @@ files {
 	MAME_DIR .. "src/mame/includes/snk68.h",
 	MAME_DIR .. "src/mame/video/snk68.cpp",
 	MAME_DIR .. "src/mame/video/snk68_spr.cpp",
+	MAME_DIR .. "src/mame/video/snk68_spr.h",
 
 }
 
@@ -4009,6 +4013,7 @@ files {
 	MAME_DIR .. "src/mame/includes/tiamc1.h",
 	MAME_DIR .. "src/mame/video/tiamc1.cpp",
 	MAME_DIR .. "src/mame/audio/tiamc1.cpp",
+	MAME_DIR .. "src/mame/audio/tiamc1.h",
 }
 
 createMAMEProjects(_target, _subtarget, "thepit")
@@ -4582,6 +4587,7 @@ files {
 	MAME_DIR .. "src/mame/machine/micro3d.cpp",
 	MAME_DIR .. "src/mame/video/micro3d.cpp",
 	MAME_DIR .. "src/mame/audio/micro3d.cpp",
+	MAME_DIR .. "src/mame/audio/micro3d.h",
 	MAME_DIR .. "src/mame/drivers/midas.cpp",
 	MAME_DIR .. "src/mame/drivers/mil4000.cpp",
 	MAME_DIR .. "src/mame/drivers/miniboy7.cpp",

@@ -4,14 +4,12 @@
  *   DIABLO31 and DIABLO44 hard drive support
  **********************************************************/
 
-#if !defined(_DIABLO_HD_DEVICE_)
-#define _DIABLO_HD_DEVICE_
+#ifndef MAME_MACHINE_DIABLO_HD_H
+#define MAME_MACHINE_DIABLO_HD_H
+
+#pragma once
 
 #include "imagedev/diablo.h"
-
-#ifndef DIABLO_DEBUG
-#define DIABLO_DEBUG    1                           //!< set to 1 to enable debug log output
-#endif
 
 #define DIABLO_HD_0 "diablo0"
 #define DIABLO_HD_1 "diablo1"
@@ -73,14 +71,9 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
-#if DIABLO_DEBUG
-	int m_log_level;
 	template <typename Format, typename... Params> void logprintf(int level, Format &&fmt, Params &&... args);
-#   define  LOG_DRIVE(x) logprintf x
 
-#else
-#   define  LOG_DRIVE(x)
-#endif
+	int m_log_level;
 	bool m_diablo31;                        //!< true, if this is a DIABLO31 drive
 	int m_unit;                             //!< drive unit number (0 or 1)
 	char m_description[32];                 //!< description of the drive(s)
@@ -141,13 +134,11 @@ private:
 	//! expand a sector into an array of clock and data bits
 	uint32_t* expand_sector();
 
-#if DIABLO_DEBUG
 	//! dump a number of words as ASCII characters
 	void dump_ascii(uint8_t *src, size_t size);
 
 	//! dump a record's contents
 	size_t dump_record(uint8_t *src, size_t addr, size_t size, const char *name, int cr);
-#endif
 
 	//! find a sync bit in an array of clock and data bits
 	size_t squeeze_sync(uint32_t *bits, size_t src, size_t size);

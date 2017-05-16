@@ -4,7 +4,8 @@
 
 #include "emu.h"
 #include "includes/namconb1.h"
-#include "includes/namcoic.h"
+
+#include "machine/namcoic.h"
 
 
 /* nth_word32 is a general-purpose utility function, which allows us to

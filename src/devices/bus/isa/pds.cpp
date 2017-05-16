@@ -19,12 +19,12 @@
 #include "emu.h"
 #include "pds.h"
 
-const device_type ISA8_PDS = device_creator<isa8_pds_device>;
+DEFINE_DEVICE_TYPE(ISA8_PDS, isa8_pds_device, "isa_pds", "Programmers Development System (host)")
 
 isa8_pds_device::isa8_pds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, ISA8_PDS, "Programmers Development System", tag, owner, clock, "isa_pds", __FILE__),
-		device_isa8_card_interface( mconfig, *this ),
-		m_ppi(*this,"pds_ppi")
+	: device_t(mconfig, ISA8_PDS, tag, owner, clock)
+	, device_isa8_card_interface(mconfig, *this)
+	, m_ppi(*this,"pds_ppi")
 {
 }
 

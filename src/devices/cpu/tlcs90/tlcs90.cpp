@@ -21,12 +21,12 @@ static const char *const op_names[] =   {   "??",       "nop",  "ex",   "exx",  
 ALLOW_SAVE_TYPE(tlcs90_device::e_mode); // allow save_item on a non-fundamental type
 
 
-const device_type TMP90840 = device_creator<tmp90840_device>;
-const device_type TMP90841 = device_creator<tmp90841_device>;
-const device_type TMP90845 = device_creator<tmp90845_device>;
-const device_type TMP91640 = device_creator<tmp91640_device>;
-const device_type TMP91641 = device_creator<tmp91641_device>;
-const device_type TMP90PH44 = device_creator<tmp90ph44_device>;
+DEFINE_DEVICE_TYPE(TMP90840,  tmp90840_device,  "tmp90840",  "TMP90840")
+DEFINE_DEVICE_TYPE(TMP90841,  tmp90841_device,  "tmp90841",  "TMP90841")
+DEFINE_DEVICE_TYPE(TMP90845,  tmp90845_device,  "tmp90845",  "TMP90845")
+DEFINE_DEVICE_TYPE(TMP91640,  tmp91640_device,  "tmp91640",  "TMP91640")
+DEFINE_DEVICE_TYPE(TMP91641,  tmp91641_device,  "tmp91641",  "TMP91641")
+DEFINE_DEVICE_TYPE(TMP90PH44, tmp90ph44_device, "tmp90ph44", "TMP90PH44")
 
 
 static ADDRESS_MAP_START(tmp90840_mem, AS_PROGRAM, 8, tlcs90_device)
@@ -60,8 +60,8 @@ static ADDRESS_MAP_START(tmp90ph44_mem, AS_PROGRAM, 8, tlcs90_device )
 ADDRESS_MAP_END
 
 
-tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor program_map)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, program_map)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 {
@@ -69,36 +69,36 @@ tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, co
 
 
 tmp90840_device::tmp90840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90840, "TMP90840", tag, owner, clock, "tmp90840", __FILE__, ADDRESS_MAP_NAME(tmp90840_mem))
+	: tlcs90_device(mconfig, TMP90840, tag, owner, clock, ADDRESS_MAP_NAME(tmp90840_mem))
 {
 }
 
 tmp90841_device::tmp90841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90841, "TMP90841", tag, owner, clock, "tmp90841", __FILE__, ADDRESS_MAP_NAME(tmp90841_mem))
+	: tlcs90_device(mconfig, TMP90841, tag, owner, clock, ADDRESS_MAP_NAME(tmp90841_mem))
 {
 }
 
 tmp90845_device::tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90845, "TMP90845", tag, owner, clock, "tmp90845", __FILE__, ADDRESS_MAP_NAME(tmp90841_mem))
+	: tlcs90_device(mconfig, TMP90845, tag, owner, clock, ADDRESS_MAP_NAME(tmp90841_mem))
 {
 }
 
 
 
 tmp91640_device::tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP91640, "TMP91640", tag, owner, clock, "tmp91640", __FILE__, ADDRESS_MAP_NAME(tmp91640_mem))
+	: tlcs90_device(mconfig, TMP91640, tag, owner, clock, ADDRESS_MAP_NAME(tmp91640_mem))
 {
 }
 
 
 tmp91641_device::tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP91641, "TMP91641", tag, owner, clock, "tmp91641", __FILE__, ADDRESS_MAP_NAME(tmp91641_mem))
+	: tlcs90_device(mconfig, TMP91641, tag, owner, clock, ADDRESS_MAP_NAME(tmp91641_mem))
 {
 }
 
 
 tmp90ph44_device::tmp90ph44_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90PH44, "TMP90PH44", tag, owner, clock, "tmp90ph44", __FILE__, ADDRESS_MAP_NAME(tmp90ph44_mem))
+	: tlcs90_device(mconfig, TMP90PH44, tag, owner, clock, ADDRESS_MAP_NAME(tmp90ph44_mem))
 {
 }
 

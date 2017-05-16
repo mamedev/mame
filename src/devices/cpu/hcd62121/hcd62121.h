@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef __HCD62121_H__
-#define __HCD62121_H__
+#ifndef MAME_CPU_HCD62121_HCD62121_H
+#define MAME_CPU_HCD62121_HCD62121_H
 
-
+#pragma once
 
 
 #define MCFG_HCD62121_KOL_CB(_devcb) devcb = &hcd62121_cpu_device::set_kol_callback(*device, DEVCB_##_devcb);
@@ -20,14 +20,29 @@ public:
 	// construction/destruction
 	hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_kol_callback(device_t &device, _Object object) { return downcast<hcd62121_cpu_device &>(device).m_kol_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_koh_callback(device_t &device, _Object object) { return downcast<hcd62121_cpu_device &>(device).m_koh_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_port_callback(device_t &device, _Object object) { return downcast<hcd62121_cpu_device &>(device).m_port_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_opt_callback(device_t &device, _Object object) { return downcast<hcd62121_cpu_device &>(device).m_opt_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_ki_callback(device_t &device, _Object object) { return downcast<hcd62121_cpu_device &>(device).m_ki_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in0_callback(device_t &device, _Object object) { return downcast<hcd62121_cpu_device &>(device).m_in0_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_kol_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_kol_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_koh_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_koh_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_port_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_opt_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_opt_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ki_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_ki_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in0_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_in0_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
+	enum
+	{
+		HCD62121_IP=1, HCD62121_SP, HCD62121_F, HCD62121_LAR,
+		HCD62121_CS, HCD62121_DS, HCD62121_SS, HCD62121_DSIZE,
+		/* 128 byte register file */
+		HCD62121_R00, HCD62121_R04, HCD62121_R08, HCD62121_R0C,
+		HCD62121_R10, HCD62121_R14, HCD62121_R18, HCD62121_R1C,
+		HCD62121_R20, HCD62121_R24, HCD62121_R28, HCD62121_R2C,
+		HCD62121_R30, HCD62121_R34, HCD62121_R38, HCD62121_R3C,
+		HCD62121_R40, HCD62121_R44, HCD62121_R48, HCD62121_R4C,
+		HCD62121_R50, HCD62121_R54, HCD62121_R58, HCD62121_R5C,
+		HCD62121_R60, HCD62121_R64, HCD62121_R68, HCD62121_R6C,
+		HCD62121_R70, HCD62121_R74, HCD62121_R78, HCD62121_R7C
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -113,7 +128,6 @@ private:
 };
 
 
-extern const device_type HCD62121;
+DECLARE_DEVICE_TYPE(HCD62121, hcd62121_cpu_device)
 
-
-#endif /* __HCD62121_H__ */
+#endif // MAME_CPU_HCD62121_HCD62121_H

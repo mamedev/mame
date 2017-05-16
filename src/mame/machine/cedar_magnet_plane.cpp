@@ -6,12 +6,12 @@
 #include "cedar_magnet_plane.h"
 
 
-const device_type CEDAR_MAGNET_PLANE = device_creator<cedar_magnet_plane_device>;
+DEFINE_DEVICE_TYPE(CEDAR_MAGNET_PLANE, cedar_magnet_plane_device, "cedmag_plane", "Cedar Plane")
 
 
 cedar_magnet_plane_device::cedar_magnet_plane_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CEDAR_MAGNET_PLANE, "Cedar Plane", tag, owner, clock, "cedmag_plane", __FILE__),
-	cedar_magnet_board_interface(mconfig, *this, "planecpu", "ram")
+	: device_t(mconfig, CEDAR_MAGNET_PLANE, tag, owner, clock)
+	, cedar_magnet_board_interface(mconfig, *this, "planecpu", "ram")
 {
 }
 

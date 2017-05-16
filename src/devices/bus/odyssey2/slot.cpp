@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type O2_CART_SLOT = device_creator<o2_cart_slot_device>;
+DEFINE_DEVICE_TYPE(O2_CART_SLOT, o2_cart_slot_device, "o2_cart_slot", "Odyssey 2 Cartridge Slot")
 
 //**************************************************************************
 //    Odyssey 2 Cartridges Interface
@@ -26,9 +26,9 @@ const device_type O2_CART_SLOT = device_creator<o2_cart_slot_device>;
 //-------------------------------------------------
 
 device_o2_cart_interface::device_o2_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0)
+	: device_slot_card_interface(mconfig, device)
+	, m_rom(nullptr)
+	, m_rom_size(0)
 {
 }
 
@@ -72,11 +72,11 @@ void device_o2_cart_interface::ram_alloc(uint32_t size)
 //-------------------------------------------------
 //  o2_cart_slot_device - constructor
 //-------------------------------------------------
-o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, O2_CART_SLOT, "Odyssey 2 Cartridge Slot", tag, owner, clock, "o2_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(O2_STD), m_cart(nullptr)
+o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, O2_CART_SLOT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_slot_interface(mconfig, *this)
+	, m_type(O2_STD), m_cart(nullptr)
 {
 }
 

@@ -749,7 +749,7 @@ INTERRUPT_GEN_MEMBER(m63_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( m63, m63_state )
+static MACHINE_CONFIG_START( m63 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_12MHz/4)     /* 3 MHz */
@@ -799,7 +799,7 @@ static MACHINE_CONFIG_DERIVED( atomboy, m63 )
 	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fghtbskt, m63_state )
+static MACHINE_CONFIG_START( fghtbskt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)     /* 3 MHz */

@@ -50,7 +50,7 @@ static INPUT_PORTS_START( sanremmg )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sanremmg, sanremmg_state )
+static MACHINE_CONFIG_START( sanremmg )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, 50000000) // ??? doesn't seem to be ARM, but what is it?
@@ -76,4 +76,4 @@ ROM_START( sanremmg )
 ROM_END
 
 
-GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, driver_device,  0,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, sanremmg_state,  0,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )

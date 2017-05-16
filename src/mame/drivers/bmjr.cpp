@@ -33,7 +33,7 @@ public:
 		, m_beep(*this, "beeper")
 		, m_p_wram(*this, "wram")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
@@ -333,7 +333,7 @@ void bmjr_state::machine_reset()
 	m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
-static MACHINE_CONFIG_START( bmjr, bmjr_state )
+static MACHINE_CONFIG_START( bmjr )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4) //unknown clock / divider
 	MCFG_CPU_PROGRAM_MAP(bmjr_mem)
@@ -379,5 +379,5 @@ DRIVER_INIT_MEMBER(bmjr_state,bmjr)
 {
 }
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY        FULLNAME       FLAGS */
-COMP( 1982, bmjr,   0,      0,       bmjr,      bmjr, bmjr_state,    bmjr,  "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY    FULLNAME           FLAGS */
+COMP( 1982, bmjr,   0,      0,       bmjr,      bmjr,  bmjr_state,  bmjr,  "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)

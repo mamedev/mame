@@ -267,7 +267,7 @@ INTERRUPT_GEN_MEMBER(jackpool_state::jackpool_interrupt)
 }
 
 
-static MACHINE_CONFIG_START( jackpool, jackpool_state )
+static MACHINE_CONFIG_START( jackpool )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) // ?
 	MCFG_CPU_PROGRAM_MAP(jackpool_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?
@@ -289,7 +289,7 @@ static MACHINE_CONFIG_START( jackpool, jackpool_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

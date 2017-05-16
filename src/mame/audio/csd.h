@@ -5,11 +5,11 @@
     Cheap Squeak Deluxe / Artificial Artist Sound Board
 
 ***************************************************************************/
+#ifndef MAME_AUDIO_CSD_H
+#define MAME_AUDIO_CSD_H
 
 #pragma once
 
-#ifndef MAME_AUDIO_CSD_H
-#define MAME_AUDIO_CSD_H
 
 #include "cpu/m68000/m68000.h"
 #include "machine/6821pia.h"
@@ -58,6 +58,6 @@ private:
 };
 
 // device type definition
-extern const device_type MIDWAY_CHEAP_SQUEAK_DELUXE;
+DECLARE_DEVICE_TYPE(MIDWAY_CHEAP_SQUEAK_DELUXE, midway_cheap_squeak_deluxe_device)
 
 #endif // MAME_AUDIO_CSD_H

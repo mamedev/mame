@@ -1046,7 +1046,7 @@ MACHINE_RESET_MEMBER(fortyl_state,undoukai)
 	}
 }
 
-static MACHINE_CONFIG_START( 40love, fortyl_state )
+static MACHINE_CONFIG_START( 40love )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,8000000/2) /* OK */
@@ -1105,7 +1105,7 @@ static MACHINE_CONFIG_START( 40love, fortyl_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( undoukai, fortyl_state )
+static MACHINE_CONFIG_START( undoukai )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,8000000/2)
@@ -1279,6 +1279,6 @@ ROM_START( undoukai )
 	ROM_LOAD( "a17-18.23v", 0x0c00, 0x0400, CRC(3023a1da) SHA1(08ce4c6e99d04b358d66f0588852311d07183619) )  /* ??? */
 ROM_END
 
-GAME( 1984, 40love,   0,        40love,   40love, fortyl_state,   40love,   ROT0, "Taito Corporation", "Forty-Love", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, fieldday, 0,        undoukai, undoukai, fortyl_state, undoukai, ROT0, "Taito Corporation", "Field Day", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 40love,   0,        40love,   40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, fieldday, 0,        undoukai, undoukai, fortyl_state, undoukai, ROT0, "Taito Corporation", "Field Day",            MACHINE_SUPPORTS_SAVE )
 GAME( 1984, undoukai, fieldday, undoukai, undoukai, fortyl_state, undoukai, ROT0, "Taito Corporation", "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )

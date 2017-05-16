@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CST_QL_DISC_INTERFACE = device_creator<cst_ql_disc_interface_t>;
+DEFINE_DEVICE_TYPE(CST_QL_DISC_INTERFACE, cst_ql_disc_interface_device, "ql_qldisc", "CST QL Disc Interface")
 
 
 //-------------------------------------------------
@@ -36,7 +36,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *cst_ql_disc_interface_t::device_rom_region() const
+const tiny_rom_entry *cst_ql_disc_interface_device::device_rom_region() const
 {
 	return ROM_NAME( cst_ql_disc_interface );
 }
@@ -48,11 +48,11 @@ const tiny_rom_entry *cst_ql_disc_interface_t::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  cst_ql_disc_interface_t - constructor
+//  cst_ql_disc_interface_device - constructor
 //-------------------------------------------------
 
-cst_ql_disc_interface_t::cst_ql_disc_interface_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CST_QL_DISC_INTERFACE, "CST QL Disc Interface", tag, owner, clock, "ql_qdisc", __FILE__),
+cst_ql_disc_interface_device::cst_ql_disc_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CST_QL_DISC_INTERFACE, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this)
 {
 }
@@ -62,7 +62,7 @@ cst_ql_disc_interface_t::cst_ql_disc_interface_t(const machine_config &mconfig, 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void cst_ql_disc_interface_t::device_start()
+void cst_ql_disc_interface_device::device_start()
 {
 }
 
@@ -71,7 +71,7 @@ void cst_ql_disc_interface_t::device_start()
 //  read -
 //-------------------------------------------------
 
-uint8_t cst_ql_disc_interface_t::read(address_space &space, offs_t offset, uint8_t data)
+uint8_t cst_ql_disc_interface_device::read(address_space &space, offs_t offset, uint8_t data)
 {
 	return data;
 }
@@ -81,6 +81,6 @@ uint8_t cst_ql_disc_interface_t::read(address_space &space, offs_t offset, uint8
 //  write -
 //-------------------------------------------------
 
-void cst_ql_disc_interface_t::write(address_space &space, offs_t offset, uint8_t data)
+void cst_ql_disc_interface_device::write(address_space &space, offs_t offset, uint8_t data)
 {
 }

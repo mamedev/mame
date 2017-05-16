@@ -610,7 +610,7 @@ static const char *const bowl3d_sample_names[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( meadows, meadows_state )
+static MACHINE_CONFIG_START( meadows )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
@@ -647,7 +647,7 @@ static MACHINE_CONFIG_START( meadows, meadows_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( minferno, meadows_state )
+static MACHINE_CONFIG_START( minferno )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24)     /* 5MHz / 8 / 3 = 208.33 kHz */
@@ -671,7 +671,7 @@ static MACHINE_CONFIG_START( minferno, meadows_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bowl3d, meadows_state )
+static MACHINE_CONFIG_START( bowl3d )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
@@ -881,7 +881,7 @@ DRIVER_INIT_MEMBER(meadows_state,minferno)
  *
  *************************************/
 
-GAMEL( 1978, deadeye,  0, meadows,  meadows, driver_device,  0,        ROT0,  "Meadows Games, Inc.", "Dead Eye", 0, layout_deadeye )
-GAME ( 1978, bowl3d,   0, bowl3d,   bowl3d, driver_device,   0,        ROT90, "Meadows Games, Inc.", "3-D Bowling", MACHINE_NO_SOUND )
-GAMEL( 1978, gypsyjug, 0, meadows,  meadows, meadows_state,  gypsyjug, ROT0,  "Meadows Games, Inc.", "Gypsy Juggler", MACHINE_IMPERFECT_GRAPHICS, layout_gypsyjug )
+GAMEL( 1978, deadeye,  0, meadows,  meadows,  meadows_state, 0,        ROT0,  "Meadows Games, Inc.", "Dead Eye",          0, layout_deadeye )
+GAME ( 1978, bowl3d,   0, bowl3d,   bowl3d,   meadows_state, 0,        ROT90, "Meadows Games, Inc.", "3-D Bowling",       MACHINE_NO_SOUND )
+GAMEL( 1978, gypsyjug, 0, meadows,  meadows,  meadows_state, gypsyjug, ROT0,  "Meadows Games, Inc.", "Gypsy Juggler",     MACHINE_IMPERFECT_GRAPHICS, layout_gypsyjug )
 GAMEL( 1978, minferno, 0, minferno, minferno, meadows_state, minferno, ROT0,  "Meadows Games, Inc.", "Inferno (Meadows)", MACHINE_NO_SOUND, layout_minferno )

@@ -7,14 +7,14 @@
  *
  */
 
+#ifndef MAME_CPU_PSX_SIO_H
+#define MAME_CPU_PSX_SIO_H
+
 #pragma once
 
-#ifndef __PSXSIO_H__
-#define __PSXSIO_H__
 
-
-extern const device_type PSX_SIO0;
-extern const device_type PSX_SIO1;
+DECLARE_DEVICE_TYPE(PSX_SIO0, psxsio0_device)
+DECLARE_DEVICE_TYPE(PSX_SIO1, psxsio1_device)
 
 #define MCFG_PSX_SIO_IRQ_HANDLER(_devcb) \
 	devcb = &psxsio_device::set_irq_handler(*device, DEVCB_##_devcb);
@@ -51,14 +51,12 @@ extern const device_type PSX_SIO1;
 class psxsio_device : public device_t
 {
 public:
-	psxsio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxsio_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_sck_handler(device_t &device, _Object object) { return downcast<psxsio_device &>(device).m_sck_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<psxsio_device &>(device).m_txd_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_dtr_handler(device_t &device, _Object object) { return downcast<psxsio_device &>(device).m_dtr_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_rts_handler(device_t &device, _Object object) { return downcast<psxsio_device &>(device).m_rts_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<psxsio_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sck_handler(device_t &device, Object &&cb) { return downcast<psxsio_device &>(device).m_sck_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<psxsio_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dtr_handler(device_t &device, Object &&cb) { return downcast<psxsio_device &>(device).m_dtr_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rts_handler(device_t &device, Object &&cb) { return downcast<psxsio_device &>(device).m_rts_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
@@ -67,6 +65,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_dsr);
 
 protected:
+	psxsio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -109,4 +109,4 @@ public:
 	psxsio1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-#endif
+#endif // MAME_CPU_PSX_SIO_H

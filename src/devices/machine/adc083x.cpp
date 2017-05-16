@@ -46,13 +46,14 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-const device_type ADC0831 = device_creator<adc0831_device>;
-const device_type ADC0832 = device_creator<adc0832_device>;
-const device_type ADC0834 = device_creator<adc0834_device>;
-const device_type ADC0838 = device_creator<adc0838_device>;
+DEFINE_DEVICE_TYPE(ADC0831, adc0831_device, "adc0831", "ADC0831")
+DEFINE_DEVICE_TYPE(ADC0832, adc0832_device, "adc0832", "ADC0832")
+DEFINE_DEVICE_TYPE(ADC0834, adc0834_device, "adc0834", "ADC0834")
+DEFINE_DEVICE_TYPE(ADC0838, adc0838_device, "adc0838", "ADC0838")
 
-adc083x_device::adc083x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+adc083x_device::adc083x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t mux_bits)
+	: device_t(mconfig, type, tag, owner, clock),
+	m_mux_bits(mux_bits),
 	m_cs(0),
 	m_clk(0),
 	m_di(0),
@@ -69,27 +70,23 @@ adc083x_device::adc083x_device(const machine_config &mconfig, device_type type, 
 }
 
 adc0831_device::adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: adc083x_device(mconfig, ADC0831, "ADC0831", tag, owner, clock, "adc0831", __FILE__)
+	: adc083x_device(mconfig, ADC0831, tag, owner, clock, 0)
 {
-	m_mux_bits = 0;
 }
 
 adc0832_device::adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: adc083x_device(mconfig, ADC0832, "ADC0832", tag, owner, clock, "adc0832", __FILE__)
+	: adc083x_device(mconfig, ADC0832, tag, owner, clock, 2)
 {
-	m_mux_bits = 2;
 }
 
 adc0834_device::adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: adc083x_device(mconfig, ADC0834, "ADC0834", tag, owner, clock, "adc0834", __FILE__)
+	: adc083x_device(mconfig, ADC0834, tag, owner, clock, 3)
 {
-	m_mux_bits = 3;
 }
 
 adc0838_device::adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: adc083x_device(mconfig, ADC0838, "ADC0838", tag, owner, clock, "adc0838", __FILE__)
+	: adc083x_device(mconfig, ADC0838, tag, owner, clock, 4)
 {
-	m_mux_bits = 4;
 }
 
 /*-------------------------------------------------
@@ -117,7 +114,6 @@ void adc083x_device::device_start()
 	save_item( NAME(m_state) );
 	save_item( NAME(m_bit) );
 	save_item( NAME(m_output) );
-	save_item( NAME(m_mux_bits) );
 }
 
 /*-------------------------------------------------

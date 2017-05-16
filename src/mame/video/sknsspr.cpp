@@ -19,12 +19,12 @@
 #include "sknsspr.h"
 #include "screen.h"
 
-const device_type SKNS_SPRITE = device_creator<sknsspr_device>;
+DEFINE_DEVICE_TYPE(SKNS_SPRITE, sknsspr_device, "sknsspr", "SKNS Sprite")
 
 
 sknsspr_device::sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SKNS_SPRITE, "SKNS Sprite", tag, owner, clock, "sknsspr", __FILE__),
-		device_video_interface(mconfig, *this)
+	: device_t(mconfig, SKNS_SPRITE, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
 {
 }
 

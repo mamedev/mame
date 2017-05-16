@@ -29,7 +29,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_LIGHT_PHASER = device_creator<sms_light_phaser_device>;
+DEFINE_DEVICE_TYPE(SMS_LIGHT_PHASER, sms_light_phaser_device, "sms_light_phaser", "Sega SMS Light Phaser")
 
 
 #define LGUN_RADIUS           6
@@ -84,7 +84,7 @@ ioport_constructor sms_light_phaser_device::device_input_ports() const
 //-------------------------------------------------
 
 sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SMS_LIGHT_PHASER, "Sega SMS Light Phaser", tag, owner, clock, "sms_light_phaser", __FILE__),
+	device_t(mconfig, SMS_LIGHT_PHASER, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_sms_control_port_interface(mconfig, *this),
 	m_lphaser_pins(*this, "CTRL_PORT"),

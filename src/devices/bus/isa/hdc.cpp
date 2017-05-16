@@ -157,37 +157,36 @@ static INPUT_PORTS_START( isa_hdc )
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )
 INPUT_PORTS_END
 
-const device_type XT_HDC = device_creator<xt_hdc_device>;
-const device_type EC1841_HDC = device_creator<ec1841_device>;
-const device_type ST11M_HDC = device_creator<st11m_device>;
+DEFINE_DEVICE_TYPE(XT_HDC,     xt_hdc_device, "xt_hdc", "Generic PC-XT Fixed Disk Controller")
+DEFINE_DEVICE_TYPE(EC1841_HDC, ec1841_device, "ec1481", "EX1841 Fixed Disk Controller")
+DEFINE_DEVICE_TYPE(ST11M_HDC,  st11m_device,  "st11m",  "Seagate ST11M Fixed Disk Controller")
 
 xt_hdc_device::xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, XT_HDC, "Generic PC-XT Fixed Disk Controller", tag, owner, clock, "xt_hdc", __FILE__), buffer_ptr(nullptr), csb(0), status(0), error(0), m_current_cmd(0),
-		m_irq_handler(*this),
-		m_drq_handler(*this), drv(0), timer(nullptr), data_cnt(0), hdc_control(0), hdcdma_src(nullptr), hdcdma_dst(nullptr), hdcdma_read(0), hdcdma_write(0), hdcdma_size(0)
+	xt_hdc_device(mconfig, XT_HDC, tag, owner, clock)
 {
 	m_type = STANDARD;
 }
 
-xt_hdc_device::xt_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source), buffer_ptr(nullptr), csb(0), status(0), error(0), m_type(0), m_current_cmd(0),
-		m_irq_handler(*this),
-		m_drq_handler(*this), drv(0), timer(nullptr), data_cnt(0), hdc_control(0), hdcdma_src(nullptr), hdcdma_dst(nullptr), hdcdma_read(0), hdcdma_write(0), hdcdma_size(0)
+xt_hdc_device::xt_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	buffer_ptr(nullptr), csb(0), status(0), error(0), m_type(0), m_current_cmd(0),
+	m_irq_handler(*this),
+	m_drq_handler(*this), drv(0), timer(nullptr), data_cnt(0), hdc_control(0), hdcdma_src(nullptr), hdcdma_dst(nullptr), hdcdma_read(0), hdcdma_write(0), hdcdma_size(0)
 {
 }
 
 ec1841_device::ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		xt_hdc_device(mconfig, EC1841_HDC, "EC1841 Fixed Disk Controller", tag, owner, clock, "ec1481", __FILE__),
-		m_irq_handler(*this),
-		m_drq_handler(*this)
+	xt_hdc_device(mconfig, EC1841_HDC, tag, owner, clock),
+	m_irq_handler(*this),
+	m_drq_handler(*this)
 {
 	m_type = EC1841;
 }
 
 st11m_device::st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		xt_hdc_device(mconfig, ST11M_HDC, "Seagate ST11M Fixed Disk Controller", tag, owner, clock, "st11m", __FILE__),
-		m_irq_handler(*this),
-		m_drq_handler(*this)
+	xt_hdc_device(mconfig, ST11M_HDC, tag, owner, clock),
+	m_irq_handler(*this),
+	m_drq_handler(*this)
 {
 	m_type = ST11M;
 }
@@ -885,7 +884,7 @@ uint8_t xt_hdc_device::data_r()
 			data_cnt = 0;
 		}
 		data = buffer[data_cnt++];
-		if(data_cnt >= ((sector_cnt[drv] * 512) ? (sector_cnt[drv] * 512) : (256 * 512)))
+		if(data_cnt >= ((sector_cnt[drv]!=0) ? (sector_cnt[drv] * 512) : (256 * 512)))
 		{
 			data_cnt = 0;
 			pc_hdc_result(1);
@@ -928,8 +927,8 @@ void xt_hdc_device::set_ready()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_HDC = device_creator<isa8_hdc_device>;
-const device_type ISA8_HDC_EC1841 = device_creator<isa8_hdc_ec1841_device>;
+DEFINE_DEVICE_TYPE(ISA8_HDC,        isa8_hdc_device,        "isa_hdc",        "Fixed Disk Controller Card")
+DEFINE_DEVICE_TYPE(ISA8_HDC_EC1841, isa8_hdc_ec1841_device, "isa_hdc_ec1841", "EC1841 HDC Card")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -973,22 +972,20 @@ ioport_constructor isa8_hdc_device::device_input_ports() const
 //-------------------------------------------------
 
 isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA8_HDC, "Fixed Disk Controller Card", tag, owner, clock, "hdc", __FILE__),
-		device_isa8_card_interface(mconfig, *this),
-		m_hdc(*this,"hdc"), dip(0)
+	isa8_hdc_device(mconfig, ISA8_HDC, tag, owner, clock)
 {
 }
 
-isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_isa8_card_interface(mconfig, *this),
-		m_hdc(*this,"hdc"), dip(0)
+isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_isa8_card_interface(mconfig, *this),
+	m_hdc(*this,"hdc"), dip(0)
 {
 }
 
 isa8_hdc_ec1841_device::isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_hdc_device( mconfig, ISA8_HDC_EC1841, "EC1841 HDC", tag, owner, clock, "hdc_ec1841", __FILE__),
-		m_hdc(*this,"hdc")
+	isa8_hdc_device( mconfig, ISA8_HDC_EC1841, tag, owner, clock),
+	m_hdc(*this,"hdc")
 {
 }
 

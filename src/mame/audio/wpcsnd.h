@@ -6,8 +6,10 @@
  *  Created on: 4/10/2013
  */
 
-#ifndef WPCSND_H_
-#define WPCSND_H_
+#ifndef MAME_AUDIO_WPCSND_H
+#define MAME_AUDIO_WPCSND_H
+
+#pragma once
 
 #include "cpu/m6809/m6809.h"
 #include "sound/ym2151.h"
@@ -51,7 +53,7 @@ public:
 	static void static_set_romregion(device_t &device, const char *tag);
 
 	// callbacks
-	template<class _reply> void set_reply_callback(_reply reply) { m_reply_cb.set_callback(reply); }
+	template <class Reply> void set_reply_callback(Reply &&cb) { m_reply_cb.set_callback(std::forward<Reply>(cb)); }
 
 protected:
 	// overrides
@@ -68,6 +70,6 @@ private:
 	devcb_write_line m_reply_cb;
 };
 
-extern const device_type WPCSND;
+DECLARE_DEVICE_TYPE(WPCSND, wpcsnd_device)
 
-#endif /* WPCSND_H_ */
+#endif // MAME_AUDIO_WPCSND_H

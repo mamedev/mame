@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_ARCADEBOARD__
-#define __A2BUS_ARCADEBOARD__
+#ifndef MAME_BUS_A2BUS_A2ARCADEBD_H
+#define MAME_BUS_A2BUS_A2ARCADEBD_H
+
+#pragma once
 
 #include "a2bus.h"
 #include "video/tms9928a.h"
@@ -26,7 +28,6 @@ class a2bus_arcboard_device:
 public:
 	// construction/destruction
 	a2bus_arcboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	a2bus_arcboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -34,6 +35,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
 
 protected:
+	a2bus_arcboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -46,6 +49,6 @@ protected:
 };
 
 // device type definition
-extern const device_type A2BUS_ARCADEBOARD;
+DECLARE_DEVICE_TYPE(A2BUS_ARCADEBOARD, a2bus_arcboard_device)
 
-#endif  /* __A2BUS_ARCADEBOARD__ */
+#endif  // MAME_BUS_A2BUS_A2ARCADEBD_H

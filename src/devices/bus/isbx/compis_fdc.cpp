@@ -22,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMPIS_FDC = device_creator<compis_fdc_device>;
+DEFINE_DEVICE_TYPE(COMPIS_FDC, compis_fdc_device, "compis_fdc", "Compis FDC")
 
 
 //-------------------------------------------------
@@ -83,7 +83,7 @@ machine_config_constructor compis_fdc_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 compis_fdc_device::compis_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COMPIS_FDC, "Compis FDC", tag, owner, clock, "compis_fdc", __FILE__),
+	device_t(mconfig, COMPIS_FDC, tag, owner, clock),
 	device_isbx_card_interface(mconfig, *this),
 	m_fdc(*this, I8272_TAG),
 	m_floppy0(*this, I8272_TAG":0"),

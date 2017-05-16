@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SAT_CTRL_POINTER_H
+#define MAME_BUS_SAT_CTRL_POINTER_H
 
-#ifndef __SATURN_TRACK__
-#define __SATURN_TRACK__
+#pragma once
 
 
 #include "ctrl.h"
@@ -48,7 +48,6 @@ private:
 
 
 // device type definition
-extern const device_type SATURN_TRACK;
+DECLARE_DEVICE_TYPE(SATURN_TRACK, saturn_track_device)
 
-
-#endif
+#endif // MAME_BUS_SAT_CTRL_POINTER_H

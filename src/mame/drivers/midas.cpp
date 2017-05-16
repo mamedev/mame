@@ -618,7 +618,7 @@ WRITE_LINE_MEMBER(midas_state::screen_vblank_midas)
 
 
 
-static MACHINE_CONFIG_START( livequiz, midas_state )
+static MACHINE_CONFIG_START( livequiz )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
@@ -646,7 +646,7 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hammer, midas_state )
+static MACHINE_CONFIG_START( hammer )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
@@ -888,4 +888,4 @@ ROM_START( hammer )
 ROM_END
 
 GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, livequiz, ROT0, "Andamiro", "Live Quiz Show", 0 )
-GAME( 2000, hammer,   0, hammer,   hammer, driver_device,   0,        ROT0, "Andamiro", "Hammer",         0 )
+GAME( 2000, hammer,   0, hammer,   hammer,   midas_state, 0,        ROT0, "Andamiro", "Hammer",         0 )

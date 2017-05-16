@@ -426,7 +426,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( nomcu, kangaroo_state )
+static MACHINE_CONFIG_START( nomcu )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -572,7 +572,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fnkyfish,  0,        nomcu, fnkyfish, driver_device, 0, ROT90, "Sun Electronics",                 "Funky Fish", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangaroo,  0,        mcu,   kangaroo, driver_device, 0, ROT90, "Sun Electronics",                 "Kangaroo", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangarooa, kangaroo, mcu,   kangaroo, driver_device, 0, ROT90, "Sun Electronics (Atari license)", "Kangaroo (Atari)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangaroob, kangaroo, nomcu, kangaroo, driver_device, 0, ROT90, "bootleg",                         "Kangaroo (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fnkyfish,  0,        nomcu, fnkyfish, kangaroo_state, 0, ROT90, "Sun Electronics",                 "Funky Fish",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangaroo,  0,        mcu,   kangaroo, kangaroo_state, 0, ROT90, "Sun Electronics",                 "Kangaroo",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangarooa, kangaroo, mcu,   kangaroo, kangaroo_state, 0, ROT90, "Sun Electronics (Atari license)", "Kangaroo (Atari)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangaroob, kangaroo, nomcu, kangaroo, kangaroo_state, 0, ROT90, "bootleg",                         "Kangaroo (bootleg)", MACHINE_SUPPORTS_SAVE )

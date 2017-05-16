@@ -18,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_4CGA = device_creator<c64_4cga_device>;
+DEFINE_DEVICE_TYPE(C64_4CGA, c64_4cga_device, "c64_4cga", "C64 Protovision 4 Player Interface")
 
 
 static INPUT_PORTS_START( c64_4player )
@@ -60,7 +60,7 @@ ioport_constructor c64_4cga_device::device_input_ports() const
 //-------------------------------------------------
 
 c64_4cga_device::c64_4cga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_4CGA, "C64 Protovision 4 Player Interface", tag, owner, clock, "c64_4cga", __FILE__),
+	device_t(mconfig, C64_4CGA, tag, owner, clock),
 	device_pet_user_port_interface(mconfig, *this),
 	m_port(0),
 	m_joy3(0xf),

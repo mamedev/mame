@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_AMIGA_ZORRO_BUDDHA_H
+#define MAME_BUS_AMIGA_ZORRO_BUDDHA_H
 
-#ifndef __BUDDHA_H__
-#define __BUDDHA_H__
+#pragma once
 
 #include "zorro.h"
 #include "machine/autoconfig.h"
@@ -78,6 +78,6 @@ private:
 };
 
 // device type definition
-extern const device_type BUDDHA;
+DECLARE_DEVICE_TYPE(BUDDHA, buddha_device)
 
-#endif
+#endif // MAME_BUS_AMIGA_ZORRO_BUDDHA_H

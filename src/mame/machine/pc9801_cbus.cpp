@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PC9801CBUS_SLOT = device_creator<pc9801_slot_device>;
+DEFINE_DEVICE_TYPE(PC9801CBUS_SLOT, pc9801_slot_device, "pc9801_slot", "PC-9801 sound cbus slot")
 
 
 
@@ -53,8 +53,8 @@ device_pc9801cbus_card_interface::~device_pc9801cbus_card_interface()
 //-------------------------------------------------
 
 pc9801_slot_device::pc9801_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, PC9801CBUS_SLOT, "PC-9801 sound cbus slot", tag, owner, clock, "pc9801_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+	device_t(mconfig, PC9801CBUS_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this)
 {
 }
 

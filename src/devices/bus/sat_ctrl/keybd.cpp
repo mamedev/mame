@@ -13,10 +13,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_KEYBD = device_creator<saturn_keybd_device>;
+DEFINE_DEVICE_TYPE(SATURN_KEYBD, saturn_keybd_device, "saturn_keybd", "Sega Saturn Keyboard")
 
 
-static INPUT_PORTS_START( saturn_joy )
+static INPUT_PORTS_START( saturn_keybd )
 	// TODO: there's no info about the keycode used on Saturn keyboard, the following is trial & error with Game Basic software
 	PORT_START("KEY.0") // 0x00 - 0x07
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_UNUSED)
@@ -194,7 +194,7 @@ INPUT_PORTS_END
 
 ioport_constructor saturn_keybd_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( saturn_joy );
+	return INPUT_PORTS_NAME( saturn_keybd );
 }
 
 
@@ -207,10 +207,10 @@ ioport_constructor saturn_keybd_device::device_input_ports() const
 //-------------------------------------------------
 
 saturn_keybd_device::saturn_keybd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, SATURN_KEYBD, "Sega Saturn Keyboard", tag, owner, clock, "saturn_keybd", __FILE__),
-					device_saturn_control_port_interface(mconfig, *this),
-					m_key(*this, "KEY.%u", 0),
-					m_key_s1(*this, "KEYS_1")
+	device_t(mconfig, SATURN_KEYBD, tag, owner, clock),
+	device_saturn_control_port_interface(mconfig, *this),
+	m_key(*this, "KEY.%u", 0),
+	m_key_s1(*this, "KEYS_1")
 {
 	m_ctrl_id = 0x34;
 }

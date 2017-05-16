@@ -41,22 +41,22 @@
 
 #define TEXT_COPY_9COLUMN(ch) (((ch & 0xe0) == 0xc0)&&(vga.attribute.data[0x10]&4))
 
-const device_type CIRRUS_GD5428 = device_creator<cirrus_gd5428_device>;
-const device_type CIRRUS_GD5430 = device_creator<cirrus_gd5430_device>;
+DEFINE_DEVICE_TYPE(CIRRUS_GD5428, cirrus_gd5428_device, "clgd5428", "Cirrus Logic GD5428")
+DEFINE_DEVICE_TYPE(CIRRUS_GD5430, cirrus_gd5430_device, "clgd5430", "Cirrus Logic GD5430")
 
 
 cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cirrus_gd5428_device(mconfig, CIRRUS_GD5428, "Cirrus Logic GD5428", tag, owner, clock, "clgd5428", __FILE__)
+	: cirrus_gd5428_device(mconfig, CIRRUS_GD5428, tag, owner, clock)
 {
 }
 
-cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: svga_device(mconfig, type, name, tag, owner, clock, shortname, source)
+cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: svga_device(mconfig, type, tag, owner, clock)
 {
 }
 
 cirrus_gd5430_device::cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cirrus_gd5428_device(mconfig, CIRRUS_GD5430, "Cirrus Logic GD5430", tag, owner, clock, "clgd5430", __FILE__)
+	: cirrus_gd5428_device(mconfig, CIRRUS_GD5430, tag, owner, clock)
 {
 }
 

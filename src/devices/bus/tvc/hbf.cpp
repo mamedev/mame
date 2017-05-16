@@ -48,7 +48,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type TVC_HBF = device_creator<tvc_hbf_device>;
+DEFINE_DEVICE_TYPE(TVC_HBF, tvc_hbf_device, "tvc_hbf", "HBF floppy interface")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -59,10 +59,10 @@ const device_type TVC_HBF = device_creator<tvc_hbf_device>;
 //-------------------------------------------------
 
 tvc_hbf_device::tvc_hbf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, TVC_HBF, "HBF floppy interface", tag, owner, clock, "tvc_hbf", __FILE__),
-		device_tvcexp_interface( mconfig, *this ),
-		m_fdc(*this, "fdc"), m_rom(nullptr), m_ram(nullptr), m_rom_bank(0)
-	{
+	: device_t(mconfig, TVC_HBF, tag, owner, clock),
+	device_tvcexp_interface( mconfig, *this ),
+	m_fdc(*this, "fdc"), m_rom(nullptr), m_ram(nullptr), m_rom_bank(0)
+{
 }
 
 

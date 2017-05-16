@@ -262,7 +262,7 @@ DRIVER_INIT_MEMBER(prophet600_state, prophet600)
 }
 
 // master crystal is 8 MHz, all clocks derived from there
-static MACHINE_CONFIG_START( prophet600, prophet600_state )
+static MACHINE_CONFIG_START( prophet600 )
 	MCFG_CPU_ADD(MAINCPU_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)

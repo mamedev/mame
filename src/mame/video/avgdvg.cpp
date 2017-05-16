@@ -233,7 +233,7 @@ void dvg_device::dvg_draw_to(int x, int y, int intensity)
 	if (((x | y) & 0x400) == 0)
 		vg_add_point_buf((xmin + x - 512) << 16,
 							(ymin + 512 - y) << 16,
-							VECTOR_COLOR111(7), intensity << 4);
+							vector_device::color111(7), intensity << 4);
 }
 
 int dvg_device::handler_2() //dvg_gostrobe
@@ -674,7 +674,7 @@ int avg_device::handler_7() // avg_strobe3
 
 	if ((m_op & 5) == 0)
 	{
-		vg_add_point_buf(m_xpos, m_ypos, VECTOR_COLOR111(m_color),
+		vg_add_point_buf(m_xpos, m_ypos, vector_device::color111(m_color),
 							(((m_int_latch >> 1) == 1)? m_intensity: m_int_latch & 0xe) << 4);
 	}
 
@@ -947,7 +947,7 @@ int avg_starwars_device::handler_7() // starwars_strobe3
 
 	if ((m_op & 5) == 0)
 	{
-		vg_add_point_buf(m_xpos, m_ypos, VECTOR_COLOR111(m_color),
+		vg_add_point_buf(m_xpos, m_ypos, vector_device::color111(m_color),
 							((m_int_latch >> 1) * m_intensity) >> 3);
 	}
 
@@ -1187,7 +1187,7 @@ int avg_bzone_device::handler_7() // bzone_strobe3
 
 	if ((m_op & 5) == 0)
 	{
-		vg_add_point_buf(m_xpos, m_ypos, VECTOR_COLOR111(7),
+		vg_add_point_buf(m_xpos, m_ypos, vector_device::color111(7),
 							(((m_int_latch >> 1) == 1)? m_intensity: m_int_latch & 0xe) << 4);
 	}
 
@@ -1219,7 +1219,7 @@ int avg_tomcat_device::handler_7() // starwars_strobe3
 
 	if ((m_op & 5) == 0)
 	{
-		vg_add_point_buf(m_xpos, m_ypos, VECTOR_COLOR111(m_color),
+		vg_add_point_buf(m_xpos, m_ypos, vector_device::color111(m_color),
 							((m_int_latch >> 1) * m_intensity) >> 3);
 	}
 
@@ -1467,8 +1467,8 @@ void avgdvg_device::static_set_vector_tag(device_t &device, const char *tag)
 	downcast<avgdvg_device &>(device).m_vector.set_tag(tag);
 }
 
-avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_vector(*this, finder_base::DUMMY_TAG)
 {
 	m_pc = 0;
@@ -1524,55 +1524,55 @@ avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, co
 }
 
 dvg_device::dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		avgdvg_device(mconfig, DVG, "Atari DVG", tag, owner, clock, "dvg", __FILE__)
+	avgdvg_device(mconfig, DVG, tag, owner, clock)
 {
 }
 
 avg_device::avg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		avgdvg_device(mconfig, AVG, "Atari AVG", tag, owner, clock, "avg", __FILE__)
+	avg_device(mconfig, AVG, tag, owner, clock)
 {
 }
 
-avg_device::avg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		avgdvg_device(mconfig, type, name, tag, owner, clock, shortname, source)
+avg_device::avg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	avgdvg_device(mconfig, type, tag, owner, clock)
 {
 }
 
 
 avg_tempest_device::avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		avg_device(mconfig, AVG_TEMPEST, "Atari AVG (Tempest)", tag, owner, clock, "avg_tempest", __FILE__)
+	avg_device(mconfig, AVG_TEMPEST, tag, owner, clock)
 {
 }
 avg_mhavoc_device::avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		avg_device(mconfig, AVG_MHAVOC, "Atari AVG (Major Havoc)", tag, owner, clock, "avg_mhavoc", __FILE__)
+	avg_device(mconfig, AVG_MHAVOC, tag, owner, clock)
 {
 }
 
 avg_starwars_device::avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		avg_device(mconfig, AVG_STARWARS, "Atari AVG (Star Wars)", tag, owner, clock, "avg_starwars", __FILE__)
+	avg_device(mconfig, AVG_STARWARS, tag, owner, clock)
 {
 }
 
 avg_quantum_device::avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		avg_device(mconfig, AVG_QUANTUM, "Atari AVG (Quantum)", tag, owner, clock, "avg_quantum", __FILE__)
+	avg_device(mconfig, AVG_QUANTUM, tag, owner, clock)
 {
 }
 
 avg_bzone_device::avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		avg_device(mconfig, AVG_BZONE, "Atari AVG (Battle Zone)", tag, owner, clock, "avg_bzone", __FILE__)
+	avg_device(mconfig, AVG_BZONE, tag, owner, clock)
 {
 }
 
 avg_tomcat_device::avg_tomcat_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		avg_device(mconfig, AVG_TOMCAT, "Atari AVG (TomCat)", tag, owner, clock, "avg_tomcat", __FILE__)
+	avg_device(mconfig, AVG_TOMCAT, tag, owner, clock)
 {
 }
 
-const device_type DVG = device_creator<dvg_device>;
-const device_type AVG = device_creator<avg_device>;
-const device_type AVG_TEMPEST = device_creator<avg_tempest_device>;
-const device_type AVG_MHAVOC = device_creator<avg_mhavoc_device>;
-const device_type AVG_STARWARS = device_creator<avg_starwars_device>;
-const device_type AVG_QUANTUM = device_creator<avg_quantum_device>;
-const device_type AVG_BZONE = device_creator<avg_bzone_device>;
-const device_type AVG_TOMCAT = device_creator<avg_tomcat_device>;
+DEFINE_DEVICE_TYPE(DVG,          dvg_device,          "dvg",          "Atari DVG")
+DEFINE_DEVICE_TYPE(AVG,          avg_device,          "avg",          "Atari AVG")
+DEFINE_DEVICE_TYPE(AVG_TEMPEST,  avg_tempest_device,  "avg_tempest",  "Atari AVG (Tempest)")
+DEFINE_DEVICE_TYPE(AVG_MHAVOC,   avg_mhavoc_device,   "avg_mhavoc",   "Atari AVG (Major Havoc)")
+DEFINE_DEVICE_TYPE(AVG_STARWARS, avg_starwars_device, "avg_starwars", "Atari AVG (Star Wars)")
+DEFINE_DEVICE_TYPE(AVG_QUANTUM,  avg_quantum_device,  "avg_quantum",  "Atari AVG (Quantum)")
+DEFINE_DEVICE_TYPE(AVG_BZONE,    avg_bzone_device,    "avg_bzone",    "Atari AVG (Battle Zone)")
+DEFINE_DEVICE_TYPE(AVG_TOMCAT,   avg_tomcat_device,   "avg_tomcat",   "Atari AVG (TomCat)")

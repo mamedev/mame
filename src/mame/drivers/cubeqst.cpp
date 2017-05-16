@@ -48,7 +48,9 @@ public:
 				"rdac6", "ldac6",
 				"rdac7", "ldac7"
 			}),
-			m_generic_paletteram_16(*this, "paletteram") { }
+			m_generic_paletteram_16(*this, "paletteram")
+	{
+	}
 
 	std::unique_ptr<uint8_t[]> m_depth_buffer;
 	int m_video_field;
@@ -510,7 +512,7 @@ WRITE16_MEMBER( cubeqst_state::sound_dac_w )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cubeqst, cubeqst_state )
+static MACHINE_CONFIG_START( cubeqst )
 	MCFG_CPU_ADD("main_cpu", M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(m68k_program_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cubeqst_state,  vblank)
@@ -767,5 +769,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cubeqst,  0,       cubeqst, cubeqst, driver_device, 0, ROT0, "Simutrek", "Cube Quest (01/04/84)", 0 )
-GAME( 1983, cubeqsta, cubeqst, cubeqst, cubeqst, driver_device, 0, ROT0, "Simutrek", "Cube Quest (12/30/83)", 0 )
+GAME( 1983, cubeqst,  0,       cubeqst, cubeqst, cubeqst_state, 0, ROT0, "Simutrek", "Cube Quest (01/04/84)", 0 )
+GAME( 1983, cubeqsta, cubeqst, cubeqst, cubeqst, cubeqst_state, 0, ROT0, "Simutrek", "Cube Quest (12/30/83)", 0 )

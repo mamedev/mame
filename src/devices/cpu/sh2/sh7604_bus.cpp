@@ -23,7 +23,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type SH7604_BUS = device_creator<sh7604_bus_device>;
+DEFINE_DEVICE_TYPE(SH7604_BUS, sh7604_bus_device, "sh7604bus", "SH7604 BUS Controller")
 
 
 //**************************************************************************
@@ -109,9 +109,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 sh7604_bus_device::sh7604_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SH7604_BUS, "sh7604_bus_longname", tag, owner, clock, "sh7604_bus", __FILE__),
-	device_memory_interface(mconfig, *this),
-	m_space_config("regs", ENDIANNESS_BIG, 16, 4, 0, nullptr, *ADDRESS_MAP_NAME(bus_regs))
+	: device_t(mconfig, SH7604_BUS, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("regs", ENDIANNESS_BIG, 16, 4, 0, nullptr, *ADDRESS_MAP_NAME(bus_regs))
 {
 }
 

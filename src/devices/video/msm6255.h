@@ -6,11 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_VIDEO_MSM6255_H
+#define MAME_VIDEO_MSM6255_H
+
 #pragma once
-
-#ifndef __MSM6255__
-#define __MSM6255__
-
 
 
 
@@ -44,7 +43,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 
 private:
 	// registers
@@ -87,8 +86,6 @@ private:
 
 
 // device type definition
-extern const device_type MSM6255;
+DECLARE_DEVICE_TYPE(MSM6255, msm6255_device)
 
-
-
-#endif
+#endif // MAME_VIDEO_MSM6255_H

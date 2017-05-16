@@ -20,10 +20,10 @@
 //  intv_voice_device - constructor
 //-------------------------------------------------
 
-const device_type INTV_ROM_VOICE = device_creator<intv_voice_device>;
+DEFINE_DEVICE_TYPE(INTV_ROM_VOICE, intv_voice_device, "intv_voice", "Intellivision Intellivoice Expansion")
 
 intv_voice_device::intv_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intv_rom_device(mconfig, INTV_ROM_VOICE, "Intellivision Intellivoice Expansion", tag, owner, clock, "intv_voice", __FILE__),
+	: intv_rom_device(mconfig, INTV_ROM_VOICE, tag, owner, clock),
 	m_speech(*this, "sp0256_speech"),
 	m_subslot(*this, "subslot"),
 	m_ramd0_enabled(false),
@@ -122,4 +122,21 @@ WRITE16_MEMBER(intv_voice_device::write_speech)
 {
 	if (ACCESSING_BITS_0_7)
 		return m_speech->spb640_w(space, offset, data, mem_mask);
+}
+
+
+READ16_MEMBER(intv_voice_device::read_rom80)
+{
+	if (m_ram88_enabled && offset >= 0x800)
+		return m_subslot->read_ram(space, offset & 0x7ff, mem_mask);
+	else
+		return m_subslot->read_rom80(space, offset, mem_mask);
+}
+
+READ16_MEMBER(intv_voice_device::read_romd0)
+{
+	if (m_ramd0_enabled && offset < 0x800)
+		return m_subslot->read_ram(space, offset, mem_mask);
+	else
+		return m_subslot->read_romd0(space, offset, mem_mask);
 }

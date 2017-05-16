@@ -5,11 +5,11 @@
     Namco C148 - CPU Bus Manager
 
 ***************************************************************************/
+#ifndef MAME_MACHINE_NAMCO_C148_H
+#define MAME_MACHINE_NAMCO_C148_H
 
 #pragma once
 
-#ifndef __NAMCO_C148DEV_H__
-#define __NAMCO_C148DEV_H__
 
 
 
@@ -130,7 +130,7 @@ private:
 
 
 // device type definition
-extern const device_type NAMCO_C148;
+DECLARE_DEVICE_TYPE(NAMCO_C148, namco_c148_device)
 
 
 
@@ -140,4 +140,4 @@ extern const device_type NAMCO_C148;
 
 
 
-#endif
+#endif // MAME_MACHINE_NAMCO_C148_H

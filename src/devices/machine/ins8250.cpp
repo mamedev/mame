@@ -87,49 +87,47 @@ History:
 #include "emu.h"
 #include "machine/ins8250.h"
 
-const device_type INS8250 = device_creator<ins8250_device>;
-const device_type NS16450 = device_creator<ns16450_device>;
-const device_type NS16550 = device_creator<ns16550_device>;
-const device_type PC16552D = device_creator<pc16552_device>;
+DEFINE_DEVICE_TYPE(INS8250,  ins8250_device, "ins8250",  "National Semiconductor INS8250 UART")
+DEFINE_DEVICE_TYPE(NS16450,  ns16450_device, "ns16450",  "National Semiconductor NS16450 UART")
+DEFINE_DEVICE_TYPE(NS16550,  ns16550_device, "ns16550",  "National Semiconductor NS16550 UART")
+DEFINE_DEVICE_TYPE(PC16552D, pc16552_device, "pc16552d", "National Semiconductor PC16552D UART")
 
-ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
-		: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
-			device_serial_interface(mconfig, *this),
-			m_out_tx_cb(*this),
-			m_out_dtr_cb(*this),
-			m_out_rts_cb(*this),
-			m_out_int_cb(*this),
-			m_out_out1_cb(*this),
-			m_out_out2_cb(*this),
-			m_rxd(1),
-			m_dcd(1),
-			m_dsr(1),
-			m_ri(1),
-			m_cts(1)
+ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dev_type device_type)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_serial_interface(mconfig, *this)
+	, m_device_type(device_type)
+	, m_out_tx_cb(*this)
+	, m_out_dtr_cb(*this)
+	, m_out_rts_cb(*this)
+	, m_out_int_cb(*this)
+	, m_out_out1_cb(*this)
+	, m_out_out2_cb(*this)
+	, m_rxd(1)
+	, m_dcd(1)
+	, m_dsr(1)
+	, m_ri(1)
+	, m_cts(1)
 {
 	m_regs.ier = 0;
 }
 
 ins8250_device::ins8250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: ins8250_uart_device(mconfig, INS8250, "National Semiconductor INS8250", tag, owner, clock, "ins8250")
+	: ins8250_uart_device(mconfig, INS8250, tag, owner, clock, dev_type::INS8250)
 {
-	m_device_type = TYPE_INS8250;
 }
 
 ns16450_device::ns16450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: ins8250_uart_device(mconfig, NS16450, "National Semiconductor NS16450", tag, owner, clock, "ns16450")
+	: ins8250_uart_device(mconfig, NS16450, tag, owner, clock, dev_type::NS16450)
 {
-	m_device_type = TYPE_NS16450;
 }
 
 ns16550_device::ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: ins8250_uart_device(mconfig, NS16550, "National Semiconductor NS16550", tag, owner, clock, "ns16550")
+	: ins8250_uart_device(mconfig, NS16550, tag, owner, clock, dev_type::NS16550)
 {
-	m_device_type = TYPE_NS16550;
 }
 
-pc16552_device::pc16552_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PC16552D, "National Semiconductor PC16552D", tag, owner, clock, "pc16552d", __FILE__)
+pc16552_device::pc16552_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PC16552D, tag, owner, clock)
 {
 }
 
@@ -221,7 +219,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			{
 				m_regs.thr = data;
 				m_regs.lsr &= ~0x20;
-				if((m_device_type >= TYPE_NS16550) && (m_regs.fcr & 1))
+				if((m_device_type >= dev_type::NS16550) && (m_regs.fcr & 1))
 					push_tx(data);
 				clear_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 				if(m_regs.lsr & 0x40)
@@ -356,7 +354,7 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
 				data = (m_regs.dl & 0xff);
 			else
 			{
-				if((m_device_type >= TYPE_NS16550) && (m_regs.fcr & 1))
+				if((m_device_type >= dev_type::NS16550) && (m_regs.fcr & 1))
 					m_regs.rbr = pop_rx();
 				else
 				{

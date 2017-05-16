@@ -17,8 +17,9 @@ TODO:
 **********************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "hcd62121.h"
+
+#include "debugger.h"
 
 
 enum
@@ -44,11 +45,11 @@ constexpr u8 FLAG_CL = 0x01;
 constexpr u8 FLAG_ZH = 0x10;
 
 
-const device_type HCD62121 = device_creator<hcd62121_cpu_device>;
+DEFINE_DEVICE_TYPE(HCD62121, hcd62121_cpu_device, "hcd62121_cpu_device", "Hitachi HCD62121")
 
 
 hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, HCD62121, "Hitachi HCD62121", tag, owner, clock, "hcd62121", __FILE__)
+	: cpu_device(mconfig, HCD62121, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 24, 0)
 	, m_prev_pc(0)
 	, m_sp(0)

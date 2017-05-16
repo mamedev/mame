@@ -238,7 +238,7 @@ void drmicro_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( drmicro, drmicro_state )
+static MACHINE_CONFIG_START( drmicro )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MCLK/6) /* 3.072MHz? */
@@ -277,7 +277,7 @@ static MACHINE_CONFIG_START( drmicro, drmicro_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(drmicro_state, pcm_w))          /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)  /* 6 KHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -322,4 +322,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, drmicro, 0, drmicro, drmicro, driver_device, 0, ROT270, "Sanritsu", "Dr. Micro", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, drmicro, 0, drmicro, drmicro, drmicro_state, 0, ROT270, "Sanritsu", "Dr. Micro", MACHINE_SUPPORTS_SAVE )

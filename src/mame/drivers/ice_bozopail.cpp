@@ -20,10 +20,10 @@ http://www.highwaygames.com/arcade-machines/bozo-s-grand-prize-game-6751/
 #include "emu.h"
 #include "speaker.h"
 
-class ice_bozopail : public driver_device
+class ice_bozopail_state : public driver_device
 {
 public:
-	ice_bozopail(const machine_config &mconfig, device_type type, const char *tag)
+	ice_bozopail_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 	//  ,m_maincpu(*this, "maincpu")
 	{ }
@@ -39,16 +39,16 @@ INPUT_PORTS_END
 
 
 
-void ice_bozopail::machine_start()
+void ice_bozopail_state::machine_start()
 {
 }
 
-void ice_bozopail::machine_reset()
+void ice_bozopail_state::machine_reset()
 {
 }
 
 
-static MACHINE_CONFIG_START( ice_bozoice_bozo, ice_bozopail )
+static MACHINE_CONFIG_START( ice_bozoice_bozo )
 
 	/* basic machine hardware */
 //  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
@@ -67,4 +67,4 @@ ROM_START( ice_bozo )
 	ROM_LOAD( "ICE-BOZO.U9",  0x100000, 0x100000, CRC(26fd9d60) SHA1(41fe8d42db1eb16b413bd5a0f16bf0d081c3cc97) )
 ROM_END
 
-GAME( 1997?, ice_bozo,  0,    ice_bozoice_bozo, ice_bozoice_bozo, driver_device,  0, ROT0, "Innovative Creations in Entertainment", "Bozo's Pail Toss (v2.07)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1997?, ice_bozo,  0,    ice_bozoice_bozo, ice_bozoice_bozo, ice_bozopail_state,  0, ROT0, "Innovative Creations in Entertainment", "Bozo's Pail Toss (v2.07)", MACHINE_IS_SKELETON_MECHANICAL )

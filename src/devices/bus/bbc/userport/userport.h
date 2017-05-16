@@ -25,10 +25,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_BBC_USERPORT_USERPORT_H
+#define MAME_BUS_BBC_USERPORT_USERPORT_H
 
-#ifndef __BBC_USERPORT_SLOT__
-#define __BBC_USERPORT_SLOT__
+#pragma once
 
 
 //**************************************************************************
@@ -43,7 +43,6 @@ class device_bbc_userport_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_bbc_userport_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_bbc_userport_interface();
 
 	virtual uint8_t read_portb() { return 0xff; };
@@ -51,6 +50,8 @@ public:
 	virtual uint8_t read_cb2() { return 0xff; };
 
 protected:
+	device_bbc_userport_interface(const machine_config &mconfig, device_t &device);
+
 	bbc_userport_device *m_slot;
 };
 
@@ -62,7 +63,6 @@ class bbc_userport_device : public device_t,
 public:
 	// construction/destruction
 	bbc_userport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~bbc_userport_device() {}
 
 	uint8_t read_portb();
 	uint8_t read_cb1();
@@ -76,7 +76,7 @@ protected:
 };
 
 // device type definition
-extern const device_type BBC_USERPORT_SLOT;
+DECLARE_DEVICE_TYPE(BBC_USERPORT_SLOT, bbc_userport_device)
 
 
 //**************************************************************************
@@ -100,4 +100,4 @@ extern const device_type BBC_USERPORT_SLOT;
 SLOT_INTERFACE_EXTERN( bbc_userport_devices );
 
 
-#endif
+#endif // MAME_BUS_BBC_USERPORT_USERPORT_H

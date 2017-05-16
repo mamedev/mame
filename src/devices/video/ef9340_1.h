@@ -9,10 +9,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_VIDEO_EF9340_1_H
+#define MAME_VIDEO_EF9340_1_H
 
-#ifndef __EF9340_1_H__
-#define __EF9340_1_H__
+#pragma once
 
 
 
@@ -47,7 +47,7 @@ protected:
 	void ef9340_scanline(int vpos);
 
 	/* timers */
-	static const device_timer_id TIMER_LINE = 0;
+	static constexpr device_timer_id TIMER_LINE = 0;
 
 	emu_timer *m_line_timer;
 
@@ -75,6 +75,6 @@ protected:
 
 
 // device type definition
-extern const device_type EF9340_1;
+DECLARE_DEVICE_TYPE(EF9340_1, ef9340_1_device)
 
-#endif  /* __EF9340_1_H__ */
+#endif // MAME_VIDEO_EF9340_1_H

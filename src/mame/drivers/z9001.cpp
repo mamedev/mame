@@ -56,7 +56,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_WRITE8_MEMBER(port88_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
@@ -187,7 +187,7 @@ static const gfx_layout z9001_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-WRITE8_MEMBER( z9001_state::kbd_put )
+void z9001_state::kbd_put(u8 data)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(0x0025, data);
 }
@@ -197,7 +197,7 @@ static GFXDECODE_START( z9001 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( z9001, z9001_state )
+static MACHINE_CONFIG_START( z9001 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_9_8304MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(z9001_mem)
@@ -225,7 +225,7 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(z9001_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(z9001_state, kbd_put))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z9001_timer", z9001_state, timer_callback, attotime::from_msec(10))
 
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_9_8304MHz / 4)
@@ -304,10 +304,10 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT    CLASS        INIT  COMPANY      FULLNAME       FLAGS */
-COMP( 1984, z9001,    0,       0,       z9001,     z9001, driver_device,   0,   "Robotron", "Z9001 (KC 85/1.10)", MACHINE_NOT_WORKING )
-COMP( 1986, kc85_111, z9001,   0,       z9001,     z9001, driver_device,   0,   "Robotron", "KC 85/1.11", MACHINE_NOT_WORKING )
-COMP( 1987, kc87_10,  z9001,   0,       z9001,     z9001, driver_device,   0,   "Robotron", "KC 87.10", MACHINE_NOT_WORKING )
-COMP( 1987, kc87_11,  z9001,   0,       z9001,     z9001, driver_device,   0,   "Robotron", "KC 87.11", MACHINE_NOT_WORKING )
-COMP( 1987, kc87_20,  z9001,   0,       z9001,     z9001, driver_device,   0,   "Robotron", "KC 87.20", MACHINE_NOT_WORKING )
-COMP( 1987, kc87_21,  z9001,   0,       z9001,     z9001, driver_device,   0,   "Robotron", "KC 87.21", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT  COMPANY     FULLNAME              FLAGS
+COMP( 1984, z9001,    0,       0,      z9001,   z9001, z9001_state, 0,    "Robotron", "Z9001 (KC 85/1.10)", MACHINE_NOT_WORKING )
+COMP( 1986, kc85_111, z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 85/1.11",         MACHINE_NOT_WORKING )
+COMP( 1987, kc87_10,  z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 87.10",           MACHINE_NOT_WORKING )
+COMP( 1987, kc87_11,  z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 87.11",           MACHINE_NOT_WORKING )
+COMP( 1987, kc87_20,  z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 87.20",           MACHINE_NOT_WORKING )
+COMP( 1987, kc87_21,  z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 87.21",           MACHINE_NOT_WORKING )

@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_4TBA = device_creator<c64_4tba_device>;
+DEFINE_DEVICE_TYPE(C64_4TBA, c64_4tba_device, "c64_4tba", "C64 Tie Break Adapter")
 
 
 //-------------------------------------------------
@@ -63,7 +63,7 @@ ioport_constructor c64_4tba_device::device_input_ports() const
 //-------------------------------------------------
 
 c64_4tba_device::c64_4tba_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_4TBA, "C64 Tie Break Adapter", tag, owner, clock, "c64_4tba", __FILE__),
+	device_t(mconfig, C64_4TBA, tag, owner, clock),
 	device_pet_user_port_interface(mconfig, *this)
 {
 }

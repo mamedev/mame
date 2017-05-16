@@ -193,7 +193,7 @@ static GFXDECODE_START( murogmbl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x2,  0x0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
+static MACHINE_CONFIG_START( murogmbl )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 1000000) /* Z80? */
 	MCFG_CPU_PROGRAM_MAP(murogmbl_map)
@@ -234,4 +234,4 @@ ROM_START(murogmbl)
 	ROM_LOAD( "74s288.a8",  0x0000, 0x0020, CRC(fc35201c) SHA1(4549e228c48992e0d10957f029b89a547392e72b) )
 ROM_END
 
-GAME( 1982, murogmbl,  murogem,   murogmbl, murogmbl, driver_device, 0, ROT0, "bootleg?", "Muroge Monaco (bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, murogmbl,  murogem,   murogmbl, murogmbl, murogmbl_state, 0, ROT0, "bootleg?", "Muroge Monaco (bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

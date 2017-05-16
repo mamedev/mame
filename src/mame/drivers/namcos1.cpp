@@ -1012,7 +1012,7 @@ GFXDECODE_END
     LPF info : Fco = 3.3KHz , g = -12dB/oct
 */
 
-static MACHINE_CONFIG_START( ns1, namcos1_state )
+static MACHINE_CONFIG_START( ns1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,XTAL_49_152MHz/32)

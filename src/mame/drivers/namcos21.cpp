@@ -520,7 +520,7 @@ Filter Board
 */
 #include "emu.h"
 #include "includes/namcos21.h"
-#include "includes/namcoic.h"
+#include "machine/namcoic.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
@@ -1870,7 +1870,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 	}
 }
 
-static MACHINE_CONFIG_START( configure_c148_standard, namcos21_state )
+static MACHINE_CONFIG_START( configure_c148_standard )
 	MCFG_NAMCO_C148_ADD("master_intc","maincpu",true)
 	namco_c148_device::link_c148_device(*device,"slave_intc");
 	MCFG_NAMCO_C148_EXT1_CB(WRITE8(namcos21_state, sound_reset_w))
@@ -1881,7 +1881,7 @@ static MACHINE_CONFIG_START( configure_c148_standard, namcos21_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( namcos21, namcos21_state )
+static MACHINE_CONFIG_START( namcos21 )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
@@ -1938,7 +1938,7 @@ static MACHINE_CONFIG_START( namcos21, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)
+	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -1948,7 +1948,7 @@ static MACHINE_CONFIG_START( namcos21, namcos21_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( driveyes, namcos21_state )
+static MACHINE_CONFIG_START( driveyes )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(driveyes_master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
@@ -1999,7 +1999,7 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)
+	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -2008,7 +2008,7 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( winrun, namcos21_state )
+static MACHINE_CONFIG_START( winrun )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(winrun_master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
@@ -2062,7 +2062,7 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)
+	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 

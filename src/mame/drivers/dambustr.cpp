@@ -251,7 +251,7 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 
 
 
-static MACHINE_CONFIG_START( dambustr, dambustr_state )
+static MACHINE_CONFIG_START( dambustr )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(dambustr_map)
@@ -370,6 +370,6 @@ ROM_START( dambustruk )
 ROM_END
 
 
-GAME( 1981, dambustr,   0,        dambustr, dambustr, dambustr_state,   dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )
-GAME( 1981, dambustra,  dambustr, dambustr, dambustr, dambustr_state,   dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", 0 )
-GAME( 1981, dambustruk, dambustr, dambustr, dambustruk, dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (UK)", 0 )
+GAME( 1981, dambustr,   0,        dambustr, dambustr,   dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )
+GAME( 1981, dambustra,  dambustr, dambustr, dambustr,   dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", 0 )
+GAME( 1981, dambustruk, dambustr, dambustr, dambustruk, dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (UK)",        0 )

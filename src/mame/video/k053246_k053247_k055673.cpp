@@ -39,7 +39,7 @@ The sprite RAM format is very similar to the 053245.
 #include "konami_helper.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 /*****************************************************************************
@@ -162,7 +162,7 @@ READ16_MEMBER( k053247_device::k055673_5bpp_rom_word_r ) // 5bpp
 			romofs /= 2;
 			return ROM8[romofs];
 		default:
-			LOG(("55673_rom_word_r: Unknown read offset %x\n", offset));
+			LOG("55673_rom_word_r: Unknown read offset %x\n", offset);
 			break;
 	}
 
@@ -214,7 +214,7 @@ READ8_MEMBER( k053247_device::k053246_r )
 	}
 	else
 	{
-//      LOG(("%04x: read from unknown 053246 address %x\n", space.device().safe_pc(), offset));
+//      LOG("%04x: read from unknown 053246 address %x\n", space.device().safe_pc(), offset);
 		return 0;
 	}
 }
@@ -914,10 +914,10 @@ void k053247_device::zdrawgfxzoom32GP(
 
 
 
-const device_type K055673 = device_creator<k055673_device>;
+DEFINE_DEVICE_TYPE(K055673, k055673_device, "k055673", "K055673 Sprite Generator")
 
 k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: k053247_device(mconfig, K055673, "K053246 & K055673 Sprite Generator", tag, owner, clock, "k055673", __FILE__)
+	: k053247_device(mconfig, K055673, tag, owner, clock)
 {
 }
 
@@ -1067,19 +1067,16 @@ void k055673_device::device_start()
 
 
 
-const device_type K053246 = device_creator<k053247_device>;
+DEFINE_DEVICE_TYPE(K053247, k053247_device, "k053247", "K053246/K053247 Sprite Generator")
+device_type const K053246 = K053247;
 
 k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K053246, "K053246 & K053247 Sprite Generator", tag, owner, clock, "k053247", __FILE__),
-		device_video_interface(mconfig, *this),
-		device_gfx_interface(mconfig, *this),
-		m_gfx_num(0)
+	: k053247_device(mconfig, K053247, tag, owner, clock)
 {
-	clear_all();
 }
 
-k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		device_gfx_interface(mconfig, *this, nullptr),
 		m_gfx_num(0)

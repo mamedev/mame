@@ -128,7 +128,7 @@ better notes (complete chip lists) for each board still needed
 
 #include "emu.h"
 #include "includes/namcos2.h"
-#include "includes/namcoic.h"
+#include "machine/namcoic.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
@@ -593,7 +593,7 @@ static GFXDECODE_START( namcos21 )
 	GFXDECODE_ENTRY( "obj_board1", 0x000000, tile_layout,  0x000, 0x20 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( gal3, gal3_state )
+static MACHINE_CONFIG_START( gal3 )
 	MCFG_CPU_ADD("maincpu", M68020, 49152000/2)
 	MCFG_CPU_PROGRAM_MAP(cpu_mst_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)
@@ -644,12 +644,12 @@ static MACHINE_CONFIG_START( gal3, gal3_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140_16g", 8000000/374)
-	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)    //to be verified
+	MCFG_C140_BANK_TYPE(SYSTEM21)    //to be verified
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	MCFG_C140_ADD("c140_16a", 8000000/374)
-	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)
+	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -866,6 +866,6 @@ ROM_START( gal3 )
 	DISK_IMAGE_READONLY( "gal3_ld2", 0, NO_DUMP )
 ROM_END
 
-/*    YEAR, NAME,     PARENT, MACHINE,  INPUT,  INIT, MONITOR,  COMPANY,   FULLNAME,                       FLAGS */
-GAMEL( 199?, gal3,    0,     gal3,    gal3, driver_device,    0,    ROT0,  "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )
+/*    YEAR,  NAME     PARENT, MACHINE, INPUT, STATE,      INIT, MONITOR, COMPANY, FULLNAME,                                   FLAGS */
+GAMEL( 199?, gal3,    0,      gal3,    gal3,  gal3_state, 0,    ROT0,    "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )
 //GAMEL( 199?, gal3zlgr,    0,        gal3,    gal3, driver_device,    0, ROT0,  "Namco", "Galaxian 3 - Theater 6 J2 : Attack of The Zolgear", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )

@@ -19,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_LASER128 = device_creator<a2bus_laser128_device>;
+DEFINE_DEVICE_TYPE(A2BUS_LASER128, a2bus_laser128_device, "a2laser128", "VTech Laser 128 Internal Device")
 
 MACHINE_CONFIG_FRAGMENT( a2laser128 )
 MACHINE_CONFIG_END
@@ -42,16 +42,15 @@ machine_config_constructor a2bus_laser128_device::device_mconfig_additions() con
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_laser128_device::a2bus_laser128_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_laser128_device::a2bus_laser128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_slot7_bank(0), m_slot7_ram_bank(0)
 
 {
 }
 
 a2bus_laser128_device::a2bus_laser128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_LASER128, "VTech Laser 128 Internal Device", tag, owner, clock, "a2laser128", __FILE__),
-	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_slot7_bank(0), m_slot7_ram_bank(0)
+	a2bus_laser128_device(mconfig, A2BUS_LASER128, tag, owner, clock)
 {
 }
 

@@ -185,7 +185,7 @@ void pgm_028_025_state::igs025_to_igs028_callback( void )
 }
 
 
-MACHINE_CONFIG_START( pgm_028_025_ol, pgm_028_025_state )
+MACHINE_CONFIG_START( pgm_028_025_ol )
 	MCFG_FRAGMENT_ADD(pgmbase)
 
 	MCFG_CPU_MODIFY("maincpu")

@@ -11,9 +11,6 @@
 #include "ti8x.h"
 
 
-extern device_type const TI8X_TEE_CONNECTOR;
-
-
 namespace bus { namespace ti8x {
 
 class tee_connector_device : public device_t, public device_ti8x_link_port_interface
@@ -41,5 +38,8 @@ protected:
 };
 
 } } // namespace bus::ti8x
+
+
+DECLARE_DEVICE_TYPE_NS(TI8X_TEE_CONNECTOR, bus::ti8x, tee_connector_device)
 
 #endif // MAME_DEVICES_BUS_TI8X_TEECONN_H

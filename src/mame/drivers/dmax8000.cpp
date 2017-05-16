@@ -65,7 +65,7 @@ private:
 	required_device<z80dart_device> m_dart1;
 	required_device<z80dart_device> m_dart2;
 	required_device<z80ctc_device> m_ctc;
-	required_device<fd1793_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 };
 
@@ -112,7 +112,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(dmax8000_io, AS_IO, 8, dmax8000_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("dart1", z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("pio1", z80pio_device, read, write) // fdd controls
@@ -167,7 +167,7 @@ static SLOT_INTERFACE_START( floppies )
 	SLOT_INTERFACE( "drive0", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( dmax8000, dmax8000_state )
+static MACHINE_CONFIG_START( dmax8000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz ) // no idea what crystal is used, but 4MHz clock is confirmed
 	MCFG_CPU_PROGRAM_MAP(dmax8000_mem)
@@ -222,5 +222,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT     CLASS            INIT      COMPANY      FULLNAME       FLAGS */
+//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT     CLAS            INIT      COMPANY    FULLNAME        FLAGS
 COMP( 1981, dmax8000,  0,       0,      dmax8000,   dmax8000, dmax8000_state, dmax8000, "Datamax", "Datamax 8000", MACHINE_NOT_WORKING )

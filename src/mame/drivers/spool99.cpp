@@ -355,7 +355,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( spool99, spool99_state )
+static MACHINE_CONFIG_START( spool99 )
 
 	MCFG_CPU_ADD("maincpu", Z80, 24000000/8)
 	MCFG_CPU_PROGRAM_MAP(spool99_map)
@@ -379,7 +379,7 @@ static MACHINE_CONFIG_START( spool99, spool99_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END

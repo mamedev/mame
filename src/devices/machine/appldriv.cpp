@@ -24,7 +24,7 @@ static inline apple525_floppy_image_device *get_device(device_t *device)
 	assert(device != nullptr);
 	assert(device->type() == FLOPPY_APPLE);
 
-	return (apple525_floppy_image_device *) downcast<apple525_floppy_image_device *>(device);
+	return downcast<apple525_floppy_image_device *>(device);
 }
 
 static int apple525_enable_mask = 1;
@@ -56,7 +56,7 @@ device_t *apple525_get_device_by_type(device_t *device, int ftype, int drive)
 	return nullptr;
 }
 
-void apple525_set_enable_lines(device_t *device,int enable_mask)
+void apple525_set_enable_lines(device_t *device, int enable_mask)
 {
 	apple525_enable_mask = enable_mask;
 }
@@ -291,14 +291,14 @@ int apple525_read_status(device_t *device)
 }
 
 // device type definition
-const device_type FLOPPY_APPLE = device_creator<apple525_floppy_image_device>;
+DEFINE_DEVICE_TYPE(FLOPPY_APPLE, apple525_floppy_image_device, "floppy_apple", "Apple Disk II")
 
 //-------------------------------------------------
 //  apple525_floppy_image_device - constructor
 //-------------------------------------------------
 
 apple525_floppy_image_device::apple525_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: legacy_floppy_image_device(mconfig, FLOPPY_APPLE, "Apple Disk II", tag, owner, clock, "floppy_apple", __FILE__)
+	: legacy_floppy_image_device(mconfig, FLOPPY_APPLE, tag, owner, clock)
 {
 }
 

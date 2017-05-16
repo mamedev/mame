@@ -1339,7 +1339,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tandy200_state::tandy200_tp_tick)
 	m_tp = !m_tp;
 }
 
-static MACHINE_CONFIG_START( kc85, kc85_state )
+static MACHINE_CONFIG_START( kc85 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(kc85_mem)
@@ -1389,7 +1389,7 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc8201, pc8201_state )
+static MACHINE_CONFIG_START( pc8201 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(pc8201_mem)
@@ -1449,7 +1449,7 @@ static MACHINE_CONFIG_DERIVED( pc8300, pc8201 )
 	MCFG_RAM_EXTRA_OPTIONS("64K,96K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( trsm100, trsm100_state )
+static MACHINE_CONFIG_START( trsm100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(kc85_mem)
@@ -1504,7 +1504,7 @@ static MACHINE_CONFIG_DERIVED( tandy102, trsm100 )
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tandy200, tandy200_state )
+static MACHINE_CONFIG_START( tandy200 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(tandy200_mem)
@@ -1621,13 +1621,13 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME */
-COMP( 1983, kc85,       0,      0,      kc85,       kc85,       driver_device, 0,      "Kyosei",            "Kyotronic 85 (Japan)",     0 )
-COMP( 1983, m10,        kc85,   0,      kc85,       olivm10,    driver_device, 0,      "Olivetti",          "M-10",                     0 )
-//COMP( 1983, m10m,     kc85,   0,      kc85,       olivm10,    driver_device, 0,      "Olivetti",          "M-10 Modem (US)",          0 )
-COMP( 1983, trsm100,    0,      0,      trsm100,    kc85,       driver_device, 0,      "Tandy Radio Shack", "TRS-80 Model 100",         0 )
-COMP( 1986, tandy102,   trsm100,0,      tandy102,   kc85,       driver_device, 0,      "Tandy Radio Shack", "Tandy 102",                0 )
-COMP( 1983, pc8201,     0,      0,      pc8201,     pc8201,     driver_device, 0,      "NEC",               "PC-8201 (Japan)",          MACHINE_NOT_WORKING ) // keyboard layout wrong
-COMP( 1983, pc8201a,    pc8201, 0,      pc8201,     pc8201a,    driver_device, 0,      "NEC",               "PC-8201A",                 0 )
-COMP( 1987, npc8300,    pc8201, 0,      pc8300,     pc8201a,    driver_device, 0,      "NEC",               "PC-8300",                  MACHINE_NOT_WORKING )
-COMP( 1984, tandy200,   0,      0,      tandy200,   kc85,       driver_device, 0,      "Tandy Radio Shack", "Tandy 200",                0 )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE           INIT    COMPANY              FULLNAME */
+COMP( 1983, kc85,       0,      0,      kc85,       kc85,       kc85_state,     0,      "Kyosei",            "Kyotronic 85 (Japan)",     0 )
+COMP( 1983, m10,        kc85,   0,      kc85,       olivm10,    kc85_state,     0,      "Olivetti",          "M-10",                     0 )
+//COMP( 1983, m10m,     kc85,   0,      kc85,       olivm10,    kc85_state,     0,      "Olivetti",          "M-10 Modem (US)",          0 )
+COMP( 1983, trsm100,    0,      0,      trsm100,    kc85,       trsm100_state,  0,      "Tandy Radio Shack", "TRS-80 Model 100",         0 )
+COMP( 1986, tandy102,   trsm100,0,      tandy102,   kc85,       trsm100_state,  0,      "Tandy Radio Shack", "Tandy 102",                0 )
+COMP( 1983, pc8201,     0,      0,      pc8201,     pc8201,     pc8201_state,   0,      "NEC",               "PC-8201 (Japan)",          MACHINE_NOT_WORKING ) // keyboard layout wrong
+COMP( 1983, pc8201a,    pc8201, 0,      pc8201,     pc8201a,    pc8201_state,   0,      "NEC",               "PC-8201A",                 0 )
+COMP( 1987, npc8300,    pc8201, 0,      pc8300,     pc8201a,    pc8201_state,   0,      "NEC",               "PC-8300",                  MACHINE_NOT_WORKING )
+COMP( 1984, tandy200,   0,      0,      tandy200,   kc85,       tandy200_state, 0,      "Tandy Radio Shack", "Tandy 200",                0 )

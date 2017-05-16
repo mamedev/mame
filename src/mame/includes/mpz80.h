@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
+#ifndef MAME_INCLUDES_MPZ80_H
+#define MAME_INCLUDES_MPZ80_H
 
-#ifndef __MPZ80__
-#define __MPZ80__
+#pragma once
 
 #include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
@@ -38,7 +38,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<s100_bus_t> m_s100;
+	required_device<s100_bus_device> m_s100;
 	required_memory_region m_rom;
 	optional_shared_ptr<uint8_t> m_map_ram;
 	required_ioport m_16c;
@@ -93,4 +93,4 @@ public:
 	DECLARE_DRIVER_INIT(mpz80);
 };
 
-#endif
+#endif // MAME_INCLUDES_MPZ80_H

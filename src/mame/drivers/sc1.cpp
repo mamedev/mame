@@ -170,7 +170,7 @@ static INPUT_PORTS_START( sc1 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sc1, sc1_state )
+static MACHINE_CONFIG_START( sc1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(sc1_mem)
@@ -198,5 +198,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                           FULLNAME       FLAGS */
-COMP( 1989, sc1,    0,      0,       sc1,       sc1, driver_device,     0,  "VEB Mikroelektronik Erfurt", "Schachcomputer SC1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  STATE       INIT  COMPANY                       FULLNAME              FLAGS
+COMP( 1989, sc1,  0,      0,       sc1,     sc1,   sc1_state,  0,    "VEB Mikroelektronik Erfurt", "Schachcomputer SC1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

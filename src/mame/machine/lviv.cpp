@@ -2,7 +2,7 @@
 // copyright-holders:Krzysztof Strzecha
 /***************************************************************************
 
-  machine.c
+  lviv.cpp
 
   Functions to emulate general aspects of PK-01 Lviv (RAM, ROM, interrupts,
   I/O ports)
@@ -208,8 +208,6 @@ void lviv_state::machine_reset()
 	membank("bank3")->set_base(mem + 0x010000);
 	membank("bank4")->set_base(mem + 0x010000);
 
-	/*machine().scheduler().timer_pulse(TIME_IN_NSEC(200), FUNC(lviv_draw_pixel));*/
-
 	/*memset(m_ram->pointer(), 0, sizeof(unsigned char)*0xffff);*/
 }
 
@@ -229,29 +227,29 @@ Lviv snapshot files (SAV)
 1411D - 1412A:  ??? (something additional)
 *******************************************************************************/
 
-void lviv_state::lviv_setup_snapshot (uint8_t * data)
+void lviv_state::lviv_setup_snapshot(uint8_t * data)
 {
 	unsigned char lo,hi;
 
 	/* Set registers */
 	lo = data[0x14112] & 0x0ff;
 	hi = data[0x14111] & 0x0ff;
-	m_maincpu->set_state_int(I8085_BC, (hi << 8) | lo);
+	m_maincpu->set_state_int(i8080_cpu_device::I8085_BC, (hi << 8) | lo);
 	lo = data[0x14114] & 0x0ff;
 	hi = data[0x14113] & 0x0ff;
-	m_maincpu->set_state_int(I8085_DE, (hi << 8) | lo);
+	m_maincpu->set_state_int(i8080_cpu_device::I8085_DE, (hi << 8) | lo);
 	lo = data[0x14116] & 0x0ff;
 	hi = data[0x14115] & 0x0ff;
-	m_maincpu->set_state_int(I8085_HL, (hi << 8) | lo);
+	m_maincpu->set_state_int(i8080_cpu_device::I8085_HL, (hi << 8) | lo);
 	lo = data[0x14118] & 0x0ff;
 	hi = data[0x14117] & 0x0ff;
-	m_maincpu->set_state_int(I8085_AF, (hi << 8) | lo);
+	m_maincpu->set_state_int(i8080_cpu_device::I8085_AF, (hi << 8) | lo);
 	lo = data[0x14119] & 0x0ff;
 	hi = data[0x1411a] & 0x0ff;
-	m_maincpu->set_state_int(I8085_SP, (hi << 8) | lo);
+	m_maincpu->set_state_int(i8080_cpu_device::I8085_SP, (hi << 8) | lo);
 	lo = data[0x1411b] & 0x0ff;
 	hi = data[0x1411c] & 0x0ff;
-	m_maincpu->set_state_int(I8085_PC, (hi << 8) | lo);
+	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, (hi << 8) | lo);
 
 	/* Memory dump */
 	memcpy (m_ram->pointer(), data+0x0011, 0xc000);
@@ -267,12 +265,12 @@ void lviv_state::lviv_setup_snapshot (uint8_t * data)
 
 void lviv_state::dump_registers()
 {
-	logerror("PC   = %04x\n", (unsigned) m_maincpu->state_int(I8085_PC));
-	logerror("SP   = %04x\n", (unsigned) m_maincpu->state_int(I8085_SP));
-	logerror("AF   = %04x\n", (unsigned) m_maincpu->state_int(I8085_AF));
-	logerror("BC   = %04x\n", (unsigned) m_maincpu->state_int(I8085_BC));
-	logerror("DE   = %04x\n", (unsigned) m_maincpu->state_int(I8085_DE));
-	logerror("HL   = %04x\n", (unsigned) m_maincpu->state_int(I8085_HL));
+	logerror("PC   = %04x\n", (unsigned) m_maincpu->state_int(i8080_cpu_device::I8085_PC));
+	logerror("SP   = %04x\n", (unsigned) m_maincpu->state_int(i8080_cpu_device::I8085_SP));
+	logerror("AF   = %04x\n", (unsigned) m_maincpu->state_int(i8080_cpu_device::I8085_AF));
+	logerror("BC   = %04x\n", (unsigned) m_maincpu->state_int(i8080_cpu_device::I8085_BC));
+	logerror("DE   = %04x\n", (unsigned) m_maincpu->state_int(i8080_cpu_device::I8085_DE));
+	logerror("HL   = %04x\n", (unsigned) m_maincpu->state_int(i8080_cpu_device::I8085_HL));
 }
 
 image_verify_result lviv_state::lviv_verify_snapshot(uint8_t * data, uint32_t size)

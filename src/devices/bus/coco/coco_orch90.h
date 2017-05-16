@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
+#ifndef MAME_BUS_COCO_COCO_ORCH90_H
+#define MAME_BUS_COCO_COCO_ORCH90_H
+
 #pragma once
 
-#ifndef __COCO_ORCH90_H__
-#define __COCO_ORCH90_H__
-
-#include "sound/dac.h"
 #include "cococart.h"
+#include "sound/dac.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -36,6 +36,6 @@ private:
 
 
 // device type definition
-extern const device_type COCO_ORCH90;
+DECLARE_DEVICE_TYPE(COCO_ORCH90, coco_orch90_device)
 
-#endif  /* __COCO_ORCH90_H__ */
+#endif // MAME_BUS_COCO_COCO_ORCH90_H

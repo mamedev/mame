@@ -29,7 +29,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_RTC = device_creator<wangpc_rtc_device>;
+DEFINE_DEVICE_TYPE(WANGPC_RTC, wangpc_rtc_device, "wangpc_rtc", "Wang PC-PM040-B Remote Telecommunication Controller")
 
 
 //-------------------------------------------------
@@ -187,7 +187,7 @@ ioport_constructor wangpc_rtc_device::device_input_ports() const
 //-------------------------------------------------
 
 wangpc_rtc_device::wangpc_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WANGPC_RTC, "Wang PC-PM040-B", tag, owner, clock, "wangpc_rtc", __FILE__),
+	device_t(mconfig, WANGPC_RTC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
 	m_dmac(*this, AM9517A_TAG),

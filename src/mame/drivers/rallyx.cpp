@@ -841,7 +841,7 @@ INTERRUPT_GEN_MEMBER(rallyx_state::jungler_vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( rallyx, rallyx_state )
+static MACHINE_CONFIG_START( rallyx )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
@@ -885,7 +885,7 @@ static MACHINE_CONFIG_START( rallyx, rallyx_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( jungler, rallyx_state )
+static MACHINE_CONFIG_START( jungler )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
@@ -1409,20 +1409,20 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, rallyx,   0,        rallyx,   rallyx, driver_device,   0, ROT0,  "Namco", "Rally X (32k Ver.?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallyxa,  rallyx,   rallyx,   rallyx, driver_device,   0, ROT0,  "Namco", "Rally X", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallyxm,  rallyx,   rallyx,   rallyx, driver_device,   0, ROT0,  "Namco (Midway license)", "Rally X (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallyxmr, rallyx,   rallyx,   rallyx, driver_device,   0, ROT0,  "bootleg (Model Racing)", "Rally X (Model Racing bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, nrallyx,  0,        rallyx,   nrallyx, driver_device,  0, ROT0,  "Namco", "New Rally X", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, nrallyxb, nrallyx,  rallyx,   nrallyx, driver_device,  0, ROT0,  "Namco", "New Rally X (bootleg?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, jungler,  0,        jungler,  jungler, driver_device,  0, ROT90, "Konami", "Jungler", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, junglers, jungler,  jungler,  jungler, driver_device,  0, ROT90, "Konami (Stern Electronics license)", "Jungler (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jackler,  jungler,  jungler,  jungler, driver_device,  0, ROT90, "bootleg", "Jackler (Jungler bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, savanna,  jungler,  jungler,  jungler, driver_device,  0, ROT90, "bootleg (Olympia)", "Savanna (Jungler bootleg)", MACHINE_SUPPORTS_SAVE ) // or licensed from Konami?
-GAME( 1982, tactcian, 0,        tactcian, tactcian, driver_device, 0, ROT90, "Konami (Sega license)", "Tactician (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tactcian2,tactcian, tactcian, tactcian, driver_device, 0, ROT90, "Konami (Sega license)", "Tactician (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, locomotn, 0,        locomotn, locomotn, driver_device, 0, ROT90, "Konami (Centuri license)", "Loco-Motion", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, gutangtn, locomotn, locomotn, locomotn, driver_device, 0, ROT90, "Konami (Sega license)", "Guttang Gottong", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, cottong,  locomotn, locomotn, locomotn, driver_device, 0, ROT90, "bootleg", "Cotocoto Cottong", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, locoboot, locomotn, locomotn, locomotn, driver_device, 0, ROT90, "bootleg", "Loco-Motion (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, commsega, 0,        commsega, commsega, driver_device, 0, ROT90, "Sega", "Commando (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyx,   0,        rallyx,   rallyx,   rallyx_state, 0, ROT0,  "Namco", "Rally X (32k Ver.?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyxa,  rallyx,   rallyx,   rallyx,   rallyx_state, 0, ROT0,  "Namco", "Rally X", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyxm,  rallyx,   rallyx,   rallyx,   rallyx_state, 0, ROT0,  "Namco (Midway license)", "Rally X (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyxmr, rallyx,   rallyx,   rallyx,   rallyx_state, 0, ROT0,  "bootleg (Model Racing)", "Rally X (Model Racing bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, nrallyx,  0,        rallyx,   nrallyx,  rallyx_state, 0, ROT0,  "Namco", "New Rally X", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, nrallyxb, nrallyx,  rallyx,   nrallyx,  rallyx_state, 0, ROT0,  "Namco", "New Rally X (bootleg?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, jungler,  0,        jungler,  jungler,  rallyx_state, 0, ROT90, "Konami", "Jungler", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, junglers, jungler,  jungler,  jungler,  rallyx_state, 0, ROT90, "Konami (Stern Electronics license)", "Jungler (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jackler,  jungler,  jungler,  jungler,  rallyx_state, 0, ROT90, "bootleg", "Jackler (Jungler bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, savanna,  jungler,  jungler,  jungler,  rallyx_state, 0, ROT90, "bootleg (Olympia)", "Savanna (Jungler bootleg)", MACHINE_SUPPORTS_SAVE ) // or licensed from Konami?
+GAME( 1982, tactcian, 0,        tactcian, tactcian, rallyx_state, 0, ROT90, "Konami (Sega license)", "Tactician (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tactcian2,tactcian, tactcian, tactcian, rallyx_state, 0, ROT90, "Konami (Sega license)", "Tactician (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, locomotn, 0,        locomotn, locomotn, rallyx_state, 0, ROT90, "Konami (Centuri license)", "Loco-Motion", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, gutangtn, locomotn, locomotn, locomotn, rallyx_state, 0, ROT90, "Konami (Sega license)", "Guttang Gottong", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, cottong,  locomotn, locomotn, locomotn, rallyx_state, 0, ROT90, "bootleg", "Cotocoto Cottong", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, locoboot, locomotn, locomotn, locomotn, rallyx_state, 0, ROT90, "bootleg", "Loco-Motion (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, commsega, 0,        commsega, commsega, rallyx_state, 0, ROT90, "Sega", "Commando (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

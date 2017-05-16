@@ -6,16 +6,13 @@
 
 **********************************************************************/
 
+#ifndef MAME_VIDEO_HUC6261_H
+#define MAME_VIDEO_HUC6261_H
 
-#ifndef __HUC6261_H_
-#define __HUC6261_H_
+#pragma once
 
 #include "video/huc6270.h"
 #include "video/huc6272.h"
-
-/* Screen timing stuff */
-#define HUC6261_WPF         1365    /* width of a line in frame including blanking areas */
-#define HUC6261_LPF         263     /* max number of lines in a single frame */
 
 
 #define MCFG_HUC6261_VDC1(_tag) \
@@ -32,6 +29,10 @@ class huc6261_device :  public device_t,
 						public device_video_interface
 {
 public:
+	// Screen timing stuff
+	static constexpr unsigned WPF = 1365;   // width of a line in frame including blanking areas
+	static constexpr unsigned LPF = 263;    // max number of lines in a single frame
+
 	// construction/destruction
 	huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -77,12 +78,12 @@ private:
 	emu_timer   *m_timer;
 	std::unique_ptr<bitmap_rgb32>  m_bmp;
 	int32_t   m_uv_lookup[65536][3];
+
 	inline uint32_t yuv2rgb(uint32_t yuv);
 	inline void apply_pal_offs(uint16_t *pix_data);
 };
 
 
-extern const device_type HUC6261;
+DECLARE_DEVICE_TYPE(HUC6261, huc6261_device)
 
-
-#endif
+#endif // MAME_VIDEO_HUC6261_H

@@ -57,6 +57,7 @@
 #include "coco_multi.h"
 #include "coco_232.h"
 #include "coco_orch90.h"
+#include "coco_gmc.h"
 #include "coco_pak.h"
 #include "coco_fdc.h"
 
@@ -74,6 +75,7 @@
 static SLOT_INTERFACE_START(coco_cart_slot1_3)
 	SLOT_INTERFACE("rs232", COCO_232)
 	SLOT_INTERFACE("orch90", COCO_ORCH90)
+	SLOT_INTERFACE("games_master", COCO_PAK_GMC)
 	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
 	SLOT_INTERFACE("pak", COCO_PAK)
 SLOT_INTERFACE_END
@@ -82,6 +84,7 @@ static SLOT_INTERFACE_START(coco_cart_slot4)
 	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
 	SLOT_INTERFACE("rs232", COCO_232)
 	SLOT_INTERFACE("orch90", COCO_ORCH90)
+	SLOT_INTERFACE("games_master", COCO_PAK_GMC)
 	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
 	SLOT_INTERFACE("pak", COCO_PAK)
 SLOT_INTERFACE_END
@@ -111,7 +114,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_MULTIPAK = device_creator<coco_multipak_device>;
+DEFINE_DEVICE_TYPE(COCO_MULTIPAK, coco_multipak_device, "coco_multipack", "CoCo Multi-Pak Interface")
 
 
 
@@ -124,8 +127,9 @@ const device_type COCO_MULTIPAK = device_creator<coco_multipak_device>;
 //-------------------------------------------------
 
 coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, COCO_MULTIPAK, "CoCo Multi-Pak Interface", tag, owner, clock, "coco_multipak", __FILE__),
-		device_cococart_interface( mconfig, *this ), m_select(0)
+	: device_t(mconfig, COCO_MULTIPAK, tag, owner, clock)
+	, device_cococart_interface(mconfig, *this)
+	, m_slots(*this, "slot%u", 1), m_select(0)
 {
 }
 
@@ -136,12 +140,6 @@ coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const 
 
 void coco_multipak_device::device_start()
 {
-	// identify slots
-	m_slots[0] = dynamic_cast<cococart_slot_device *>(subdevice(SLOT1_TAG));
-	m_slots[1] = dynamic_cast<cococart_slot_device *>(subdevice(SLOT2_TAG));
-	m_slots[2] = dynamic_cast<cococart_slot_device *>(subdevice(SLOT3_TAG));
-	m_slots[3] = dynamic_cast<cococart_slot_device *>(subdevice(SLOT4_TAG));
-
 	// install $FF7F handler
 	write8_delegate wh = write8_delegate(FUNC(coco_multipak_device::ff7f_write), this);
 	machine().device(":maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xFF7F, 0xFF7F, wh);

@@ -16,6 +16,7 @@
 #include "cpu/m6809/m6809.h"
 #include "bus/coco/coco_232.h"
 #include "bus/coco/coco_orch90.h"
+#include "bus/coco/coco_gmc.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_fdc.h"
 #include "bus/coco/coco_multi.h"
@@ -146,7 +147,7 @@ static SLOT_INTERFACE_START( dragon_alpha_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_35_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( dragon_base, dragon_state )
+static MACHINE_CONFIG_START( dragon_base )
 	MCFG_DEVICE_MODIFY(":")
 	MCFG_DEVICE_CLOCK(XTAL_4_433619MHz)
 
@@ -213,7 +214,7 @@ static MACHINE_CONFIG_DERIVED( dragon32, dragon_base )
 	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( dragon64, dragon_base, dragon64_state )
+static MACHINE_CONFIG_DERIVED( dragon64, dragon_base )
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -233,13 +234,13 @@ static MACHINE_CONFIG_DERIVED_CLASS( dragon64, dragon_base, dragon64_state )
 	MCFG_SOFTWARE_LIST_ADD("dragon_os9_list", "dragon_os9")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( dragon200e, dragon64, dragon200e_state )
+static MACHINE_CONFIG_DERIVED( dragon200e, dragon64 )
 	// video hardware
 	MCFG_DEVICE_MODIFY(VDG_TAG)
 	MCFG_MC6847_CHARROM_CALLBACK(dragon200e_state, char_rom_r)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( d64plus, dragon64, d64plus_state )
+static MACHINE_CONFIG_DERIVED( d64plus, dragon64 )
 	// internal ram
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -269,7 +270,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( d64plus, dragon64, d64plus_state )
 	//
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( dgnalpha, dragon_base, dragon_alpha_state )
+static MACHINE_CONFIG_DERIVED( dgnalpha, dragon_base )
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -386,11 +387,11 @@ ROM_START(dgnalpha)
 	ROM_LOAD("alpha_ba.rom",    0x8000,  0x4000, CRC(84f68bf9) SHA1(1983b4fb398e3dd9668d424c666c5a0b3f1e2b69))
 ROM_END
 
-/*     YEAR     NAME        PARENT    COMPAT  MACHINE     INPUT   CLASS           INIT    COMPANY                          FULLNAME                       FLAGS */
-COMP(  1982,    dragon32,   0,        0,      dragon32,   dragon, driver_device,  0,      "Dragon Data Ltd",               "Dragon 32",                   0 )
-COMP(  1983,    dragon64,   dragon32, 0,      dragon64,   dragon, driver_device,  0,      "Dragon Data Ltd",               "Dragon 64",                   0 )
-COMP(  1985,    dragon200,  dragon32, 0,      dragon64,   dragon, driver_device,  0,      "Eurohard S.A.",                 "Dragon 200",                  0 )
-COMP(  1985,    dragon200e, dragon32, 0,      dragon200e, dragon, driver_device,  0,      "Eurohard S.A.",                 "Dragon 200-E",                MACHINE_NOT_WORKING )
-COMP(  1985,    d64plus,    dragon32, 0,      d64plus,    dragon, driver_device,  0,      "Dragon Data Ltd / Compusense",  "Dragon 64 Plus",              MACHINE_NOT_WORKING )
-COMP(  1983,    tanodr64,   dragon32, 0,      tanodr64,   dragon, driver_device,  0,      "Dragon Data Ltd / Tano Ltd",    "Tano Dragon 64 (NTSC)",       0 )
-COMP(  1984,    dgnalpha,   dragon32, 0,      dgnalpha,   dragon, driver_device,  0,      "Dragon Data Ltd",               "Dragon Professional (Alpha)", 0 )
+//    YEAR     NAME        PARENT    COMPAT  MACHINE     INPUT   CLASS               INIT    COMPANY                          FULLNAME                       FLAGS
+COMP( 1982,    dragon32,   0,        0,      dragon32,   dragon, dragon_state,       0,      "Dragon Data Ltd",               "Dragon 32",                   0 )
+COMP( 1983,    dragon64,   dragon32, 0,      dragon64,   dragon, dragon64_state,     0,      "Dragon Data Ltd",               "Dragon 64",                   0 )
+COMP( 1985,    dragon200,  dragon32, 0,      dragon64,   dragon, dragon64_state,     0,      "Eurohard S.A.",                 "Dragon 200",                  0 )
+COMP( 1985,    dragon200e, dragon32, 0,      dragon200e, dragon, dragon200e_state,   0,      "Eurohard S.A.",                 "Dragon 200-E",                MACHINE_NOT_WORKING )
+COMP( 1985,    d64plus,    dragon32, 0,      d64plus,    dragon, d64plus_state,      0,      "Dragon Data Ltd / Compusense",  "Dragon 64 Plus",              MACHINE_NOT_WORKING )
+COMP( 1983,    tanodr64,   dragon32, 0,      tanodr64,   dragon, dragon64_state,     0,      "Dragon Data Ltd / Tano Ltd",    "Tano Dragon 64 (NTSC)",       0 )
+COMP( 1984,    dgnalpha,   dragon32, 0,      dgnalpha,   dragon, dragon_alpha_state, 0,      "Dragon Data Ltd",               "Dragon Professional (Alpha)", 0 )

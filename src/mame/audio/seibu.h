@@ -24,6 +24,10 @@
     * = encrypted
 
 ***************************************************************************/
+#ifndef MAME_AUDIO_SEIBU_H
+#define MAME_AUDIO_SEIBU_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/okiadpcm.h"
@@ -91,7 +95,7 @@ private:
 	};
 };
 
-extern const device_type SEIBU_SOUND;
+DECLARE_DEVICE_TYPE(SEIBU_SOUND, seibu_sound_device)
 
 
 // SEI80BU (Z80 program decryption)
@@ -110,7 +114,7 @@ protected:
 	virtual void rom_bank_updated() override { }
 };
 
-extern const device_type SEI80BU;
+DECLARE_DEVICE_TYPE(SEI80BU, sei80bu_device)
 
 // Seibu ADPCM device
 
@@ -143,7 +147,7 @@ private:
 	required_region_ptr<uint8_t> m_base;
 };
 
-extern const device_type SEIBU_ADPCM;
+DECLARE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device)
 
 /**************************************************************************/
 
@@ -182,3 +186,5 @@ extern const device_type SEIBU_ADPCM;
 	devcb = &seibu_sound_device::set_ym_write_callback(*device, DEVCB_##_devcb);
 
 /**************************************************************************/
+
+#endif // MAME_AUDIO_SEIBU_H

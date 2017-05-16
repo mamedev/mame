@@ -7,10 +7,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_GAMEGEAR_SMSCRTLADP_H
+#define MAME_BUS_GAMEGEAR_SMSCRTLADP_H
 
-#ifndef __SMS_CTRL_ADAPTOR__
-#define __SMS_CTRL_ADAPTOR__
+#pragma once
 
 
 #include "ggext.h"
@@ -49,7 +49,7 @@ private:
 
 
 // device type definition
-extern const device_type SMS_CTRL_ADAPTOR;
+DECLARE_DEVICE_TYPE(SMS_CTRL_ADAPTOR, sms_ctrl_adaptor_device)
 
 
-#endif
+#endif // MAME_BUS_GAMEGEAR_SMSCRTLADP_H

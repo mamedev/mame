@@ -15,8 +15,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VC4000_CART_SLOT = device_creator<vc4000_cart_slot_device>;
-const device_type H21_CART_SLOT = device_creator<h21_cart_slot_device>;
+DEFINE_DEVICE_TYPE(VC4000_CART_SLOT, vc4000_cart_slot_device, "vc4000_cart_slot", "Interton VC 4000 Cartridge Slot")
+DEFINE_DEVICE_TYPE(H21_CART_SLOT,    h21_cart_slot_device,    "h21_cart_slot",    "TRQ H-21 Cartridge Slot")
 
 //**************************************************************************
 //    VC4000 Cartridges Interface
@@ -74,20 +74,17 @@ void device_vc4000_cart_interface::ram_alloc(uint32_t size)
 //  vc4000_cart_slot_device - constructor
 //-------------------------------------------------
 vc4000_cart_slot_device::vc4000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vc4000_cart_slot_device(mconfig, VC4000_CART_SLOT, "Interton VC 4000 Cartridge Slot", tag, owner, clock, "vc4000_cart_slot", __FILE__)
+	: vc4000_cart_slot_device(mconfig, VC4000_CART_SLOT, tag, owner, clock)
 {
 }
 
 vc4000_cart_slot_device::vc4000_cart_slot_device(
 		const machine_config &mconfig,
 		device_type type,
-		const char *name,
 		const char *tag,
 		device_t *owner,
-		uint32_t clock,
-		const char *shortname,
-		const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)
 	, m_type(VC4000_STD)
@@ -118,7 +115,7 @@ void vc4000_cart_slot_device::device_start()
 //-------------------------------------------------
 
 h21_cart_slot_device::h21_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vc4000_cart_slot_device(mconfig, H21_CART_SLOT, "TRQ H-21 Cartridge Slot", tag, owner, clock, "h21_cart_slot", __FILE__)
+	: vc4000_cart_slot_device(mconfig, H21_CART_SLOT, tag, owner, clock)
 {
 }
 

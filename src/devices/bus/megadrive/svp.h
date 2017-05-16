@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Pierpaolo Prazzoli,Grazvydas Ignotas
-#ifndef __MD_SVP_H
-#define __MD_SVP_H
+#ifndef MAME_BUS_MEGADRIVE_SVP_H
+#define MAME_BUS_MEGADRIVE_SVP_H
 
 #include "md_slot.h"
 #include "cpu/ssp1601/ssp1601.h"
@@ -17,18 +17,12 @@ class md_rom_svp_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_rom_svp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	md_rom_svp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-//protected:
 	// device-level overrides
-	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void set_bank_to_rom(const char *banktag, uint32_t offset) override;
-
-	required_device<device_t> m_svp;
-	required_ioport m_test_ipt;
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -56,6 +50,14 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_pmc);
 	virtual DECLARE_WRITE16_MEMBER(write_al);
 
+protected:
+	md_rom_svp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+
+	required_device<device_t> m_svp;
+	required_ioport m_test_ipt;
+
 	uint32_t pm_io(int reg, int write, uint32_t d);
 
 	uint32_t m_pmac_read[6];  // read modes/addrs for PM0-PM5
@@ -70,6 +72,6 @@ public:
 
 
 // device type definition
-extern const device_type MD_ROM_SVP;
+DECLARE_DEVICE_TYPE(MD_ROM_SVP, md_rom_svp_device)
 
-#endif
+#endif // MAME_BUS_MEGADRIVE_SVP_H

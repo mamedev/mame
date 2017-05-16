@@ -26,10 +26,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_BBC_JOYPORT_JOYPORT_H
+#define MAME_BUS_BBC_JOYPORT_JOYPORT_H
 
-#ifndef __COMPACT_JOYPORT__
-#define __COMPACT_JOYPORT__
+#pragma once
 
 
 
@@ -54,7 +54,6 @@ class bbc_joyport_slot_device : public device_t, public device_slot_interface
 public:
 	// construction/destruction
 	bbc_joyport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~bbc_joyport_slot_device() {}
 
 	uint8_t cb_r();
 	uint8_t pb_r();
@@ -74,21 +73,22 @@ class device_bbc_joyport_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_bbc_joyport_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_bbc_joyport_interface();
 
 	virtual uint8_t cb_r() { return 0xff; }
 	virtual uint8_t pb_r() { return 0x1f; }
 
 protected:
+	device_bbc_joyport_interface(const machine_config &mconfig, device_t &device);
+
 	bbc_joyport_slot_device *m_slot;
 };
 
 
 // device type definition
-extern const device_type BBC_JOYPORT_SLOT;
+DECLARE_DEVICE_TYPE(BBC_JOYPORT_SLOT, bbc_joyport_slot_device)
 
 SLOT_INTERFACE_EXTERN( bbc_joyport_devices );
 
 
-#endif /* __COMPACT_JOYPORT__ */
+#endif // MAME_BUS_BBC_JOYPORT_JOYPORT_H

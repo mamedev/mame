@@ -83,7 +83,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80sio2_device> m_sio;
-	required_device<wd2797_t> m_fdc;
+	required_device<wd2797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<centronics_device> m_centronics;
@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( act_f1_io, AS_IO, 16, f1_state )
 	AM_RANGE(0x0010, 0x0017) AM_DEVREADWRITE8(Z80CTC_TAG, z80ctc_device, read, write, 0x00ff)
 	AM_RANGE(0x0020, 0x0027) AM_DEVREADWRITE8(Z80SIO2_TAG, z80sio2_device, ba_cd_r, ba_cd_w, 0x00ff)
 //  AM_RANGE(0x0030, 0x0031) AM_WRITE8(ctc_ack_w, 0x00ff)
-	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8(WD2797_TAG, wd2797_t, read, write, 0x00ff)
+	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8(WD2797_TAG, wd2797_device, read, write, 0x00ff)
 //  AM_RANGE(0x01e0, 0x01ff) winchester
 ADDRESS_MAP_END
 
@@ -329,7 +329,7 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( act_f1 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( act_f1, f1_state )
+static MACHINE_CONFIG_START( act_f1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_14MHz/4)
 	MCFG_CPU_PROGRAM_MAP(act_f1_mem)
@@ -411,8 +411,8 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1984, f1,    0,      0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F1",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1984, f1e,   f1,     0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F1e",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1984, f2,    f1,     0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F2",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1985, f10,   f1,     0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F10",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE     INIT  COMPANY  FULLNAME        FLAGS
+COMP( 1984, f1,    0,      0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, f1e,   f1,     0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F1e",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, f2,    f1,     0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F2",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1985, f10,   f1,     0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F10",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -20,6 +20,7 @@
 
 #include "emu.h"
 #include "includes/z88.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -620,7 +621,7 @@ static SLOT_INTERFACE_START(z88_cart)
 	SLOT_INTERFACE("1024kflash", Z88_1024K_FLASH)    // 1024KB Flash cart
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( z88, z88_state )
+static MACHINE_CONFIG_START( z88 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_9_8304MHz/3)  // divided by 3 through the uPD65031
 	MCFG_CPU_PROGRAM_MAP(z88_mem)
@@ -751,15 +752,15 @@ ROM_START(z88tr)
 	ROMX_LOAD("z88v317tk.rom", 0x00000, 0x20000, CRC(9468d677) SHA1(8d76e94f43846c736bf257d15d531c2df1e20fae), ROM_BIOS(1) )
 ROM_END
 
-/*    YEAR     NAME    PARENT  COMPAT  MACHINE     INPUT  CLASS            INIT  COMPANY                FULLNAME           FLAGS */
-COMP( 1988,    z88  ,    0,    0,      z88,        z88  , driver_device,   0,    "Cambridge Computers", "Z88"            , MACHINE_NOT_WORKING)
-COMP( 1988,    z88de,  z88,    0,      z88,        z88de, driver_device,   0,    "Cambridge Computers", "Z88 (German)"   , MACHINE_NOT_WORKING)
-COMP( 1988,    z88es,  z88,    0,      z88,        z88es, driver_device,   0,    "Cambridge Computers", "Z88 (Spanish)"  , MACHINE_NOT_WORKING)
-COMP( 1988,    z88fr,  z88,    0,      z88,        z88fr, driver_device,   0,    "Cambridge Computers", "Z88 (French)"   , MACHINE_NOT_WORKING)
-COMP( 1988,    z88it,  z88,    0,      z88,        z88it, driver_device,   0,    "Cambridge Computers", "Z88 (Italian)"  , MACHINE_NOT_WORKING)
-COMP( 1988,    z88se,  z88,    0,      z88,        z88se, driver_device,   0,    "Cambridge Computers", "Z88 (Swedish)"  , MACHINE_NOT_WORKING)
-COMP( 1988,    z88fi,  z88,    0,      z88,        z88se, driver_device,   0,    "Cambridge Computers", "Z88 (Finnish)"  , MACHINE_NOT_WORKING)
-COMP( 1988,    z88no,  z88,    0,      z88,        z88no, driver_device,   0,    "Cambridge Computers", "Z88 (Norwegian)", MACHINE_NOT_WORKING)
-COMP( 1988,    z88dk,  z88,    0,      z88,        z88no, driver_device,   0,    "Cambridge Computers", "Z88 (Danish)"   , MACHINE_NOT_WORKING)
-COMP( 1988,    z88ch,  z88,    0,      z88,        z88ch, driver_device,   0,    "Cambridge Computers", "Z88 (Swiss)"    , MACHINE_NOT_WORKING)
-COMP( 1988,    z88tr,  z88,    0,      z88,        z88tr, driver_device,   0,    "Cambridge Computers", "Z88 (Turkish)"  , MACHINE_NOT_WORKING)
+/*    YEAR     NAME    PARENT  COMPAT  MACHINE     INPUT  CLASS        INIT  COMPANY                FULLNAME           FLAGS */
+COMP( 1988,    z88  ,    0,    0,      z88,        z88  , z88_state,   0,    "Cambridge Computers", "Z88"            , MACHINE_NOT_WORKING)
+COMP( 1988,    z88de,  z88,    0,      z88,        z88de, z88_state,   0,    "Cambridge Computers", "Z88 (German)"   , MACHINE_NOT_WORKING)
+COMP( 1988,    z88es,  z88,    0,      z88,        z88es, z88_state,   0,    "Cambridge Computers", "Z88 (Spanish)"  , MACHINE_NOT_WORKING)
+COMP( 1988,    z88fr,  z88,    0,      z88,        z88fr, z88_state,   0,    "Cambridge Computers", "Z88 (French)"   , MACHINE_NOT_WORKING)
+COMP( 1988,    z88it,  z88,    0,      z88,        z88it, z88_state,   0,    "Cambridge Computers", "Z88 (Italian)"  , MACHINE_NOT_WORKING)
+COMP( 1988,    z88se,  z88,    0,      z88,        z88se, z88_state,   0,    "Cambridge Computers", "Z88 (Swedish)"  , MACHINE_NOT_WORKING)
+COMP( 1988,    z88fi,  z88,    0,      z88,        z88se, z88_state,   0,    "Cambridge Computers", "Z88 (Finnish)"  , MACHINE_NOT_WORKING)
+COMP( 1988,    z88no,  z88,    0,      z88,        z88no, z88_state,   0,    "Cambridge Computers", "Z88 (Norwegian)", MACHINE_NOT_WORKING)
+COMP( 1988,    z88dk,  z88,    0,      z88,        z88no, z88_state,   0,    "Cambridge Computers", "Z88 (Danish)"   , MACHINE_NOT_WORKING)
+COMP( 1988,    z88ch,  z88,    0,      z88,        z88ch, z88_state,   0,    "Cambridge Computers", "Z88 (Swiss)"    , MACHINE_NOT_WORKING)
+COMP( 1988,    z88tr,  z88,    0,      z88,        z88tr, z88_state,   0,    "Cambridge Computers", "Z88 (Turkish)"  , MACHINE_NOT_WORKING)

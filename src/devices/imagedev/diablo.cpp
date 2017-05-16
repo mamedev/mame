@@ -5,9 +5,10 @@
  **********************************************************/
 
 #include "emu.h"
+#include "diablo.h"
+
 #include "emuopts.h"
 #include "harddisk.h"
-#include "diablo.h"
 
 
 OPTION_GUIDE_START(dsk_option_guide)
@@ -23,14 +24,14 @@ static const char *dsk_option_spec =
 
 
 // device type definition
-const device_type DIABLO = device_creator<diablo_image_device>;
+DEFINE_DEVICE_TYPE(DIABLO, diablo_image_device, "diablo_image", "Diablo")
 
 //-------------------------------------------------
 //  diablo_image_device - constructor
 //-------------------------------------------------
 
 diablo_image_device::diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DIABLO, "Diablo", tag, owner, clock, "diablo_image", __FILE__),
+	: device_t(mconfig, DIABLO, tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		m_chd(nullptr),
 		m_hard_disk_handle(nullptr),

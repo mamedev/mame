@@ -13,10 +13,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_Z80_KL5C80A12_H
+#define MAME_CPU_Z80_KL5C80A12_H
 
-#ifndef __KL5C80A12__
-#define __KL5C80A12__
+#pragma once
 
 #include "z80.h"
 #include "machine/z80ctc.h"
@@ -47,7 +47,6 @@ protected:
 
 
 // device type definition
-extern const device_type KL5C80A12;
+DECLARE_DEVICE_TYPE(KL5C80A12, kl5c80a12_device)
 
-
-#endif /// __KL5C80A12__
+#endif // MAME_CPU_Z80_KL5C80A12_H

@@ -168,7 +168,8 @@ Sega PC BD MODEL2 C-CRX COMMUNICATION 837-12839
 #include "emuopts.h"
 #include "machine/m2comm.h"
 
-//#define __M2COMM_VERBOSE__
+#define VERBOSE 0
+#include "logmacro.h"
 
 MACHINE_CONFIG_FRAGMENT( m2comm )
 MACHINE_CONFIG_END
@@ -177,7 +178,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type M2COMM = device_creator<m2comm_device>;
+DEFINE_DEVICE_TYPE(M2COMM, m2comm_device, "m2comm", "Model 2 Communication Board")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -198,7 +199,7 @@ machine_config_constructor m2comm_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, M2COMM, "MODEL2 COMMUNICATION BD", tag, owner, clock, "m2comm", __FILE__),
+	device_t(mconfig, M2COMM, tag, owner, clock),
 	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
 	m_line_tx(OPEN_FLAG_READ)
 {
@@ -239,34 +240,26 @@ void m2comm_device::device_reset()
 READ8_MEMBER(m2comm_device::zfg_r)
 {
 	uint8_t result = m_zfg | (~m_fg << 7) | 0x7e;
-#ifdef __M2COMM_VERBOSE__
-	osd_printf_verbose("m2comm-zfg_r: read register %02x for value %02x\n", offset, result);
-#endif
+	LOG("m2comm-zfg_r: read register %02x for value %02x\n", offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(m2comm_device::zfg_w)
 {
-#ifdef __M2COMM_VERBOSE__
-	osd_printf_verbose("m2comm-zfg_w: %02x\n", data);
-#endif
+	LOG("m2comm-zfg_w: %02x\n", data);
 	m_zfg = data & 0x01;
 }
 
 READ8_MEMBER(m2comm_device::share_r)
 {
 	uint8_t result = m_shared[offset];
-#ifdef __M2COMM_VERBOSE__
-	osd_printf_verbose("m2comm-share_r: read shared memory %02x for value %02x\n", offset, result);
-#endif
+	LOG("m2comm-share_r: read shared memory %02x for value %02x\n", offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(m2comm_device::share_w)
 {
-#ifdef __M2COMM_VERBOSE__
-	osd_printf_verbose("m2comm-share_w: %02x %02x\n", offset, data);
-#endif
+	LOG("m2comm-share_w: %02x %02x\n", offset, data);
 	m_shared[offset] = data;
 }
 
@@ -279,7 +272,7 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 {
 	m_cn = data & 0x01;
 
-#ifndef __M2COMM_SIMULATION__
+#ifndef M2COMM_SIMULATION
 	if (!m_cn)
 		device_reset();
 #else
@@ -336,13 +329,13 @@ WRITE8_MEMBER(m2comm_device::fg_w)
 
 void m2comm_device::check_vint_irq()
 {
-#ifndef __M2COMM_SIMULATION__
+#ifndef M2COMM_SIMULATION
 #else
 	comm_tick();
 #endif
 }
 
-#ifdef __M2COMM_SIMULATION__
+#ifdef M2COMM_SIMULATION
 void m2comm_device::comm_tick()
 {
 	if (m_linkenable == 0x01)

@@ -8,13 +8,12 @@
 
 #include "emu.h"
 #include "hd20.h"
-SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_HD20 = device_creator<cpc_hd20_device>;
+DEFINE_DEVICE_TYPE(CPC_HD20, cpc_hd20_device, "cpc_hd20", "Dobbertin HD20")
 
 static MACHINE_CONFIG_FRAGMENT( cpc_hd20 )
 	MCFG_DEVICE_ADD("hdc",ST11M_HDC,0)
@@ -48,7 +47,7 @@ const tiny_rom_entry *cpc_hd20_device::device_rom_region() const
 //**************************************************************************
 
 cpc_hd20_device::cpc_hd20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CPC_HD20, "Dobbertin HD20", tag, owner, clock, "cpc_hd20", __FILE__),
+	device_t(mconfig, CPC_HD20, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_hdc(*this,"hdc")
 {

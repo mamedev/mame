@@ -384,7 +384,7 @@ static DEVICE_INPUT_DEFAULTS_START( debug_serial ) // set up debug port to defau
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( cybikov1, cybiko_state )
+static MACHINE_CONFIG_START( cybikov1 )
 	// cpu
 	MCFG_CPU_ADD( "maincpu", H8S2241, XTAL_11_0592MHz )
 	MCFG_CPU_PROGRAM_MAP( cybikov1_mem )
@@ -397,8 +397,8 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	// screen
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_SIZE( HD66421_WIDTH, HD66421_HEIGHT )
-	MCFG_SCREEN_VISIBLE_AREA( 0, HD66421_WIDTH - 1, 0, HD66421_HEIGHT - 1 )
+	MCFG_SCREEN_SIZE( hd66421_device::WIDTH, hd66421_device::HEIGHT )
+	MCFG_SCREEN_VISIBLE_AREA( 0, hd66421_device::WIDTH - 1, 0, hd66421_device::HEIGHT - 1 )
 	MCFG_SCREEN_UPDATE_DEVICE("hd66421", hd66421_device, update_screen)
 	MCFG_SCREEN_PALETTE("hd66421:palette")
 	// video
@@ -531,7 +531,7 @@ ROM_END
 // DRIVERS  //
 //////////////
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     INIT        COMPANY       FULLNAME                FLAGS */
-COMP( 2000, cybikov1,   0,          0,      cybikov1,   cybiko, cybiko_state,   cybiko  ,   "Cybiko Inc", "Cybiko Classic (V1)",  MACHINE_IMPERFECT_SOUND )
-COMP( 2000, cybikov2,   cybikov1,   0,      cybikov2,   cybiko, cybiko_state,   cybiko  ,   "Cybiko Inc", "Cybiko Classic (V2)",  MACHINE_IMPERFECT_SOUND )
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE         INIT        COMPANY       FULLNAME                FLAGS */
+COMP( 2000, cybikov1,   0,          0,      cybikov1,   cybiko,   cybiko_state, cybiko,     "Cybiko Inc", "Cybiko Classic (V1)",  MACHINE_IMPERFECT_SOUND )
+COMP( 2000, cybikov2,   cybikov1,   0,      cybikov2,   cybiko,   cybiko_state, cybiko,     "Cybiko Inc", "Cybiko Classic (V2)",  MACHINE_IMPERFECT_SOUND )
 COMP( 2001, cybikoxt,   cybikov1,   0,      cybikoxt,   cybikoxt, cybiko_state, cybikoxt,   "Cybiko Inc", "Cybiko Xtreme",        MACHINE_IMPERFECT_SOUND )

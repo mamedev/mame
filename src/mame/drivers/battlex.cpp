@@ -288,7 +288,7 @@ void battlex_state::machine_reset()
 	m_in0_b4 = 0;
 }
 
-static MACHINE_CONFIG_START( battlex, battlex_state )
+static MACHINE_CONFIG_START( battlex )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_10MHz/4 )      // ?
@@ -430,4 +430,4 @@ DRIVER_INIT_MEMBER(battlex_state,battlex)
  *************************************/
 
 GAME( 1982, battlex,   0,   battlex,  battlex,  battlex_state,  battlex, ROT180, "Omori Electric Co., Ltd.", "Battle Cross", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1983, dodgeman,  0,   dodgeman, dodgeman, battlex_state,  battlex, ROT180, "Omori Electric Co., Ltd.",  "Dodge Man", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1983, dodgeman,  0,   dodgeman, dodgeman, battlex_state,  battlex, ROT180, "Omori Electric Co., Ltd.", "Dodge Man",    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

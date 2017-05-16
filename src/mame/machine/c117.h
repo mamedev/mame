@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Alex W. Jackson
+#ifndef MAME_MACHINE_C117_H
+#define MAME_MACHINE_C117_H
 
 #pragma once
 
-#ifndef __C117_H__
-#define __C117_H__
 
 #include "machine/watchdog.h"
 
@@ -84,6 +84,6 @@ private:
 };
 
 // device type definition
-extern const device_type NAMCO_C117;
+DECLARE_DEVICE_TYPE(NAMCO_C117, namco_c117_device)
 
-#endif
+#endif // MAME_MACHINE_C117_H

@@ -4,7 +4,7 @@
 #include "fdc37c665gt.h"
 
 fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, FDC37C665GT, "FDC37C665GT", tag, owner, clock, "fdc37c665gt", __FILE__),
+	device_t(mconfig, FDC37C665GT, tag, owner, clock),
 	m_uart1(*this, "uart1"),
 	m_uart2(*this, "uart2")
 {
@@ -59,4 +59,4 @@ machine_config_constructor fdc37c665gt_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(fdc37c665gt);
 }
 
-const device_type FDC37C665GT = device_creator<fdc37c665gt_device>;
+DEFINE_DEVICE_TYPE(FDC37C665GT, fdc37c665gt_device, "fdc37c665gt", "FDC37C665GT")

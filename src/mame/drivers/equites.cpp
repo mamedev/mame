@@ -1134,7 +1134,7 @@ void equites_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( equites, equites_state )
+static MACHINE_CONFIG_START( equites )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
@@ -1179,7 +1179,7 @@ static MACHINE_CONFIG_DERIVED( gekisou, equites )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( splndrbt, equites_state )
+static MACHINE_CONFIG_START( splndrbt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */

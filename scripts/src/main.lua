@@ -269,7 +269,7 @@ if (STANDALONE~=true) then
 	}
 if (_OPTIONS["osd"] ~= "uwp") then
 	links {
-		"linenoise-ng",
+		"linenoise",
 	}
 end
 end

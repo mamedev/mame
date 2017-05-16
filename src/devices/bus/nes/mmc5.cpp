@@ -19,7 +19,7 @@
 #include "mmc5.h"
 
 #include "cpu/m6502/m6502.h"
-#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access PPU_BOTTOM_VISIBLE_SCANLINE
+#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 #include "sound/nes_apu.h"  // temp hack to pass the additional sound regs to APU...
 
 
@@ -41,15 +41,15 @@ static const int m_mmc5_attrib[4] = {0x00, 0x55, 0xaa, 0xff};
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_EXROM = device_creator<nes_exrom_device>;
+DEFINE_DEVICE_TYPE(NES_EXROM, nes_exrom_device, "nes_exrom", "NES Cart ExROM (MMC-5) PCB")
 
 
 nes_exrom_device::nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_EXROM, "NES Cart ExROM (MMC-5) PCB", tag, owner, clock, "nes_exrom", __FILE__), m_irq_count(0),
-	m_irq_status(0), m_irq_enable(0), m_mult1(0), m_mult2(0), m_mmc5_scanline(0), m_vrom_page_a(0), m_vrom_page_b(0), m_floodtile(0), m_floodattr(0),
-	m_prg_mode(0), m_chr_mode(0), m_wram_protect_1(0), m_wram_protect_2(0), m_exram_control(0), m_wram_base(0), m_last_chr(0), m_ex1_chr(0),
-	m_split_chr(0), m_ex1_bank(0), m_high_chr(0), m_split_scr(0), m_split_rev(0), m_split_ctrl(0), m_split_yst(0), m_split_bank(0), m_vcount(0)
-				{
+	: nes_nrom_device(mconfig, NES_EXROM, tag, owner, clock), m_irq_count(0)
+	, m_irq_status(0), m_irq_enable(0), m_mult1(0), m_mult2(0), m_mmc5_scanline(0), m_vrom_page_a(0), m_vrom_page_b(0), m_floodtile(0), m_floodattr(0)
+	, m_prg_mode(0), m_chr_mode(0), m_wram_protect_1(0), m_wram_protect_2(0), m_exram_control(0), m_wram_base(0), m_last_chr(0), m_ex1_chr(0)
+	, m_split_chr(0), m_ex1_bank(0), m_high_chr(0), m_split_scr(0), m_split_rev(0), m_split_ctrl(0), m_split_yst(0), m_split_bank(0), m_vcount(0)
+{
 }
 
 
@@ -245,7 +245,7 @@ void nes_exrom_device::hblank_irq(int scanline, int vblank, int blanked )
 	// "In Frame" flag
 	if (scanline == 0)
 		m_irq_status |= 0x40;
-	else if (scanline > PPU_BOTTOM_VISIBLE_SCANLINE)
+	else if (scanline > ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 		m_irq_status &= ~0x40;
 }
 

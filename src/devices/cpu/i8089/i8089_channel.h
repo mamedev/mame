@@ -8,12 +8,10 @@
 
 ***************************************************************************/
 
+#ifndef MAME_CPU_I8080_I8089_CHANNEL_H
+#define MAME_CPU_I8080_I8089_CHANNEL_H
+
 #pragma once
-
-#ifndef __I8089_CHANNEL_H__
-#define __I8089_CHANNEL_H__
-
-#include "i8089.h"
 
 
 //**************************************************************************
@@ -24,7 +22,7 @@
 	MCFG_DEVICE_ADD(_tag, I8089_CHANNEL, 0)
 
 #define MCFG_I8089_CHANNEL_SINTR(_sintr) \
-	downcast<i8089_channel *>(device)->set_sintr_callback(DEVCB_##_sintr);
+	downcast<i8089_channel_device *>(device)->set_sintr_callback(DEVCB_##_sintr);
 
 
 //**************************************************************************
@@ -34,13 +32,13 @@
 // forward declaration
 class i8089_device;
 
-class i8089_channel : public device_t
+class i8089_channel_device : public device_t
 {
 public:
 	// construction/destruction
-	i8089_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8089_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _sintr> void set_sintr_callback(_sintr sintr) { m_write_sintr.set_callback(sintr); }
+	template <class Object> void set_sintr_callback(Object &&sintr) { m_write_sintr.set_callback(std::forward<Object>(sintr)); }
 
 	// set register
 	void set_reg(int reg, uint32_t value, int tag = -1);
@@ -217,7 +215,6 @@ private:
 
 
 // device type definition
-extern const device_type I8089_CHANNEL;
+DECLARE_DEVICE_TYPE(I8089_CHANNEL, i8089_channel_device)
 
-
-#endif  /* __I8089_CHANNEL_H__ */
+#endif // MAME_CPU_I8080_I8089_CHANNEL_H

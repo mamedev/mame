@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_DEVICES_MACHINE_KEYBOARD_IPP
-#define MAME_DEVICES_MACHINE_KEYBOARD_IPP
+#ifndef MAME_MACHINE_KEYBOARD_IPP
+#define MAME_MACHINE_KEYBOARD_IPP
 
 #pragma once
 
@@ -176,4 +176,4 @@ bool device_matrix_keyboard_interface<ROW_COUNT>::are_all_keys_up()
 			[] (ioport_value a, auto const &b) { return a | b->read(); });
 }
 
-#endif // MAME_DEVICES_MACHINE_KEYBOARD_IPP
+#endif // MAME_MACHINE_KEYBOARD_IPP

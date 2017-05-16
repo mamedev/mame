@@ -182,7 +182,7 @@ static MACHINE_CONFIG_FRAGMENT( magtouch_sb_conf )
 	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( magtouch, magtouch_state )
+static MACHINE_CONFIG_START( magtouch )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(magtouch_map)
@@ -243,4 +243,4 @@ ROM_START(magtouch)
 	ROM_FILL(0x511ba, 1, 0xeb) // skip csum
 ROM_END
 
-GAME( 1995, magtouch,   0,         magtouch,  magtouch, driver_device, 0, ROT0, "Micro Manufacturing",     "Magical Touch", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, magtouch,   0,         magtouch,  magtouch, magtouch_state, 0, ROT0, "Micro Manufacturing",     "Magical Touch", MACHINE_UNEMULATED_PROTECTION )

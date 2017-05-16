@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_CORVFDC02__
-#define __A2BUS_CORVFDC02__
+#ifndef MAME_BUS_A2BUS_CORVFDC02_H
+#define MAME_BUS_A2BUS_CORVFDC02_H
+
+#pragma once
 
 #include "a2bus.h"
 #include "machine/upd765.h"
@@ -25,7 +27,6 @@ class a2bus_corvfdc02_device:
 {
 public:
 	// construction/destruction
-	a2bus_corvfdc02_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a2bus_corvfdc02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
@@ -38,6 +39,8 @@ public:
 	DECLARE_FLOPPY_FORMATS(corv_floppy_formats);
 
 protected:
+	a2bus_corvfdc02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -64,6 +67,6 @@ private:
 };
 
 // device type definition
-extern const device_type A2BUS_CORVFDC02;
+DECLARE_DEVICE_TYPE(A2BUS_CORVFDC02, a2bus_corvfdc02_device)
 
-#endif /* __A2BUS_CORVFDC02__ */
+#endif // MAME_BUS_A2BUS_CORVFDC02_H

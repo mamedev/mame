@@ -16,26 +16,26 @@
 #include "video/hlcd0538.h"
 
 
-const device_type HLCD0538 = device_creator<hlcd0538_device>;
-const device_type HLCD0539 = device_creator<hlcd0539_device>;
+DEFINE_DEVICE_TYPE(HLCD0538, hlcd0538_device, "hlcd0538", "Hughes HLCD 0538 LCD Driver")
+DEFINE_DEVICE_TYPE(HLCD0539, hlcd0539_device, "hlcd0539", "Hughes HLCD 0539 LCD Driver")
 
 //-------------------------------------------------
 //  constructor
 //-------------------------------------------------
 
-hlcd0538_device::hlcd0538_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_write_cols(*this), m_write_interrupt(*this)
+hlcd0538_device::hlcd0538_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_write_cols(*this), m_write_interrupt(*this)
 {
 }
 
 hlcd0538_device::hlcd0538_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hlcd0538_device(mconfig, HLCD0538, "HLCD 0538 LCD Driver", tag, owner, clock, "hlcd0538", __FILE__)
+	: hlcd0538_device(mconfig, HLCD0538, tag, owner, clock)
 {
 }
 
 hlcd0539_device::hlcd0539_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hlcd0538_device(mconfig, HLCD0539, "HLCD 0539 LCD Driver", tag, owner, clock, "hlcd0539", __FILE__)
+	: hlcd0538_device(mconfig, HLCD0539, tag, owner, clock)
 {
 }
 

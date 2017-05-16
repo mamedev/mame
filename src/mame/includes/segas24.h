@@ -82,9 +82,9 @@ public:
 
 	uint16_t *shared_ram;
 
-	segas24_tile *vtile;
-	segas24_sprite *vsprite;
-	segas24_mixer *vmixer;
+	segas24_tile_device *vtile;
+	segas24_sprite_device *vsprite;
+	segas24_mixer_device *vmixer;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_ym);
 	DECLARE_READ16_MEMBER(  sys16_paletteram_r );

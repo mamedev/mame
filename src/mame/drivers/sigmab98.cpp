@@ -1236,7 +1236,7 @@ static ADDRESS_MAP_START( animalc_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(sammymdl_leds_w )
 	AM_RANGE( 0x34, 0x34 ) AM_READ(unk_34_r )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
@@ -1480,7 +1480,7 @@ static ADDRESS_MAP_START( haekaka_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE(haekaka_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(haekaka_leds_w )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
@@ -1727,7 +1727,7 @@ static ADDRESS_MAP_START( itazuram_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE(sammymdl_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(sammymdl_leds_w )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
@@ -1956,7 +1956,7 @@ static ADDRESS_MAP_START( tdoboon_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE(sammymdl_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(sammymdl_leds_w )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
@@ -2148,7 +2148,7 @@ INTERRUPT_GEN_MEMBER(sigmab98_state::sigmab98_vblank_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x5a);
 }
 
-static MACHINE_CONFIG_START( sigmab98, sigmab98_state )
+static MACHINE_CONFIG_START( sigmab98 )
 	MCFG_CPU_ADD("maincpu", Z80, 10000000)  // !! TAXAN KY-80, clock @X1? !!
 	MCFG_CPU_PROGRAM_MAP(gegege_mem_map)
 	MCFG_CPU_IO_MAP(gegege_io_map)
@@ -2229,7 +2229,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymdl_irq)
 		m_maincpu->set_input_line_and_vector(0,HOLD_LINE, m_timer1_vector);
 }
 
-static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
+static MACHINE_CONFIG_START( sammymdl )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 2)    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
 	MCFG_CPU_PROGRAM_MAP( animalc_map )
 	MCFG_CPU_IO_MAP( animalc_io )

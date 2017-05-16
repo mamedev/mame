@@ -906,7 +906,7 @@ static const floppy_interface mac_floppy_interface =
 	"floppy_3_5"
 };
 
-static MACHINE_CONFIG_START( mac512ke, mac_state )
+static MACHINE_CONFIG_START( mac512ke )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
@@ -1029,7 +1029,7 @@ static MACHINE_CONFIG_DERIVED( macclasc, macplus )
 	MCFG_MACKBD_REMOVE(MACKBD_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macprtb, mac_state )
+static MACHINE_CONFIG_START( macprtb )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C15M)
 	MCFG_CPU_PROGRAM_MAP(macprtb_map)
@@ -1053,7 +1053,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1090,7 +1090,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macii, mac_state )
+static MACHINE_CONFIG_START( macii )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020PMMU, C15M)
@@ -1101,7 +1101,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1168,7 +1168,7 @@ static MACHINE_CONFIG_DERIVED( maciihmu, macii )
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( maciifx, mac_state )
+static MACHINE_CONFIG_START( maciifx )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 40000000)
@@ -1177,7 +1177,7 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1275,7 +1275,7 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
 	MCFG_NUBUS_SLOT_ADD("pds","lcpds", mac_lcpds_cards, nullptr)
 
-	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_V8, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_REPLACE("asc", C15M, V8, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1329,7 +1329,7 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,48M,64M,80M")
 
-	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_SONORA, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_REPLACE("asc", C15M, SONORA, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1442,7 +1442,7 @@ static MACHINE_CONFIG_DERIVED( maciicx, maciix )    // IIcx is a IIx with only s
 	MCFG_NUBUS_SLOT_REMOVE("nbe")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macse30, mac_state )
+static MACHINE_CONFIG_START( macse30 )
 
 	MCFG_CPU_ADD("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macse30_map)
@@ -1465,7 +1465,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1520,7 +1520,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macpb140, mac_state )
+static MACHINE_CONFIG_START( macpb140 )
 
 	MCFG_CPU_ADD("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
@@ -1543,7 +1543,7 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1608,7 +1608,7 @@ static MACHINE_CONFIG_DERIVED( macpb170, macpb140 )
 	MCFG_RAM_EXTRA_OPTIONS("6M,8M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macpb160, mac_state )
+static MACHINE_CONFIG_START( macpb160 )
 
 	MCFG_CPU_ADD("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb160_map)
@@ -1631,7 +1631,7 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1724,7 +1724,7 @@ static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 	MCFG_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbv)
 
-	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_EAGLE, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_REPLACE("asc", C15M, EAGLE, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1814,7 +1814,7 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pwrmac, mac_state )
+static MACHINE_CONFIG_START( pwrmac )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC601, 60000000)
@@ -1882,7 +1882,7 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_CUDA_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macqd700, mac_state )
+static MACHINE_CONFIG_START( macqd700 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(quadra700_map)
@@ -1902,7 +1902,7 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_EASC, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_ADD("asc", C15M, EASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2309,37 +2309,37 @@ ROM_START( maclc520 )
 	ROM_LOAD( "ede66cbd.rom", 0x000000, 0x100000, CRC(a893cb0f) SHA1(c54ee2f45020a4adeb7451adce04cd6e5fb69790) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */
-//COMP( 1983, mactw,    0,        0,  mac128k,  macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
-COMP( 1987, macse,    0,        0,  macse,    macadb, mac_state,   macse,         "Apple Computer", "Macintosh SE",  0 )
-COMP( 1987, macsefd,  0,        0,  macse,    macadb, mac_state,   macse,         "Apple Computer", "Macintosh SE (FDHD)",  0 )
-COMP( 1987, macii,    0,        0,  macii,    macadb, mac_state,   macii,         "Apple Computer", "Macintosh II",  0 )
-COMP( 1987, maciihmu, macii,    0,  maciihmu, macadb, mac_state,   macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", 0 )
-COMP( 1988, mac2fdhd, 0,        0,  macii,    macadb, mac_state,   maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",  0 )
-COMP( 1988, maciix,   mac2fdhd, 0,  maciix,   macadb, mac_state,   maciix,        "Apple Computer", "Macintosh IIx",  0 )
-COMP( 1989, macprtb,  0,        0,  macprtb,  macadb, mac_state,   macprtb,   "Apple Computer", "Macintosh Portable", MACHINE_NOT_WORKING )
-COMP( 1989, macse30,  mac2fdhd, 0,  macse30,  macadb, mac_state,   macse30,   "Apple Computer", "Macintosh SE/30",  0 )
-COMP( 1989, maciicx,  mac2fdhd, 0,  maciicx,  macadb, mac_state,   maciicx,   "Apple Computer", "Macintosh IIcx",  0 )
-COMP( 1989, maciici,  0,        0,  maciici,  maciici, mac_state,  maciici,   "Apple Computer", "Macintosh IIci", 0 )
-COMP( 1990, maciifx,  0,        0,  maciifx,  macadb, mac_state,   maciifx,      "Apple Computer", "Macintosh IIfx",  MACHINE_NOT_WORKING )
-COMP( 1990, macclasc, 0,        0,  macclasc, macadb, mac_state,   macclassic,    "Apple Computer", "Macintosh Classic",  0 )
-COMP( 1990, maclc,    0,        0,  maclc,    maciici, mac_state,  maclc,         "Apple Computer", "Macintosh LC", MACHINE_IMPERFECT_SOUND )
-COMP( 1990, maciisi,  0,        0,  maciisi,  maciici, mac_state,  maciisi,   "Apple Computer", "Macintosh IIsi", 0 )
-COMP( 1991, macpb100, 0,        0,  macprtb,  macadb, mac_state,   macprtb,   "Apple Computer", "Macintosh PowerBook 100", MACHINE_NOT_WORKING )
-COMP( 1991, macpb140, 0,        0,  macpb140, macadb, mac_state,   macpb140,      "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING )
-COMP( 1991, macpb170, macpb140, 0,  macpb170, macadb, mac_state,   macpb140,      "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING )
-COMP( 1991, macqd700, macpb140, 0,  macqd700, macadb, mac_state,   macquadra700, "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING )
-COMP( 1991, macclas2, 0,        0,  macclas2, macadb, mac_state,   macclassic2,  "Apple Computer", "Macintosh Classic II", MACHINE_IMPERFECT_SOUND )
-COMP( 1991, maclc2,   0,        0,  maclc2,   maciici, mac_state,  maclc2,        "Apple Computer", "Macintosh LC II",  MACHINE_IMPERFECT_SOUND )
-COMP( 1992, macpb145, macpb140, 0,  macpb145, macadb, mac_state,   macpb140,      "Apple Computer", "Macintosh PowerBook 145", MACHINE_NOT_WORKING )
-COMP( 1992, macpb160, 0,        0,  macpb160, macadb, mac_state,   macpb160,      "Apple Computer", "Macintosh PowerBook 160", MACHINE_NOT_WORKING )
-COMP( 1992, macpb180, macpb160, 0,  macpb180, macadb, mac_state,   macpb160,      "Apple Computer", "Macintosh PowerBook 180", MACHINE_NOT_WORKING )
-COMP( 1992, macpb180c,macpb160, 0,  macpb180c,macadb, mac_state,   macpb160,     "Apple Computer", "Macintosh PowerBook 180c", MACHINE_NOT_WORKING )
-COMP( 1992, macpd210, 0,        0,  macpd210, macadb, mac_state,   macpd210,     "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING )
-COMP( 1993, maccclas, 0,        0,  maccclas, macadb, mac_state,   maclrcclassic,"Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING )
-COMP( 1992, macpb145b,macpb140, 0,  macpb170, macadb, mac_state,   macpb140,      "Apple Computer", "Macintosh PowerBook 145B", MACHINE_NOT_WORKING )
-COMP( 1993, maclc3,   0,        0,  maclc3,   maciici, mac_state,  maclc3,        "Apple Computer", "Macintosh LC III",  MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maciivx,  0,        0,  maciivx,  maciici, mac_state,  maciivx,   "Apple Computer", "Macintosh IIvx", MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maciivi,  maciivx,  0,  maciivi,  maciici, mac_state,  maciivx,   "Apple Computer", "Macintosh IIvi", MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maclc520, 0,        0,  maclc520, maciici, mac_state,  maclc520,     "Apple Computer", "Macintosh LC 520",  MACHINE_NOT_WORKING )
-COMP( 1994, pmac6100, 0,        0,  pwrmac,   macadb, mac_state,   macpm6100,     "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    STATE       INIT           COMPANY          FULLNAME */
+//COMP( 1983, mactw,    0,        0,      mac128k,  macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
+COMP( 1987, macse,    0,        0,      macse,    macadb,  mac_state,  macse,        "Apple Computer", "Macintosh SE",  0 )
+COMP( 1987, macsefd,  0,        0,      macse,    macadb,  mac_state,  macse,        "Apple Computer", "Macintosh SE (FDHD)",  0 )
+COMP( 1987, macii,    0,        0,      macii,    macadb,  mac_state,  macii,        "Apple Computer", "Macintosh II",  0 )
+COMP( 1987, maciihmu, macii,    0,      maciihmu, macadb,  mac_state,  macii,        "Apple Computer", "Macintosh II (w/o 68851 MMU)", 0 )
+COMP( 1988, mac2fdhd, 0,        0,      macii,    macadb,  mac_state,  maciifdhd,    "Apple Computer", "Macintosh II (FDHD)",  0 )
+COMP( 1988, maciix,   mac2fdhd, 0,      maciix,   macadb,  mac_state,  maciix,       "Apple Computer", "Macintosh IIx",  0 )
+COMP( 1989, macprtb,  0,        0,      macprtb,  macadb,  mac_state,  macprtb,      "Apple Computer", "Macintosh Portable", MACHINE_NOT_WORKING )
+COMP( 1989, macse30,  mac2fdhd, 0,      macse30,  macadb,  mac_state,  macse30,      "Apple Computer", "Macintosh SE/30",  0 )
+COMP( 1989, maciicx,  mac2fdhd, 0,      maciicx,  macadb,  mac_state,  maciicx,      "Apple Computer", "Macintosh IIcx",  0 )
+COMP( 1989, maciici,  0,        0,      maciici,  maciici, mac_state,  maciici,      "Apple Computer", "Macintosh IIci", 0 )
+COMP( 1990, maciifx,  0,        0,      maciifx,  macadb,  mac_state,  maciifx,      "Apple Computer", "Macintosh IIfx",  MACHINE_NOT_WORKING )
+COMP( 1990, macclasc, 0,        0,      macclasc, macadb,  mac_state,  macclassic,   "Apple Computer", "Macintosh Classic",  0 )
+COMP( 1990, maclc,    0,        0,      maclc,    maciici, mac_state,  maclc,        "Apple Computer", "Macintosh LC", MACHINE_IMPERFECT_SOUND )
+COMP( 1990, maciisi,  0,        0,      maciisi,  maciici, mac_state,  maciisi,      "Apple Computer", "Macintosh IIsi", 0 )
+COMP( 1991, macpb100, 0,        0,      macprtb,  macadb,  mac_state,  macprtb,      "Apple Computer", "Macintosh PowerBook 100", MACHINE_NOT_WORKING )
+COMP( 1991, macpb140, 0,        0,      macpb140, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING )
+COMP( 1991, macpb170, macpb140, 0,      macpb170, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING )
+COMP( 1991, macqd700, macpb140, 0,      macqd700, macadb,  mac_state,  macquadra700, "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING )
+COMP( 1991, macclas2, 0,        0,      macclas2, macadb,  mac_state,  macclassic2,  "Apple Computer", "Macintosh Classic II", MACHINE_IMPERFECT_SOUND )
+COMP( 1991, maclc2,   0,        0,      maclc2,   maciici, mac_state,  maclc2,       "Apple Computer", "Macintosh LC II",  MACHINE_IMPERFECT_SOUND )
+COMP( 1992, macpb145, macpb140, 0,      macpb145, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 145", MACHINE_NOT_WORKING )
+COMP( 1992, macpb160, 0,        0,      macpb160, macadb,  mac_state,  macpb160,     "Apple Computer", "Macintosh PowerBook 160", MACHINE_NOT_WORKING )
+COMP( 1992, macpb180, macpb160, 0,      macpb180, macadb,  mac_state,  macpb160,     "Apple Computer", "Macintosh PowerBook 180", MACHINE_NOT_WORKING )
+COMP( 1992, macpb180c,macpb160, 0,      macpb180c,macadb,  mac_state,  macpb160,     "Apple Computer", "Macintosh PowerBook 180c", MACHINE_NOT_WORKING )
+COMP( 1992, macpd210, 0,        0,      macpd210, macadb,  mac_state,  macpd210,     "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING )
+COMP( 1993, maccclas, 0,        0,      maccclas, macadb,  mac_state,  maclrcclassic,"Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING )
+COMP( 1992, macpb145b,macpb140, 0,      macpb170, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 145B", MACHINE_NOT_WORKING )
+COMP( 1993, maclc3,   0,        0,      maclc3,   maciici, mac_state,  maclc3,       "Apple Computer", "Macintosh LC III",  MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maciivx,  0,        0,      maciivx,  maciici, mac_state,  maciivx,      "Apple Computer", "Macintosh IIvx", MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maciivi,  maciivx,  0,      maciivi,  maciici, mac_state,  maciivx,      "Apple Computer", "Macintosh IIvi", MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maclc520, 0,        0,      maclc520, maciici, mac_state,  maclc520,     "Apple Computer", "Macintosh LC 520",  MACHINE_NOT_WORKING )
+COMP( 1994, pmac6100, 0,        0,      pwrmac,   macadb,  mac_state,  macpm6100,    "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

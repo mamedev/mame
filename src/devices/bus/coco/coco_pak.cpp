@@ -43,7 +43,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_PAK = device_creator<coco_pak_device>;
+DEFINE_DEVICE_TYPE(COCO_PAK, coco_pak_device, "cocopak", "CoCo Program PAK")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -52,18 +52,16 @@ const device_type COCO_PAK = device_creator<coco_pak_device>;
 //-------------------------------------------------
 //  coco_pak_device - constructor
 //-------------------------------------------------
-coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_cococart_interface( mconfig, *this ), m_cart(nullptr), m_owner(nullptr),
-		m_autostart(*this, CART_AUTOSTART_TAG)
+coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_cococart_interface(mconfig, *this)
+	, m_cart(nullptr), m_owner(nullptr), m_autostart(*this, CART_AUTOSTART_TAG)
 {
 }
 
 coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, COCO_PAK, "CoCo Program PAK", tag, owner, clock, "cocopak", __FILE__),
-		device_cococart_interface( mconfig, *this ), m_cart(nullptr), m_owner(nullptr),
-		m_autostart(*this, CART_AUTOSTART_TAG)
-	{
+	: coco_pak_device(mconfig, COCO_PAK, tag, owner, clock)
+{
 }
 
 //-------------------------------------------------
@@ -138,7 +136,7 @@ uint8_t* coco_pak_device::get_cart_base()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_PAK_BANKED = device_creator<coco_pak_banked_device>;
+DEFINE_DEVICE_TYPE(COCO_PAK_BANKED, coco_pak_banked_device, "cocopak_banked", "CoCo Program PAK (Banked)")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -148,8 +146,12 @@ const device_type COCO_PAK_BANKED = device_creator<coco_pak_banked_device>;
 //  coco_pak_device - constructor
 //-------------------------------------------------
 
+coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: coco_pak_device(mconfig, type, tag, owner, clock)
+{
+}
 coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: coco_pak_device(mconfig, COCO_PAK_BANKED, "CoCo Program PAK (Banked)", tag, owner, clock, "cocopak_banked", __FILE__)
+	: coco_pak_banked_device(mconfig, COCO_PAK_BANKED, tag, owner, clock)
 {
 }
 

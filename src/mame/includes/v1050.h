@@ -1,9 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#ifndef MAME_INCLUDES_V1050_H
+#define MAME_INCLUDES_V1050_H
+
 #pragma once
 
-#ifndef __V1050__
-#define __V1050__
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
@@ -162,7 +164,6 @@ private:
 	void scan_keyboard();
 	void set_baud_sel(int sel);
 
-public: // HACK for MC6845
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<i8214_device> m_pic;
@@ -171,7 +172,7 @@ public: // HACK for MC6845
 	required_device<msm58321_device> m_rtc;
 	required_device<i8251_device> m_uart_kb;
 	required_device<i8251_device> m_uart_sio;
-	required_device<mb8877_t> m_fdc;
+	required_device<mb8877_device> m_fdc;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_device<centronics_device> m_centronics;
@@ -183,7 +184,7 @@ public: // HACK for MC6845
 	required_device<clock_device> m_clock_sio;
 	required_device<timer_device> m_timer_ack;
 	required_device<timer_device> m_timer_rst;
-	required_device<SCSI_PORT_DEVICE> m_sasibus;
+	required_device<scsi_port_device> m_sasibus;
 	required_device<output_latch_device> m_sasi_data_out;
 	required_device<input_buffer_device> m_sasi_data_in;
 	required_device<input_buffer_device> m_sasi_ctrl_in;
@@ -229,4 +230,4 @@ public: // HACK for MC6845
 
 MACHINE_CONFIG_EXTERN( v1050_video );
 
-#endif
+#endif // MAME_INCLUDES_V1050_H

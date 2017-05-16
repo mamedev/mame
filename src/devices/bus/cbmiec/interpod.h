@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CBMIEC_INTERPOD_H
+#define MAME_BUS_CBMIEC_INTERPOD_H
 
-#ifndef __INTERPOD__
-#define __INTERPOD__
+#pragma once
 
 #include "cbmiec.h"
 #include "bus/ieee488/ieee488.h"
@@ -43,8 +43,7 @@
 
 // ======================> interpod_device
 
-class interpod_device :  public device_t,
-							public device_cbm_iec_interface
+class interpod_device : public device_t, public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
@@ -61,15 +60,14 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
-	required_device<mos6532_t> m_riot;
+	required_device<mos6532_new_device> m_riot;
 	required_device<acia6850_device> m_acia;
 	required_device<ieee488_device> m_ieee;
 };
 
 
 // device type definition
-extern const device_type INTERPOD;
+DECLARE_DEVICE_TYPE(INTERPOD, interpod_device)
 
 
-
-#endif
+#endif // MAME_BUS_CBMIEC_INTERPOD_H

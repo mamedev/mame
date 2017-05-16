@@ -216,7 +216,7 @@ void pc4_state::machine_start()
 	m_blink = 0;
 }
 
-static MACHINE_CONFIG_START( pc4, pc4_state )
+static MACHINE_CONFIG_START( pc4 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pc4_mem)
@@ -250,5 +250,5 @@ ROM_START( pc4 )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 ROM_END
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                FLAGS */
-COMP( 1990, pc4,       0,          0,      pc4,  pc4, driver_device, 0,      "Laser Computer",   "Laser PC4",                       MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY             FULLNAME     FLAGS
+COMP( 1990, pc4,   0,      0,      pc4,     pc4,   pc4_state, 0,    "Laser Computer",   "Laser PC4", MACHINE_NOT_WORKING )

@@ -593,7 +593,7 @@ static GFXDECODE_START( turtship )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sidearms, sidearms_state )
+static MACHINE_CONFIG_START( sidearms )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
@@ -642,7 +642,7 @@ static MACHINE_CONFIG_START( sidearms, sidearms_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( turtship, sidearms_state )
+static MACHINE_CONFIG_START( turtship )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
@@ -690,7 +690,7 @@ static MACHINE_CONFIG_START( turtship, sidearms_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( whizz, sidearms_state )
+static MACHINE_CONFIG_START( whizz )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz (?) */

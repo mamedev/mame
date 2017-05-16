@@ -19,13 +19,13 @@
 #include "emu.h"
 #include "cdp1869.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
 
 #define CDP1869_WEIGHT_RED      30 // % of max luminance
 #define CDP1869_WEIGHT_GREEN    59
@@ -56,7 +56,7 @@ enum
 //**************************************************************************
 
 // device type definition
-const device_type CDP1869 = device_creator<cdp1869_device>;
+DEFINE_DEVICE_TYPE(CDP1869, cdp1869_device, "cdp1869", "RCA CDP1869 VIS")
 
 // I/O map
 DEVICE_ADDRESS_MAP_START( io_map, 8, cdp1869_device )
@@ -175,16 +175,16 @@ inline int cdp1869_device::read_pcb(offs_t pma, offs_t cma, uint8_t pmd)
 
 inline void cdp1869_device::update_prd_changed_timer()
 {
-	int start = CDP1869_SCANLINE_PREDISPLAY_START_PAL;
-	int end = CDP1869_SCANLINE_PREDISPLAY_END_PAL;
+	int start = SCANLINE_PREDISPLAY_START_PAL;
+	int end = SCANLINE_PREDISPLAY_END_PAL;
 	int next_state;
 	int scanline = m_screen->vpos();
 	int next_scanline;
 
 	if (is_ntsc())
 	{
-		start = CDP1869_SCANLINE_PREDISPLAY_START_NTSC;
-		end = CDP1869_SCANLINE_PREDISPLAY_END_NTSC;
+		start = SCANLINE_PREDISPLAY_START_NTSC;
+		end = SCANLINE_PREDISPLAY_END_NTSC;
 	}
 
 	if (scanline < start)
@@ -341,7 +341,7 @@ inline int cdp1869_device::get_pen(int ccb0, int ccb1, int pcb)
 //-------------------------------------------------
 
 cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CDP1869, "RCA CDP1869", tag, owner, clock, "cdp1869", __FILE__),
+	device_t(mconfig, CDP1869, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	device_memory_interface(mconfig, *this),
@@ -572,7 +572,7 @@ void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int 
 
 	data <<= 2;
 
-	for (i = 0; i < CDP1869_CHAR_WIDTH; i++)
+	for (i = 0; i < CHAR_WIDTH; i++)
 	{
 		if (data & 0x80)
 		{
@@ -940,25 +940,25 @@ uint32_t cdp1869_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 	if (is_ntsc())
 	{
-		outer.min_x = CDP1869_HBLANK_END;
-		outer.max_x = CDP1869_HBLANK_START - 1;
-		outer.min_y = CDP1869_SCANLINE_VBLANK_END_NTSC;
-		outer.max_y = CDP1869_SCANLINE_VBLANK_START_NTSC - 1;
-		screen_rect.min_x = CDP1869_SCREEN_START_NTSC;
-		screen_rect.max_x = CDP1869_SCREEN_END - 1;
-		screen_rect.min_y = CDP1869_SCANLINE_DISPLAY_START_NTSC;
-		screen_rect.max_y = CDP1869_SCANLINE_DISPLAY_END_NTSC - 1;
+		outer.min_x = HBLANK_END;
+		outer.max_x = HBLANK_START - 1;
+		outer.min_y = SCANLINE_VBLANK_END_NTSC;
+		outer.max_y = SCANLINE_VBLANK_START_NTSC - 1;
+		screen_rect.min_x = SCREEN_START_NTSC;
+		screen_rect.max_x = SCREEN_END - 1;
+		screen_rect.min_y = SCANLINE_DISPLAY_START_NTSC;
+		screen_rect.max_y = SCANLINE_DISPLAY_END_NTSC - 1;
 	}
 	else
 	{
-		outer.min_x = CDP1869_HBLANK_END;
-		outer.max_x = CDP1869_HBLANK_START - 1;
-		outer.min_y = CDP1869_SCANLINE_VBLANK_END_PAL;
-		outer.max_y = CDP1869_SCANLINE_VBLANK_START_PAL - 1;
-		screen_rect.min_x = CDP1869_SCREEN_START_PAL;
-		screen_rect.max_x = CDP1869_SCREEN_END - 1;
-		screen_rect.min_y = CDP1869_SCANLINE_DISPLAY_START_PAL;
-		screen_rect.max_y = CDP1869_SCANLINE_DISPLAY_END_PAL - 1;
+		outer.min_x = HBLANK_END;
+		outer.max_x = HBLANK_START - 1;
+		outer.min_y = SCANLINE_VBLANK_END_PAL;
+		outer.max_y = SCANLINE_VBLANK_START_PAL - 1;
+		screen_rect.min_x = SCREEN_START_PAL;
+		screen_rect.max_x = SCREEN_END - 1;
+		screen_rect.min_y = SCANLINE_DISPLAY_START_PAL;
+		screen_rect.max_y = SCANLINE_DISPLAY_END_PAL - 1;
 	}
 
 	outer &= cliprect;
@@ -966,7 +966,7 @@ uint32_t cdp1869_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 	if (!m_dispoff)
 	{
-		int width = CDP1869_CHAR_WIDTH;
+		int width = CHAR_WIDTH;
 		int height = get_lines();
 
 		if (!m_freshorz)

@@ -6,35 +6,26 @@
 #include "68340.h"
 
 
-READ32_MEMBER( m68340cpu_device::m68340_internal_serial_r )
+READ32_MEMBER( m68340_cpu_device::m68340_internal_serial_r )
 {
-	m68340cpu_device *m68k = this;
-	m68340_serial* serial = m68k->m68340SERIAL;
-	assert(serial != nullptr);
+	assert(m68340SERIAL);
+	//m68340_serial &serial = *m68340SERIAL;
 
-	if (serial)
-	{
-		int pc = space.device().safe_pc();
-		logerror("%08x m68340_internal_serial_r %08x, (%08x)\n", pc, offset*4,mem_mask);
-	}
+	int pc = space.device().safe_pc();
+	logerror("%08x m68340_internal_serial_r %08x, (%08x)\n", pc, offset*4,mem_mask);
 
 	return 0x00000000;
 }
 
-WRITE32_MEMBER( m68340cpu_device::m68340_internal_serial_w )
+WRITE32_MEMBER( m68340_cpu_device::m68340_internal_serial_w )
 {
-	m68340cpu_device *m68k = this;
-	m68340_serial* serial = m68k->m68340SERIAL;
-	assert(serial != nullptr);
+	assert(m68340SERIAL);
+	//m68340_serial &serial = *m68340SERIAL;
 
-	if (serial)
-	{
-		int pc = space.device().safe_pc();
-		logerror("%08x m68340_internal_serial_w %08x, %08x (%08x)\n", pc, offset*4,data,mem_mask);
-	}
-
+	int pc = space.device().safe_pc();
+	logerror("%08x m68340_internal_serial_w %08x, %08x (%08x)\n", pc, offset*4,data,mem_mask);
 }
 
-void m68340_serial::reset(void)
+void m68340_serial::reset()
 {
 }

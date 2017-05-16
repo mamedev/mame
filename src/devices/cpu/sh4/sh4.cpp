@@ -25,12 +25,14 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "sh4.h"
 #include "sh4regs.h"
 #include "sh4comn.h"
 #include "sh3comn.h"
 #include "sh4tmu.h"
+
+#include "debugger.h"
+
 
 #if SH4_USE_FASTRAM_OPTIMIZATION
 void sh34_base_device::add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base)
@@ -55,10 +57,10 @@ CPU_DISASSEMBLE( sh4 );
 CPU_DISASSEMBLE( sh4be );
 
 
-const device_type SH3LE = device_creator<sh3_device>;
-const device_type SH3BE = device_creator<sh3be_device>;
-const device_type SH4LE = device_creator<sh4_device>;
-const device_type SH4BE = device_creator<sh4be_device>;
+DEFINE_DEVICE_TYPE(SH3LE, sh3_device,   "sh3le", "SH-3 (little)")
+DEFINE_DEVICE_TYPE(SH3BE, sh3be_device, "sh3be", "SH-3 (big)")
+DEFINE_DEVICE_TYPE(SH4LE, sh4_device,   "sh4le", "SH-4 (little)")
+DEFINE_DEVICE_TYPE(SH4BE, sh4be_device, "sh4be", "SH-4 (big)")
 
 
 #if 0
@@ -89,8 +91,8 @@ static ADDRESS_MAP_START( sh3_internal_map, AS_PROGRAM, 64, sh3_base_device )
 ADDRESS_MAP_END
 
 
-sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, endianness_t endianness, address_map_constructor internal)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", endianness, 64, 32, 0, internal)
 	, m_io_config("io", endianness, 64, 8)
 	, c_md2(0)
@@ -118,40 +120,40 @@ sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type ty
 }
 
 
-sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, endianness_t endianness)
-	: sh34_base_device(mconfig, type, name, tag, owner, clock, shortname, endianness, ADDRESS_MAP_NAME(sh3_internal_map))
+sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, ADDRESS_MAP_NAME(sh3_internal_map))
 {
 	m_cpu_type = CPU_TYPE_SH3;
 }
 
 
-sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, endianness_t endianness)
-	: sh34_base_device(mconfig, type, name, tag, owner, clock, shortname, endianness, ADDRESS_MAP_NAME(sh4_internal_map))
+sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, ADDRESS_MAP_NAME(sh4_internal_map))
 {
 	m_cpu_type = CPU_TYPE_SH4;
 }
 
 
 sh3_device::sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh3_base_device(mconfig, SH3LE, "SH-3 (little)", tag, owner, clock, "sh3", ENDIANNESS_LITTLE)
+	: sh3_base_device(mconfig, SH3LE, tag, owner, clock, ENDIANNESS_LITTLE)
 {
 }
 
 
 sh3be_device::sh3be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh3_base_device(mconfig, SH3BE, "SH-3 (big)", tag, owner, clock, "sh3be", ENDIANNESS_BIG)
+	: sh3_base_device(mconfig, SH3BE, tag, owner, clock, ENDIANNESS_BIG)
 {
 }
 
 
 sh4_device::sh4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh4_base_device(mconfig, SH4LE, "SH-4 (little)", tag, owner, clock, "sh4", ENDIANNESS_LITTLE)
+	: sh4_base_device(mconfig, SH4LE, tag, owner, clock, ENDIANNESS_LITTLE)
 {
 }
 
 
 sh4be_device::sh4be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh4_base_device(mconfig, SH4BE, "SH-4 (big)", tag, owner, clock, "sh4be", ENDIANNESS_BIG)
+	: sh4_base_device(mconfig, SH4BE, tag, owner, clock, ENDIANNESS_BIG)
 {
 }
 

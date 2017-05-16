@@ -611,7 +611,7 @@ MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( pipedrm, pipedrm_state )
+static MACHINE_CONFIG_START( pipedrm )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( pipedrm, pipedrm_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hatris, pipedrm_state )
+static MACHINE_CONFIG_START( hatris )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
@@ -925,9 +925,9 @@ DRIVER_INIT_MEMBER(pipedrm_state,hatris)
  *
  *************************************/
 
-GAME( 1990, pipedrm,  0,       pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pipedrmu, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pipedrmj, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrm,  0,       pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (World)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrmu, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrmj, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (Japan)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1990, pipedrmt, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (Taiwan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hatris,   0,       hatris,  hatris, pipedrm_state,  hatris,  ROT0, "Video System Co.", "Hatris (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hatrisj,  hatris,  hatris,  hatris, pipedrm_state,  hatris,  ROT0, "Video System Co.", "Hatris (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatris,   0,       hatris,  hatris,  pipedrm_state, hatris,  ROT0, "Video System Co.", "Hatris (US)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatrisj,  hatris,  hatris,  hatris,  pipedrm_state, hatris,  ROT0, "Video System Co.", "Hatris (Japan)",      MACHINE_SUPPORTS_SAVE )

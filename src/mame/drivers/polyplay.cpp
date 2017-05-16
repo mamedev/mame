@@ -308,7 +308,7 @@ GFXDECODE_END
 
 
 /* the machine driver */
-static MACHINE_CONFIG_START( polyplay_zre, polyplay_state )
+static MACHINE_CONFIG_START( polyplay_zre )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80CPU_TAG, Z80, POLYPLAY_MAIN_CLOCK / 4) /* UB880D */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_zre)
@@ -350,7 +350,7 @@ static MACHINE_CONFIG_START( polyplay_zre, polyplay_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( polyplay_zrepp, polyplay_state )
+static MACHINE_CONFIG_START( polyplay_zrepp )
 	MCFG_FRAGMENT_ADD( polyplay_zre )
 
 	/* basic machine hardware */
@@ -434,6 +434,6 @@ ROM_START( polyplay2c )
 ROM_END
 
 /* game driver */
-GAMEL( 1986, polyplay,   0,         polyplay_zre,   polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE)",            0, layout_polyplay )
-GAMEL( 1989, polyplay2,  0,         polyplay_zrepp, polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP)",         0, layout_polyplay )
-GAMEL( 1989, polyplay2c, polyplay2, polyplay_zrepp, polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP - Czech)", 0, layout_polyplay )
+GAMEL( 1986, polyplay,   0,         polyplay_zre,   polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE)",            0, layout_polyplay )
+GAMEL( 1989, polyplay2,  0,         polyplay_zrepp, polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP)",         0, layout_polyplay )
+GAMEL( 1989, polyplay2c, polyplay2, polyplay_zrepp, polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP - Czech)", 0, layout_polyplay )

@@ -9,11 +9,11 @@
 #include "emu.h"
 #include "74175.h"
 
-const device_type TTL74174 = device_creator<ttl74174_device>;
-const device_type TTL74175 = device_creator<ttl74175_device>;
+DEFINE_DEVICE_TYPE(TTL74174, ttl74174_device, "ttl74174", "54/74174 Hex D Flip-Flops with Clear")
+DEFINE_DEVICE_TYPE(TTL74175, ttl74175_device, "ttl74175", "54/74175 Quad D Flip-Flops with Clear")
 
-ttl741745_device::ttl741745_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+ttl741745_device::ttl741745_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_q1_func(*this)
 	, m_q2_func(*this)
 	, m_q3_func(*this)
@@ -32,7 +32,7 @@ ttl741745_device::ttl741745_device(const machine_config &mconfig, device_type ty
 }
 
 ttl74174_device::ttl74174_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ttl741745_device(mconfig, TTL74174, "54/74174 Hex D Flip-Flops with Clear", tag, owner, clock, "ttl74174")
+	: ttl741745_device(mconfig, TTL74174, tag, owner, clock)
 	, m_q5_func(*this)
 	, m_q6_func(*this)
 	, m_d5(0)
@@ -43,7 +43,7 @@ ttl74174_device::ttl74174_device(const machine_config &mconfig, const char *tag,
 }
 
 ttl74175_device::ttl74175_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ttl741745_device(mconfig, TTL74175, "54/74175 Quad D Flip-Flops with Clear", tag, owner, clock, "ttl74175")
+	: ttl741745_device(mconfig, TTL74175, tag, owner, clock)
 	, m_not_q1_func(*this)
 	, m_not_q2_func(*this)
 	, m_not_q3_func(*this)

@@ -167,36 +167,36 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<netlist_mame_device_t> m_video_board;
-	required_device<netlist_ram_pointer_t> m_u9;
-	required_device<netlist_ram_pointer_t> m_u10;
-	required_device<netlist_ram_pointer_t> m_u11;
-	required_device<netlist_ram_pointer_t> m_u12;
-	required_device<netlist_ram_pointer_t> m_u13;
-	required_device<netlist_ram_pointer_t> m_u14;
-	required_device<netlist_ram_pointer_t> m_u15;
-	required_device<netlist_ram_pointer_t> m_u16;
-	required_device<netlist_ram_pointer_t> m_u22;
-	required_device<netlist_ram_pointer_t> m_u23;
-	required_device<netlist_ram_pointer_t> m_u24;
-	required_device<netlist_ram_pointer_t> m_u25;
-	required_device<netlist_ram_pointer_t> m_u26;
-	required_device<netlist_ram_pointer_t> m_u27;
-	required_device<netlist_ram_pointer_t> m_u28;
-	required_device<netlist_ram_pointer_t> m_u29;
-	required_device<netlist_mame_logic_input_t> m_cpu_db0;
-	required_device<netlist_mame_logic_input_t> m_cpu_db1;
-	required_device<netlist_mame_logic_input_t> m_cpu_db2;
-	required_device<netlist_mame_logic_input_t> m_cpu_db3;
-	required_device<netlist_mame_logic_input_t> m_cpu_db4;
-	required_device<netlist_mame_logic_input_t> m_cpu_db5;
-	required_device<netlist_mame_logic_input_t> m_cpu_db6;
-	required_device<netlist_mame_logic_input_t> m_cpu_db7;
-	required_device<netlist_mame_logic_input_t> m_cpu_ba4;
-	required_device<netlist_mame_logic_input_t> m_cpu_iowq;
-	required_device<netlist_mame_analog_output_t> m_video_out;
-	required_device<netlist_mame_analog_output_t> m_vblank_out;
-	required_device<netlist_mame_analog_output_t> m_tvinterq_out;
+	required_device<netlist_mame_device> m_video_board;
+	required_device<netlist_mame_ram_pointer_device> m_u9;
+	required_device<netlist_mame_ram_pointer_device> m_u10;
+	required_device<netlist_mame_ram_pointer_device> m_u11;
+	required_device<netlist_mame_ram_pointer_device> m_u12;
+	required_device<netlist_mame_ram_pointer_device> m_u13;
+	required_device<netlist_mame_ram_pointer_device> m_u14;
+	required_device<netlist_mame_ram_pointer_device> m_u15;
+	required_device<netlist_mame_ram_pointer_device> m_u16;
+	required_device<netlist_mame_ram_pointer_device> m_u22;
+	required_device<netlist_mame_ram_pointer_device> m_u23;
+	required_device<netlist_mame_ram_pointer_device> m_u24;
+	required_device<netlist_mame_ram_pointer_device> m_u25;
+	required_device<netlist_mame_ram_pointer_device> m_u26;
+	required_device<netlist_mame_ram_pointer_device> m_u27;
+	required_device<netlist_mame_ram_pointer_device> m_u28;
+	required_device<netlist_mame_ram_pointer_device> m_u29;
+	required_device<netlist_mame_logic_input_device> m_cpu_db0;
+	required_device<netlist_mame_logic_input_device> m_cpu_db1;
+	required_device<netlist_mame_logic_input_device> m_cpu_db2;
+	required_device<netlist_mame_logic_input_device> m_cpu_db3;
+	required_device<netlist_mame_logic_input_device> m_cpu_db4;
+	required_device<netlist_mame_logic_input_device> m_cpu_db5;
+	required_device<netlist_mame_logic_input_device> m_cpu_db6;
+	required_device<netlist_mame_logic_input_device> m_cpu_db7;
+	required_device<netlist_mame_logic_input_device> m_cpu_ba4;
+	required_device<netlist_mame_logic_input_device> m_cpu_iowq;
+	required_device<netlist_mame_analog_output_device> m_video_out;
+	required_device<netlist_mame_analog_output_device> m_vblank_out;
+	required_device<netlist_mame_analog_output_device> m_tvinterq_out;
 	required_device<ay31015_device> m_uart;
 	required_device<ay3600_device> m_kbdc;
 	required_ioport m_baud_dips;
@@ -686,7 +686,7 @@ static GFXDECODE_START( hazl1500 )
 	GFXDECODE_ENTRY( CHAR_EPROM_TAG, 0x0000, hazl1500_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
+static MACHINE_CONFIG_START( hazl1500 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CPU_TAG, I8080, XTAL_18MHz/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
 	MCFG_CPU_PROGRAM_MAP(hazl1500_mem)
@@ -784,5 +784,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     CLASS          INIT    COMPANY                     FULLNAME            FLAGS */
-COMP( 1977, hazl1500, 0,        0,       hazl1500, hazl1500, driver_device, 0,      "Hazeltine Corporation",    "Hazeltine 1500",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     CLASS           INIT    COMPANY                     FULLNAME            FLAGS
+COMP( 1977, hazl1500, 0,        0,       hazl1500, hazl1500, hazl1500_state, 0,      "Hazeltine Corporation",    "Hazeltine 1500",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

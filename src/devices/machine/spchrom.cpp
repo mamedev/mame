@@ -23,10 +23,10 @@
 #define TMS5220_ADDRESS_MASK 0x3FFFFUL  /* 18-bit mask for tms5220 address */
 
 // device type definition
-const device_type SPEECHROM = device_creator<speechrom_device>;
+DEFINE_DEVICE_TYPE(SPEECHROM, speechrom_device, "speechrom", "TI Speech ROM")
 
 speechrom_device::speechrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SPEECHROM, "SPEECHROM", tag, owner, clock, "speechrom", __FILE__), m_speechrom_data(nullptr), m_speechROMlen(0),
+	: device_t(mconfig, SPEECHROM, tag, owner, clock), m_speechrom_data(nullptr), m_speechROMlen(0),
 	m_speechROMaddr(0),
 	m_load_pointer(0),
 	m_ROM_bits_count(0),

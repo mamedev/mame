@@ -24,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SFX_SOUND_EXPANDER = device_creator<c64_sfx_sound_expander_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_SFX_SOUND_EXPANDER, c64_sfx_sound_expander_cartridge_device, "c64_sfxse", "C64 SFX Sound Expander cartridge")
 
 
 //-------------------------------------------------
@@ -183,7 +183,7 @@ inline offs_t c64_sfx_sound_expander_cartridge_device::get_offset(offs_t offset,
 //-------------------------------------------------
 
 c64_sfx_sound_expander_cartridge_device::c64_sfx_sound_expander_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_SFX_SOUND_EXPANDER, "C64 SFX Sound Expander cartridge", tag, owner, clock, "c64_sfxse", __FILE__),
+	device_t(mconfig, C64_SFX_SOUND_EXPANDER, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_opl(*this, YM3526_TAG),
 	m_exp(*this, C64_EXPANSION_SLOT_TAG),

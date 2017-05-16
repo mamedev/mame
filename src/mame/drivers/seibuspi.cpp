@@ -1863,7 +1863,7 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 	m_z80_prg_transfer_pos = 0;
 }
 
-static MACHINE_CONFIG_START( spi, seibuspi_state )
+static MACHINE_CONFIG_START( spi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // AMD or Intel 386DX, 25MHz
@@ -1992,7 +1992,7 @@ MACHINE_CONFIG_END
 
 /* SYS386I */
 
-static MACHINE_CONFIG_START( sys386i, seibuspi_state )
+static MACHINE_CONFIG_START( sys386i )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_40MHz) // AMD 386DX, 40MHz
@@ -2020,10 +2020,10 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/20, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/20, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/20, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/20, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -2049,7 +2049,7 @@ DRIVER_INIT_MEMBER(seibuspi_state,sys386f)
 	}
 }
 
-static MACHINE_CONFIG_START( sys386f, seibuspi_state )
+static MACHINE_CONFIG_START( sys386f )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // Intel i386DX, 25MHz

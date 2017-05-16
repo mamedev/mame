@@ -2959,7 +2959,7 @@ MACHINE_RESET_MEMBER(taitoz_state,taitoz)
 
 /* Contcirc vis area seems narrower than the other games... */
 
-static MACHINE_CONFIG_START( contcirc, taitoz_state )
+static MACHINE_CONFIG_START( contcirc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3037,7 +3037,7 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( chasehq, taitoz_state )
+static MACHINE_CONFIG_START( chasehq )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3115,7 +3115,7 @@ static MACHINE_CONFIG_START( chasehq, taitoz_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( enforce, taitoz_state )
+static MACHINE_CONFIG_START( enforce )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3194,7 +3194,7 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bshark, taitoz_state )
+static MACHINE_CONFIG_START( bshark )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3272,7 +3272,7 @@ static MACHINE_CONFIG_DERIVED( bsharkjjs, bshark )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sci, taitoz_state )
+static MACHINE_CONFIG_START( sci )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3348,7 +3348,7 @@ static MACHINE_CONFIG_START( sci, taitoz_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( nightstr, taitoz_state )
+static MACHINE_CONFIG_START( nightstr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3428,7 +3428,7 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( aquajack, taitoz_state )
+static MACHINE_CONFIG_START( aquajack )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3507,7 +3507,7 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spacegun, taitoz_state )
+static MACHINE_CONFIG_START( spacegun )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz ??? */
@@ -3577,7 +3577,7 @@ static MACHINE_CONFIG_START( spacegun, taitoz_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dblaxle, taitoz_state )
+static MACHINE_CONFIG_START( dblaxle )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -3653,7 +3653,7 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( racingb, taitoz_state )
+static MACHINE_CONFIG_START( racingb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -5373,46 +5373,46 @@ DRIVER_INIT_MEMBER(taitoz_state,bshark)
 
 
 
-GAMEL(1987, contcirc,   0,        contcirc, contcirc, taitoz_state, taitoz,   ROT0,               "Taito Corporation Japan",   "Continental Circus (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1987, contcircu,  contcirc, contcirc, contcrcu, taitoz_state, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1987, contcircua, contcirc, contcirc, contcrcj, taitoz_state, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1987, contcircj , contcirc, contcirc, contcrcj, taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Continental Circus (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcirc,   0,        contcirc,  contcirc,  taitoz_state, taitoz,   ROT0,               "Taito Corporation Japan",   "Continental Circus (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcircu,  contcirc, contcirc,  contcrcu,  taitoz_state, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcircua, contcirc, contcirc,  contcrcj,  taitoz_state, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcircj , contcirc, contcirc,  contcrcj,  taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Continental Circus (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
 
-GAMEL(1988, chasehq,    0,        chasehq,  chasehq, taitoz_state,  taitoz,   ROT0,               "Taito Corporation Japan",   "Chase H.Q. (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1988, chasehqj,   chasehq,  chasehq,  chasehqj, taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Chase H.Q. (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1988, chasehqju,  chasehq,  chasehq,  chasehq, taitoz_state,  taitoz,   ROT0,               "Taito Corporation",         "Chase H.Q. (Japan, upright?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc ) // same code rev as Chase H.Q. (World)
-GAMEL(1988, chasehqu,   chasehq,  chasehq,  chasehq, taitoz_state,  taitoz,   ROT0,               "Taito America Corporation", "Chase H.Q. (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehq,    0,        chasehq,   chasehq,   taitoz_state, taitoz,   ROT0,               "Taito Corporation Japan",   "Chase H.Q. (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehqj,   chasehq,  chasehq,   chasehqj,  taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Chase H.Q. (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehqju,  chasehq,  chasehq,   chasehq,   taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Chase H.Q. (Japan, upright?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc ) // same code rev as Chase H.Q. (World)
+GAMEL(1988, chasehqu,   chasehq,  chasehq,   chasehq,   taitoz_state, taitoz,   ROT0,               "Taito America Corporation", "Chase H.Q. (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
 
-GAME( 1988, enforce,    0,        enforce,  enforce,  taitoz_state, taitoz,   ROT0,               "Taito Corporation Japan",   "Enforce (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, enforcej,   enforce,  enforce,  enforcej, taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Enforce (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, enforceja,  enforce,  enforce,  enforceja,taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Enforce (Japan, Analog Controls)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, enforce,    0,        enforce,   enforce,   taitoz_state, taitoz,   ROT0,               "Taito Corporation Japan",   "Enforce (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, enforcej,   enforce,  enforce,   enforcej,  taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Enforce (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, enforceja,  enforce,  enforce,   enforceja, taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Enforce (Japan, Analog Controls)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, bshark,     0,        bshark,   bshark, taitoz_state,   bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Battle Shark (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bsharku,    bshark,   bshark,   bsharku, taitoz_state,  bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bsharkj,    bshark,   bshark,   bsharkj, taitoz_state,  bshark,   ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bsharkjjs,  bshark,   bsharkjjs,bsharkjjs, taitoz_state,bshark,   ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan, Joystick)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bshark,     0,        bshark,    bshark,    taitoz_state, bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Battle Shark (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bsharku,    bshark,   bshark,    bsharku,   taitoz_state, bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bsharkj,    bshark,   bshark,    bsharkj,   taitoz_state, bshark,   ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bsharkjjs,  bshark,   bsharkjjs, bsharkjjs, taitoz_state, bshark,   ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan, Joystick)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1989, sci,        0,        sci,      sci, taitoz_state,      taitoz,   ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1989, scia,       sci,      sci,      sci, taitoz_state,      taitoz,   ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1989, scij,       sci,      sci,      scij, taitoz_state,     taitoz,   ROT0,               "Taito Corporation",         "Special Criminal Investigation (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1989, sciu,       sci,      sci,      sciu, taitoz_state,     taitoz,   ROT0,               "Taito America Corporation", "Special Criminal Investigation (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1991, scin,       sci,      sci,      sci, taitoz_state,      taitoz,   ROT0,               "hack (Negro Torino)",       "Super Special Criminal Investigation (Negro Torino hack)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1989, sci,        0,        sci,       sci,       taitoz_state, taitoz,   ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1989, scia,       sci,      sci,       sci,       taitoz_state, taitoz,   ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1989, scij,       sci,      sci,       scij,      taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Special Criminal Investigation (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1989, sciu,       sci,      sci,       sciu,      taitoz_state, taitoz,   ROT0,               "Taito America Corporation", "Special Criminal Investigation (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1991, scin,       sci,      sci,       sci,       taitoz_state, taitoz,   ROT0,               "hack (Negro Torino)",       "Super Special Criminal Investigation (Negro Torino hack)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
 
-GAME( 1989, nightstr,   0,        nightstr, nightstr, taitoz_state, taitoz,   ROT0,               "Taito Corporation Japan",   "Night Striker (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, nightstrj,  nightstr, nightstr, nghtstrj, taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Night Striker (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, nightstru,  nightstr, nightstr, nghtstru, taitoz_state, taitoz,   ROT0,               "Taito America Corporation", "Night Striker (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, nightstr,   0,        nightstr,  nightstr,  taitoz_state, taitoz,   ROT0,               "Taito Corporation Japan",   "Night Striker (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, nightstrj,  nightstr, nightstr,  nghtstrj,  taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Night Striker (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, nightstru,  nightstr, nightstr,  nghtstru,  taitoz_state, taitoz,   ROT0,               "Taito America Corporation", "Night Striker (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, aquajack,   0,        aquajack, aquajack, taitoz_state, taitoz,   ROT0,               "Taito Corporation Japan",   "Aqua Jack (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aquajacku,  aquajack, aquajack, aquajack, taitoz_state, taitoz,   ROT0,               "Taito America Corporation", "Aqua Jack (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aquajackj,  aquajack, aquajack, aquajckj, taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Aqua Jack (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aquajack,   0,        aquajack,  aquajack,  taitoz_state, taitoz,   ROT0,               "Taito Corporation Japan",   "Aqua Jack (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aquajacku,  aquajack, aquajack,  aquajack,  taitoz_state, taitoz,   ROT0,               "Taito America Corporation", "Aqua Jack (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aquajackj,  aquajack, aquajack,  aquajckj,  taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Aqua Jack (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, spacegun,   0,        spacegun, spacegun, taitoz_state, bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Space Gun (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spacegunj,  spacegun, spacegun, spacegnj, taitoz_state, bshark,   ORIENTATION_FLIP_X, "Taito Corporation",         "Space Gun (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spacegunu,  spacegun, spacegun, spacegnu, taitoz_state, bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Space Gun (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spacegun,   0,        spacegun,  spacegun,  taitoz_state, bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Space Gun (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spacegunj,  spacegun, spacegun,  spacegnj,  taitoz_state, bshark,   ORIENTATION_FLIP_X, "Taito Corporation",         "Space Gun (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spacegunu,  spacegun, spacegun,  spacegnu,  taitoz_state, bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Space Gun (US)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1991, dblaxle,    0,        dblaxle,  dblaxle, taitoz_state,  taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
-GAMEL(1991, dblaxleu,   dblaxle,  dblaxle,  dblaxle, taitoz_state,  taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US, earlier)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
-GAMEL(1991, pwheelsj,   dblaxle,  dblaxle,  pwheelsj, taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Power Wheels (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxle,    0,        dblaxle,   dblaxle,   taitoz_state, taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxleu,   dblaxle,  dblaxle,   dblaxle,   taitoz_state, taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US, earlier)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, pwheelsj,   dblaxle,  dblaxle,   pwheelsj,  taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Power Wheels (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
 
-GAMEL(1991, racingb,    0,        racingb,  racingb, taitoz_state,  taitoz,   ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
-GAMEL(1991, racingbj,   racingb,  racingb,  racingb, taitoz_state,  taitoz,   ROT0,               "Taito Corporation",         "Racing Beat (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, racingb,    0,        racingb,   racingb,   taitoz_state, taitoz,   ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, racingbj,   racingb,  racingb,   racingb,   taitoz_state, taitoz,   ROT0,               "Taito Corporation",         "Racing Beat (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )

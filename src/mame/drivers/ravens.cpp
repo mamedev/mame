@@ -100,7 +100,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port1c_w);
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_MACHINE_RESET(ravens2);
 	DECLARE_READ8_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
@@ -258,7 +258,7 @@ static INPUT_PORTS_START( ravens )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("???") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 INPUT_PORTS_END
 
-WRITE8_MEMBER( ravens_state::kbd_put )
+void ravens_state::kbd_put(u8 data)
 {
 	if (data > 0x60) data -= 0x20; // fold to uppercase
 	m_term_data = data;
@@ -328,7 +328,7 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 	return result;
 }
 
-static MACHINE_CONFIG_START( ravens, ravens_state )
+static MACHINE_CONFIG_START( ravens )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz) // frequency is unknown
 	MCFG_CPU_PROGRAM_MAP(ravens_mem)
@@ -348,7 +348,7 @@ static MACHINE_CONFIG_START( ravens, ravens_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ravens2, ravens_state )
+static MACHINE_CONFIG_START( ravens2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz) // frequency is unknown
 	MCFG_CPU_PROGRAM_MAP(ravens_mem)
@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( ravens2, ravens_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ravens_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ravens_state, kbd_put))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", ravens_state, ravens, "pgm", 1)
@@ -387,6 +387,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE  INPUT   CLASS        INIT     COMPANY    FULLNAME       FLAGS */
-COMP( 1984, ravens,  0,       0,       ravens,  ravens, driver_device, 0, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", MACHINE_NO_SOUND_HW )
-COMP( 1985, ravens2, ravens,  0,       ravens2, ravens, driver_device, 0, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME     PARENT   COMPAT   MACHINE  INPUT   CLASS         INIT  COMPANY                            FULLNAME                               FLAGS */
+COMP( 1984, ravens,  0,       0,       ravens,  ravens, ravens_state, 0,    "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", MACHINE_NO_SOUND_HW )
+COMP( 1985, ravens2, ravens,  0,       ravens2, ravens, ravens_state, 0,    "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", MACHINE_NO_SOUND_HW )

@@ -87,7 +87,7 @@
 
     Type 5 US UNIX layout:
 
-      76      xx      05  06  08  0a    0c  0e  10  11    12  07  09  0b    16  17  15    2d  02  04  30
+      76      0f      05  06  08  0a    0c  0e  10  11    12  07  09  0b    16  17  15    2d  02  04  30
 
     01  03    1d  1e  1f  20  21  22  23  24  25  26  27  28  29  58  2a    2c  34  60    62  2e  2f  47
     19  1a    35    36  37  38  39  3a  3b  3c  3d  3e  3f  40  41    2b    42  4a  7b    44  45  46
@@ -95,7 +95,7 @@
     48  49    63       64  65  66  67  68  69  6a  6b  6c  6d         6e        14        70  71  72
     5f  61    77     13   78                79                7a  43  0d    18  1b  1c      5e    32  5a
 
-    xx is a blank key
+    0f is a blank key
     backspace immediately above return
     backslash and backtick/tilde at top right of main area
     control on home row, caps lock at bottom left corner of main area
@@ -136,16 +136,17 @@
     DEVICE TYPE GLOBALS
 ***************************************************************************/
 
-device_type const SUN_TYPE3_HLE_KEYBOARD    = device_creator<bus::sunkbd::hle_type3_device>;
-device_type const SUN_TYPE4_HLE_KEYBOARD    = device_creator<bus::sunkbd::hle_type4_device>;
-device_type const SUN_TYPE5_HLE_KEYBOARD    = device_creator<bus::sunkbd::hle_type5_device>;
-device_type const SUN_TYPE5_GB_HLE_KEYBOARD = device_creator<bus::sunkbd::hle_type5_gb_device>;
-device_type const SUN_TYPE5_SE_HLE_KEYBOARD = device_creator<bus::sunkbd::hle_type5_se_device>;
-device_type const SUN_TYPE5_JP_HLE_KEYBOARD = device_creator<bus::sunkbd::hle_type5_jp_device>;
+DEFINE_DEVICE_TYPE_NS(SUN_TYPE3_HLE_KEYBOARD,    bus::sunkbd, hle_type3_device,    "kbd_type3_hle",    "Sun Type 3 Keyboard (HLE)")
+DEFINE_DEVICE_TYPE_NS(SUN_TYPE4_HLE_KEYBOARD,    bus::sunkbd, hle_type4_device,    "kbd_type4_hle",    "Sun Type 4 Keyboard (HLE)")
+DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_HLE_KEYBOARD,    bus::sunkbd, hle_type5_device,    "kbd_type5_hle_us", "Sun Type 5 Keyboard (U.S.A. - HLE)")
+DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_GB_HLE_KEYBOARD, bus::sunkbd, hle_type5_gb_device, "kbd_type5_hle_gb", "Sun Type 5 Keyboard (Great Britain - HLE)")
+DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_SE_HLE_KEYBOARD, bus::sunkbd, hle_type5_se_device, "kbd_type5_hle_se", "Sun Type 5 Keyboard (Sweden - HLE)")
+DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_JP_HLE_KEYBOARD, bus::sunkbd, hle_type5_jp_device, "kbd_type5_hle_jp", "Sun Type 5 Keyboard (Japan - HLE)")
 
 
 
 namespace bus { namespace sunkbd {
+
 namespace {
 /***************************************************************************
     INPUT PORT DEFINITIONS
@@ -421,9 +422,9 @@ INPUT_PORTS_START( basic_jp )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('\\') PORT_CHAR('_')
 
 	PORT_MODIFY("ROW7")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Kakutei")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Henkan")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Nihongo On-Off") PORT_CODE(KEYCODE_MENU)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Kakutei")                                // 確定
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Henkan")                                 // 変換
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Nihongo On-Off") PORT_CODE(KEYCODE_MENU) // 日本語 On-Off
 INPUT_PORTS_END
 
 
@@ -723,7 +724,7 @@ INPUT_PORTS_START( hle_type5_jp_device )
 	TYPE5_DIPS(0x11)
 
 	PORT_MODIFY("ROW0")
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Kana")         PORT_CODE(KEYCODE_RALT)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Kana")         PORT_CODE(KEYCODE_RALT) // かな
 INPUT_PORTS_END
 
 
@@ -754,13 +755,10 @@ MACHINE_CONFIG_END
 hle_device_base::hle_device_base(
 		machine_config const &mconfig,
 		device_type type,
-		char const *name,
 		char const *tag,
 		device_t *owner,
-		uint32_t clock,
-		char const *shortname,
-		char const *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_sun_keyboard_port_interface(mconfig, *this)
 	, device_matrix_keyboard_interface(mconfig, *this, "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7")
@@ -1083,12 +1081,9 @@ hle_type3_device::hle_type3_device(
 	: hle_device_base(
 			mconfig,
 			SUN_TYPE3_HLE_KEYBOARD,
-			"Sun Type 3 Keyboard (HLE)",
 			tag,
 			owner,
-			clock,
-			"type3_hle_kbd",
-			__FILE__)
+			clock)
 {
 }
 
@@ -1134,12 +1129,9 @@ hle_type4_device::hle_type4_device(
 	: hle_type4_device_base(
 			mconfig,
 			SUN_TYPE4_HLE_KEYBOARD,
-			"Sun Type 4 Keyboard (HLE)",
 			tag,
 			owner,
-			clock,
-			"type4_hle_kbd",
-			__FILE__)
+			clock)
 {
 }
 
@@ -1173,12 +1165,9 @@ hle_type5_device::hle_type5_device(
 	: hle_type4_device_base(
 			mconfig,
 			SUN_TYPE5_HLE_KEYBOARD,
-			"Sun Type 5 Keyboard (U.S.A. - HLE)",
 			tag,
 			owner,
-			clock,
-			"type5_hle_kbd",
-			__FILE__)
+			clock)
 {
 }
 
@@ -1212,12 +1201,9 @@ hle_type5_gb_device::hle_type5_gb_device(
 	: hle_type4_device_base(
 			mconfig,
 			SUN_TYPE5_GB_HLE_KEYBOARD,
-			"Sun Type 5 Keyboard (Great Britain - HLE)",
 			tag,
 			owner,
-			clock,
-			"type5_gb_hle_kbd",
-			__FILE__)
+			clock)
 {
 }
 
@@ -1251,12 +1237,9 @@ hle_type5_se_device::hle_type5_se_device(
 	: hle_type4_device_base(
 			mconfig,
 			SUN_TYPE5_SE_HLE_KEYBOARD,
-			"Sun Type 5 Keyboard (Sweden - HLE)",
 			tag,
 			owner,
-			clock,
-			"type5_se_hle_kbd",
-			__FILE__)
+			clock)
 {
 }
 
@@ -1290,12 +1273,9 @@ hle_type5_jp_device::hle_type5_jp_device(
 	: hle_type4_device_base(
 			mconfig,
 			SUN_TYPE5_JP_HLE_KEYBOARD,
-			"Sun Type 5 Keyboard (Japan - HLE)",
 			tag,
 			owner,
-			clock,
-			"type5_jp_hle_kbd",
-			__FILE__)
+			clock)
 {
 }
 

@@ -5,6 +5,10 @@
     Cirrus Logic GD542x/3x video chipsets
 
 */
+#ifndef MAME_VIDEO_CLGD542X_H
+#define MAME_VIDEO_CLGD542X_H
+
+#pragma once
 
 #include "video/pc_vga.h"
 
@@ -16,7 +20,7 @@ class cirrus_gd5428_device :  public svga_device
 public:
 	// construction/destruction
 	cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+
 	virtual READ8_MEMBER(port_03c0_r) override;
 	virtual WRITE8_MEMBER(port_03c0_w) override;
 	virtual READ8_MEMBER(port_03b0_r) override;
@@ -27,7 +31,10 @@ public:
 	virtual WRITE8_MEMBER(mem_w) override;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
 protected:
+	cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -83,6 +90,7 @@ protected:
 	uint8_t m_vclk_denom[4];
 
 	inline uint8_t cirrus_vga_latch_write(int offs, uint8_t data);
+
 private:
 	void cirrus_define_video_mode();
 	uint8_t cirrus_seq_reg_read(uint8_t index);
@@ -104,10 +112,13 @@ class cirrus_gd5430_device :  public cirrus_gd5428_device
 {
 public:
 	cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
 	virtual void device_start() override;
 };
 
 // device type definition
-extern const device_type CIRRUS_GD5428;
-extern const device_type CIRRUS_GD5430;
+DECLARE_DEVICE_TYPE(CIRRUS_GD5428, cirrus_gd5428_device)
+DECLARE_DEVICE_TYPE(CIRRUS_GD5430, cirrus_gd5430_device)
+
+#endif // MAME_VIDEO_CLGD542X_H

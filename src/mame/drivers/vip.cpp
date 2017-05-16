@@ -710,7 +710,7 @@ QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 //  MACHINE_CONFIG( vip )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vip, vip_state )
+static MACHINE_CONFIG_START( vip )
 	// basic machine hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_52128MHz/2)
 	MCFG_CPU_PROGRAM_MAP(vip_mem)
@@ -808,6 +808,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME    FLAGS
-COMP( 1977, vip,    0,      0,      vip,        vip, driver_device, 0,      "RCA",  "Cosmac VIP (VP-711)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )
-COMP( 1977, vp111,  vip,    0,      vp111,      vip, driver_device, 0,      "RCA",  "Cosmac VIP (VP-111)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE      INIT    COMPANY  FULLNAME                FLAGS
+COMP( 1977, vip,    0,      0,      vip,     vip,   vip_state, 0,      "RCA",   "Cosmac VIP (VP-711)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )
+COMP( 1977, vp111,  vip,    0,      vp111,   vip,   vip_state, 0,      "RCA",   "Cosmac VIP (VP-111)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )

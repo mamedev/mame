@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_AGAT7LANGCARD__
-#define __A2BUS_AGAT7LANGCARD__
+#ifndef MAME_BUS_A2BUS_AGAT7LANGCARD_H
+#define MAME_BUS_A2BUS_AGAT7LANGCARD_H
+
+#pragma once
 
 #include "emu.h"
 #include "a2bus.h"
@@ -24,10 +26,11 @@ class a2bus_agat7langcard_device:
 {
 public:
 	// construction/destruction
-	a2bus_agat7langcard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a2bus_agat7langcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	a2bus_agat7langcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -53,5 +56,6 @@ private:
 
 // device type definition
 extern const device_type A2BUS_AGAT7LANGCARD;
+DECLARE_DEVICE_TYPE(A2BUS_AGAT7LANGCARD, a2bus_agat7langcard_device)
 
-#endif /* __A2BUS_AGAT7LANGCARD__ */
+#endif // MAME_BUS_A2BUS_AGAT7LANGCARD_H

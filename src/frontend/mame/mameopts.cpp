@@ -321,6 +321,11 @@ bool mame_options::parse_command_line(emu_options &options, std::vector<std::str
 	if (!options.parse_command_line(args, OPTION_PRIORITY_CMDLINE, error_string))
 		return false;
 
+	// in order to evaluate softlist options, we need to fish any hashpath variable out of INI files; this is
+	// because hashpath in particular can affect softlist evaluation
+	if (options.software_name()[0] != '\0' && options.read_config())
+		populate_hashpath_from_ini_files(options);
+
 	// identify any options as a result of softlists
 	auto softlist_opts = evaluate_initial_softlist_options(options);
 
@@ -551,7 +556,7 @@ void mame_options::parse_standard_inis(emu_options &options, std::string &error_
 	}
 
 	// next parse "source/<sourcefile>.ini"
-	std::string sourcename = core_filename_extract_base(cursystem->source_file, true).insert(0, "source" PATH_SEPARATOR);
+	std::string sourcename = core_filename_extract_base(cursystem->type.source(), true).insert(0, "source" PATH_SEPARATOR);
 	parse_one_ini(options,sourcename.c_str(), OPTION_PRIORITY_SOURCE_INI, &error_string);
 
 	// then parse the grandparent, parent, and system-specific INIs
@@ -690,3 +695,24 @@ bool mame_options::parse_one_ini(emu_options &options, const char *basename, int
 	return result;
 }
 
+
+//-------------------------------------------------
+//  populate_hashpath_from_ini_files
+//-------------------------------------------------
+
+void mame_options::populate_hashpath_from_ini_files(emu_options &options)
+{
+	// create temporary emu_options for the purposes of evaluating the INI files
+	emu_options temp_options;
+	std::string temp_error_string;
+	temp_options.set_value(OPTION_SYSTEMNAME, options.system_name(), OPTION_PRIORITY_MAXIMUM, temp_error_string);
+	temp_options.set_value(OPTION_INIPATH, options.ini_path(), OPTION_PRIORITY_MAXIMUM, temp_error_string);
+
+	// read the INIs into temp_options
+	parse_standard_inis(temp_options, temp_error_string);
+
+	// and fish out hashpath
+	const auto entry = temp_options.get_entry(OPTION_HASHPATH);
+	if (entry)
+		options.set_value(OPTION_HASHPATH, entry->value(), entry->priority(), temp_error_string);
+}

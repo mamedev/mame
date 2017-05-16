@@ -1886,7 +1886,7 @@ GFXDECODE_END
 #define VBSTART             (240)
 
 
-static MACHINE_CONFIG_START( rallybik, toaplan1_rallybik_state )
+static MACHINE_CONFIG_START( rallybik )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -1926,7 +1926,7 @@ static MACHINE_CONFIG_START( rallybik, toaplan1_rallybik_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( truxton, toaplan1_state )
+static MACHINE_CONFIG_START( truxton )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -1964,7 +1964,7 @@ static MACHINE_CONFIG_START( truxton, toaplan1_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hellfire, toaplan1_state )
+static MACHINE_CONFIG_START( hellfire )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2002,7 +2002,7 @@ static MACHINE_CONFIG_START( hellfire, toaplan1_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( zerowing, toaplan1_state )
+static MACHINE_CONFIG_START( zerowing )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2040,7 +2040,7 @@ static MACHINE_CONFIG_START( zerowing, toaplan1_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( demonwld, toaplan1_state )
+static MACHINE_CONFIG_START( demonwld )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2083,7 +2083,7 @@ static MACHINE_CONFIG_START( demonwld, toaplan1_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( samesame, toaplan1_state )
+static MACHINE_CONFIG_START( samesame )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2121,7 +2121,7 @@ static MACHINE_CONFIG_START( samesame, toaplan1_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( outzone, toaplan1_state )
+static MACHINE_CONFIG_START( outzone )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2159,7 +2159,7 @@ static MACHINE_CONFIG_START( outzone, toaplan1_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( outzonecv, toaplan1_state )
+static MACHINE_CONFIG_START( outzonecv )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -2197,7 +2197,7 @@ static MACHINE_CONFIG_START( outzonecv, toaplan1_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vimana, toaplan1_state )
+static MACHINE_CONFIG_START( vimana )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
@@ -3112,41 +3112,41 @@ DRIVER_INIT_MEMBER(toaplan1_state,demonwld)
 
 
 
-GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1_state, toaplan1, ROT270, "Toaplan / Taito Corporation", "Rally Bike / Dash Yarou", 0 )
+GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1_rallybik_state, toaplan1, ROT270, "Toaplan / Taito Corporation", "Rally Bike / Dash Yarou", 0 )
 
-GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1_state, toaplan1, ROT270, "Toaplan / Taito Corporation", "Truxton / Tatsujin", 0 )
+GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1_state,          toaplan1, ROT270, "Toaplan / Taito Corporation", "Truxton / Tatsujin", 0 )
 
-GAME( 1989, hellfire,   0,        hellfire, hellfire,  toaplan1_state, toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (2P set)", 0 )
-GAME( 1989, hellfire1,  hellfire, hellfire, hellfire1, toaplan1_state, toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (1P set)", 0 )
-GAME( 1989, hellfire2a, hellfire, hellfire, hellfire2a,toaplan1_state, toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (2P set, older)", 0 )
-GAME( 1989, hellfire1a, hellfire, hellfire, hellfire1a,toaplan1_state, toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (1P set, older)", 0 )
+GAME( 1989, hellfire,   0,        hellfire, hellfire,  toaplan1_state,          toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (2P set)",        0 )
+GAME( 1989, hellfire1,  hellfire, hellfire, hellfire1, toaplan1_state,          toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (1P set)",        0 )
+GAME( 1989, hellfire2a, hellfire, hellfire, hellfire2a,toaplan1_state,          toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (2P set, older)", 0 )
+GAME( 1989, hellfire1a, hellfire, hellfire, hellfire1a,toaplan1_state,          toaplan1, ROT0,   "Toaplan (Taito license)",     "Hellfire (1P set, older)", 0 )
 
-GAME( 1989, zerowing,   0,        zerowing, zerowing2, toaplan1_state, toaplan1, ROT0,   "Toaplan",                     "Zero Wing (2P set)", 0 )
-GAME( 1989, zerowing1,  zerowing, zerowing, zerowing,  toaplan1_state, toaplan1, ROT0,   "Toaplan",                     "Zero Wing (1P set)", 0 )
-GAME( 1989, zerowingw,  zerowing, zerowing, zerowing2, toaplan1_state, toaplan1, ROT0,   "Toaplan (Williams license)",  "Zero Wing (2P set, Williams license)", 0 )
+GAME( 1989, zerowing,   0,        zerowing, zerowing2, toaplan1_state,          toaplan1, ROT0,   "Toaplan",                     "Zero Wing (2P set)",                   0 )
+GAME( 1989, zerowing1,  zerowing, zerowing, zerowing,  toaplan1_state,          toaplan1, ROT0,   "Toaplan",                     "Zero Wing (1P set)",                   0 )
+GAME( 1989, zerowingw,  zerowing, zerowing, zerowing2, toaplan1_state,          toaplan1, ROT0,   "Toaplan (Williams license)",  "Zero Wing (2P set, Williams license)", 0 )
 
-GAME( 1990, demonwld,   0,        demonwld, demonwld,  toaplan1_state, demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 1)", 0 )
-GAME( 1989, demonwld1,  demonwld, demonwld, demonwld,  toaplan1_state, demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 2)", 0 )
-GAME( 1989, demonwld2,  demonwld, demonwld, demonwld1, toaplan1_state, demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 3)", 0 )
-GAME( 1989, demonwld3,  demonwld, demonwld, demonwld1, toaplan1_state, demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 4)", 0 )
-GAME( 1989, demonwld4,  demonwld, demonwld, demonwld1, toaplan1_state, demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 5)", 0 )
+GAME( 1990, demonwld,   0,        demonwld, demonwld,  toaplan1_state,          demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 1)", 0 )
+GAME( 1989, demonwld1,  demonwld, demonwld, demonwld,  toaplan1_state,          demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 2)", 0 )
+GAME( 1989, demonwld2,  demonwld, demonwld, demonwld1, toaplan1_state,          demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 3)", 0 )
+GAME( 1989, demonwld3,  demonwld, demonwld, demonwld1, toaplan1_state,          demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 4)", 0 )
+GAME( 1989, demonwld4,  demonwld, demonwld, demonwld1, toaplan1_state,          demonwld, ROT0,   "Toaplan",                     "Demon's World / Horror Story (set 5)", 0 )
 
-GAME( 1990, fireshrk,   0,        samesame, fireshrk,  toaplan1_state, toaplan1, ROT270, "Toaplan",                     "Fire Shark", 0 )
-GAME( 1989, fireshrka,  fireshrk, samesame, fireshrka, toaplan1_state, toaplan1, ROT270, "Toaplan",                     "Fire Shark (earlier)", 0 )
-GAME( 1990, fireshrkd,  fireshrk, samesame, samesame2, toaplan1_state, toaplan1, ROT270, "Toaplan (Dooyong license)",   "Fire Shark (Korea, set 1, easier)", 0 )
-GAME( 1990, fireshrkdh, fireshrk, samesame, samesame2, toaplan1_state, toaplan1, ROT270, "Toaplan (Dooyong license)",   "Fire Shark (Korea, set 2, harder)", 0 )
-GAME( 1989, samesame,   fireshrk, samesame, samesame,  toaplan1_state, toaplan1, ROT270, "Toaplan",                     "Same! Same! Same! (1P set)", 0 )
-GAME( 1989, samesame2,  fireshrk, samesame, samesame2, toaplan1_state, toaplan1, ROT270, "Toaplan",                     "Same! Same! Same! (2P set)", 0 )
-GAME( 2015, samesamenh, fireshrk, samesame, samesame,  toaplan1_state, toaplan1, ROT270, "hack (trap15)",               "Same! Same! Same! (1P set, NEW VER! hack)", 0 )
+GAME( 1990, fireshrk,   0,        samesame, fireshrk,  toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Fire Shark",                                0 )
+GAME( 1989, fireshrka,  fireshrk, samesame, fireshrka, toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Fire Shark (earlier)",                      0 )
+GAME( 1990, fireshrkd,  fireshrk, samesame, samesame2, toaplan1_state,          toaplan1, ROT270, "Toaplan (Dooyong license)",   "Fire Shark (Korea, set 1, easier)",         0 )
+GAME( 1990, fireshrkdh, fireshrk, samesame, samesame2, toaplan1_state,          toaplan1, ROT270, "Toaplan (Dooyong license)",   "Fire Shark (Korea, set 2, harder)",         0 )
+GAME( 1989, samesame,   fireshrk, samesame, samesame,  toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Same! Same! Same! (1P set)",                0 )
+GAME( 1989, samesame2,  fireshrk, samesame, samesame2, toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Same! Same! Same! (2P set)",                0 )
+GAME( 2015, samesamenh, fireshrk, samesame, samesame,  toaplan1_state,          toaplan1, ROT270, "hack (trap15)",               "Same! Same! Same! (1P set, NEW VER! hack)", 0 )
 
-GAME( 1990, outzone,    0,        outzone,  outzone,   toaplan1_state, toaplan1, ROT270, "Toaplan",                     "Out Zone", 0 )
-GAME( 1990, outzoneh,   outzone,  outzone,  outzone,   toaplan1_state, toaplan1, ROT270, "Toaplan",                     "Out Zone (harder)", 0 )
-GAME( 1990, outzonea,   outzone,  outzone,  outzonea,  toaplan1_state, toaplan1, ROT270, "Toaplan",                     "Out Zone (old set)", 0 )
-GAME( 1990, outzoneb,   outzone,  outzone,  outzonea,  toaplan1_state, toaplan1, ROT270, "Toaplan",                     "Out Zone (older set)", 0 )
-GAME( 1990, outzonec,   outzone,  outzone,  outzonec,  toaplan1_state, toaplan1, ROT270, "Toaplan",                     "Out Zone (oldest set)", MACHINE_IMPERFECT_SOUND ) // prototype?
-GAME( 1990, outzonecv,  outzone,  outzonecv,outzone,   toaplan1_state, toaplan1, ROT270, "Toaplan",                     "Out Zone (Zero Wing TP-015 PCB conversion)", 0 )
+GAME( 1990, outzone,    0,        outzone,  outzone,   toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Out Zone",                                   0 )
+GAME( 1990, outzoneh,   outzone,  outzone,  outzone,   toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Out Zone (harder)",                          0 )
+GAME( 1990, outzonea,   outzone,  outzone,  outzonea,  toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Out Zone (old set)",                         0 )
+GAME( 1990, outzoneb,   outzone,  outzone,  outzonea,  toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Out Zone (older set)",                       0 )
+GAME( 1990, outzonec,   outzone,  outzone,  outzonec,  toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Out Zone (oldest set)",                      MACHINE_IMPERFECT_SOUND ) // prototype?
+GAME( 1990, outzonecv,  outzone,  outzonecv,outzone,   toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Out Zone (Zero Wing TP-015 PCB conversion)", 0 )
 
 // has various licenses / regions depending on jumpers, including Tecmo
-GAME( 1991, vimana,     0,        vimana,   vimana,    toaplan1_state, toaplan1, ROT270, "Toaplan",                    "Vimana (World, set 1)", 0 )
-GAME( 1991, vimanan,    vimana,   vimana,   vimanan,   toaplan1_state, toaplan1, ROT270, "Toaplan",                    "Vimana (World, set 2)", 0 )
-GAME( 1991, vimanaj,    vimana,   vimana,   vimanaj,   toaplan1_state, toaplan1, ROT270, "Toaplan",                    "Vimana (Japan)", 0 )
+GAME( 1991, vimana,     0,        vimana,   vimana,    toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Vimana (World, set 1)", 0 )
+GAME( 1991, vimanan,    vimana,   vimana,   vimanan,   toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Vimana (World, set 2)", 0 )
+GAME( 1991, vimanaj,    vimana,   vimana,   vimanaj,   toaplan1_state,          toaplan1, ROT270, "Toaplan",                     "Vimana (Japan)",        0 )

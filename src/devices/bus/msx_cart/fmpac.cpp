@@ -11,11 +11,11 @@ with: PAC2 BACKUP DATA. We only store the raw sram contents.
 #include "fmpac.h"
 #include "speaker.h"
 
-const device_type MSX_CART_FMPAC = device_creator<msx_cart_fmpac>;
+DEFINE_DEVICE_TYPE(MSX_CART_FMPAC, msx_cart_fmpac_device, "msx_cart_fmpac", "MSX Cartridge - FM-PAC")
 
 
-msx_cart_fmpac::msx_cart_fmpac(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_FMPAC, "MSX Cartridge - FM-PAC", tag, owner, clock, "msx_cart_fmpac", __FILE__)
+msx_cart_fmpac_device::msx_cart_fmpac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSX_CART_FMPAC, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_ym2413(*this, "ym2413")
 	, m_selected_bank(0)
@@ -37,13 +37,13 @@ static MACHINE_CONFIG_FRAGMENT( fmpac )
 MACHINE_CONFIG_END
 
 
-machine_config_constructor msx_cart_fmpac::device_mconfig_additions() const
+machine_config_constructor msx_cart_fmpac_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( fmpac );
 }
 
 
-void msx_cart_fmpac::device_start()
+void msx_cart_fmpac_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
 	save_item(NAME(m_sram_active));
@@ -52,21 +52,21 @@ void msx_cart_fmpac::device_start()
 	save_item(NAME(m_1fff));
 	save_item(NAME(m_7ff6));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_fmpac::restore_banks), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_fmpac_device::restore_banks), this));
 
 	// Install IO read/write handlers
 	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
-	space.install_write_handler(0x7c, 0x7d, write8_delegate(FUNC(msx_cart_fmpac::write_ym2413), this));
+	space.install_write_handler(0x7c, 0x7d, write8_delegate(FUNC(msx_cart_fmpac_device::write_ym2413), this));
 }
 
 
-void msx_cart_fmpac::restore_banks()
+void msx_cart_fmpac_device::restore_banks()
 {
 	m_bank_base = get_rom_base() + ( m_selected_bank & 0x03 ) * 0x4000;
 }
 
 
-void msx_cart_fmpac::device_reset()
+void msx_cart_fmpac_device::device_reset()
 {
 	m_selected_bank = 0;
 	m_sram_active = false;
@@ -77,7 +77,7 @@ void msx_cart_fmpac::device_reset()
 }
 
 
-void msx_cart_fmpac::initialize_cartridge()
+void msx_cart_fmpac_device::initialize_cartridge()
 {
 	if ( get_rom_size() != 0x10000 )
 	{
@@ -93,7 +93,7 @@ void msx_cart_fmpac::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_fmpac::read_cart)
+READ8_MEMBER(msx_cart_fmpac_device::read_cart)
 {
 	if (offset >= 0x4000 && offset < 0x8000)
 	{
@@ -122,7 +122,7 @@ READ8_MEMBER(msx_cart_fmpac::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_fmpac::write_cart)
+WRITE8_MEMBER(msx_cart_fmpac_device::write_cart)
 {
 	if (offset >= 0x4000 && offset < 0x6000)
 	{
@@ -165,7 +165,7 @@ WRITE8_MEMBER(msx_cart_fmpac::write_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_fmpac::write_ym2413)
+WRITE8_MEMBER(msx_cart_fmpac_device::write_ym2413)
 {
 	if (m_opll_active)
 	{

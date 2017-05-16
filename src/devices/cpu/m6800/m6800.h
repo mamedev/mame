@@ -2,10 +2,10 @@
 // copyright-holders:Aaron Giles
 /*** m6800: Portable 6800 class emulator *************************************/
 
-#pragma once
+#ifndef MAME_CPU_M6800_M6800_H
+#define MAME_CPU_M6800_M6800_H
 
-#ifndef __M6800_H__
-#define __M6800_H__
+#pragma once
 
 
 enum
@@ -78,7 +78,6 @@ public:
 
 	// construction/destruction
 	m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	m6800_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, bool has_io, int clock_divider, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal = nullptr);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_out_sc2_func(device_t &device, _Object object) { return downcast<m6800_cpu_device &>(device).m_out_sc2_func.set_callback(object); }
@@ -88,6 +87,8 @@ public:
 	DECLARE_WRITE8_MEMBER( m6801_io_w );
 
 protected:
+	m6800_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool has_io, int clock_divider, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -454,11 +455,12 @@ class m6801_cpu_device : public m6800_cpu_device
 {
 public:
 	m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal = nullptr);
 
 	void m6801_clock_serial();
 
 protected:
+	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal = nullptr);
+
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
@@ -469,9 +471,10 @@ class m6802_cpu_device : public m6800_cpu_device
 {
 public:
 	m6802_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	m6802_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, const m6800_cpu_device::op_func *insn, const uint8_t *cycles);
 
 protected:
+	m6802_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles);
+
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
@@ -502,9 +505,10 @@ class hd6301_cpu_device : public m6801_cpu_device
 {
 public:
 	hd6301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
+	hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 };
 
@@ -552,15 +556,15 @@ public:
 };
 
 
-extern const device_type M6800;
-extern const device_type M6801;
-extern const device_type M6802;
-extern const device_type M6803;
-extern const device_type M6808;
-extern const device_type HD6301;
-extern const device_type HD63701;
-extern const device_type NSC8105;
-extern const device_type HD6303R;
-extern const device_type HD6303Y;
+DECLARE_DEVICE_TYPE(M6800, m6800_cpu_device)
+DECLARE_DEVICE_TYPE(M6801, m6801_cpu_device)
+DECLARE_DEVICE_TYPE(M6802, m6802_cpu_device)
+DECLARE_DEVICE_TYPE(M6803, m6803_cpu_device)
+DECLARE_DEVICE_TYPE(M6808, m6808_cpu_device)
+DECLARE_DEVICE_TYPE(HD6301, hd6301_cpu_device)
+DECLARE_DEVICE_TYPE(HD63701, hd63701_cpu_device)
+DECLARE_DEVICE_TYPE(NSC8105, nsc8105_cpu_device)
+DECLARE_DEVICE_TYPE(HD6303R, hd6303r_cpu_device)
+DECLARE_DEVICE_TYPE(HD6303Y, hd6303y_cpu_device)
 
-#endif /* __M6800_H__ */
+#endif // MAME_CPU_M6800_M6800_H

@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef M24_Z8000_H_
-#define M24_Z8000_H_
+#ifndef MAME_MACHINE_M24_Z8000_H
+#define MAME_MACHINE_M24_Z8000_H
+
+#pragma once
 
 #include "cpu/z8000/z8000.h"
 #include "machine/i8251.h"
@@ -18,7 +20,7 @@ public:
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	template<class _Object> static devcb_base &set_halt_callback(device_t &device, _Object object) { return downcast<m24_z8000_device &>(device).m_halt_out.set_callback(object); }
+	template <class Object> static devcb_base &set_halt_callback(device_t &device, Object &&cb) { return downcast<m24_z8000_device &>(device).m_halt_out.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ16_MEMBER(pmem_r);
 	DECLARE_WRITE16_MEMBER(pmem_w);
@@ -33,14 +35,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mo_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
 	IRQ_CALLBACK_MEMBER(int_cb);
-	bool halted() { return m_z8000_halt; }
 
-	required_device<z8001_device> m_z8000;
+	DECLARE_WRITE_LINE_MEMBER(halt_w) { m_z8000->set_input_line(INPUT_LINE_HALT, state); }
+	DECLARE_WRITE_LINE_MEMBER(int_w) { m_z8000->set_input_line(INPUT_LINE_IRQ1, state); }
+
+	bool halted() const { return m_z8000_halt; }
+
 protected:
 	void device_start() override;
 	void device_reset() override;
 
 private:
+	required_device<z8001_device> m_z8000;
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	devcb_write_line m_halt_out;
@@ -51,5 +57,6 @@ private:
 };
 
 extern const device_type M24_Z8000;
+DECLARE_DEVICE_TYPE(M24_Z8000, m24_z8000_device)
 
-#endif /* M24_Z8000_H_ */
+#endif // MAME_MACHINE_M24_Z8000_H

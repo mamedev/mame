@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VCS_CTRL_JOYSTICK_H
+#define MAME_BUS_VCS_CTRL_JOYSTICK_H
 
-#ifndef __VCS_JOYSTICK__
-#define __VCS_JOYSTICK__
+#pragma once
 
 #include "ctrl.h"
 
@@ -44,7 +44,7 @@ private:
 
 
 // device type definition
-extern const device_type VCS_JOYSTICK;
+DECLARE_DEVICE_TYPE(VCS_JOYSTICK, vcs_joystick_device)
 
 
-#endif
+#endif // MAME_BUS_VCS_CTRL_JOYSTICK_H

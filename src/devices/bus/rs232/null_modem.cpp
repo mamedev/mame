@@ -4,7 +4,7 @@
 #include "null_modem.h"
 
 null_modem_device::null_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NULL_MODEM, "Null Modem", tag, owner, clock, "null_modem", __FILE__),
+	: device_t(mconfig, NULL_MODEM, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
 	m_stream(*this, "stream"),
@@ -138,4 +138,4 @@ void null_modem_device::rcv_complete()
 	m_stream->output(get_received_char());
 }
 
-const device_type NULL_MODEM = device_creator<null_modem_device>;
+DEFINE_DEVICE_TYPE(NULL_MODEM, null_modem_device, "null_modem", "RS232 Null Modem")

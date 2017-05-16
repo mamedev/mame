@@ -4,14 +4,14 @@
     SCSP (YMF292-F) header
 */
 
-#pragma once
+#ifndef MAME_SOUND_SCSP_H
+#define MAME_SOUND_SCSP_H
 
-#ifndef __SCSP_H__
-#define __SCSP_H__
+#pragma once
 
 #include "scspdsp.h"
 
-#define FM_DELAY    0    // delay in number of slots processed before samples are written to the FM ring buffer
+#define SCSP_FM_DELAY    0    // delay in number of slots processed before samples are written to the FM ring buffer
 				// driver code indicates should be 4, but sounds distorted then
 
 
@@ -25,54 +25,6 @@
 	devcb = &scsp_device::set_main_irq_callback(*device, DEVCB_##_devcb);
 
 
-enum SCSP_STATE {SCSP_ATTACK,SCSP_DECAY1,SCSP_DECAY2,SCSP_RELEASE};
-
-struct SCSP_EG_t
-{
-	int volume; //
-	SCSP_STATE state;
-	int step;
-	//step vals
-	int AR;     //Attack
-	int D1R;    //Decay1
-	int D2R;    //Decay2
-	int RR;     //Release
-
-	int DL;     //Decay level
-	uint8_t EGHOLD;
-	uint8_t LPLINK;
-};
-
-struct SCSP_LFO_t
-{
-	uint16_t phase;
-	uint32_t phase_step;
-	int *table;
-	int *scale;
-};
-
-struct SCSP_SLOT
-{
-	union
-	{
-		uint16_t data[0x10];  //only 0x1a bytes used
-		uint8_t datab[0x20];
-	} udata;
-
-	uint8_t Backwards;    //the wave is playing backwards
-	uint8_t active;   //this slot is currently playing
-	uint8_t *base;        //samples base address
-	uint32_t cur_addr;    //current play address (24.8)
-	uint32_t nxt_addr;    //next play address
-	uint32_t step;        //pitch step (24.8)
-	SCSP_EG_t EG;            //Envelope
-	SCSP_LFO_t PLFO;     //Phase LFO
-	SCSP_LFO_t ALFO;     //Amplitude LFO
-	int slot;
-	int16_t Prev;  //Previous sample (for interpolation)
-};
-
-
 class scsp_device : public device_t,
 					public device_sound_interface
 {
@@ -80,8 +32,8 @@ public:
 	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_roffset(device_t &device, int roffset) { downcast<scsp_device &>(device).m_roffset = roffset; }
-	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<scsp_device &>(device).m_irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_main_irq_callback(device_t &device, _Object object) { return downcast<scsp_device &>(device).m_main_irq_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<scsp_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_main_irq_callback(device_t &device, Object &&cb) { return downcast<scsp_device &>(device).m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	// SCSP register access
 	DECLARE_READ16_MEMBER( read );
@@ -101,6 +53,53 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	enum SCSP_STATE { SCSP_ATTACK, SCSP_DECAY1, SCSP_DECAY2, SCSP_RELEASE };
+
+	struct SCSP_EG_t
+	{
+		int volume; //
+		SCSP_STATE state;
+		int step;
+		//step vals
+		int AR;     //Attack
+		int D1R;    //Decay1
+		int D2R;    //Decay2
+		int RR;     //Release
+
+		int DL;     //Decay level
+		uint8_t EGHOLD;
+		uint8_t LPLINK;
+	};
+
+	struct SCSP_LFO_t
+	{
+		uint16_t phase;
+		uint32_t phase_step;
+		int *table;
+		int *scale;
+	};
+
+	struct SCSP_SLOT
+	{
+		union
+		{
+			uint16_t data[0x10];  //only 0x1a bytes used
+			uint8_t datab[0x20];
+		} udata;
+
+		uint8_t Backwards;    //the wave is playing backwards
+		uint8_t active;   //this slot is currently playing
+		uint8_t *base;        //samples base address
+		uint32_t cur_addr;    //current play address (24.8)
+		uint32_t nxt_addr;    //next play address
+		uint32_t step;        //pitch step (24.8)
+		SCSP_EG_t EG;            //Envelope
+		SCSP_LFO_t PLFO;     //Phase LFO
+		SCSP_LFO_t ALFO;     //Amplitude LFO
+		int slot;
+		int16_t Prev;  //Previous sample (for interpolation)
+	};
+
 	int m_roffset;                /* offset in the region */
 	devcb_write8       m_irq_cb;  /* irq callback */
 	devcb_write_line   m_main_irq_cb;
@@ -114,8 +113,8 @@ private:
 	SCSP_SLOT m_Slots[32];
 	int16_t m_RINGBUF[128];
 	uint8_t m_BUFPTR;
-#if FM_DELAY
-	int16_t m_DELAYBUF[FM_DELAY];
+#if SCSP_FM_DELAY
+	int16_t m_DELAYBUF[SCSP_FM_DELAY];
 	uint8_t m_DELAYPTR;
 #endif
 	uint8_t *m_SCSPRAM;
@@ -209,7 +208,6 @@ private:
 	void LFO_ComputeStep(SCSP_LFO_t *LFO, uint32_t LFOF, uint32_t LFOWS, uint32_t LFOS, int ALFO);
 };
 
-extern const device_type SCSP;
+DECLARE_DEVICE_TYPE(SCSP, scsp_device)
 
-
-#endif /* __SCSP_H__ */
+#endif // MAME_SOUND_SCSP_H

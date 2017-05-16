@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_VIDEO_V9938_H
-#define MAME_DEVICES_VIDEO_V9938_H
+#ifndef MAME_VIDEO_V9938_H
+#define MAME_VIDEO_V9938_H
 
 #pragma once
 
@@ -60,8 +60,8 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type V9938;
-extern const device_type V9958;
+DECLARE_DEVICE_TYPE(V9938, v9938_device)
+DECLARE_DEVICE_TYPE(V9958, v9958_device)
 
 
 
@@ -76,14 +76,8 @@ class v99x8_device :    public device_t,
 						public device_palette_interface,
 						public device_video_interface
 {
-protected:
-	// construction/destruction
-	v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, uint32_t clock);
-
 public:
-	template<class _irq> devcb_base &set_interrupt_callback(_irq irq) {
-		return m_int_callback.set_callback(irq);
-	}
+	template <class Object> devcb_base &set_interrupt_callback(Object &&irq) { return m_int_callback.set_callback(std::forward<Object>(irq)); }
 	int get_transpen();
 	bitmap_ind16 &get_bitmap() { return m_bitmap; }
 	void update_mouse_state(int mx_delta, int my_delta, int button_state);
@@ -105,26 +99,29 @@ public:
 	/* RESET pin */
 	void reset_line(int state) { if (state==ASSERT_LINE) device_reset(); }
 
-	static const int HTOTAL = 684;
-	static const int HVISIBLE = 544;
-	static const int VTOTAL_NTSC = 262;
-	static const int VTOTAL_PAL = 313;
-	static const int VVISIBLE_NTSC = 26 + 192 + 25;
-	static const int VVISIBLE_PAL = 53 + 192 + 49;
+	static constexpr int HTOTAL = 684;
+	static constexpr int HVISIBLE = 544;
+	static constexpr int VTOTAL_NTSC = 262;
+	static constexpr int VTOTAL_PAL = 313;
+	static constexpr int VVISIBLE_NTSC = 26 + 192 + 25;
+	static constexpr int VVISIBLE_PAL = 53 + 192 + 49;
 	// Looking at some youtube videos of real units on real monitors
 	// there appear to be small vertical timing differences. Some (LCD)
 	// monitors show the full borders, other CRT monitors seem to
 	// display ~5 lines less at the top and bottom of the screen.
-	static const int VERTICAL_ADJUST = 5;
-	static const int TOP_ERASE = 13;
-	static const int VERTICAL_SYNC = 3;
+	static constexpr int VERTICAL_ADJUST = 5;
+	static constexpr int TOP_ERASE = 13;
+	static constexpr int VERTICAL_SYNC = 3;
 
 protected:
-	static const device_timer_id TIMER_LINE = 0;
+	// construction/destruction
+	v99x8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int model);
+
+	static constexpr device_timer_id TIMER_LINE = 0;
 	const address_space_config      m_space_config;
 	address_space*                  m_vram_space;
 
-	int m_model;
+	const int m_model;
 
 	// device overrides
 	virtual void device_start() override;
@@ -132,7 +129,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_DATA) const override { return (spacenum == AS_DATA) ? &m_space_config : nullptr; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_DATA) ? &m_space_config : nullptr; }
 
 	virtual void palette_init() = 0;
 

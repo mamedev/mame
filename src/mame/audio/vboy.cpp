@@ -11,7 +11,7 @@
 #include "vboy.h"
 
 // device type definition
-const device_type VBOYSND = device_creator<vboysnd_device>;
+DEFINE_DEVICE_TYPE(VBOYSND, vboysnd_device, "vboysnd", "Virtual Boy Audio")
 
 //#define LAME_COMPILER_BUG
 
@@ -196,8 +196,8 @@ static inline void mputb(uint8_t *ptr, int8_t data) { *ptr = data; }
 //-------------------------------------------------
 
 vboysnd_device::vboysnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VBOYSND, "Virtual Boy audio", tag, owner, clock, "vboysnd", __FILE__),
-		device_sound_interface(mconfig, *this)
+	: device_t(mconfig, VBOYSND, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 {
 }
 

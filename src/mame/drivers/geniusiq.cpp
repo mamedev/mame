@@ -792,7 +792,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state,iq128_cart)
 }
 
 
-static MACHINE_CONFIG_START( iq128, geniusiq_state )
+static MACHINE_CONFIG_START( iq128 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // The main crystal is at 32MHz, not sure whats the CPU freq
 	MCFG_CPU_PROGRAM_MAP(geniusiq_mem)
@@ -828,7 +828,7 @@ static MACHINE_CONFIG_DERIVED( iqtv512, iq128 )
 	MCFG_AMD_29F040_ADD("flash")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gl8008cx, gl8008cx_state )
+static MACHINE_CONFIG_START( gl8008cx )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // TODO wrong CPU and frequency
 	MCFG_CPU_PROGRAM_MAP(gl8008cx_mem)
@@ -892,12 +892,12 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME        PARENT          COMPAT MACHINE   INPUT        INIT                COMPANY             FULLNAME                  FLAGS */
-COMP( 1997, iq128,      0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ 128 (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1997, iq128_fr,   iq128,          0,    iq128,     geniusiq,    driver_device,  0,  "Video Technology", "Genius IQ 128 (France)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1998, iqtv512,    0,              0,    iqtv512,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ TV 512 (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1999, gl8008cx,   0,              0,    gl8008cx,  gl8008cx,    driver_device,  0,  "Video Technology", "Genius Leader 8008 CX (Germany)", MACHINE_IS_SKELETON)
-COMP( 1999, bs9009cx,   0,              0,    gl8008cx,  gl8008cx,    driver_device,  0,  "Video Technology", "BrainStation 9009 CXL (Germany)", MACHINE_IS_SKELETON)
-COMP( 1998, itunlim,    0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Vtech IT Unlimited (UK)", MACHINE_NO_SOUND)
-COMP( 19??, iqunlim,    0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Vtech IQ Unlimited (Germany)", MACHINE_IS_SKELETON)
-COMP( 19??, glmmc,      0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Genius Leader Master Mega Color (Germany)", MACHINE_IS_SKELETON)
+//    YEAR  NAME        PARENT  COMPAT  MACHINE    INPUT        STATE           INIT  COMPANY             FULLNAME                                     FLAGS
+COMP( 1997, iq128,      0,      0,      iq128,     geniusiq_de, geniusiq_state, 0,    "Video Technology", "Genius IQ 128 (Germany)",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1997, iq128_fr,   iq128,  0,      iq128,     geniusiq,    geniusiq_state, 0,    "Video Technology", "Genius IQ 128 (France)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1998, iqtv512,    0,      0,      iqtv512,   geniusiq_de, geniusiq_state, 0,    "Video Technology", "Genius IQ TV 512 (Germany)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1999, gl8008cx,   0,      0,      gl8008cx,  gl8008cx,    gl8008cx_state, 0,    "Video Technology", "Genius Leader 8008 CX (Germany)",           MACHINE_IS_SKELETON)
+COMP( 1999, bs9009cx,   0,      0,      gl8008cx,  gl8008cx,    gl8008cx_state, 0,    "Video Technology", "BrainStation 9009 CXL (Germany)",           MACHINE_IS_SKELETON)
+COMP( 1998, itunlim,    0,      0,      iq128,     geniusiq_de, geniusiq_state, 0,    "Video Technology", "Vtech IT Unlimited (UK)",                   MACHINE_NO_SOUND)
+COMP( 19??, iqunlim,    0,      0,      iq128,     geniusiq_de, geniusiq_state, 0,    "Video Technology", "Vtech IQ Unlimited (Germany)",              MACHINE_IS_SKELETON)
+COMP( 19??, glmmc,      0,      0,      iq128,     geniusiq_de, geniusiq_state, 0,    "Video Technology", "Genius Leader Master Mega Color (Germany)", MACHINE_IS_SKELETON)

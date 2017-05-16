@@ -77,15 +77,16 @@
     - needs a proper way to dump security dongles, anything but p9112 has placeholder ROM for ds2430.
 
     Game status:
-        ppp2nd              POST: "DIP SWITCH ERROR", "NO SECURITY ERROR"
+        ppp2nd              POST: "NO SECURITY ERROR"
         boxingm             Goes to attract mode when ran with memory card check. Coins up.
         code1d,b            RTC self check bad
         gticlub2            Attract mode works. Coins up. Hangs in car selection.
         gticlub2ea          Doesn't boot: bad CHD?
-        jpark3              POST?: Shows "Now loading..." then black screen (sets global timer 1 on EPIC...)
+        jpark3              POST?: Shows "Now loading..." then black screen (sets global timer 1 on EPIC) - with IRQ3 crashes at first 3d frame
         mocapglf            Security code error
         mocapb,j            Crash after self checks
-        p911,e,j,uc,kc      "Distribution error"
+        p911                "Distribution error"
+		p911e,j,uc,kc       Hangs at POST, with IRQ3 it crashes at first 3d frame
         p9112               RTC self check bad
         popn9               Doesn't boot: bad CHD?
         sscopex/sogeki      Security code error
@@ -2238,8 +2239,24 @@ INPUT_PORTS_START( boxingm )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // memory card check for boxingm (actually comms enable?)
 INPUT_PORTS_END
 
+// TODO: left/right escape, 2nd service switch?
+INPUT_PORTS_START( jpark3 )
+	PORT_INCLUDE( viper )
+	
+	PORT_MODIFY("IN3")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	
+	PORT_MODIFY("IN4")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Gun Trigger") PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Gun Trigger") PORT_PLAYER(2)
+
+INPUT_PORTS_END
+
 INPUT_PORTS_START( p911 )
 	PORT_INCLUDE( viper )
+
+	PORT_MODIFY("IN4")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")
 
 	PORT_MODIFY("IN5")
 	// one of these is P2 SHT2 (checks and fails serial if pressed)
@@ -2302,7 +2319,7 @@ void viper_state::machine_reset()
 	m_ds2430_unk_status = 1;
 }
 
-static MACHINE_CONFIG_START( viper, viper_state )
+static MACHINE_CONFIG_START( viper )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MPC8240, 200000000)
@@ -2393,7 +2410,9 @@ ROM_START(ppp2nd)
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
-
+	// byte 0x1e (0) JAA (1) AAA
+	// byte 0x1f (1) rental
+	
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ata:0:hdd:image" )
@@ -2970,8 +2989,8 @@ GAME(2000, code1d,    kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Ko
 GAME(2000, code1db,   code1d,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Code One Dispatch (ver B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, gticlub2,  kviper,    viper, gticlub2, viper_state, vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, gticlub2ea,gticlub2,  viper, gticlub2, viper_state, vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, jpark3,    kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver EBC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2001, jpark3u,   jpark3,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver UA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, jpark3,    kviper,    viper, jpark3, viper_state, vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver EBC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, jpark3u,   jpark3,    viper, jpark3, viper_state, vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver UA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, mocapglf,  kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, mocapb,    kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Mocap Boxing (ver AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, mocapbj,   mocapb,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

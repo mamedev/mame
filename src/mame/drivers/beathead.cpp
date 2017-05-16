@@ -360,7 +360,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( beathead, beathead_state )
+static MACHINE_CONFIG_START( beathead )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
@@ -430,4 +430,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1993, beathead, 0, beathead, beathead, driver_device, 0, ROT0, "Atari Games", "BeatHead (prototype)", 0 )
+GAME( 1993, beathead, 0, beathead, beathead, beathead_state, 0, ROT0, "Atari Games", "BeatHead (prototype)", 0 )

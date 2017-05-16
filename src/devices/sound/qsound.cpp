@@ -20,7 +20,7 @@
   - understand higher bits of reg 0
   - understand reg 9
   - understand other writes to $90-$ff area
-  
+
   Links:
   https://siliconpr0n.org/map/capcom/dl-1425
 
@@ -30,7 +30,7 @@
 #include "qsound.h"
 
 // device type definition
-const device_type QSOUND = device_creator<qsound_device>;
+DEFINE_DEVICE_TYPE(QSOUND, qsound_device, "qsound", "Q-Sound")
 
 
 // program map for the DSP16A; note that apparently Western Electric/AT&T
@@ -80,7 +80,7 @@ ROM_END
 //-------------------------------------------------
 
 qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, QSOUND, "Q-Sound", tag, owner, clock, "qsound", __FILE__),
+	: device_t(mconfig, QSOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_cpu(*this, "qsound"),
 		m_sample_rom(*this, DEVICE_SELF),

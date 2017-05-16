@@ -8,10 +8,10 @@
 
 *************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_LDPR8210_H
+#define MAME_MACHINE_LDPR8210_H
 
-#ifndef __LDPR8210_H__
-#define __LDPR8210_H__
+#pragma once
 
 #include "laserdsc.h"
 #include "cpu/mcs48/mcs48.h"
@@ -32,30 +32,14 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type PIONEER_PR8210;
-extern const device_type SIMUTREK_SPECIAL;
+DECLARE_DEVICE_TYPE(PIONEER_PR8210,   pioneer_pr8210_device)
+DECLARE_DEVICE_TYPE(SIMUTREK_SPECIAL, simutrek_special_device)
 
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// pioneer PIA subclass
-class pioneer_pia
-{
-public:
-	uint8_t               frame[7];               // (20-26) 7 characters for the chapter/frame
-	uint8_t               text[17];               // (20-30) 17 characters for the display
-	uint8_t               control;                // (40) control lines
-	uint8_t               latchdisplay;           //   flag: set if the display was latched
-	uint8_t               portb;                  // (60) port B value (LEDs)
-	uint8_t               display;                // (80) display enable
-	uint8_t               porta;                  // (A0) port A value (from serial decoder)
-	uint8_t               vbi1;                   // (C0) VBI decoding state 1
-	uint8_t               vbi2;                   // (E0) VBI decoding state 2
-};
-
 
 // ======================> pioneer_pr8210_device
 
@@ -65,7 +49,6 @@ class pioneer_pr8210_device : public laserdisc_device
 public:
 	// construction/destruction
 	pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// input and output
 	void control_w(uint8_t data);
@@ -78,6 +61,8 @@ protected:
 		TID_VBI_DATA_FETCH,
 		TID_FIRST_SUBCLASS_TIMER
 	};
+
+	pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -110,6 +95,21 @@ public:
 	DECLARE_READ_LINE_MEMBER( i8049_t1_r );
 
 protected:
+	// pioneer PIA subclass
+	class pioneer_pia
+	{
+	public:
+		uint8_t               frame[7];               // (20-26) 7 characters for the chapter/frame
+		uint8_t               text[17];               // (20-30) 17 characters for the display
+		uint8_t               control;                // (40) control lines
+		uint8_t               latchdisplay;           //   flag: set if the display was latched
+		uint8_t               portb;                  // (60) port B value (LEDs)
+		uint8_t               display;                // (80) display enable
+		uint8_t               porta;                  // (A0) port A value (from serial decoder)
+		uint8_t               vbi1;                   // (C0) VBI decoding state 1
+		uint8_t               vbi2;                   // (E0) VBI decoding state 2
+	};
+
 	// internal overlay helpers
 	void overlay_draw_group(bitmap_yuy16 &bitmap, const uint8_t *text, int count, float xstart);
 	void overlay_erase(bitmap_yuy16 &bitmap, float xstart, float xend);
@@ -189,5 +189,4 @@ protected:
 	uint8_t               m_controlthis;          // latched value for our control over the current pair of fields
 };
 
-
-#endif
+#endif // MAME_MACHINE_LDPR8210_H

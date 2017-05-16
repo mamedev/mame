@@ -232,7 +232,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( babbage, babbage_state )
+static MACHINE_CONFIG_START( babbage )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK) //2.5MHz
 	MCFG_CPU_PROGRAM_MAP(babbage_map)
@@ -274,5 +274,5 @@ ROM_START(babbage)
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT       COMPANY           FULLNAME */
-COMP( 1986, babbage,  0,      0,      babbage,    babbage, driver_device, 0,   "Mr Takafumi Aihara",  "Babbage-2nd" , MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    STATE          INIT  COMPANY               FULLNAME        FLAGS
+COMP( 1986, babbage,  0,      0,      babbage,    babbage, babbage_state, 0,    "Mr Takafumi Aihara", "Babbage-2nd" , MACHINE_NO_SOUND_HW )

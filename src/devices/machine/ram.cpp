@@ -12,8 +12,8 @@
 #include <ctype.h>
 
 #include "emu.h"
-#include "emuopts.h"
 #include "ram.h"
+#include "emuopts.h"
 
 
 /*****************************************************************************
@@ -21,17 +21,15 @@
 *****************************************************************************/
 
 // device type definition
-const device_type RAM = device_creator<ram_device>;
+DEFINE_DEVICE_TYPE(RAM, ram_device, "ram", "RAM")
 
-template class device_finder<ram_device, false>;
-template class device_finder<ram_device, true>;
 
 //-------------------------------------------------
 //  ram_device - constructor
 //-------------------------------------------------
 
 ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RAM, "RAM", tag, owner, clock, "ram", __FILE__)
+	: device_t(mconfig, RAM, tag, owner, clock)
 {
 	m_size = 0;
 	m_default_size = nullptr;

@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VCS_JOYSTICK_BOOSTER = device_creator<vcs_joystick_booster_device>;
+DEFINE_DEVICE_TYPE(VCS_JOYSTICK_BOOSTER, vcs_joystick_booster_device, "vcs_joystick_booster", "Atari / CBM Digital joystick with Boostergrip")
 
 
 static INPUT_PORTS_START( vcs_joystick_booster )
@@ -58,7 +58,7 @@ ioport_constructor vcs_joystick_booster_device::device_input_ports() const
 //-------------------------------------------------
 
 vcs_joystick_booster_device::vcs_joystick_booster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VCS_JOYSTICK_BOOSTER, "Atari / CBM Digital joystick with Boostergrip", tag, owner, clock, "vcs_joystick_booster", __FILE__),
+	device_t(mconfig, VCS_JOYSTICK_BOOSTER, tag, owner, clock),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),
 	m_potx(*this, "POTX"),

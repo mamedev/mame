@@ -750,7 +750,7 @@ INTERRUPT_GEN_MEMBER(cedar_magnet_state::irq)
 	m_cedsprite->irq_hold();
 }
 
-static MACHINE_CONFIG_START( cedar_magnet, cedar_magnet_state )
+static MACHINE_CONFIG_START( cedar_magnet )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
@@ -902,8 +902,8 @@ DRIVER_INIT_MEMBER(cedar_magnet_state, mag_exzi)
 	m_prothack = mag_exzi_protection_hack;
 }
 
-GAME( 1987, cedmag,    0,         cedar_magnet, cedar_magnet, driver_device,       0,        ROT0,  "EFO SA / Cedar", "Magnet System", MACHINE_IS_BIOS_ROOT )
+GAME( 1987, cedmag,    0,         cedar_magnet, cedar_magnet, cedar_magnet_state,  0,        ROT0,  "EFO SA / Cedar", "Magnet System",                         MACHINE_IS_BIOS_ROOT )
 
-GAME( 1987, mag_time,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_time, ROT90, "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Sega
-GAME( 1987, mag_exzi,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_exzi, ROT0,  "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Taito
+GAME( 1987, mag_time,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_time, ROT90, "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Sega
+GAME( 1987, mag_exzi,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_exzi, ROT0,  "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Taito
 GAME( 1987, mag_xain,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_xain, ROT0,  "EFO SA / Cedar", "Xain'd Sleena (SC 3.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Technos

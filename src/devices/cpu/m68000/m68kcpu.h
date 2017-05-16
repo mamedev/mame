@@ -12,11 +12,11 @@
  *
  */
 
+#ifndef MAME_CPU_M68000_M68KCPU_H
+#define MAME_CPU_M68000_M68KCPU_H
 
 #pragma once
 
-#ifndef __M68KCPU_H__
-#define __M68KCPU_H__
 
 class m68000_base_device;
 
@@ -1701,4 +1701,4 @@ static inline void m68ki_check_interrupts(m68000_base_device *m68k)
 /* ============================== END OF FILE ============================= */
 /* ======================================================================== */
 
-#endif /* __M68KCPU_H__ */
+#endif // MAME_CPU_M68000_M68KCPU_H

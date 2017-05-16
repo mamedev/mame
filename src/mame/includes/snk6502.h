@@ -5,10 +5,11 @@
     rokola hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SNK6502_H
+#define MAME_INCLUDES_SNK6502_H
 
-#include "sound/discrete.h"
-#include "sound/samples.h"
-#include "sound/sn76477.h"
+#pragma once
+
 
 class snk6502_sound_device;
 
@@ -53,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(scrollx_w);
 	DECLARE_WRITE8_MEMBER(scrolly_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE8_MEMBER(fantasy_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(satansat_b002_w);
 	DECLARE_WRITE8_MEMBER(satansat_backcolor_w);
 
@@ -86,75 +88,4 @@ public:
 	void postload();
 };
 
-
-/*----------- defined in audio/snk6502.c -----------*/
-
-#define CHANNELS    3
-
-struct TONE
-{
-	int mute;
-	int offset;
-	int base;
-	int mask;
-	int32_t   sample_rate;
-	int32_t   sample_step;
-	int32_t   sample_cur;
-	int16_t   form[16];
-};
-
-class snk6502_sound_device : public device_t,
-									public device_sound_interface
-{
-public:
-	snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~snk6502_sound_device() {}
-
-	DECLARE_WRITE8_MEMBER( sasuke_sound_w );
-	DECLARE_WRITE8_MEMBER( satansat_sound_w );
-	DECLARE_WRITE8_MEMBER( vanguard_sound_w );
-	DECLARE_WRITE8_MEMBER( vanguard_speech_w );
-	DECLARE_WRITE8_MEMBER( fantasy_sound_w );
-	DECLARE_WRITE8_MEMBER( fantasy_speech_w );
-
-	void set_music_clock(double clock_time);
-	void set_music_freq(int freq);
-	int music0_playing();
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-
-private:
-	// internal state
-	TONE m_tone_channels[CHANNELS];
-	int32_t m_tone_clock_expire;
-	int32_t m_tone_clock;
-	sound_stream * m_tone_stream;
-
-	optional_device<samples_device> m_samples;
-	uint8_t *m_ROM;
-	int m_Sound0StopOnRollover;
-	uint8_t m_LastPort1;
-
-	int m_hd38880_cmd;
-	uint32_t m_hd38880_addr;
-	int m_hd38880_data_bytes;
-	double m_hd38880_speed;
-
-	inline void validate_tone_channel(int channel);
-	void sasuke_build_waveform(int mask);
-	void satansat_build_waveform(int mask);
-	void build_waveform(int channel, int mask);
-	void speech_w(uint8_t data, const uint16_t *table, int start);
-};
-
-extern const device_type SNK6502;
-
-DISCRETE_SOUND_EXTERN( fantasy );
-extern const char *const sasuke_sample_names[];
-extern const char *const vanguard_sample_names[];
-extern const char *const fantasy_sample_names[];
+#endif // MAME_INCLUDES_SNK6502_H

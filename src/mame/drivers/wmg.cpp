@@ -489,7 +489,7 @@ DRIVER_INIT_MEMBER( wmg_state, wmg )
  *  Machine Driver
  *
  *************************************/
-static MACHINE_CONFIG_START( wmg, wmg_state )
+static MACHINE_CONFIG_START( wmg )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)

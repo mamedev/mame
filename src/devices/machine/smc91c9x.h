@@ -8,11 +8,8 @@
 
 **************************************************************************/
 
-#ifndef __SMC91C9X__
-#define __SMC91C9X__
-
-#define ETHER_BUFFER_SIZE   (2048)
-#define ETHER_RX_BUFFERS    (4)
+#ifndef MAME_MACHINE_SMC91C9X_H
+#define MAME_MACHINE_SMC91C9X_H
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -21,20 +18,22 @@
 class smc91c9x_device : public device_t
 {
 public:
-	smc91c9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	~smc91c9x_device() {}
-
-	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<smc91c9x_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<smc91c9x_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 
 protected:
+	smc91c9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	static constexpr unsigned ETHER_BUFFER_SIZE   = 2048;
+	static constexpr unsigned ETHER_RX_BUFFERS    = 4;
+
 	// internal state
 	devcb_write_line m_irq_handler;
 
@@ -70,31 +69,31 @@ public:
 	smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type SMC91C94;
-
 class smc91c96_device : public smc91c9x_device
 {
 public:
 	smc91c96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type SMC91C96;
+
+DECLARE_DEVICE_TYPE(SMC91C94, smc91c94_device)
+DECLARE_DEVICE_TYPE(SMC91C96, smc91c96_device)
+
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_SMC91C94_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SMC91C94, 0)
+#define MCFG_SMC91C94_ADD(tag) \
+		MCFG_DEVICE_ADD((tag), SMC91C94, 0)
 
-#define MCFG_SMC91C94_IRQ_CALLBACK(_write) \
-	devcb = &smc91c94_device::set_irq_callback(*device, DEVCB_##_write);
+#define MCFG_SMC91C94_IRQ_CALLBACK(write) \
+		devcb = &smc91c94_device::set_irq_callback(*device, DEVCB_##write);
 
-#define MCFG_SMC91C96_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SMC91C96, 0)
+#define MCFG_SMC91C96_ADD(tag) \
+	MCFG_DEVICE_ADD((tag), SMC91C96, 0)
 
-#define MCFG_SMC91C96_IRQ_CALLBACK(_write) \
-	devcb = &smc91c96_device::set_irq_callback(*device, DEVCB_##_write);
+#define MCFG_SMC91C96_IRQ_CALLBACK(write) \
+	devcb = &smc91c96_device::set_irq_callback(*device, DEVCB_##write);
 
-
-#endif
+#endif // MAME_MACHINE_SMC91C9X_H

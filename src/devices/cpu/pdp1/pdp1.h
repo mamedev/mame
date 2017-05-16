@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Raphael Nabet
-#pragma once
+#ifndef MAME_CPU_PDP1_PDP1_H
+#define MAME_CPU_PDP1_PDP1_H
 
-#ifndef __PDP1_H__
-#define __PDP1_H__
+#pragma once
 
 
 
@@ -198,11 +198,11 @@ private:
 };
 
 
-extern const device_type PDP1;
+DECLARE_DEVICE_TYPE(PDP1, pdp1_device)
 
 
 #define MCFG_PDP1_RESET_PARAM(_param) \
 	pdp1_device::static_set_reset_param(*device, &(_param));
 
 
-#endif /* __PDP1_H__ */
+#endif // MAME_CPU_PDP1_PDP1_H

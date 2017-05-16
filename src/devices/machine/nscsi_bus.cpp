@@ -3,14 +3,15 @@
 #include "emu.h"
 #include "nscsi_bus.h"
 
-const device_type NSCSI_BUS = device_creator<nscsi_bus_device>;
-const device_type NSCSI_CONNECTOR = device_creator<nscsi_connector>;
+DEFINE_DEVICE_TYPE(NSCSI_BUS,       nscsi_bus_device, "nscsi_bus",       "SCSI Bus (new)")
+DEFINE_DEVICE_TYPE(NSCSI_CONNECTOR, nscsi_connector,  "nscsi_connector", "SCSI Connector Abstraction (new)")
+
 
 nscsi_bus_device::nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NSCSI_BUS, "NSCSI Bus", tag, owner, clock, "nscsi_bus", __FILE__), data(0), ctrl(0)
+	device_t(mconfig, NSCSI_BUS, tag, owner, clock), data(0), ctrl(0)
 {
 	devcnt = 0;
-	memset(dev, 0, sizeof(dev));
+	std::fill(std::begin(dev), std::end(dev), dev_t{ nullptr, 0, 0, 0 });
 }
 
 void nscsi_bus_device::device_start()
@@ -134,7 +135,7 @@ void nscsi_bus_device::device_config_complete()
 
 
 nscsi_connector::nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NSCSI_CONNECTOR, "NSCSI Connector Abstraction", tag, owner, clock, "nscsi_connector", __FILE__),
+	device_t(mconfig, NSCSI_CONNECTOR, tag, owner, clock),
 	device_slot_interface(mconfig, *this)
 {
 }
@@ -152,8 +153,8 @@ nscsi_device *nscsi_connector::get_device()
 	return dynamic_cast<nscsi_device *>(get_card_device());
 }
 
-nscsi_device::nscsi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+nscsi_device::nscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_slot_card_interface(mconfig, *this)
 {
 	scsi_id = scsi_refid = -1;
@@ -174,11 +175,6 @@ void nscsi_device::scsi_ctrl_changed()
 void nscsi_device::device_start()
 {
 	save_item(NAME(scsi_id));
-}
-
-nscsi_full_device::nscsi_full_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	nscsi_device(mconfig, type, name, tag, owner, clock, shortname, source)
-{
 }
 
 

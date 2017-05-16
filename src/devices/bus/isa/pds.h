@@ -6,8 +6,8 @@
  *  Created on: 31/01/2014
  */
 
-#ifndef ISA_PDS_H_
-#define ISA_PDS_H_
+#ifndef MAME_BUS_ISA_PDS_H
+#define MAME_BUS_ISA_PDS_H
 
 #include "isa.h"
 #include "machine/i8255.h"
@@ -17,23 +17,22 @@ class isa8_pds_device :
 		public device_isa8_card_interface
 {
 public:
-		isa8_pds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_pds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-		DECLARE_READ8_MEMBER(ppi_r);
-		DECLARE_WRITE8_MEMBER(ppi_w);
+	DECLARE_READ8_MEMBER(ppi_r);
+	DECLARE_WRITE8_MEMBER(ppi_w);
 
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override;
-
-		required_device<i8255_device> m_ppi;
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
 protected:
-		// device-level overrides
-		virtual void device_start() override;
-		virtual void device_reset() override;
-		virtual void device_stop() override;
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
+	required_device<i8255_device> m_ppi;
 };
 
-extern const device_type ISA8_PDS;
+DECLARE_DEVICE_TYPE(ISA8_PDS, isa8_pds_device)
 
-#endif /* ISA_PDS_H_ */
+#endif // MAME_BUS_ISA_PDS_H

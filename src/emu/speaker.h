@@ -18,7 +18,7 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type SPEAKER;
+DECLARE_DEVICE_TYPE(SPEAKER, speaker_device)
 
 
 
@@ -78,9 +78,6 @@ protected:
 
 // speaker device iterator
 typedef device_type_iterator<speaker_device> speaker_device_iterator;
-
-extern template class device_finder<speaker_device, false>;
-extern template class device_finder<speaker_device, true>;
 
 
 #endif  /* MAME_EMU_SPEAKER_H */

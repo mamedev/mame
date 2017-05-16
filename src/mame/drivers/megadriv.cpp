@@ -369,18 +369,15 @@ WRITE_LINE_MEMBER(md_cons_state::screen_vblank_console)
 			m_vdp->m_megadriv_scanline_timer->adjust(attotime::zero);
 
 			if (m_32x)
-			{
-				m_32x->m_32x_vblank_flag = 0;
-				m_32x->m_32x_hcount_compare_val = -1;
-				m_32x->update_total_scanlines(mode3);
-			}
+				m_32x->screen_eof(mode3);
+
 			if (m_segacd)
 				m_segacd->update_total_scanlines(mode3);
 		}
 	}
 }
 
-static MACHINE_CONFIG_START( ms_megadriv, md_cons_state )
+static MACHINE_CONFIG_START( ms_megadriv )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
@@ -393,7 +390,7 @@ static MACHINE_CONFIG_START( ms_megadriv, md_cons_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ms_megadpal, md_cons_state )
+static MACHINE_CONFIG_START( ms_megadpal )
 	MCFG_FRAGMENT_ADD( md_pal )
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
@@ -581,7 +578,7 @@ void md_cons_state::_32x_scanline_helper_callback(int scanline)
 		m_32x->_32x_render_videobuffer_to_screenbuffer_helper(scanline);
 }
 
-static MACHINE_CONFIG_START( genesis_32x, md_cons_state )
+static MACHINE_CONFIG_START( genesis_32x )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
@@ -622,7 +619,7 @@ static MACHINE_CONFIG_START( genesis_32x, md_cons_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mdj_32x, md_cons_state )
+static MACHINE_CONFIG_START( mdj_32x )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
@@ -663,7 +660,7 @@ static MACHINE_CONFIG_START( mdj_32x, md_cons_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( md_32x, md_cons_state )
+static MACHINE_CONFIG_START( md_32x )
 	MCFG_FRAGMENT_ADD( md_pal )
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
@@ -736,7 +733,7 @@ ROM_END
 
 /****************************************** SegaCD emulation ****************************************/
 
-static MACHINE_CONFIG_START( genesis_scd, md_cons_state )
+static MACHINE_CONFIG_START( genesis_scd )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
@@ -754,7 +751,7 @@ static MACHINE_CONFIG_START( genesis_scd, md_cons_state )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( md_scd, md_cons_state )
+static MACHINE_CONFIG_START( md_scd )
 	MCFG_FRAGMENT_ADD( md_pal )
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
@@ -772,7 +769,7 @@ static MACHINE_CONFIG_START( md_scd, md_cons_state )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","megacd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mdj_scd, md_cons_state )
+static MACHINE_CONFIG_START( mdj_scd )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)

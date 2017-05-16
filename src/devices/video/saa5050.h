@@ -23,10 +23,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_VIDEO_SAA5050_H
+#define MAME_VIDEO_SAA5050_H
 
-#ifndef __SAA5050__
-#define __SAA5050__
+#pragma once
 
 
 
@@ -54,12 +54,11 @@ class saa5050_device :  public device_t
 {
 public:
 	// construction/destruction
-	saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_screen_size(device_t &device, int cols, int rows, int size) { downcast<saa5050_device &>(device).m_cols = cols; downcast<saa5050_device &>(device).m_rows = rows; downcast<saa5050_device &>(device).m_size = size; }
 
-	template<class _Object> static devcb_base &set_d_rd_callback(device_t &device, _Object object) { return downcast<saa5050_device &>(device).m_read_d.set_callback(object); }
+	template <class Object> static devcb_base &set_d_rd_callback(device_t &device, Object &&cb) { return downcast<saa5050_device &>(device).m_read_d.set_callback(std::forward<Object>(cb)); }
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -78,6 +77,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+	saa5050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -254,15 +255,13 @@ public:
 
 
 // device type definition
-extern const device_type SAA5050; // English
-extern const device_type SAA5051; // German
-extern const device_type SAA5052; // Swedish/Finnish
-extern const device_type SAA5053; // Italian
-extern const device_type SAA5054; // Belgian
-extern const device_type SAA5055; // US ASCII
-extern const device_type SAA5056; // Hebrew
-extern const device_type SAA5057; // Cyrillic
+DECLARE_DEVICE_TYPE(SAA5050, saa5050_device) // English
+DECLARE_DEVICE_TYPE(SAA5051, saa5051_device) // German
+DECLARE_DEVICE_TYPE(SAA5052, saa5052_device) // Swedish/Finnish
+DECLARE_DEVICE_TYPE(SAA5053, saa5053_device) // Italian
+DECLARE_DEVICE_TYPE(SAA5054, saa5054_device) // Belgian
+DECLARE_DEVICE_TYPE(SAA5055, saa5055_device) // US ASCII
+DECLARE_DEVICE_TYPE(SAA5056, saa5056_device) // Hebrew
+DECLARE_DEVICE_TYPE(SAA5057, saa5057_device) // Cyrillic
 
-
-
-#endif
+#endif // MAME_VIDEO_SAA5050_H

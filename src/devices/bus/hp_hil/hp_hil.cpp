@@ -28,7 +28,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type HP_HIL_SLOT = device_creator<hp_hil_slot_device>;
+DEFINE_DEVICE_TYPE(HP_HIL_SLOT, hp_hil_slot_device, "hp_hil_slot", "HP-HIL Slot")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -38,7 +38,7 @@ const device_type HP_HIL_SLOT = device_creator<hp_hil_slot_device>;
 //  hp_hil_slot_device - constructor
 //-------------------------------------------------
 hp_hil_slot_device::hp_hil_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HP_HIL_SLOT, "HP_HIL_SLOT", tag, owner, clock, "hp_hil_slot", __FILE__)
+	: device_t(mconfig, HP_HIL_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 {
 }
@@ -67,14 +67,14 @@ void hp_hil_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type HP_HIL_MLC = device_creator<hp_hil_mlc_device>;
+DEFINE_DEVICE_TYPE(HP_HIL_MLC, hp_hil_mlc_device, "hp_hil_mlc", "HP-HIL Master Link Controller")
 
 
 //-------------------------------------------------
 //  hp_hil_mlc_device - constructor
 //-------------------------------------------------
 hp_hil_mlc_device::hp_hil_mlc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HP_HIL_MLC, "HP-HIL Master Link Controller", tag, owner, clock, "hp_hil", __FILE__)
+	: device_t(mconfig, HP_HIL_MLC, tag, owner, clock)
 	, int_cb(*this)
 	, nmi_cb(*this)
 {

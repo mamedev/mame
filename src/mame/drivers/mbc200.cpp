@@ -78,7 +78,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pm_porta_w);
 	DECLARE_WRITE8_MEMBER(pm_portb_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(update_row);
 	required_device<palette_device> m_palette;
 
@@ -93,7 +93,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<mb8876_t> m_fdc;
+	required_device<mb8876_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 };
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( mbc200_io , AS_IO, 8, mbc200_state)
 	//AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
 	//AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
 	AM_RANGE(0xe0, 0xe1) AM_READ(keyboard_r) AM_WRITENOP
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_t, read, write)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_device, read, write)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("ppi_m", i8255_device, read, write)
 	AM_RANGE(0xec, 0xec) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
 	AM_RANGE(0xed, 0xed) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
@@ -207,7 +207,7 @@ READ8_MEMBER( mbc200_state::keyboard_r )
 }
 
 // convert standard control keys to expected code;
-WRITE8_MEMBER( mbc200_state::kbd_put )
+void mbc200_state::kbd_put(u8 data)
 {
 	switch (data)
 	{
@@ -290,7 +290,7 @@ static GFXDECODE_START( mbc200 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( mbc200, mbc200_state )
+static MACHINE_CONFIG_START( mbc200 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz/2) // NEC D780C-1
 	MCFG_CPU_PROGRAM_MAP(mbc200_mem)
@@ -344,7 +344,7 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 
 	/* Keyboard */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(mbc200_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(mbc200_state, kbd_put))
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mbc200")
@@ -361,5 +361,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   CLASS          INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1982, mbc200,  0,       0,       mbc200,    mbc200, driver_device,   0,  "Sanyo",   "MBC-200", 0 )
+//    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY   FULLNAME   FLAGS
+COMP( 1982, mbc200,  0,       0,       mbc200,    mbc200, mbc200_state,  0,    "Sanyo",  "MBC-200", 0 )

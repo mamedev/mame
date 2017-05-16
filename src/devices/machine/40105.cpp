@@ -32,7 +32,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CD40105 = device_creator<cmos_40105_device>;
+DEFINE_DEVICE_TYPE(CD40105, cmos_40105_device, "cd40105", "40105 FIFO")
 const device_type HC40105 = CD40105;
 
 
@@ -45,7 +45,7 @@ const device_type HC40105 = CD40105;
 //-------------------------------------------------
 
 cmos_40105_device::cmos_40105_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, CD40105, "40105 FIFO", tag, owner, clock, "cd40105", __FILE__),
+	: device_t(mconfig, CD40105, tag, owner, clock),
 		m_write_dir(*this),
 		m_write_dor(*this),
 		m_write_q(*this),

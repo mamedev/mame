@@ -625,9 +625,9 @@ uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 
 	for (int y = 0; y < 224; y++)
 	{
 		uint32_t* lineptr = &bitmap.pix32(y);
-		uint32_t* srcptr =  &m_vdp1->get_bitmap().pix32(y + SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
+		uint32_t* srcptr =  &m_vdp1->get_bitmap().pix32(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT);
 
-		for (int x = 0; x < SEGA315_5124_WIDTH; x++)
+		for (int x = 0; x < sega315_5124_device::WIDTH; x++)
 		{
 			uint32_t src = srcptr[x] & 0xffffff;
 
@@ -651,7 +651,7 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 	MACHINE_RESET_CALL_MEMBER(megadriv);
 }
 
-static MACHINE_CONFIG_START( megaplay, mplay_state )
+static MACHINE_CONFIG_START( megaplay )
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(md_ntsc)
 
@@ -686,8 +686,8 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 	/* New update functions to handle the extra layer */
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
-		SEGA315_5124_WIDTH , SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256, \
-		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
+			sega315_5124_device::WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
+			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mplay_state, screen_update_megplay)
 
 	// Megaplay has an additional SMS VDP as an overlay
@@ -967,9 +967,9 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 /* 02 */ GAME( 1993, mp_gaxe2, megaplay, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play) (Rev B)" , 0 )
 /* 02 */ GAME( 1993, mp_gaxe2a,mp_gaxe2, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)" , 0 )
 /* 03 */ GAME( 1993, mp_gslam, megaplay, megaplay, mp_gslam, mplay_state, megaplay, ROT0, "Sega",                  "Grand Slam (Mega Play)",0  )
-/* 04 */ GAME( 1993, mp_twc,   megaplay, megaplay, mp_twc, mplay_state,   megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)" , 0 )
-/* 05 */ GAME( 1993, mp_sor2,  megaplay, megaplay, mp_sor2, mplay_state,  megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)" , 0 )
-/* 06 */ GAME( 1993, mp_bio,   megaplay, megaplay, mp_bio, mplay_state,   megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)" , 0 )
+/* 04 */ GAME( 1993, mp_twc,   megaplay, megaplay, mp_twc,   mplay_state, megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)" , 0 )
+/* 05 */ GAME( 1993, mp_sor2,  megaplay, megaplay, mp_sor2,  mplay_state, megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)" , 0 )
+/* 06 */ GAME( 1993, mp_bio,   megaplay, megaplay, mp_bio,   mplay_state, megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)" , 0 )
 /* 07 */ GAME( 1993, mp_soni2, megaplay, megaplay, mp_soni2, mplay_state, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega Play)" , 0 )
 /* 08 */
 /* 09 */ GAME( 1993, mp_shnb3, megaplay, megaplay, mp_shnb3, mplay_state, megaplay, ROT0, "Sega",                  "Shinobi III (Mega Play)" , 0 )

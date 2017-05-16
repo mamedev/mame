@@ -34,30 +34,31 @@ public:
 	int execute(std::vector<std::string> &args);
 
 	// direct access to the command operations
-	void listxml(const char *gamename = "*");
-	void listfull(const char *gamename = "*");
-	void listsource(const char *gamename = "*");
-	void listclones(const char *gamename = "*");
-	void listbrothers(const char *gamename = "*");
-	void listcrc(const char *gamename = "*");
-	void listroms(const char *gamename = "*");
-	void listsamples(const char *gamename = "*");
-	void listdevices(const char *gamename = "*");
-	void listslots(const char *gamename = "*");
-	void listmedia(const char *gamename = "*");
-	void listsoftware(const char *gamename = "*");
-	void verifysoftware(const char *gamename = "*");
-	void verifyroms(const char *gamename = "*");
-	void verifysamples(const char *gamename = "*");
-	void romident(const char *filename);
-	void getsoftlist(const char *gamename = "*");
-	void verifysoftlist(const char *gamename = "*");
 
 private:
+	// commands
+	void listxml(const std::vector<std::string> &args);
+	void listfull(const std::vector<std::string> &args);
+	void listsource(const std::vector<std::string> &args);
+	void listclones(const std::vector<std::string> &args);
+	void listbrothers(const std::vector<std::string> &args);
+	void listcrc(const std::vector<std::string> &args);
+	void listroms(const std::vector<std::string> &args);
+	void listsamples(const std::vector<std::string> &args);
+	void listdevices(const std::vector<std::string> &args);
+	void listslots(const std::vector<std::string> &args);
+	void listmedia(const std::vector<std::string> &args);
+	void listsoftware(const std::vector<std::string> &args);
+	void verifysoftware(const std::vector<std::string> &args);
+	void verifyroms(const std::vector<std::string> &args);
+	void verifysamples(const std::vector<std::string> &args);
+	void romident(const std::vector<std::string> &args);
+	void getsoftlist(const std::vector<std::string> &args);
+	void verifysoftlist(const std::vector<std::string> &args);
+
 	// internal helpers
 	void execute_commands(const char *exename);
 	void display_help(const char *exename);
-	void display_suggestions(const char *gamename);
 	void output_single_softlist(FILE *out, software_list_device &swlist);
 	void start_execution(mame_machine_manager *manager, std::vector<std::string> &args);
 
@@ -67,4 +68,4 @@ private:
 	int                 m_result;
 };
 
-#endif  /* MAME_FRONTEND_CLIFRONT_H */
+#endif  // MAME_FRONTEND_CLIFRONT_H

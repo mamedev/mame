@@ -289,7 +289,7 @@ static GFXDECODE_START( dominob )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( dominob, dominob_state )
+static MACHINE_CONFIG_START( dominob )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)
@@ -361,5 +361,5 @@ ROM_START( dominobv2 )
 	ROM_LOAD( "u114v2",   0xc0000, 0x40000, CRC(df17ee65) SHA1(1cb434719a8c406726d2c966392be03a2dc1d758) )
 ROM_END
 
-GAME( 1996, dominob,  0,       dominob,  dominob, driver_device,  0, ROT0, "Wonwoo Systems", "Domino Block", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, dominobv2,dominob, dominob,  dominob, driver_device,  0, ROT0, "Wonwoo Systems", "Domino Block ver.2", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, dominob,  0,       dominob,  dominob, dominob_state,  0, ROT0, "Wonwoo Systems", "Domino Block",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, dominobv2,dominob, dominob,  dominob, dominob_state,  0, ROT0, "Wonwoo Systems", "Domino Block ver.2", MACHINE_SUPPORTS_SAVE )
