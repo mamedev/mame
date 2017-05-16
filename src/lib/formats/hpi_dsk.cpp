@@ -61,7 +61,7 @@ constexpr uint32_t ID_CD_PATTERN= 0x55552a54;	// C/D pattern of 0xff + ID_AM
 constexpr uint32_t DATA_CD_PATTERN = 0x55552a44;	// C/D pattern of 0xff + DATA_AM
 constexpr unsigned GAP1_SIZE	= 17;	// Size of gap 1 (+1)
 constexpr unsigned GAP2_SIZE	= 35;	// Size of gap 2 (+1)
-constexpr unsigned ID_DATA_OFFSET = 30 * 16;	// Nominal distance (in cells) between ID & DATA AM
+constexpr int ID_DATA_OFFSET = 30 * 16;	// Nominal distance (in cells) between ID & DATA AM
 // Size of image file (holding 77 cylinders)
 constexpr unsigned HPI_IMAGE_SIZE = HPI_TRACKS * HPI_HEADS * HPI_SECTORS * HPI_SECTOR_SIZE;
 constexpr unsigned HPI_RED_TRACKS = 75;	// Reduced number of tracks
@@ -355,7 +355,7 @@ bool hpi_format::get_next_sector(const uint8_t *bitstream , int bitstream_size ,
 	std::vector<uint8_t> block;
 	while (true) {
 		// Scan for ID block first
-		int id_pos;
+		int id_pos = 0;
 		while (true) {
 			if (block.size() == 0) {
 				block = get_next_id_n_block(bitstream , bitstream_size , pos , id_pos);
