@@ -44,6 +44,7 @@ private:
 
 	void load_values();
 	TIMER_CALLBACK_MEMBER( timer_tick );
+	emu_timer * m_tick_timer;
 };
 
 DECLARE_DEVICE_TYPE(SP0250, sp0250_device)

@@ -134,6 +134,7 @@ private:
 	int m_carry, m_zero;
 
 	struct { int t2ms, t512ms; int count; } m_timer;
+	emu_timer *m_2ms_tick_timer;
 
 	address_space *m_program;
 	direct_read_data *m_direct;

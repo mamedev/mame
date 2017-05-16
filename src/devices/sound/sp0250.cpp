@@ -76,7 +76,8 @@ void sp0250_device::device_start()
 	if (!m_drq.isnull())
 	{
 		m_drq( ASSERT_LINE);
-		machine().scheduler().timer_pulse(attotime::from_hz(clock()) * CLOCK_DIVIDER, timer_expired_delegate(FUNC(sp0250_device::timer_tick), this));
+		m_tick_timer= machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sp0250_device::timer_tick), this));
+		m_tick_timer->adjust(attotime::from_hz(clock()) * CLOCK_DIVIDER, 0, attotime::from_hz(clock()) * CLOCK_DIVIDER);
 	}
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / CLOCK_DIVIDER);
