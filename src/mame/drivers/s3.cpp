@@ -584,7 +584,7 @@ ROM_END
 
 GAME( 1977, httip_l1, 0, s3,  s3, s3_state, 0, ROT0, "Williams", "Hot Tip (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1977, lucky_l1, 0, s3,  s3, s3_state, 0, ROT0, "Williams", "Lucky Seven (L-1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, wldcp_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "World Cup Soccer (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, wldcp_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "World Cup (L-1)",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1978, cntct_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "Contact (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1978, disco_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "Disco Fever (L-1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1978, phnix_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "Phoenix (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
