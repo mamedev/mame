@@ -4454,7 +4454,7 @@ ROM_END
 
 
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT               COMPANY, FULLNAME, FLAGS */
+//    YEAR  NAME       PARENT   CMP MACHINE   INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
 CONS( 1979, bambball,  0,        0, bambball, bambball, bambball_state, 0, "Bambino", "Dribble Away Basketball", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, bmboxing,  0,        0, bmboxing, bmboxing, bmboxing_state, 0, "Bambino", "Knock-Em Out Boxing", MACHINE_SUPPORTS_SAVE )
 

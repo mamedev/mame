@@ -171,4 +171,5 @@ ROM_START( tama )
 ROM_END
 
 
-CONS( 1997, tama, 0, 0, tama, tama, tamag1_state, 0, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE      INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1997, tama, 0,      0, tama,   tama, tamag1_state, 0, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )
