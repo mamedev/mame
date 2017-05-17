@@ -602,6 +602,8 @@ WRITE8_MEMBER(vegas_state::sio_w)
 		int index = offset >> 12;
 		switch (index) {
 		case 0:
+			if (LOG_SIO)
+				logerror("sio_w: Reset Control offset: %08x index: %d data: %02X\n", offset, index, data);
 			// Reset Control:  Bit 0=>Reset IOASIC, Bit 1=>Reset NSS Connection, Bit 2=>Reset SMC, Bit 3=>Reset VSYNC, Bit 4=>VSYNC Polarity
 			m_sio_irq_clear = data;
 
@@ -621,6 +623,14 @@ WRITE8_MEMBER(vegas_state::sio_w)
 			break;
 		case 1:
 			// Interrupt Enable
+			// Bit 0 => SIO Watchdog
+			// Bit 1 => A/D Converter
+			// Bit 2 => IOASIC
+			// Bit 3 => NSS / Hi-Link
+			// Bit 4 => Ethernet
+			// Bit 5 => Vsync
+			if (LOG_SIO)
+				logerror("sio_w: Interrupt Enable offset: %08x index: %d data: %02X\n", offset, index, data);
 			m_sio_irq_enable = data;
 			update_sio_irqs();
 			break;
@@ -1247,6 +1257,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vegas_cs3_map, AS_PROGRAM, 32, vegas_state)
 	AM_RANGE(0x00000000, 0x00000003) AM_READWRITE(analog_port_r, analog_port_w)
+	//AM_RANGE(0x00001000, 0x00001003) AM_READWRITE(lcd_r, lcd_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vegas_cs4_map, AS_PROGRAM, 32, vegas_state)
@@ -1267,6 +1278,7 @@ static ADDRESS_MAP_START(vegas_cs6_map, AS_PROGRAM, 32, vegas_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(vegas_cs7_map, AS_PROGRAM, 32, vegas_state)
+	//AM_RANGE(0x00000000, 0x00000003) AM_READWRITE8(nss_r, nss_w, 0xffffffff)
 	AM_RANGE(0x00001000, 0x0000100f) AM_READWRITE(ethernet_r, ethernet_w)
 	AM_RANGE(0x00005000, 0x00005003) AM_DEVWRITE("dcs", dcs_audio_device, dsio_idma_addr_w) // if (m_dcs_idma_cs == 7)
 	AM_RANGE(0x00007000, 0x00007003) AM_DEVREADWRITE("dcs", dcs_audio_device, dsio_idma_data_r, dsio_idma_data_w) // if (m_dcs_idma_cs == 7)
