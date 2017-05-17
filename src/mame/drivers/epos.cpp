@@ -13,11 +13,15 @@
     - Super Glob seems like a later revision of The Glob, the most obvious
       difference being an updated service mode.
     - These games don't have cocktail mode.
-    - The divisor 4 was derived using the timing loop used to split the screen
-      in the middle.  This loop takes roughly 24200 cycles, giving
+    - The CPU clock divisor 4 was derived using the timing loop used to split
+      the screen in the middle.  This loop takes roughly 24200 cycles, giving
       2500 + (24200 - 2500) * 2 * 60 = 2754000 = 2.75MHz for the CPU speed,
       assuming 60 fps and a 2500 cycle VBLANK period.
-      This should be easy to check since the schematics are available, .
+      This also matches the IGMO schematic, as it is the /CLK signal, which is
+      derived from the 11MHz xtal by dividing it down by two 74LS193 chips, one
+      (U92) dividing the clock by 2, and another (U91) having 3 taps, further
+      dividing the already divided clock by 2 (/CLK), 4 (/PLOAD) and 8 (CLOCK).
+      The CLOCK signal drives the AY.
     - I think theglob2 is earlier than theglob.  They only differ in one routine,
       but it appears to be a bug fix.  Also, theglob3 appears to be even older.
 
@@ -472,7 +476,7 @@ static MACHINE_CONFIG_START( epos ) /* EPOS TRISTAR 8000 PCB */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_11MHz/16) /*  0.6875 MHz??? - clock not confirmed (similar to the clock listed below) */
+	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_11MHz/16) /*  0.6875 MHz, confirmed from schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
