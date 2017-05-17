@@ -1571,7 +1571,10 @@ int linenoiseColumns(void)
 
 void linenoisePreloadBuffer(const char* preloadText)
 {
-    if(strnlen(preloadText, LINENOISE_MAX_LINE) >= LINENOISE_MAX_LINE)
+	size_t n = 0;
+	while((n < LINENOISE_MAX_LINE) && preloadText[n])
+		n++;
+    if(n >= LINENOISE_MAX_LINE)
         return;
     preload = 1;
     strcpy(preload_buf, preloadText);
