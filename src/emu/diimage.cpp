@@ -516,31 +516,35 @@ bool device_image_interface::load_software_region(const char *tag, optional_shar
 void device_image_interface::run_hash(util::core_file &file, void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *),
 	util::hash_collection &hashes, const char *types)
 {
-	// instantiate the vector
+	// reset the hash; we want to override existing data
+	hashes.reset();
+
+	// figure out the size
 	u32 size = (u32) file.size();
 	if (size != file.size())
 		throw false;
-	std::vector<u8> buf((size_t)size);
 
-	// get a pointer
-	u8 *ptr = size > 0 ? &buf[0] : nullptr;
+	// only do anything if we have data
+	if (size > 0)
+	{
+		std::vector<u8> buf((size_t)size);
 
-	// clear it out
-	memset(ptr, 0, size);
+		// clear it out
+		memset(&buf[0], 0, size);
 
-	// read the file
-	file.seek(0, SEEK_SET);
-	file.read(ptr, size);
-	
-	// get the hashes
-	hashes.reset();
-	if (partialhash)
-		partialhash(hashes, ptr, size, types);
-	else
-		hashes.compute(ptr, size, types);
+		// read the file
+		file.seek(0, SEEK_SET);
+		file.read(&buf[0], size);
 
-	// cleanup
-	file.seek(0, SEEK_SET);
+		// get the hashes
+		if (partialhash)
+			partialhash(hashes, &buf[0], size, types);
+		else
+			hashes.compute(&buf[0], size, types);
+
+		// cleanup
+		file.seek(0, SEEK_SET);
+	}
 }
 
 
