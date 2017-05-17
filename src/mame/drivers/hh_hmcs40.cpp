@@ -2792,7 +2792,7 @@ MACHINE_CONFIG_END
   2 VFD revisions are known, the difference is Pac-Man's color: cyan or red.
 
 ***************************************************************************/
-#if 0
+
 class epacman2_state : public egalaxn2_state
 {
 public:
@@ -2800,7 +2800,7 @@ public:
 		: egalaxn2_state(mconfig, type, tag)
 	{ }
 };
-#endif
+
 // handlers are identical to Galaxian 2, so we can use those
 
 // config
@@ -4481,8 +4481,8 @@ CONS( 1981, sag_si2,   0,        0, sag,      sag,      sag_state,      0, "Ente
 CONS( 1981, sag_bb4,   0,        0, sag,      sag,      sag_state,      0, "Entex", "Select-A-Game: Baseball 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, sag_pb,    0,        0, sag,      sag,      sag_state,      0, "Entex", "Select-A-Game: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, egalaxn2_state, 0, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, epacman2,  0,        0, epacman2, epacman2, egalaxn2_state, 0, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, epacman2r, epacman2, 0, epacman2, epacman2, egalaxn2_state, 0, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, epacman2,  0,        0, epacman2, epacman2, epacman2_state, 0, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, epacman2r, epacman2, 0, epacman2, epacman2, epacman2_state, 0, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, estargte,  0,        0, estargte, estargte, estargte_state, 0, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, eturtles,  0,        0, eturtles, eturtles, eturtles_state, 0, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
 
