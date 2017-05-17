@@ -2303,27 +2303,27 @@ DRIVER_INIT_MEMBER(mitchell_state,hatena)
 DRIVER_INIT_MEMBER(mitchell_state,spang)
 {
 	m_input_type = 3;
-	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
+	m_nvram->set_base(m_mainram, m_mainram.bytes());
 	configure_banks(spang_decode);
 }
 
 DRIVER_INIT_MEMBER(mitchell_state,spangbl)
 {
 	m_input_type = 3;
-	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
+	m_nvram->set_base(m_mainram, m_mainram.bytes());
 	bootleg_decode();
 }
 
 DRIVER_INIT_MEMBER(mitchell_state,spangj)
 {
 	m_input_type = 3;
-	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
+	m_nvram->set_base(m_mainram, m_mainram.bytes());
 	configure_banks(spangj_decode);
 }
 DRIVER_INIT_MEMBER(mitchell_state,sbbros)
 {
 	m_input_type = 3;
-	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
+	m_nvram->set_base(m_mainram, m_mainram.bytes());
 	configure_banks(sbbros_decode);
 }
 DRIVER_INIT_MEMBER(mitchell_state,qtono1)
@@ -2367,13 +2367,13 @@ DRIVER_INIT_MEMBER(mitchell_state,marukin)
 DRIVER_INIT_MEMBER(mitchell_state,block)
 {
 	m_input_type = 2;
-	m_nvram->set_base(&memregion("maincpu")->base()[0xff80], 0x80); /* NVRAM */
+	m_nvram->set_base(m_mainram, m_mainram.bytes());
 	configure_banks(block_decode);
 }
 DRIVER_INIT_MEMBER(mitchell_state,blockbl)
 {
 	m_input_type = 2;
-	m_nvram->set_base(&memregion("maincpu")->base()[0xff80], 0x80); /* NVRAM */
+	m_nvram->set_base(m_mainram, m_mainram.bytes());
 	bootleg_decode();
 }
 
