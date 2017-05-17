@@ -30,7 +30,6 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
-		m_mainram(*this, "ram"),
 		m_bank1(*this, "bank1"),
 		m_bank0d(*this, "bank0d"),
 		m_bank1d(*this, "bank1d"),
@@ -51,7 +50,6 @@ public:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
-	optional_shared_ptr<uint8_t> m_mainram;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
@@ -74,7 +72,6 @@ public:
 	int        m_dial_selected;
 	int        m_dir[2];
 	int        m_keymatrix;
-	uint8_t       m_dummy_nvram;
 
 	uint8_t m_irq_source;
 	DECLARE_READ8_MEMBER(pang_port5_r);
