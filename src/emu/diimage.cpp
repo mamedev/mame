@@ -516,23 +516,28 @@ bool device_image_interface::load_software_region(const char *tag, optional_shar
 void device_image_interface::run_hash(util::core_file &file, void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *),
 	util::hash_collection &hashes, const char *types)
 {
-	u32 size;
-	std::vector<u8> buf;
+	// instantiate the vector
+	u32 size = (u32) file.size();
+	if (size != file.size())
+		throw false;
+	std::vector<u8> buf((size_t)size);
 
-	hashes.reset();
-	size = (u32) file.size();
+	// get a pointer
+	u8 *ptr = size > 0 ? &buf[0] : nullptr;
 
-	buf.resize(size);
-	memset(&buf[0], 0, size);
+	// clear it out
+	memset(ptr, 0, size);
 
 	// read the file
 	file.seek(0, SEEK_SET);
-	file.read(&buf[0], size);
-
+	file.read(ptr, size);
+	
+	// get the hashes
+	hashes.reset();
 	if (partialhash)
-		partialhash(hashes, &buf[0], size, types);
+		partialhash(hashes, ptr, size, types);
 	else
-		hashes.compute(&buf[0], size, types);
+		hashes.compute(ptr, size, types);
 
 	// cleanup
 	file.seek(0, SEEK_SET);
