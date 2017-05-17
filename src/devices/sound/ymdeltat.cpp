@@ -204,7 +204,7 @@ value:   START, REC, MEMDAT, REPEAT, SPOFF, x,x,RESET   meaning:
 
 		portstate = v & (0x80|0x40|0x20|0x10|0x01); /* start, rec, memory mode, repeat flag copy, reset(bit0) */
 
-		if (portstate & 0x8 )/* START,REC,MEMDATA,REPEAT,SPOFF,--,--,RESET */
+		if (portstate & 0x80)/* START,REC,MEMDATA,REPEAT,SPOFF,--,--,RESET */
 		{
 			/* set PCM BUSY bit */
 			PCM_BSY = 1;
