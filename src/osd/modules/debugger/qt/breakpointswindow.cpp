@@ -133,5 +133,5 @@ void BreakpointsWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) con
 void BreakpointsWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_bwType = node.get_attribute_int("bwtype", m_bwType);
+	m_bwType = node.attribute("bwtype").as_int( m_bwType);
 }

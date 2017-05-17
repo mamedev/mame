@@ -1142,7 +1142,7 @@ void laserdisc_device::process_track_data()
 //  configuration file
 //-------------------------------------------------
 
-void laserdisc_device::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void laserdisc_device::config_load(config_type cfg_type, util::xml::data_node const &parentnode)
 {
 	// we only care about game files
 	if (cfg_type != config_type::GAME)
@@ -1153,20 +1153,20 @@ void laserdisc_device::config_load(config_type cfg_type, util::xml::data_node co
 		return;
 
 	// iterate over overlay nodes
-	for (util::xml::data_node const *ldnode = parentnode->get_child("device"); ldnode != nullptr; ldnode = ldnode->get_next_sibling("device"))
+	for (util::xml::data_node const ldnode : parentnode.children("device"))
 	{
-		const char *devtag = ldnode->get_attribute_string("tag", "");
+		const char *devtag = ldnode.attribute("tag").as_string( "");
 		if (strcmp(devtag, tag()) == 0)
 		{
 			// handle the overlay node
-			util::xml::data_node const *const overnode = ldnode->get_child("overlay");
+			util::xml::data_node const overnode = ldnode.child("overlay");
 			if (overnode != nullptr)
 			{
 				// fetch positioning controls
-				m_overposx = overnode->get_attribute_float("hoffset", m_overposx);
-				m_overscalex = overnode->get_attribute_float("hstretch", m_overscalex);
-				m_overposy = overnode->get_attribute_float("voffset", m_overposy);
-				m_overscaley = overnode->get_attribute_float("vstretch", m_overscaley);
+				m_overposx = overnode.attribute("hoffset").as_float( m_overposx);
+				m_overscalex = overnode.attribute("hstretch").as_float( m_overscalex);
+				m_overposy = overnode.attribute("voffset").as_float( m_overposy);
+				m_overscaley = overnode.attribute("vstretch").as_float( m_overscaley);
 			}
 		}
 	}
@@ -1178,52 +1178,52 @@ void laserdisc_device::config_load(config_type cfg_type, util::xml::data_node co
 //  file
 //-------------------------------------------------
 
-void laserdisc_device::config_save(config_type cfg_type, util::xml::data_node *parentnode)
+void laserdisc_device::config_save(config_type cfg_type, util::xml::data_node &parentnode)
 {
 	// we only care about game files
 	if (cfg_type != config_type::GAME)
 		return;
 
 	// create a node
-	util::xml::data_node *const ldnode = parentnode->add_child("device", nullptr);
+	util::xml::data_node ldnode = parentnode.append_child("device");
 	if (ldnode != nullptr)
 	{
 		// output the basics
-		ldnode->set_attribute("tag", tag());
+		ldnode.get_or_append_attribute("tag").set_value( tag());
 
 		// add an overlay node
-		util::xml::data_node *const overnode = ldnode->add_child("overlay", nullptr);
+		util::xml::data_node overnode = ldnode.append_child("overlay");
 		bool changed = false;
 		if (overnode != nullptr)
 		{
 			// output the positioning controls
 			if (m_overposx != m_orig_config.m_overposx)
 			{
-				overnode->set_attribute_float("hoffset", m_overposx);
+				overnode.get_or_append_attribute("hoffset").set_value( m_overposx);
 				changed = true;
 			}
 
 			if (m_overscalex != m_orig_config.m_overscalex)
 			{
-				overnode->set_attribute_float("hstretch", m_overscalex);
+				overnode.get_or_append_attribute("hstretch").set_value( m_overscalex);
 				changed = true;
 			}
 
 			if (m_overposy != m_orig_config.m_overposy)
 			{
-				overnode->set_attribute_float("voffset", m_overposy);
+				overnode.get_or_append_attribute("voffset").set_value( m_overposy);
 				changed = true;
 			}
 
 			if (m_overscaley != m_orig_config.m_overscaley)
 			{
-				overnode->set_attribute_float("vstretch", m_overscaley);
+				overnode.get_or_append_attribute("vstretch").set_value( m_overscaley);
 				changed = true;
 			}
 		}
 
 		// if nothing changed, kill the node
 		if (!changed)
-			ldnode->delete_node();
+			ldnode.parent().remove_child(ldnode);
 	}
 }

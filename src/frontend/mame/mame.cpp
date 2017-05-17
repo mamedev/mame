@@ -353,14 +353,14 @@ bool emulator_info::frame_hook()
 	return mame_machine_manager::instance()->lua()->frame_hook();
 }
 
-void emulator_info::layout_file_cb(util::xml::data_node &layout)
+void emulator_info::layout_file_cb(util::xml::data_node const &layout)
 {
-	util::xml::data_node const *const mamelayout = layout.get_child("mamelayout");
+	util::xml::data_node mamelayout = layout.child("mamelayout");
 	if (mamelayout)
 	{
-		util::xml::data_node const *const script = mamelayout->get_child("script");
+		util::xml::data_node script = mamelayout.child("script");
 		if(script)
-			mame_machine_manager::instance()->lua()->call_plugin_set("layout", script->get_value());
+			mame_machine_manager::instance()->lua()->call_plugin_set("layout", script.text().get());
 	}
 }
 

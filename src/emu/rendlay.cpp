@@ -224,7 +224,7 @@ static int get_variable_value(running_machine &machine, const char *string, char
 
 static const char *xml_get_attribute_string_with_subst(running_machine &machine, util::xml::data_node const &node, const char *attribute, const char *defvalue)
 {
-	const char *str = node.get_attribute_string(attribute, nullptr);
+	const char *str = node.attribute(attribute).as_string( nullptr);
 	static char buffer[1000];
 
 	// if nothing, just return the default
@@ -298,7 +298,7 @@ static float xml_get_attribute_float_with_subst(running_machine &machine, util::
 //  parse_bounds - parse a bounds XML node
 //-------------------------------------------------
 
-void parse_bounds(running_machine &machine, util::xml::data_node const *boundsnode, render_bounds &bounds)
+void parse_bounds(running_machine &machine, util::xml::data_node const &boundsnode, render_bounds &bounds)
 {
 	// skip if nothing
 	if (boundsnode == nullptr)
@@ -309,21 +309,21 @@ void parse_bounds(running_machine &machine, util::xml::data_node const *boundsno
 	}
 
 	// parse out the data
-	if (boundsnode->has_attribute("left"))
+	if (boundsnode.attribute("left"))
 	{
 		// left/right/top/bottom format
-		bounds.x0 = xml_get_attribute_float_with_subst(machine, *boundsnode, "left", 0.0f);
-		bounds.x1 = xml_get_attribute_float_with_subst(machine, *boundsnode, "right", 1.0f);
-		bounds.y0 = xml_get_attribute_float_with_subst(machine, *boundsnode, "top", 0.0f);
-		bounds.y1 = xml_get_attribute_float_with_subst(machine, *boundsnode, "bottom", 1.0f);
+		bounds.x0 = xml_get_attribute_float_with_subst(machine, boundsnode, "left", 0.0f);
+		bounds.x1 = xml_get_attribute_float_with_subst(machine, boundsnode, "right", 1.0f);
+		bounds.y0 = xml_get_attribute_float_with_subst(machine, boundsnode, "top", 0.0f);
+		bounds.y1 = xml_get_attribute_float_with_subst(machine, boundsnode, "bottom", 1.0f);
 	}
-	else if (boundsnode->has_attribute("x"))
+	else if (boundsnode.attribute("x"))
 	{
 		// x/y/width/height format
-		bounds.x0 = xml_get_attribute_float_with_subst(machine, *boundsnode, "x", 0.0f);
-		bounds.x1 = bounds.x0 + xml_get_attribute_float_with_subst(machine, *boundsnode, "width", 1.0f);
-		bounds.y0 = xml_get_attribute_float_with_subst(machine, *boundsnode, "y", 0.0f);
-		bounds.y1 = bounds.y0 + xml_get_attribute_float_with_subst(machine, *boundsnode, "height", 1.0f);
+		bounds.x0 = xml_get_attribute_float_with_subst(machine, boundsnode, "x", 0.0f);
+		bounds.x1 = bounds.x0 + xml_get_attribute_float_with_subst(machine, boundsnode, "width", 1.0f);
+		bounds.y0 = xml_get_attribute_float_with_subst(machine, boundsnode, "y", 0.0f);
+		bounds.y1 = bounds.y0 + xml_get_attribute_float_with_subst(machine, boundsnode, "height", 1.0f);
 	}
 	else
 		throw emu_fatalerror("Illegal bounds value in XML");
@@ -339,7 +339,7 @@ void parse_bounds(running_machine &machine, util::xml::data_node const *boundsno
 //  parse_color - parse a color XML node
 //-------------------------------------------------
 
-void parse_color(running_machine &machine, util::xml::data_node const *colornode, render_color &color)
+void parse_color(running_machine &machine, util::xml::data_node const &colornode, render_color &color)
 {
 	// skip if nothing
 	if (colornode == nullptr)
@@ -349,10 +349,10 @@ void parse_color(running_machine &machine, util::xml::data_node const *colornode
 	}
 
 	// parse out the data
-	color.r = xml_get_attribute_float_with_subst(machine, *colornode, "red", 1.0);
-	color.g = xml_get_attribute_float_with_subst(machine, *colornode, "green", 1.0);
-	color.b = xml_get_attribute_float_with_subst(machine, *colornode, "blue", 1.0);
-	color.a = xml_get_attribute_float_with_subst(machine, *colornode, "alpha", 1.0);
+	color.r = xml_get_attribute_float_with_subst(machine, colornode, "red", 1.0);
+	color.g = xml_get_attribute_float_with_subst(machine, colornode, "green", 1.0);
+	color.b = xml_get_attribute_float_with_subst(machine, colornode, "blue", 1.0);
+	color.a = xml_get_attribute_float_with_subst(machine, colornode, "alpha", 1.0);
 
 	// check for errors
 	if (color.r < 0.0f || color.r > 1.0f || color.g < 0.0f || color.g > 1.0f ||
@@ -367,7 +367,7 @@ void parse_color(running_machine &machine, util::xml::data_node const *colornode
 //  node
 //-------------------------------------------------
 
-static void parse_orientation(running_machine &machine, util::xml::data_node const *orientnode, int &orientation)
+static void parse_orientation(running_machine &machine, util::xml::data_node const &orientnode, int &orientation)
 {
 	// skip if nothing
 	if (orientnode == nullptr)
@@ -377,7 +377,7 @@ static void parse_orientation(running_machine &machine, util::xml::data_node con
 	}
 
 	// parse out the data
-	int rotate = xml_get_attribute_int_with_subst(machine, *orientnode, "rotate", 0);
+	int rotate = xml_get_attribute_int_with_subst(machine, orientnode, "rotate", 0);
 	switch (rotate)
 	{
 		case 0:     orientation = ROT0;     break;
@@ -386,11 +386,11 @@ static void parse_orientation(running_machine &machine, util::xml::data_node con
 		case 270:   orientation = ROT270;   break;
 		default:    throw emu_fatalerror("Invalid rotation in XML orientation node: %d", rotate);
 	}
-	if (strcmp("yes", xml_get_attribute_string_with_subst(machine, *orientnode, "swapxy", "no")) == 0)
+	if (strcmp("yes", xml_get_attribute_string_with_subst(machine, orientnode, "swapxy", "no")) == 0)
 		orientation ^= ORIENTATION_SWAP_XY;
-	if (strcmp("yes", xml_get_attribute_string_with_subst(machine, *orientnode, "flipx", "no")) == 0)
+	if (strcmp("yes", xml_get_attribute_string_with_subst(machine, orientnode, "flipx", "no")) == 0)
 		orientation ^= ORIENTATION_FLIP_X;
-	if (strcmp("yes", xml_get_attribute_string_with_subst(machine, *orientnode, "flipy", "no")) == 0)
+	if (strcmp("yes", xml_get_attribute_string_with_subst(machine, orientnode, "flipy", "no")) == 0)
 		orientation ^= ORIENTATION_FLIP_Y;
 }
 
@@ -440,14 +440,14 @@ layout_element::layout_element(running_machine &machine, util::xml::data_node co
 	// parse components in order
 	bool first = true;
 	render_bounds bounds = { 0 };
-	for (util::xml::data_node const *compnode = elemnode.get_first_child(); compnode; compnode = compnode->get_next_sibling())
+	for (util::xml::data_node const compnode: elemnode.children())
 	{
-		make_component_map::const_iterator const make_func(s_make_component.find(compnode->get_name()));
+		make_component_map::const_iterator const make_func(s_make_component.find(compnode.name()));
 		if (make_func == s_make_component.end())
-			throw emu_fatalerror("Unknown element component: %s", compnode->get_name());
+			throw emu_fatalerror("Unknown element component: %s", compnode.name());
 
 		// insert the new component into the list
-		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(machine, *compnode, dirname)));
+		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(machine, compnode, dirname)));
 
 		// accumulate bounds
 		if (first)
@@ -619,8 +619,8 @@ layout_element::component::component(running_machine &machine, util::xml::data_n
 {
 	// fetch common data
 	m_state = xml_get_attribute_int_with_subst(machine, compnode, "state", -1);
-	parse_bounds(machine, compnode.get_child("bounds"), m_bounds);
-	parse_color(machine, compnode.get_child("color"), m_color);
+	parse_bounds(machine, compnode.child("bounds"), m_bounds);
+	parse_color(machine, compnode.child("color"), m_color);
 }
 
 
@@ -2222,34 +2222,34 @@ layout_view::layout_view(running_machine &machine, util::xml::data_node const &v
 	m_name = xml_get_attribute_string_with_subst(machine, viewnode, "name", "");
 
 	// if we have a bounds item, load it
-	util::xml::data_node const *const boundsnode = viewnode.get_child("bounds");
+	util::xml::data_node const boundsnode = viewnode.child("bounds");
 	m_expbounds.x0 = m_expbounds.y0 = m_expbounds.x1 = m_expbounds.y1 = 0;
 	if (boundsnode != nullptr)
 		parse_bounds(machine, boundsnode, m_expbounds);
 
 	// load backdrop items
-	for (util::xml::data_node const *itemnode = viewnode.get_child("backdrop"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("backdrop"))
-		m_backdrop_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
+	for (util::xml::data_node const itemnode : viewnode.children("backdrop"))
+		m_backdrop_list.append(*global_alloc(item(machine, itemnode, elemlist)));
 
 	// load screen items
-	for (util::xml::data_node const *itemnode = viewnode.get_child("screen"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("screen"))
-		m_screen_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
+	for (util::xml::data_node const itemnode : viewnode.children("screen"))
+		m_screen_list.append(*global_alloc(item(machine, itemnode, elemlist)));
 
 	// load overlay items
-	for (util::xml::data_node const *itemnode = viewnode.get_child("overlay"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("overlay"))
-		m_overlay_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
+	for (util::xml::data_node const itemnode : viewnode.children("overlay"))
+		m_overlay_list.append(*global_alloc(item(machine, itemnode, elemlist)));
 
 	// load bezel items
-	for (util::xml::data_node const *itemnode = viewnode.get_child("bezel"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("bezel"))
-		m_bezel_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
+	for (util::xml::data_node const itemnode : viewnode.children("bezel"))
+		m_bezel_list.append(*global_alloc(item(machine, itemnode, elemlist)));
 
 	// load cpanel items
-	for (util::xml::data_node const *itemnode = viewnode.get_child("cpanel"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("cpanel"))
-		m_cpanel_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
+	for (util::xml::data_node const itemnode : viewnode.children("cpanel"))
+		m_cpanel_list.append(*global_alloc(item(machine, itemnode, elemlist)));
 
 	// load marquee items
-	for (util::xml::data_node const *itemnode = viewnode.get_child("marquee"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("marquee"))
-		m_marquee_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
+	for (util::xml::data_node const itemnode : viewnode.children("marquee"))
+		m_marquee_list.append(*global_alloc(item(machine, itemnode, elemlist)));
 
 	// recompute the data for the view based on a default layer config
 	recompute(render_layer_config());
@@ -2448,12 +2448,12 @@ layout_view::item::item(running_machine &machine, util::xml::data_node const &it
 	m_input_mask = xml_get_attribute_int_with_subst(machine, itemnode, "inputmask", 0);
 	if (m_output_name[0] != 0 && m_element != nullptr)
 		machine.output().set_value(m_output_name.c_str(), m_element->default_state());
-	parse_bounds(machine, itemnode.get_child("bounds"), m_rawbounds);
-	parse_color(machine, itemnode.get_child("color"), m_color);
-	parse_orientation(machine, itemnode.get_child("orientation"), m_orientation);
+	parse_bounds(machine, itemnode.child("bounds"), m_rawbounds);
+	parse_color(machine, itemnode.child("color"), m_color);
+	parse_orientation(machine, itemnode.child("orientation"), m_orientation);
 
 	// sanity checks
-	if (strcmp(itemnode.get_name(), "screen") == 0)
+	if (strcmp(itemnode.name(), "screen") == 0)
 	{
 		if (m_screen == nullptr)
 			throw emu_fatalerror("Layout references invalid screen index %d", index);
@@ -2461,7 +2461,7 @@ layout_view::item::item(running_machine &machine, util::xml::data_node const &it
 	else
 	{
 		if (m_element == nullptr)
-			throw emu_fatalerror("Layout item of type %s require an element tag", itemnode.get_name());
+			throw emu_fatalerror("Layout item of type %s require an element tag", itemnode.name());
 	}
 
 	if (has_input())
@@ -2546,22 +2546,22 @@ layout_file::layout_file(running_machine &machine, util::xml::data_node const &r
 	: m_next(nullptr)
 {
 	// find the layout node
-	util::xml::data_node const *const mamelayoutnode = rootnode.get_child("mamelayout");
+	util::xml::data_node const mamelayoutnode = rootnode.child("mamelayout");
 	if (mamelayoutnode == nullptr)
 		throw emu_fatalerror("Invalid XML file: missing mamelayout node");
 
 	// validate the config data version
-	int const version = mamelayoutnode->get_attribute_int("version", 0);
+	int const version = mamelayoutnode.attribute("version").as_int( 0);
 	if (version != LAYOUT_VERSION)
 		throw emu_fatalerror("Invalid XML file: unsupported version");
 
 	// parse all the elements
-	for (util::xml::data_node const *elemnode = mamelayoutnode->get_child("element"); elemnode != nullptr; elemnode = elemnode->get_next_sibling("element"))
-		m_elemlist.append(*global_alloc(layout_element(machine, *elemnode, dirname)));
+	for (util::xml::data_node const elemnode : mamelayoutnode.children("element"))
+		m_elemlist.append(*global_alloc(layout_element(machine, elemnode, dirname)));
 
 	// parse all the views
-	for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
-		m_viewlist.append(*global_alloc(layout_view(machine, *viewnode, m_elemlist)));
+	for (util::xml::data_node const viewnode : mamelayoutnode.children("view"))
+		m_viewlist.append(*global_alloc(layout_view(machine, viewnode, m_elemlist)));
 }
 
 

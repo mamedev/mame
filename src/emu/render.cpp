@@ -1701,9 +1701,9 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 bool render_target::load_layout_file(const char *dirname, const char *filename)
 {
 	// if the first character of the "file" is an open brace, assume it is an XML string
-	util::xml::data_node *rootnode;
+	util::xml::document_node rootnode;
 	if (filename[0] == '<')
-		rootnode = util::xml::data_node::string_read(filename, nullptr);
+		rootnode.load_string(filename);
 
 	// otherwise, assume it is a file
 	else
@@ -1720,7 +1720,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 			return false;
 
 		// read the file
-		rootnode = util::xml::data_node::file_read(layoutfile, nullptr);
+		rootnode.load_file(layoutfile);
 	}
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
@@ -1737,7 +1737,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	bool result = true;
 	try
 	{
-		m_filelist.append(*global_alloc(layout_file(m_manager.machine(), *rootnode, dirname)));
+		m_filelist.append(*global_alloc(layout_file(m_manager.machine(), rootnode, dirname)));
 	}
 	catch (emu_fatalerror &err)
 	{
@@ -1748,10 +1748,10 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 		result = false;
 	}
 
-	emulator_info::layout_file_cb(*rootnode);
+	util::xml::data_node const layoutnode(rootnode.document_element());
+	emulator_info::layout_file_cb(layoutnode);
 
 	// free the root node
-	rootnode->file_free();
 	return result;
 }
 
@@ -2218,7 +2218,7 @@ int render_target::view_index(layout_view &targetview) const
 void render_target::config_load(util::xml::data_node const &targetnode)
 {
 	// find the view
-	const char *viewname = targetnode.get_attribute_string("view", nullptr);
+	const char *viewname = targetnode.attribute("view").as_string( nullptr);
 	if (viewname != nullptr)
 		for (int viewnum = 0; viewnum < 1000; viewnum++)
 		{
@@ -2233,32 +2233,32 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 		}
 
 	// modify the artwork config
-	int tmpint = targetnode.get_attribute_int("backdrops", -1);
+	int tmpint = targetnode.attribute("backdrops").as_int( -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_backdrops_enabled(tmpint);
 
-	tmpint = targetnode.get_attribute_int("overlays", -1);
+	tmpint = targetnode.attribute("overlays").as_int( -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_overlays_enabled(tmpint);
 
-	tmpint = targetnode.get_attribute_int("bezels", -1);
+	tmpint = targetnode.attribute("bezels").as_int( -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_bezels_enabled(tmpint);
 
-	tmpint = targetnode.get_attribute_int("cpanels", -1);
+	tmpint = targetnode.attribute("cpanels").as_int( -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_cpanels_enabled(tmpint);
 
-	tmpint = targetnode.get_attribute_int("marquees", -1);
+	tmpint = targetnode.attribute("marquees").as_int( -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_marquees_enabled(tmpint);
 
-	tmpint = targetnode.get_attribute_int("zoom", -1);
+	tmpint = targetnode.attribute("zoom").as_int( -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_zoom_to_screen(tmpint);
 
 	// apply orientation
-	tmpint = targetnode.get_attribute_int("rotate", -1);
+	tmpint = targetnode.attribute("rotate").as_int( -1);
 	if (tmpint != -1)
 	{
 		if (tmpint == 90)
@@ -2295,24 +2295,24 @@ bool render_target::config_save(util::xml::data_node &targetnode)
 	bool changed = false;
 
 	// output the basics
-	targetnode.set_attribute_int("index", index());
+	targetnode.attribute("index").set_value( index());
 
 	// output the view
 	if (m_curview != m_base_view)
 	{
-		targetnode.set_attribute("view", m_curview->name());
+		targetnode.get_or_append_attribute("view").set_value( m_curview->name());
 		changed = true;
 	}
 
 	// output the layer config
 	if (m_layerconfig != m_base_layerconfig)
 	{
-		targetnode.set_attribute_int("backdrops", m_layerconfig.backdrops_enabled());
-		targetnode.set_attribute_int("overlays", m_layerconfig.overlays_enabled());
-		targetnode.set_attribute_int("bezels", m_layerconfig.bezels_enabled());
-		targetnode.set_attribute_int("cpanels", m_layerconfig.cpanels_enabled());
-		targetnode.set_attribute_int("marquees", m_layerconfig.marquees_enabled());
-		targetnode.set_attribute_int("zoom", m_layerconfig.zoom_to_screen());
+		targetnode.get_or_append_attribute("backdrops").set_value( m_layerconfig.backdrops_enabled());
+		targetnode.get_or_append_attribute("overlays").set_value( m_layerconfig.overlays_enabled());
+		targetnode.get_or_append_attribute("bezels").set_value( m_layerconfig.bezels_enabled());
+		targetnode.get_or_append_attribute("cpanels").set_value( m_layerconfig.cpanels_enabled());
+		targetnode.get_or_append_attribute("marquees").set_value( m_layerconfig.marquees_enabled());
+		targetnode.get_or_append_attribute("zoom").set_value( m_layerconfig.zoom_to_screen());
 		changed = true;
 	}
 
@@ -2327,7 +2327,7 @@ bool render_target::config_save(util::xml::data_node &targetnode)
 		else if (orientation_add(ROT270, m_base_orientation) == m_orientation)
 			rotate = 270;
 		assert(rotate != 0);
-		targetnode.set_attribute_int("rotate", rotate);
+		targetnode.get_or_append_attribute("rotate").set_value( rotate);
 		changed = true;
 	}
 
@@ -2870,7 +2870,7 @@ void render_manager::container_free(render_container *container)
 //  configuration file
 //-------------------------------------------------
 
-void render_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void render_manager::config_load(config_type cfg_type, util::xml::data_node const &parentnode)
 {
 	// we only care about game files
 	if (cfg_type != config_type::GAME)
@@ -2881,26 +2881,26 @@ void render_manager::config_load(config_type cfg_type, util::xml::data_node cons
 		return;
 
 	// check the UI target
-	util::xml::data_node const *const uinode = parentnode->get_child("interface");
+	util::xml::data_node const uinode = parentnode.child("interface");
 	if (uinode != nullptr)
 	{
-		render_target *target = target_by_index(uinode->get_attribute_int("target", 0));
+		render_target *target = target_by_index(uinode.attribute("target").as_int( 0));
 		if (target != nullptr)
 			set_ui_target(*target);
 	}
 
 	// iterate over target nodes
-	for (util::xml::data_node const *targetnode = parentnode->get_child("target"); targetnode; targetnode = targetnode->get_next_sibling("target"))
+	for (util::xml::data_node const targetnode : parentnode.children("target"))
 	{
-		render_target *target = target_by_index(targetnode->get_attribute_int("index", -1));
+		render_target *target = target_by_index(targetnode.attribute("index").as_int( -1));
 		if (target != nullptr)
-			target->config_load(*targetnode);
+			target->config_load(targetnode);
 	}
 
 	// iterate over screen nodes
-	for (util::xml::data_node const *screennode = parentnode->get_child("screen"); screennode; screennode = screennode->get_next_sibling("screen"))
+	for (util::xml::data_node const screennode : parentnode.children("screen"))
 	{
-		int index = screennode->get_attribute_int("index", -1);
+		int index = screennode.attribute("index").as_int( -1);
 		render_container *container = m_screen_container_list.find(index);
 		render_container::user_settings settings;
 
@@ -2908,15 +2908,15 @@ void render_manager::config_load(config_type cfg_type, util::xml::data_node cons
 		container->get_user_settings(settings);
 
 		// fetch color controls
-		settings.m_brightness = screennode->get_attribute_float("brightness", settings.m_brightness);
-		settings.m_contrast = screennode->get_attribute_float("contrast", settings.m_contrast);
-		settings.m_gamma = screennode->get_attribute_float("gamma", settings.m_gamma);
+		settings.m_brightness = screennode.attribute("brightness").as_float( settings.m_brightness);
+		settings.m_contrast = screennode.attribute("contrast").as_float( settings.m_contrast);
+		settings.m_gamma = screennode.attribute("gamma").as_float( settings.m_gamma);
 
 		// fetch positioning controls
-		settings.m_xoffset = screennode->get_attribute_float("hoffset", settings.m_xoffset);
-		settings.m_xscale = screennode->get_attribute_float("hstretch", settings.m_xscale);
-		settings.m_yoffset = screennode->get_attribute_float("voffset", settings.m_yoffset);
-		settings.m_yscale = screennode->get_attribute_float("vstretch", settings.m_yscale);
+		settings.m_xoffset = screennode.attribute("hoffset").as_float( settings.m_xoffset);
+		settings.m_xscale = screennode.attribute("hstretch").as_float( settings.m_xscale);
+		settings.m_yoffset = screennode.attribute("voffset").as_float( settings.m_yoffset);
+		settings.m_yscale = screennode.attribute("vstretch").as_float( settings.m_yscale);
 
 		// set the new values
 		container->set_user_settings(settings);
@@ -2929,7 +2929,7 @@ void render_manager::config_load(config_type cfg_type, util::xml::data_node cons
 //  file
 //-------------------------------------------------
 
-void render_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
+void render_manager::config_save(config_type cfg_type, util::xml::data_node &parentnode)
 {
 	// we only care about game files
 	if (cfg_type != config_type::GAME)
@@ -2939,9 +2939,9 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 	if (m_ui_target->index() != 0)
 	{
 		// create a node for it
-		util::xml::data_node *const uinode = parentnode->add_child("interface", nullptr);
+		util::xml::data_node uinode = parentnode.append_child("interface");
 		if (uinode != nullptr)
-			uinode->set_attribute_int("target", m_ui_target->index());
+			uinode.attribute("target").set_value( m_ui_target->index());
 	}
 
 	// iterate over targets
@@ -2953,9 +2953,9 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 			break;
 
 		// create a node
-		util::xml::data_node *const targetnode = parentnode->add_child("target", nullptr);
-		if (targetnode != nullptr && !target->config_save(*targetnode))
-			targetnode->delete_node();
+		util::xml::data_node targetnode = parentnode.append_child("target");
+		if (targetnode != nullptr && !target->config_save(targetnode))
+			targetnode.parent().remove_child(targetnode);
 	}
 
 	// iterate over screen containers
@@ -2963,13 +2963,13 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 	for (render_container *container = m_screen_container_list.first(); container != nullptr; container = container->next(), scrnum++)
 	{
 		// create a node
-		util::xml::data_node *const screennode = parentnode->add_child("screen", nullptr);
+		util::xml::data_node screennode = parentnode.append_child("screen");
 		if (screennode != nullptr)
 		{
 			bool changed = false;
 
 			// output the basics
-			screennode->set_attribute_int("index", scrnum);
+			screennode.attribute("index").set_value( scrnum);
 
 			render_container::user_settings settings;
 			container->get_user_settings(settings);
@@ -2977,50 +2977,50 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 			// output the color controls
 			if (settings.m_brightness != machine().options().brightness())
 			{
-				screennode->set_attribute_float("brightness", settings.m_brightness);
+				screennode.attribute("brightness").set_value( settings.m_brightness);
 				changed = true;
 			}
 
 			if (settings.m_contrast != machine().options().contrast())
 			{
-				screennode->set_attribute_float("contrast", settings.m_contrast);
+				screennode.attribute("contrast").set_value( settings.m_contrast);
 				changed = true;
 			}
 
 			if (settings.m_gamma != machine().options().gamma())
 			{
-				screennode->set_attribute_float("gamma", settings.m_gamma);
+				screennode.attribute("gamma").set_value( settings.m_gamma);
 				changed = true;
 			}
 
 			// output the positioning controls
 			if (settings.m_xoffset != 0.0f)
 			{
-				screennode->set_attribute_float("hoffset", settings.m_xoffset);
+				screennode.attribute("hoffset").set_value( settings.m_xoffset);
 				changed = true;
 			}
 
 			if (settings.m_xscale != 1.0f)
 			{
-				screennode->set_attribute_float("hstretch", settings.m_xscale);
+				screennode.attribute("hstretch").set_value( settings.m_xscale);
 				changed = true;
 			}
 
 			if (settings.m_yoffset != 0.0f)
 			{
-				screennode->set_attribute_float("voffset", settings.m_yoffset);
+				screennode.attribute("voffset").set_value( settings.m_yoffset);
 				changed = true;
 			}
 
 			if (settings.m_yscale != 1.0f)
 			{
-				screennode->set_attribute_float("vstretch", settings.m_yscale);
+				screennode.attribute("vstretch").set_value( settings.m_yscale);
 				changed = true;
 			}
 
 			// if nothing changed, kill the node
 			if (!changed)
-				screennode->delete_node();
+				screennode.parent().remove_child(screennode);
 		}
 	}
 }

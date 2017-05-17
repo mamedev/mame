@@ -95,7 +95,7 @@ static void xml_configuration_load(running_machine &machine, config_type cfg_typ
 	util::xml::data_node const * wnode = nullptr;
 	for (wnode = parentnode->get_child("window"); wnode != nullptr; wnode = wnode->get_next_sibling("window"))
 	{
-		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)wnode->get_attribute_int("type", WindowQtConfig::WIN_TYPE_UNKNOWN);
+		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)wnode->attribute("type").as_int( WindowQtConfig::WIN_TYPE_UNKNOWN);
 		switch (type)
 		{
 			case WindowQtConfig::WIN_TYPE_MAIN:               xmlConfigurations.push_back(new MainWindowQtConfig()); break;

@@ -270,9 +270,9 @@ void WindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 
 void WindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
-	m_size.setX(node.get_attribute_int("size_x", m_size.x()));
-	m_size.setY(node.get_attribute_int("size_y", m_size.y()));
-	m_position.setX(node.get_attribute_int("position_x", m_position.x()));
-	m_position.setY(node.get_attribute_int("position_y", m_position.y()));
-	m_type = (WindowQtConfig::WindowType)node.get_attribute_int("type", m_type);
+	m_size.setX(node.attribute("size_x").as_int( m_size.x()));
+	m_size.setY(node.attribute("size_y").as_int( m_size.y()));
+	m_position.setX(node.attribute("position_x").as_int( m_position.x()));
+	m_position.setY(node.attribute("position_y").as_int( m_position.y()));
+	m_type = (WindowQtConfig::WindowType)node.attribute("type").as_int( m_type);
 }

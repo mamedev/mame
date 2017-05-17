@@ -989,7 +989,7 @@ void sound_manager::resume()
 //  configuration file
 //-------------------------------------------------
 
-void sound_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void sound_manager::config_load(config_type cfg_type, util::xml::data_node const &parentnode)
 {
 	// we only care about game files
 	if (cfg_type != config_type::GAME)
@@ -1000,13 +1000,13 @@ void sound_manager::config_load(config_type cfg_type, util::xml::data_node const
 		return;
 
 	// iterate over channel nodes
-	for (util::xml::data_node const *channelnode = parentnode->get_child("channel"); channelnode != nullptr; channelnode = channelnode->get_next_sibling("channel"))
+	for (util::xml::data_node const channelnode : parentnode.children("channel"))
 	{
 		mixer_input info;
-		if (indexed_mixer_input(channelnode->get_attribute_int("index", -1), info))
+		if (indexed_mixer_input(channelnode.attribute("index").as_int(-1), info))
 		{
-			float defvol = channelnode->get_attribute_float("defvol", 1.0f);
-			float newvol = channelnode->get_attribute_float("newvol", -1000.0f);
+			float defvol = channelnode.attribute("defvol").as_float( 1.0f);
+			float newvol = channelnode.attribute("newvol").as_float( -1000.0f);
 			if (newvol != -1000.0f)
 				info.stream->set_user_gain(info.inputnum, newvol / defvol);
 		}
@@ -1019,7 +1019,7 @@ void sound_manager::config_load(config_type cfg_type, util::xml::data_node const
 //  file
 //-------------------------------------------------
 
-void sound_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
+void sound_manager::config_save(config_type cfg_type, util::xml::data_node &parentnode)
 {
 	// we only care about game files
 	if (cfg_type != config_type::GAME)
@@ -1036,11 +1036,11 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 
 			if (newvol != 1.0f)
 			{
-				util::xml::data_node *const channelnode = parentnode->add_child("channel", nullptr);
+				util::xml::data_node channelnode = parentnode.append_child("channel");
 				if (channelnode != nullptr)
 				{
-					channelnode->set_attribute_int("index", mixernum);
-					channelnode->set_attribute_float("newvol", newvol);
+					channelnode.attribute("index").set_value( mixernum);
+					channelnode.attribute("newvol").set_value( newvol);
 				}
 			}
 		}

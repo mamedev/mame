@@ -381,7 +381,7 @@ void crosshair_manager::render(screen_device &screen)
     configuration file
 -------------------------------------------------*/
 
-void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node const &parentnode)
 {
 	/* Note: crosshair_load() is only registered if croshairs are used */
 
@@ -394,9 +394,9 @@ void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node c
 		return;
 
 	/* loop and get player crosshair info */
-	for (util::xml::data_node const *crosshairnode = parentnode->get_child("crosshair"); crosshairnode; crosshairnode = crosshairnode->get_next_sibling("crosshair"))
+	for (util::xml::data_node const crosshairnode : parentnode.children("crosshair"))
 	{
-		int const player = crosshairnode->get_attribute_int("player", -1);
+		int const player = crosshairnode.attribute("player").as_int( -1);
 
 		// check to make sure we have a valid player
 		if (player >= 0 && player < MAX_PLAYERS)
@@ -406,7 +406,7 @@ void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node c
 			if (crosshair.is_used())
 			{
 				// get, check, and store visibility mode
-				int const mode = crosshairnode->get_attribute_int("mode", CROSSHAIR_VISIBILITY_DEFAULT);
+				int const mode = crosshairnode.attribute("mode").as_int( CROSSHAIR_VISIBILITY_DEFAULT);
 				if (mode >= CROSSHAIR_VISIBILITY_OFF && mode <= CROSSHAIR_VISIBILITY_AUTO)
 				{
 					crosshair.set_mode(u8(mode));
@@ -416,16 +416,16 @@ void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node c
 				}
 
 				// get and store crosshair pic name
-				crosshair.set_bitmap_name(crosshairnode->get_attribute_string("pic", ""));
+				crosshair.set_bitmap_name(crosshairnode.attribute("pic").as_string( ""));
 			}
 		}
 	}
 
 	/* get, check, and store auto visibility time */
-	util::xml::data_node const *crosshairnode = parentnode->get_child("autotime");
+	util::xml::data_node const crosshairnode = parentnode.child("autotime");
 	if (crosshairnode)
 	{
-		int const auto_time = crosshairnode->get_attribute_int("val", CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT);
+		int const auto_time = crosshairnode.attribute("val").as_int( CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT);
 		if ((auto_time >= CROSSHAIR_VISIBILITY_AUTOTIME_MIN) && (auto_time <= CROSSHAIR_VISIBILITY_AUTOTIME_MAX))
 			m_auto_time = u8(auto_time);
 	}
@@ -437,7 +437,7 @@ void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node c
     configuration file
 -------------------------------------------------*/
 
-void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
+void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node &parentnode)
 {
 	/* Note: crosshair_save() is only registered if crosshairs are used */
 
@@ -452,30 +452,30 @@ void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node *
 		if (crosshair.is_used())
 		{
 			/* create a node */
-			util::xml::data_node *const crosshairnode = parentnode->add_child("crosshair", nullptr);
+			util::xml::data_node crosshairnode = parentnode.append_child("crosshair");
 
 			if (crosshairnode != nullptr)
 			{
 				bool changed = false;
 
-				crosshairnode->set_attribute_int("player", player);
+				crosshairnode.get_or_append_attribute("player").set_value( player);
 
 				if (crosshair.mode() != CROSSHAIR_VISIBILITY_DEFAULT)
 				{
-					crosshairnode->set_attribute_int("mode", crosshair.mode());
+					crosshairnode.get_or_append_attribute("mode").set_value( crosshair.mode());
 					changed = true;
 				}
 
 				// only save graphic name if not the default
 				if (*crosshair.bitmap_name() != '\0')
 				{
-					crosshairnode->set_attribute("pic", crosshair.bitmap_name());
+					crosshairnode.get_or_append_attribute("pic").set_value( crosshair.bitmap_name());
 					changed = true;
 				}
 
 				/* if nothing changed, kill the node */
 				if (!changed)
-					crosshairnode->delete_node();
+					crosshairnode.parent().remove_child(crosshairnode);
 			}
 		}
 	}
@@ -484,10 +484,10 @@ void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node *
 	if (m_auto_time != CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT)
 	{
 		/* create a node */
-		util::xml::data_node *const crosshairnode = parentnode->add_child("autotime", nullptr);
+		util::xml::data_node crosshairnode = parentnode.append_child("autotime");
 
 		if (crosshairnode != nullptr)
-			crosshairnode->set_attribute_int("val", m_auto_time);
+			crosshairnode.get_or_append_attribute("val").set_value( m_auto_time);
 	}
 
 }

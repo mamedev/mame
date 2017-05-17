@@ -119,13 +119,13 @@ void image_manager::unload_all()
 	}
 }
 
-void image_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void image_manager::config_load(config_type cfg_type, util::xml::data_node const &parentnode)
 {
 	if ((cfg_type == config_type::GAME) && (parentnode != nullptr))
 	{
-		for (util::xml::data_node const *node = parentnode->get_child("device"); node; node = node->get_next_sibling("device"))
+		for (util::xml::data_node const node : parentnode.children("device"))
 		{
-			const char *const dev_instance = node->get_attribute_string("instance", nullptr);
+			const char *const dev_instance = node.attribute("instance").as_string( nullptr);
 
 			if ((dev_instance != nullptr) && (dev_instance[0] != '\0'))
 			{
@@ -133,7 +133,7 @@ void image_manager::config_load(config_type cfg_type, util::xml::data_node const
 				{
 					if (!strcmp(dev_instance, image.instance_name().c_str()))
 					{
-						const char *const working_directory = node->get_attribute_string("directory", nullptr);
+						const char *const working_directory = node.attribute("directory").as_string( nullptr);
 						if (working_directory != nullptr)
 							image.set_working_directory(working_directory);
 					}
@@ -148,7 +148,7 @@ void image_manager::config_load(config_type cfg_type, util::xml::data_node const
     directories to the configuration file
 -------------------------------------------------*/
 
-void image_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
+void image_manager::config_save(config_type cfg_type, util::xml::data_node &parentnode)
 {
 	/* only care about game-specific data */
 	if (cfg_type == config_type::GAME)
@@ -157,11 +157,11 @@ void image_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 		{
 			const char *const dev_instance = image.instance_name().c_str();
 
-			util::xml::data_node *const node = parentnode->add_child("device", nullptr);
+			util::xml::data_node node = parentnode.append_child("device");
 			if (node != nullptr)
 			{
-				node->set_attribute("instance", dev_instance);
-				node->set_attribute("directory", image.working_directory().c_str());
+				node.get_or_append_attribute("instance").set_value( dev_instance);
+				node.get_or_append_attribute("directory").set_value( image.working_directory().c_str());
 			}
 		}
 	}
