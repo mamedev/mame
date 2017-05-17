@@ -97,6 +97,8 @@ offsets:
 
 READ8_MEMBER(stv_state::stv_ioga_r)
 {
+	const char *const portg[] = { "PORTG.0", "PORTG.1", "PORTG.2", "PORTG.3" };
+
 	uint8_t res;
 
 	res = 0xff;
@@ -113,8 +115,14 @@ READ8_MEMBER(stv_state::stv_ioga_r)
 		case 0x07: res = m_system_output; break; // port D, read-backs value written
 		case 0x09: res = ioport("PORTE")->read(); break; // P3
 		case 0x0b: res = ioport("PORTF")->read(); break; // P4
-		case 0x0d: res = 0; break; // PORT-G
+		case 0x0d:
+			if (m_ioga_mode & 0x80)
+				res = (ioport(portg[(m_ioga_portg >> 1) & 3])->read()) >> (((m_ioga_portg & 1) ^ 1) * 8);	 // PORT-G counter mode
+			else
+				res = ioport("PORTG")->read();
+			break;
 		case 0x1b: res = 0; break; // Serial COM READ status
+		case 0x1d: res = m_ioga_mode; break;
 	}
 
 	return res;
@@ -131,13 +139,19 @@ WRITE8_MEMBER(stv_state::stv_ioga_w)
 	{
 		case 0x07:
 //			if (data != m_system_output)
-//				printf("OUT %02x\n", data);
+//				logerror("OUT %02x\n", data);
 			m_system_output = data;
 			/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
 			machine().bookkeeping().coin_counter_w(0,~data & 0x01);
 			machine().bookkeeping().coin_counter_w(1,~data & 0x02);
 			machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
 			machine().bookkeeping().coin_lockout_w(1,~data & 0x08);
+			break;
+		case 0x0d:
+			m_ioga_portg = data;
+			break;
+		case 0x1d:
+			m_ioga_mode = data;
 			break;
 	}
 }
@@ -238,6 +252,19 @@ WRITE8_MEMBER(stv_state::stvmp_ioga_w)
 		case 0x11: m_port_sel = data; break;
 		default:   stv_ioga_w(space,offset,data); break;
 	}
+}
+
+WRITE8_MEMBER(stv_state::hop_ioga_w)
+{
+	if (offset == 7) {
+		if ((data & 0x80) == 0) {
+			m_hopper->motor_w(0);		//
+			m_hopper->motor_w(0x80); 	// ugly hack to reset status of ticket dispenser device
+			m_hopper->motor_w(0);
+		} else 
+			m_hopper->motor_w(0x80);
+	}
+	stv_ioga_w(space, offset, data);
 }
 
 /* remaps with a 8-bit handler because MAME can't install r/w handlers with a different bus parallelism than the CPU native one, shrug ... */
@@ -343,6 +370,19 @@ WRITE32_MEMBER(stv_state::magzun_ioga_w32)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
 			if(!machine().side_effect_disabled())
 				printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
+}
+
+WRITE32_MEMBER(stv_state::hop_ioga_w32)
+{
+	if(ACCESSING_BITS_16_23)
+		hop_ioga_w(space,offset*4+1,data >> 16);
+	if(ACCESSING_BITS_0_7)
+		hop_ioga_w(space,offset*4+3,data);
+	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
+		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
+			printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
+
+	return;
 }
 
 /*
@@ -935,6 +975,13 @@ DRIVER_INIT_MEMBER(stv_state,nameclv3)
 	DRIVER_INIT_CALL(stv);
 }
 
+DRIVER_INIT_MEMBER(stv_state, hopper)
+{
+	DRIVER_INIT_CALL(stv);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::hop_ioga_w32),this));
+	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::hop_ioga_w32),this));
+}
+
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(stv_SMPC_r, stv_SMPC_w,0xffffffff)
@@ -1093,6 +1140,9 @@ static MACHINE_CONFIG_DERIVED( stv_slot, stv )
 	MCFG_FRAGMENT_ADD( stv_cartslot )
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( hopper, stv )
+		MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+MACHINE_CONFIG_END
 
 MACHINE_RESET_MEMBER(stv_state,stv)
 {
@@ -1292,6 +1342,18 @@ static INPUT_PORTS_START( stv )
 
 	PORT_START("PORTF")
 	STV_PLAYER_INPUTS(4, BUTTON1, BUTTON2, BUTTON3, START)
+
+	PORT_START("PORTG")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PORTG.0")
+	PORT_BIT( 0x0000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("PORTG.1")
+	PORT_BIT( 0x0000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("PORTG.2")
+	PORT_BIT( 0x0000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("PORTG.3")
+	PORT_BIT( 0x0000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( stv6b )
@@ -1638,18 +1700,26 @@ static INPUT_PORTS_START( patocar )
 	PORT_INCLUDE( stv )
 
 	PORT_MODIFY("PORTA")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )	// hopper ?
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )	// hopper ?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )	// hopper ?
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_MODIFY("PORTB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 )	// ??
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 )	// Door switch ?
-	PORT_BIT( 0x0c, IP_ACTIVE_LOW,  IPT_BUTTON5 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN3 )		// Medal
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW,  IPT_BUTTON5 )	// ??
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN3 )	PORT_NAME("Medal")
 	PORT_BIT( 0xd0, IP_ACTIVE_LOW,  IPT_UNUSED )
 
+	// TODO: sense/delta values seems wrong
+	PORT_MODIFY("PORTG.0")
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(1)
+	PORT_MODIFY("PORTG.1")
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_RESET PORT_REVERSE PORT_PLAYER(1)
+
 	PORT_MODIFY("PORTC")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )  PORT_NAME("Select Button")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Power Button")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -3501,7 +3571,7 @@ GAME( 1997, maruchan,  stvbios, stv,      stv,      stv_state,   maruchan,   ROT
 GAME( 1996, mausuke,   stvbios, stv,      stv,      stv_state,   mausuke,    ROT0,   "Data East",                    "Mausuke no Ojama the World (J 960314 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, myfairld,  stvbios, stv,      myfairld, stv_state,   stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, othellos,  stvbios, stv,      stv,      stv_state,   othellos,   ROT0,   "Success",                      "Othello Shiyouyo (J 980423 V1.002)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, patocar,   stvbios, stv,      patocar,  stv_state,   stv,        ROT0,   "Sega",                         "Hashire Patrol Car (J 990326 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, patocar,   stvbios, hopper,   patocar,  stv_state,   hopper,     ROT0,   "Sega",                         "Hashire Patrol Car (J 990326 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1995, pblbeach,  stvbios, stv,      stv,      stv_state,   pblbeach,   ROT0,   "T&E Soft",                     "Pebble Beach - The Great Shot (JUE 950913 V0.990)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, prikura,   stvbios, stv,      stv,      stv_state,   prikura,    ROT0,   "Atlus",                        "Princess Clara Daisakusen (J 960910 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, puyosun,   stvbios, stv,      stv,      stv_state,   puyosun,    ROT0,   "Compile",                      "Puyo Puyo Sun (J 961115 V0.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
