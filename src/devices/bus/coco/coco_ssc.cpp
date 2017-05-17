@@ -204,7 +204,7 @@ READ8_MEMBER(coco_ssc_device::ff7d_read)
 			break;
 
 		case 0x01:
-			data = 0x3f;
+			data = 0x1f;
 
 			if( tms7000_portc & C_BSY )
 			{
