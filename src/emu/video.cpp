@@ -914,8 +914,13 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 		if (slept)
 		{
 			// if we overslept, keep an average of the amount
+			// however, if we overslept too much, which is very likely resulted by a system time
+			// change, instead of inaccuracy of sleep, we should not update this average amount, as
+			// it's both a wrong reflection of the average and will potentially cause delta to be
+			// calculated as a very small value, even less than minimum_sleep, which will make this
+			// loop to be a busy one wasting cpu resource
 			osd_ticks_t actual_ticks = new_ticks - current_ticks;
-			if (actual_ticks > delta)
+			if (actual_ticks > delta && actual_ticks < delta * 2)
 			{
 				// take 90% of the previous average plus 10% of the new value
 				osd_ticks_t oversleep_milliticks = 1000 * (actual_ticks - delta) / delta;
