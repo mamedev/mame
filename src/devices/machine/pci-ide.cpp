@@ -11,7 +11,8 @@ ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, d
 	m_ide2(*this, "ide2"),
 	m_irq_num(-1),
 	m_irq_handler(*this),
-	m_legacy_top(0x000)
+	m_legacy_top(0x000),
+	m_pif(0x8a)
 {
 }
 
@@ -106,7 +107,7 @@ void ide_pci_device::device_reset()
 	bank_infos[2].adr = (m_legacy_top << 20) | 0x170;
 	bank_infos[3].adr = (m_legacy_top << 20) | 0x374;
 	bank_infos[4].adr = 0xf00;
-	pclass = 0x01018a;
+	pclass = 0x010100 | m_pif;
 	remap_cb();
 
 	// PCI0646U allow BAR
