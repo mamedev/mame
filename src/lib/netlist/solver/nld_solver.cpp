@@ -10,15 +10,16 @@
  */
 
 #if 0
-#pragma GCC optimize "fast-math"
-#pragma GCC optimize "strict-aliasing"
-#pragma GCC optimize "tree-vectorize"
+#pragma GCC optimize "-ftree-vectorize"
+#pragma GCC optimize "-ffast-math"
+#pragma GCC optimize "-funsafe-math-optimizations"
+#pragma GCC optimize "-funroll-loops"
+#pragma GCC optimize "-funswitch-loops"
+#pragma GCC optimize "-fstrict-aliasing"
 #pragma GCC optimize "tree-vectorizer-verbose=7"
 #pragma GCC optimize "opt-info-vec"
 #pragma GCC optimize "opt-info-vec-missed"
 //#pragma GCC optimize "tree-parallelize-loops=4"
-#pragma GCC optimize "unroll-loops"
-#pragma GCC optimize "unswitch-loops"
 #pragma GCC optimize "variable-expansion-in-unroller"
 #pragma GCC optimize "unsafe-loop-optimizations"
 #pragma GCC optimize "vect-cost-model"
@@ -301,6 +302,7 @@ void NETLIB_NAME(solver)::post_start()
 				else
 					ms = create_solver<2,2>(2, sname);
 				break;
+#if 0
 			case 3:
 				ms = create_solver<3,3>(3, sname);
 				break;
@@ -338,11 +340,15 @@ void NETLIB_NAME(solver)::post_start()
 				ms = create_solver<31,31>(31, sname);
 				break;
 			case 35:
-				ms = create_solver<31,31>(31, sname);
+				ms = create_solver<35,35>(35, sname);
+				break;
+			case 43:
+				ms = create_solver<43,43>(43, sname);
 				break;
 			case 49:
 				ms = create_solver<49,49>(49, sname);
 				break;
+#endif
 #if 0
 			case 87:
 				ms = create_solver<87,87>(87, sname);

@@ -364,10 +364,12 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 	}
 #else
 		for (std::size_t i = 0; i < railstart; i++)
-		{
 			mat.A[tcr[i]] -= go[i];
-			gtot_t = gtot_t + gt[i];
-			RHS_t = RHS_t + Idr[i];
+
+		for (std::size_t i = 0; i < railstart; i++)
+		{
+			gtot_t        += gt[i];
+			RHS_t         += Idr[i];
 		}
 
 		for (std::size_t i = railstart; i < term_count; i++)

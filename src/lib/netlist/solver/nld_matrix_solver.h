@@ -232,9 +232,10 @@ void matrix_solver_t::build_LE_A()
 	for (std::size_t k = 0; k < iN; k++)
 	{
 		terms_for_net_t *terms = m_terms[k].get();
+		nl_double * Ak = &child.A(k, 0);
 
 		for (std::size_t i=0; i < iN; i++)
-			child.A(k,i) = 0.0;
+			Ak[i] = 0.0;
 
 		const std::size_t terms_count = terms->count();
 		const std::size_t railstart =  terms->m_railstart;
@@ -245,14 +246,14 @@ void matrix_solver_t::build_LE_A()
 			for (std::size_t i = 0; i < terms_count; i++)
 				akk += gt[i];
 
-			child.A(k,k) = akk;
+			Ak[k] = akk;
 		}
 
 		const nl_double * const RESTRICT go = terms->go();
 		int * RESTRICT net_other = terms->connected_net_idx();
 
 		for (std::size_t i = 0; i < railstart; i++)
-			child.A(k,net_other[i]) -= go[i];
+			Ak[net_other[i]] -= go[i];
 	}
 }
 

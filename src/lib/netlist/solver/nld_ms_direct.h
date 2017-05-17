@@ -14,6 +14,12 @@
 #include "nld_matrix_solver.h"
 #include "vector_base.h"
 
+/* Disabling dynamic allocation gives a ~10% boost in performance
+ * This flag has been added to support continuous storage for arrays
+ * going forward in case we implement cuda solvers in the future.
+ */
+#define NL_USE_DYNAMIC_ALLOCATION (1)
+
 namespace netlist
 {
 	namespace devices
@@ -48,10 +54,17 @@ protected:
 	template <typename T>
 	void LE_back_subst(T * RESTRICT x);
 
+#if (NL_USE_DYNAMIC_ALLOCATION)
+	template <typename T1, typename T2>
+	nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r * m_pitch + c]; }
+	template <typename T1>
+	nl_ext_double &RHS(const T1 &r) { return m_A[r * m_pitch + N()]; }
+#else
 	template <typename T1, typename T2>
 	nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r][c]; }
 	template <typename T1>
 	nl_ext_double &RHS(const T1 &r) { return m_A[r][N()]; }
+#endif
 	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
 
 private:
@@ -59,8 +72,12 @@ private:
 	static constexpr std::size_t m_pitch = (((storage_N + 1) + 7) / 8) * 8;
 	//static const std::size_t m_pitch = (((storage_N + 1) + 15) / 16) * 16;
 	//static const std::size_t m_pitch = (((storage_N + 1) + 31) / 32) * 32;
+#if (NL_USE_DYNAMIC_ALLOCATION)
+	//nl_ext_double * RESTRICT m_A;
+	std::vector<nl_ext_double> m_A;
+#else
 	nl_ext_double m_A[storage_N][m_pitch];
-
+#endif
 	//nl_ext_double m_RHSx[storage_N];
 
 	const std::size_t m_dim;
@@ -74,6 +91,9 @@ private:
 template <std::size_t m_N, std::size_t storage_N>
 matrix_solver_direct_t<m_N, storage_N>::~matrix_solver_direct_t()
 {
+#if (NL_USE_DYNAMIC_ALLOCATION)
+	//plib::pfree_array(m_A);
+#endif
 }
 
 template <std::size_t m_N, std::size_t storage_N>
@@ -107,15 +127,17 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 		{
 
 			/* FIXME: Singular matrix? */
+			nl_double *Ai = &A(i, 0);
 			const nl_double f = 1.0 / A(i,i);
 			const auto &nzrd = m_terms[i]->m_nzrd;
 			const auto &nzbd = m_terms[i]->m_nzbd;
 
 			for (std::size_t j : nzbd)
 			{
-				const nl_double f1 = -f * A(j,i);
+				nl_double *Aj = &A(j, 0);
+				const nl_double f1 = -f * Aj[i];
 				for (std::size_t k : nzrd)
-					A(j,k) += A(i,k) * f1;
+					Aj[k] += Ai[k] * f1;
 				//RHS(j) += RHS(i) * f1;
 			}
 		}
@@ -195,11 +217,11 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_back_subst(
 
 			const auto *p = m_terms[j]->m_nzrd.data();
 			const auto e = m_terms[j]->m_nzrd.size() - 1; /* exclude RHS element */
-
+			T * Aj = &A(j,0);
 			for (std::size_t k = 0; k < e; k++)
 			{
 				const auto pk = p[k];
-				tmp += A(j,pk) * x[pk];
+				tmp += Aj[pk] * x[pk];
 			}
 			x[j] = (RHS(j) - tmp) / A(j,j);
 		}
@@ -239,6 +261,10 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(netlist_t &anetli
 : matrix_solver_t(anetlist, name, ASCENDING, params)
 , m_dim(size)
 {
+#if (NL_USE_DYNAMIC_ALLOCATION)
+	m_A.resize(N() * m_pitch);
+	//m_A = plib::palloc_array<nl_ext_double>(N() * m_pitch);
+#endif
 	for (unsigned k = 0; k < N(); k++)
 	{
 		m_last_RHS[k] = 0.0;
@@ -251,6 +277,10 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(netlist_t &anetli
 : matrix_solver_t(anetlist, name, sort, params)
 , m_dim(size)
 {
+#if (NL_USE_DYNAMIC_ALLOCATION)
+	m_A.resize(N() * m_pitch);
+	//m_A = plib::palloc_array<nl_ext_double>(N() * m_pitch);
+#endif
 	for (unsigned k = 0; k < N(); k++)
 	{
 		m_last_RHS[k] = 0.0;
