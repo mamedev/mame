@@ -75,7 +75,7 @@ struct YM_DELTAT {     /* AT: rearranged and tightened structure */
 
 	uint8_t ADPCM_Read();
 	void ADPCM_Write(int r, int v);
-	void ADPCM_Reset(int panidx, int emulation_mode, device_t *dev);
+	void ADPCM_Reset(int panidx, int mode, device_t *dev);
 	void ADPCM_CALC();
 
 	void postload(uint8_t *regs);
