@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_V1050KB_H
+#define MAME_MACHINE_V1050KB_H
 
-#ifndef __V1050_KEYBOARD__
-#define __V1050_KEYBOARD__
+#pragma once
 
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
@@ -37,7 +37,7 @@ public:
 	// construction/destruction
 	v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_tx_handler(device_t &device, _Object object) { return downcast<v1050_keyboard_device &>(device).m_out_tx_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_out_tx_handler(device_t &device, Object &&cb) { return downcast<v1050_keyboard_device &>(device).m_out_tx_handler.set_callback(std::forward<Object>(cb)); }
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -67,8 +67,6 @@ private:
 
 
 // device type definition
-extern const device_type V1050_KEYBOARD;
+DECLARE_DEVICE_TYPE(V1050_KEYBOARD, v1050_keyboard_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_V1050KB_H

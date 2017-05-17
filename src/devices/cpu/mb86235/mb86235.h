@@ -6,32 +6,15 @@
  *
  *****************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_MB86235_MB86235_H
+#define MAME_CPU_MB86235_MB86235_H
 
-#ifndef __MB86235_H__
-#define __MB86235_H__
+#pragma once
 
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 
 class mb86235_frontend;
-
-
-
-
-#define OP_USERFLAG_FIFOIN              0x1
-#define OP_USERFLAG_FIFOOUT0            0x2
-#define OP_USERFLAG_FIFOOUT1            0x4
-#define OP_USERFLAG_REPEAT              0x8
-#define OP_USERFLAG_REPEATED_OP         0x10
-#define OP_USERFLAG_PR_MASK             0x300
-#define OP_USERFLAG_PR_INC              0x100
-#define OP_USERFLAG_PR_DEC              0x200
-#define OP_USERFLAG_PR_ZERO             0x300
-#define OP_USERFLAG_PW_MASK             0xc00
-#define OP_USERFLAG_PW_INC              0x400
-#define OP_USERFLAG_PW_DEC              0x800
-#define OP_USERFLAG_PW_ZERO             0xc00
 
 
 class mb86235_device :  public cpu_device
@@ -65,9 +48,9 @@ public:
 		MB86235_AR0, MB86235_AR1, MB86235_AR2, MB86235_AR3, MB86235_AR4, MB86235_AR5, MB86235_AR6, MB86235_AR7,
 	};
 
-	const int FIFOIN_SIZE = 16;
-	const int FIFOOUT0_SIZE = 16;
-	const int FIFOOUT1_SIZE = 16;
+	static constexpr int FIFOIN_SIZE = 16;
+	static constexpr int FIFOOUT0_SIZE = 16;
+	static constexpr int FIFOOUT1_SIZE = 16;
 
 protected:
 	// device-level overrides
@@ -243,9 +226,9 @@ private:
 };
 
 
-extern const device_type MB86235;
+DECLARE_DEVICE_TYPE(MB86235, mb86235_device)
 
 
 CPU_DISASSEMBLE( mb86235 );
 
-#endif /* __MB86235_H__ */
+#endif // MAME_CPU_MB86235_MB86235_H

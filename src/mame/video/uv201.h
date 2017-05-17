@@ -96,9 +96,9 @@ public:
 	// construction/destruction
 	uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_ext_int_wr_callback(device_t &device, _Object object) { return downcast<uv201_device &>(device).m_write_ext_int.set_callback(object); }
-	template<class _Object> static devcb_base &set_hblank_wr_callback(device_t &device, _Object object) { return downcast<uv201_device &>(device).m_write_hblank.set_callback(object); }
-	template<class _Object> static devcb_base &set_db_rd_callback(device_t &device, _Object object) { return downcast<uv201_device &>(device).m_read_db.set_callback(object); }
+	template <class Object> static devcb_base &set_ext_int_wr_callback(device_t &device, Object &&cb) { return downcast<uv201_device &>(device).m_write_ext_int.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_hblank_wr_callback(device_t &device, Object &&cb) { return downcast<uv201_device &>(device).m_write_hblank.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_db_rd_callback(device_t &device, Object &&cb) { return downcast<uv201_device &>(device).m_read_db.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -153,5 +153,6 @@ private:
 
 // device type definition
 extern const device_type UV201;
+DECLARE_DEVICE_TYPE(UV201, uv201_device)
 
 #endif // MAME_VIDEO_UV201_H

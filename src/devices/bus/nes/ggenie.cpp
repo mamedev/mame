@@ -30,14 +30,14 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_GGENIE = device_creator<nes_ggenie_device>;
+DEFINE_DEVICE_TYPE(NES_GGENIE, nes_ggenie_device, "nes_ggenie", "NES Cart Game Genie PCB")
 
 
 nes_ggenie_device::nes_ggenie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_GGENIE, "NES Cart Game Genie PCB", tag, owner, clock, "nes_ggenie", __FILE__),
-						m_ggslot(*this, "gg_slot"),
-	m_gg_bypass(0)
-				{
+	: nes_nrom_device(mconfig, NES_GGENIE, tag, owner, clock)
+	, m_ggslot(*this, "gg_slot")
+	, m_gg_bypass(0)
+{
 }
 
 

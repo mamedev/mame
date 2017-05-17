@@ -31,6 +31,7 @@
 #include "bus/coco/coco_fdc.h"
 #include "bus/coco/coco_multi.h"
 #include "bus/coco/coco_orch90.h"
+#include "bus/coco/coco_gmc.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_t4426.h"
 
@@ -252,6 +253,7 @@ SLOT_INTERFACE_START( coco_cart )
 	SLOT_INTERFACE("cp400_fdc", CP400_FDC)
 	SLOT_INTERFACE("rs232", COCO_232)
 	SLOT_INTERFACE("orch90", COCO_ORCH90)
+	SLOT_INTERFACE("games_master", COCO_PAK_GMC)
 	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
 	SLOT_INTERFACE("pak", COCO_PAK)
 	SLOT_INTERFACE("multi", COCO_MULTIPAK) MCFG_SLOT_OPTION_CLOCK("multi", DERIVED_CLOCK(1, 1))
@@ -298,7 +300,7 @@ DEVICE_INPUT_DEFAULTS_END
 //  MACHINE_CONFIG
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( coco, coco12_state )
+static MACHINE_CONFIG_START( coco )
 	MCFG_DEVICE_MODIFY(":")
 	MCFG_DEVICE_CLOCK(XTAL_3_579545MHz)
 
@@ -465,12 +467,12 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-/*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT      INIT    COMPANY                 FULLNAME */
-COMP(  1980,    coco,       0,      0,      coco,      coco, driver_device,      0,      "Tandy Radio Shack",    "Color Computer", 0)
-COMP(  1981,    cocoe,      coco,   0,      cocoe,     coco, driver_device,      0,      "Tandy Radio Shack",    "Color Computer (Extended BASIC 1.0)", 0)
-COMP(  1983,    coco2,      coco,   0,      coco2,     coco, driver_device,      0,      "Tandy Radio Shack",    "Color Computer 2", 0)
-COMP(  1985?,   coco2b,     coco,   0,      coco2b,    coco, driver_device,      0,      "Tandy Radio Shack",    "Color Computer 2B", 0)
-COMP(  1984,    cp400,      coco,   0,      cp400,     coco, driver_device,      0,      "Prologica",            "CP400", 0)
-COMP(  1984,    lzcolor64,  coco,   0,      coco,      coco, driver_device,      0,      "Digiponto",            "LZ Color64", 0)
-COMP(  1984,    mx1600,     coco,   0,      coco,      coco, driver_device,      0,      "Dynacom",              "MX-1600", 0)
-COMP(  1986,    t4426,      coco,   0,      t4426,     coco, driver_device,      0,      "Terco AB",             "Terco 4426 CNC Programming station", MACHINE_NOT_WORKING)
+//     YEAR     NAME        PARENT  COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY              FULLNAME                               FLAGS
+COMP(  1980,    coco,       0,      0,      coco,    coco,  coco12_state, 0,    "Tandy Radio Shack", "Color Computer",                      0 )
+COMP(  1981,    cocoe,      coco,   0,      cocoe,   coco,  coco12_state, 0,    "Tandy Radio Shack", "Color Computer (Extended BASIC 1.0)", 0 )
+COMP(  1983,    coco2,      coco,   0,      coco2,   coco,  coco12_state, 0,    "Tandy Radio Shack", "Color Computer 2",                    0 )
+COMP(  1985?,   coco2b,     coco,   0,      coco2b,  coco,  coco12_state, 0,    "Tandy Radio Shack", "Color Computer 2B",                   0 )
+COMP(  1984,    cp400,      coco,   0,      cp400,   coco,  coco12_state, 0,    "Prologica",         "CP400",                               0 )
+COMP(  1984,    lzcolor64,  coco,   0,      coco,    coco,  coco12_state, 0,    "Digiponto",         "LZ Color64",                          0 )
+COMP(  1984,    mx1600,     coco,   0,      coco,    coco,  coco12_state, 0,    "Dynacom",           "MX-1600",                             0 )
+COMP(  1986,    t4426,      coco,   0,      t4426,   coco,  coco12_state, 0,    "Terco AB",          "Terco 4426 CNC Programming station",  MACHINE_NOT_WORKING )

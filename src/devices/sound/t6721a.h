@@ -30,10 +30,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_SOUND_T6721A_H
+#define MAME_SOUND_T6721A_H
 
-#ifndef __T6721__
-#define __T6721__
+#pragma once
 
 
 
@@ -69,10 +69,10 @@ public:
 	t6721a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _eos> devcb_base &set_eos_callback(_eos eos) { return m_write_eos.set_callback(eos); }
-	template<class _phi2> devcb_base &set_phi2_callback(_phi2 phi2) { return m_write_phi2.set_callback(phi2); }
-	template<class _dtrd> devcb_base &set_dtrd_callback(_dtrd dtrd) { return m_write_dtrd.set_callback(dtrd); }
-	template<class _apd> devcb_base &set_apd_callback(_apd apd) { return m_write_apd.set_callback(apd); }
+	template <class Object> devcb_base &set_eos_callback(Object &&eos) { return m_write_eos.set_callback(std::forward<Object>(eos)); }
+	template <class Object> devcb_base &set_phi2_callback(Object &&phi2) { return m_write_phi2.set_callback(std::forward<Object>(phi2)); }
+	template <class Object> devcb_base &set_dtrd_callback(Object &&dtrd) { return m_write_dtrd.set_callback(std::forward<Object>(dtrd)); }
+	template <class Object> devcb_base &set_apd_callback(Object &&apd) { return m_write_apd.set_callback(std::forward<Object>(apd)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -115,8 +115,6 @@ private:
 
 
 // device type definition
-extern const device_type T6721A;
+DECLARE_DEVICE_TYPE(T6721A, t6721a_device)
 
-
-
-#endif
+#endif // MAME_SOUND_T6721A_H

@@ -4,12 +4,13 @@
 #include "emu.h"
 #include "prot_kof2k3bl.h"
 
-const device_type KOF2K3BL_PROT = device_creator<kof2k3bl_prot_device>;
+DEFINE_DEVICE_TYPE(NG_KOF2K3BL_PROT, kof2k3bl_prot_device, "ng_kof2k3bl_prot", "Neo Geo KoF 2003 Bootleg Protection")
 
 
 kof2k3bl_prot_device::kof2k3bl_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, KOF2K3BL_PROT, "Neo Geo KOF 2003 Bootleg Protection", tag, owner, clock, "kof2k3bl_prot", __FILE__)
-{}
+	device_t(mconfig, NG_KOF2K3BL_PROT, tag, owner, clock)
+{
+}
 
 
 void kof2k3bl_prot_device::device_start()

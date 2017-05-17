@@ -402,7 +402,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tec1, tec1_state )
+static MACHINE_CONFIG_START( tec1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 1000000)   /* speed can be varied between 250kHz and 2MHz */
 	MCFG_CPU_PROGRAM_MAP(tec1_map)
@@ -417,7 +417,7 @@ static MACHINE_CONFIG_START( tec1, tec1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tecjmon, tec1_state )
+static MACHINE_CONFIG_START( tecjmon )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tecjmon_map)
@@ -460,6 +460,6 @@ ROM_START(tecjmon)
 	ROM_LOAD("util.rom",    0x3800, 0x0800, CRC(7c19700d) SHA1(dc5b3ade66bb11c54430056966ed99cdd299d82b) )
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT       COMPANY                     FULLNAME */
-COMP( 1984, tec1,     0,      0,      tec1,       tec1, driver_device,    0,    "Talking Electronics magazine",  "TEC-1" , 0 )
-COMP( 1984, tecjmon,  tec1,   0,      tecjmon,    tec1, driver_device,    0,    "Talking Electronics magazine",  "TEC-1A with JMON" , 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT STATE       INIT  COMPANY                         FULLNAME            FLAGS
+COMP( 1984, tec1,     0,      0,      tec1,       tec1, tec1_state, 0,    "Talking Electronics magazine", "TEC-1",            0 )
+COMP( 1984, tecjmon,  tec1,   0,      tecjmon,    tec1, tec1_state, 0,    "Talking Electronics magazine", "TEC-1A with JMON", 0 )

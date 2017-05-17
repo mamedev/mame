@@ -46,16 +46,19 @@ Tandy 1000 (80386) variations:
 #include "sound/sn76496.h"
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
+#include "bus/pc_joy/pc_joy.h"
+#include "screen.h"
 #include "softlist.h"
 
-extern const device_type T1000_MOTHERBOARD;
+DECLARE_DEVICE_TYPE(T1000_MOTHERBOARD, t1000_mb_device)
 
 class t1000_mb_device : public pc_noppi_mb_device
 {
 public:
 	// construction/destruction
 	t1000_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: pc_noppi_mb_device(mconfig, T1000_MOTHERBOARD, "T1000_MOTHERBOARD", tag, owner, clock, "t1000_mb", __FILE__) { }
+		: pc_noppi_mb_device(mconfig, T1000_MOTHERBOARD, tag, owner, clock)
+	{ }
 protected:
 	virtual void device_start() override;
 };
@@ -64,7 +67,7 @@ void t1000_mb_device::device_start()
 {
 }
 
-const device_type T1000_MOTHERBOARD = device_creator<t1000_mb_device>;
+DEFINE_DEVICE_TYPE(T1000_MOTHERBOARD, t1000_mb_device, "t1000_mb", "Tandy 1000 Motherboard")
 
 class tandy1000_state : public driver_device
 {
@@ -656,7 +659,7 @@ static MACHINE_CONFIG_FRAGMENT(tandy1000_101key)
 	MCFG_AT_KEYB_ADD("pc_keyboard", 1, DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( t1000hx, tandy1000_state )
+static MACHINE_CONFIG_START( t1000hx )
 	MCFG_CPU_ADD("maincpu", I8088, 8000000)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_map)
 	MCFG_CPU_IO_MAP(tandy1000_io)
@@ -686,7 +689,7 @@ static MACHINE_CONFIG_DERIVED( t1000sx, t1000hx )
 	MCFG_RAM_EXTRA_OPTIONS("384K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( t1000rl, tandy1000_state )
+static MACHINE_CONFIG_START( t1000rl )
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_28_63636MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_bank_map)
 	MCFG_CPU_IO_MAP(tandy1000_bank_io)
@@ -718,7 +721,7 @@ static MACHINE_CONFIG_DERIVED( t1000sl2, t1000rl )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( t1000tl, tandy1000_state )
+static MACHINE_CONFIG_START( t1000tl )
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_28_63636MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_286_map)
 	MCFG_CPU_IO_MAP(tandy1000_16_io)
@@ -907,11 +910,11 @@ ROM_START( t1000tl2 )
 ROM_END
 
 
-/*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT         INIT        COMPANY            FULLNAME */
+//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT         STATE               INIT  COMPANY               FULLNAME          FLAGS
 // tandy 1000
-COMP( 1987, t1000hx,    ibm5150,    0,          t1000hx,    t1000_90key,  driver_device,    0,    "Tandy Radio Shack", "Tandy 1000 HX", 0)
-COMP( 1987, t1000sx,    ibm5150,    0,          t1000sx,    t1000_90key,  driver_device,    0,    "Tandy Radio Shack", "Tandy 1000 SX", 0)
-COMP( 1987, t1000tx,    ibm5150,    0,          t1000tx,    t1000_90key,  driver_device,    0,    "Tandy Radio Shack", "Tandy 1000 TX", 0)
-COMP( 1989, t1000rl,    ibm5150,    0,          t1000rl,    t1000_101key, driver_device,    0,    "Tandy Radio Shack", "Tandy 1000 RL", 0)
-COMP( 1989, t1000tl2,   ibm5150,    0,          t1000tl,    t1000_101key, driver_device,    0,    "Tandy Radio Shack", "Tandy 1000 TL/2", 0)
-COMP( 1988, t1000sl2,   ibm5150,    0,          t1000sl2,   t1000_101key, driver_device,    0,    "Tandy Radio Shack", "Tandy 1000 SL/2", 0)
+COMP( 1987, t1000hx,    ibm5150,    0,          t1000hx,    t1000_90key,  tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 HX",   0 )
+COMP( 1987, t1000sx,    ibm5150,    0,          t1000sx,    t1000_90key,  tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 SX",   0 )
+COMP( 1987, t1000tx,    ibm5150,    0,          t1000tx,    t1000_90key,  tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 TX",   0 )
+COMP( 1989, t1000rl,    ibm5150,    0,          t1000rl,    t1000_101key, tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 RL",   0 )
+COMP( 1989, t1000tl2,   ibm5150,    0,          t1000tl,    t1000_101key, tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 TL/2", 0 )
+COMP( 1988, t1000sl2,   ibm5150,    0,          t1000sl2,   t1000_101key, tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 SL/2", 0 )

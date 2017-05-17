@@ -22,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type I8089 = device_creator<i8089_device>;
+DEFINE_DEVICE_TYPE(I8089, i8089_device, "i8089", "I8089")
 
 
 //**************************************************************************
@@ -34,7 +34,7 @@ const device_type I8089 = device_creator<i8089_device>;
 //-------------------------------------------------
 
 i8089_device::i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	cpu_device(mconfig, I8089, "I8089", tag, owner, clock, "i8089", __FILE__),
+	cpu_device(mconfig, I8089, tag, owner, clock),
 	m_icount(0),
 	m_ch1(*this, "1"),
 	m_ch2(*this, "2"),
@@ -68,29 +68,29 @@ void i8089_device::device_start()
 	state_add(SCB, "SCB", m_scb).mask(0xfffff);
 	state_add(SOC, "SOC", m_soc).mask(0x03).formatstr("%2s");
 	state_add_divider(DIVIDER1);
-	state_add(CH1_GA, "CH1  GA", m_ch1->m_r[i8089_channel::GA].w).mask(0xfffff).formatstr("%8s");
-	state_add(CH1_GB, "CH1  GB", m_ch1->m_r[i8089_channel::GB].w).mask(0xfffff).formatstr("%8s");
-	state_add(CH1_GC, "CH1  GC", m_ch1->m_r[i8089_channel::GC].w).mask(0xfffff).formatstr("%8s");
-	state_add(CH1_TP, "CH1  TP", m_ch1->m_r[i8089_channel::TP].w).mask(0xfffff).formatstr("%8s");
-	state_add(CH1_BC, "CH1  BC", m_ch1->m_r[i8089_channel::BC].w).mask(0xffff);
-	state_add(CH1_IX, "CH1  IX", m_ch1->m_r[i8089_channel::IX].w).mask(0xffff);
-	state_add(CH1_CC, "CH1  CC", m_ch1->m_r[i8089_channel::CC].w).mask(0xffff);
-	state_add(CH1_MC, "CH1  MC", m_ch1->m_r[i8089_channel::MC].w).mask(0xffff);
-	state_add(CH1_CP, "CH1  CP", m_ch1->m_r[i8089_channel::CP].w).mask(0xfffff);
-	state_add(CH1_PP, "CH1  PP", m_ch1->m_r[i8089_channel::PP].w).mask(0xfffff);
-	state_add(CH1_PSW, "CH1 PSW", m_ch1->m_r[i8089_channel::PSW].w).callimport().callexport().formatstr("%12s");
+	state_add(CH1_GA, "CH1  GA", m_ch1->m_r[i8089_channel_device::GA].w).mask(0xfffff).formatstr("%8s");
+	state_add(CH1_GB, "CH1  GB", m_ch1->m_r[i8089_channel_device::GB].w).mask(0xfffff).formatstr("%8s");
+	state_add(CH1_GC, "CH1  GC", m_ch1->m_r[i8089_channel_device::GC].w).mask(0xfffff).formatstr("%8s");
+	state_add(CH1_TP, "CH1  TP", m_ch1->m_r[i8089_channel_device::TP].w).mask(0xfffff).formatstr("%8s");
+	state_add(CH1_BC, "CH1  BC", m_ch1->m_r[i8089_channel_device::BC].w).mask(0xffff);
+	state_add(CH1_IX, "CH1  IX", m_ch1->m_r[i8089_channel_device::IX].w).mask(0xffff);
+	state_add(CH1_CC, "CH1  CC", m_ch1->m_r[i8089_channel_device::CC].w).mask(0xffff);
+	state_add(CH1_MC, "CH1  MC", m_ch1->m_r[i8089_channel_device::MC].w).mask(0xffff);
+	state_add(CH1_CP, "CH1  CP", m_ch1->m_r[i8089_channel_device::CP].w).mask(0xfffff);
+	state_add(CH1_PP, "CH1  PP", m_ch1->m_r[i8089_channel_device::PP].w).mask(0xfffff);
+	state_add(CH1_PSW, "CH1 PSW", m_ch1->m_r[i8089_channel_device::PSW].w).callimport().callexport().formatstr("%12s");
 	state_add_divider(DIVIDER2);
-	state_add(CH2_GA, "CH2  GA", m_ch2->m_r[i8089_channel::GA].w).mask(0xfffff).formatstr("%8s");
-	state_add(CH2_GB, "CH2  GB", m_ch2->m_r[i8089_channel::GB].w).mask(0xfffff).formatstr("%8s");
-	state_add(CH2_GC, "CH2  GC", m_ch2->m_r[i8089_channel::GC].w).mask(0xfffff).formatstr("%8s");
-	state_add(CH2_TP, "CH2  TP", m_ch2->m_r[i8089_channel::TP].w).mask(0xfffff).formatstr("%8s");
-	state_add(CH2_BC, "CH2  BC", m_ch2->m_r[i8089_channel::BC].w).mask(0xffff);
-	state_add(CH2_IX, "CH2  IX", m_ch2->m_r[i8089_channel::IX].w).mask(0xffff);
-	state_add(CH2_CC, "CH2  CC", m_ch2->m_r[i8089_channel::CC].w).mask(0xffff);
-	state_add(CH2_MC, "CH2  MC", m_ch2->m_r[i8089_channel::MC].w).mask(0xffff);
-	state_add(CH2_CP, "CH2  CP", m_ch2->m_r[i8089_channel::CP].w).mask(0xfffff);
-	state_add(CH2_PP, "CH2  PP", m_ch2->m_r[i8089_channel::PP].w).mask(0xfffff);
-	state_add(CH2_PSW, "CH2 PSW", m_ch2->m_r[i8089_channel::PSW].w).callimport().callexport().formatstr("%12s");
+	state_add(CH2_GA, "CH2  GA", m_ch2->m_r[i8089_channel_device::GA].w).mask(0xfffff).formatstr("%8s");
+	state_add(CH2_GB, "CH2  GB", m_ch2->m_r[i8089_channel_device::GB].w).mask(0xfffff).formatstr("%8s");
+	state_add(CH2_GC, "CH2  GC", m_ch2->m_r[i8089_channel_device::GC].w).mask(0xfffff).formatstr("%8s");
+	state_add(CH2_TP, "CH2  TP", m_ch2->m_r[i8089_channel_device::TP].w).mask(0xfffff).formatstr("%8s");
+	state_add(CH2_BC, "CH2  BC", m_ch2->m_r[i8089_channel_device::BC].w).mask(0xffff);
+	state_add(CH2_IX, "CH2  IX", m_ch2->m_r[i8089_channel_device::IX].w).mask(0xffff);
+	state_add(CH2_CC, "CH2  CC", m_ch2->m_r[i8089_channel_device::CC].w).mask(0xffff);
+	state_add(CH2_MC, "CH2  MC", m_ch2->m_r[i8089_channel_device::MC].w).mask(0xffff);
+	state_add(CH2_CP, "CH2  CP", m_ch2->m_r[i8089_channel_device::CP].w).mask(0xfffff);
+	state_add(CH2_PP, "CH2  PP", m_ch2->m_r[i8089_channel_device::PP].w).mask(0xfffff);
+	state_add(CH2_PSW, "CH2 PSW", m_ch2->m_r[i8089_channel_device::PSW].w).callimport().callexport().formatstr("%12s");
 	state_add(STATE_GENPC, "GENPC", m_current_tp).mask(0xfffff).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_current_tp).mask(0xfffff).noshow();
 
@@ -162,7 +162,7 @@ offs_t i8089_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u
 
 void i8089_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
-	const i8089_channel *ch = m_ch1;
+	const i8089_channel_device *ch = m_ch1;
 
 	if (entry.index() >= CH2_GA && entry.index() <= CH2_PSW)
 		ch = m_ch2;
@@ -177,31 +177,31 @@ void i8089_device::state_string_export(const device_state_entry &entry, std::str
 		break;
 	case CH1_GA:
 	case CH2_GA:
-		str = string_format("%d %05X", ch->m_r[i8089_channel::GA].t & 1, ch->m_r[i8089_channel::GA].w);
+		str = string_format("%d %05X", ch->m_r[i8089_channel_device::GA].t & 1, ch->m_r[i8089_channel_device::GA].w);
 		break;
 	case CH1_GB:
 	case CH2_GB:
-		str = string_format("%d %05X", ch->m_r[i8089_channel::GB].t & 1, ch->m_r[i8089_channel::GB].w);
+		str = string_format("%d %05X", ch->m_r[i8089_channel_device::GB].t & 1, ch->m_r[i8089_channel_device::GB].w);
 		break;
 	case CH1_GC:
 	case CH2_GC:
-		str = string_format("%d %05X", ch->m_r[i8089_channel::GC].t & 1, ch->m_r[i8089_channel::GC].w);
+		str = string_format("%d %05X", ch->m_r[i8089_channel_device::GC].t & 1, ch->m_r[i8089_channel_device::GC].w);
 		break;
 	case CH1_TP:
 	case CH2_TP:
-		str = string_format("%d %05X", ch->m_r[i8089_channel::TP].t & 1, ch->m_r[i8089_channel::TP].w);
+		str = string_format("%d %05X", ch->m_r[i8089_channel_device::TP].t & 1, ch->m_r[i8089_channel_device::TP].w);
 		break;
 	case CH1_PSW:
 	case CH2_PSW:
 		str = string_format("%c%s%c%s%s%s%c%c",
-			BIT(ch->m_r[i8089_channel::PSW].w, 7) ? 'P':'.',
-			BIT(ch->m_r[i8089_channel::PSW].w, 6) ? "XF":"..",
-			BIT(ch->m_r[i8089_channel::PSW].w, 5) ? 'B':'.',
-			BIT(ch->m_r[i8089_channel::PSW].w, 4) ? "IS":"..",
-			BIT(ch->m_r[i8089_channel::PSW].w, 3) ? "IC":"..",
-			BIT(ch->m_r[i8089_channel::PSW].w, 2) ? "TB":"..",
-			BIT(ch->m_r[i8089_channel::PSW].w, 1) ? 'S':'.',
-			BIT(ch->m_r[i8089_channel::PSW].w, 0) ? 'D':'.');
+			BIT(ch->m_r[i8089_channel_device::PSW].w, 7) ? 'P':'.',
+			BIT(ch->m_r[i8089_channel_device::PSW].w, 6) ? "XF":"..",
+			BIT(ch->m_r[i8089_channel_device::PSW].w, 5) ? 'B':'.',
+			BIT(ch->m_r[i8089_channel_device::PSW].w, 4) ? "IS":"..",
+			BIT(ch->m_r[i8089_channel_device::PSW].w, 3) ? "IC":"..",
+			BIT(ch->m_r[i8089_channel_device::PSW].w, 2) ? "TB":"..",
+			BIT(ch->m_r[i8089_channel_device::PSW].w, 1) ? 'S':'.',
+			BIT(ch->m_r[i8089_channel_device::PSW].w, 0) ? 'D':'.');
 		break;
 	}
 }
@@ -258,8 +258,8 @@ void i8089_device::initialize()
 	offs_t cb_address = ((cb_segment << 4) + cb_offset) & 0x0fffff;
 
 	// initialize channels
-	m_ch1->set_reg(i8089_channel::CP, cb_address);
-	m_ch2->set_reg(i8089_channel::CP, cb_address + 8);
+	m_ch1->set_reg(i8089_channel_device::CP, cb_address);
+	m_ch2->set_reg(i8089_channel_device::CP, cb_address + 8);
 
 	// clear busy
 	uint16_t ccw = read_word(0, cb_address);

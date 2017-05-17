@@ -49,9 +49,9 @@
 #include "bus/ti99x/ti99defs.h"
 #include "bus/ti99x/datamux.h"
 #include "bus/ti99x/gromport.h"
-#include "bus/ti99x/joyport.h"
 
-#include "bus/ti99_peb/peribox.h"
+#include "bus/ti99/joyport/joyport.h"
+#include "bus/ti99/peb/peribox.h"
 #include "machine/ram.h"
 
 #include "softlist.h"
@@ -87,7 +87,7 @@ public:
 		m_video(*this, VDP_TAG),
 		m_cassette1(*this, "cassette"),
 		m_cassette2(*this, "cassette2")
-		{ }
+	{ }
 
 	// Machine management
 	DECLARE_MACHINE_START(ti99_4);
@@ -165,9 +165,9 @@ private:
 	// Connected devices
 	required_device<tms9900_device>     m_cpu;
 	required_device<tms9901_device>     m_tms9901;
-	required_device<gromport_device>    m_gromport;
+	required_device<ti99_gromport_device> m_gromport;
 	required_device<peribox_device>     m_peribox;
-	required_device<joyport_device>     m_joyport;
+	required_device<ti99_joyport_device> m_joyport;
 	required_device<ti99_datamux_device> m_datamux;
 	optional_device<tms9928a_device>    m_video;
 	required_device<cassette_image_device> m_cassette1;
@@ -454,7 +454,7 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 
 	switch (offset & 0x03)
 	{
-	case TMS9901_CB_INT7:
+	case tms9901_device::CB_INT7:
 		//
 		// Read pins INT3*-INT7* of TI99's 9901.
 		// bit 1: INT1 status
@@ -490,7 +490,7 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 
 		break;
 
-	case TMS9901_INT8_INT15:
+	case tms9901_device::INT8_INT15:
 		// |1|1|1|INT12|0|K|K|K|
 		if (m_keyboard_column >= (m_model==MODEL_4? 5:6)) answer = 0x07;
 		else answer = ((ioport(column[m_keyboard_column])->read())>>5) & 0x07;
@@ -498,12 +498,12 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 		if (m_model != MODEL_4 || m_int12==CLEAR_LINE) answer |= 0x10;
 		break;
 
-	case TMS9901_P0_P7:
+	case tms9901_device::P0_P7:
 		// Required for the handset (only on TI-99/4)
 		if ((m_joyport->read_port() & 0x20)!=0) answer |= 2;
 		break;
 
-	case TMS9901_P8_P15:
+	case tms9901_device::P8_P15:
 		// Preset to 1
 		answer = 4;
 
@@ -830,7 +830,7 @@ MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4)
     TI-99/4 - predecessor of the more popular TI-99/4A
 ***********************************************************************/
 
-static MACHINE_CONFIG_START( ti99_4, ti99_4x_state )
+static MACHINE_CONFIG_START( ti99_4 )
 	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4x_state, external_operation) )
@@ -854,7 +854,7 @@ static MACHINE_CONFIG_START( ti99_4, ti99_4x_state )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_4x_state, cassette_output) )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4x_state, tms9901_interrupt) )
 
-	MCFG_DEVICE_ADD( DATAMUX_TAG, DATAMUX, 0)
+	MCFG_DEVICE_ADD( DATAMUX_TAG, TI99_DATAMUX, 0)
 	MCFG_DMUX_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_dmux) )
 
 	MCFG_GROMPORT4_ADD( GROMPORT_TAG )
@@ -950,7 +950,7 @@ MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4a)
 	m_int12 = CLEAR_LINE;
 }
 
-static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
+static MACHINE_CONFIG_START( ti99_4a )
 	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4x_state, external_operation) )
@@ -974,7 +974,7 @@ static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_4x_state, cassette_output) )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4x_state, tms9901_interrupt) )
 
-	MCFG_DEVICE_ADD( DATAMUX_TAG, DATAMUX, 0)
+	MCFG_DEVICE_ADD( DATAMUX_TAG, TI99_DATAMUX, 0)
 	MCFG_DMUX_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_dmux) )
 
 	MCFG_GROMPORT4_ADD( GROMPORT_TAG )
@@ -1112,7 +1112,7 @@ MACHINE_RESET_MEMBER(ti99_4x_state, ti99_4ev)
 	m_gromclk_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_10_738635MHz/24));
 }
 
-static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
+static MACHINE_CONFIG_START( ti99_4ev_60hz )
 	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4x_state, external_operation) )
@@ -1136,7 +1136,7 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_4x_state, cassette_output) )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4x_state, tms9901_interrupt) )
 
-	MCFG_DEVICE_ADD( DATAMUX_TAG, DATAMUX, 0)
+	MCFG_DEVICE_ADD( DATAMUX_TAG, TI99_DATAMUX, 0)
 	MCFG_DMUX_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_dmux) )
 	MCFG_GROMPORT4_ADD( GROMPORT_TAG )
 	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_cart) )
@@ -1253,10 +1253,10 @@ ROM_START(ti99_4ev)
 	ROM_LOAD("994a_grom2.u502", 0x4000, 0x1800, CRC(e0bb5341) SHA1(e255f0d65d69b927cecb8fcfac7a4c17d585ea96)) /* system GROM 2 */
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE        INPUT    CLASS          INIT  COMPANY             FULLNAME                          FLAGS
-COMP( 1979, ti99_4,   0,        0,     ti99_4_60hz,   ti99_4,  driver_device, 0,   "Texas Instruments", "TI-99/4 Home Computer (US)",       MACHINE_SUPPORTS_SAVE)
-COMP( 1980, ti99_4e,  ti99_4,   0,     ti99_4_50hz,   ti99_4,  driver_device, 0,   "Texas Instruments", "TI-99/4 Home Computer (Europe)",   MACHINE_SUPPORTS_SAVE)
-COMP( 1981, ti99_4a,  0,        0,     ti99_4a_60hz,  ti99_4a, driver_device, 0,   "Texas Instruments", "TI-99/4A Home Computer (US)",      MACHINE_SUPPORTS_SAVE)
-COMP( 1981, ti99_4ae, ti99_4a,  0,     ti99_4a_50hz,  ti99_4a, driver_device, 0,   "Texas Instruments", "TI-99/4A Home Computer (Europe)",  MACHINE_SUPPORTS_SAVE)
-COMP( 1983, ti99_4qi, ti99_4a,  0,     ti99_4qi_60hz, ti99_4a, driver_device, 0,   "Texas Instruments", "TI-99/4QI Home Computer (US)",     MACHINE_SUPPORTS_SAVE)
-COMP( 1994, ti99_4ev, ti99_4a,  0,     ti99_4ev_60hz, ti99_4a, driver_device, 0,   "Texas Instruments", "TI-99/4A Home Computer with EVPC", MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME      PARENT  COMPAT   MACHINE        INPUT    CLASS          INIT  COMPANY             FULLNAME                            FLAGS
+COMP( 1979, ti99_4,   0,        0,     ti99_4_60hz,   ti99_4,  ti99_4x_state, 0,   "Texas Instruments", "TI-99/4 Home Computer (US)",       MACHINE_SUPPORTS_SAVE)
+COMP( 1980, ti99_4e,  ti99_4,   0,     ti99_4_50hz,   ti99_4,  ti99_4x_state, 0,   "Texas Instruments", "TI-99/4 Home Computer (Europe)",   MACHINE_SUPPORTS_SAVE)
+COMP( 1981, ti99_4a,  0,        0,     ti99_4a_60hz,  ti99_4a, ti99_4x_state, 0,   "Texas Instruments", "TI-99/4A Home Computer (US)",      MACHINE_SUPPORTS_SAVE)
+COMP( 1981, ti99_4ae, ti99_4a,  0,     ti99_4a_50hz,  ti99_4a, ti99_4x_state, 0,   "Texas Instruments", "TI-99/4A Home Computer (Europe)",  MACHINE_SUPPORTS_SAVE)
+COMP( 1983, ti99_4qi, ti99_4a,  0,     ti99_4qi_60hz, ti99_4a, ti99_4x_state, 0,   "Texas Instruments", "TI-99/4QI Home Computer (US)",     MACHINE_SUPPORTS_SAVE)
+COMP( 1994, ti99_4ev, ti99_4a,  0,     ti99_4ev_60hz, ti99_4a, ti99_4x_state, 0,   "Texas Instruments", "TI-99/4A Home Computer with EVPC", MACHINE_SUPPORTS_SAVE)

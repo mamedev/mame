@@ -16,14 +16,9 @@
 #include "emu.h"
 #include "fixfreq.h"
 
-/***************************************************************************
+//#define VERBOSE 1
+#include "logmacro.h"
 
-    Local variables
-
-***************************************************************************/
-
-//#define VERBOSE_OUT(x) printf x
-#define VERBOSE_OUT(x)
 
 /***************************************************************************
 
@@ -31,11 +26,12 @@
 
 ***************************************************************************/
 // device type definition
-const device_type FIXFREQ = device_creator<fixedfreq_device>;
+DEFINE_DEVICE_TYPE(FIXFREQ, fixedfreq_device, "fixfreq", "Fixed-Frequency Monochrome Monitor")
 
-fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this, false), m_htotal(0), m_vtotal(0), m_vid(0), m_last_x(0), m_last_y(0), m_cur_bm(0),
+fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
+		device_video_interface(mconfig, *this, false),
+		m_htotal(0), m_vtotal(0), m_vid(0), m_last_x(0), m_last_y(0), m_cur_bm(0),
 		// default to NTSC "704x480@30i"
 		m_monitor_clock(13500000),
 		m_hvisible(704),
@@ -48,26 +44,13 @@ fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type ty
 		m_vbackporch(525),
 		m_fieldcount(2),
 		m_sync_threshold(0.3),
-		m_gain(1.0 / 3.7), m_vint(0), m_int_trig(0), m_mult(0), m_sig_vsync(0), m_sig_composite(0), m_sig_field(0)
+		m_gain(1.0 / 3.7),
+		m_vint(0), m_int_trig(0), m_mult(0), m_sig_vsync(0), m_sig_composite(0), m_sig_field(0)
 {
 }
 
 fixedfreq_device::fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, FIXFREQ, "Fixed Frequency Monochrome Monitor", tag, owner, clock, "fixfreq", __FILE__),
-		device_video_interface(mconfig, *this, false),
-		// default to NTSC "704x480@30i"
-		m_monitor_clock(13500000),
-		m_hvisible(704),
-		m_hfrontporch(728),
-		m_hsync(791),
-		m_hbackporch(858),
-		m_vvisible(480),
-		m_vfrontporch(486),
-		m_vsync(492),
-		m_vbackporch(525),
-		m_fieldcount(2),
-		m_sync_threshold(0.3),
-		m_gain(1.0 / 3.7)
+	: fixedfreq_device(mconfig, FIXFREQ, tag, owner, clock)
 {
 }
 
@@ -160,7 +143,7 @@ void fixedfreq_device::recompute_parameters(bool postload)
 
 	m_int_trig = (exp(- 3.0/(3.0+3.0))) - exp(-1.0);
 	m_mult = (double) (m_monitor_clock) / (double) m_htotal * 1.0; // / (3.0 + 3.0);
-	VERBOSE_OUT(("trigger %f with len %f\n", m_int_trig, 1e6 / m_mult));
+	LOG("trigger %f with len %f\n", m_int_trig, 1e6 / m_mult);
 
 	m_bitmap[0] = std::make_unique<bitmap_rgb32>(m_htotal, m_vtotal);
 	m_bitmap[1] = std::make_unique<bitmap_rgb32>(m_htotal, m_vtotal);
@@ -211,7 +194,7 @@ int fixedfreq_device::sync_separator(const attotime &time, double newval)
 	{
 		m_sig_field = last_comp;   /* force false-progressive */
 		m_sig_field = (m_sig_field ^ 1) ^ last_comp;   /* if there is no field switch, auto switch */
-		VERBOSE_OUT(("Field: %d\n", m_sig_field));
+		LOG("Field: %d\n", m_sig_field);
 	}
 	if (!last_comp && m_sig_composite)
 	{
@@ -266,16 +249,16 @@ NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_vid)
 	}
 	if (sync & 1)
 	{
-		VERBOSE_OUT(("VSYNC %d %d\n", pixels, m_last_y + m_sig_field));
+		LOG("VSYNC %d %d\n", pixels, m_last_y + m_sig_field);
 	}
 	if (sync & 2)
 	{
-		VERBOSE_OUT(("HSYNC up %d\n", pixels));
+		LOG("HSYNC up %d\n", pixels);
 		//if (m_last_y == 27) printf("HSYNC up %d %d\n", m_last_y, pixels);
 	}
 	if (sync & 4)
 	{
-		VERBOSE_OUT(("HSYNC down %f %d %f\n", time.as_double()* 1e6, pixels, m_vid));
+		LOG("HSYNC down %f %d %f\n", time.as_double()* 1e6, pixels, m_vid);
 	}
 
 	if (sync & 1)

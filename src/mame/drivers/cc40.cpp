@@ -579,7 +579,7 @@ void cc40_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(cc40_state::postload), this));
 }
 
-static MACHINE_CONFIG_START( cc40, cc40_state )
+static MACHINE_CONFIG_START( cc40 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS70C20, XTAL_5MHz / 2)
@@ -638,4 +638,5 @@ ROM_START( cc40 )
 ROM_END
 
 
-COMP( 1983, cc40, 0, 0, cc40, cc40, driver_device, 0, "Texas Instruments", "Compact Computer 40", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE    INIT  COMPANY, FULLNAME, FLAGS
+COMP( 1983, cc40, 0,      0, cc40,   cc40, cc40_state, 0, "Texas Instruments", "Compact Computer 40", MACHINE_SUPPORTS_SAVE )

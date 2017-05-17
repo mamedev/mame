@@ -34,7 +34,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_FDC = device_creator<adam_fdc_device>;
+DEFINE_DEVICE_TYPE(ADAM_FDC, adam_fdc_device, "adam_fdc", "Adam FDC")
 
 
 //-------------------------------------------------
@@ -81,16 +81,16 @@ static ADDRESS_MAP_START( adam_fdc_mem, AS_PROGRAM, 8, adam_fdc_device )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(M6801_TAG, m6801_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_WRITEONLY AM_SHARE("ram")
-	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_t, status_r)
+	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_device, status_r)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_READONLY AM_SHARE("ram")
-	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_t, cmd_w)
-	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_t, track_r)
-	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_t, track_w)
-	AM_RANGE(0x4800, 0x4800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_t, sector_r)
-	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_t, sector_w)
-	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_t, data_r)
+	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_device, cmd_w)
+	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_device, track_r)
+	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_device, track_w)
+	AM_RANGE(0x4800, 0x4800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_device, sector_r)
+	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_device, sector_w)
+	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_device, data_r)
 	AM_RANGE(0x6c00, 0x6fff) AM_READ(data_r)
-	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_t, data_w)
+	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_device, data_w)
 	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x7000) AM_ROM AM_REGION(M6801_TAG, 0)
 ADDRESS_MAP_END
 
@@ -179,7 +179,7 @@ ioport_constructor adam_fdc_device::device_input_ports() const
 //-------------------------------------------------
 
 adam_fdc_device::adam_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ADAM_FDC, "Adam FDC", tag, owner, clock, "adam_fdc", __FILE__),
+	: device_t(mconfig, ADAM_FDC, tag, owner, clock),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG),
 		m_fdc(*this, WD2793_TAG),

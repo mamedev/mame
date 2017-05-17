@@ -55,10 +55,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MOS6526_H
+#define MAME_MACHINE_MOS6526_H
 
-#ifndef __MOS6526__
-#define __MOS6526__
+#pragma once
 
 
 
@@ -107,19 +107,18 @@ class mos6526_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
 	mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_tod_clock(device_t &device, int clock) { downcast<mos6526_device &>(device).m_tod_clock = clock; }
 
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb_base &set_cnt_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_cnt.set_callback(object); }
-	template<class _Object> static devcb_base &set_sp_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_sp.set_callback(object); }
-	template<class _Object> static devcb_base &set_pa_rd_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_read_pa.set_callback(object); }
-	template<class _Object> static devcb_base &set_pa_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_pa.set_callback(object); }
-	template<class _Object> static devcb_base &set_pb_rd_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_read_pb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pb_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_pb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pc_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_pc.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_cnt_wr_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_write_cnt.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sp_wr_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_write_sp.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pa_rd_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_read_pa.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pa_wr_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_write_pa.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pb_rd_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_read_pb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pb_wr_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_write_pb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pc_wr_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_write_pc.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -146,6 +145,8 @@ protected:
 		TYPE_5710
 	};
 
+	mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -153,7 +154,7 @@ protected:
 	virtual void execute_run() override;
 
 	int m_icount;
-	int m_variant;
+	const int m_variant;
 	int m_tod_clock;
 
 	inline void update_interrupt();
@@ -285,11 +286,9 @@ public:
 
 
 // device type definition
-extern const device_type MOS6526;
-extern const device_type MOS6526A;
-extern const device_type MOS8520;
-extern const device_type MOS5710;
+DECLARE_DEVICE_TYPE(MOS6526,  mos6526_device)
+DECLARE_DEVICE_TYPE(MOS6526A, mos6526a_device)
+DECLARE_DEVICE_TYPE(MOS8520,  mos8520_device)
+DECLARE_DEVICE_TYPE(MOS5710,  mos5710_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_MOS6526_H

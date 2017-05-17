@@ -29,7 +29,8 @@ typedef std::unordered_map<std::string, const software_info *> softlist_map;
 //**************************************************************************
 
 // device type definition
-const device_type SOFTWARE_LIST = device_creator<software_list_device>;
+DEFINE_DEVICE_TYPE(SOFTWARE_LIST, software_list_device, "software_list", "Software List")
+
 false_software_list_loader false_software_list_loader::s_instance;
 rom_software_list_loader rom_software_list_loader::s_instance;
 image_software_list_loader image_software_list_loader::s_instance;
@@ -79,7 +80,7 @@ bool image_software_list_loader::load_software(device_image_interface &device, s
 //-------------------------------------------------
 
 software_list_device::software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SOFTWARE_LIST, "Software list", tag, owner, clock, "software_list", __FILE__),
+	: device_t(mconfig, SOFTWARE_LIST, tag, owner, clock),
 	m_list_type(SOFTWARE_LIST_ORIGINAL_SYSTEM),
 	m_filter(nullptr),
 	m_parsed(false),

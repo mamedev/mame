@@ -4,30 +4,27 @@
 #include "halnote.h"
 
 
-const device_type MSX_CART_HALNOTE = device_creator<msx_cart_halnote>;
+DEFINE_DEVICE_TYPE(MSX_CART_HALNOTE, msx_cart_halnote_device, "msx_cart_halnote", "MSX Cartridge - Halnote")
 
 
-msx_cart_halnote::msx_cart_halnote(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_HALNOTE, "MSX Cartridge - Halnote", tag, owner, clock, "msx_cart_halnote", __FILE__)
+msx_cart_halnote_device::msx_cart_halnote_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSX_CART_HALNOTE, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
+	, m_selected_bank{ 0, 0, 0, 0, 0, 0, 0, 0 }
+	, m_bank_base{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }
 {
-	for (int i = 0; i < 8; i++)
-	{
-		m_selected_bank[i] = 0;
-		m_bank_base[i] = nullptr;
-	}
 }
 
 
-void msx_cart_halnote::device_start()
+void msx_cart_halnote_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_halnote::restore_banks), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_halnote_device::restore_banks), this));
 }
 
 
-void msx_cart_halnote::map_bank(int bank)
+void msx_cart_halnote_device::map_bank(int bank)
 {
 	if (bank < 2)
 	{
@@ -58,7 +55,7 @@ void msx_cart_halnote::map_bank(int bank)
 }
 
 
-void msx_cart_halnote::restore_banks()
+void msx_cart_halnote_device::restore_banks()
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -67,7 +64,7 @@ void msx_cart_halnote::restore_banks()
 }
 
 
-void msx_cart_halnote::device_reset()
+void msx_cart_halnote_device::device_reset()
 {
 	for (auto & elem : m_selected_bank)
 	{
@@ -76,7 +73,7 @@ void msx_cart_halnote::device_reset()
 }
 
 
-void msx_cart_halnote::initialize_cartridge()
+void msx_cart_halnote_device::initialize_cartridge()
 {
 	if (get_rom_size() != 0x100000)
 	{
@@ -87,7 +84,7 @@ void msx_cart_halnote::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_halnote::read_cart)
+READ8_MEMBER(msx_cart_halnote_device::read_cart)
 {
 	if (offset >= 0xc000)
 	{
@@ -109,7 +106,7 @@ READ8_MEMBER(msx_cart_halnote::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_halnote::write_cart)
+WRITE8_MEMBER(msx_cart_halnote_device::write_cart)
 {
 	if (offset < 0x4000)
 	{
@@ -153,7 +150,7 @@ WRITE8_MEMBER(msx_cart_halnote::write_cart)
 			break;
 
 		default:
-			logerror("msx_cart_halnote: Unhandled write %02x to %04x\n", data, offset);
+			logerror("msx_cart_halnote_device: Unhandled write %02x to %04x\n", data, offset);
 			break;
 	}
 }

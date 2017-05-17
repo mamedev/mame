@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START( md_bootleg, md_boot_state )
+MACHINE_CONFIG_START( md_bootleg )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -678,7 +678,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( megadrvb, md_boot_state )
+static MACHINE_CONFIG_START( megadrvb )
 	MCFG_FRAGMENT_ADD(md_ntsc)
 	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
 MACHINE_CONFIG_END
@@ -697,7 +697,7 @@ MACHINE_START_MEMBER(md_boot_state, md_6button)
 		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(uintptr_t)i);
 }
 
-static MACHINE_CONFIG_START( megadrvb_6b, md_boot_state )
+static MACHINE_CONFIG_START( megadrvb_6b )
 	MCFG_FRAGMENT_ADD(md_ntsc)
 	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_6button)
 MACHINE_CONFIG_END

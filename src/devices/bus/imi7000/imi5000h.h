@@ -8,10 +8,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_IMI7000_IMI5000H_H
+#define MAME_BUS_IMI7000_IMI5000H_H
 
-#ifndef __IMI5000H__
-#define __IMI5000H__
+#pragma once
 
 #include "imi7000.h"
 #include "cpu/z80/z80.h"
@@ -82,7 +82,6 @@ private:
 
 // device type definition
 extern const device_type IMI5000H;
+DECLARE_DEVICE_TYPE(IMI5000H, imi5000h_device)
 
-
-
-#endif
+#endif // MAME_BUS_IMI7000_IMI5000H_H

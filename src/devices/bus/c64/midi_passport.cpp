@@ -26,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MIDI_PASSPORT = device_creator<c64_passport_midi_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_MIDI_PASSPORT, c64_passport_midi_cartridge_device, "c64_midipp", "C64 Passport MIDI")
 
 
 //-------------------------------------------------
@@ -98,7 +98,7 @@ machine_config_constructor c64_passport_midi_cartridge_device::device_mconfig_ad
 //-------------------------------------------------
 
 c64_passport_midi_cartridge_device::c64_passport_midi_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_MIDI_PASSPORT, "C64 Passport MIDI", tag, owner, clock, "c64_midipp", __FILE__),
+	device_t(mconfig, C64_MIDI_PASSPORT, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_acia(*this, MC6850_TAG),
 	m_ptm(*this, MC6840_TAG),

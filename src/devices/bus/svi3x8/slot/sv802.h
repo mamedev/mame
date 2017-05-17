@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SVI3X8_SLOT_SV802_H
+#define MAME_BUS_SVI3X8_SLOT_SV802_H
 
-#ifndef __SVI3X8_SLOT_SV802_H__
-#define __SVI3X8_SLOT_SV802_H__
+#pragma once
 
 #include "slot.h"
 #include "machine/buffer.h"
@@ -45,6 +45,6 @@ private:
 };
 
 // device type definition
-extern const device_type SV802;
+DECLARE_DEVICE_TYPE(SV802, sv802_device)
 
-#endif // __SVI3X8_SLOT_SV802_H__
+#endif // MAME_BUS_SVI3X8_SLOT_SV802_H

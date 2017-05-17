@@ -6,7 +6,6 @@
 
   TODO:
   - svg lcd screen background/foreground (not supported in core)
-  - svg lcd screen for ml102
   - ktmnt: "LIMIT" flickers when going underwater on level 1
 
 ***************************************************************************/
@@ -221,7 +220,7 @@ static INPUT_PORTS_START( ktopgun )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ktopgun, ktopgun_state )
+static MACHINE_CONFIG_START( ktopgun )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -290,7 +289,7 @@ static INPUT_PORTS_START( kcontra )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( kcontra, kcontra_state )
+static MACHINE_CONFIG_START( kcontra )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -358,7 +357,7 @@ static INPUT_PORTS_START( ktmnt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ktmnt, ktmnt_state )
+static MACHINE_CONFIG_START( ktmnt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -421,7 +420,7 @@ static INPUT_PORTS_START( kgradius )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( kgradius, kgradius_state )
+static MACHINE_CONFIG_START( kgradius )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -484,7 +483,7 @@ static INPUT_PORTS_START( kloneran )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( kloneran, kloneran_state )
+static MACHINE_CONFIG_START( kloneran )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -547,7 +546,7 @@ static INPUT_PORTS_START( dm53 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( dm53, dm53_state )
+static MACHINE_CONFIG_START( dm53 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -614,7 +613,7 @@ static INPUT_PORTS_START( jr55 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( jr55, jr55_state )
+static MACHINE_CONFIG_START( jr55 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -662,8 +661,8 @@ public:
 static INPUT_PORTS_START( ml102 )
 	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1")
@@ -676,7 +675,7 @@ static INPUT_PORTS_START( ml102 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ml102, ml102_state )
+static MACHINE_CONFIG_START( ml102 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
@@ -685,7 +684,12 @@ static MACHINE_CONFIG_START( ml102, ml102_state )
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
 
-	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1759, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1759-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -757,7 +761,7 @@ static INPUT_PORTS_START( bx301 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bx301, bx301_state )
+static MACHINE_CONFIG_START( bx301 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM511, XTAL_32_768kHz)
@@ -794,7 +798,7 @@ ROM_START( ktopgun ) // except for filler/unused bytes, ROM listing in patent US
 	ROM_LOAD( "cms54c_kms598", 0x0000, 0x1000, CRC(50870b35) SHA1(cda1260c2e1c180995eced04b7d7ff51616dcef5) )
 
 	ROM_REGION( 423317, "svg", 0)
-	ROM_LOAD( "ktopgun.svg", 0, 423317, BAD_DUMP CRC(1e341717) SHA1(74f4ae3fa0e4aacfda76d46753a5a06f115d221f) ) // by sean, ver. 11 apr 2017
+	ROM_LOAD( "ktopgun.svg", 0, 423317, BAD_DUMP CRC(1e341717) SHA1(74f4ae3fa0e4aacfda76d46753a5a06f115d221f) ) // by Sean, ver. 11 apr 2017
 ROM_END
 
 
@@ -806,7 +810,7 @@ ROM_START( kcontra ) // except for filler/unused bytes, ROM listing in patent US
 	ROM_LOAD( "kms73b_kms773.melody", 0x000, 0x100, CRC(23d02b99) SHA1(703938e496db0eeacd14fe7605d4b5c39e0a5bc8) )
 
 	ROM_REGION( 710430, "svg", 0)
-	ROM_LOAD( "kcontra.svg", 0, 710430, BAD_DUMP CRC(66cfc3a2) SHA1(bd38d62bb14321dfec2f99c1cd9346fb5f1fd856) ) // by sean, ver. 11 apr 2017
+	ROM_LOAD( "kcontra.svg", 0, 710430, BAD_DUMP CRC(66cfc3a2) SHA1(bd38d62bb14321dfec2f99c1cd9346fb5f1fd856) ) // by Sean, ver. 11 apr 2017
 ROM_END
 
 
@@ -818,7 +822,7 @@ ROM_START( ktmnt ) // except for filler/unused bytes, ROM listing in patent US51
 	ROM_LOAD( "kms73b_kms774.melody", 0x000, 0x100, CRC(8270d626) SHA1(bd91ca1d5cd7e2a62eef05c0033b19dcdbe441ca) )
 
 	ROM_REGION( 607424, "svg", 0)
-	ROM_LOAD( "ktmnt.svg", 0, 607424, BAD_DUMP CRC(54ce0f2e) SHA1(1cd2d4c3026e8693f234ddfbbbe5f24311e5981d) ) // by sean, ver. 11 apr 2017
+	ROM_LOAD( "ktmnt.svg", 0, 607424, BAD_DUMP CRC(54ce0f2e) SHA1(1cd2d4c3026e8693f234ddfbbbe5f24311e5981d) ) // by Sean, ver. 11 apr 2017
 ROM_END
 
 
@@ -830,7 +834,7 @@ ROM_START( kgradius )
 	ROM_LOAD( "kms73b_kms771.melody", 0x000, 0x100, CRC(4c586b73) SHA1(14c5ab2898013a577f678970a648c374749cc66d) )
 
 	ROM_REGION( 628695, "svg", 0)
-	ROM_LOAD( "kgradius.svg", 0, 628695, BAD_DUMP CRC(56ac8ee8) SHA1(c47190e7aaebbe84ed1ad55a8e88f5ebb18f939b) ) // by sean, ver. 11 apr 2017
+	ROM_LOAD( "kgradius.svg", 0, 628695, BAD_DUMP CRC(56ac8ee8) SHA1(c47190e7aaebbe84ed1ad55a8e88f5ebb18f939b) ) // by Sean, ver. 11 apr 2017
 ROM_END
 
 
@@ -842,7 +846,7 @@ ROM_START( kloneran )
 	ROM_LOAD( "kms73b_kms781.melody", 0x000, 0x100, CRC(a393de36) SHA1(55089f04833ccb318524ab2b584c4817505f4019) )
 
 	ROM_REGION( 630184, "svg", 0)
-	ROM_LOAD( "kloneran.svg", 0, 630184, BAD_DUMP CRC(9b254520) SHA1(c9c85df44cc16f59f25df418b2e1aeba9f2f470c) ) // by sean, ver. 11 apr 2017
+	ROM_LOAD( "kloneran.svg", 0, 630184, BAD_DUMP CRC(9b254520) SHA1(c9c85df44cc16f59f25df418b2e1aeba9f2f470c) ) // by Sean, ver. 11 apr 2017
 ROM_END
 
 
@@ -850,8 +854,8 @@ ROM_START( gnw_dm53 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dm53_cms54c_cms565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
 
-	ROM_REGION( 193821, "svg", 0)
-	ROM_LOAD( "gnw_dm53.svg", 0, 193821, BAD_DUMP CRC(e242fe9b) SHA1(a5b364c21b1f2b3e0de6e82175b46e95abb24018) ) // by OG/hap, ver. 2 may 2017
+	ROM_REGION( 195362, "svg", 0)
+	ROM_LOAD( "gnw_dm53.svg", 0, 195362, BAD_DUMP CRC(3aa1cdfa) SHA1(cc938d05160fdefb9f030e9d9caeaf6ff472ffe3) ) // by OG/hap, ver. 17 may 2017
 ROM_END
 
 
@@ -866,10 +870,10 @@ ROM_END
 
 ROM_START( gnw_ml102 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "ml102_cms54c_kms577", 0x0000, 0x1000, CRC(9792fb45) SHA1(5f84c34f4a8ece3abbf6573bb7b7d26f75f5530a) )
+	ROM_LOAD( "ml102_cms54c_kms577", 0x0000, 0x1000, CRC(c1128dea) SHA1(8647e36f43a0e37756a3c7b6a3f08d4c8243f1cc) )
 
-	ROM_REGION( 100000, "svg", 0)
-	ROM_LOAD( "gnw_ml102.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 300571, "svg", 0)
+	ROM_LOAD( "gnw_ml102.svg", 0, 300571, BAD_DUMP CRC(8d8be5a9) SHA1(ee3a761ee956b86c064c83a15e4b833f83c23520) ) // by Sean/hap/JonasP, ver. 17 may 2017
 ROM_END
 
 
@@ -881,19 +885,19 @@ ROM_START( gnw_bx301 )
 	ROM_LOAD( "bx301_kms73b_kms744.melody", 0x000, 0x100, CRC(439d943d) SHA1(52880df15ec7513f96482f455ef3d9778aa24750) )
 
 	ROM_REGION( 258514, "svg", 0)
-	ROM_LOAD( "gnw_bx301.svg", 0, 258514, BAD_DUMP CRC(7b251101) SHA1(002e41374517f1fd8cecd66a2b2338aac736f319) ) // by sean, ver. 11 apr 2017
+	ROM_LOAD( "gnw_bx301.svg", 0, 258514, BAD_DUMP CRC(7b251101) SHA1(002e41374517f1fd8cecd66a2b2338aac736f319) ) // by Sean, ver. 11 apr 2017
 ROM_END
 
 
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1989, ktopgun,   0,        0, ktopgun,   ktopgun,   driver_device, 0, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kcontra,   0,        0, kcontra,   kcontra,   driver_device, 0, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, ktmnt,     0,        0, ktmnt,     ktmnt,     driver_device, 0, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kgradius,  0,        0, kgradius,  kgradius,  driver_device, 0, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kloneran,  0,        0, kloneran,  kloneran,  driver_device, 0, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT CMP MACHINE    INPUT      STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1989, ktopgun,   0,      0, ktopgun,   ktopgun,   ktopgun_state,  0, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kcontra,   0,      0, kcontra,   kcontra,   kcontra_state,  0, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, ktmnt,     0,      0, ktmnt,     ktmnt,     ktmnt_state,    0, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kgradius,  0,      0, kgradius,  kgradius,  kgradius_state, 0, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kloneran,  0,      0, kloneran,  kloneran,  kloneran_state, 0, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, gnw_dm53,  0,        0, dm53,      dm53,      driver_device, 0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_jr55,  0,        0, jr55,      jr55,      driver_device, 0, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_ml102, 0,        0, ml102,     ml102,     driver_device, 0, "Nintendo", "Game & Watch: Mario's Cement Factory", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // GNW: missing svg screen
-CONS( 1984, gnw_bx301, 0,        0, bx301,     bx301,     driver_device, 0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gnw_dm53,  0,      0, dm53,      dm53,      dm53_state,     0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_jr55,  0,      0, jr55,      jr55,      jr55_state,     0, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_ml102, 0,      0, ml102,     ml102,     ml102_state,    0, "Nintendo", "Game & Watch: Mario's Cement Factory", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, gnw_bx301, 0,      0, bx301,     bx301,     bx301_state,    0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )

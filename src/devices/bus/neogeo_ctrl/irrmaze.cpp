@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    SNK Neo Geo Irritation Maze Analog Controller emulation
+    SNK Neo Geo Irritating Maze Trackball Controller emulation
 
 **********************************************************************/
 
@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEOGEO_IRRMAZE = device_creator<neogeo_irrmaze_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_IRRMAZE, neogeo_irrmaze_device, "neogeo_irrmaze", "SNK Neo Geo Irritating Maze Trackball controller")
 
 
 static INPUT_PORTS_START( neogeo_irrmaze )
@@ -51,11 +51,11 @@ ioport_constructor neogeo_irrmaze_device::device_input_ports() const
 //-------------------------------------------------
 
 neogeo_irrmaze_device::neogeo_irrmaze_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, NEOGEO_IRRMAZE, "SNK Neo Geo Irritating Maze Analog Controller", tag, owner, clock, "neogeo_irrmaze", __FILE__),
-					device_neogeo_ctrl_edge_interface(mconfig, *this),
-					m_tx(*this, "TRACK_X"),
-					m_ty(*this, "TRACK_Y"),
-					m_buttons(*this, "BUTTONS")
+	device_t(mconfig, NEOGEO_IRRMAZE, tag, owner, clock),
+	device_neogeo_ctrl_edge_interface(mconfig, *this),
+	m_tx(*this, "TRACK_X"),
+	m_ty(*this, "TRACK_Y"),
+	m_buttons(*this, "BUTTONS")
 {
 }
 

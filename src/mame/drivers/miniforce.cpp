@@ -173,7 +173,7 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-MACHINE_CONFIG_START (miniforce, miniforce_state)
+MACHINE_CONFIG_START (miniforce)
 //  MCFG_CPU_PROGRAM_MAP (miniforce_mem)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", 1, miniforce_vme_cards, "fccpu21")
@@ -191,5 +191,5 @@ ROM_START(miniforce)
 ROM_END
 
 /* Drivers TODO: setup distinct miniforce machine configurations */
-/*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT COMPANY                  FULLNAME          FLAGS */
-COMP (1987, miniforce,      0,      0,     miniforce,   miniforce,  driver_device,  0,   "Force Computers",       "miniFORCE",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT  COMPANY             FULLNAME      FLAGS */
+COMP (1987, miniforce,  0,      0,      miniforce,  miniforce,  miniforce_state,  0,    "Force Computers",  "miniFORCE",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER)

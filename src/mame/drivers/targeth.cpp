@@ -181,7 +181,7 @@ static INPUT_PORTS_START( targeth )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( targeth, targeth_state )
+static MACHINE_CONFIG_START( targeth )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)          /* 12 MHz */
@@ -204,7 +204,7 @@ static MACHINE_CONFIG_START( targeth, targeth_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -249,5 +249,5 @@ ROM_START( targetha )
 	ROM_LOAD( "targeth.c3",     0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
 ROM_END
 
-GAME( 1994, targeth,  0,       targeth, targeth, driver_device, 0, ROT0, "Gaelco", "Target Hits (ver 1.1)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, targetha, targeth, targeth, targeth, driver_device, 0, ROT0, "Gaelco", "Target Hits (ver 1.0)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, targeth,  0,       targeth, targeth, targeth_state, 0, ROT0, "Gaelco", "Target Hits (ver 1.1)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, targetha, targeth, targeth, targeth, targeth_state, 0, ROT0, "Gaelco", "Target Hits (ver 1.0)", MACHINE_UNEMULATED_PROTECTION )

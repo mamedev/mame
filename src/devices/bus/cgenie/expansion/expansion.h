@@ -34,10 +34,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CGENIE_EXPANSION_EXPANSION_H
+#define MAME_BUS_CGENIE_EXPANSION_EXPANSION_H
 
-#ifndef __CGENIE_EXPANSION_H__
-#define __CGENIE_EXPANSION_H__
+#pragma once
 
 
 
@@ -45,45 +45,45 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_EXPANSION_SLOT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EXPANSION_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(expansion_slot_carts, nullptr, false)
+#define MCFG_CG_EXP_SLOT_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, CG_EXP_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(cg_exp_slot_carts, nullptr, false)
 
-#define MCFG_EXPANSION_SLOT_INT_HANDLER(_devcb) \
-	devcb = &expansion_slot_device::set_int_handler(*device, DEVCB_##_devcb);
+#define MCFG_CG_EXP_SLOT_INT_HANDLER(_devcb) \
+	devcb = &cg_exp_slot_device::set_int_handler(*device, DEVCB_##_devcb);
 
-#define MCFG_EXPANSION_SLOT_NMI_HANDLER(_devcb) \
-	devcb = &expansion_slot_device::set_nmi_handler(*device, DEVCB_##_devcb);
+#define MCFG_CG_EXP_SLOT_NMI_HANDLER(_devcb) \
+	devcb = &cg_exp_slot_device::set_nmi_handler(*device, DEVCB_##_devcb);
 
-#define MCFG_EXPANSION_SLOT_RESET_HANDLER(_devcb) \
-	devcb = &expansion_slot_device::set_reset_handler(*device, DEVCB_##_devcb);
+#define MCFG_CG_EXP_SLOT_RESET_HANDLER(_devcb) \
+	devcb = &cg_exp_slot_device::set_reset_handler(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class device_expansion_interface;
+class device_cg_exp_interface;
 
-class expansion_slot_device : public device_t, public device_slot_interface
+class cg_exp_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~expansion_slot_device();
+	cg_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~cg_exp_slot_device();
 
 	void set_program_space(address_space *program);
 	void set_io_space(address_space *io);
 
 	// callbacks
-	template<class _Object> static devcb_base &set_int_handler(device_t &device, _Object object)
-		{ return downcast<expansion_slot_device &>(device).m_int_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_int_handler(device_t &device, Object &&cb)
+	{ return downcast<cg_exp_slot_device &>(device).m_int_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_nmi_handler(device_t &device, _Object object)
-		{ return downcast<expansion_slot_device &>(device).m_nmi_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
+	{ return downcast<cg_exp_slot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_reset_handler(device_t &device, _Object object)
-		{ return downcast<expansion_slot_device &>(device).m_reset_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_reset_handler(device_t &device, Object &&cb)
+	{ return downcast<cg_exp_slot_device &>(device).m_reset_handler.set_callback(std::forward<Object>(cb)); }
 
 	// called from cart device
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
@@ -98,7 +98,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	device_expansion_interface *m_cart;
+	device_cg_exp_interface *m_cart;
 
 private:
 	devcb_write_line m_int_handler;
@@ -107,21 +107,22 @@ private:
 };
 
 // class representing interface-specific live expansion device
-class device_expansion_interface : public device_slot_card_interface
+class device_cg_exp_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_expansion_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_expansion_interface();
+	virtual ~device_cg_exp_interface();
 
 protected:
-	expansion_slot_device *m_slot;
+	device_cg_exp_interface(const machine_config &mconfig, device_t &device);
+
+	cg_exp_slot_device *m_slot;
 };
 
 // device type definition
-extern const device_type EXPANSION_SLOT;
+extern const device_type CG_EXP_SLOT;
 
 // include here so drivers don't need to
 #include "carts.h"
 
-#endif // __CGENIE_EXPANSION_H__
+#endif // MAME_BUS_CGENIE_EXPANSION_EXPANSION_H

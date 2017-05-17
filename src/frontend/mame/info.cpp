@@ -303,10 +303,10 @@ void info_xml_creator::output_one(device_type_set *devtypes)
 	fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(driver.name));
 
 	// strip away any path information from the source_file and output it
-	const char *start = strrchr(driver.source_file, '/');
+	const char *start = strrchr(driver.type.source(), '/');
 	if (!start)
-		start = strrchr(driver.source_file, '\\');
-	start = start ? (start + 1) : driver.source_file;
+		start = strrchr(driver.type.source(), '\\');
+	start = start ? (start + 1) : driver.type.source();
 	fprintf(m_output, " sourcefile=\"%s\"", util::xml::normalize_string(start));
 
 	// append bios and runnable flags
@@ -329,8 +329,8 @@ void info_xml_creator::output_one(device_type_set *devtypes)
 	fprintf(m_output, ">\n");
 
 	// output game description
-	if (driver.description != nullptr)
-		fprintf(m_output, "\t\t<description>%s</description>\n", util::xml::normalize_string(driver.description));
+	if (driver.type.fullname() != nullptr)
+		fprintf(m_output, "\t\t<description>%s</description>\n", util::xml::normalize_string(driver.type.fullname()));
 
 	// print the year only if is a number or another allowed character (? or +)
 	if (driver.year != nullptr && strspn(driver.year, "0123456789?+") == strlen(driver.year))

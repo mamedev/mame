@@ -7,7 +7,7 @@
 
 
 octopus_keyboard_device::octopus_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
-	: buffered_rs232_device(mconfig, OCTOPUS_KEYBOARD, "Octopus Keyboard", tag, owner, 0, "octopus_kb", __FILE__)
+	: buffered_rs232_device(mconfig, OCTOPUS_KEYBOARD, tag, owner, 0)
 	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF")
 {
 }
@@ -260,6 +260,4 @@ void octopus_keyboard_device::device_timer(emu_timer &timer, device_timer_id id,
 }
 
 
-const device_type OCTOPUS_KEYBOARD = device_creator<octopus_keyboard_device>;
-
-
+DEFINE_DEVICE_TYPE(OCTOPUS_KEYBOARD, octopus_keyboard_device, "octopus_kb", "Octopus Keyboard")

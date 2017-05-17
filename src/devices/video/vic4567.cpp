@@ -59,8 +59,8 @@
 #define VIC6567_Y_BEGIN         -6             /* first 6 lines after retrace not for lightpen! */
 #define VIC6569_X_BEGIN         38
 #define VIC6569_Y_BEGIN         -6
-#define VIC2_X_BEGIN            ((m_type == VIC4567_PAL) ? VIC6569_X_BEGIN : VIC6567_X_BEGIN)
-#define VIC2_Y_BEGIN            ((m_type == VIC4567_PAL) ? VIC6569_Y_BEGIN : VIC6567_Y_BEGIN)
+#define VIC2_X_BEGIN            ((m_type == vic3_type::PAL) ? VIC6569_X_BEGIN : VIC6567_X_BEGIN)
+#define VIC2_Y_BEGIN            ((m_type == vic3_type::PAL) ? VIC6569_Y_BEGIN : VIC6567_Y_BEGIN)
 #define VIC2_X_VALUE            ((LIGHTPEN_X_VALUE + VIC2_X_BEGIN + VIC2_MAME_XPOS) / 2)
 #define VIC2_Y_VALUE            ((LIGHTPEN_Y_VALUE + VIC2_Y_BEGIN + VIC2_MAME_YPOS))
 
@@ -127,12 +127,12 @@
 #define FOREGROUNDCOLOR         (m_reg[0x24] & 0x0f)
 
 
-#define VIC2_LINES      (m_type == VIC4567_PAL ? VIC6569_LINES : VIC6567_LINES)
-#define VIC2_VISIBLELINES   (m_type == VIC4567_PAL ? VIC6569_VISIBLELINES : VIC6567_VISIBLELINES)
-#define VIC2_VISIBLECOLUMNS (m_type == VIC4567_PAL ? VIC6569_VISIBLECOLUMNS : VIC6567_VISIBLECOLUMNS)
+#define VIC2_LINES      (m_type == vic3_type::PAL ? VIC6569_LINES : VIC6567_LINES)
+#define VIC2_VISIBLELINES   (m_type == vic3_type::PAL ? VIC6569_VISIBLELINES : VIC6567_VISIBLELINES)
+#define VIC2_VISIBLECOLUMNS (m_type == vic3_type::PAL ? VIC6569_VISIBLECOLUMNS : VIC6567_VISIBLECOLUMNS)
 #define VIC2_STARTVISIBLELINES ((VIC2_LINES - VIC2_VISIBLELINES)/2)
-#define VIC2_FIRSTRASTERLINE  (m_type == VIC4567_PAL ? VIC6569_FIRSTRASTERLINE : VIC6567_FIRSTRASTERLINE)
-#define VIC2_COLUMNS          (m_type == VIC4567_PAL ? VIC6569_COLUMNS : VIC6567_COLUMNS)
+#define VIC2_FIRSTRASTERLINE  (m_type == vic3_type::PAL ? VIC6569_FIRSTRASTERLINE : VIC6567_FIRSTRASTERLINE)
+#define VIC2_COLUMNS          (m_type == vic3_type::PAL ? VIC6569_COLUMNS : VIC6567_COLUMNS)
 #define VIC2_STARTVISIBLECOLUMNS ((VIC2_COLUMNS - VIC2_VISIBLECOLUMNS)/2)
 
 #define VIC3_BITPLANES_MASK (m_reg[0x32])
@@ -145,22 +145,22 @@
 #define VIC3_BITPLANE_IADDR(x) (x & 1 ? VIC3_BITPLANE_IADDR_HELPER(x) + 0x10000 : VIC3_BITPLANE_IADDR_HELPER(x))
 
 
-const device_type VIC3 = device_creator<vic3_device>;
+DEFINE_DEVICE_TYPE(VIC3, vic3_device, "vic3", "CSG 4567 VIC-III")
 
 vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: device_t(mconfig, VIC3, "4567 VIC III", tag, owner, clock, "vic3", __FILE__),
-				device_video_interface(mconfig, *this),
-				m_type(VIC4567_NTSC),
-				m_cpu(*this, finder_base::DUMMY_TAG),
-				m_dma_read_cb(*this),
-				m_dma_read_color_cb(*this),
-				m_interrupt_cb(*this),
-				m_port_changed_cb(*this),
-				m_lightpen_button_cb(*this),
-				m_lightpen_x_cb(*this),
-				m_lightpen_y_cb(*this),
-				m_c64_mem_r_cb(*this),
-				m_palette(*this, "palette")
+	: device_t(mconfig, VIC3, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_type(vic3_type::NTSC)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_dma_read_cb(*this)
+	, m_dma_read_color_cb(*this)
+	, m_interrupt_cb(*this)
+	, m_port_changed_cb(*this)
+	, m_lightpen_button_cb(*this)
+	, m_lightpen_x_cb(*this)
+	, m_lightpen_y_cb(*this)
+	, m_c64_mem_r_cb(*this)
+	, m_palette(*this, "palette")
 {
 }
 
@@ -1971,7 +1971,7 @@ void vic3_device::raster_interrupt_gen()
 		{
 			m_rows = new_rows;
 			m_columns = new_columns;
-			if (m_type == VIC4567_PAL)
+			if (m_type == vic3_type::PAL)
 				m_screen->set_visible_area(
 									VIC2_STARTVISIBLECOLUMNS + 32,
 									VIC2_STARTVISIBLECOLUMNS + 32 + m_columns + 16 - 1,
@@ -1990,7 +1990,7 @@ void vic3_device::raster_interrupt_gen()
 		}
 		else
 		{
-			if (m_type == VIC4567_PAL)
+			if (m_type == vic3_type::PAL)
 			{
 				if (m_on)
 					vic2_drawlines(m_lastline, m_lines, VIC2_STARTVISIBLECOLUMNS + 32, VIC2_STARTVISIBLECOLUMNS + 32 + m_columns + 16 - 1);
@@ -2023,7 +2023,7 @@ void vic3_device::raster_interrupt_gen()
 	if (m_on)
 		if ((m_rasterline >= VIC2_FIRSTRASTERLINE) && (m_rasterline < (VIC2_FIRSTRASTERLINE + VIC2_VISIBLELINES)))
 		{
-			if (m_type == VIC4567_PAL)
+			if (m_type == vic3_type::PAL)
 			{
 				if (m_on)
 					vic2_drawlines(m_rasterline - 1, m_rasterline, VIC2_STARTVISIBLECOLUMNS + 32, VIC2_STARTVISIBLECOLUMNS + 32 + m_columns + 16 - 1);

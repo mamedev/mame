@@ -17,15 +17,9 @@
 #include "2612intf.h"
 #include "fm.h"
 
-/*------------------------- TM2612 -------------------------------*/
+/*------------------------- YM2612 -------------------------------*/
 /* IRQ Handler */
-static void IRQHandler(void *param,int irq)
-{
-	ym2612_device *ym2612 = (ym2612_device *) param;
-	ym2612->_IRQHandler(irq);
-}
-
-void ym2612_device::_IRQHandler(int irq)
+void ym2612_device::irq_handler(int irq)
 {
 	if (!m_irq_handler.isnull())
 		m_irq_handler(irq);
@@ -46,13 +40,7 @@ void ym2612_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-static void timer_handler(void *param,int c,int count,int clock)
-{
-	ym2612_device *ym2612 = (ym2612_device *) param;
-	ym2612->_timer_handler(c, count, clock);
-}
-
-void ym2612_device::_timer_handler(int c,int count,int clock)
+void ym2612_device::timer_handler(int c,int count,int clock)
 {
 	if( count == 0 )
 	{   /* Reset FM Timer */
@@ -65,18 +53,6 @@ void ym2612_device::_timer_handler(int c,int count,int clock)
 		if (!m_timer[c]->enable(true))
 			m_timer[c]->adjust(period);
 	}
-}
-
-/* update request from fm.c */
-void ym2612_update_request(void *param)
-{
-	ym2612_device *ym2612 = (ym2612_device *) param;
-	ym2612->_ym2612_update_request();
-}
-
-void ym2612_device::_ym2612_update_request()
-{
-	m_stream->update();
 }
 
 //-------------------------------------------------
@@ -114,7 +90,7 @@ void ym2612_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this,0,2,rate);
 
 	/**** initialize YM2612 ****/
-	m_chip = ym2612_init(this,this,clock(),rate,timer_handler,IRQHandler);
+	m_chip = ym2612_init(this,clock(),rate,&ym2612_device::static_timer_handler,&ym2612_device::static_irq_handler);
 	assert_always(m_chip != nullptr, "Error creating YM2612 chip");
 }
 
@@ -164,26 +140,27 @@ WRITE8_MEMBER( ym2612_device::write )
 }
 
 
-const device_type YM2612 = device_creator<ym2612_device>;
+DEFINE_DEVICE_TYPE(YM2612, ym2612_device, "ym2612", "YM2612 OPN2")
 
 ym2612_device::ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, YM2612, "YM2612", tag, owner, clock, "ym2612", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_irq_handler(*this)
+	: ym2612_device(mconfig, YM2612, tag, owner, clock)
 {
 }
 
-ym2612_device::ym2612_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_sound_interface(mconfig, *this),
-		m_irq_handler(*this)
+ym2612_device::ym2612_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_stream(nullptr)
+	, m_timer{ nullptr, nullptr }
+	, m_chip(nullptr)
+	, m_irq_handler(*this)
 {
 }
 
 
-const device_type YM3438 = device_creator<ym3438_device>;
+DEFINE_DEVICE_TYPE(YM3438, ym3438_device, "ym3438", "YM3438 OPN2C")
 
 ym3438_device::ym3438_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ym2612_device(mconfig, YM3438, "YM3438", tag, owner, clock, "ym3438", __FILE__)
+	: ym2612_device(mconfig, YM3438, tag, owner, clock)
 {
 }

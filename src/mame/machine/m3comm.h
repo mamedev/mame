@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:MetalliC
-#pragma once
+#ifndef MAME_MACHINE_M3COMM_H
+#define MAME_MACHINE_M3COMM_H
 
-#ifndef __M3COMM_H__
-#define __M3COMM_H__
+#pragma once
 
 #include "machine/ram.h"
 #include "cpu/m68000/m68000.h"
@@ -77,6 +77,6 @@ private:
 };
 
 // device type definition
-extern const device_type M3COMM;
+DECLARE_DEVICE_TYPE(M3COMM, m3comm_device)
 
-#endif  /* __M3COMM_H__ */
+#endif  // MAME_MACHINE_M3COMM_H

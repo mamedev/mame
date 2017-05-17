@@ -111,7 +111,7 @@ static GFXDECODE_START( tcl )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,  128, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tcl, tcl_state )
+static MACHINE_CONFIG_START( tcl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4)

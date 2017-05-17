@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type APF_CART_SLOT = device_creator<apf_cart_slot_device>;
+DEFINE_DEVICE_TYPE(APF_CART_SLOT, apf_cart_slot_device, "apf_cart_slot", "APF Cartridge Slot")
 
 //**************************************************************************
 //    APF Cartridges Interface
@@ -73,10 +73,10 @@ void device_apf_cart_interface::ram_alloc(uint32_t size)
 //  apf_cart_slot_device - constructor
 //-------------------------------------------------
 apf_cart_slot_device::apf_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, APF_CART_SLOT, "APF Cartridge Slot", tag, owner, clock, "apf_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(APF_STD), m_cart(nullptr)
+	device_t(mconfig, APF_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(APF_STD), m_cart(nullptr)
 {
 }
 

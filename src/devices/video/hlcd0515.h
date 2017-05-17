@@ -6,18 +6,10 @@
 
 */
 
-#ifndef _HLCD0515_H_
-#define _HLCD0515_H_
+#ifndef MAME_VIDEO_HLCD0515_H
+#define MAME_VIDEO_HLCD0515_H
 
-
-// COL/ROW pins (offset for ROW)
-#define MCFG_HLCD0515_WRITE_COLS_CB(_devcb) \
-	devcb = &hlcd0515_device::set_write_cols_callback(*device, DEVCB_##_devcb);
-
-// DATA OUT pin, don't use on HLCD0569
-#define MCFG_HLCD0515_WRITE_DATA_CB(_devcb) \
-	devcb = &hlcd0515_device::set_write_data_callback(*device, DEVCB_##_devcb);
-
+#pragma once
 
 // pinout reference
 
@@ -50,21 +42,32 @@
     Internally, this is divided by 2, and by number of rows to get display refresh frequency.
 */
 
+
+// COL/ROW pins (offset for ROW)
+#define MCFG_HLCD0515_WRITE_COLS_CB(_devcb) \
+	devcb = &hlcd0515_device::set_write_cols_callback(*device, DEVCB_##_devcb);
+
+// DATA OUT pin, don't use on HLCD0569
+#define MCFG_HLCD0515_WRITE_DATA_CB(_devcb) \
+	devcb = &hlcd0515_device::set_write_data_callback(*device, DEVCB_##_devcb);
+
+
 class hlcd0515_device : public device_t
 {
 public:
 	hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	hlcd0515_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u8 colmax, const char *shortname, const char *source);
 
 	// static configuration helpers
-	template<typename Object> static devcb_base &set_write_cols_callback(device_t &device, Object &&object) { return downcast<hlcd0515_device &>(device).m_write_cols.set_callback(std::forward<Object>(object)); }
-	template<typename Object> static devcb_base &set_write_data_callback(device_t &device, Object &&object) { return downcast<hlcd0515_device &>(device).m_write_data.set_callback(std::forward<Object>(object)); }
+	template <typename Object> static devcb_base &set_write_cols_callback(device_t &device, Object &&cb) { return downcast<hlcd0515_device &>(device).m_write_cols.set_callback(std::forward<Object>(cb)); }
+	template <typename Object> static devcb_base &set_write_data_callback(device_t &device, Object &&cb) { return downcast<hlcd0515_device &>(device).m_write_data.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_cs);
 	DECLARE_WRITE_LINE_MEMBER(write_data) { m_data = (state) ? 1 : 0; }
 
 protected:
+	hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 colmax);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -72,7 +75,7 @@ protected:
 	virtual void set_control();
 	void clock_data(int col);
 
-	u8 m_colmax;    // number of column pins
+	const u8 m_colmax;    // number of column pins
 
 	int m_cs;       // input pin state
 	int m_clock;    // "
@@ -104,9 +107,7 @@ protected:
 };
 
 
+DECLARE_DEVICE_TYPE(HLCD0515, hlcd0515_device)
+DECLARE_DEVICE_TYPE(HLCD0569, hlcd0569_device)
 
-extern const device_type HLCD0515;
-extern const device_type HLCD0569;
-
-
-#endif /* _HLCD0515_H_ */
+#endif // MAME_VIDEO_HLCD0515_H

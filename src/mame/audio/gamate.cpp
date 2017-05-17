@@ -7,13 +7,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/gamate.h"
+#include "audio/gamate.h"
 
 
 enum { ClockDelay=32 };
 
 // device type definition
-const device_type GAMATE_SND = device_creator<gamate_sound_device>;
+DEFINE_DEVICE_TYPE(GAMATE_SND, gamate_sound_device, "gamate_sound", "Gamate Audio Custom")
 
 const int gamate_sound_device::DAConverter[]={ 0, 3, 7, 13,  23, 41, 75, 137,  249, 453, 825, 1499,  2726, 4956, 9011, 16383 }; // (*.55) on the real below index 8 bareless measureable
 const uint8_t Mask[]={ 0xff, 0x0f, 0xff, 0x0f, 0xff, 0x0f, 0x1f, 0x3f,  0x1f, 0x1f, 0x1f, 0xff, 0xff, 0xf };
@@ -27,10 +27,11 @@ const int EnvelopeVolumes[]={ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 
 //-------------------------------------------------
 
 gamate_sound_device::gamate_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GAMATE_SND, "Gamate Audio Custom", tag, owner, clock, "gamate_sound", __FILE__)
+	: device_t(mconfig, GAMATE_SND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_mixer_channel(nullptr)
-	{}
+{
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

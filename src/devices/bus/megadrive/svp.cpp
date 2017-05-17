@@ -34,22 +34,20 @@
 //  md_rom_device - constructor
 //-------------------------------------------------
 
-const device_type MD_ROM_SVP = device_creator<md_rom_svp_device>;
+DEFINE_DEVICE_TYPE(MD_ROM_SVP, md_rom_svp_device, "md_rom_svp", "MD Virtua Racing")
 
-md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-							: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-							device_md_cart_interface( mconfig, *this ),
-							m_svp(*this, "svp"),
-							m_test_ipt(*this, "MEMORY_TEST"), m_emu_status(0), m_xst(0), m_xst2(0)
-						{
+md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_md_cart_interface(mconfig, *this)
+	, m_svp(*this, "svp")
+	, m_test_ipt(*this, "MEMORY_TEST")
+	, m_emu_status(0), m_xst(0), m_xst2(0)
+{
 }
 
 md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-							: device_t(mconfig, MD_ROM_SVP, "MD Virtua Racing", tag, owner, clock, "md_rom_svp", __FILE__),
-							device_md_cart_interface( mconfig, *this ),
-							m_svp(*this, "svp"),
-							m_test_ipt(*this, "MEMORY_TEST"), m_emu_status(0), m_xst(0), m_xst2(0)
-						{
+	: md_rom_svp_device(mconfig, MD_ROM_SVP, tag, owner, clock)
+{
 }
 
 

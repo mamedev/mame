@@ -895,6 +895,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/hpi_dsk.h,FORMATS["HPI_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["HPI_DSK"]~=null or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/hpi_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/hpi_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/hp_ipc_dsk.h,FORMATS["HP_IPC_DSK"] = true
 --------------------------------------------------
 

@@ -486,7 +486,7 @@ ST0016_DMA_OFFS_CB(macs_state::dma_offset)
 	return m_cart_bank;
 }
 
-static MACHINE_CONFIG_START( macs, macs_state )
+static MACHINE_CONFIG_START( macs )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(macs_mem)
@@ -767,11 +767,11 @@ DRIVER_INIT_MEMBER(macs_state,kisekaem)
 }
 
 
-GAME( 1995, macsbios, 0,        macs, macs_m, macs_state, macs,     ROT0, "I'Max", "Multi Amenity Cassette System BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1995, mac2bios, 0,        macs, macs_m, macs_state, macs2,     ROT0, "I'Max", "Multi Amenity Cassette System 2 BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1995, macsbios, 0,        macs, macs_m,   macs_state, macs,     ROT0, "I'Max",            "Multi Amenity Cassette System BIOS",   MACHINE_IS_BIOS_ROOT | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1995, mac2bios, 0,        macs, macs_m,   macs_state, macs2,    ROT0, "I'Max",            "Multi Amenity Cassette System 2 BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 1995, kisekaem, macsbios, macs, kisekaem, macs_state, kisekaem,   ROT0, "I'Max", "Kisekae Mahjong",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
-GAME( 1995, kisekaeh, macsbios, macs, macs_h, macs_state,   kisekaeh,   ROT0, "I'Max", "Kisekae Hanafuda",  MACHINE_NOT_WORKING |MACHINE_IMPERFECT_SOUND)
-GAME( 1996, cultname, macsbios, macs, macs_m, macs_state,   macs,       ROT0, "I'Max", "Seimei-Kantei-Meimei-Ki Cult Name",  MACHINE_NOT_WORKING |MACHINE_IMPERFECT_SOUND)
-GAME( 1999, yuka,     macsbios, macs, macs_h, macs_state,   macs2,      ROT0, "Yubis / T.System", "Yu-Ka",  0 )
-GAME( 1999, yujan,    macsbios, macs, macs_m, macs_state,   macs2,      ROT0, "Yubis / T.System", "Yu-Jan",  0 )
+GAME( 1995, kisekaem, macsbios, macs, kisekaem, macs_state, kisekaem, ROT0, "I'Max",            "Kisekae Mahjong",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, kisekaeh, macsbios, macs, macs_h,   macs_state, kisekaeh, ROT0, "I'Max",            "Kisekae Hanafuda",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, cultname, macsbios, macs, macs_m,   macs_state, macs,     ROT0, "I'Max",            "Seimei-Kantei-Meimei-Ki Cult Name",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, yuka,     macsbios, macs, macs_h,   macs_state, macs2,    ROT0, "Yubis / T.System", "Yu-Ka",                                0 )
+GAME( 1999, yujan,    macsbios, macs, macs_m,   macs_state, macs2,    ROT0, "Yubis / T.System", "Yu-Jan",                               0 )

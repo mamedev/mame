@@ -24,15 +24,15 @@
 // - 30-term microinstructions PLA(mpla) at the top half, to the right of the midline, supporting 16 microinstructions
 // - 20-term output PLA(opla) at the top-left
 // - the ALU is between the opla and mpla
-const device_type TMS1000 = device_creator<tms1000_cpu_device>; // 28-pin DIP, 11 R pins
-const device_type TMS1070 = device_creator<tms1070_cpu_device>; // high voltage version
-const device_type TMS1040 = device_creator<tms1040_cpu_device>; // same as TMS1070 with just a different pinout?
-const device_type TMS1200 = device_creator<tms1200_cpu_device>; // 40-pin DIP, 13 R pins
-const device_type TMS1700 = device_creator<tms1700_cpu_device>; // 28-pin DIP, RAM/ROM size halved, 9 R pins
-const device_type TMS1730 = device_creator<tms1730_cpu_device>; // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins(output PLA is still 8-bit, O1,O3,O5 unused)
+DEFINE_DEVICE_TYPE(TMS1000,  tms1000_cpu_device,  "tms1000",  "TMS1000") // 28-pin DIP, 11 R pins
+DEFINE_DEVICE_TYPE(TMS1070,  tms1070_cpu_device,  "tms1070",  "TMS1070") // high voltage version
+DEFINE_DEVICE_TYPE(TMS1040,  tms1040_cpu_device,  "tms1040",  "TMS1040") // same as TMS1070 with just a different pinout?
+DEFINE_DEVICE_TYPE(TMS1200,  tms1200_cpu_device,  "tms1200",  "TMS1200") // 40-pin DIP, 13 R pins
+DEFINE_DEVICE_TYPE(TMS1700,  tms1700_cpu_device,  "tms1700",  "TMS1700") // 28-pin DIP, RAM/ROM size halved, 9 R pins
+DEFINE_DEVICE_TYPE(TMS1730,  tms1730_cpu_device,  "tms1730",  "TMS1730") // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins (output PLA is still 8-bit, O1,O3,O5 unused)
 
-const device_type MC141000 = device_creator<mc141000_cpu_device>; // CMOS, pin-compatible with TMS1000(reverse polarity)
-const device_type MC141200 = device_creator<mc141200_cpu_device>; // CMOS, 40-pin DIP, 16 R pins
+DEFINE_DEVICE_TYPE(MC141000, mc141000_cpu_device, "mc141000", "MC141000") // CMOS, pin-compatible with TMS1000(reverse polarity)
+DEFINE_DEVICE_TYPE(MC141200, mc141200_cpu_device, "mc141200", "MC141200") // CMOS, 40-pin DIP, 16 R pins
 
 
 // internal memory maps
@@ -56,40 +56,49 @@ ADDRESS_MAP_END
 
 // device definitions
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1k_base_device(mconfig, TMS1000, "TMS1000", tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 10 /* prg width */, ADDRESS_MAP_NAME(program_10bit_8), 6 /* data width */, ADDRESS_MAP_NAME(data_64x4), "tms1000", __FILE__)
-{ }
+	: tms1000_cpu_device(mconfig, TMS1000, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 10 /* prg width */, ADDRESS_MAP_NAME(program_10bit_8), 6 /* data width */, ADDRESS_MAP_NAME(data_64x4))
+{
+}
 
-tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-	: tms1k_base_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
-{ }
+tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
+	: tms1k_base_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data)
+{
+}
 
 tms1070_cpu_device::tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1000_cpu_device(mconfig, TMS1070, "TMS1070", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1070", __FILE__)
-{ }
+	: tms1000_cpu_device(mconfig, TMS1070, tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4))
+{
+}
 
 tms1040_cpu_device::tms1040_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1000_cpu_device(mconfig, TMS1040, "TMS1040", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1040", __FILE__)
-{ }
+	: tms1000_cpu_device(mconfig, TMS1040, tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4))
+{
+}
 
 tms1200_cpu_device::tms1200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1000_cpu_device(mconfig, TMS1200, "TMS1200", tag, owner, clock, 8, 13, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1200", __FILE__)
-{ }
+	: tms1000_cpu_device(mconfig, TMS1200, tag, owner, clock, 8, 13, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4))
+{
+}
 
 tms1700_cpu_device::tms1700_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1000_cpu_device(mconfig, TMS1700, "TMS1700", tag, owner, clock, 8, 9, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_9bit_8), 6, ADDRESS_MAP_NAME(data_32x4), "tms1700", __FILE__)
-{ }
+	: tms1000_cpu_device(mconfig, TMS1700, tag, owner, clock, 8, 9, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_9bit_8), 6, ADDRESS_MAP_NAME(data_32x4))
+{
+}
 
 tms1730_cpu_device::tms1730_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1000_cpu_device(mconfig, TMS1730, "TMS1730", tag, owner, clock, 8, 9, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_9bit_8), 6, ADDRESS_MAP_NAME(data_32x4), "tms1730", __FILE__)
-{ }
+	: tms1000_cpu_device(mconfig, TMS1730, tag, owner, clock, 8, 9, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_9bit_8), 6, ADDRESS_MAP_NAME(data_32x4))
+{
+}
 
 mc141000_cpu_device::mc141000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1000_cpu_device(mconfig, MC141000, "MC141000", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "mc141000", __FILE__)
-{ }
+	: tms1000_cpu_device(mconfig, MC141000, tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4))
+{
+}
 
 mc141200_cpu_device::mc141200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1000_cpu_device(mconfig, MC141200, "MC141200", tag, owner, clock, 8, 16, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "mc141200", __FILE__)
-{ }
+	: tms1000_cpu_device(mconfig, MC141200, tag, owner, clock, 8, 16, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4))
+{
+}
 
 
 // machine configs
@@ -97,9 +106,9 @@ static MACHINE_CONFIG_FRAGMENT(tms1000)
 
 	// microinstructions PLA, output PLA
 	MCFG_PLA_ADD("mpla", 8, 16, 30)
-	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
 	MCFG_PLA_ADD("opla", 5, 8, 20)
-	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
 MACHINE_CONFIG_END
 
 machine_config_constructor tms1000_cpu_device::device_mconfig_additions() const

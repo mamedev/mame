@@ -102,7 +102,7 @@ public:
 	required_device<pia6821_device>         m_pia0;
 	required_device<pia6821_device>         m_pia1;
 	required_device<acia6850_device>        m_acia;
-	required_device<mb8877_t>               m_fdc;
+	required_device<mb8877_device>          m_fdc;
 	required_device<ram_device>             m_ram;
 	required_device<ieee488_device>         m_ieee;
 	required_device<floppy_connector>       m_floppy0;

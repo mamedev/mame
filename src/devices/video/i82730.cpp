@@ -27,9 +27,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type I82730 = device_creator<i82730_device>;
+DEFINE_DEVICE_TYPE(I82730, i82730_device, "i82730", "Intel 82730")
 
-const char *i82730_device::m_command_names[] =
+const char *const i82730_device::s_command_names[] =
 {
 	/* 00 */ "NOP",
 	/* 01 */ "START DISPLAY",
@@ -55,7 +55,7 @@ const char *i82730_device::m_command_names[] =
 //-------------------------------------------------
 
 i82730_device::i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, I82730, "I82730", tag, owner, clock, "i82730", __FILE__),
+	device_t(mconfig, I82730, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_sint_handler(*this),
 	m_cpu_tag(nullptr), m_program(nullptr),
@@ -250,8 +250,8 @@ void i82730_device::execute_command()
 	uint8_t command = read_byte(m_cbp + 1);
 	uint16_t tmp;
 
-	if (VERBOSE_COMMANDS && command < ARRAY_LENGTH(m_command_names))
-		logerror("%s('%s'): executing command: %s [cbp = %08x]\n", shortname(), basetag(), m_command_names[command], m_cbp);
+	if (VERBOSE_COMMANDS && command < ARRAY_LENGTH(s_command_names))
+		logerror("%s('%s'): executing command: %s [cbp = %08x]\n", shortname(), basetag(), s_command_names[command], m_cbp);
 
 	tmp = read_word(m_cbp + 2);
 	m_list_switch = BIT(tmp, 6);
@@ -303,7 +303,7 @@ void i82730_device::execute_command()
 
 	// LPEN ENABLE
 	case 0x07:
-		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), m_command_names[command]);
+		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), s_command_names[command]);
 		break;
 
 	// READ STATUS
@@ -314,17 +314,17 @@ void i82730_device::execute_command()
 
 	// LD CUR POS
 	case 0x09:
-		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), m_command_names[command]);
+		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), s_command_names[command]);
 		break;
 
 	// SELF TEST
 	case 0x0a:
-		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), m_command_names[command]);
+		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), s_command_names[command]);
 		break;
 
 	// TEST ROW BUFFER
 	case 0x0b:
-		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), m_command_names[command]);
+		fatalerror("%s('%s'): Unimplemented command %s\n", shortname(), basetag(), s_command_names[command]);
 		break;
 
 	default:

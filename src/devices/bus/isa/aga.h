@@ -19,8 +19,8 @@
     ROM_LOAD("hercules.chr", 0x00000, 0x1000, CRC(7e8c9d76))
 
 */
-#ifndef __ISA_AGA_H__
-#define __ISA_AGA_H__
+#ifndef MAME_BUS_ISA_AGA_H
+#define MAME_BUS_ISA_AGA_H
 
 #include "isa.h"
 #include "cga.h"
@@ -37,9 +37,6 @@ class isa8_aga_device :
 public:
 	// construction/destruction
 	isa8_aga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	isa8_aga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	// device-level overrides
-	virtual void device_start() override;
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -72,6 +69,11 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<mc6845_device> m_mc6845;
 
+protected:
+	isa8_aga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	// device-level overrides
+	virtual void device_start() override;
+
 	required_ioport m_cga_config;
 
 	int     m_update_row_type;
@@ -96,7 +98,7 @@ public:
 };
 
 // device type definition
-extern const device_type ISA8_AGA;
+DECLARE_DEVICE_TYPE(ISA8_AGA, isa8_aga_device)
 
 // ======================> isa8_aga_pc200_device
 
@@ -106,22 +108,24 @@ class isa8_aga_pc200_device :
 public:
 	// construction/destruction
 	isa8_aga_pc200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	// device-level overrides
-	virtual void device_start() override;
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	uint8_t m_port8;
-	uint8_t m_portd;
-	uint8_t m_porte;
 
 	DECLARE_READ8_MEMBER( pc200_videoram_r );
 	DECLARE_WRITE8_MEMBER( pc200_videoram_w );
 	DECLARE_WRITE8_MEMBER( pc200_cga_w );
 	DECLARE_READ8_MEMBER( pc200_cga_r );
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	uint8_t m_port8;
+	uint8_t m_portd;
+	uint8_t m_porte;
 };
 
 // device type definition
-extern const device_type ISA8_AGA_PC200;
+DECLARE_DEVICE_TYPE(ISA8_AGA_PC200, isa8_aga_pc200_device)
 
-#endif
+#endif // MAME_BUS_ISA_AGA_H

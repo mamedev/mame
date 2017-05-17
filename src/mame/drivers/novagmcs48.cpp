@@ -142,7 +142,7 @@ INPUT_CHANGED_MEMBER(novagmcs48_state::octo_cpu_freq)
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( presto, novagmcs48_state )
+static MACHINE_CONFIG_START( presto )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8049, 6000000) // LC circuit, measured
@@ -191,6 +191,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1984, npresto,  0,       0,      presto,    presto,    driver_device, 0, "Novag", "Presto (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, nocto,    npresto, 0,      octo,      octo,      driver_device, 0, "Novag", "Octo (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  CMP MACHINE  INPUT    STATE          INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1984, npresto,  0,       0, presto,  presto,  novagmcs48_state, 0, "Novag", "Presto (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, nocto,    npresto, 0, octo,    octo,    novagmcs48_state, 0, "Novag", "Octo (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller
-#pragma once
+#ifndef MAME_CPU_Z180_Z180_H
+#define MAME_CPU_Z180_Z180_H
 
-#ifndef __Z180_H__
-#define __Z180_H__
+#pragma once
 
 #include "cpu/z80/z80daisy.h"
 
@@ -1773,11 +1773,9 @@ private:
 	void xycb_fd();
 	void xycb_fe();
 	void xycb_ff();
-
 };
 
 
-extern const device_type Z180;
+DECLARE_DEVICE_TYPE(Z180, z180_device)
 
-
-#endif /* __Z180_H__ */
+#endif // MAME_CPU_Z180_Z180_H

@@ -43,8 +43,8 @@ static ADDRESS_MAP_START( aim65_mem, AS_PROGRAM, 8, aim65_state )
 	AM_RANGE( 0x4000, 0x7fff ) AM_ROM /* 4 ROM sockets in 16K PROM/ROM module */
 	AM_RANGE( 0x8000, 0x9fff ) AM_NOP /* User available expansions */
 	AM_RANGE( 0xa000, 0xa00f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE("via6522_1", via6522_device, read, write) // user via
-	AM_RANGE( 0xa400, 0xa47f ) AM_DEVICE("riot", mos6532_t, ram_map)
-	AM_RANGE( 0xa480, 0xa497 ) AM_DEVICE("riot", mos6532_t, io_map)
+	AM_RANGE( 0xa400, 0xa47f ) AM_DEVICE("riot", mos6532_new_device, ram_map)
+	AM_RANGE( 0xa480, 0xa497 ) AM_DEVICE("riot", mos6532_new_device, io_map)
 	AM_RANGE( 0xa498, 0xa7ff ) AM_NOP /* Not available */
 	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE("via6522_0", via6522_device, read, write) // system via
 	AM_RANGE( 0xac00, 0xac03 ) AM_DEVREADWRITE("pia6821", pia6821_device, read, write)
@@ -176,7 +176,7 @@ image_init_result aim65_state::load_cart(device_image_interface &image, generic_
 }
 
 
-static MACHINE_CONFIG_START( aim65, aim65_state )
+static MACHINE_CONFIG_START( aim65 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
 	MCFG_CPU_PROGRAM_MAP(aim65_mem)
@@ -201,7 +201,7 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* other devices */
-	MCFG_DEVICE_ADD("riot", MOS6532n, AIM65_CLOCK)
+	MCFG_DEVICE_ADD("riot", MOS6532_NEW, AIM65_CLOCK)
 	MCFG_MOS6530n_OUT_PA_CB(WRITE8(aim65_state, aim65_riot_a_w))
 	MCFG_MOS6530n_IN_PB_CB(READ8(aim65_state, aim65_riot_b_r))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
@@ -306,5 +306,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT    COMPANY    FULLNAME  FLAGS */
-COMP(1977, aim65,       0,      0,      aim65,   aim65, driver_device,  0,     "Rockwell", "AIM 65", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+//   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT    COMPANY    FULLNAME  FLAGS
+COMP(1977, aim65,       0,      0,      aim65,   aim65, aim65_state,  0,     "Rockwell", "AIM 65", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

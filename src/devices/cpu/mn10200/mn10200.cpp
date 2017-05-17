@@ -36,7 +36,7 @@ enum mn10200_flag
 };
 
 
-const device_type MN1020012A = device_creator<mn1020012a_device>;
+DEFINE_DEVICE_TYPE(MN1020012A, mn1020012a_device, "mn1020012a", "MN1020012A")
 
 // internal memory maps
 static ADDRESS_MAP_START( mn1020012a_internal_map, AS_PROGRAM, 16, mn10200_device )
@@ -44,9 +44,17 @@ static ADDRESS_MAP_START( mn1020012a_internal_map, AS_PROGRAM, 16, mn10200_devic
 ADDRESS_MAP_END
 
 
+mn10200_device::mn10200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, program), m_program(nullptr)
+	, m_read_port0(*this), m_read_port1(*this), m_read_port2(*this), m_read_port3(*this), m_read_port4(*this)
+	, m_write_port0(*this), m_write_port1(*this), m_write_port2(*this), m_write_port3(*this), m_write_port4(*this), m_cycles(0), m_pc(0), m_psw(0), m_mdr(0), m_nmicr(0), m_iagr(0),
+	m_extmdl(0), m_extmdh(0), m_possible_irq(false), m_pplul(0), m_ppluh(0), m_p3md(0), m_p4(0)
+{ }
+
 // device definitions
 mn1020012a_device::mn1020012a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mn10200_device(mconfig, MN1020012A, "MN1020012A", tag, owner, clock, ADDRESS_MAP_NAME(mn1020012a_internal_map), "mn1020012a", __FILE__)
+	: mn10200_device(mconfig, MN1020012A, tag, owner, clock, ADDRESS_MAP_NAME(mn1020012a_internal_map))
 { }
 
 

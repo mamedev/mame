@@ -11,8 +11,10 @@ TODO:
     Add pci configuration write to PIF byte
 ***************************************************************************/
 
-#ifndef PCI_IDE_H
-#define PCI_IDE_H
+#ifndef MAME_MACHINE_PCI_IDE_H
+#define MAME_MACHINE_PCI_IDE_H
+
+#pragma once
 
 #include "pci.h"
 #include "idectrl.h"
@@ -43,8 +45,9 @@ public:
 	DECLARE_READ32_MEMBER(ide2_read_cs1);
 	DECLARE_WRITE32_MEMBER(ide2_write_cs1);
 	void set_irq_info(const char *tag, const int irq_num);
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ide_pci_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ide_pci_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	void set_legacy_top(int val) { m_legacy_top = val & 0xfff; };
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -70,9 +73,10 @@ private:
 	DECLARE_WRITE8_MEMBER(prog_if_w);
 	DECLARE_READ32_MEMBER(pcictrl_r);
 	DECLARE_WRITE32_MEMBER(pcictrl_w);
+	DECLARE_READ32_MEMBER(address_base_r);
 	DECLARE_WRITE32_MEMBER(address_base_w);
 };
 
-extern const device_type IDE_PCI;
+DECLARE_DEVICE_TYPE(IDE_PCI, ide_pci_device)
 
-#endif
+#endif // MAME_MACHINE_PCI_IDE_H

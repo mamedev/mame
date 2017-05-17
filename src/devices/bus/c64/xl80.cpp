@@ -57,7 +57,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_XL80 = device_creator<c64_xl80_device>;
+DEFINE_DEVICE_TYPE(C64_XL80, c64_xl80_device, "c64_xl80", "C64 XL 80 cartridge")
 
 
 //-------------------------------------------------
@@ -161,7 +161,7 @@ machine_config_constructor c64_xl80_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_XL80, "XL 80", tag, owner, clock, "c64_xl80", __FILE__),
+	device_t(mconfig, C64_XL80, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_crtc(*this, HD46505SP_TAG),
 	m_palette(*this, "palette"),

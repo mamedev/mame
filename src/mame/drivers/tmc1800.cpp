@@ -704,7 +704,7 @@ QUICKLOAD_LOAD_MEMBER( tmc1800_base_state, tmc1800 )
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
+static MACHINE_CONFIG_START( tmc1800 )
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(tmc1800_map)
@@ -736,7 +736,7 @@ static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
 	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( osc1000b, osc1000b_state )
+static MACHINE_CONFIG_START( osc1000b )
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(osc1000b_map)
@@ -767,7 +767,7 @@ static MACHINE_CONFIG_START( osc1000b, osc1000b_state )
 	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tmc2000, tmc2000_state )
+static MACHINE_CONFIG_START( tmc2000 )
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(tmc2000_map)
@@ -793,7 +793,7 @@ static MACHINE_CONFIG_START( tmc2000, tmc2000_state )
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nano, nano_state )
+static MACHINE_CONFIG_START( nano )
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(nano_map)
@@ -871,8 +871,8 @@ DRIVER_INIT_MEMBER(tmc1800_state,tmc1800)
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY         FULLNAME        FLAGS */
-COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800, tmc1800_state,    tmc1800, "Telercas Oy",  "Telmac 1800",  MACHINE_NOT_WORKING )
-COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800, driver_device,    0,       "OSCOM Oy",     "OSCOM 1000B",  MACHINE_NOT_WORKING )
-COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000, driver_device,    0,       "Telercas Oy",  "Telmac 2000",  MACHINE_SUPPORTS_SAVE )
-COMP( 1980, nano,       tmc2000,0,      nano,       nano,    driver_device,    0,       "OSCOM Oy",     "OSCOM Nano",   MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    STATE           INIT     COMPANY        FULLNAME       FLAGS
+COMP( 1977, tmc1800,    0,       0,      tmc1800,    tmc1800, tmc1800_state,  tmc1800, "Telercas Oy", "Telmac 1800", MACHINE_NOT_WORKING )
+COMP( 1977, osc1000b,   tmc1800, 0,      osc1000b,   tmc1800, osc1000b_state, 0,       "OSCOM Oy",    "OSCOM 1000B", MACHINE_NOT_WORKING )
+COMP( 1980, tmc2000,    0,       0,      tmc2000,    tmc2000, tmc2000_state,  0,       "Telercas Oy", "Telmac 2000", MACHINE_SUPPORTS_SAVE )
+COMP( 1980, nano,       tmc2000, 0,      nano,       nano,    nano_state,     0,       "OSCOM Oy",    "OSCOM Nano",  MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

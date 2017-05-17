@@ -9,6 +9,7 @@
 #ifndef MAME_CPU_SM510_SM510_H
 #define MAME_CPU_SM510_SM510_H
 
+#pragma once
 
 // I/O ports setup
 
@@ -100,8 +101,8 @@ class sm510_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	sm510_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	sm510_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
+		: cpu_device(mconfig, type, tag, owner, clock)
 		, m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program)
 		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
 		, m_prgwidth(prgwidth)
@@ -117,16 +118,16 @@ public:
 	{ }
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_k_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_read_k.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_ba_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_read_ba.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_b_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_read_b.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_s_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_write_s.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_r_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_write_r.set_callback(object); }
+	template <class Object> static devcb_base &set_read_k_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_read_k.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_ba_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_read_ba.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_b_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_read_b.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_s_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_s.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_r_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_r.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_write_sega_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_write_sega.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_segb_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_write_segb.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_segc_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_write_segc.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_segbs_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_write_segbs.set_callback(object); }
+	template <class Object> static devcb_base &set_write_sega_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_sega.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_segb_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_segb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_segc_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_segc.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_segbs_callback(device_t &device, Object &&cb) { return downcast<sm510_base_device &>(device).m_write_segbs.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides
@@ -323,9 +324,10 @@ class sm511_device : public sm510_base_device
 {
 public:
 	sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	sm511_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
+	sm511_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
 	virtual void device_post_load() override { notify_clock_changed(); }
 	virtual void device_reset() override;
 
@@ -345,9 +347,8 @@ public:
 
 
 
-extern const device_type SM510;
-extern const device_type SM511;
-extern const device_type SM512;
+DECLARE_DEVICE_TYPE(SM510, sm510_device)
+DECLARE_DEVICE_TYPE(SM511, sm511_device)
+DECLARE_DEVICE_TYPE(SM512, sm512_device)
 
-
-#endif /* MAME_CPU_SM510_SM510_H */
+#endif // MAME_CPU_SM510_SM510_H

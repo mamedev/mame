@@ -68,8 +68,8 @@
 //**************************************************************************
 
 // devices
-const device_type PIONEER_PR8210 = device_creator<pioneer_pr8210_device>;
-const device_type SIMUTREK_SPECIAL = device_creator<simutrek_special_device>;
+DEFINE_DEVICE_TYPE(PIONEER_PR8210,   pioneer_pr8210_device,   "pr8210",   "Pioneer PR-8210")
+DEFINE_DEVICE_TYPE(SIMUTREK_SPECIAL, simutrek_special_device, "simutrek", "Simutrek Modified PR-8210")
 
 
 // bitmaps for the characters
@@ -180,23 +180,12 @@ ROM_END
 //-------------------------------------------------
 
 pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: laserdisc_device(mconfig, PIONEER_PR8210, "Pioneer PR-8210", tag, owner, clock, "pr8210", __FILE__),
-		m_control(0),
-		m_lastcommand(0),
-		m_accumulator(0),
-		m_lastcommandtime(attotime::zero),
-		m_lastbittime(attotime::zero),
-		m_firstbittime(attotime::zero),
-		m_i8049_cpu(*this, "pr8210"),
-		m_slowtrg(attotime::zero),
-		m_vsync(false),
-		m_i8049_port1(0),
-		m_i8049_port2(0)
+	: pioneer_pr8210_device(mconfig, PIONEER_PR8210, tag, owner, clock)
 {
 }
 
-pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: laserdisc_device(mconfig, type, name, tag, owner, clock, shortname, source),
+pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: laserdisc_device(mconfig, type, tag, owner, clock),
 		m_control(0),
 		m_lastcommand(0),
 		m_accumulator(0),
@@ -891,7 +880,7 @@ ROM_END
 //-------------------------------------------------
 
 simutrek_special_device::simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pioneer_pr8210_device(mconfig, SIMUTREK_SPECIAL, "Simutrek Modified PR-8210", tag, owner, clock, "simutrek", __FILE__),
+	: pioneer_pr8210_device(mconfig, SIMUTREK_SPECIAL, tag, owner, clock),
 		m_i8748_cpu(*this, "simutrek"),
 		m_audio_squelch(0),
 		m_data(0),

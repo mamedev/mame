@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_TURBO232_H
+#define MAME_BUS_C64_TURBO232_H
 
-#ifndef __TURBO232__
-#define __TURBO232__
+#pragma once
 
 
 #include "exp.h"
@@ -83,7 +83,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_TURBO232;
+DECLARE_DEVICE_TYPE(C64_TURBO232, c64_turbo232_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_TURBO232_H

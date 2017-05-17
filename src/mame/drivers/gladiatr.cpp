@@ -676,7 +676,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( ppking, ppking_state )
+static MACHINE_CONFIG_START( ppking )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
@@ -725,11 +725,11 @@ static MACHINE_CONFIG_START( ppking, ppking_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* vclk input mode    */
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
+static MACHINE_CONFIG_START( gladiatr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
@@ -809,7 +809,7 @@ static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* vclk input mode    */
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

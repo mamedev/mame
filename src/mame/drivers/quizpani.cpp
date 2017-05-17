@@ -193,7 +193,7 @@ static GFXDECODE_START( quizpani )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( quizpani, quizpani_state )
+static MACHINE_CONFIG_START( quizpani )
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(quizpani_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", quizpani_state,  irq4_line_hold)
@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( quizpani, quizpani_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 16000000/4, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 16000000/4, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
@@ -248,4 +248,4 @@ ROM_START( quizpani )
 	ROM_LOAD( "qz8.121", 0x200, 0x100, CRC(b4c19741) SHA1(a6d3686bad6ef2336463b89bc2d249003d9b4bcc) ) /* unknown */
 ROM_END
 
-GAME( 1993, quizpani, 0, quizpani, quizpani, driver_device, 0, ROT0, "NMK", "Quiz Panicuru Fantasy", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, quizpani, 0, quizpani, quizpani, quizpani_state, 0, ROT0, "NMK", "Quiz Panicuru Fantasy", MACHINE_SUPPORTS_SAVE )

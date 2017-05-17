@@ -572,7 +572,7 @@ static const struct CassetteOptions pmd85_cassette_options =
 };
 
 /* machine definition */
-static MACHINE_CONFIG_START( pmd85, pmd85_state )
+static MACHINE_CONFIG_START( pmd85 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)     /* 2.048MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(pmd85_mem)
@@ -807,13 +807,13 @@ ROM_START(c2717pmd)
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT  INIT      COMPANY  FULLNAME */
-COMP( 1985, pmd851,  0,      0,     pmd851,  pmd85, pmd85_state, pmd851,   "Tesla", "PMD-85.1" , 0)
-COMP( 1985, pmd852,  pmd851, 0,     pmd851,  pmd85, pmd85_state, pmd851,   "Tesla", "PMD-85.2" , 0)
-COMP( 1985, pmd852a, pmd851, 0,     pmd852a, pmd85, pmd85_state, pmd852a,  "Tesla", "PMD-85.2A" , 0)
-COMP( 1985, pmd852b, pmd851, 0,     pmd852a, pmd85, pmd85_state, pmd852a,  "Tesla", "PMD-85.2B" , 0)
-COMP( 1988, pmd853,  pmd851, 0,     pmd853,  pmd85, pmd85_state, pmd853,   "Tesla", "PMD-85.3" , 0)
-COMP( 1986, alfa,    pmd851, 0,     alfa,    alfa, pmd85_state,  alfa,     "Didaktik Skalica", "Didaktik Alfa" , 0)
-COMP( 1985, mato,    pmd851, 0,     mato,    mato, pmd85_state,  mato,     "Statny", "Mato" , 0)
-COMP( 1989, c2717,   pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno", "Consul 2717" , 0)
-COMP( 1989, c2717pmd,pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno", "Consul 2717 (with PMD-32)" , MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT  STATE        INIT      COMPANY             FULLNAME                     FLAGS
+COMP( 1985, pmd851,  0,      0,     pmd851,  pmd85, pmd85_state, pmd851,   "Tesla",            "PMD-85.1",                  0 )
+COMP( 1985, pmd852,  pmd851, 0,     pmd851,  pmd85, pmd85_state, pmd851,   "Tesla",            "PMD-85.2",                  0 )
+COMP( 1985, pmd852a, pmd851, 0,     pmd852a, pmd85, pmd85_state, pmd852a,  "Tesla",            "PMD-85.2A",                 0 )
+COMP( 1985, pmd852b, pmd851, 0,     pmd852a, pmd85, pmd85_state, pmd852a,  "Tesla",            "PMD-85.2B",                 0 )
+COMP( 1988, pmd853,  pmd851, 0,     pmd853,  pmd85, pmd85_state, pmd853,   "Tesla",            "PMD-85.3",                  0 )
+COMP( 1986, alfa,    pmd851, 0,     alfa,    alfa,  pmd85_state, alfa,     "Didaktik Skalica", "Didaktik Alfa",             0 )
+COMP( 1985, mato,    pmd851, 0,     mato,    mato,  pmd85_state, mato,     "Statny",           "Mato",                      0 )
+COMP( 1989, c2717,   pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno",   "Consul 2717",               0 )
+COMP( 1989, c2717pmd,pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno",   "Consul 2717 (with PMD-32)", MACHINE_NOT_WORKING )

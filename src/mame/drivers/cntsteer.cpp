@@ -904,7 +904,7 @@ MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 	MACHINE_RESET_CALL_MEMBER(zerotrgt);
 }
 
-static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
+static MACHINE_CONFIG_START( cntsteer )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)      /* ? */
@@ -958,7 +958,7 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
+static MACHINE_CONFIG_START( zerotrgt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)      /* ? */
@@ -1221,7 +1221,7 @@ DRIVER_INIT_MEMBER(cntsteer_state,zerotrgt)
 
 /***************************************************************************/
 
-GAME( 1985, zerotrgt,  0,        zerotrgt,  zerotrgt, cntsteer_state,  zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CW)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+GAME( 1985, zerotrgt,  0,        zerotrgt,  zerotrgt,  cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CW)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 GAME( 1985, zerotrgta, zerotrgt, zerotrgt,  zerotrgta, cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CT)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gekitsui,  zerotrgt, zerotrgt,  zerotrgta, cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cntsteer,  0,        cntsteer,  cntsteer, cntsteer_state,  zerotrgt, ROT270, "Data East Corporation", "Counter Steer (Japan)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_WRONG_COLORS|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gekitsui,  zerotrgt, zerotrgt,  zerotrgta, cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)",     MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cntsteer,  0,        cntsteer,  cntsteer,  cntsteer_state, zerotrgt, ROT270, "Data East Corporation", "Counter Steer (Japan)",   MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_WRONG_COLORS|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )

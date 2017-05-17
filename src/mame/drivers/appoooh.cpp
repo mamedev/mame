@@ -416,7 +416,7 @@ INTERRUPT_GEN_MEMBER(appoooh_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( appoooh_common, appoooh_state )
+static MACHINE_CONFIG_START( appoooh_common )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* ??? the main xtal is 18.432 MHz */
@@ -439,7 +439,7 @@ static MACHINE_CONFIG_START( appoooh_common, appoooh_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(appoooh_state, adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)  /* 6KHz               */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -611,6 +611,6 @@ DRIVER_INIT_MEMBER(appoooh_state,robowresb)
  *
  *************************************/
 
-GAME( 1984, appoooh,   0,        appoooh,  appoooh, driver_device,  0,        ROT0, "Sanritsu / Sega", "Appoooh", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, robowres,  0,        robowrese,robowres, driver_device, 0,        ROT0, "Sanritsu / Sega", "Robo Wres 2001", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, robowresb, robowres, robowres, robowres, appoooh_state, robowresb,ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, appoooh,   0,        appoooh,  appoooh,  appoooh_state, 0,         ROT0, "Sanritsu / Sega", "Appoooh",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowres,  0,        robowrese,robowres, appoooh_state, 0,         ROT0, "Sanritsu / Sega", "Robo Wres 2001",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowresb, robowres, robowres, robowres, appoooh_state, robowresb, ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", MACHINE_SUPPORTS_SAVE )

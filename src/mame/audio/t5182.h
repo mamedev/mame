@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
+#ifndef MAME_AUDIO_T5182_H
+#define MAME_AUDIO_T5182_H
+
+#pragma once
+
 #include "sound/ym2151.h"
 #include "cpu/z80/z80.h"
 
@@ -8,7 +13,6 @@ class t5182_device : public device_t
 {
 public:
 	t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~t5182_device() {}
 
 	enum
 	{
@@ -57,4 +61,6 @@ private:
 	TIMER_CALLBACK_MEMBER( setirq_callback );
 };
 
-extern const device_type T5182;
+DECLARE_DEVICE_TYPE(T5182, t5182_device)
+
+#endif // MAME_AUDIO_T5182_H

@@ -75,15 +75,15 @@ static const pen_t default_colortable[] =
 //**************************************************************************
 
 // devices
-const device_type PPU_2C02 = device_creator<ppu2c02_device>;
-const device_type PPU_2C03B = device_creator<ppu2c03b_device>;
-const device_type PPU_2C04 = device_creator<ppu2c04_device>;
-const device_type PPU_2C07 = device_creator<ppu2c07_device>;
-const device_type PPU_PALC = device_creator<ppupalc_device>;
-const device_type PPU_2C05_01 = device_creator<ppu2c05_01_device>;
-const device_type PPU_2C05_02 = device_creator<ppu2c05_02_device>;
-const device_type PPU_2C05_03 = device_creator<ppu2c05_03_device>;
-const device_type PPU_2C05_04 = device_creator<ppu2c05_04_device>;
+DEFINE_DEVICE_TYPE(PPU_2C02,    ppu2c02_device,    "ppu2c02",    "2C02 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C03B,   ppu2c03b_device,   "ppu2c03b",   "2C03B PPC")
+DEFINE_DEVICE_TYPE(PPU_2C04,    ppu2c04_device,    "ppu2c04",    "2C04 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C07,    ppu2c07_device,    "ppu2c07",    "2C07 PPU")
+DEFINE_DEVICE_TYPE(PPU_PALC,    ppupalc_device,    "ppupalc",    "Generic PAL Clone PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_01, ppu2c05_01_device, "ppu2c05_01", "2C05_01 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_02, ppu2c05_02_device, "ppu2c05_02", "2C05_02 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_03, ppu2c05_03_device, "ppu2c05_03", "2C05_03 PPU")
+DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device, "ppu2c05_04", "2C05_04 PPU")
 
 
 // default address map
@@ -105,10 +105,10 @@ const address_space_config *ppu2c0x_device::memory_space_config(address_spacenum
 
 
 // static
-void ppu2c0x_device::set_nmi_delegate(device_t &device,ppu2c0x_nmi_delegate cb)
+void ppu2c0x_device::set_nmi_delegate(device_t &device, nmi_delegate &&cb)
 {
 	ppu2c0x_device &dev = downcast<ppu2c0x_device &>(device);
-	dev.m_nmi_callback_proc = cb;
+	dev.m_nmi_callback_proc = std::move(cb);
 }
 //-------------------------------------------------
 //  ppu2c0x_device - constructor
@@ -117,14 +117,14 @@ void ppu2c0x_device::set_nmi_delegate(device_t &device,ppu2c0x_nmi_delegate cb)
 void ppu2c0x_device::device_config_complete()
 {
 	/* reset the callbacks */
-	m_latch = ppu2c0x_latch_delegate();
-	m_scanline_callback_proc = ppu2c0x_scanline_delegate();
-	m_hblank_callback_proc = ppu2c0x_hblank_delegate();
-	m_vidaccess_callback_proc = ppu2c0x_vidaccess_delegate();
+	m_latch = latch_delegate();
+	m_scanline_callback_proc = scanline_delegate();
+	m_hblank_callback_proc = hblank_delegate();
+	m_vidaccess_callback_proc = vidaccess_delegate();
 }
 
-ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(ppu2c0x))
@@ -152,62 +152,62 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 
 	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
 
-	m_scanlines_per_frame = PPU_NTSC_SCANLINES_PER_FRAME;
-	m_vblank_first_scanline = PPU_VBLANK_FIRST_SCANLINE;
+	m_scanlines_per_frame = NTSC_SCANLINES_PER_FRAME;
+	m_vblank_first_scanline = VBLANK_FIRST_SCANLINE;
 
 	/* usually, no security value... */
 	m_security_value = 0;
 
-	m_nmi_callback_proc = ppu2c0x_nmi_delegate();
+	m_nmi_callback_proc = nmi_delegate();
 }
 
 
 // NTSC NES
-ppu2c02_device::ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C02, "2C02 PPU", tag, owner, clock, "ppu2c02", __FILE__)
+ppu2c02_device::ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C02, tag, owner, clock)
 {
 }
 
 // Playchoice 10
-ppu2c03b_device::ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C03B, "2C03B PPU", tag, owner, clock, "ppu2c03b", __FILE__)
+ppu2c03b_device::ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C03B, tag, owner, clock)
 {
 }
 
 // Vs. Unisystem
-ppu2c04_device::ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C04, "2C04 PPU", tag, owner, clock, "ppu2c04", __FILE__)
+ppu2c04_device::ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C04, tag, owner, clock)
 {
 }
 
 // PAL NES
-ppu2c07_device::ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C07, "2C07 PPU", tag, owner, clock, "ppu2c07", __FILE__)
+ppu2c07_device::ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C07, tag, owner, clock)
 {
-	m_scanlines_per_frame = PPU_PAL_SCANLINES_PER_FRAME;
+	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
 }
 
 // PAL clones
-ppupalc_device::ppupalc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_PALC, "Generic PAL Clone PPU", tag, owner, clock, "ppupalc", __FILE__)
+ppupalc_device::ppupalc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_PALC, tag, owner, clock)
 {
-	m_scanlines_per_frame = PPU_PAL_SCANLINES_PER_FRAME;
-	m_vblank_first_scanline = PPU_VBLANK_FIRST_SCANLINE_PALC;
+	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
+	m_vblank_first_scanline = VBLANK_FIRST_SCANLINE_PALC;
 }
 
 // The PPU_2C05 variants have different protection value, set at device start, but otherwise are all the same...
 // Vs. Unisystem (Ninja Jajamaru Kun)
-ppu2c05_01_device::ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_01, "2C05_01 PPU", tag, owner, clock, "ppu2c05_01", __FILE__)
+ppu2c05_01_device::ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_01, tag, owner, clock)
 {
 	m_security_value = 0x1b;    // game (jajamaru) doesn't seem to ever actually check it
 }
 // Vs. Unisystem (Mighty Bomb Jack)
-ppu2c05_02_device::ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_02, "2C05_02 PPU", tag, owner, clock, "ppu2c05_02", __FILE__)
+ppu2c05_02_device::ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_02, tag, owner, clock)
 {
 	m_security_value = 0x3d;
 }
 // Vs. Unisystem (Gumshoe)
-ppu2c05_03_device::ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_03, "2C05_03 PPU", tag, owner, clock, "ppu2c05_03", __FILE__)
+ppu2c05_03_device::ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_03, tag, owner, clock)
 {
 	m_security_value = 0x1c;
 }
 // Vs. Unisystem (Top Gun)
-ppu2c05_04_device::ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_04, "2C05_04 PPU", tag, owner, clock, "ppu2c05_04", __FILE__)
+ppu2c05_04_device::ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_04, tag, owner, clock)
 {
 	m_security_value = 0x1b;
 }
@@ -948,7 +948,7 @@ void ppu2c0x_device::render_scanline( void )
 
 void ppu2c0x_device::update_scanline( void )
 {
-	if (m_scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
+	if (m_scanline <= BOTTOM_VISIBLE_SCANLINE)
 	{
 		/* Render this scanline if appropriate */
 		if (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES))
@@ -1149,7 +1149,7 @@ WRITE8_MEMBER( ppu2c0x_device::write )
 	}
 
 #ifdef MAME_DEBUG
-	if (m_scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
+	if (m_scanline <= BOTTOM_VISIBLE_SCANLINE)
 	{
 		logerror("PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, m_scanline, m_screen->vpos(), m_screen->hpos());
 	}
@@ -1200,7 +1200,7 @@ WRITE8_MEMBER( ppu2c0x_device::write )
 		case PPU_SPRITE_DATA: /* 4 */
 			// If the PPU is currently rendering the screen, 0xff is written instead of the desired data.
 			if (m_use_sprite_write_limitation)
-				if (m_scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
+				if (m_scanline <= BOTTOM_VISIBLE_SCANLINE)
 					data = 0xff;
 			m_spriteram[m_regs[PPU_SPRITE_ADDRESS]] = data;
 			m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;

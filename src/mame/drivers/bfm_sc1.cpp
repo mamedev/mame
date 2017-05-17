@@ -213,7 +213,7 @@ public:
 	required_device<stepper_device> m_reel4;
 	required_device<stepper_device> m_reel5;
 	optional_device<upd7759_device> m_upd7759;
-	optional_device<bfm_bd1_t> m_vfd0;
+	optional_device<bfm_bd1_device> m_vfd0;
 	required_device<meters_device> m_meters;
 };
 
@@ -1077,7 +1077,7 @@ INPUT_PORTS_END
 // machine driver for scorpion1 board ///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
+static MACHINE_CONFIG_START( scorpion1 )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)          // 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(sc1_base)                      // setup read and write memorymap
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc1_state, timer_irq,  1000)               // generate 1000 IRQ's per second

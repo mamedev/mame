@@ -13,49 +13,43 @@
  *****************************************************************************/
 
 #include "emu.h"
+#include "z8000.h"
+#include "z8000cpu.h"
+
 #include "debugger.h"
 #include "debug/debugcon.h"
-#include "z8000.h"
 
-#define VERBOSE 0
-
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 extern int z8k_segm;
 extern int z8k_segm_mode;
 
-#include "z8000cpu.h"
-
-const device_type Z8001 = device_creator<z8001_device>;
-const device_type Z8002 = device_creator<z8002_device>;
+DEFINE_DEVICE_TYPE(Z8001, z8001_device, "z8001", "Zilog Z8001")
+DEFINE_DEVICE_TYPE(Z8002, z8002_device, "z8002", "Zilog Z8002")
 
 
 z8002_device::z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, Z8002, "Z8002", tag, owner, clock, "z8002", __FILE__)
-	, z80_daisy_chain_interface(mconfig, *this)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 16, 0)
-	, m_io_config("io", ENDIANNESS_BIG, 8, 16, 0)
-	, m_mo_out(*this), m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_program(nullptr), m_data(nullptr), m_direct(nullptr), m_io(nullptr), m_icount(0)
-		, m_vector_mult(1)
+	: z8002_device(mconfig, Z8002, tag, owner, clock, 16, 8, 1)
 {
 }
 
 
-z8002_device::z8002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+z8002_device::z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int iobits, int vecmult)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, z80_daisy_chain_interface(mconfig, *this)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 20, 0)
-	, m_io_config("io", ENDIANNESS_BIG, 16, 16, 0)
-	, m_mo_out(*this), m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_program(nullptr), m_data(nullptr), m_direct(nullptr), m_io(nullptr), m_icount(0)
-	, m_vector_mult(2)
+	, m_program_config("program", ENDIANNESS_BIG, 16, addrbits, 0)
+	, m_io_config("io", ENDIANNESS_BIG, iobits, 16, 0)
+	, m_mo_out(*this)
+	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_program(nullptr), m_data(nullptr), m_direct(nullptr), m_io(nullptr), m_icount(0)
+	, m_vector_mult(vecmult)
 {
 }
 
 
 z8001_device::z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8002_device(mconfig, Z8001, "Zilog Z8001", tag, owner, clock, "z8001", __FILE__)
+	: z8002_device(mconfig, Z8001, tag, owner, clock, 20, 16, 2)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 20, 0)
 {
 }
@@ -69,7 +63,7 @@ offs_t z8002_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u
 
 
 /* opcode execution table */
-Z8000_exec *z8000_exec = nullptr;
+std::unique_ptr<z8002_device::Z8000_exec const []> z8002_device::z8000_exec;
 
 /* zero, sign and parity flags for logical byte operations */
 static uint8_t z8000_zsp[256];
@@ -385,7 +379,7 @@ void z8002_device::set_irq(int type)
 			m_irq_req = type;
 			break;
 		case Z8000_SYSCALL >> 8:
-			LOG(("Z8K '%s' SYSCALL $%02x\n", tag(), type & 0xff));
+			LOG("Z8K SYSCALL $%02x\n", type & 0xff);
 			m_irq_req = type;
 			break;
 		default:
@@ -474,7 +468,7 @@ void z8002_device::Interrupt()
 		m_irq_req &= ~Z8000_EPU;
 		CHANGE_FCW(GET_FCW(EPU));
 		m_pc = GET_PC(EPU);
-		LOG(("Z8K '%s' ext instr trap $%04x\n", tag(), m_pc));
+		LOG("Z8K ext instr trap $%04x\n", m_pc);
 	}
 	else
 	if (m_irq_req & Z8000_TRAP)
@@ -486,7 +480,7 @@ void z8002_device::Interrupt()
 		m_irq_req &= ~Z8000_TRAP;
 		CHANGE_FCW(GET_FCW(TRAP));
 		m_pc = GET_PC(TRAP);
-		LOG(("Z8K '%s' priv instr trap $%04x\n", tag(), m_pc));
+		LOG("Z8K priv instr trap $%04x\n", m_pc);
 	}
 	else
 	if (m_irq_req & Z8000_SYSCALL)
@@ -498,7 +492,7 @@ void z8002_device::Interrupt()
 		m_irq_req &= ~Z8000_SYSCALL;
 		CHANGE_FCW(GET_FCW(SYSCALL));
 		m_pc = GET_PC(SYSCALL);
-		LOG(("Z8K '%s' syscall $%04x\n", tag(), m_pc));
+		LOG("Z8K syscall $%04x\n", m_pc);
 	}
 	else
 	if (m_irq_req & Z8000_SEGTRAP)
@@ -510,7 +504,7 @@ void z8002_device::Interrupt()
 		m_irq_req &= ~Z8000_SEGTRAP;
 		CHANGE_FCW(GET_FCW(SEGTRAP));
 		m_pc = GET_PC(SEGTRAP);
-		LOG(("Z8K '%s' segtrap $%04x\n", tag(), m_pc));
+		LOG("Z8K segtrap $%04x\n", m_pc);
 	}
 	else
 	if (m_irq_req & Z8000_NMI)
@@ -523,7 +517,7 @@ void z8002_device::Interrupt()
 		m_irq_req &= ~Z8000_NMI;
 		CHANGE_FCW(GET_FCW(NMI));
 		m_pc = GET_PC(NMI);
-		LOG(("Z8K '%s' NMI $%04x\n", tag(), m_pc));
+		LOG("Z8K NMI $%04x\n", m_pc);
 	}
 	else
 	if ((m_irq_req & Z8000_NVI) && (m_fcw & F_NVIE))
@@ -535,7 +529,7 @@ void z8002_device::Interrupt()
 		m_pc = GET_PC(NVI);
 		m_irq_req &= ~Z8000_NVI;
 		CHANGE_FCW(GET_FCW(NVI));
-		LOG(("Z8K '%s' NVI $%04x\n", tag(), m_pc));
+		LOG("Z8K NVI $%04x\n", m_pc);
 	}
 	else
 	if ((m_irq_req & Z8000_VI) && (m_fcw & F_VIE))
@@ -547,7 +541,7 @@ void z8002_device::Interrupt()
 		m_pc = read_irq_vector();
 		m_irq_req &= ~Z8000_VI;
 		CHANGE_FCW(GET_FCW(VI));
-		LOG(("Z8K '%s' VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", tag(), m_irq_vec, VEC00 + ( m_vector_mult * 2 ) * (m_irq_req & 0xff), m_fcw, m_pc));
+		LOG("Z8K VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", m_irq_vec, VEC00 + ( m_vector_mult * 2 ) * (m_irq_req & 0xff), m_fcw, m_pc);
 	}
 }
 
@@ -699,9 +693,7 @@ void z8001_device::device_start()
 	m_direct = &m_program->direct();
 	m_io = &space(AS_IO);
 
-	/* already initialized? */
-	if(z8000_exec == nullptr)
-		z8000_init_tables();
+	init_tables();
 
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
@@ -732,9 +724,7 @@ void z8002_device::device_start()
 	m_direct = &m_program->direct();
 	m_io = &space(AS_IO);
 
-	/* already initialized? */
-	if(z8000_exec == nullptr)
-		z8000_init_tables();
+	init_tables();
 
 	z8k_segm = false;
 
@@ -768,7 +758,8 @@ void z8002_device::device_reset()
 
 z8002_device::~z8002_device()
 {
-	z8000_deinit_tables();
+	// FIXME: assumes that these CPUs can't outlive each other
+	deinit_tables();
 }
 
 void z8002_device::execute_run()
@@ -791,11 +782,9 @@ void z8002_device::execute_run()
 		}
 		else
 		{
-			Z8000_exec *exec;
-
 			m_op[0] = RDOP();
 			m_op_valid = 1;
-			exec = &z8000_exec[m_op[0]];
+			Z8000_exec const *const exec = &z8000_exec[m_op[0]];
 
 			m_icount -= exec->cycles;
 			(this->*exec->opcode)();

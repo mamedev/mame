@@ -301,7 +301,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( ohpaipee, nbmj8900_state )
+static MACHINE_CONFIG_START( ohpaipee )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */

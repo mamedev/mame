@@ -5,11 +5,11 @@
     Nokia MikroMikko 1 keyboard emulation
 
 *********************************************************************/
+#ifndef MAME_MACHINE_MM1KB_H
+#define MAME_MACHINE_MM1KB_H
 
 #pragma once
 
-#ifndef __MM1_KEYBOARD__
-#define __MM1_KEYBOARD__
 
 #include "sound/samples.h"
 
@@ -20,7 +20,7 @@
 //**************************************************************************
 
 #define MCFG_MM1_KEYBOARD_KBST_CALLBACK(_write) \
-	devcb = &mm1_keyboard_t::set_kbst_wr_callback(*device, DEVCB_##_write);
+	devcb = &mm1_keyoard_device::set_kbst_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -28,15 +28,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> mm1_keyboard_t
+// ======================> mm1_keyoard_device
 
-class mm1_keyboard_t :  public device_t
+class mm1_keyoard_device :  public device_t
 {
 public:
 	// construction/destruction
-	mm1_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mm1_keyoard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_kbst_wr_callback(device_t &device, _Object object) { return downcast<mm1_keyboard_t &>(device).m_write_kbst.set_callback(object); }
+	template <class Object> static devcb_base &set_kbst_wr_callback(device_t &device, Object &&cb) { return downcast<mm1_keyoard_device &>(device).m_write_kbst.set_callback(std::forward<Object>(cb)); }
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -83,8 +83,8 @@ private:
 
 
 // device type definition
-extern const device_type MM1_KEYBOARD;
+DECLARE_DEVICE_TYPE(MM1_KEYBOARD, mm1_keyoard_device)
 
 
 
-#endif
+#endif // MAME_MACHINE_MM1KB_H

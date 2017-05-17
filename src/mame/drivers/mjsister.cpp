@@ -483,7 +483,7 @@ void mjsister_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( mjsister, mjsister_state )
+static MACHINE_CONFIG_START( mjsister )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
@@ -547,4 +547,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, mjsister, 0, mjsister, mjsister, driver_device, 0, ROT0, "Toaplan", "Mahjong Sisters (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mjsister, 0, mjsister, mjsister, mjsister_state, 0, ROT0, "Toaplan", "Mahjong Sisters (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -620,7 +620,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( wunit, midwunit_state )
+static MACHINE_CONFIG_START( wunit )
 
 	MCFG_CPU_ADD("maincpu", TMS34010, 50000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)

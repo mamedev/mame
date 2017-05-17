@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_IEEE488_C8050FDC_H
+#define MAME_BUS_IEEE488_C8050FDC_H
 
-#ifndef __C8050_FLOPPY__
-#define __C8050_FLOPPY__
+#pragma once
 
 #include "formats/d80_dsk.h"
 #include "formats/d82_dsk.h"
@@ -23,16 +23,16 @@
 //**************************************************************************
 
 #define MCFG_C8050_SYNC_CALLBACK(_write) \
-	devcb = &c8050_fdc_t::set_sync_wr_callback(*device, DEVCB_##_write);
+	devcb = &c8050_fdc_device::set_sync_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_C8050_READY_CALLBACK(_write) \
-	devcb = &c8050_fdc_t::set_ready_wr_callback(*device, DEVCB_##_write);
+	devcb = &c8050_fdc_device::set_ready_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_C8050_BRDY_CALLBACK(_write) \
-	devcb = &c8050_fdc_t::set_brdy_wr_callback(*device, DEVCB_##_write);
+	devcb = &c8050_fdc_device::set_brdy_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_C8050_ERROR_CALLBACK(_write) \
-	devcb = &c8050_fdc_t::set_error_wr_callback(*device, DEVCB_##_write);
+	devcb = &c8050_fdc_device::set_error_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -40,18 +40,18 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c8050_fdc_t
+// ======================> c8050_fdc_device
 
-class c8050_fdc_t :  public device_t
+class c8050_fdc_device :  public device_t
 {
 public:
 	// construction/destruction
-	c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c8050_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_sync.set_callback(object); }
-	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_ready.set_callback(object); }
-	template<class _Object> static devcb_base &set_brdy_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_brdy.set_callback(object); }
-	template<class _Object> static devcb_base &set_error_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_error.set_callback(object); }
+	template <class Object> static devcb_base &set_sync_wr_callback(device_t &device, Object &&cb) { return downcast<c8050_fdc_device &>(device).m_write_sync.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ready_wr_callback(device_t &device, Object &&cb) { return downcast<c8050_fdc_device &>(device).m_write_ready.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_brdy_wr_callback(device_t &device, Object &&cb) { return downcast<c8050_fdc_device &>(device).m_write_brdy.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_error_wr_callback(device_t &device, Object &&cb) { return downcast<c8050_fdc_device &>(device).m_write_error.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -162,8 +162,6 @@ protected:
 
 
 // device type definition
-extern const device_type C8050_FDC;
+DECLARE_DEVICE_TYPE(C8050_FDC, c8050_fdc_device)
 
-
-
-#endif
+#endif // MAME_BUS_IEEE488_C8050FDC_H

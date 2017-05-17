@@ -36,17 +36,17 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_SOMARI = device_creator<nes_somari_device>;
+DEFINE_DEVICE_TYPE(NES_SOMARI, nes_somari_device, "nes_somari", "NES Cart Team Somari PCB")
 
 
 nes_somari_device::nes_somari_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_SOMARI, "NES Cart Team Somari PCB", tag, owner, clock, "nes_somari", __FILE__),
-	m_board_mode(0),
-	m_mmc3_mirror_reg(0),
-	m_count(0),
-	m_mmc1_latch(0),
-	m_vrc_mirror_reg(0)
-				{
+	: nes_txrom_device(mconfig, NES_SOMARI, tag, owner, clock)
+	, m_board_mode(0)
+	, m_mmc3_mirror_reg(0)
+	, m_count(0)
+	, m_mmc1_latch(0)
+	, m_vrc_mirror_reg(0)
+{
 }
 
 

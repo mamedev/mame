@@ -7,18 +7,13 @@
  *
  */
 
+#ifndef MAME_CPU_PSX_MDEC_H
+#define MAME_CPU_PSX_MDEC_H
+
 #pragma once
 
-#ifndef __PSXMDEC_H__
-#define __PSXMDEC_H__
 
-
-extern const device_type PSX_MDEC;
-
-#define DCTSIZE ( 8 )
-#define DCTSIZE2 ( DCTSIZE * DCTSIZE )
-
-#define MDEC_COS_PRECALC_BITS ( 21 )
+DECLARE_DEVICE_TYPE(PSX_MDEC, psxmdec_device)
 
 class psxmdec_device : public device_t
 {
@@ -37,6 +32,13 @@ protected:
 	virtual void device_post_load() override;
 
 private:
+	static constexpr unsigned DCTSIZE = 8;
+	static constexpr unsigned DCTSIZE2 = DCTSIZE * DCTSIZE;
+
+	static constexpr unsigned MDEC_COS_PRECALC_BITS = 21;
+
+	static const uint32_t m_p_n_mdec_zigzag[ DCTSIZE2 ];
+
 	void mdec_cos_precalc();
 	void mdec_idct( int32_t *p_n_src, int32_t *p_n_dst );
 	uint32_t mdec_unpack( uint32_t *ram, uint32_t n_address );
@@ -72,4 +74,4 @@ private:
 	int32_t m_p_n_unpacked[ DCTSIZE2 * 6 * 2 ];
 };
 
-#endif
+#endif // MAME_CPU_PSX_MDEC_H

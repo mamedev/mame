@@ -178,7 +178,7 @@ static INPUT_PORTS_START(ggconnie)
 	PORT_DIPSETTING(0x00, DEF_STR(On) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
+static MACHINE_CONFIG_START( ggconnie )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(sgx_mem)
@@ -186,7 +186,7 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/3, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/3, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( ggconnie_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
@@ -223,7 +223,7 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", PCE_MAIN_CLOCK/12, OKIM6295_PIN7_HIGH) /* unknown clock / pin 7 */
+	MCFG_OKIM6295_ADD("oki", PCE_MAIN_CLOCK/12, PIN7_HIGH) /* unknown clock / pin 7 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_CONFIG_END
@@ -237,4 +237,4 @@ ROM_START(ggconnie)
 	ROM_LOAD( "adpcm_u31.bin", 0x00000, 0x80000, CRC(de514c2b) SHA1(da73aa825d73646f556f6d4dbb46f43acf7c3357) )
 ROM_END
 
-GAME( 1996, ggconnie, 0, ggconnie, ggconnie, pce_common_state, pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

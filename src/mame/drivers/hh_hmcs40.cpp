@@ -385,7 +385,7 @@ public:
 WRITE8_MEMBER(bambball_state::plate_w)
 {
 	// R1x-R3x(,D0-D3): vfd matrix plate
-	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
@@ -405,7 +405,7 @@ WRITE16_MEMBER(bambball_state::grid_w)
 	m_grid = data >> 7 & 0x1ff;
 
 	// D0-D3: more plates (update display there)
-	plate_w(space, 3 + HMCS40_PORT_R1X, data & 0xf);
+	plate_w(space, 3 + hmcs40_cpu_device::PORT_R1X, data & 0xf);
 }
 
 READ8_MEMBER(bambball_state::input_r)
@@ -444,7 +444,7 @@ static INPUT_PORTS_START( bambball )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bambball, bambball_state )
+static MACHINE_CONFIG_START( bambball )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
@@ -506,7 +506,7 @@ void bmboxing_state::prepare_display()
 WRITE8_MEMBER(bmboxing_state::plate_w)
 {
 	// R1x-R3x: vfd matrix plate
-	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -580,7 +580,7 @@ static INPUT_PORTS_START( bmboxing )
 	PORT_BIT( 0xfff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bmboxing, bmboxing_state )
+static MACHINE_CONFIG_START( bmboxing )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
@@ -705,7 +705,7 @@ INPUT_CHANGED_MEMBER(bfriskyt_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( bfriskyt, bfriskyt_state )
+static MACHINE_CONFIG_START( bfriskyt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -815,7 +815,7 @@ static INPUT_PORTS_START( packmon )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( packmon, packmon_state )
+static MACHINE_CONFIG_START( packmon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -950,7 +950,7 @@ INPUT_CHANGED_MEMBER(msthawk_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( msthawk, msthawk_state )
+static MACHINE_CONFIG_START( msthawk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -1071,7 +1071,7 @@ INPUT_CHANGED_MEMBER(bzaxxon_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( bzaxxon, bzaxxon_state )
+static MACHINE_CONFIG_START( bzaxxon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 450000) // approximation
@@ -1187,7 +1187,7 @@ INPUT_CHANGED_MEMBER(zackman_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( zackman, zackman_state )
+static MACHINE_CONFIG_START( zackman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1314,7 +1314,7 @@ INPUT_CHANGED_MEMBER(bpengo_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( bpengo, bpengo_state )
+static MACHINE_CONFIG_START( bpengo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1439,7 +1439,7 @@ INPUT_CHANGED_MEMBER(bbtime_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( bbtime, bbtime_state )
+static MACHINE_CONFIG_START( bbtime )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1539,7 +1539,7 @@ static INPUT_PORTS_START( bdoramon )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bdoramon, bdoramon_state )
+static MACHINE_CONFIG_START( bdoramon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -1632,7 +1632,7 @@ static INPUT_PORTS_START( bultrman )
 	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bultrman, bultrman_state )
+static MACHINE_CONFIG_START( bultrman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 350000) // approximation
@@ -1693,7 +1693,7 @@ void machiman_state::prepare_display()
 WRITE8_MEMBER(machiman_state::plate_w)
 {
 	// R0x-R3x,R6012: vfd matrix plate
-	int shift = (offset == HMCS40_PORT_R6X) ? 16 : offset * 4;
+	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 16 : offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -1721,7 +1721,7 @@ static INPUT_PORTS_START( machiman )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( machiman, machiman_state )
+static MACHINE_CONFIG_START( machiman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1788,7 +1788,7 @@ public:
 WRITE8_MEMBER(pairmtch_state::plate_w)
 {
 	// R2x,R3x,R6x: vfd matrix plate
-	int shift = (offset == HMCS40_PORT_R6X) ? 8 : (offset-2) * 4;
+	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 8 : (offset-2) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	display_matrix(12, 6, m_plate, m_grid);
 }
@@ -1871,7 +1871,7 @@ static INPUT_PORTS_START( pairmtch )
 	PORT_BIT( 0x86bf, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pairmtch, pairmtch_state )
+static MACHINE_CONFIG_START( pairmtch )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1993,7 +1993,7 @@ static INPUT_PORTS_START( alnattck )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Fire")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( alnattck, alnattck_state )
+static MACHINE_CONFIG_START( alnattck )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -2120,7 +2120,7 @@ void cdkong_state::machine_start()
 	save_item(NAME(m_speaker_volume));
 }
 
-static MACHINE_CONFIG_START( cdkong, cdkong_state )
+static MACHINE_CONFIG_START( cdkong )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -2196,11 +2196,11 @@ void cgalaxn_state::prepare_display()
 WRITE8_MEMBER(cgalaxn_state::grid_w)
 {
 	// R10,R11: input mux
-	if (offset == HMCS40_PORT_R1X)
+	if (offset == hmcs40_cpu_device::PORT_R1X)
 		m_inp_mux = data & 3;
 
 	// R1x-R3x: vfd matrix grid
-	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -2253,7 +2253,7 @@ INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 	prepare_display();
 }
 
-static MACHINE_CONFIG_START( cgalaxn, cgalaxn_state )
+static MACHINE_CONFIG_START( cgalaxn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -2319,7 +2319,7 @@ public:
 WRITE8_MEMBER(cpacman_state::plate_w)
 {
 	// R1x-R6x(,D1,D2): vfd matrix plate
-	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
@@ -2340,7 +2340,7 @@ WRITE16_MEMBER(cpacman_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D1,D2: plate 8,14 (update display there)
-	plate_w(space, 6 + HMCS40_PORT_R1X, data >> 1 & 3);
+	plate_w(space, 6 + hmcs40_cpu_device::PORT_R1X, data >> 1 & 3);
 }
 
 READ8_MEMBER(cpacman_state::input_r)
@@ -2372,7 +2372,7 @@ static INPUT_PORTS_START( cpacman )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cpacman, cpacman_state )
+static MACHINE_CONFIG_START( cpacman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -2436,7 +2436,7 @@ public:
 WRITE8_MEMBER(cmspacmn_state::plate_w)
 {
 	// R1x-R6x(,D0,D1): vfd matrix plate
-	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
@@ -2457,7 +2457,7 @@ WRITE16_MEMBER(cmspacmn_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0,D1: more plates (update display there)
-	plate_w(space, 6 + HMCS40_PORT_R1X, data & 3);
+	plate_w(space, 6 + hmcs40_cpu_device::PORT_R1X, data & 3);
 }
 
 READ8_MEMBER(cmspacmn_state::input_r)
@@ -2489,7 +2489,7 @@ static INPUT_PORTS_START( cmspacmn )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cmspacmn, cmspacmn_state )
+static MACHINE_CONFIG_START( cmspacmn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -2636,7 +2636,7 @@ static INPUT_PORTS_START( sag )
 	PORT_CONFSETTING(    0x02, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( sag, sag_state )
+static MACHINE_CONFIG_START( sag )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 450000) // approximation
@@ -2707,7 +2707,7 @@ WRITE16_MEMBER(egalaxn2_state::grid_w)
 WRITE8_MEMBER(egalaxn2_state::plate_w)
 {
 	// R1x-R6x: vfd matrix plate
-	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -2751,7 +2751,7 @@ static INPUT_PORTS_START( egalaxn2 )
 	PORT_CONFSETTING(    0x04, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( egalaxn2, egalaxn2_state )
+static MACHINE_CONFIG_START( egalaxn2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -2792,7 +2792,7 @@ MACHINE_CONFIG_END
   2 VFD revisions are known, the difference is Pac-Man's color: cyan or red.
 
 ***************************************************************************/
-#if 0
+
 class epacman2_state : public egalaxn2_state
 {
 public:
@@ -2800,7 +2800,7 @@ public:
 		: egalaxn2_state(mconfig, type, tag)
 	{ }
 };
-#endif
+
 // handlers are identical to Galaxian 2, so we can use those
 
 // config
@@ -3000,7 +3000,7 @@ void eturtles_state::machine_start()
 	save_item(NAME(m_cop_irq));
 }
 
-static MACHINE_CONFIG_START( eturtles, eturtles_state )
+static MACHINE_CONFIG_START( eturtles )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -3110,7 +3110,7 @@ static INPUT_PORTS_START( estargte )
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( estargte, estargte_state )
+static MACHINE_CONFIG_START( estargte )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -3236,7 +3236,7 @@ static INPUT_PORTS_START( ghalien )
 	PORT_CONFSETTING(      0x8000, "Professional" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ghalien, ghalien_state )
+static MACHINE_CONFIG_START( ghalien )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -3363,7 +3363,7 @@ INPUT_CHANGED_MEMBER(gckong_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( gckong, gckong_state )
+static MACHINE_CONFIG_START( gckong )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -3482,7 +3482,7 @@ INPUT_CHANGED_MEMBER(gdigdug_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( gdigdug, gdigdug_state )
+static MACHINE_CONFIG_START( gdigdug )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -3551,7 +3551,7 @@ void mwcbaseb_state::prepare_display()
 WRITE8_MEMBER(mwcbaseb_state::plate_w)
 {
 	// R1x-R3x,R6x: vfd matrix plate
-	int shift = (offset == HMCS40_PORT_R6X) ? 12 : (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 12 : (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -3644,7 +3644,7 @@ INPUT_PORTS_END
 
 static const s16 mwcbaseb_speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0, -0x8000, -0x4000 };
 
-static MACHINE_CONFIG_START( mwcbaseb, mwcbaseb_state )
+static MACHINE_CONFIG_START( mwcbaseb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -3732,7 +3732,7 @@ static INPUT_PORTS_START( pbqbert )
 	PORT_BIT( 0xe1ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pbqbert, pbqbert_state )
+static MACHINE_CONFIG_START( pbqbert )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -3857,7 +3857,7 @@ INPUT_CHANGED_MEMBER(kingman_state::input_changed)
 	update_int0();
 }
 
-static MACHINE_CONFIG_START( kingman, kingman_state )
+static MACHINE_CONFIG_START( kingman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -3978,7 +3978,7 @@ INPUT_CHANGED_MEMBER(tmtron_state::input_changed)
 	update_int1();
 }
 
-static MACHINE_CONFIG_START( tmtron, tmtron_state )
+static MACHINE_CONFIG_START( tmtron )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -4035,7 +4035,7 @@ public:
 WRITE8_MEMBER(vinvader_state::plate_w)
 {
 	// R1x-R3x(,D4-D6): vfd matrix plate
-	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
@@ -4052,7 +4052,7 @@ WRITE16_MEMBER(vinvader_state::grid_w)
 	m_grid = data >> 7 & 0x1ff;
 
 	// D4-D6: more plates (update display there)
-	plate_w(space, 3 + HMCS40_PORT_R1X, data >> 4 & 7);
+	plate_w(space, 3 + hmcs40_cpu_device::PORT_R1X, data >> 4 & 7);
 }
 
 
@@ -4072,7 +4072,7 @@ static INPUT_PORTS_START( vinvader )
 	PORT_BIT( 0xfff5, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vinvader, vinvader_state )
+static MACHINE_CONFIG_START( vinvader )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
@@ -4454,47 +4454,47 @@ ROM_END
 
 
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, bambball,  0,        0, bambball, bambball, driver_device, 0, "Bambino", "Dribble Away Basketball", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, bmboxing,  0,        0, bmboxing, bmboxing, driver_device, 0, "Bambino", "Knock-Em Out Boxing", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   CMP MACHINE   INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1979, bambball,  0,        0, bambball, bambball, bambball_state, 0, "Bambino", "Dribble Away Basketball", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, bmboxing,  0,        0, bmboxing, bmboxing, bmboxing_state, 0, "Bambino", "Knock-Em Out Boxing", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, driver_device, 0, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, packmon,   0,        0, packmon,  packmon,  driver_device, 0, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  driver_device, 0, "Bandai (Mattel license)", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, bzaxxon,   0,        0, bzaxxon,  bzaxxon,  driver_device, 0, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bpengo,    0,        0, bpengo,   bpengo,   driver_device, 0, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bbtime,    0,        0, bbtime,   bbtime,   driver_device, 0, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bdoramon,  0,        0, bdoramon, bdoramon, driver_device, 0, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bultrman,  0,        0, bultrman, bultrman, driver_device, 0, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, machiman,  0,        0, machiman, machiman, driver_device, 0, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, driver_device, 0, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, bfriskyt_state, 0, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, packmon,   0,        0, packmon,  packmon,  packmon_state,  0, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  msthawk_state,  0, "Bandai (Mattel license)", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bzaxxon,   0,        0, bzaxxon,  bzaxxon,  bzaxxon_state,  0, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, zackman,   0,        0, zackman,  zackman,  zackman_state,  0, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, bpengo,    0,        0, bpengo,   bpengo,   bpengo_state,   0, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, bbtime,    0,        0, bbtime,   bbtime,   bbtime_state,   0, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, bdoramon,  0,        0, bdoramon, bdoramon, bdoramon_state, 0, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, bultrman,  0,        0, bultrman, bultrman, bultrman_state, 0, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, machiman,  0,        0, machiman, machiman, machiman_state, 0, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, pairmtch_state, 0, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, driver_device, 0, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, alnattck,  0,        0, alnattck, alnattck, alnattck_state, 0, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   cdkong_state,   0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  cgalaxn_state,  0, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  cpacman_state,  0, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  cpacman_state,  0, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, cmspacmn_state, 0, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, sag_si2,   0,        0, sag,      sag,      driver_device, 0, "Entex", "Select-A-Game: Space Invader 2", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING ) // suspect bad dump
-CONS( 1981, sag_bb4,   0,        0, sag,      sag,      driver_device, 0, "Entex", "Select-A-Game: Baseball 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, sag_pb,    0,        0, sag,      sag,      driver_device, 0, "Entex", "Select-A-Game: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, driver_device, 0, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, epacman2,  0,        0, epacman2, epacman2, driver_device, 0, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, epacman2r, epacman2, 0, epacman2, epacman2, driver_device, 0, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, estargte,  0,        0, estargte, estargte, driver_device, 0, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, eturtles,  0,        0, eturtles, eturtles, driver_device, 0, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, sag_si2,   0,        0, sag,      sag,      sag_state,      0, "Entex", "Select-A-Game: Space Invader 2", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING ) // suspect bad dump
+CONS( 1981, sag_bb4,   0,        0, sag,      sag,      sag_state,      0, "Entex", "Select-A-Game: Baseball 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, sag_pb,    0,        0, sag,      sag,      sag_state,      0, "Entex", "Select-A-Game: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, egalaxn2_state, 0, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, epacman2,  0,        0, epacman2, epacman2, epacman2_state, 0, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, epacman2r, epacman2, 0, epacman2, epacman2, epacman2_state, 0, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, estargte,  0,        0, estargte, estargte, estargte_state, 0, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, eturtles,  0,        0, eturtles, eturtles, eturtles_state, 0, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  driver_device, 0, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, gckong,    0,        0, gckong,   gckong,   driver_device, 0, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  driver_device, 0, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  ghalien_state,  0, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   0, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  gdigdug_state,  0, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, driver_device, 0, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, 0, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  driver_device, 0, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  pbqbert_state,  0, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, kingman,   0,        0, kingman,  kingman,  driver_device, 0, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, tmtron,    0,        0, tmtron,   tmtron,   driver_device, 0, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, kingman,   0,        0, kingman,  kingman,  kingman_state,  0, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, tmtron,    0,        0, tmtron,   tmtron,   tmtron_state,   0, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, vinvader,  0,        0, vinvader, vinvader, driver_device, 0, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, vinvader,  0,        0, vinvader, vinvader, vinvader_state, 0, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE )

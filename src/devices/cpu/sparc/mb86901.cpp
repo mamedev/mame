@@ -18,11 +18,13 @@
 //================================================================
 
 #include "emu.h"
-#include "debugger.h"
 #include "sparc.h"
 #include "sparcdefs.h"
 
-const device_type MB86901 = device_creator<mb86901_device>;
+#include "debugger.h"
+
+
+DEFINE_DEVICE_TYPE(MB86901, mb86901_device, "mb86901", "Fujitsu MB86901")
 
 const int mb86901_device::NWINDOWS = 7;
 
@@ -39,7 +41,7 @@ const int mb86901_device::NWINDOWS = 7;
 //-------------------------------------------------
 
 mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, MB86901, "Fujitsu MB86901", tag, owner, clock, "mb86901", __FILE__)
+	: cpu_device(mconfig, MB86901, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
 	, m_dasm(this, 7)
 {

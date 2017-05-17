@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef PCI_SATA_H
-#define PCI_SATA_H
+#ifndef MAME_MACHINE_PCI_SATA_H
+#define MAME_MACHINE_PCI_SATA_H
+
+#pragma once
 
 #include "pci.h"
 
@@ -25,6 +27,6 @@ private:
 	DECLARE_ADDRESS_MAP(ide_command_posting_map, 32);
 };
 
-extern const device_type SATA;
+DECLARE_DEVICE_TYPE(SATA, sata_device)
 
-#endif
+#endif // MAME_MACHINE_PCI_SATA_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __SNS_SFX_H
-#define __SNS_SFX_H
+#ifndef MAME_BUS_SNES_SFX_H
+#define MAME_BUS_SNES_SFX_H
 
 #include "snes_slot.h"
 #include "rom.h"
@@ -16,12 +16,7 @@ public:
 	// construction/destruction
 	sns_rom_superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	required_device<superfx_device> m_superfx;
 
 	// additional reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l) override;
@@ -39,12 +34,18 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(superfx_w_bank3);
 	virtual DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	required_device<superfx_device> m_superfx;
 
 	uint8_t sfx_ram[0x200000];
 };
 
 
 // device type definition
-extern const device_type SNS_LOROM_SUPERFX;
+DECLARE_DEVICE_TYPE(SNS_LOROM_SUPERFX, sns_rom_superfx_device)
 
-#endif
+#endif // MAME_BUS_SNES_SFX_H

@@ -75,7 +75,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(qbar_w);
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 
 private:
 	bool m_q_state;
@@ -326,9 +326,9 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ nullptr }
 };
 
-WRITE8_MEMBER( rc702_state::kbd_put )
+void rc702_state::kbd_put(u8 data)
 {
-	m_pio->pa_w(space, 0, data);
+	m_pio->pa_w(machine().dummy_space(), 0, data);
 	m_pio->strobe_a(0);
 	m_pio->strobe_a(1);
 }
@@ -337,7 +337,7 @@ static SLOT_INTERFACE_START( floppies )
 	SLOT_INTERFACE( "drive0", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( rc702, rc702_state )
+static MACHINE_CONFIG_START( rc702 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(rc702_mem)
@@ -380,7 +380,7 @@ static MACHINE_CONFIG_START( rc702, rc702_state )
 
 	/* Keyboard */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(rc702_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(rc702_state, kbd_put))
 
 	MCFG_DEVICE_ADD("7474", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(rc702_state, q_w))
@@ -424,5 +424,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT     CLASS            INIT      COMPANY           FULLNAME       FLAGS */
+//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT     CLASS            INIT    COMPANY            FULLNAME         FLAGS
 COMP( 1979, rc702,     0,       0,      rc702,      rc702,    rc702_state,     rc702,  "Regnecentralen",  "RC702 Piccolo", MACHINE_NOT_WORKING )

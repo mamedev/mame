@@ -1911,7 +1911,7 @@ MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
 #define ALPHA68K_VBEND 16
 #define ALPHA68K_VBSTART 240
 
-static MACHINE_CONFIG_START( sstingry, alpha68k_state )
+static MACHINE_CONFIG_START( sstingry )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
@@ -1972,7 +1972,7 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kyros, alpha68k_state )
+static MACHINE_CONFIG_START( kyros )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)   /* Verified on bootleg PCB */
@@ -2024,7 +2024,7 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( jongbou, alpha68k_state )
+static MACHINE_CONFIG_START( jongbou )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
@@ -2066,7 +2066,7 @@ static MACHINE_CONFIG_START( jongbou, alpha68k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
+static MACHINE_CONFIG_START( alpha68k_I )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
@@ -2111,7 +2111,7 @@ INTERRUPT_GEN_MEMBER(alpha68k_state::alpha68k_sound_nmi)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
+static MACHINE_CONFIG_START( alpha68k_II )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* Correct */
@@ -2166,7 +2166,7 @@ static MACHINE_CONFIG_DERIVED( btlfieldb, alpha68k_II )
 	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60*4) // MCU irq
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
+static MACHINE_CONFIG_START( alpha68k_II_gm )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
@@ -2216,7 +2216,7 @@ static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
+static MACHINE_CONFIG_START( alpha68k_V )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* ? */
@@ -2265,7 +2265,7 @@ static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
+static MACHINE_CONFIG_START( alpha68k_V_sb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* ? */
@@ -2314,7 +2314,7 @@ static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tnextspc, alpha68k_state )
+static MACHINE_CONFIG_START( tnextspc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 9000000) /* Confirmed 18 MHz/2 */
@@ -3492,10 +3492,10 @@ DRIVER_INIT_MEMBER(alpha68k_state,tnextspc)
 
 GAME( 1986, sstingry,  0,        sstingry,       sstingry, alpha68k_state, sstingry, ROT90, "Alpha Denshi Co.",                                  "Super Stingray (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1987, kyros,     0,        kyros,          kyros, alpha68k_state,    kyros,    ROT90, "Alpha Denshi Co. (World Games Inc. license)",       "Kyros", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kyrosj,    kyros,    kyros,          kyros, alpha68k_state,    kyros,    ROT90, "Alpha Denshi Co.",                                  "Kyros No Yakata (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, kyros,     0,        kyros,          kyros,    alpha68k_state, kyros,    ROT90, "Alpha Denshi Co. (World Games Inc. license)",       "Kyros", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kyrosj,    kyros,    kyros,          kyros,    alpha68k_state, kyros,    ROT90, "Alpha Denshi Co.",                                  "Kyros No Yakata (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, jongbou,   0,        jongbou,        jongbou, alpha68k_state,  jongbou,  ROT90, "SNK",                                               "Mahjong Block Jongbou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, jongbou,   0,        jongbou,        jongbou,  alpha68k_state, jongbou,  ROT90, "SNK",                                               "Mahjong Block Jongbou (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, paddlema,  0,        alpha68k_I,     paddlema, alpha68k_state, paddlema, ROT90, "SNK",                                               "Paddle Mania", MACHINE_SUPPORTS_SAVE )
 
@@ -3503,7 +3503,7 @@ GAME( 1987, timesold,  0,        alpha68k_II,    timesold, alpha68k_state, times
 GAME( 1987, timesold1, timesold, alpha68k_II,    timesold, alpha68k_state, timesold1,ROT90, "Alpha Denshi Co. (SNK/Romstar license)",            "Time Soldiers (US Rev 1)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, btlfield,  timesold, alpha68k_II,    btlfield, alpha68k_state, btlfield, ROT90, "Alpha Denshi Co. (SNK license)",                    "Battle Field (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, btlfieldb, timesold, btlfieldb,      btlfieldb, alpha68k_state,btlfieldb,ROT90, "bootleg",                                           "Battle Field (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, btlfieldb, timesold, btlfieldb,      btlfieldb,alpha68k_state, btlfieldb,ROT90, "bootleg",                                           "Battle Field (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr, alpha68k_state, skysoldr, ROT90, "Alpha Denshi Co. (SNK of America/Romstar license)", "Sky Soldiers (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, skysoldrbl,skysoldr, alpha68k_II,    skysoldr, alpha68k_state, skysoldr, ROT90, "bootleg",                                           "Sky Soldiers (bootleg)", MACHINE_SUPPORTS_SAVE )
@@ -3514,12 +3514,12 @@ GAME( 1988, goldmedla, goldmedl, alpha68k_II_gm, goldmedl, alpha68k_state, goldm
 GAME( 1988, goldmedlb, goldmedl, alpha68k_II_gm, goldmedl, alpha68k_state, goldmedla,ROT0,  "bootleg",                                           "Gold Medalist (bootleg)", MACHINE_UNEMULATED_PROTECTION|MACHINE_IMPERFECT_GRAPHICS ) // same as above
 
 GAME( 1989, skyadvnt,  0,        alpha68k_V,     skyadvnt, alpha68k_state, skyadvnt, ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, skyadvntu, skyadvnt, alpha68k_V,     skyadvntu, alpha68k_state,skyadvntu,ROT90, "Alpha Denshi Co. (SNK of America license)",         "Sky Adventure (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skyadvntu, skyadvnt, alpha68k_V,     skyadvntu,alpha68k_state, skyadvntu,ROT90, "Alpha Denshi Co. (SNK of America license)",         "Sky Adventure (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, skyadvntj, skyadvnt, alpha68k_V,     skyadvnt, alpha68k_state, skyadvnt, ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, gangwars,  0,        alpha68k_V,     gangwars, alpha68k_state, gangwars, ROT0,  "Alpha Denshi Co.",                                  "Gang Wars", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, gangwarsj, gangwars, alpha68k_V,     gangwars, alpha68k_state, gangwars, ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gangwarsu, gangwars, alpha68k_V,     gangwarsu, alpha68k_state,gangwarsu,ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gangwarsu, gangwars, alpha68k_V,     gangwarsu,alpha68k_state, gangwarsu,ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, gangwarsb, gangwars, alpha68k_V,     gangwars, alpha68k_state, gangwars, ROT0,  "bootleg",                                           "Gang Wars (bootleg)", MACHINE_SUPPORTS_SAVE ) // has (undumped) 68705 MCU in place of Alpha MCU, otherwise the same as 'gangwars'
 
 GAME( 1989, sbasebal,  0,        alpha68k_V_sb,  sbasebal, alpha68k_state, sbasebal, ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // calculated pitcher launching speed

@@ -675,7 +675,7 @@ WRITE8_MEMBER(gts1_state::gts1_do_w)
 }
 
 
-static MACHINE_CONFIG_START( gts1, gts1_state )
+static MACHINE_CONFIG_START( gts1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPS4_2, XTAL_3_579545MHz)  // divided by 18 in the CPU
 	MCFG_CPU_PROGRAM_MAP(gts1_map)

@@ -954,7 +954,7 @@ FLOPPY_FORMATS_MEMBER( fanucspmg_state::floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
+static MACHINE_CONFIG_START( fanucspmg )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, I8086, XTAL_15MHz/3)
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem)
@@ -1042,6 +1042,6 @@ ROM_START( fanucspgm )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME       PARENT       COMPAT   MACHINE    INPUT      CLASS           INIT       COMPANY  FULLNAME            FLAGS */
-COMP( 1983, fanucspg,  0,             0,    fanucspmg,  fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1983, fanucspgm, fanucspg,      0,    fanucspmgm, fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G (monochrome)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT       COMPANY  FULLNAME                         FLAGS
+COMP( 1983, fanucspg,  0,        0,      fanucspmg,  fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, fanucspgm, fanucspg, 0,      fanucspmgm, fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G (monochrome)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

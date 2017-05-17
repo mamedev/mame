@@ -18,8 +18,9 @@
 #include "coreutil.h"
 
 // Debugging
-#define VERBOSE 0
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 #define BIT_MASK(n) (1U << (n))
 
@@ -27,15 +28,15 @@
 #define BIT_CLR(w , n)  ((w) &= ~BIT_MASK(n))
 #define BIT_SET(w , n)  ((w) |= BIT_MASK(n))
 
-hp98034_io_card::hp98034_io_card(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp9845_io_card_device(mconfig , HP98034_IO_CARD , "HP98034 card" , tag , owner , clock , "hp98034" , __FILE__),
+hp98034_io_card_device::hp98034_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hp9845_io_card_device(mconfig , HP98034_IO_CARD , tag , owner , clock),
 	  m_cpu(*this , "np"),
 	  m_sw1(*this , "sw1"),
 	  m_ieee488(*this , IEEE488_TAG)
 {
 }
 
-hp98034_io_card::~hp98034_io_card()
+hp98034_io_card_device::~hp98034_io_card_device()
 {
 }
 
@@ -82,12 +83,12 @@ static INPUT_PORTS_START(hp98034_port)
 	PORT_DIPSETTING(0x20 , DEF_STR(Off))
 INPUT_PORTS_END
 
-ioport_constructor hp98034_io_card::device_input_ports() const
+ioport_constructor hp98034_io_card_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(hp98034_port);
 }
 
-void hp98034_io_card::device_start()
+void hp98034_io_card_device::device_start()
 {
 	save_item(NAME(m_dc));
 	save_item(NAME(m_idr));
@@ -99,7 +100,7 @@ void hp98034_io_card::device_start()
 	save_item(NAME(m_data_out));
 }
 
-void hp98034_io_card::device_reset()
+void hp98034_io_card_device::device_reset()
 {
 	hp9845_io_card_device::device_reset();
 
@@ -113,7 +114,7 @@ void hp98034_io_card::device_reset()
 	update_dc();
 }
 
-READ16_MEMBER(hp98034_io_card::reg_r)
+READ16_MEMBER(hp98034_io_card_device::reg_r)
 {
 	uint16_t res = m_odr;
 
@@ -132,15 +133,18 @@ READ16_MEMBER(hp98034_io_card::reg_r)
 	m_force_flg = true;
 
 	update_flg();
-	// PPU yields to let NP see FLG=0 immediately
-	// (horrible race conditions lurking...)
-	space.device().execute().yield();
+	// PPU pauses for an instant to let NP see FLG=0 immediately
+	// There's a bug in Mass Memory opt. ROM because the PPU
+	// doesn't wait for FLG from 98034 in a few (common) cases.
+	// A magic combination of relative speeds between PPU and
+	// NP always hides this bug in the real hw.
+	space.device().execute().spin_until_time(attotime::from_usec(5));
 
-	LOG(("read R%u=%04x\n" , offset + 4 , res));
+	LOG("read R%u=%04x\n" , offset + 4 , res);
 	return res;
 }
 
-WRITE16_MEMBER(hp98034_io_card::reg_w)
+WRITE16_MEMBER(hp98034_io_card_device::reg_w)
 {
 	m_idr = (uint8_t)data;
 
@@ -155,22 +159,22 @@ WRITE16_MEMBER(hp98034_io_card::reg_w)
 	m_force_flg = true;
 
 	update_flg();
-	// PPU yields to let NP see FLG=0 immediately
-	// (horrible race conditions lurking...)
-	space.device().execute().yield();
-	LOG(("write R%u=%04x\n" , offset + 4 , data));
+	// PPU pauses for an instant to let NP see FLG=0 immediately
+	// (see above)
+	space.device().execute().spin_until_time(attotime::from_usec(5));
+	LOG("write R%u=%04x\n" , offset + 4 , data);
 }
 
-WRITE8_MEMBER(hp98034_io_card::dc_w)
+WRITE8_MEMBER(hp98034_io_card_device::dc_w)
 {
 	if (data != m_dc) {
-		//LOG(("DC=%02x\n" , data));
+		//LOG("DC=%02x\n" , data);
 		m_dc = data;
 		update_dc();
 	}
 }
 
-READ8_MEMBER(hp98034_io_card::dc_r)
+READ8_MEMBER(hp98034_io_card_device::dc_r)
 {
 	uint8_t res;
 
@@ -184,19 +188,19 @@ READ8_MEMBER(hp98034_io_card::dc_r)
 	return res;
 }
 
-WRITE8_MEMBER(hp98034_io_card::hpib_data_w)
+WRITE8_MEMBER(hp98034_io_card_device::hpib_data_w)
 {
 	m_data_out = data;
 	update_data_out();
 }
 
-WRITE8_MEMBER(hp98034_io_card::hpib_ctrl_w)
+WRITE8_MEMBER(hp98034_io_card_device::hpib_ctrl_w)
 {
 	m_ctrl_out = data;
 	update_ctrl_out();
 }
 
-READ8_MEMBER(hp98034_io_card::hpib_ctrl_r)
+READ8_MEMBER(hp98034_io_card_device::hpib_ctrl_r)
 {
 	uint8_t res = 0;
 
@@ -228,39 +232,39 @@ READ8_MEMBER(hp98034_io_card::hpib_ctrl_r)
 	return res;
 }
 
-READ8_MEMBER(hp98034_io_card::hpib_data_r)
+READ8_MEMBER(hp98034_io_card_device::hpib_data_r)
 {
 	return ~m_ieee488->dio_r();
 }
 
-READ8_MEMBER(hp98034_io_card::idr_r)
+READ8_MEMBER(hp98034_io_card_device::idr_r)
 {
 	return m_idr;
 }
 
-WRITE8_MEMBER(hp98034_io_card::odr_w)
+WRITE8_MEMBER(hp98034_io_card_device::odr_w)
 {
 	m_odr = data;
 }
 
-READ8_MEMBER(hp98034_io_card::mode_reg_r)
+READ8_MEMBER(hp98034_io_card_device::mode_reg_r)
 {
 	return m_mode_reg;
 }
 
-WRITE8_MEMBER(hp98034_io_card::mode_reg_clear_w)
+WRITE8_MEMBER(hp98034_io_card_device::mode_reg_clear_w)
 {
 	m_mode_reg = 0xff;
 	m_force_flg = false;
 	update_flg();
 }
 
-READ8_MEMBER(hp98034_io_card::switch_r)
+READ8_MEMBER(hp98034_io_card_device::switch_r)
 {
 	return m_sw1->read() | 0xc0;
 }
 
-IRQ_CALLBACK_MEMBER(hp98034_io_card::irq_callback)
+IRQ_CALLBACK_MEMBER(hp98034_io_card_device::irq_callback)
 {
 	int res = 0xff;
 
@@ -271,12 +275,12 @@ IRQ_CALLBACK_MEMBER(hp98034_io_card::irq_callback)
 	return res;
 }
 
-WRITE_LINE_MEMBER(hp98034_io_card::ieee488_ctrl_w)
+WRITE_LINE_MEMBER(hp98034_io_card_device::ieee488_ctrl_w)
 {
 	update_clr_hpib();
 }
 
-void hp98034_io_card::update_dc(void)
+void hp98034_io_card_device::update_dc()
 {
 	irq_w(!BIT(m_dc , 0));
 	sts_w(BIT(m_dc , 4));
@@ -284,17 +288,17 @@ void hp98034_io_card::update_dc(void)
 	update_clr_hpib();
 }
 
-void hp98034_io_card::update_flg(void)
+void hp98034_io_card_device::update_flg()
 {
 	flg_w(BIT(m_dc , 3) && !m_force_flg);
 }
 
-void hp98034_io_card::update_np_irq(void)
+void hp98034_io_card_device::update_np_irq()
 {
 	m_cpu->set_input_line(0 , (!m_ieee488->ifc_r() || m_clr_hpib) && BIT(m_dc , HP_NANO_IE_DC));
 }
 
-void hp98034_io_card::update_data_out(void)
+void hp98034_io_card_device::update_data_out()
 {
 	if (m_clr_hpib) {
 		m_data_out = 0;
@@ -302,7 +306,7 @@ void hp98034_io_card::update_data_out(void)
 	m_ieee488->dio_w(~m_data_out);
 }
 
-void hp98034_io_card::update_ctrl_out(void)
+void hp98034_io_card_device::update_ctrl_out()
 {
 	if (m_clr_hpib) {
 		m_ieee488->dav_w(1);
@@ -321,13 +325,13 @@ void hp98034_io_card::update_ctrl_out(void)
 	m_ieee488->ifc_w(!BIT(m_ctrl_out , 3));
 }
 
-void hp98034_io_card::update_clr_hpib(void)
+void hp98034_io_card_device::update_clr_hpib()
 {
 	m_clr_hpib = !m_ieee488->atn_r() && BIT(m_dc , 5);
 	update_data_out();
 	update_ctrl_out();
 	update_np_irq();
-	LOG(("clr_hpib %d\n" , m_clr_hpib));
+	LOG("clr_hpib %d\n" , m_clr_hpib);
 }
 
 ROM_START(hp98034)
@@ -335,12 +339,12 @@ ROM_START(hp98034)
 	ROM_LOAD("1816-1242.bin" , 0 , 0x400 , CRC(301a9f5f) SHA1(3d7c1ace38c4d3178fdbf764c044535d9f6ac94f))
 ROM_END
 
-static ADDRESS_MAP_START(np_program_map , AS_PROGRAM , 8 , hp98034_io_card)
+static ADDRESS_MAP_START(np_program_map , AS_PROGRAM , 8 , hp98034_io_card_device)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000 , 0x3ff) AM_ROM AM_REGION("np" , 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(np_io_map , AS_IO , 8 , hp98034_io_card)
+static ADDRESS_MAP_START(np_io_map , AS_IO , 8 , hp98034_io_card_device)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0 , 0) AM_WRITE(hpib_data_w)
 	AM_RANGE(1 , 1) AM_WRITE(hpib_ctrl_w)
@@ -358,25 +362,25 @@ static MACHINE_CONFIG_FRAGMENT(hp98034)
 	MCFG_CPU_ADD("np" , HP_NANOPROCESSOR , 2000000)
 	MCFG_CPU_PROGRAM_MAP(np_program_map)
 	MCFG_CPU_IO_MAP(np_io_map)
-	MCFG_HP_NANO_DC_CHANGED(WRITE8(hp98034_io_card , dc_w))
-	MCFG_HP_NANO_READ_DC_CB(READ8(hp98034_io_card , dc_r))
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(hp98034_io_card , irq_callback)
+	MCFG_HP_NANO_DC_CHANGED(WRITE8(hp98034_io_card_device , dc_w))
+	MCFG_HP_NANO_READ_DC_CB(READ8(hp98034_io_card_device , dc_r))
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(hp98034_io_card_device , irq_callback)
 
 	MCFG_IEEE488_SLOT_ADD("ieee_dev" , 0 , hp_ieee488_devices , nullptr)
 	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_IFC_CALLBACK(WRITELINE(hp98034_io_card , ieee488_ctrl_w))
-	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(hp98034_io_card , ieee488_ctrl_w))
+	MCFG_IEEE488_IFC_CALLBACK(WRITELINE(hp98034_io_card_device , ieee488_ctrl_w))
+	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(hp98034_io_card_device , ieee488_ctrl_w))
 MACHINE_CONFIG_END
 
-const tiny_rom_entry *hp98034_io_card::device_rom_region() const
+const tiny_rom_entry *hp98034_io_card_device::device_rom_region() const
 {
 	return ROM_NAME(hp98034);
 }
 
-machine_config_constructor hp98034_io_card::device_mconfig_additions() const
+machine_config_constructor hp98034_io_card_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME(hp98034);
 }
 
 // device type definition
-const device_type HP98034_IO_CARD = device_creator<hp98034_io_card>;
+DEFINE_DEVICE_TYPE(HP98034_IO_CARD, hp98034_io_card_device, "hp98034", "HP98034 card")

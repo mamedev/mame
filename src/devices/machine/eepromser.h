@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_EEPROMSER_H
+#define MAME_MACHINE_EEPROMSER_H
 
-#ifndef __EEPROMSER_H__
-#define __EEPROMSER_H__
+#pragma once
 
 #include "eeprom.h"
 
@@ -102,10 +102,6 @@
 
 class eeprom_serial_base_device : public eeprom_base_device
 {
-protected:
-	// construction/destruction
-	eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
-
 public:
 	// inline configuration helpers
 	static void static_set_address_bits(device_t &device, int addrbits);
@@ -113,6 +109,9 @@ public:
 	static void static_enable_output_on_falling_clock(device_t &device);
 
 protected:
+	// construction/destruction
+	eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -197,10 +196,6 @@ protected:
 
 class eeprom_serial_93cxx_device : public eeprom_serial_base_device
 {
-protected:
-	// construction/destruction
-	eeprom_serial_93cxx_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
-
 public:
 	// read handlers
 	DECLARE_READ_LINE_MEMBER(do_read);  // combined DO+READY/BUSY
@@ -211,6 +206,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(di_write);        // DI
 
 protected:
+	// construction/destruction
+	eeprom_serial_93cxx_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
+
 	// subclass overrides
 	virtual void parse_command_and_address() override;
 };
@@ -220,10 +218,6 @@ protected:
 
 class eeprom_serial_er5911_device : public eeprom_serial_base_device
 {
-protected:
-	// construction/destruction
-	eeprom_serial_er5911_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
-
 public:
 	// read handlers
 	DECLARE_READ_LINE_MEMBER(do_read);          // DO
@@ -235,6 +229,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(di_write);        // DI
 
 protected:
+	// construction/destruction
+	eeprom_serial_er5911_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
+
 	// subclass overrides
 	virtual void parse_command_and_address() override;
 };
@@ -246,10 +243,6 @@ class eeprom_serial_x24c44_device : public eeprom_serial_base_device
 {
 		//async recall not implemented
 		//async store not implemented
-protected:
-	// construction/destruction
-	eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
-
 public:
 	// read handlers
 	DECLARE_READ_LINE_MEMBER(do_read);          // DO
@@ -260,6 +253,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(di_write);        // DI
 
 protected:
+	// construction/destruction
+	eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
+
 	// subclass overrides
 	virtual void parse_command_and_address() override;
 	void handle_event(eeprom_event event) override;
@@ -287,7 +283,8 @@ class eeprom_serial_##_lowercase##_##_bits##bit_device : public eeprom_serial_##
 public: \
 	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); \
 }; \
-extern const device_type EEPROM_SERIAL_##_uppercase##_##_bits##BIT;
+DECLARE_DEVICE_TYPE(EEPROM_SERIAL_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device)
+
 // standard 93CX6 class of 16-bit EEPROMs
 DECLARE_SERIAL_EEPROM_DEVICE(93cxx, 93c06, 93C06, 16)
 DECLARE_SERIAL_EEPROM_DEVICE(93cxx, 93c46, 93C46, 16)
@@ -319,4 +316,5 @@ DECLARE_SERIAL_EEPROM_DEVICE(93cxx, s29390, S29390, 16)
 
 // X24c44 8 bit 32byte ram/eeprom combo
 DECLARE_SERIAL_EEPROM_DEVICE(x24c44, x24c44, X24C44, 16)
-#endif
+
+#endif // MAME_MACHINE_EEPROMSER_H

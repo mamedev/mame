@@ -43,10 +43,10 @@ each one of them can declare to have four different priority levels.
 #include "tc0360pri.h"
 
 
-const device_type TC0360PRI = device_creator<tc0360pri_device>;
+DEFINE_DEVICE_TYPE(TC0360PRI, tc0360pri_device, "tc0360pri", "Taito TC0360PRI")
 
 tc0360pri_device::tc0360pri_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0360PRI, "Taito TC0360PRI", tag, owner, clock, "tc0360pri", __FILE__)
+	: device_t(mconfig, TC0360PRI, tag, owner, clock)
 {
 }
 

@@ -10,11 +10,10 @@
 
 ***************************************************************************/
 
+#ifndef MAME_VIDEO_GBA_LCD_H
+#define MAME_VIDEO_GBA_LCD_H
+
 #pragma once
-
-#ifndef __GBA_LCD_H__
-#define __GBA_LCD_H__
-
 
 
 
@@ -23,7 +22,7 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type GBA_LCD;
+DECLARE_DEVICE_TYPE(GBA_LCD, gba_lcd_device)
 
 
 //**************************************************************************
@@ -103,29 +102,29 @@ public:
 	TIMER_CALLBACK_MEMBER(perform_hbl);
 	TIMER_CALLBACK_MEMBER(perform_scan);
 
-	template<class _Object> static devcb_base &set_int_hblank_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &set_int_hblank_callback(device_t &device, Object &&cb)
 	{
-		return downcast<gba_lcd_device &>(device).m_int_hblank_cb.set_callback(object);
+		return downcast<gba_lcd_device &>(device).m_int_hblank_cb.set_callback(std::forward<Object>(cb));
 	}
 
-	template<class _Object> static devcb_base &set_int_vblank_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &set_int_vblank_callback(device_t &device, Object &&cb)
 	{
-		return downcast<gba_lcd_device &>(device).m_int_vblank_cb.set_callback(object);
+		return downcast<gba_lcd_device &>(device).m_int_vblank_cb.set_callback(std::forward<Object>(cb));
 	}
 
-	template<class _Object> static devcb_base &set_int_vcount_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &set_int_vcount_callback(device_t &device, Object &&cb)
 	{
-		return downcast<gba_lcd_device &>(device).m_int_vcount_cb.set_callback(object);
+		return downcast<gba_lcd_device &>(device).m_int_vcount_cb.set_callback(std::forward<Object>(cb));
 	}
 
-	template<class _Object> static devcb_base &set_dma_hblank_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &set_dma_hblank_callback(device_t &device, Object &&cb)
 	{
-		return downcast<gba_lcd_device &>(device).m_dma_hblank_cb.set_callback(object);
+		return downcast<gba_lcd_device &>(device).m_dma_hblank_cb.set_callback(std::forward<Object>(cb));
 	}
 
-	template<class _Object> static devcb_base &set_dma_vblank_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &set_dma_vblank_callback(device_t &device, Object &&cb)
 	{
-		return downcast<gba_lcd_device &>(device).m_dma_vblank_cb.set_callback(object);
+		return downcast<gba_lcd_device &>(device).m_dma_vblank_cb.set_callback(std::forward<Object>(cb));
 	}
 
 protected:
@@ -250,4 +249,4 @@ private:
 	static constexpr uint32_t TRANSPARENT_PIXEL = 0x80000000;
 };
 
-#endif /* GBA_LCD_H_ */
+#endif // MAME_VIDEO_GBA_LCD_H

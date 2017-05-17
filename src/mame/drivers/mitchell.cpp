@@ -17,7 +17,7 @@
 
     TODO:
     - understand what bits 0 and 3 of input port 0x05 are
-
+    - correct sound clocks for the MSM5205 bootlegs
 
 ******************************************************************************
 Pang
@@ -1163,7 +1163,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mitchell_state::mitchell_irq)
 	}
 }
 
-static MACHINE_CONFIG_START( mgakuen, mitchell_state )
+static MACHINE_CONFIG_START( mgakuen )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2) /* probably same clock as the other mitchell hardware games */
@@ -1195,7 +1195,7 @@ static MACHINE_CONFIG_START( mgakuen, mitchell_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* probably same clock as the other mitchell hardware games */
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* probably same clock as the other mitchell hardware games */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_16MHz/4) /* probably same clock as the other mitchell hardware games */
@@ -1203,7 +1203,7 @@ static MACHINE_CONFIG_START( mgakuen, mitchell_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pang, mitchell_state )
+static MACHINE_CONFIG_START( pang )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz/2) /* verified on pcb */
@@ -1236,7 +1236,7 @@ static MACHINE_CONFIG_START( pang, mitchell_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("ymsnd",YM2413, XTAL_16MHz/4) /* verified on pcb */
@@ -1288,7 +1288,7 @@ static MACHINE_CONFIG_DERIVED( spangbl, pangnv )
 
 	MCFG_DEVICE_REMOVE("scantimer")
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // Z80A CPU; clock unknown
 	MCFG_CPU_PROGRAM_MAP(spangbl_sound_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", spangbl)
@@ -1296,9 +1296,9 @@ static MACHINE_CONFIG_DERIVED( spangbl, pangnv )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DEVICE_REMOVE("oki")
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(mitchell_state, spangbl_adpcm_int))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 4KHz 4-bit */
+	MCFG_SOUND_ADD("msm", MSM5205, 384000) // clock and prescaler unknown
+	MCFG_MSM5205_VCLK_CB(WRITELINE(mitchell_state, spangbl_adpcm_int)) // controls music as well as ADCPM rate
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
@@ -1313,7 +1313,7 @@ static MACHINE_CONFIG_DERIVED( pangba, spangbl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mstworld, mitchell_state )
+static MACHINE_CONFIG_START( mstworld )
 
 	/* basic machine hardware */
 	/* it doesn't glitch with the clock speed set to 4x normal, however this is incorrect..
@@ -1352,12 +1352,12 @@ static MACHINE_CONFIG_START( mstworld, mitchell_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 990000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 990000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( marukin, mitchell_state )
+static MACHINE_CONFIG_START( marukin )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2) /* verified on pcb */
@@ -1387,7 +1387,7 @@ static MACHINE_CONFIG_START( marukin, mitchell_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_16MHz/4) /* verified on pcb */
@@ -1412,7 +1412,7 @@ Vsync is 59.09hz
 
 */
 
-static MACHINE_CONFIG_START( pkladiesbl, mitchell_state )
+static MACHINE_CONFIG_START( pkladiesbl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
@@ -1442,7 +1442,7 @@ static MACHINE_CONFIG_START( pkladiesbl, mitchell_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* It should be a OKIM5205 with a 384khz resonator */
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* It should be a OKIM5205 with a 384khz resonator */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3750000) /* verified on pcb, read the comments */
@@ -1805,6 +1805,44 @@ ROM_START( pangba )
 	ROM_LOAD( "pang.9",     0x030000, 0x10000, CRC(6496be82) SHA1(9c7ef4c6c3a0361f3118339a0c63b0923045d6c3) )
 	ROM_LOAD( "pang.12",    0x000000, 0x10000, CRC(fa247a04) SHA1(b5cab5f65eb3af3deeea6afba955056ca51f39af) )
 	ROM_LOAD( "pang.10",    0x010000, 0x10000, CRC(082151ee) SHA1(0857b9f7430e0fc6217eafbaf008ff9da8e7a493) )
+ROM_END
+
+ROM_START( pangbb )
+	ROM_REGION( 2*0x50000, "maincpu", 0 )
+	ROM_LOAD( "3", 0x50000, 0x08000, CRC(2548534f) SHA1(c67964e1d0b51ea7bb62685055dee1910e9f0fb9) )
+	ROM_CONTINUE( 0x00000, 0x08000 )
+	ROM_LOAD( "2", 0x60000, 0x04000, CRC(8167b646) SHA1(db131cb53e81abd070db83721752a8f5473afbb9) )
+	ROM_CONTINUE( 0x10000, 0x04000 )
+	ROM_CONTINUE( 0x64000, 0x04000 )
+	ROM_CONTINUE( 0x14000, 0x04000 )
+	ROM_CONTINUE( 0x68000, 0x04000 )
+	ROM_CONTINUE( 0x18000, 0x04000 )
+	ROM_CONTINUE( 0x6c000, 0x04000 )
+	ROM_CONTINUE( 0x1c000, 0x04000 )
+	ROM_LOAD( "1", 0x70000, 0x04000, CRC(5c3afca2) SHA1(130c801495d83e2336b8c5b04ca168e76e9e0da8) )
+	ROM_CONTINUE( 0x20000, 0x04000 )
+	ROM_CONTINUE( 0x74000, 0x04000 )
+	ROM_CONTINUE( 0x24000, 0x04000 )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Sound Z80 + M5205(?) samples */
+	ROM_LOAD( "24", 0x00000, 0x10000, CRC(09c43210) SHA1(79b5aed2c5d6d9110129885e8979c1f13b7b8aac) ) // Same music as pangba, but arranged for YM2413 instead of YM3812
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT | ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "14", 0x000001, 0x10000, CRC(c90095ee) SHA1(bf380f289eb42030a9f911aa5f697ba76f5723db) )
+	ROM_LOAD16_BYTE( "6", 0x000000, 0x10000, CRC(c0133cf3) SHA1(07916f7ce6bbaea75b68f5d1d2cb4486825fc397) )
+	ROM_LOAD16_BYTE( "13", 0x020001, 0x10000, CRC(a49e98ec) SHA1(8a3d13bd755b58b0bc1d1497363409a1eeade129) )
+	ROM_LOAD16_BYTE( "5", 0x020000, 0x10000, CRC(5804ae3e) SHA1(33de9aea7aa201aa650b0b6c5347713bf10cc13d) )
+
+	ROM_LOAD16_BYTE( "16", 0x080001, 0x10000, CRC(bc508935) SHA1(1a11144b563befc11015d75e3867c07329ee6f32) )
+	ROM_LOAD16_BYTE( "8", 0x080000, 0x10000, CRC(53a99bb6) SHA1(ffb75c5541d7c1478f05717b2cfa4bfe9b4654cd) )
+	ROM_LOAD16_BYTE( "15", 0x0a0001, 0x10000, CRC(bf5c09b9) SHA1(f66a901292b190aa39dc2460363307e94c358d4d) )
+	ROM_LOAD16_BYTE( "7", 0x0a0000, 0x10000, CRC(8b718670) SHA1(c22005a665a9e0bcfc3ddbc22ca4a2a261224ce1) )
+
+	ROM_REGION( 0x040000, "gfx2", ROMREGION_INVERT )
+	ROM_LOAD( "11", 0x020000, 0x10000, CRC(07191732) SHA1(7de03ddb07b2afad311b9ed5c84e04bef62d0050) )
+	ROM_LOAD( "9", 0x030000, 0x10000, CRC(6496be82) SHA1(9c7ef4c6c3a0361f3118339a0c63b0923045d6c3) )
+	ROM_LOAD( "12", 0x000000, 0x10000, CRC(fa247a04) SHA1(b5cab5f65eb3af3deeea6afba955056ca51f39af) )
+	ROM_LOAD( "10", 0x010000, 0x10000, CRC(082151ee) SHA1(0857b9f7430e0fc6217eafbaf008ff9da8e7a493) )
 ROM_END
 
 ROM_START( cworld )
@@ -2404,14 +2442,15 @@ GAME( 1989, bbros,     pang,     pang,      pang,     mitchell_state, pang,     
 GAME( 1989, pompingw,  pang,     pang,      pang,     mitchell_state, pang,      ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangb,     pang,     pang,      pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangbold,  pang,     pang,      pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangba,    pang,     pangba,    pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangba,    pang,     pangba,    pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangb2,    pang,     pang,      pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbb,    pang,     spangbl,   pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, cworld,    0,        pang,      qtono1,   mitchell_state, cworld,    ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hatena,    0,        pang,      qtono1,   mitchell_state, hatena,    ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, spang,     0,        pangnv,    pang,     mitchell_state, spang,     ROT0,   "Mitchell",                  "Super Pang (World 900914)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, sbbros,    spang,    pangnv,    pang,     mitchell_state, sbbros,    ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, spangj,    spang,    pangnv,    pang,     mitchell_state, spangj,    ROT0,   "Mitchell",                  "Super Pang (Japan 901023)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spangbl,   spang,    spangbl,   spangbl,  mitchell_state, spangbl,   ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg)", MACHINE_SUPPORTS_SAVE ) // different sound hardware
+GAME( 1990, spangbl,   spang,    spangbl,   spangbl,  mitchell_state, spangbl,   ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different sound hardware
 GAME( 1994, mstworld,  0,        mstworld,  mstworld, mitchell_state, mstworld,  ROT0,   "bootleg (TCH)",             "Monsters World (bootleg of Super Pang)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, marukin,   0,        marukin,   marukin,  mitchell_state, marukin,   ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, qtono1,    0,        pang,      qtono1,   mitchell_state, qtono1,    ROT0,   "Capcom",                    "Quiz Tonosama no Yabou (Japan)", MACHINE_SUPPORTS_SAVE )

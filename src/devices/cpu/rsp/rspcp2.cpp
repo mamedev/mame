@@ -10,8 +10,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "rsp.h"
 #include "rspcp2.h"
+
+#include "rsp.h"
+#include "rspdefs.h"
+
 
 #if USE_SIMD
 #include <emmintrin.h>

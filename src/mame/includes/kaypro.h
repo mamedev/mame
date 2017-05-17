@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
+#ifndef MAME_INCLUDES_KAYPRO_H
+#define MAME_INCLUDES_KAYPRO_H
+
+#pragma once
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
@@ -100,9 +105,11 @@ private:
 	required_device<z80sio0_device> m_sio;
 	optional_device<z80sio0_device> m_sio2x;
 	required_device<centronics_device> m_centronics;
-	required_device<fd1793_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	optional_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_beep;
 };
+
+#endif // MAME_INCLUDES_KAYPRO_H

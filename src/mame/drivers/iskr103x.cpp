@@ -60,7 +60,7 @@ static DEVICE_INPUT_DEFAULTS_START(iskr1031)
 DEVICE_INPUT_DEFAULTS_END
 
 // XXX
-static MACHINE_CONFIG_START( iskr1030m, iskr103x_state )
+static MACHINE_CONFIG_START( iskr1030m )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",  I8086, 4772720)
 	MCFG_CPU_PROGRAM_MAP(iskr1031_map)
@@ -114,6 +114,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT                       INIT        COMPANY     FULLNAME */
-COMP ( 1989,    iskr1030m,  ibm5150,    0,      iskr1030m,  0,         driver_device,   0,          "Schetmash", "Iskra 1030M", MACHINE_NOT_WORKING)
-COMP ( 1989,    iskr1031,   ibm5150,    0,      iskr1031,   0,         driver_device,   0,          "<unknown>", "Iskra 1031", 0)
+//     YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT  STATE           INIT  COMPANY       FULLNAME      FLAGS
+COMP ( 1989, iskr1030m, ibm5150, 0,      iskr1030m,  0,     iskr103x_state, 0,    "Schetmash", "Iskra 1030M", MACHINE_NOT_WORKING )
+COMP ( 1989, iskr1031,  ibm5150, 0,      iskr1031,   0,     iskr103x_state, 0,    "<unknown>", "Iskra 1031",  0 )

@@ -1269,7 +1269,7 @@ void konamim2_state::machine_reset()
 	cde_init();
 }
 
-static MACHINE_CONFIG_START( m2, konamim2_state )
+static MACHINE_CONFIG_START( m2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC602, 66000000)   /* actually PPC602, 66MHz */
@@ -1302,7 +1302,7 @@ static MACHINE_CONFIG_START( m2, konamim2_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS ( 3do_m2, m2, konamim2_state )
+static MACHINE_CONFIG_DERIVED ( 3do_m2, m2 )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(3do_m2_main)
@@ -1458,4 +1458,4 @@ GAME( 1998, evilngt,  0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Evi
 GAME( 1998, evilngte, evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Evil Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1998, hellngt,  evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Hell Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    driver_device, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    konamim2_state, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

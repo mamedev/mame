@@ -256,7 +256,7 @@ WRITE8_MEMBER(toratora_state::sn1_port_b_u3_w)
 	 * However, shot audio is muted if V < 1.0, as mixer state
 	 * is set to SLF & VCO. Should SLF FF state be inverted?
 	 */
-	m_sn1->slf_cap_voltage_w((data >> 5) == 0x7 ? 2.5 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
+	m_sn1->slf_cap_voltage_w((data >> 5) == 0x7 ? 2.5 : sn76477_device::EXTERNAL_VOLTAGE_DISCONNECT);
 }
 
 
@@ -292,7 +292,7 @@ WRITE8_MEMBER(toratora_state::sn2_port_b_u2_w)
 	m_sn2->envelope_1_w   ((data >> 3) & 0x01);
 	m_sn2->envelope_2_w   ((data >> 4) & 0x01);
 	m_sn2->slf_res_w(resistances[(data >> 5)]);
-	m_sn2->slf_cap_voltage_w((data >> 5) == 0x7 ? 2.5 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
+	m_sn2->slf_cap_voltage_w((data >> 5) == 0x7 ? 2.5 : sn76477_device::EXTERNAL_VOLTAGE_DISCONNECT);
 
 	/* Seems like the output should be muted in this case, but unsure of exact mechanism */
 	m_sn2->amplitude_res_w((data >> 5) == 0x0 ? RES_INF : RES_K(47));
@@ -390,7 +390,7 @@ void toratora_state::machine_reset()
 	m_clear_tv = 0;
 }
 
-static MACHINE_CONFIG_START( toratora, toratora_state )
+static MACHINE_CONFIG_START( toratora )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 5185000 / 8) /* 5.185 MHz XTAL divided by 8 (@ U94.12) */
@@ -522,5 +522,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, toratora, 0,        toratora, toratora, driver_device, 0, ROT90, "Game Plan", "Tora Tora (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, toratorab,toratora, toratora, toratora, driver_device, 0, ROT90, "Game Plan", "Tora Tora (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, toratora, 0,        toratora, toratora, toratora_state, 0, ROT90, "Game Plan", "Tora Tora (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, toratorab,toratora, toratora, toratora, toratora_state, 0, ROT90, "Game Plan", "Tora Tora (set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

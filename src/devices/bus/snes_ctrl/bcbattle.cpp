@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_BARCODE_BATTLER = device_creator<snes_bcbattle_device>;
+DEFINE_DEVICE_TYPE(SNES_BARCODE_BATTLER, snes_bcbattle_device, "snes_bcbattle", "Epoch Barcode Battler (SFC)")
 
 
 MACHINE_CONFIG_FRAGMENT( snes_battler )
@@ -83,9 +83,12 @@ void snes_bcbattle_device::device_timer(emu_timer &timer, device_timer_id id, in
 //-------------------------------------------------
 
 snes_bcbattle_device::snes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, SNES_BARCODE_BATTLER, "Epoch Barcode Battler (SFC)", tag, owner, clock, "snes_bcbattle", __FILE__),
-					device_snes_control_port_interface(mconfig, *this),
-					m_reader(*this, "battler"), m_pending_code(0), m_new_code(0), m_transmitting(0), m_cur_bit(0), m_cur_byte(0), battler_timer(nullptr), m_strobe(0), m_idx(0)
+	device_t(mconfig, SNES_BARCODE_BATTLER, tag, owner, clock),
+	device_snes_control_port_interface(mconfig, *this),
+	m_reader(*this, "battler"),
+	m_pending_code(0), m_new_code(0), m_transmitting(0), m_cur_bit(0), m_cur_byte(0),
+	battler_timer(nullptr),
+	m_strobe(0), m_idx(0)
 {
 }
 

@@ -229,7 +229,7 @@ void kopunch_state::machine_start()
 	save_item(NAME(m_scrollx));
 }
 
-static MACHINE_CONFIG_START( kopunch, kopunch_state )
+static MACHINE_CONFIG_START( kopunch )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, 4000000) // 4 MHz?
@@ -312,4 +312,4 @@ ROM_START( kopunch )
 ROM_END
 
 
-GAME( 1981, kopunch, 0, kopunch, kopunch, driver_device, 0, ROT270, "Sega", "KO Punch", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, kopunch, 0, kopunch, kopunch, kopunch_state, 0, ROT270, "Sega", "KO Punch", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

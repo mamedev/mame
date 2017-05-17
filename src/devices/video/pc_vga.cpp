@@ -121,78 +121,78 @@ enum
 
 ***************************************************************************/
 // device type definition
-const device_type VGA = device_creator<vga_device>;
-const device_type TSENG_VGA = device_creator<tseng_vga_device>;
-const device_type S3_VGA = device_creator<s3_vga_device>;
-const device_type GAMTOR_VGA = device_creator<gamtor_vga_device>;
-const device_type ATI_VGA = device_creator<ati_vga_device>;
-const device_type IBM8514A = device_creator<ibm8514a_device>;
-const device_type MACH8 = device_creator<mach8_device>;
+DEFINE_DEVICE_TYPE(VGA,        vga_device,        "vga",        "VGA")
+DEFINE_DEVICE_TYPE(TSENG_VGA,  tseng_vga_device,  "tseng_vga",  "Tseng Labs VGA")
+DEFINE_DEVICE_TYPE(S3_VGA,     s3_vga_device,     "s3_vga",     "S3 Graphics VGA")
+DEFINE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device, "gamtor_vga", "GAMTOR VGA")
+DEFINE_DEVICE_TYPE(ATI_VGA,    ati_vga_device,    "ati_vga",    "ATi VGA")
+DEFINE_DEVICE_TYPE(IBM8514A,   ibm8514a_device,   "ibm8514a",   "IBM 8514/A Video")
+DEFINE_DEVICE_TYPE(MACH8,      mach8_device,      "mach8",      "Mach8")
 
-vga_device::vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+vga_device::vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_palette(*this, "^palette")
 	, m_screen(*this,"^screen")
 {
 }
 
 vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vga_device(mconfig, VGA, "VGA", tag, owner, clock, "vga", __FILE__)
+	: vga_device(mconfig, VGA, tag, owner, clock)
 {
 }
 
-svga_device::svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
+svga_device::svga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: vga_device(mconfig, type, tag, owner, clock)
 {
 }
 
 tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, TSENG_VGA, "TSENG LABS VGA", tag, owner, clock, "tseng_vga", __FILE__)
+	: svga_device(mconfig, TSENG_VGA, tag, owner, clock)
 {
 }
 
 s3_vga_device::s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: s3_vga_device(mconfig, S3_VGA, "S3 Graphics VGA", tag, owner, clock, "s3_vga", __FILE__)
+	: s3_vga_device(mconfig, S3_VGA, tag, owner, clock)
 {
 }
 
-s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: ati_vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
+s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ati_vga_device(mconfig, type, tag, owner, clock)
 {
 }
 
 gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, GAMTOR_VGA, "GAMTOR VGA", tag, owner, clock, "gamtor_vga", __FILE__)
+	: svga_device(mconfig, GAMTOR_VGA, tag, owner, clock)
 {
 }
 
 ati_vga_device::ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ati_vga_device(mconfig, ATI_VGA, "ATI VGA", tag, owner, clock, "ati_vga", __FILE__)
+	: ati_vga_device(mconfig, ATI_VGA, tag, owner, clock)
 {
 }
 
-ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: svga_device(mconfig, type, name, tag, owner, clock, shortname, source)
+ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: svga_device(mconfig, type, tag, owner, clock)
 {
 }
 
 ibm8514a_device::ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ibm8514a_device(mconfig, IBM8514A, "IBM8514A Video", tag, owner, clock, "ibm8514a", __FILE__)
+	: ibm8514a_device(mconfig, IBM8514A, tag, owner, clock)
 {
 }
 
-ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 {
 }
 
-mach8_device::mach8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: ibm8514a_device(mconfig, type, name, tag, owner, clock, shortname, source)
+mach8_device::mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ibm8514a_device(mconfig, type, tag, owner, clock)
 {
 }
 
 mach8_device::mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mach8_device(mconfig, MACH8, "MACH8", tag, owner, clock, "mach8", __FILE__)
+	: mach8_device(mconfig, MACH8, tag, owner, clock)
 {
 }
 

@@ -470,7 +470,7 @@ void superwng_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( superwng, superwng_state )
+static MACHINE_CONFIG_START( superwng )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -525,4 +525,4 @@ ROM_START( superwng )
 ROM_END
 
 
-GAME( 1985, superwng,   0,      superwng, superwng, driver_device, 0, ROT90, "Wing", "Super Wing", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // crashes after bonus stage, see notes, bad rom?
+GAME( 1985, superwng,   0,      superwng, superwng, superwng_state, 0, ROT90, "Wing", "Super Wing", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // crashes after bonus stage, see notes, bad rom?

@@ -885,7 +885,7 @@ SLOT_INTERFACE_START(amstrad_centronics_devices)
 	SLOT_INTERFACE("digiblst", CENTRONICS_DIGIBLASTER)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( amstrad_base, amstrad_state )
+static MACHINE_CONFIG_START( amstrad_base )
 	/* Machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
@@ -1010,7 +1010,7 @@ static MACHINE_CONFIG_DERIVED( kccomp, cpc6128 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cpcplus, amstrad_state )
+static MACHINE_CONFIG_START( cpcplus )
 	/* Machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
@@ -1089,7 +1089,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gx4000, amstrad_state )
+static MACHINE_CONFIG_START( gx4000 )
 	/* Machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
@@ -1286,14 +1286,14 @@ ROM_END
  *
  *************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT               COMPANY                FULLNAME                                     FLAGS */
-COMP( 1984, cpc464,   0,        0,      cpc464,   cpc464,   driver_device, 0,  "Amstrad plc",         "Amstrad CPC464",                            0 )
-COMP( 1985, cpc664,   cpc464,   0,      cpc664,   cpc664,   driver_device, 0,  "Amstrad plc",         "Amstrad CPC664",                            0 )
-COMP( 1985, cpc6128,  cpc464,   0,      cpc6128,  cpc6128,  driver_device, 0,  "Amstrad plc",         "Amstrad CPC6128",                           0 )
-COMP( 1985, cpc6128f, cpc464,   0,      cpc6128,  cpc6128f, driver_device, 0,  "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
-COMP( 1985, cpc6128s, cpc464,   0,      cpc6128,  cpc6128s, driver_device, 0,  "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",          0 )
-COMP( 1990, cpc464p,  0,        0,      cpcplus,  plus,     driver_device, 0,  "Amstrad plc",         "Amstrad CPC464+",                           0 )
-COMP( 1990, cpc6128p, 0,        0,      cpcplus,  plus,     driver_device, 0,  "Amstrad plc",         "Amstrad CPC6128+",                          0 )
-CONS( 1990, gx4000,   0,        0,      gx4000,   gx4000,   driver_device, 0,  "Amstrad plc",         "Amstrad GX4000",                            0 )
-COMP( 1989, kccomp,   cpc464,   0,      kccomp,   kccomp,   driver_device, 0,  "VEB Mikroelektronik", "KC Compact",                                0 )
-COMP( 1993, al520ex,  cpc464,   0,      aleste,   aleste,   driver_device, 0,  "Patisonic",           "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE          INIT  COMPANY                FULLNAME                                     FLAGS */
+COMP( 1984, cpc464,   0,        0,      cpc464,   cpc464,   amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC464",                            0 )
+COMP( 1985, cpc664,   cpc464,   0,      cpc664,   cpc664,   amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC664",                            0 )
+COMP( 1985, cpc6128,  cpc464,   0,      cpc6128,  cpc6128,  amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128",                           0 )
+COMP( 1985, cpc6128f, cpc464,   0,      cpc6128,  cpc6128f, amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
+COMP( 1985, cpc6128s, cpc464,   0,      cpc6128,  cpc6128s, amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",          0 )
+COMP( 1990, cpc464p,  0,        0,      cpcplus,  plus,     amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC464+",                           0 )
+COMP( 1990, cpc6128p, 0,        0,      cpcplus,  plus,     amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128+",                          0 )
+CONS( 1990, gx4000,   0,        0,      gx4000,   gx4000,   amstrad_state, 0,    "Amstrad plc",         "Amstrad GX4000",                            0 )
+COMP( 1989, kccomp,   cpc464,   0,      kccomp,   kccomp,   amstrad_state, 0,    "VEB Mikroelektronik", "KC Compact",                                0 )
+COMP( 1993, al520ex,  cpc464,   0,      aleste,   aleste,   amstrad_state, 0,    "Patisonic",           "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )

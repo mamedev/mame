@@ -2567,7 +2567,7 @@ DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init(0); save_item(NAME(m_latche
 #define SSV_VBEND 0
 #define SSV_VBSTART 0xf0
 
-static MACHINE_CONFIG_START( ssv, ssv_state )
+static MACHINE_CONFIG_START( ssv )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V60, SSV_MASTER_CLOCK) /* Based on STA-0001 & STA-0001B System boards */

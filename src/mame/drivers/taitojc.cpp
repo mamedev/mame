@@ -1086,7 +1086,7 @@ void taitojc_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( taitojc, taitojc_state )
+static MACHINE_CONFIG_START( taitojc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_10MHz*2) // 20MHz, clock source = CY7C991
@@ -1141,7 +1141,7 @@ static MACHINE_CONFIG_DERIVED( dendego, taitojc )
 
 	/* sound hardware */
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "subwoofer", 0.20)
 MACHINE_CONFIG_END
 

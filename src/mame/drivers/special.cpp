@@ -49,7 +49,7 @@ static ADDRESS_MAP_START( erik_io_map, AS_IO, 8, special_state )
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(erik_rr_reg_r, erik_rr_reg_w)
 	AM_RANGE(0xf2, 0xf2) AM_READWRITE(erik_rc_reg_r, erik_rc_reg_w)
 	AM_RANGE(0xf3, 0xf3) AM_READWRITE(erik_disk_reg_r, erik_disk_reg_w)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("fd1793", fd1793_t, read, write)
+	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("fd1793", fd1793_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(specimx_mem, AS_PROGRAM, 8, special_state )
@@ -60,7 +60,7 @@ static ADDRESS_MAP_START(specimx_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0xffc0, 0xffdf ) AM_RAMBANK("bank4")
 	AM_RANGE( 0xffe0, 0xffe3 ) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE( 0xffe4, 0xffe7 ) AM_RAM //external 8255
-	AM_RANGE( 0xffe8, 0xffeb ) AM_DEVREADWRITE("fd1793", fd1793_t, read, write)
+	AM_RANGE( 0xffe8, 0xffeb ) AM_DEVREADWRITE("fd1793", fd1793_device, read, write)
 	AM_RANGE( 0xffec, 0xffef ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE( 0xfff0, 0xfff3 ) AM_READWRITE(specimx_disk_ctrl_r, specimx_disk_ctrl_w)
 	AM_RANGE( 0xfff8, 0xfffb ) AM_READWRITE(specimx_video_color_r,specimx_video_color_w)
@@ -358,7 +358,7 @@ static SLOT_INTERFACE_START( specimx_floppies )
 SLOT_INTERFACE_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( special, special_state )
+static MACHINE_CONFIG_START( special )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(specialist_mem)
@@ -475,7 +475,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( erik, special_state )
+static MACHINE_CONFIG_START( erik )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(erik_mem)
@@ -598,11 +598,11 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME        PARENT    COMPAT   MACHINE    INPUT     CLASS              INIT        COMPANY      FULLNAME       FLAGS */
-COMP( 1985, special,    0,        0,       special,   special,  special_state,    special,   "<unknown>", "Specialist", 0 )
-COMP( 1985, specialm,   special,  0,       specialm,  special,  special_state,    special,   "<unknown>", "Specialist M", 0 )
-COMP( 1985, pioner,     special,  0,       special,   special,  special_state,    special,   "<unknown>", "Pioner", MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT    COMPAT   MACHINE    INPUT     CLASS             INIT       COMPANY      FULLNAME                    FLAGS
+COMP( 1985, special,    0,        0,       special,   special,  special_state,    special,   "<unknown>", "Specialist",               0 )
+COMP( 1985, specialm,   special,  0,       specialm,  special,  special_state,    special,   "<unknown>", "Specialist M",             0 )
+COMP( 1985, pioner,     special,  0,       special,   special,  special_state,    special,   "<unknown>", "Pioner",                   MACHINE_NOT_WORKING )
 COMP( 1985, specialp,   special,  0,       specialp,  specialp, special_state,    special,   "<unknown>", "Specialist + hires graph", MACHINE_NOT_WORKING )
-COMP( 1985, lik,        special,  0,       special,   lik,      special_state,    special,   "<unknown>", "Lik", 0 )
-COMP( 1985, specimx,    special,  0,       specimx,   specimx,  driver_device,    0,         "<unknown>", "Specialist MX", 0)
-COMP( 1994, erik,       special,  0,       erik,      special,  special_state,    erik,      "<unknown>", "Erik", 0 )
+COMP( 1985, lik,        special,  0,       special,   lik,      special_state,    special,   "<unknown>", "Lik",                      0 )
+COMP( 1985, specimx,    special,  0,       specimx,   specimx,  special_state,    0,         "<unknown>", "Specialist MX",            0 )
+COMP( 1994, erik,       special,  0,       erik,      special,  special_state,    erik,      "<unknown>", "Erik",                     0 )

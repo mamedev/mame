@@ -465,7 +465,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( gambl186, gambl186_state )
+static MACHINE_CONFIG_START( gambl186 )
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(gambl186_map)
 	MCFG_CPU_IO_MAP(gambl186_io)
@@ -524,6 +524,6 @@ ROM_START( gambl186b )
 ROM_END
 
 // version numbering isn't clear, rom labels don't agree with test mode display.
-GAME( 1997, gambl186,  0,        gambl186, gambl186, driver_device, 0,    ROT0,  "EGD",     "Multi Game (Versione 4.0.3 - 1.5.7, 05-FEV-99(397)) (V398?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 4.0.3 (1.5.7), csmb15A, CSMB_0015A (IT), - 05-FEV-99(397)
-GAME( 1997, gambl186a, gambl186, gambl186, gambl186, driver_device, 0,    ROT0,  "EGD",     "Multi Game (Versione 4.0.3 - 1.5.7, 05-FEV-99(397)) (V399?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // same?
-GAME( 1997, gambl186b, gambl186, gambl186, gambl186, driver_device, 0,    ROT0,  "EGD",     "Multi Game (Versione 3.8.6T - 1.5.6, 25-AUG-97) (V378?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 3.8.6T (1.5.6), mult5_it, CSMB-0000F (IT), 25-AUG-97
+GAME( 1997, gambl186,  0,        gambl186, gambl186, gambl186_state, 0,    ROT0,  "EGD",     "Multi Game (Versione 4.0.3 - 1.5.7, 05-FEV-99(397)) (V398?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 4.0.3 (1.5.7), csmb15A, CSMB_0015A (IT), - 05-FEV-99(397)
+GAME( 1997, gambl186a, gambl186, gambl186, gambl186, gambl186_state, 0,    ROT0,  "EGD",     "Multi Game (Versione 4.0.3 - 1.5.7, 05-FEV-99(397)) (V399?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // same?
+GAME( 1997, gambl186b, gambl186, gambl186, gambl186, gambl186_state, 0,    ROT0,  "EGD",     "Multi Game (Versione 3.8.6T - 1.5.6, 25-AUG-97) (V378?)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 3.8.6T (1.5.6), mult5_it, CSMB-0000F (IT), 25-AUG-97

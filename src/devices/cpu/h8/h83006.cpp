@@ -3,12 +3,12 @@
 #include "emu.h"
 #include "h83006.h"
 
-const device_type H83006 = device_creator<h83006_device>;
-const device_type H83007 = device_creator<h83007_device>;
+DEFINE_DEVICE_TYPE(H83006, h83006_device, "h83006", "H8/3006")
+DEFINE_DEVICE_TYPE(H83007, h83007_device, "h83007", "H8/3007")
 
 
-h83006_device::h83006_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	h8h_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h83006_device::map), this)),
+h83006_device::h83006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
+	h8h_device(mconfig, type, tag, owner, clock, address_map_delegate(FUNC(h83006_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	port4(*this, "port4"),
@@ -29,45 +29,21 @@ h83006_device::h83006_device(const machine_config &mconfig, device_type type, co
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
 	sci2(*this, "sci2"),
-	watchdog(*this, "watchdog")
+	watchdog(*this, "watchdog"),
+	syscr(0),
+	ram_start(start)
 {
-	syscr = 0;
-	ram_start = 0;
 }
 
 h83006_device::h83006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8h_device(mconfig, H83006, "H8/3006", tag, owner, clock, "h83006", __FILE__, address_map_delegate(FUNC(h83006_device::map), this)),
-	intc(*this, "intc"),
-	adc(*this, "adc"),
-	port4(*this, "port4"),
-	port6(*this, "port6"),
-	port7(*this, "port7"),
-	port8(*this, "port8"),
-	port9(*this, "port9"),
-	porta(*this, "porta"),
-	portb(*this, "portb"),
-	timer8_0(*this, "timer8_0"),
-	timer8_1(*this, "timer8_1"),
-	timer8_2(*this, "timer8_2"),
-	timer8_3(*this, "timer8_3"),
-	timer16(*this, "timer16"),
-	timer16_0(*this, "timer16:0"),
-	timer16_1(*this, "timer16:1"),
-	timer16_2(*this, "timer16:2"),
-	sci0(*this, "sci0"),
-	sci1(*this, "sci1"),
-	sci2(*this, "sci2"),
-	watchdog(*this, "watchdog")
+	h83006_device(mconfig, H83006, tag, owner, clock, 0xfff720)
 {
-	syscr = 0;
-	ram_start = 0xfff720;
 }
 
 
 h83007_device::h83007_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h83006_device(mconfig, H83007, "H8/3007", tag, owner, clock, "h83007", __FILE__)
+	h83006_device(mconfig, H83007, tag, owner, clock, 0xffef20)
 {
-	ram_start = 0xffef20;
 }
 
 static MACHINE_CONFIG_FRAGMENT(h83006)

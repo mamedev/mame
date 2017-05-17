@@ -5,13 +5,10 @@
     Luxor ABC-80 keyboard emulation
 
 **********************************************************************/
+#ifndef MAME_MACHINE_ABC80KB_H
+#define MAME_MACHINE_ABC80KB_H
 
 #pragma once
-
-#ifndef __ABC80_KEYBOARD__
-#define __ABC80_KEYBOARD__
-
-#include "cpu/mcs48/mcs48.h"
 
 
 
@@ -66,8 +63,8 @@ private:
 
 
 // device type definition
-extern const device_type ABC80_KEYBOARD;
+DECLARE_DEVICE_TYPE(ABC80_KEYBOARD, abc80_keyboard_device)
 
 
 
-#endif
+#endif // MAME_MACHINE_ABC80KB_H

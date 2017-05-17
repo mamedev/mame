@@ -294,7 +294,7 @@ void goal92_state::machine_reset()
 	m_adpcm_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( goal92, goal92_state )
+static MACHINE_CONFIG_START( goal92 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)
@@ -334,7 +334,7 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(goal92_state, goal92_adpcm_int))   /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -401,4 +401,4 @@ ROM_END
 
 
 
-GAME( 1992, goal92,   cupsoc, goal92,   goal92, driver_device, 0, ROT0, "bootleg", "Goal! '92", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, goal92,   cupsoc, goal92,   goal92, goal92_state, 0, ROT0, "bootleg", "Goal! '92", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -35,7 +35,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( stargame )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( stargame, stargame_state )
+static MACHINE_CONFIG_START( stargame )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 1000000)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
@@ -63,5 +63,5 @@ ROM_START(whtforce)
 ROM_END
 
 
-GAME( 1986, spcship,  0, stargame, stargame, driver_device, 0, ROT0, "Stargame", "Space Ship (Pinball)",  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, whtforce, 0, stargame, stargame, driver_device, 0, ROT0, "Stargame", "White Force", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, spcship,  0, stargame, stargame, stargame_state, 0, ROT0, "Stargame", "Space Ship (Pinball)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, whtforce, 0, stargame, stargame, stargame_state, 0, ROT0, "Stargame", "White Force",           MACHINE_IS_SKELETON_MECHANICAL )

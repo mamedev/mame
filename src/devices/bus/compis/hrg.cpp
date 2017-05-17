@@ -24,20 +24,20 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMPIS_HRG = device_creator<compis_hrg_t>;
-const device_type COMPIS_UHRG = device_creator<compis_uhrg_t>;
+DEFINE_DEVICE_TYPE(COMPIS_HRG,  compis_hrg_device,  "compis_hrg",  "Compis HRG")
+DEFINE_DEVICE_TYPE(COMPIS_UHRG, compis_uhrg_device, "compis_uhrg", "Compis UHRG")
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( upd7220_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hrg_map, AS_0, 16, compis_hrg_t )
+static ADDRESS_MAP_START( hrg_map, AS_0, 16, compis_hrg_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x00000, 0x7fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( uhrg_map, AS_0, 16, compis_uhrg_t )
+static ADDRESS_MAP_START( uhrg_map, AS_0, 16, compis_uhrg_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
@@ -47,7 +47,7 @@ ADDRESS_MAP_END
 //  UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels )
 //-------------------------------------------------
 
-UPD7220_DISPLAY_PIXELS_MEMBER( compis_hrg_t::display_pixels )
+UPD7220_DISPLAY_PIXELS_MEMBER( compis_hrg_device::display_pixels )
 {
 	uint16_t i,gfx = m_video_ram[(address & 0x7fff) >> 1];
 	const pen_t *pen = m_palette->pens();
@@ -61,7 +61,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( compis_hrg_t::display_pixels )
 //  UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels )
 //-------------------------------------------------
 
-UPD7220_DISPLAY_PIXELS_MEMBER( compis_uhrg_t::display_pixels )
+UPD7220_DISPLAY_PIXELS_MEMBER( compis_uhrg_device::display_pixels )
 {
 	uint16_t i,gfx = m_video_ram[(address & 0x1ffff) >> 1];
 	const pen_t *pen = m_palette->pens();
@@ -86,7 +86,7 @@ static MACHINE_CONFIG_FRAGMENT( hrg )
 
 	MCFG_DEVICE_ADD(UPD7220_TAG, UPD7220, 2252500) // unknown clock
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, hrg_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(compis_hrg_t, display_pixels)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(compis_hrg_device, display_pixels)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
@@ -98,7 +98,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor compis_hrg_t::device_mconfig_additions() const
+machine_config_constructor compis_hrg_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( hrg );
 }
@@ -119,7 +119,7 @@ static MACHINE_CONFIG_FRAGMENT( uhrg )
 
 	MCFG_DEVICE_ADD(UPD7220_TAG, UPD7220, 2252500*2) // unknown clock
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, uhrg_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(compis_uhrg_t, display_pixels)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(compis_uhrg_device, display_pixels)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
@@ -131,7 +131,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor compis_uhrg_t::device_mconfig_additions() const
+machine_config_constructor compis_uhrg_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( uhrg );
 }
@@ -143,11 +143,11 @@ machine_config_constructor compis_uhrg_t::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  compis_hrg_t - constructor
+//  compis_hrg_device - constructor
 //-------------------------------------------------
 
-compis_hrg_t::compis_hrg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+compis_hrg_device::compis_hrg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_compis_graphics_card_interface(mconfig, *this),
 	m_crtc(*this, UPD7220_TAG),
 	m_palette(*this, "palette"),
@@ -155,13 +155,13 @@ compis_hrg_t::compis_hrg_t(const machine_config &mconfig, device_type type, cons
 {
 }
 
-compis_hrg_t::compis_hrg_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	compis_hrg_t(mconfig, COMPIS_HRG, "Compis HRG", tag, owner, clock, "compis_hrg", __FILE__)
+compis_hrg_device::compis_hrg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	compis_hrg_device(mconfig, COMPIS_HRG, tag, owner, clock)
 {
 }
 
-compis_uhrg_t::compis_uhrg_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	compis_hrg_t(mconfig, COMPIS_UHRG, "Compis UHRG", tag, owner, clock, "compis_uhrg", __FILE__)
+compis_uhrg_device::compis_uhrg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	compis_hrg_device(mconfig, COMPIS_UHRG, tag, owner, clock)
 {
 }
 
@@ -170,7 +170,7 @@ compis_uhrg_t::compis_uhrg_t(const machine_config &mconfig, const char *tag, dev
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void compis_hrg_t::device_start()
+void compis_hrg_device::device_start()
 {
 }
 
@@ -179,7 +179,7 @@ void compis_hrg_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void compis_hrg_t::device_reset()
+void compis_hrg_device::device_reset()
 {
 }
 
@@ -188,7 +188,7 @@ void compis_hrg_t::device_reset()
 //  pcs6_6_r -
 //-------------------------------------------------
 
-uint8_t compis_hrg_t::pcs6_6_r(address_space &space, offs_t offset)
+uint8_t compis_hrg_device::pcs6_6_r(address_space &space, offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -225,7 +225,7 @@ uint8_t compis_hrg_t::pcs6_6_r(address_space &space, offs_t offset)
 //  pcs6_6_w -
 //-------------------------------------------------
 
-void compis_hrg_t::pcs6_6_w(address_space &space, offs_t offset, uint8_t data)
+void compis_hrg_device::pcs6_6_w(address_space &space, offs_t offset, uint8_t data)
 {
 	//logerror("%s PCS 6:6 write %04x : %02x\n", machine().describe_context(), offset, data);
 

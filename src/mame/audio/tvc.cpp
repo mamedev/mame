@@ -10,14 +10,14 @@
 #include "tvc.h"
 
 // device type definition
-const device_type TVC_SOUND = device_creator<tvc_sound_device>;
+DEFINE_DEVICE_TYPE(TVC_SOUND, tvc_sound_device, "tvc_sound", "TVC 64 Audio Custom")
 
 //-------------------------------------------------
 //  tvc_sound_device - constructor
 //-------------------------------------------------
 
 tvc_sound_device::tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, TVC_SOUND, "TVC 64 Audio Custom", tag, owner, clock, "tvc_sound", __FILE__),
+	device_t(mconfig, TVC_SOUND, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_write_sndint(*this)
 {

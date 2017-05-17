@@ -233,7 +233,7 @@ static GFXDECODE_START( gumbo )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gumbo, gumbo_state )
+static MACHINE_CONFIG_START( gumbo )
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_14_31818MHz/2)
 	MCFG_CPU_PROGRAM_MAP(gumbo_map)
@@ -254,7 +254,7 @@ static MACHINE_CONFIG_START( gumbo, gumbo_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_14_31818MHz/16, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_14_31818MHz/16, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -397,10 +397,10 @@ ROM_START( dblpointd )
 	ROM_LOAD( "d15.bin", 0x40000, 0x40000, CRC(6b899a51) SHA1(04114ec9695caaac722800ac1a4ffb563ec433c9) )
 ROM_END
 
-GAME( 1994, gumbo,    0,        gumbo,    gumbo, driver_device,    0, ROT0,  "Min Corp.", "Gumbo", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mspuzzleg,gumbo,    gumbo,    gumbo, driver_device,    0, ROT0,  "Min Corp.", "Miss Puzzle (Clone of Gumbo)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, msbingo,  0,        mspuzzle, msbingo, driver_device,  0, ROT0,  "Min Corp.", "Miss Bingo", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mspuzzle, 0,        mspuzzle, mspuzzle, driver_device, 0, ROT90, "Min Corp.", "Miss Puzzle", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mspuzzlen,mspuzzle, mspuzzle, mspuzzle, driver_device, 0, ROT90, "Min Corp.", "Miss Puzzle (Nudes)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dblpoint, 0,        dblpoint, dblpoint, driver_device, 0, ROT0,  "Min Corp.", "Double Point", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dblpointd,dblpoint, dblpoint, dblpoint, driver_device, 0, ROT0,  "bootleg? (Dong Bang Electron)", "Double Point (Dong Bang Electron, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gumbo,    0,        gumbo,    gumbo,    gumbo_state, 0, ROT0,  "Min Corp.",                     "Gumbo",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mspuzzleg,gumbo,    gumbo,    gumbo,    gumbo_state, 0, ROT0,  "Min Corp.",                     "Miss Puzzle (Clone of Gumbo)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1994, msbingo,  0,        mspuzzle, msbingo,  gumbo_state, 0, ROT0,  "Min Corp.",                     "Miss Bingo",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mspuzzle, 0,        mspuzzle, mspuzzle, gumbo_state, 0, ROT90, "Min Corp.",                     "Miss Puzzle",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mspuzzlen,mspuzzle, mspuzzle, mspuzzle, gumbo_state, 0, ROT90, "Min Corp.",                     "Miss Puzzle (Nudes)",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dblpoint, 0,        dblpoint, dblpoint, gumbo_state, 0, ROT0,  "Min Corp.",                     "Double Point",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dblpointd,dblpoint, dblpoint, dblpoint, gumbo_state, 0, ROT0,  "bootleg? (Dong Bang Electron)", "Double Point (Dong Bang Electron, bootleg?)", MACHINE_SUPPORTS_SAVE )

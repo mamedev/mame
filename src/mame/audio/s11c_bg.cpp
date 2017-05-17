@@ -13,16 +13,16 @@
 #include "sound/volt_reg.h"
 
 
-const device_type S11C_BG = device_creator<s11c_bg_device>;
+DEFINE_DEVICE_TYPE(S11C_BG, s11c_bg_device, "s11c_bg", "Williams System 11C Background Music")
 
 s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig,S11C_BG,"Williams System 11C Background Music",tag,owner,clock, "s11c_bg", __FILE__),
-	device_mixer_interface(mconfig, *this),
-	m_cpu(*this,"bgcpu"),
-	m_ym2151(*this,"ym2151"),
-	m_hc55516(*this,"hc55516_bg"),
-	m_pia40(*this,"pia40"),
-	m_cpubank(*this,"bgbank")
+	: device_t(mconfig, S11C_BG,tag,owner,clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_cpu(*this, "bgcpu")
+	, m_ym2151(*this, "ym2151")
+	, m_hc55516(*this, "hc55516_bg")
+	, m_pia40(*this, "pia40")
+	, m_cpubank(*this, "bgbank")
 {
 }
 

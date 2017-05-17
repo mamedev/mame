@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl,psxAuthor,R. Belmont
-#pragma once
+#ifndef MAME_BUS_PSX_MEMCARD_H
+#define MAME_BUS_PSX_MEMCARD_H
 
-#ifndef _PSXCARD_
-#define _PSXCARD_
+#pragma once
 
 
 class psx_controller_port_device;
@@ -31,7 +31,23 @@ public:
 
 	void disable(bool state) { m_disabled = state; if(state) unload(); }
 
+	void clock_w(bool state) { if(!m_clock && !m_sel && state && !m_pad) do_card(); m_clock = state; }
+	void sel_w(bool state);
+	bool rx_r() { return m_rx; }
+	bool ack_r() { return m_ack; }
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 private:
+	void read_card(const unsigned short addr, unsigned char *buf);
+	void write_card(const unsigned short addr, unsigned char *buf);
+	unsigned char checksum_data(const unsigned char *buf, const unsigned int sz);
+	void do_card();
+	bool transfer(uint8_t to, uint8_t *from);
+	void ack_timer(void *ptr, int param);
+
 	unsigned char pkt[0x8b], pkt_ptr, pkt_sz, cmd;
 	unsigned short addr;
 	int state;
@@ -50,25 +66,9 @@ private:
 
 	emu_timer *m_ack_timer;
 	psx_controller_port_device *m_owner;
-
-	void read_card(const unsigned short addr, unsigned char *buf);
-	void write_card(const unsigned short addr, unsigned char *buf);
-	unsigned char checksum_data(const unsigned char *buf, const unsigned int sz);
-	void do_card();
-	bool transfer(uint8_t to, uint8_t *from);
-	void ack_timer(void *ptr, int param);
-
-public:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	void clock_w(bool state) { if(!m_clock && !m_sel && state && !m_pad) do_card(); m_clock = state; }
-	void sel_w(bool state);
-	bool rx_r() { return m_rx; }
-	bool ack_r() { return m_ack; }
 };
 
 // device type definition
-extern const device_type PSXCARD;
+DECLARE_DEVICE_TYPE(PSXCARD, psxcard_device)
 
-#endif
+#endif // MAME_BUS_PSX_MEMCARD_H

@@ -641,7 +641,7 @@ void menu_export::handle()
 						// iterate through drivers and output the info
 						while (drvlist.next())
 							if ((drvlist.driver().flags & MACHINE_NO_STANDALONE) == 0)
-								util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().description);
+								util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().type.fullname());
 						file.puts(buffer.str().c_str());
 						file.close();
 						machine().popmessage(_("%s.txt saved under ui folder."), filename.c_str());
@@ -806,7 +806,7 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 	float maxwidth = origx2 - origx1;
 
 	text[0] = _("Configure machine:");
-	text[1] = m_drv->description;
+	text[1] = m_drv->type.fullname();
 
 	for (auto & elem : text)
 	{

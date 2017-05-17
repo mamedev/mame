@@ -1,32 +1,33 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef LSI53C810_H
-#define LSI53C810_H
+#ifndef MAME_MACHINE_53C810_H
+#define MAME_MACHINE_53C810_H
+
+#pragma once
 
 #include "legscsi.h"
 
-typedef device_delegate<void (int state)> lsi53c810_irq_delegate;
 #define LSI53C810_IRQ_CB(name)  void name(int state)
-
-typedef device_delegate<void (uint32_t src, uint32_t dst, int length, int byteswap)> lsi53c810_dma_delegate;
 #define LSI53C810_DMA_CB(name)  void name(uint32_t src, uint32_t dst, int length, int byteswap)
-
-typedef device_delegate<uint32_t (uint32_t dsp)> lsi53c810_fetch_delegate;
 #define LSI53C810_FETCH_CB(name)  uint32_t name(uint32_t dsp)
 
 
 class lsi53c810_device : public legacy_scsi_host_adapter
 {
 public:
+	typedef device_delegate<void (int state)> irq_delegate;
+	typedef device_delegate<void (uint32_t src, uint32_t dst, int length, int byteswap)> dma_delegate;
+	typedef device_delegate<uint32_t (uint32_t dsp)> fetch_delegate;
+
 	// construction/destruction
 	lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_irq_callback(device_t &device, lsi53c810_irq_delegate callback) { downcast<lsi53c810_device &>(device).m_irq_cb = callback; }
-	static void set_dma_callback(device_t &device, lsi53c810_dma_delegate callback) { downcast<lsi53c810_device &>(device).m_dma_cb = callback; }
-	static void set_fetch_callback(device_t &device, lsi53c810_fetch_delegate callback) { downcast<lsi53c810_device &>(device).m_fetch_cb = callback; }
+	static void set_irq_callback(device_t &device, irq_delegate &&callback) { downcast<lsi53c810_device &>(device).m_irq_cb = std::move(callback); }
+	static void set_dma_callback(device_t &device, dma_delegate &&callback) { downcast<lsi53c810_device &>(device).m_dma_cb = std::move(callback); }
+	static void set_fetch_callback(device_t &device, fetch_delegate &&callback) { downcast<lsi53c810_device &>(device).m_fetch_cb = std::move(callback); }
 
-	uint8_t lsi53c810_reg_r( int offset );
-	void lsi53c810_reg_w(int offset, uint8_t data);
+	uint8_t reg_r(int offset);
+	void reg_w(int offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -36,9 +37,9 @@ private:
 	typedef delegate<void (void)> opcode_handler_delegate;
 	opcode_handler_delegate dma_opcode[256];
 
-	lsi53c810_irq_delegate m_irq_cb;
-	lsi53c810_dma_delegate m_dma_cb;
-	lsi53c810_fetch_delegate m_fetch_cb;
+	irq_delegate m_irq_cb;
+	dma_delegate m_dma_cb;
+	fetch_delegate m_fetch_cb;
 
 	uint32_t FETCH();
 	void dmaop_invalid();
@@ -99,15 +100,16 @@ private:
 
 // device type definition
 extern const device_type LSI53C810;
+DECLARE_DEVICE_TYPE(LSI53C810, lsi53c810_device)
 
 
 #define MCFG_LSI53C810_IRQ_CB(_class, _method) \
-	lsi53c810_device::set_irq_callback(*device, lsi53c810_irq_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	lsi53c810_device::set_irq_callback(*device, lsi53c810_device::irq_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_LSI53C810_DMA_CB(_class, _method) \
-	lsi53c810_device::set_dma_callback(*device, lsi53c810_dma_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	lsi53c810_device::set_dma_callback(*device, lsi53c810_device::dma_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_LSI53C810_FETCH_CB(_class, _method) \
-	lsi53c810_device::set_fetch_callback(*device, lsi53c810_fetch_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	lsi53c810_device::set_fetch_callback(*device, lsi53c810_device::fetch_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
-#endif
+#endif // MAME_MACHINE_53C810_H

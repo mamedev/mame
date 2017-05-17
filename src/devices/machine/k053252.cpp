@@ -63,10 +63,10 @@ TODO:
 #include "k053252.h"
 
 
-const device_type K053252 = device_creator<k053252_device>;
+DEFINE_DEVICE_TYPE(K053252, k053252_device, "k053252", "K053252 Timing/Interrupt Controller")
 
 k053252_device::k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K053252, "K053252 Timing/Interrupt", tag, owner, clock, "k053252", __FILE__)
+	: device_t(mconfig, K053252, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_int1_en_cb(*this)
 	, m_int2_en_cb(*this)

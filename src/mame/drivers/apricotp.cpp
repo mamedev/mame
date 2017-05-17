@@ -112,7 +112,7 @@ public:
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit;
 	required_device<z80dart_device> m_sio;
-	required_device<wd2797_t> m_fdc;
+	required_device<wd2797_device> m_fdc;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
 	required_device<floppy_connector> m_floppy0;
@@ -433,7 +433,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fp_io, AS_IO, 16, fp_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000, 0x007) AM_DEVREADWRITE8(WD2797_TAG, wd2797_t, read, write, 0x00ff)
+	AM_RANGE(0x000, 0x007) AM_DEVREADWRITE8(WD2797_TAG, wd2797_device, read, write, 0x00ff)
 	AM_RANGE(0x008, 0x00f) AM_DEVREADWRITE8(I8253A5_TAG, pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0x018, 0x01f) AM_DEVREADWRITE8(Z80SIO0_TAG, z80sio0_device, ba_cd_r, ba_cd_w, 0x00ff)
 	AM_RANGE(0x020, 0x021) AM_DEVWRITE8("cent_data_out", output_latch_device, write, 0x00ff)
@@ -574,7 +574,7 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( fp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( fp, fp_state )
+static MACHINE_CONFIG_START( fp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_15MHz/3)
 	MCFG_CPU_PROGRAM_MAP(fp_mem)
@@ -621,8 +621,8 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 	MCFG_DEVICE_ADD(I8237_TAG, AM9517A, 250000)
 	MCFG_I8237_OUT_EOP_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir7_w))
-	MCFG_I8237_IN_IOR_1_CB(DEVREAD8(WD2797_TAG, wd_fdc_t, data_r))
-	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8(WD2797_TAG, wd_fdc_t, data_w))
+	MCFG_I8237_IN_IOR_1_CB(DEVREAD8(WD2797_TAG, wd_fdc_device_base, data_r))
+	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8(WD2797_TAG, wd_fdc_device_base, data_w))
 	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NOOP)
 
 	MCFG_DEVICE_ADD(I8253A5_TAG, PIT8253, 0)
@@ -688,5 +688,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1984, fp,    0,      0,      fp,   fp, driver_device,    0,     "ACT",   "Apricot Portable / FP", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE     INIT  COMPANY  FULLNAME                 FLAGS
+COMP( 1984, fp,    0,      0,      fp,      fp,    fp_state, 0,    "ACT",   "Apricot Portable / FP", MACHINE_NOT_WORKING )

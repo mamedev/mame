@@ -4921,22 +4921,22 @@ has been replaced with an all-zero block. -->
 		<info name="developer" value="Access Software, Inc." />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Crime Wave [Access Software Inc] [1990] [3.5HD] [disk 1 of 4].img" size="737280" crc="2e051a02" sha1="7856ca4b29a0fcd07d164fc7e28a926572384819" offset="0"/>
+				<rom name="Crime Wave [Access Software Inc] [1990] [3.5DD] [disk 1 of 4].img" size="737280" crc="2e051a02" sha1="7856ca4b29a0fcd07d164fc7e28a926572384819" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Crime Wave [Access Software Inc] [1990] [3.5HD] [disk 2 of 4].img" size="737280" crc="e1565d97" sha1="e8ade2b4bbc5f79f638eb82103f16e42971a7264" offset="0"/>
+				<rom name="Crime Wave [Access Software Inc] [1990] [3.5DD] [disk 2 of 4].img" size="737280" crc="e1565d97" sha1="e8ade2b4bbc5f79f638eb82103f16e42971a7264" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Crime Wave [Access Software Inc] [1990] [3.5HD] [disk 3 of 4].img" size="737280" crc="0878f47d" sha1="397e629b7491391c65fb207aca0f2d04a66f5688" offset="0"/>
+				<rom name="Crime Wave [Access Software Inc] [1990] [3.5DD] [disk 3 of 4].img" size="737280" crc="0878f47d" sha1="397e629b7491391c65fb207aca0f2d04a66f5688" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Crime Wave [Access Software Inc] [1990] [3.5HD] [disk 4 of 4].img" size="737280" crc="b0621879" sha1="0d1c8091dd95384f41d91709daa9b21ef5181e7b" offset="0"/>
+				<rom name="Crime Wave [Access Software Inc] [1990] [3.5DD] [disk 4 of 4].img" size="737280" crc="b0621879" sha1="0d1c8091dd95384f41d91709daa9b21ef5181e7b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5086,6 +5086,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Double Dragon III - The Rosetta Stone (World) (5.25'') (Disk 2).img" size="368640" crc="fb5a97a4" sha1="a46b44548145024479a5889482e88446d4b25f9e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ferrarf1">
+		<description>Ferrari Formula One</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Imagitec Design" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Ferrari Formula One [5.25][1 of 2].img" size="368640" crc="e9f05a53" sha1="ca767c546a26bdcf57f0d30f8bc6c1d834c58a81" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Ferrari Formula One [5.25][2 of 2].img" size="368640" crc="9815c5b6" sha1="ddb8e3bcea701b3a325a0e2a4359c491fde47a59" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5562,6 +5579,23 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="opwolf">
+		<description>Operation Wolf</description>
+		<year>1989</year>
+		<publisher>Taito Corporation</publisher>
+		<info name="developer" value="Taito Corporation" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Operation Wolf [Taito Corporation] [1989] [5.25] [disk 1 of 2].img" size="368640" crc="fd9f35d4" sha1="356c16b69b424ecfec117054ef5530c9b0414651" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Operation Wolf [Taito Corporation] [1989] [5.25] [disk 2 of 2].img" size="368640" crc="61685134" sha1="e0f1f60365e7d2b59b18ab6e7ebde0e98c82a459" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ptomb">
 		<description>Pharaoh's Tomb</description>
 		<year>1990</year>
@@ -5765,6 +5799,17 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="savage">
+		<description>Savage</description>
+		<year>1989</year>
+		<publisher>Probe</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Savage [5.25].img" size="368640" crc="336dd3b9" sha1="68ba386d590f2bd85c64adabcceb4e7d1679c5ca" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="agidemos">
 		<description>Sierra Demo</description>
 		<year>1987</year>
@@ -5880,6 +5925,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Superman - The Man of Steel [1989] [First Star Software] [5.25] [2 of 2].img" size="368640" crc="e904711c" sha1="d66e64bd467b1dd0dedbe613b087e1ea63fcb38f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="term2">
+		<description>Terminator 2: Judgment Day</description>
+		<year>1991</year>
+		<publisher>Ocean Software Ltd.</publisher>
+		<info name="developer" value="Dementia" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Terminator 2 Judgment Day [Ocean] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="d0935eef" sha1="5816a1ab889f293ec4d1492abfdcdbc232176554" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Terminator 2 Judgment Day [Ocean] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="1ce42358" sha1="bdce14d4f6dd17a79391c0fffe6d8e6d7a2f4c5d" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

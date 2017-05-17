@@ -3,15 +3,15 @@
 #include "emu.h"
 #include "h8s2357.h"
 
-const device_type H8S2357 = device_creator<h8s2357_device>;
-const device_type H8S2352 = device_creator<h8s2352_device>;
-const device_type H8S2398 = device_creator<h8s2398_device>;
-const device_type H8S2394 = device_creator<h8s2394_device>;
-const device_type H8S2392 = device_creator<h8s2392_device>;
-const device_type H8S2390 = device_creator<h8s2390_device>;
+DEFINE_DEVICE_TYPE(H8S2357, h8s2357_device, "h8s2357", "H8S/2357")
+DEFINE_DEVICE_TYPE(H8S2352, h8s2352_device, "h8s2352", "H8S/2352")
+DEFINE_DEVICE_TYPE(H8S2398, h8s2398_device, "h8s2398", "H8S/2398")
+DEFINE_DEVICE_TYPE(H8S2394, h8s2394_device, "h8s2394", "H8S/2394")
+DEFINE_DEVICE_TYPE(H8S2392, h8s2392_device, "h8s2392", "H8S/2392")
+DEFINE_DEVICE_TYPE(H8S2390, h8s2390_device, "h8s2390", "H8S/2390")
 
-h8s2357_device::h8s2357_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	h8s2000_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h8s2357_device::map), this)),
+h8s2357_device::h8s2357_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
+	h8s2000_device(mconfig, type, tag, owner, clock, address_map_delegate(FUNC(h8s2357_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	port1(*this, "port1"),
@@ -39,76 +39,40 @@ h8s2357_device::h8s2357_device(const machine_config &mconfig, device_type type, 
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
 	sci2(*this, "sci2"),
-	watchdog(*this, "watchdog")
+	watchdog(*this, "watchdog"),
+	ram_start(start),
+	syscr(0)
 {
-	ram_start = 0;
-	syscr = 0;
 }
 
 h8s2357_device::h8s2357_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8s2000_device(mconfig, H8S2357, "H8S/2357", tag, owner, clock, "h8s2357", __FILE__, address_map_delegate(FUNC(h8s2357_device::map), this)),
-	intc(*this, "intc"),
-	adc(*this, "adc"),
-	port1(*this, "port1"),
-	port2(*this, "port2"),
-	port3(*this, "port3"),
-	port4(*this, "port4"),
-	port5(*this, "port5"),
-	port6(*this, "port6"),
-	porta(*this, "porta"),
-	portb(*this, "portb"),
-	portc(*this, "portc"),
-	portd(*this, "portd"),
-	porte(*this, "porte"),
-	portf(*this, "portf"),
-	portg(*this, "portg"),
-	timer8_0(*this, "timer8_0"),
-	timer8_1(*this, "timer8_1"),
-	timer16(*this, "timer16"),
-	timer16_0(*this, "timer16:0"),
-	timer16_1(*this, "timer16:1"),
-	timer16_2(*this, "timer16:2"),
-	timer16_3(*this, "timer16:3"),
-	timer16_4(*this, "timer16:4"),
-	timer16_5(*this, "timer16:5"),
-	sci0(*this, "sci0"),
-	sci1(*this, "sci1"),
-	sci2(*this, "sci2"),
-	watchdog(*this, "watchdog")
+	h8s2357_device(mconfig, H8S2357, tag, owner, clock, 0xffdc00)
 {
-	ram_start = 0;
-	syscr = 0;
-	ram_start = 0xffdc00;
 }
 
 h8s2352_device::h8s2352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8s2357_device(mconfig, H8S2352, "H8S/2352", tag, owner, clock, "h8s2352", __FILE__)
+	h8s2357_device(mconfig, H8S2352, tag, owner, clock, 0xffdc00)
 {
-	ram_start = 0xffdc00;
 }
 
 h8s2398_device::h8s2398_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8s2357_device(mconfig, H8S2398, "H8S/2398", tag, owner, clock, "h8s2398", __FILE__)
+	h8s2357_device(mconfig, H8S2398, tag, owner, clock, 0xffdc00)
 {
-	ram_start = 0xffdc00;
 }
 
 h8s2394_device::h8s2394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8s2357_device(mconfig, H8S2394, "H8S/2394", tag, owner, clock, "h8s2394", __FILE__)
+	h8s2357_device(mconfig, H8S2394, tag, owner, clock, 0xff7c00)
 {
-	ram_start = 0xff7c00;
 }
 
 h8s2392_device::h8s2392_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8s2357_device(mconfig, H8S2392, "H8S/2392", tag, owner, clock, "h8s2392", __FILE__)
+	h8s2357_device(mconfig, H8S2392, tag, owner, clock, 0xffdc00)
 {
-	ram_start = 0xffdc00;
 }
 
 h8s2390_device::h8s2390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8s2357_device(mconfig, H8S2390, "H8S/2390", tag, owner, clock, "h8s2390", __FILE__)
+	h8s2357_device(mconfig, H8S2390, tag, owner, clock, 0xffec00)
 {
-	ram_start = 0xffec00;
 }
 
 static MACHINE_CONFIG_FRAGMENT(h8s2357)

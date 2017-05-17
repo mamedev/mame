@@ -21,7 +21,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type IE15_CPU = device_creator<ie15_cpu_device>;
+DEFINE_DEVICE_TYPE(IE15_CPU, ie15_cpu_device, "ie15_cpu", "ie15 CPU")
 
 //**************************************************************************
 //  DEVICE INTERFACE
@@ -31,11 +31,10 @@ const device_type IE15_CPU = device_creator<ie15_cpu_device>;
 //  ie15_cpu_device - constructor
 //-------------------------------------------------
 ie15_cpu_device::ie15_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, IE15_CPU, "ie15 CPU", tag, owner, clock, "ie15_cpu", __FILE__),
-		m_program_config("program", ENDIANNESS_LITTLE, 8, 14),
-		m_io_config("io", ENDIANNESS_LITTLE, 8, 8), m_A(0), m_CF(0), m_ZF(0), m_RF(0), m_flags(0),
-		m_program(nullptr), m_io(nullptr),
-		m_direct(nullptr)
+	: cpu_device(mconfig, IE15_CPU, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 14)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8), m_A(0), m_CF(0), m_ZF(0), m_RF(0), m_flags(0)
+	, m_program(nullptr), m_io(nullptr), m_direct(nullptr)
 {
 	// set our instruction counter
 	m_icountptr = &m_icount;

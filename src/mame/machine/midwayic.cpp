@@ -105,7 +105,7 @@ void midway_serial_pic_device::serial_register_state()
 	save_item(NAME(m_ormask));
 }
 
-const device_type MIDWAY_SERIAL_PIC = device_creator<midway_serial_pic_device>;
+DEFINE_DEVICE_TYPE(MIDWAY_SERIAL_PIC, midway_serial_pic_device, "midway_serial_pic_sim", "Midway Serial PIC Simulation")
 
 
 //-------------------------------------------------
@@ -113,12 +113,12 @@ const device_type MIDWAY_SERIAL_PIC = device_creator<midway_serial_pic_device>;
 //-------------------------------------------------
 
 midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	midway_serial_pic_device(mconfig, MIDWAY_SERIAL_PIC, "Midway Serial Pic Simulation", tag, owner, clock, "midway_serial_pic_sim", __FILE__)
+	midway_serial_pic_device(mconfig, MIDWAY_SERIAL_PIC, tag, owner, clock)
 {
 }
 
-midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_upper(0),
 	m_buff(0),
 	m_idx(0),
@@ -193,7 +193,7 @@ WRITE8_MEMBER(midway_serial_pic_device::write)
  *************************************/
 
 
-const device_type MIDWAY_SERIAL_PIC_EMU = device_creator<midway_serial_pic_emu_device>;
+DEFINE_DEVICE_TYPE(MIDWAY_SERIAL_PIC_EMU, midway_serial_pic_emu_device, "midway_serial_pic_emu", "Midway Serial PIC Emulation")
 
 
 //-------------------------------------------------
@@ -201,7 +201,7 @@ const device_type MIDWAY_SERIAL_PIC_EMU = device_creator<midway_serial_pic_emu_d
 //-------------------------------------------------
 
 midway_serial_pic_emu_device::midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MIDWAY_SERIAL_PIC_EMU, "Midway Serial Pic Emulation", tag, owner, clock, "midway_serial_pic_emu", __FILE__)
+	device_t(mconfig, MIDWAY_SERIAL_PIC_EMU, tag, owner, clock)
 {
 }
 
@@ -278,7 +278,7 @@ static inline uint8_t make_bcd(uint8_t data)
 	return ((data / 10) << 4) | (data % 10);
 }
 
-const device_type MIDWAY_SERIAL_PIC2 = device_creator<midway_serial_pic2_device>;
+DEFINE_DEVICE_TYPE(MIDWAY_SERIAL_PIC2, midway_serial_pic2_device, "midway_serial_pic2", "Midway Serial PIC 2")
 
 
 //-------------------------------------------------
@@ -286,27 +286,12 @@ const device_type MIDWAY_SERIAL_PIC2 = device_creator<midway_serial_pic2_device>
 //-------------------------------------------------
 
 midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	midway_serial_pic_device(mconfig, MIDWAY_SERIAL_PIC2, "Midway Serial Pic 2", tag, owner, clock, "midway_serial_pic2", __FILE__),
-	device_nvram_interface(mconfig, *this),
-	m_latch(0),
-	m_state(0),
-	m_index(0),
-	m_total(0),
-	m_nvram_addr(0),
-	m_time_index(0),
-	m_time_just_written(0),
-	m_yearoffs(0),
-	m_time_write_timer(nullptr)
+	midway_serial_pic2_device(mconfig, MIDWAY_SERIAL_PIC2, tag, owner, clock)
 {
-	memset(m_buffer,0,sizeof(m_buffer));
-	memset(m_time_buf,0,sizeof(m_time_buf));
-	memset(m_nvram,0,sizeof(m_nvram));
-	memset(m_default_nvram,0,sizeof(m_default_nvram));
-
 }
 
-midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	midway_serial_pic_device(mconfig, type, name, tag, owner, clock, shortname, source),
+midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	midway_serial_pic_device(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	m_latch(0),
 	m_state(0),
@@ -655,7 +640,7 @@ void midway_ioasic_device::ioasic_register_state()
 	save_item(NAME(m_fifo_force_buffer_empty_pc));
 }
 
-const device_type MIDWAY_IOASIC = device_creator<midway_ioasic_device>;
+DEFINE_DEVICE_TYPE(MIDWAY_IOASIC, midway_ioasic_device, "midway_ioasic", "Midway IOASIC")
 
 
 //-------------------------------------------------
@@ -663,7 +648,7 @@ const device_type MIDWAY_IOASIC = device_creator<midway_ioasic_device>;
 //-------------------------------------------------
 
 midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	midway_serial_pic2_device(mconfig, MIDWAY_IOASIC, "Midway IOASIC", tag, owner, clock, "midway_ioasic", __FILE__),
+	midway_serial_pic2_device(mconfig, MIDWAY_IOASIC, tag, owner, clock),
 	m_serial_tx_cb(*this),
 	m_has_dcs(0),
 	m_has_cage(0),
@@ -1109,7 +1094,7 @@ WRITE32_MEMBER( midway_ioasic_device::packed_w )
 		write(space, offset*2+1, data >> 16, 0x0000ffff);
 }
 
-WRITE8_MEMBER(midway_ioasic_device::serial_rx_w)
+void midway_ioasic_device::serial_rx_w(u8 data)
 {
 	// Break Detect        0x0100
 	// Frame Error         0x0200

@@ -276,7 +276,7 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
+static MACHINE_CONFIG_START( gunbustr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
@@ -440,6 +440,6 @@ DRIVER_INIT_MEMBER(gunbustr_state,gunbustrj)
 	m_coin_lockout = false;
 }
 
-GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan", "Gunbuster (World)", 0 )
-GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)", 0 )
-GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation", "Gunbuster (Japan)", 0 )
+GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Gunbuster (World)", 0 )
+GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)",    0 )
+GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation",         "Gunbuster (Japan)", 0 )

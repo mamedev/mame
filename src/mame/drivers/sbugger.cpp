@@ -212,7 +212,7 @@ INPUT_PORTS_END
 /* machine driver */
 
 
-static MACHINE_CONFIG_START( sbugger, sbugger_state )
+static MACHINE_CONFIG_START( sbugger )
 
 	MCFG_CPU_ADD("maincpu", I8085A, 6000000)        /* 3.00 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(sbugger_map)
@@ -279,5 +279,5 @@ ROM_START( sbuggera )
 	ROM_LOAD( "spbugger.gfx", 0x0000, 0x1000, CRC(d3f345b5) SHA1(a5082ffc3043352e9b731af95770bdd62fb928bf) )
 ROM_END
 
-GAME( 1981, sbugger,  0,        sbugger,  sbugger, driver_device,  0, ROT270, "Game-A-Tron", "Space Bugger (set 1)", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, sbuggera, sbugger,  sbugger,  sbugger, driver_device,  0, ROT270, "Game-A-Tron", "Space Bugger (set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, sbugger,  0,        sbugger,  sbugger, sbugger_state,  0, ROT270, "Game-A-Tron", "Space Bugger (set 1)", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, sbuggera, sbugger,  sbugger,  sbugger, sbugger_state,  0, ROT270, "Game-A-Tron", "Space Bugger (set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

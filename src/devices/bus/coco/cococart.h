@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __COCOCART_H__
-#define __COCOCART_H__
+#ifndef MAME_BUS_COCO_COCOCART_H
+#define MAME_BUS_COCO_COCOCART_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -61,9 +63,9 @@ public:
 	// construction/destruction
 	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &static_set_cart_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_cart_callback.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_nmi_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_nmi_callback.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_halt_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_halt_callback.set_callback(object); }
+	template <class Object> static devcb_base &static_set_cart_callback(device_t &device, Object &&cb) { return downcast<cococart_slot_device &>(device).m_cart_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_nmi_callback(device_t &device, Object &&cb) { return downcast<cococart_slot_device &>(device).m_nmi_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_halt_callback(device_t &device, Object &&cb) { return downcast<cococart_slot_device &>(device).m_halt_callback.set_callback(std::forward<Object>(cb)); }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -144,6 +146,7 @@ private:
 
 // device type definition
 extern const device_type COCOCART_SLOT;
+DECLARE_DEVICE_TYPE(COCOCART_SLOT, cococart_slot_device)
 
 // ======================> device_cococart_interface
 
@@ -151,7 +154,6 @@ class device_cococart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_cococart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_cococart_interface();
 
 	virtual DECLARE_READ8_MEMBER(read);
@@ -162,6 +164,8 @@ public:
 	void set_cart_base_update(cococart_base_update_delegate update);
 
 protected:
+	device_cococart_interface(const machine_config &mconfig, device_t &device);
+
 	void cart_base_changed(void);
 
 private:
@@ -179,4 +183,4 @@ private:
 #define MCFG_COCO_CARTRIDGE_REMOVE(_tag)        \
 	MCFG_DEVICE_REMOVE(_tag)
 
-#endif // __COCOCART_H__
+#endif // MAME_BUS_COCO_COCOCART_H

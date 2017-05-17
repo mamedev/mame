@@ -7,10 +7,10 @@
  *
  **********************************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_ES5510_ES5510_H
+#define MAME_CPU_ES5510_ES5510_H
 
-#ifndef __ES5510_H__
-#define __ES5510_H__
+#pragma once
 
 
 class es5510_device : public cpu_device {
@@ -189,6 +189,6 @@ private:
 	ram_t ram, ram_p, ram_pp; // ram operations for cycles N, N-1 and N-2
 };
 
-extern const device_type ES5510;
+DECLARE_DEVICE_TYPE(ES5510, es5510_device)
 
-#endif // __ES5510_H__
+#endif // MAME_CPU_ES5510_ES5510_H

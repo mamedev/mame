@@ -39,7 +39,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC_KBD_EC_1841 = device_creator<ec_1841_keyboard_device>;
+DEFINE_DEVICE_TYPE(PC_KBD_EC_1841, ec_1841_keyboard_device, "kb_ec1841", "EC-1841 Keyboard")
 
 
 //-------------------------------------------------
@@ -274,7 +274,7 @@ ioport_constructor ec_1841_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 ec_1841_keyboard_device::ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC_KBD_EC_1841, "EC-1841 Keyboard", tag, owner, clock, "kb_ec1841", __FILE__),
+	: device_t(mconfig, PC_KBD_EC_1841, tag, owner, clock),
 		device_pc_kbd_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),
 		m_kbd(*this, "MD%02u", 0),

@@ -310,7 +310,7 @@ int z180_device::take_interrupt(int irq)
 		device_z80daisy_interface *intf = daisy_get_irq_device();
 		irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback_member(*this, 0);
 
-		LOG(("Z180 '%s' single int. irq_vector $%02x\n", tag(), irq_vector));
+		LOG("Z180 single int. irq_vector $%02x\n", irq_vector);
 
 		/* Interrupt mode 2. Call [m_I:databyte] */
 		if( m_IM == 2 )
@@ -318,7 +318,7 @@ int z180_device::take_interrupt(int irq)
 			irq_vector = (irq_vector & 0xff) + (m_I << 8);
 			PUSH( PC );
 			RM16(irq_vector, &m_PC );
-			LOG(("Z180 '%s' IM2 [$%04x] = $%04x\n",tag() , irq_vector, _PCD));
+			LOG("Z180 IM2 [$%04x] = $%04x\n", irq_vector, _PCD);
 			/* CALL opcode timing */
 			cycles += m_cc[Z180_TABLE_op][0xcd];
 		}
@@ -326,7 +326,7 @@ int z180_device::take_interrupt(int irq)
 		/* Interrupt mode 1. RST 38h */
 		if( m_IM == 1 )
 		{
-			LOG(("Z180 '%s' IM1 $0038\n",tag() ));
+			LOG("Z180 IM1 $0038\n");
 			PUSH( PC );
 			_PCD = 0x0038;
 			/* RST $38 + 'interrupt latency' cycles */
@@ -337,7 +337,7 @@ int z180_device::take_interrupt(int irq)
 			/* Interrupt mode 0. We check for CALL and JP instructions, */
 			/* if neither of these were found we assume a 1 byte opcode */
 			/* was placed on the databus                                */
-			LOG(("Z180 '%s' IM0 $%04x\n",tag() , irq_vector));
+			LOG("Z180 IM0 $%04x\n", irq_vector);
 			switch (irq_vector & 0xff0000)
 			{
 				case 0xcd0000:  /* call */
@@ -366,7 +366,7 @@ int z180_device::take_interrupt(int irq)
 		irq_vector = (m_I << 8) + (irq_vector & 0xff);
 		PUSH( PC );
 		RM16(irq_vector, &m_PC );
-		LOG(("Z180 '%s' INT%d [$%04x] = $%04x\n", tag(), irq, irq_vector, _PCD));
+		LOG("Z180 INT%d [$%04x] = $%04x\n", irq, irq_vector, _PCD);
 		/* CALL opcode timing */
 		cycles += m_cc[Z180_TABLE_op][0xcd];
 	}

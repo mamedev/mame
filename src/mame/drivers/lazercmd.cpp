@@ -622,7 +622,7 @@ void lazercmd_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( lazercmd, lazercmd_state )
+static MACHINE_CONFIG_START( lazercmd )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz? */
@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( lazercmd, lazercmd_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( medlanes, lazercmd_state )
+static MACHINE_CONFIG_START( medlanes )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz */
@@ -696,7 +696,7 @@ static MACHINE_CONFIG_START( medlanes, lazercmd_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bbonk, lazercmd_state )
+static MACHINE_CONFIG_START( bbonk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz */

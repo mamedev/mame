@@ -70,12 +70,12 @@ PARAMETERS
 #define LOG(x)      do { if (VERBOSE) logerror x; } while (0)
 
 
-const device_type VT100_VIDEO = device_creator<vt100_video_device>;
-const device_type RAINBOW_VIDEO = device_creator<rainbow_video_device>;
+DEFINE_DEVICE_TYPE(VT100_VIDEO, vt100_video_device, "vt100_video", "VT100 Video")
+DEFINE_DEVICE_TYPE(RAINBOW_VIDEO, rainbow_video_device, "rainbow_video", "Rainbow Video")
 
 
-vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_read_ram(*this)
 	, m_write_clear_video_interrupt(*this)
@@ -86,13 +86,13 @@ vt100_video_device::vt100_video_device(const machine_config &mconfig, device_typ
 
 
 vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vt100_video_device(mconfig, VT100_VIDEO, "VT100 Video", tag, owner, clock, "vt100_video", __FILE__)
+	: vt100_video_device(mconfig, VT100_VIDEO, tag, owner, clock)
 {
 }
 
 
 rainbow_video_device::rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vt100_video_device(mconfig, RAINBOW_VIDEO, "Rainbow Video", tag, owner, clock, "rainbow_video", __FILE__)
+	: vt100_video_device(mconfig, RAINBOW_VIDEO, tag, owner, clock)
 {
 }
 
@@ -108,7 +108,8 @@ void vt100_video_device::device_start()
 	m_write_clear_video_interrupt.resolve_safe();
 
 	// LBA7 is scan line frequency update
-	machine().scheduler().timer_pulse(attotime::from_nsec(31778), timer_expired_delegate(FUNC(vt100_video_device::lba7_change), this));
+	m_lba7_change_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vt100_video_device::lba7_change), this));
+	m_lba7_change_timer->adjust(attotime::from_nsec(31778), 0, attotime::from_nsec(31778));
 
 	save_item(NAME(m_lba7));
 	save_item(NAME(m_scroll_latch));

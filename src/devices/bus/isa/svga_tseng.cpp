@@ -22,7 +22,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_SVGA_ET4K = device_creator<isa8_svga_et4k_device>;
+DEFINE_DEVICE_TYPE(ISA8_SVGA_ET4K, isa8_svga_et4k_device, "et4000", "SVGA Tseng ET4000 Graphics Card")
 
 
 static MACHINE_CONFIG_FRAGMENT( vga_tseng )
@@ -63,8 +63,9 @@ const tiny_rom_entry *isa8_svga_et4k_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_svga_et4k_device::isa8_svga_et4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA8_SVGA_ET4K, "SVGA Tseng ET4000 Graphics Card", tag, owner, clock, "et4000", __FILE__),
-		device_isa8_card_interface(mconfig, *this), m_vga(nullptr)
+	device_t(mconfig, ISA8_SVGA_ET4K, tag, owner, clock),
+	device_isa8_card_interface(mconfig, *this),
+	m_vga(nullptr)
 {
 }
 

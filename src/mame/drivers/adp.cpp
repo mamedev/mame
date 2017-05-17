@@ -177,7 +177,7 @@ public:
 		m_duart(*this, "duart68681"),
 		m_palette(*this, "palette"),
 		m_in0(*this, "IN0")
-		{ }
+	{ }
 
 	required_device<microtouch_device> m_microtouch;
 	required_device<cpu_device> m_maincpu;
@@ -533,7 +533,7 @@ static ADDRESS_MAP_START( fstation_hd63484_map, AS_0, 16, adp_state )
 	AM_RANGE(0x80000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( quickjac, adp_state )
+static MACHINE_CONFIG_START( quickjac )
 
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(quickjac_mem)
@@ -721,11 +721,11 @@ ROM_START( fstation )
 ROM_END
 
 
-GAME( 1990, backgamn,  0,        backgamn,    skattv, driver_device,    0, ROT0,  "ADP",     "Backgammon", MACHINE_NOT_WORKING )
-GAME( 1993, quickjac,  0,        quickjac,    quickjac, driver_device,  0, ROT0,  "ADP",     "Quick Jack", MACHINE_NOT_WORKING )
-GAME( 1994, skattv,    0,        skattv,      skattv, driver_device,    0, ROT0,  "ADP",     "Skat TV", MACHINE_NOT_WORKING )
-GAME( 1995, skattva,   skattv,   skattva,     skattva, driver_device,   0, ROT0,  "ADP",     "Skat TV (version TS3)", MACHINE_NOT_WORKING )
-GAME( 1997, fashiong,  0,        fashiong,    skattv, driver_device,    0, ROT0,  "ADP",     "Fashion Gambler (set 1)", MACHINE_NOT_WORKING )
-GAME( 1997, fashiong2, fashiong, fashiong,    skattv, driver_device,    0, ROT0,  "ADP",     "Fashion Gambler (set 2)", MACHINE_NOT_WORKING )
-GAME( 1999, funlddlx,  0,        funland,     skattv, driver_device,    0, ROT0,  "Stella",  "Funny Land de Luxe", MACHINE_NOT_WORKING )
-GAME( 2000, fstation,  0,        fstation,    fstation, driver_device,  0, ROT0,  "ADP",     "Fun Station Spielekoffer 9 Spiele", MACHINE_NOT_WORKING )
+GAME( 1990, backgamn,  0,        backgamn,    skattv,   adp_state, 0, ROT0,  "ADP",     "Backgammon",                        MACHINE_NOT_WORKING )
+GAME( 1993, quickjac,  0,        quickjac,    quickjac, adp_state, 0, ROT0,  "ADP",     "Quick Jack",                        MACHINE_NOT_WORKING )
+GAME( 1994, skattv,    0,        skattv,      skattv,   adp_state, 0, ROT0,  "ADP",     "Skat TV",                           MACHINE_NOT_WORKING )
+GAME( 1995, skattva,   skattv,   skattva,     skattva,  adp_state, 0, ROT0,  "ADP",     "Skat TV (version TS3)",             MACHINE_NOT_WORKING )
+GAME( 1997, fashiong,  0,        fashiong,    skattv,   adp_state, 0, ROT0,  "ADP",     "Fashion Gambler (set 1)",           MACHINE_NOT_WORKING )
+GAME( 1997, fashiong2, fashiong, fashiong,    skattv,   adp_state, 0, ROT0,  "ADP",     "Fashion Gambler (set 2)",           MACHINE_NOT_WORKING )
+GAME( 1999, funlddlx,  0,        funland,     skattv,   adp_state, 0, ROT0,  "Stella",  "Funny Land de Luxe",                MACHINE_NOT_WORKING )
+GAME( 2000, fstation,  0,        fstation,    fstation, adp_state, 0, ROT0,  "ADP",     "Fun Station Spielekoffer 9 Spiele", MACHINE_NOT_WORKING )

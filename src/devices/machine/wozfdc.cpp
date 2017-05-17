@@ -9,9 +9,10 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "wozfdc.h"
+
 #include "imagedev/floppy.h"
 #include "formats/ap2_dsk.h"
-#include "wozfdc.h"
 
 /***************************************************************************
     PARAMETERS
@@ -21,8 +22,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DISKII_FDC = device_creator<diskii_fdc>;
-const device_type APPLEIII_FDC = device_creator<appleiii_fdc>;
+DEFINE_DEVICE_TYPE(DISKII_FDC,   diskii_fdc_device,   "d2fdc", "Apple Disk II floppy controller")
+DEFINE_DEVICE_TYPE(APPLEIII_FDC, appleiii_fdc_device, "a3fdc", "Apple III floppy controller")
 
 #define DISKII_P6_REGION  "diskii_rom_p6"
 
@@ -44,18 +45,18 @@ const tiny_rom_entry *wozfdc_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-wozfdc_device::wozfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+wozfdc_device::wozfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock)
 {
 }
 
-diskii_fdc::diskii_fdc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	wozfdc_device(mconfig, DISKII_FDC, "Apple Disk II floppy controller", tag, owner, clock, "d2fdc", __FILE__)
+diskii_fdc_device::diskii_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	wozfdc_device(mconfig, DISKII_FDC, tag, owner, clock)
 {
 }
 
-appleiii_fdc::appleiii_fdc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	wozfdc_device(mconfig, APPLEIII_FDC, "Apple III floppy controller", tag, owner, clock, "a3fdc", __FILE__)
+appleiii_fdc_device::appleiii_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	wozfdc_device(mconfig, APPLEIII_FDC, tag, owner, clock)
 {
 }
 
@@ -149,7 +150,7 @@ void wozfdc_device::a3_update_drive_sel()
 	}
 }
 
-void diskii_fdc::device_reset()
+void diskii_fdc_device::device_reset()
 {
 	wozfdc_device::device_reset();
 	external_drive_select = false;
@@ -160,7 +161,7 @@ void diskii_fdc::device_reset()
 	}
 }
 
-void appleiii_fdc::device_reset()
+void appleiii_fdc_device::device_reset()
 {
 	wozfdc_device::device_reset();
 	external_drive_select = true;
@@ -420,7 +421,7 @@ void wozfdc_device::lss_sync()
 }
 
 // set the two images for the Disk II
-void diskii_fdc::set_floppies(floppy_connector *f0, floppy_connector *f1)
+void diskii_fdc_device::set_floppies(floppy_connector *f0, floppy_connector *f1)
 {
 	floppy0 = f0;
 	floppy1 = f1;
@@ -431,7 +432,7 @@ void diskii_fdc::set_floppies(floppy_connector *f0, floppy_connector *f1)
 	}
 }
 
-void appleiii_fdc::set_floppies_4(floppy_connector *f0, floppy_connector *f1, floppy_connector *f2, floppy_connector *f3)
+void appleiii_fdc_device::set_floppies_4(floppy_connector *f0, floppy_connector *f1, floppy_connector *f2, floppy_connector *f3)
 {
 	floppy0 = f0;
 	floppy1 = f1;
@@ -444,19 +445,19 @@ void appleiii_fdc::set_floppies_4(floppy_connector *f0, floppy_connector *f1, fl
 	}
 }
 
-READ8_MEMBER(appleiii_fdc::read_c0dx)
+READ8_MEMBER(appleiii_fdc_device::read_c0dx)
 {
 	control_dx(offset);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(appleiii_fdc::write_c0dx)
+WRITE8_MEMBER(appleiii_fdc_device::write_c0dx)
 {
 	control_dx(offset);
 }
 
-void appleiii_fdc::control_dx(int offset)
+void appleiii_fdc_device::control_dx(int offset)
 {
 	switch (offset)
 	{

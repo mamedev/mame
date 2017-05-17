@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef __M6507_H__
-#define __M6507_H__
+#ifndef MAME_CPU_M6502_M6507_H
+#define MAME_CPU_M6502_M6507_H
 
 #include "m6502.h"
 
@@ -44,6 +44,6 @@ enum {
 	M6507_SET_OVERFLOW = m6502_device::V_LINE
 };
 
-extern const device_type M6507;
+DECLARE_DEVICE_TYPE(M6507, m6507_device)
 
-#endif
+#endif // MAME_CPU_M6502_M6507_H

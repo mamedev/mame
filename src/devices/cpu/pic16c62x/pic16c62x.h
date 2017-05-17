@@ -13,10 +13,10 @@
 	*                                                                          *
 	\**************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_PIC16C62X_PIC16C62X_H
+#define MAME_CPU_PIC16C62X_PIC16C62X_H
 
-#ifndef __PIC16C62X_H__
-#define __PIC16C62X_H__
+#pragma once
 
 
 
@@ -42,21 +42,21 @@ enum
 #define PIC16C62x_T0        0
 
 
-extern const device_type PIC16C620;
-extern const device_type PIC16C620A;
-//extern const device_type PIC16CR620A;
-extern const device_type PIC16C621;
-extern const device_type PIC16C621A;
-extern const device_type PIC16C622;
-extern const device_type PIC16C622A;
+DECLARE_DEVICE_TYPE(PIC16C620,   pic16c620_device)
+DECLARE_DEVICE_TYPE(PIC16C620A,  pic16c620a_device)
+//DECLARE_DEVICE_TYPE(PIC16CR620A, pic16cr620a_device)
+DECLARE_DEVICE_TYPE(PIC16C621,   pic16c621_device)
+DECLARE_DEVICE_TYPE(PIC16C621A,  pic16c621a_device)
+DECLARE_DEVICE_TYPE(PIC16C622,   pic16c622_device)
+DECLARE_DEVICE_TYPE(PIC16C622A,  pic16c622a_device)
 
 
 class pic16c62x_device : public cpu_device
 {
-public:
-	// construction/destruction
-	pic16c62x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int picmodel);
 protected:
+	// construction/destruction
+	pic16c62x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int picmodel);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -71,7 +71,7 @@ protected:
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
 	{
 		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ) );
 	}
@@ -253,4 +253,4 @@ public:
 };
 
 
-#endif  /* __PIC16C62X_H__ */
+#endif  // MAME_CPU_PIC16C62X_PIC16C62X_H

@@ -9,8 +9,10 @@
 
 *****************************************************************************/
 
-#ifndef __TI99DEFS__
-#define __TI99DEFS__
+#ifndef MAME_BUS_TI99X_TI99DEFS_H
+#define MAME_BUS_TI99X_TI99DEFS_H
+
+#pragma once
 
 // TI-99/4(A)
 #define TISOUNDCHIP_TAG "soundchip"
@@ -117,22 +119,24 @@
 */
 class bus8z_device : public device_t
 {
+protected:
+	bus8z_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, type, tag, owner, clock) { }
 public:
-	bus8z_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source) { }
-	virtual DECLARE_READ8Z_MEMBER(readz) =0;
-	virtual DECLARE_WRITE8_MEMBER(write) =0;
-	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { };
+	virtual DECLARE_READ8Z_MEMBER(readz) = 0;
+	virtual DECLARE_WRITE8_MEMBER(write) = 0;
+	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { }
 };
 
 class bus16z_device : device_t
 {
+protected:
+	bus16z_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, type, tag, owner, clock) { }
 public:
-	bus16z_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-		: device_t(mconfig, type, name, tag, owner, clock, shortname, source) { }
-	virtual DECLARE_READ16Z_MEMBER(read16z) =0;
-	virtual DECLARE_WRITE16_MEMBER(write16) =0;
-	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { };
+	virtual DECLARE_READ16Z_MEMBER(read16z) = 0;
+	virtual DECLARE_WRITE16_MEMBER(write16) = 0;
+	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { }
 };
 
 /****************************************************************************
@@ -152,21 +156,22 @@ public:
     exposing the console class to the external class.
 
 ****************************************************************************/
-class ti99_4x_state;
 
-extern const device_type EVPC_CONN;
+DECLARE_DEVICE_TYPE(EVPC_CONN, evpc_clock_connector)
 
 class evpc_clock_connector : public device_t
 {
 public:
 	evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &static_set_vdpint_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &static_set_vdpint_callback(device_t &device, Object &&cb)
 	{
-		return downcast<evpc_clock_connector &>(device).m_vdpint.set_callback(object);
+		return downcast<evpc_clock_connector &>(device).m_vdpint.set_callback(std::forward<Object>(cb));
 	}
 
 	WRITE_LINE_MEMBER( vclock_line ) { m_vdpint(state); }
+
+protected:
 	void device_start() override;
 
 private:
@@ -197,4 +202,4 @@ enum
 	GENEVE_PFM512A
 };
 
-#endif
+#endif // MAME_BUS_TI99X_TI99DEFS_H

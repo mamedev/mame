@@ -6,10 +6,10 @@
 
 ****************************************************************************/
 
-#pragma once
+#ifndef MAME_INCLUDES_ALESIS_H
+#define MAME_INCLUDES_ALESIS_H
 
-#ifndef _ALESIS_H_
-#define _ALESIS_H_
+#pragma once
 
 #include "cpu/mcs51/mcs51.h"
 #include "machine/nvram.h"
@@ -111,6 +111,6 @@ private:
 };
 
 // device type definition
-extern const device_type ALESIS_DM3AG;
+DECLARE_DEVICE_TYPE(ALESIS_DM3AG, alesis_dm3ag_device)
 
-#endif  // _ALESIS_H_
+#endif  // MAME_INCLUDES_ALESIS_H

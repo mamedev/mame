@@ -71,8 +71,10 @@ public:
 	uint32_t m_paper_feed;  // amount of paper fed through printer, by n/360 inches.  One line feed is 61/360in (from the linefeed command in CP/M;s ptr menu)
 	std::unique_ptr<bitmap_ind16> m_prn_output;
 	uint8_t m_printer_p2_prev;
-	emu_timer* m_prn_stepper;
-	emu_timer* m_prn_pins;
+	emu_timer *m_prn_stepper;
+	emu_timer *m_prn_pins;
+	emu_timer *m_pulse_timer;
+	emu_timer *m_beep_setup_timer;
 	DECLARE_READ8_MEMBER(pcw_keyboard_r);
 	DECLARE_READ8_MEMBER(pcw_keyboard_data_r);
 	DECLARE_READ8_MEMBER(pcw_interrupt_counter_r);

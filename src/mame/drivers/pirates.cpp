@@ -251,7 +251,7 @@ GFXDECODE_END
 
 /* Machine Driver + Related bits */
 
-static MACHINE_CONFIG_START( pirates, pirates_state )
+static MACHINE_CONFIG_START( pirates )
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
 	MCFG_CPU_PROGRAM_MAP(pirates_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
@@ -275,7 +275,7 @@ static MACHINE_CONFIG_START( pirates, pirates_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1333333, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 1333333, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -472,7 +472,7 @@ DRIVER_INIT_MEMBER(pirates_state,genix)
 
 /* GAME */
 
-GAME( 1994, pirates, 0,        pirates, pirates, pirates_state, pirates,  0, "NIX", "Pirates (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pirates,  0,       pirates, pirates, pirates_state, pirates,  0, "NIX", "Pirates (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, piratesb, pirates, pirates, pirates, pirates_state, pirates,  0, "NIX", "Pirates (set 2)", MACHINE_SUPPORTS_SAVE ) // shows 'Copyright 1995' instead of (c)1994 Nix, but isn't unprotected, various changes to the names in the credis + a few other minor alterations
 
-GAME( 1994, genix,   0,        pirates, pirates, pirates_state, genix,    0, "NIX", "Genix Family", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, genix,    0,       pirates, pirates, pirates_state, genix,    0, "NIX", "Genix Family",    MACHINE_SUPPORTS_SAVE )

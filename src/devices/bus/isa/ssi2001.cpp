@@ -8,7 +8,7 @@
 #include "speaker.h"
 
 
-const device_type ISA8_SSI2001 = device_creator<ssi2001_device>;
+DEFINE_DEVICE_TYPE(ISA8_SSI2001, ssi2001_device, "ssi2001", "Innovation SSI-2001 Audio Adapter")
 
 static MACHINE_CONFIG_FRAGMENT( ssi2001 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -23,7 +23,7 @@ machine_config_constructor ssi2001_device::device_mconfig_additions() const
 }
 
 ssi2001_device::ssi2001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISA8_SSI2001, "Innovation SSI-2001 Audio Adapter", tag, owner, clock, "ssi2001", __FILE__),
+	device_t(mconfig, ISA8_SSI2001, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_joy(*this, "pc_joy"),
 	m_sid(*this, "sid6581")

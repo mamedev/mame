@@ -83,7 +83,7 @@
     GLOBAL VARIABLES
 ***************************************************************************/
 
-const device_type A2BUS_MOUSE = device_creator<a2bus_mouse_device>;
+DEFINE_DEVICE_TYPE(A2BUS_MOUSE, a2bus_mouse_device, "a2mouse", "Apple II Mouse Card")
 
 static MACHINE_CONFIG_FRAGMENT( mouse )
 	MCFG_CPU_ADD(MOUSE_MCU_TAG, M68705P3, 2043600)
@@ -161,8 +161,8 @@ const tiny_rom_entry *a2bus_mouse_device::device_rom_region() const
     LIVE DEVICE
 ***************************************************************************/
 
-a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_pia(*this, MOUSE_PIA_TAG),
 	m_mcu(*this, MOUSE_MCU_TAG),
@@ -175,7 +175,7 @@ a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_typ
 }
 
 a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_mouse_device(mconfig, A2BUS_MOUSE, "Apple II Mouse Card", tag, owner, clock, "a2mouse", __FILE__)
+	a2bus_mouse_device(mconfig, A2BUS_MOUSE, tag, owner, clock)
 {
 }
 

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_QL_STD_H
+#define MAME_BUS_QL_STD_H
 
-#ifndef __QL_STANDARD_ROM_CARTRIDGE__
-#define __QL_STANDARD_ROM_CARTRIDGE__
+#pragma once
 
 #include "rom.h"
 
@@ -19,14 +19,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> ql_standard_rom_cartridge_t
+// ======================> ql_standard_rom_cartridge_device
 
-class ql_standard_rom_cartridge_t : public device_t,
-									public device_ql_rom_cartridge_card_interface
+class ql_standard_rom_cartridge_device : public device_t, public device_ql_rom_cartridge_card_interface
 {
 public:
 	// construction/destruction
-	ql_standard_rom_cartridge_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ql_standard_rom_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -38,7 +37,6 @@ protected:
 
 
 // device type definition
-extern const device_type QL_STANDARD_ROM_CARTRIDGE;
+DECLARE_DEVICE_TYPE(QL_STANDARD_ROM_CARTRIDGE, ql_standard_rom_cartridge_device)
 
-
-#endif
+#endif // MAME_BUS_QL_STD_H

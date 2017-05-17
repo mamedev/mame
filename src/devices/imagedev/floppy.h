@@ -6,8 +6,10 @@
 
 *********************************************************************/
 
-#ifndef FLOPPY_H
-#define FLOPPY_H
+#ifndef MAME_DEVICES_IMAGEDEV_FLOPPY_H
+#define MAME_DEVICES_IMAGEDEV_FLOPPY_H
+
+#pragma once
 
 #include "formats/flopimg.h"
 #include "formats/d88_dsk.h"
@@ -71,7 +73,6 @@ public:
 	typedef delegate<void (floppy_image_device *, int)> wpt_cb;
 
 	// construction/destruction
-	floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual ~floppy_image_device();
 
 	virtual void handled_variants(uint32_t *variants, int &var_count) const = 0;
@@ -141,6 +142,8 @@ public:
 	void    enable_sound(bool doit) { m_make_sound = doit; }
 
 protected:
+	floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -207,49 +210,50 @@ protected:
 	floppy_sound_device* m_sound_out;
 };
 
-#define DECLARE_FLOPPY_IMAGE_DEVICE(_name, _interface) \
-	class _name : public floppy_image_device { \
+#define DECLARE_FLOPPY_IMAGE_DEVICE(Type, Name, Interface) \
+	class Name : public floppy_image_device { \
 	public: \
-		_name(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); \
-		virtual ~_name(); \
+		Name(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); \
+		virtual ~Name(); \
 		virtual void handled_variants(uint32_t *variants, int &var_count) const override; \
-		virtual const char *image_interface() const override { return _interface; } \
+		virtual const char *image_interface() const override { return Interface; } \
 	protected: \
 		virtual void setup_characteristics() override; \
-	};
+	}; \
+	DECLARE_DEVICE_TYPE(Type, Name)
 
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_3_ssdd, "floppy_3")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_3_dsdd, "floppy_3")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_35_ssdd, "floppy_3_5")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_35_dd, "floppy_3_5")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_35_hd, "floppy_3_5")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_35_ed, "floppy_3_5")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_sssd_35t, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_sd_35t, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_sssd, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_sd, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_ssdd, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_dd, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_ssqd, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_qd, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_hd, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_8_sssd, "floppy_8")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_8_dssd, "floppy_8")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_8_ssdd, "floppy_8")
-DECLARE_FLOPPY_IMAGE_DEVICE(floppy_8_dsdd, "floppy_8")
-DECLARE_FLOPPY_IMAGE_DEVICE(epson_smd_165, "floppy_3_5")
-DECLARE_FLOPPY_IMAGE_DEVICE(epson_sd_320, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(epson_sd_321, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(sony_oa_d31v, "floppy_3_5")
-DECLARE_FLOPPY_IMAGE_DEVICE(sony_oa_d32w, "floppy_3_5")
-DECLARE_FLOPPY_IMAGE_DEVICE(sony_oa_d32v, "floppy_3_5")
-DECLARE_FLOPPY_IMAGE_DEVICE(teac_fd_55e, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(teac_fd_55f, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(teac_fd_55g, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(alps_3255190x, "floppy_5_25")
-DECLARE_FLOPPY_IMAGE_DEVICE(ibm_6360, "floppy_8")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_SSDD,       floppy_3_ssdd,       "floppy_3")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_DSDD,       floppy_3_dsdd,       "floppy_3")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_SSDD,      floppy_35_ssdd,      "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_DD,        floppy_35_dd,        "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_HD,        floppy_35_hd,        "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_ED,        floppy_35_ed,        "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSSD_35T, floppy_525_sssd_35t, "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SD_35T,   floppy_525_sd_35t,   "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSSD,     floppy_525_sssd,     "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SD,       floppy_525_sd,       "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSDD,     floppy_525_ssdd,     "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_DD,       floppy_525_dd,       "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSQD,     floppy_525_ssqd,     "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_QD,       floppy_525_qd,       "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_HD,       floppy_525_hd,       "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_8_SSSD,       floppy_8_sssd,       "floppy_8")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_8_DSSD,       floppy_8_dssd,       "floppy_8")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_8_SSDD,       floppy_8_ssdd,       "floppy_8")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_8_DSDD,       floppy_8_dsdd,       "floppy_8")
+DECLARE_FLOPPY_IMAGE_DEVICE(EPSON_SMD_165,       epson_smd_165,       "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(EPSON_SD_320,        epson_sd_320,        "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(EPSON_SD_321,        epson_sd_321,        "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(SONY_OA_D31V,        sony_oa_d31v,        "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(SONY_OA_D32W,        sony_oa_d32w,        "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(SONY_OA_D32V,        sony_oa_d32v,        "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_55E,         teac_fd_55e,         "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_55F,         teac_fd_55f,         "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_55G,         teac_fd_55g,         "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(ALPS_3255190X,       alps_3255190x,       "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(IBM_6360,            ibm_6360,            "floppy_8")
 
-extern const device_type FLOPPYSOUND;
+DECLARE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device)
 
 
 /*
@@ -313,39 +317,9 @@ private:
 
 
 // device type definition
-extern const device_type FLOPPY_CONNECTOR;
-extern const device_type FLOPPY_3_SSDD;
-extern const device_type FLOPPY_3_DSDD;
-extern const device_type FLOPPY_35_SSDD;
-extern const device_type FLOPPY_35_DD;
-extern const device_type FLOPPY_35_HD;
-extern const device_type FLOPPY_35_ED;
-extern const device_type FLOPPY_525_SSSD_35T;
-extern const device_type FLOPPY_525_SD_35T;
-extern const device_type FLOPPY_525_SSSD;
-extern const device_type FLOPPY_525_SD;
-extern const device_type FLOPPY_525_SSDD;
-extern const device_type FLOPPY_525_DD;
-extern const device_type FLOPPY_525_SSQD;
-extern const device_type FLOPPY_525_QD;
-extern const device_type FLOPPY_525_HD;
-extern const device_type FLOPPY_8_SSSD;
-extern const device_type FLOPPY_8_DSSD;
-extern const device_type FLOPPY_8_SSDD;
-extern const device_type FLOPPY_8_DSDD;
-extern const device_type EPSON_SMD_165;
-extern const device_type EPSON_SD_320;
-extern const device_type EPSON_SD_321;
-extern const device_type SONY_OA_D31V;
-extern const device_type SONY_OA_D32W;
-extern const device_type SONY_OA_D32V;
-extern const device_type TEAC_FD_55E;
-extern const device_type TEAC_FD_55F;
-extern const device_type TEAC_FD_55G;
-extern const device_type ALPS_3255190x;
-extern const device_type IBM_6360;
+DECLARE_DEVICE_TYPE(FLOPPY_CONNECTOR, floppy_connector)
 
 extern template class device_finder<floppy_connector, false>;
 extern template class device_finder<floppy_connector, true>;
 
-#endif /* FLOPPY_H */
+#endif // MAME_DEVICES_IMAGEDEV_FLOPPY_H

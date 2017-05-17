@@ -246,7 +246,7 @@ void mosaic_state::machine_reset()
 	m_prot_val = 0;
 }
 
-static MACHINE_CONFIG_START( mosaic, mosaic_state )
+static MACHINE_CONFIG_START( mosaic )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, 7000000)  /* ??? */
@@ -344,6 +344,6 @@ ROM_END
 
 
 
-GAME( 1990, mosaic,  0,      mosaic, mosaic, driver_device, 0, ROT0, "Space", "Mosaic", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mosaica, mosaic, mosaic, mosaic, driver_device, 0, ROT0, "Space (Fuuki license)", "Mosaic (Fuuki)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gfire2,  0,      gfire2, gfire2, driver_device, 0, ROT0, "Topis Corp", "Golden Fire II", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mosaic,  0,      mosaic, mosaic, mosaic_state, 0, ROT0, "Space",                 "Mosaic",         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mosaica, mosaic, mosaic, mosaic, mosaic_state, 0, ROT0, "Space (Fuuki license)", "Mosaic (Fuuki)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gfire2,  0,      gfire2, gfire2, mosaic_state, 0, ROT0, "Topis Corp",            "Golden Fire II", MACHINE_SUPPORTS_SAVE )

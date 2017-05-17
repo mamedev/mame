@@ -4,6 +4,7 @@
 #ifndef MAME_MACHINE_IGS025_H
 #define MAME_MACHINE_IGS025_H
 
+#pragma once
 
 // used to connect the 022
 typedef device_delegate<void (void)> igs025_execute_external;
@@ -57,6 +58,6 @@ protected:
 };
 
 
-extern const device_type IGS025;
+DECLARE_DEVICE_TYPE(IGS025, igs025_device)
 
 #endif // MAME_MACHINE_IGS025_H

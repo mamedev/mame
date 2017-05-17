@@ -4,11 +4,11 @@
 #include "emu.h"
 #include "prot_kof2k2.h"
 
-const device_type KOF2002_PROT = device_creator<kof2002_prot_device>;
+DEFINE_DEVICE_TYPE(NG_KOF2002_PROT, kof2002_prot_device, "ng_kof2002_prot", "Neo Geo KoF 2002 Protection")
 
 
 kof2002_prot_device::kof2002_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, KOF2002_PROT, "Neo Geo KOF 2002 Protection", tag, owner, clock, "kof2002_prot", __FILE__)
+	: device_t(mconfig, NG_KOF2002_PROT, tag, owner, clock)
 {
 }
 

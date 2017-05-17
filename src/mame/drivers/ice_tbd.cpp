@@ -25,8 +25,8 @@ class ice_tbd_state : public driver_device
 public:
 	ice_tbd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		,m_maincpu(*this, "maincpu")
-		{ }
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -51,7 +51,7 @@ void ice_tbd_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( ice_tbd, ice_tbd_state )
+static MACHINE_CONFIG_START( ice_tbd )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000)         /* ? MHz */
@@ -66,4 +66,4 @@ ROM_START( ice_tbd )
 ROM_END
 
 
-GAME( 1988, ice_tbd,  0,    ice_tbd, ice_tbd, driver_device,  0, ROT0, "Innovative Creations in Entertainment", "Turbo Drive (ICE)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, ice_tbd,  0,    ice_tbd, ice_tbd, ice_tbd_state,  0, ROT0, "Innovative Creations in Entertainment", "Turbo Drive (ICE)", MACHINE_IS_SKELETON_MECHANICAL )

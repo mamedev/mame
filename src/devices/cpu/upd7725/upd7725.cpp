@@ -21,11 +21,11 @@
 //**************************************************************************
 
 // device type definition
-const device_type UPD7725 = device_creator<upd7725_device>;
-const device_type UPD96050 = device_creator<upd96050_device>;
+DEFINE_DEVICE_TYPE(UPD7725,  upd7725_device,  "upd7725",  "uPD7725")
+DEFINE_DEVICE_TYPE(UPD96050, upd96050_device, "upd96050", "uPD96050")
 
-necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits, const char *name, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits)
+	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, 32, abits, -2), // data bus width, address bus width, -2 means DWORD-addressable
 		m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1), m_icount(0),   // -1 for WORD-addressable
 		m_irq(0),
@@ -49,12 +49,12 @@ necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, co
 
 
 upd7725_device::upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: necdsp_device(mconfig, UPD7725, tag, owner, clock, 11, 11, "uPD7725", "upd7725", __FILE__)
+	: necdsp_device(mconfig, UPD7725, tag, owner, clock, 11, 11)
 {
 }
 
 upd96050_device::upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: necdsp_device(mconfig, UPD96050, tag, owner, clock, 14, 12, "uPD96050", "upd96050", __FILE__)
+	: necdsp_device(mconfig, UPD96050, tag, owner, clock, 14, 12)
 {
 }
 

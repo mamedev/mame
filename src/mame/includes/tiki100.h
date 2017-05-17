@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
+#ifndef MAME_INCLUDES_TIKI100_H
+#define MAME_INCLUDES_TIKI100_H
 
-#ifndef __TIKI100__
-#define __TIKI100__
+#pragma once
 
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
@@ -65,28 +65,6 @@ public:
 		m_vire(1)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<z80ctc_device> m_ctc;
-	required_device<fd1797_t> m_fdc;
-	required_device<z80pio_device> m_pio;
-	required_device<z80dart_device> m_dart;
-	required_device<ay8912_device> m_psg;
-	required_device<ram_device> m_ram;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<cassette_image_device> m_cassette;
-	required_device<centronics_device> m_centronics;
-	required_device<tiki100_bus_t> m_exp;
-	required_memory_region m_rom;
-	required_memory_region m_prom;
-	optional_shared_ptr<uint8_t> m_video_ram;
-	required_ioport_array<12> m_y;
-	required_ioport m_st_io;
-	required_device<palette_device> m_palette;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( mrq_r );
@@ -117,6 +95,29 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( busrq_w );
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<z80ctc_device> m_ctc;
+	required_device<fd1797_device> m_fdc;
+	required_device<z80pio_device> m_pio;
+	required_device<z80dart_device> m_dart;
+	required_device<ay8912_device> m_psg;
+	required_device<ram_device> m_ram;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<cassette_image_device> m_cassette;
+	required_device<centronics_device> m_centronics;
+	required_device<tiki100_bus_device> m_exp;
+	required_memory_region m_rom;
+	required_memory_region m_prom;
+	optional_shared_ptr<uint8_t> m_video_ram;
+	required_ioport_array<12> m_y;
+	required_ioport m_st_io;
+	required_device<palette_device> m_palette;
+
 	enum
 	{
 		ROM0 = 0x01,
@@ -146,4 +147,4 @@ public:
 	bool m_st;
 };
 
-#endif
+#endif // MAME_INCLUDES_TIKI100_H

@@ -429,7 +429,7 @@ INTERRUPT_GEN_MEMBER(mermaid_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( mermaid, mermaid_state )
+static MACHINE_CONFIG_START( mermaid )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   // ???
@@ -473,7 +473,7 @@ static MACHINE_CONFIG_DERIVED( rougien, mermaid )
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(mermaid_state, rougien_adpcm_int))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -582,6 +582,6 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1982, mermaid,  0,        mermaid,  mermaid, driver_device,  0, ROT0, "Sanritsu / Rock-Ola", "Mermaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn, driver_device,  0, ROT0, "Sanritsu / Esco", "Yachtsman", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1982, rougien,  0,        rougien,  rougien, driver_device,  0, ROT0, "Sanritsu", "Rougien", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1982, mermaid,  0,        mermaid,  mermaid, mermaid_state,  0, ROT0, "Sanritsu / Rock-Ola", "Mermaid",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn, mermaid_state,  0, ROT0, "Sanritsu / Esco",     "Yachtsman", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, rougien,  0,        rougien,  rougien, mermaid_state,  0, ROT0, "Sanritsu",            "Rougien",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

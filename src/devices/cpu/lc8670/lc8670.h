@@ -6,21 +6,15 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_LC8670_LC8670_H
+#define MAME_CPU_LC8670_LC8670_H
 
-#ifndef __LC8670_H__
-#define __LC8670_H__
+#pragma once
 
 
 //**************************************************************************
 //  DEFINITION
 //**************************************************************************
-
-enum
-{
-	LC8670_PC = 1,
-	LC8670_SFR
-};
 
 // input ports
 enum
@@ -39,20 +33,10 @@ enum
 	LC8670_EXT_INT3         // P73
 };
 
-// clock sources
-enum
-{
-	LC8670_SUB_CLOCK = 0,
-	LC8670_RC_CLOCK,
-	LC8670_CF_CLOCK
-};
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef uint32_t (*lc8670_lcd_update)(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* vram, bool lcd_enabled, uint8_t stad);
 #define LC8670_LCD_UPDATE(name) uint32_t name(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* vram, bool lcd_enabled, uint8_t stad)
 
 
@@ -61,9 +45,9 @@ typedef uint32_t (*lc8670_lcd_update)(device_t &device, bitmap_ind16 &bitmap, co
 //**************************************************************************
 
 #define MCFG_LC8670_SET_CLOCK_SOURCES(_sub_clock, _rc_clock, _cf_clock) \
-	lc8670_cpu_device::static_set_cpu_clock(*device, LC8670_SUB_CLOCK, _sub_clock); \
-	lc8670_cpu_device::static_set_cpu_clock(*device, LC8670_RC_CLOCK, _rc_clock); \
-	lc8670_cpu_device::static_set_cpu_clock(*device, LC8670_CF_CLOCK, _cf_clock);
+	lc8670_cpu_device::static_set_cpu_clock(*device, lc8670_cpu_device::clock_source::SUB, _sub_clock); \
+	lc8670_cpu_device::static_set_cpu_clock(*device, lc8670_cpu_device::clock_source::RC, _rc_clock); \
+	lc8670_cpu_device::static_set_cpu_clock(*device, lc8670_cpu_device::clock_source::CF, _cf_clock);
 #define MCFG_LC8670_BANKSWITCH_CB(_devcb) \
 	devcb = &lc8670_cpu_device::static_set_bankswitch_cb(*device, DEVCB_##_devcb);
 
@@ -76,6 +60,15 @@ typedef uint32_t (*lc8670_lcd_update)(device_t &device, bitmap_ind16 &bitmap, co
 class lc8670_cpu_device : public cpu_device
 {
 public:
+	enum class clock_source
+	{
+		SUB = 0,
+		RC,
+		CF
+	};
+
+	typedef uint32_t (*lcd_update)(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* vram, bool lcd_enabled, uint8_t stad);
+
 	// construction/destruction
 	lc8670_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
@@ -91,11 +84,17 @@ public:
 	DECLARE_WRITE8_MEMBER(xram_w);
 
 	// static configuration helpers
-	static void static_set_cpu_clock(device_t &device, int _source, uint32_t _clock) { downcast<lc8670_cpu_device &>(device).m_clocks[_source] = _clock; }
-	static void static_set_lcd_update_cb(device_t &device, lc8670_lcd_update _cb) { downcast<lc8670_cpu_device &>(device).m_lcd_update_func = _cb; }
-	template<class _Object> static devcb_base & static_set_bankswitch_cb(device_t &device, _Object object) { return downcast<lc8670_cpu_device &>(device).m_bankswitch_func.set_callback(object); }
+	static void static_set_cpu_clock(device_t &device, clock_source source, uint32_t clock) { downcast<lc8670_cpu_device &>(device).m_clocks[unsigned(source)] = clock; }
+	static void static_set_lcd_update_cb(device_t &device, lcd_update cb) { downcast<lc8670_cpu_device &>(device).m_lcd_update_func = cb; }
+	template <class Object> static devcb_base & static_set_bankswitch_cb(device_t &device, Object &&cb) { return downcast<lc8670_cpu_device &>(device).m_bankswitch_func.set_callback(std::forward<Object>(cb)); }
 
 protected:
+	enum
+	{
+		LC8670_PC = 1,
+		LC8670_SFR
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -194,7 +193,6 @@ private:
 	int op_rolc();
 	int op_xor();
 
-private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
@@ -234,7 +232,7 @@ private:
 	// configuration
 	uint32_t              m_clocks[3];            // clock sources
 	devcb_write8       m_bankswitch_func;      // bankswitch CB
-	lc8670_lcd_update   m_lcd_update_func;      // LCD update CB
+	lcd_update   m_lcd_update_func;      // LCD update CB
 
 	// interrupts vectors
 	static const uint16_t s_irq_vectors[16];
@@ -271,6 +269,6 @@ private:
 	static const dasm_entry s_dasm_table[80];
 };
 
-extern const device_type LC8670;
+DECLARE_DEVICE_TYPE(LC8670, lc8670_cpu_device)
 
-#endif /* __LC8670_H__ */
+#endif // MAME_CPU_LC8670_LC8670_H

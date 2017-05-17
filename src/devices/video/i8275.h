@@ -29,10 +29,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_VIDEO_I8275_H
+#define MAME_VIDEO_I8275_H
 
-#ifndef __I8275x__
-#define __I8275x__
+#pragma once
 
 
 
@@ -48,7 +48,7 @@
 	i8275_device::static_set_character_width(*device, _value);
 
 #define MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	i8275_device::static_set_display_callback(*device, i8275_draw_character_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	i8275_device::static_set_display_callback(*device, i8275_device::draw_character_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_I8275_DRQ_CALLBACK(_write) \
 	devcb = &i8275_device::set_drq_wr_callback(*device, DEVCB_##_write);
@@ -68,8 +68,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<void (bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t lineattr, uint8_t lten, uint8_t rvv, uint8_t vsp, uint8_t gpa, uint8_t hlgt)> i8275_draw_character_delegate;
-
 
 // ======================> i8275_device
 
@@ -77,16 +75,18 @@ class i8275_device :   public device_t,
 						public device_video_interface
 {
 public:
+	typedef device_delegate<void (bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t lineattr, uint8_t lten, uint8_t rvv, uint8_t vsp, uint8_t gpa, uint8_t hlgt)> draw_character_delegate;
+
 	// construction/destruction
 	i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_character_width(device_t &device, int value) { downcast<i8275_device &>(device).m_hpixels_per_column = value; }
-	static void static_set_display_callback(device_t &device, i8275_draw_character_delegate callback) { downcast<i8275_device &>(device).m_display_cb = callback; }
+	static void static_set_display_callback(device_t &device, draw_character_delegate &&cb) { downcast<i8275_device &>(device).m_display_cb = std::move(cb); }
 
-	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<i8275_device &>(device).m_write_drq.set_callback(object); }
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8275_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb_base &set_hrtc_wr_callback(device_t &device, _Object object) { return downcast<i8275_device &>(device).m_write_hrtc.set_callback(object); }
-	template<class _Object> static devcb_base &set_vrtc_wr_callback(device_t &device, _Object object) { return downcast<i8275_device &>(device).m_write_vrtc.set_callback(object); }
+	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<i8275_device &>(device).m_write_drq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<i8275_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_hrtc_wr_callback(device_t &device, Object &&cb) { return downcast<i8275_device &>(device).m_write_hrtc.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_vrtc_wr_callback(device_t &device, Object &&cb) { return downcast<i8275_device &>(device).m_write_vrtc.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -183,7 +183,7 @@ protected:
 	devcb_write_line   m_write_hrtc;
 	devcb_write_line   m_write_vrtc;
 
-	i8275_draw_character_delegate m_display_cb;
+	draw_character_delegate m_display_cb;
 	int m_hpixels_per_column;
 
 	bitmap_rgb32 m_bitmap;
@@ -228,8 +228,6 @@ protected:
 
 
 // device type definition
-extern const device_type I8275;
+DECLARE_DEVICE_TYPE(I8275, i8275_device)
 
-
-
-#endif
+#endif // MAME_VIDEO_I8275_H

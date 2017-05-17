@@ -19,12 +19,12 @@
 //  o2_chess_device - constructor
 //-------------------------------------------------
 
-const device_type O2_ROM_CHESS = device_creator<o2_chess_device>;
+DEFINE_DEVICE_TYPE(O2_ROM_CHESS, o2_chess_device, "o2_chess", "Odyssey 2 Videopac Chess Module")
 
 
 o2_chess_device::o2_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: o2_rom_device(mconfig, O2_ROM_CHESS, "Odyssey 2 BASIC Carts", tag, owner, clock, "o2_chess", __FILE__),
-					m_cpu(*this, "subcpu")
+	: o2_rom_device(mconfig, O2_ROM_CHESS, tag, owner, clock)
+	, m_cpu(*this, "subcpu")
 {
 }
 

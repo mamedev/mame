@@ -32,7 +32,7 @@
 
 
 // device type definition
-const device_type K051649 = device_creator<k051649_device>;
+DEFINE_DEVICE_TYPE(K051649, k051649_device, "k051649", "K051649 SCC1")
 
 
 //**************************************************************************
@@ -44,7 +44,7 @@ const device_type K051649 = device_creator<k051649_device>;
 //-------------------------------------------------
 
 k051649_device::k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K051649, "K051649 SCC1", tag, owner, clock, "k051649", __FILE__),
+	: device_t(mconfig, K051649, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_mclock(0),
@@ -82,16 +82,13 @@ void k051649_device::device_start()
 
 void k051649_device::device_reset()
 {
-	k051649_sound_channel *voice = m_channel_list;
-	int i;
-
 	// reset all the voices
-	for (i = 0; i < 5; i++)
+	for (sound_channel &voice : m_channel_list)
 	{
-		voice[i].frequency = 0;
-		voice[i].volume = 0xf;
-		voice[i].counter = 0;
-		voice[i].key = 0;
+		voice.frequency = 0;
+		voice.volume = 0xf;
+		voice.counter = 0;
+		voice.key = 0;
 	}
 
 	// other parameters
@@ -105,28 +102,23 @@ void k051649_device::device_reset()
 
 void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	k051649_sound_channel *voice=m_channel_list;
-	stream_sample_t *buffer = outputs[0];
-	short *mix;
-	int i,j;
-
 	// zap the contents of the mixer buffer
 	memset(m_mixer_buffer.get(), 0, samples * sizeof(short));
 
-	for (j = 0; j < 5; j++)
+	for (sound_channel &voice : m_channel_list)
 	{
 		// channel is halted for freq < 9
-		if (voice[j].frequency > 8)
+		if (voice.frequency > 8)
 		{
-			const signed char *w = voice[j].waveram;
-			int v=voice[j].volume * voice[j].key;
-			int c=voice[j].counter;
-			int step = ((int64_t)m_mclock * (1 << FREQ_BITS)) / (float)((voice[j].frequency + 1) * 16 * (m_rate / 32)) + 0.5f;
+			const signed char *w = voice.waveram;
+			int v=voice.volume * voice.key;
+			int c=voice.counter;
+			int step = ((int64_t(m_mclock) << FREQ_BITS) / float((voice.frequency + 1) * 16 * (m_rate / 32))) + 0.5f;
 
-			mix = m_mixer_buffer.get();
+			short *mix = m_mixer_buffer.get();
 
 			// add our contribution
-			for (i = 0; i < samples; i++)
+			for (int i = 0; i < samples; i++)
 			{
 				int offs;
 
@@ -136,13 +128,14 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			}
 
 			// update the counter for this voice
-			voice[j].counter = c;
+			voice.counter = c;
 		}
 	}
 
 	// mix it down
-	mix = m_mixer_buffer.get();
-	for (i = 0; i < samples; i++)
+	stream_sample_t *buffer = outputs[0];
+	short *mix = m_mixer_buffer.get();
+	for (int i = 0; i < samples; i++)
 		*buffer++ = m_mixer_lookup[*mix++];
 }
 

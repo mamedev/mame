@@ -3,10 +3,10 @@
 #include "emu.h"
 #include "pci-ide.h"
 
-const device_type IDE_PCI = device_creator<ide_pci_device>;
+DEFINE_DEVICE_TYPE(IDE_PCI, ide_pci_device, "ide_pci", "PCI IDE interface")
 
 ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, IDE_PCI, "IDE PCI interface", tag, owner, clock, "ide_pci", __FILE__),
+	: pci_device(mconfig, IDE_PCI, tag, owner, clock),
 	m_ide(*this, "ide"),
 	m_ide2(*this, "ide2"),
 	m_irq_num(-1),
@@ -17,7 +17,7 @@ ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, d
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, ide_pci_device)
 	AM_RANGE(0x08, 0x0b) AM_WRITE8(prog_if_w, 0x0000ff00)
-	AM_RANGE(0x10, 0x1f) AM_WRITE(address_base_w)
+	AM_RANGE(0x10, 0x1f) AM_READWRITE(address_base_r, address_base_w)
 	AM_RANGE(0x40, 0x5f) AM_READWRITE(pcictrl_r, pcictrl_w)
 	AM_RANGE(0x70, 0x77) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w) // PCI646
 	AM_RANGE(0x78, 0x7f) AM_DEVREADWRITE("ide2", bus_master_ide_controller_device, bmdma_r, bmdma_w) // PCI646
@@ -214,26 +214,35 @@ WRITE32_MEMBER(ide_pci_device::pcictrl_w)
 	}
 }
 
+READ32_MEMBER(ide_pci_device::address_base_r)
+{
+	if (bank_reg_infos[offset].bank == -1)
+		return 0;
+	int bid = bank_reg_infos[offset].bank;
+	if (bank_reg_infos[offset].hi)
+		return bank_infos[bid].adr >> 32;
+	int flags = bank_infos[bid].flags;
+	return (pci_bar[offset] & ~(bank_infos[bid].size - 1)) | (flags & M_IO ? 1 : 0) | (flags & M_64A ? 4 : 0) | (flags & M_PREF ? 8 : 0);
+
+}
+
 WRITE32_MEMBER(ide_pci_device::address_base_w)
 {
-	// data==0xffffffff is used to identify required memory space
-	if (data != 0xffffffff) {
-		// Save local copy of BAR
-		pci_bar[offset] = data;
-		// Bits 0 (primary) and 2 (secondary) control if the mapping is legacy or BAR
-		switch (offset) {
-		case 0: case 1:
-			if (pclass & 0x1)
-				pci_device::address_base_w(space, offset, data);
-			break;
-		case 2: case 3:
-			if (pclass & 0x4)
-				pci_device::address_base_w(space, offset, data);
-			break;
-		default:
-			// Only the first 4 bars are controlled by pif
+	// Save local copy of BAR
+	pci_bar[offset] = data;
+	// Bits 0 (primary) and 2 (secondary) control if the mapping is legacy or BAR
+	switch (offset) {
+	case 0: case 1:
+		if (pclass & 0x1)
 			pci_device::address_base_w(space, offset, data);
-		}
-		logerror("Mapping bar[%i] = %08x\n", offset, data);
+		break;
+	case 2: case 3:
+		if (pclass & 0x4)
+			pci_device::address_base_w(space, offset, data);
+		break;
+	default:
+		// Only the first 4 bars are controlled by pif
+		pci_device::address_base_w(space, offset, data);
 	}
+	logerror("Mapping bar[%i] = %08x\n", offset, data);
 }

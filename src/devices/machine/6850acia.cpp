@@ -58,60 +58,38 @@ const int acia6850_device::transmitter_control[4][3] =
 ***************************************************************************/
 
 // device type definition
-const device_type ACIA6850 = device_creator<acia6850_device>;
-
-template class device_finder<acia6850_device, false>;
-template class device_finder<acia6850_device, true>;
+DEFINE_DEVICE_TYPE(ACIA6850, acia6850_device, "acia6850", "MC6850 ACIA")
 
 //-------------------------------------------------
 //  acia6850_device - constructor
 //-------------------------------------------------
 
 acia6850_device::acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ACIA6850, "6850 ACIA", tag, owner, clock, "acia6850", __FILE__),
-	m_txd_handler(*this),
-	m_rts_handler(*this),
-	m_irq_handler(*this),
-	m_status(SR_TDRE),
-	m_tdr(0),
-	m_first_master_reset(true),
-	m_dcd_irq_pending(false),
-	m_overrun_pending(false),
-	m_divide(0),
-	m_rts(0),
-	m_dcd(0),
-	m_irq(0),
-	m_txc(0),
-	m_txd(0),
-	m_tx_counter(0),
-	m_tx_irq_enable(false),
-	m_rxc(0),
-	m_rxd(1),
-	m_rx_irq_enable(false)
+	: acia6850_device(mconfig, ACIA6850, tag, owner, clock)
 {
 }
 
-acia6850_device::acia6850_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_txd_handler(*this),
-	m_rts_handler(*this),
-	m_irq_handler(*this),
-	m_status(SR_TDRE),
-	m_tdr(0),
-	m_first_master_reset(true),
-	m_dcd_irq_pending(false),
-	m_overrun_pending(false),
-	m_divide(0),
-	m_rts(0),
-	m_dcd(0),
-	m_irq(0),
-	m_txc(0),
-	m_txd(0),
-	m_tx_counter(0),
-	m_tx_irq_enable(false),
-	m_rxc(0),
-	m_rxd(1),
-	m_rx_irq_enable(false)
+acia6850_device::acia6850_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_txd_handler(*this)
+	, m_rts_handler(*this)
+	, m_irq_handler(*this)
+	, m_status(SR_TDRE)
+	, m_tdr(0)
+	, m_first_master_reset(true)
+	, m_dcd_irq_pending(false)
+	, m_overrun_pending(false)
+	, m_divide(0)
+	, m_rts(0)
+	, m_dcd(0)
+	, m_irq(0)
+	, m_txc(0)
+	, m_txd(0)
+	, m_tx_counter(0)
+	, m_tx_irq_enable(false)
+	, m_rxc(0)
+	, m_rxd(1)
+	, m_rx_irq_enable(false)
 {
 }
 

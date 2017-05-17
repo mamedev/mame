@@ -2041,7 +2041,7 @@ MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
 	memset(m_control_0, 0, sizeof(m_control_0));
 }
 
-static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
+static MACHINE_CONFIG_START( tumblepb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -2074,12 +2074,12 @@ static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 8000000/10, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 8000000/10, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tumbleb2, tumbleb_state )
+static MACHINE_CONFIG_START( tumbleb2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -2112,11 +2112,11 @@ static MACHINE_CONFIG_START( tumbleb2, tumbleb_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 8000000/10, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 8000000/10, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( jumpkids, tumbleb_state )
+static MACHINE_CONFIG_START( jumpkids )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -2155,11 +2155,11 @@ static MACHINE_CONFIG_START( jumpkids, tumbleb_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 8000000/8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 8000000/8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fncywld, tumbleb_state )
+static MACHINE_CONFIG_START( fncywld )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -2196,7 +2196,7 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_OKIM6295_ADD("oki", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1023924, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2217,7 +2217,7 @@ MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
 	MACHINE_RESET_CALL_MEMBER(tumbleb);
 }
 
-static MACHINE_CONFIG_START( htchctch, tumbleb_state )
+static MACHINE_CONFIG_START( htchctch )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 15000000) /* verified */
@@ -2261,7 +2261,7 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/* correct for cookie & bibi and hatch catch, (4096000/4) */
-	MCFG_OKIM6295_ADD("oki", 1024000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1024000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2276,7 +2276,7 @@ static MACHINE_CONFIG_DERIVED( chokchok, htchctch )
 	// some PCBs have left factory with a 3.57mhz while some have a 4.096 which matches other games, assuming the former are factory errors
 	// TODO: MAME sound cores doesn't handle on-the-fly sound frequency changes, I guess best action here is to make the sound chip a slot option,
 	//       assuming it's worth emulating a factory error in the first place.
-	MCFG_OKIM6295_REPLACE("oki", 4096000/4, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_REPLACE("oki", 4096000/4, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2325,7 +2325,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
+static MACHINE_CONFIG_START( suprtrio )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000) /* 14mhz should be correct, but lots of sprite flicker later in game */
@@ -2363,11 +2363,11 @@ static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 875000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 875000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pangpang, tumbleb_state )
+static MACHINE_CONFIG_START( pangpang )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -2400,7 +2400,7 @@ static MACHINE_CONFIG_START( pangpang, tumbleb_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 8000000/10, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 8000000/10, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 

@@ -9,12 +9,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_SMS_CTRL_SMSCTRL_H
+#define MAME_BUS_SMS_CTRL_SMSCTRL_H
+
 #pragma once
-
-#ifndef __SMS_CONTROL_PORT__
-#define __SMS_CONTROL_PORT__
-
-
 
 
 //**************************************************************************
@@ -54,9 +52,9 @@ public:
 	virtual ~sms_control_port_device();
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_th_input_handler(device_t &device, _Object object) { return downcast<sms_control_port_device &>(device).m_th_pin_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_th_input_handler(device_t &device, Object &&cb) { return downcast<sms_control_port_device &>(device).m_th_pin_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_pixel_handler(device_t &device, _Object object) { return downcast<sms_control_port_device &>(device).m_pixel_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_pixel_handler(device_t &device, Object &&cb) { return downcast<sms_control_port_device &>(device).m_pixel_handler.set_callback(std::forward<Object>(cb)); }
 
 	// Physical DE-9 connector interface
 
@@ -77,7 +75,7 @@ public:
 	void th_pin_w(int state);
 	uint32_t pixel_r();
 
-//protected:
+protected:
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -96,22 +94,23 @@ class device_sms_control_port_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_sms_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_sms_control_port_interface();
 
-	virtual uint8_t peripheral_r() { return 0xff; };
-	virtual void peripheral_w(uint8_t data) { };
+	virtual uint8_t peripheral_r() { return 0xff; }
+	virtual void peripheral_w(uint8_t data) { }
 
 protected:
+	device_sms_control_port_interface(const machine_config &mconfig, device_t &device);
+
 	sms_control_port_device *m_port;
 };
 
 
 // device type definition
-extern const device_type SMS_CONTROL_PORT;
+DECLARE_DEVICE_TYPE(SMS_CONTROL_PORT, sms_control_port_device)
 
 
 SLOT_INTERFACE_EXTERN( sms_control_port_devices );
 
 
-#endif
+#endif // MAME_BUS_SMS_CTRL_SMSCTRL_H

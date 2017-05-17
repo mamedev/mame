@@ -281,7 +281,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 					"supported machines (best match first):\n\n", m_options.system_name());
 			for (auto & matche : matches)
 				if (matche != -1)
-					osd_printf_error("%-18s%s\n", drivlist.driver(matche).name, drivlist.driver(matche).description);
+					osd_printf_error("%-18s%s\n", drivlist.driver(matche).name, drivlist.driver(matche).type.fullname());
 		}
 	}
 	catch (emu_exception &)
@@ -352,7 +352,7 @@ void cli_frontend::listfull(const std::vector<std::string> &args)
 	// iterate through drivers and output the info
 	while (drivlist.next())
 		if ((drivlist.driver().flags & MACHINE_NO_STANDALONE) == 0)
-			osd_printf_info("%-18s\"%s\"\n", drivlist.driver().name, drivlist.driver().description);
+			osd_printf_info("%-18s\"%s\"\n", drivlist.driver().name, drivlist.driver().type.fullname());
 }
 
 
@@ -372,7 +372,7 @@ void cli_frontend::listsource(const std::vector<std::string> &args)
 
 	// iterate through drivers and output the info
 	while (drivlist.next())
-		osd_printf_info("%-16s %s\n", drivlist.driver().name, core_filename_extract_base(drivlist.driver().source_file).c_str());
+		osd_printf_info("%-16s %s\n", drivlist.driver().name, core_filename_extract_base(drivlist.driver().type.source()).c_str());
 }
 
 
@@ -453,7 +453,7 @@ void cli_frontend::listbrothers(const std::vector<std::string> &args)
 		// otherwise, walk excluded items in the final list and mark any that match
 		drivlist.reset();
 		while (drivlist.next_excluded())
-			if (strcmp(drivlist.driver().source_file, initial_drivlist.driver().source_file) == 0)
+			if (strcmp(drivlist.driver().type.source(), initial_drivlist.driver().type.source()) == 0)
 				drivlist.include();
 	}
 
@@ -465,7 +465,7 @@ void cli_frontend::listbrothers(const std::vector<std::string> &args)
 	while (drivlist.next())
 	{
 		int clone_of = drivlist.clone();
-		osd_printf_info("%-20s %-16s %-16s\n", core_filename_extract_base(drivlist.driver().source_file).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+		osd_printf_info("%-20s %-16s %-16s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
 	}
 }
 
@@ -625,7 +625,7 @@ void cli_frontend::listdevices(const std::vector<std::string> &args)
 		if (!first)
 			printf("\n");
 		first = false;
-		printf("Driver %s (%s):\n", drivlist.driver().name, drivlist.driver().description);
+		printf("Driver %s (%s):\n", drivlist.driver().name, drivlist.driver().type.fullname());
 
 		// build a list of devices
 		std::vector<device_t *> device_list;

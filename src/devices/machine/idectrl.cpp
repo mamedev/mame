@@ -16,30 +16,33 @@
     DEBUGGING
 ***************************************************************************/
 
-#define VERBOSE                     0
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-const device_type IDE_CONTROLLER = device_creator<ide_controller_device>;
+DEFINE_DEVICE_TYPE(IDE_CONTROLLER, ide_controller_device, "idectrl", "IDE Controller (16-bit)")
 
 ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ata_interface_device(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock, "ide_controller", __FILE__)
+	ide_controller_device(mconfig, IDE_CONTROLLER, tag, owner, clock)
 {
 }
 
-ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	ata_interface_device(mconfig, type, name, tag, owner, clock, shortname, source)
+ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	ata_interface_device(mconfig, type, tag, owner, clock)
 {
 }
 
 READ16_MEMBER( ide_controller_device::read_cs0 )
 {
-	if (mem_mask == 0xffff && offset == 1 ){ offset = 0; popmessage( "requires ide_controller_32_device" ); }
+	if (mem_mask == 0xffff && offset == 1)
+	{
+		offset = 0;
+		popmessage( "requires ide_controller_32_device" );
+	}
 	if (mem_mask == 0xff00)
 	{
 		return ata_interface_device::read_cs0(space, (offset * 2) + 1, 0xff) << 8;
@@ -88,15 +91,15 @@ WRITE16_MEMBER( ide_controller_device::write_cs1 )
 }
 
 
-const device_type IDE_CONTROLLER_32 = device_creator<ide_controller_32_device>;
+DEFINE_DEVICE_TYPE(IDE_CONTROLLER_32, ide_controller_32_device, "idectrl32", "IDE Controller (32-bit)")
 
 ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ide_controller_device(mconfig, IDE_CONTROLLER_32, "IDE Controller (32 bit)", tag, owner, clock, "ide_controller32", __FILE__)
+	ide_controller_32_device(mconfig, IDE_CONTROLLER_32, tag, owner, clock)
 {
 }
 
-ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	ide_controller_device(mconfig, type, name, tag, owner, clock, shortname, source)
+ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	ide_controller_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -167,10 +170,10 @@ WRITE32_MEMBER(ide_controller_32_device::write_cs1)
 #define IDE_BUSMASTER_STATUS_ERROR          0x02
 #define IDE_BUSMASTER_STATUS_IRQ            0x04
 
-const device_type BUS_MASTER_IDE_CONTROLLER = device_creator<bus_master_ide_controller_device>;
+DEFINE_DEVICE_TYPE(BUS_MASTER_IDE_CONTROLLER, bus_master_ide_controller_device, "idectrl32bm", "Bus Master IDE Controller")
 
 bus_master_ide_controller_device::bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ide_controller_32_device(mconfig, BUS_MASTER_IDE_CONTROLLER, "Bus Master IDE Controller", tag, owner, clock, "bus_master_ide_controller", __FILE__),
+	ide_controller_32_device(mconfig, BUS_MASTER_IDE_CONTROLLER, tag, owner, clock),
 	m_dma_address(0),
 	m_dma_bytes_left(0),
 	m_dma_descriptor(0),
@@ -242,7 +245,7 @@ void bus_master_ide_controller_device::set_dmarq(int state)
 
 READ32_MEMBER( bus_master_ide_controller_device::bmdma_r )
 {
-	LOG(("%s:ide_bus_master32_r(%d, %08x)\n", machine().describe_context(), offset, mem_mask));
+	LOG("%s:ide_bus_master32_r(%d, %08x)\n", machine().describe_context(), offset, mem_mask);
 
 	switch( offset )
 	{
@@ -268,7 +271,7 @@ READ32_MEMBER( bus_master_ide_controller_device::bmdma_r )
 
 WRITE32_MEMBER( bus_master_ide_controller_device::bmdma_w )
 {
-	LOG(("%s:ide_bus_master32_w(%d, %08x, %08X)\n", machine().describe_context(), offset, mem_mask, data));
+	LOG("%s:ide_bus_master32_w(%d, %08x, %08X)\n", machine().describe_context(), offset, mem_mask, data);
 
 	switch( offset )
 	{
@@ -300,7 +303,7 @@ WRITE32_MEMBER( bus_master_ide_controller_device::bmdma_w )
 				{
 					m_bus_master_status &= ~IDE_BUSMASTER_STATUS_ACTIVE;
 
-					LOG(("DMA Aborted!\n"));
+					LOG("DMA Aborted!\n");
 				}
 			}
 		}
@@ -355,7 +358,7 @@ void bus_master_ide_controller_device::execute_dma()
 			if (m_dma_bytes_left == 0)
 				m_dma_bytes_left = 0x10000;
 
-//          LOG(("New DMA descriptor: address = %08X  bytes = %04X  last = %d\n", m_dma_address, m_dma_bytes_left, m_dma_last_buffer));
+//          LOG("New DMA descriptor: address = %08X  bytes = %04X  last = %d\n", m_dma_address, m_dma_bytes_left, m_dma_last_buffer);
 		}
 
 		if (m_bus_master_command & 8)
@@ -385,7 +388,7 @@ void bus_master_ide_controller_device::execute_dma()
 
 			if (m_dmarq)
 			{
-				LOG(("DMA Out of buffer space!\n"));
+				LOG("DMA Out of buffer space!\n");
 			}
 		}
 	}

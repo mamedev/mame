@@ -17,7 +17,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type MM58167 = device_creator<mm58167_device>;
+DEFINE_DEVICE_TYPE(MM58167, mm58167_device, "mm58167", "National Semiconductor MM58167 RTC")
 
 // registers (0-7 are the live data, 8-f are the setting for the compare IRQ)
 typedef enum
@@ -53,7 +53,7 @@ typedef enum
 //-------------------------------------------------
 
 mm58167_device::mm58167_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MM58167, "National Semiconductor MM58167", tag, owner, clock, "mm58167", __FILE__),
+	: device_t(mconfig, MM58167, tag, owner, clock),
 		device_rtc_interface(mconfig, *this),
 		m_irq_w(*this)
 {

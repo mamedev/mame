@@ -5,10 +5,10 @@
 
 const uint8_t manufacturer_id = 0xfe;
 
-const device_type MSX_S1985 = device_creator<msx_s1985_device>;
+DEFINE_DEVICE_TYPE(MSX_S1985, msx_s1985_device, "msx_s1985", "MSX-Engine S1985")
 
 msx_s1985_device::msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_S1985, "MSX-Engine S1985", tag, owner, clock, "msx_s1985", __FILE__)
+	: device_t(mconfig, MSX_S1985, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_selected(false)
 	, m_backup_ram_address(0)

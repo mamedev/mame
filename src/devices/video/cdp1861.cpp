@@ -15,9 +15,9 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define CDP1861_CYCLES_DMA_START    2*8
-#define CDP1861_CYCLES_DMA_ACTIVE   8*8
-#define CDP1861_CYCLES_DMA_WAIT     6*8
+#define CDP1861_CYCLES_DMA_START    (2*8)
+#define CDP1861_CYCLES_DMA_ACTIVE   (8*8)
+#define CDP1861_CYCLES_DMA_WAIT     (6*8)
 
 
 
@@ -26,7 +26,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type CDP1861 = device_creator<cdp1861_device>;
+DEFINE_DEVICE_TYPE(CDP1861, cdp1861_device, "cdp1861", "RCA CDP1861")
 
 
 
@@ -39,7 +39,7 @@ const device_type CDP1861 = device_creator<cdp1861_device>;
 //-------------------------------------------------
 
 cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CDP1861, "CDP1861", tag, owner, clock, "cdp1861", __FILE__),
+	: device_t(mconfig, CDP1861, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		m_write_irq(*this),
 		m_write_dma_out(*this),
@@ -85,8 +85,8 @@ void cdp1861_device::device_start()
 
 void cdp1861_device::device_reset()
 {
-	m_int_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_INT_START, 0));
-	m_efx_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_START, 0));
+	m_int_timer->adjust(m_screen->time_until_pos(SCANLINE_INT_START, 0));
+	m_efx_timer->adjust(m_screen->time_until_pos(SCANLINE_EFX_TOP_START, 0));
 	m_dma_timer->adjust(clocks_to_attotime(CDP1861_CYCLES_DMA_START));
 
 	m_disp = 0;
@@ -110,14 +110,14 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 	case TIMER_INT:
-		if (scanline == CDP1861_SCANLINE_INT_START)
+		if (scanline == SCANLINE_INT_START)
 		{
 			if (m_disp)
 			{
 				m_write_irq(ASSERT_LINE);
 			}
 
-			m_int_timer->adjust(m_screen->time_until_pos( CDP1861_SCANLINE_INT_END, 0));
+			m_int_timer->adjust(m_screen->time_until_pos( SCANLINE_INT_END, 0));
 		}
 		else
 		{
@@ -126,31 +126,31 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				m_write_irq(CLEAR_LINE);
 			}
 
-			m_int_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_INT_START, 0));
+			m_int_timer->adjust(m_screen->time_until_pos(SCANLINE_INT_START, 0));
 		}
 		break;
 
 	case TIMER_EFX:
 		switch (scanline)
 		{
-		case CDP1861_SCANLINE_EFX_TOP_START:
+		case SCANLINE_EFX_TOP_START:
 			m_write_efx(ASSERT_LINE);
-			m_efx_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_END, 0));
+			m_efx_timer->adjust(m_screen->time_until_pos(SCANLINE_EFX_TOP_END, 0));
 			break;
 
-		case CDP1861_SCANLINE_EFX_TOP_END:
+		case SCANLINE_EFX_TOP_END:
 			m_write_efx(CLEAR_LINE);
-			m_efx_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_EFX_BOTTOM_START, 0));
+			m_efx_timer->adjust(m_screen->time_until_pos(SCANLINE_EFX_BOTTOM_START, 0));
 			break;
 
-		case CDP1861_SCANLINE_EFX_BOTTOM_START:
+		case SCANLINE_EFX_BOTTOM_START:
 			m_write_efx(ASSERT_LINE);
-			m_efx_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_EFX_BOTTOM_END, 0));
+			m_efx_timer->adjust(m_screen->time_until_pos(SCANLINE_EFX_BOTTOM_END, 0));
 			break;
 
-		case CDP1861_SCANLINE_EFX_BOTTOM_END:
+		case SCANLINE_EFX_BOTTOM_END:
 			m_write_efx(CLEAR_LINE);
-			m_efx_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_START, 0));
+			m_efx_timer->adjust(m_screen->time_until_pos(SCANLINE_EFX_TOP_START, 0));
 			break;
 		}
 		break;
@@ -160,7 +160,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (m_disp)
 			{
-				if (scanline >= CDP1861_SCANLINE_DISPLAY_START && scanline < CDP1861_SCANLINE_DISPLAY_END)
+				if (scanline >= SCANLINE_DISPLAY_START && scanline < SCANLINE_DISPLAY_END)
 				{
 					m_write_dma_out(CLEAR_LINE);
 				}
@@ -174,7 +174,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (m_disp)
 			{
-				if (scanline >= CDP1861_SCANLINE_DISPLAY_START && scanline < CDP1861_SCANLINE_DISPLAY_END)
+				if (scanline >= SCANLINE_DISPLAY_START && scanline < SCANLINE_DISPLAY_END)
 				{
 					m_write_dma_out(ASSERT_LINE);
 				}

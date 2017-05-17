@@ -27,11 +27,11 @@
 #define HOURS_12_24     (0x40)
 #define HOURS_AM_PM     (0x20)
 
-const device_type DS1386_8K = device_creator<ds1386_8k_device>;
-const device_type DS1386_32K = device_creator<ds1386_32k_device>;
+DEFINE_DEVICE_TYPE(DS1386_8K,  ds1386_8k_device,  "ds1386_8k",  "DS1386 RAMified Watchdog Timekeeper (8K)")
+DEFINE_DEVICE_TYPE(DS1386_32K, ds1386_32k_device, "ds1386_32k", "DS1386 RAMified Watchdog Timekeeper (32K)")
 
-ds1386_device::ds1386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, size_t size)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+ds1386_device::ds1386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, size_t size)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_tod_alarm(0)
 	, m_watchdog_alarm(0)
@@ -61,12 +61,12 @@ ds1386_device::ds1386_device(const machine_config &mconfig, device_type type, co
 }
 
 ds1386_8k_device::ds1386_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ds1386_device(mconfig, DS1386_8K, "DS1386-8K", tag, owner, clock, "ds1386_8k", 8192)
+	: ds1386_device(mconfig, DS1386_8K, tag, owner, clock, 8*1024)
 {
 }
 
 ds1386_32k_device::ds1386_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ds1386_device(mconfig, DS1386_32K, "DS1386-32K", tag, owner, clock, "ds1386_32k", 32768)
+	: ds1386_device(mconfig, DS1386_32K, tag, owner, clock, 32*1024)
 {
 }
 

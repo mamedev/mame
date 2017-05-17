@@ -49,7 +49,7 @@ static inline void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		device->logerror( "%s: I2CMEM(%s) %s", device->machine().describe_context( ), device->tag(), buf );
+		device->logerror( "%s: I2CMEM %s", device->machine().describe_context(), buf );
 	}
 }
 
@@ -58,7 +58,7 @@ static inline void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level
 //**************************************************************************
 
 // device type definition
-const device_type I2CMEM = device_creator<i2cmem_device>;
+DEFINE_DEVICE_TYPE(I2CMEM, i2cmem_device, "i2cmem", "I2C Memory")
 
 
 //**************************************************************************
@@ -70,8 +70,8 @@ const device_type I2CMEM = device_creator<i2cmem_device>;
 //-------------------------------------------------
 
 i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: device_t(mconfig, I2CMEM, "I2C Memory", tag, owner, clock, "i2cmem", __FILE__),
-		device_nvram_interface(mconfig, *this),
+	: device_t(mconfig, I2CMEM, tag, owner, clock),
+	device_nvram_interface(mconfig, *this),
 	m_region(*this, DEVICE_SELF),
 	m_slave_address( I2CMEM_SLAVE_ADDRESS ),
 	m_page_size( 0 ),

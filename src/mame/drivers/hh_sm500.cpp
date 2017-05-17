@@ -98,7 +98,7 @@ public:
 static INPUT_PORTS_START( nupogodi )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( nupogodi, nupogodi_state )
+static MACHINE_CONFIG_START( nupogodi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KB1013VK12, XTAL_32_768kHz)
@@ -126,5 +126,5 @@ ROM_END
 
 
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1984, nupogodi,  0,        0, nupogodi,  nupogodi,  driver_device, 0, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT   CMP MACHINE    INPUT      STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1984, nupogodi,  0,        0, nupogodi,  nupogodi,  nupogodi_state, 0, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

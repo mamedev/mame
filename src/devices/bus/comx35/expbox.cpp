@@ -66,7 +66,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_EB = device_creator<comx_eb_device>;
+DEFINE_DEVICE_TYPE(COMX_EB, comx_eb_device, "comx_eb", "COMX-35E Expansion Box")
 
 
 //-------------------------------------------------
@@ -131,7 +131,7 @@ machine_config_constructor comx_eb_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COMX_EB, "COMX-35E Expansion Box", tag, owner, clock, "comx_eb", __FILE__),
+	device_t(mconfig, COMX_EB, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_rom(*this, "e000"),
 	m_select(0)

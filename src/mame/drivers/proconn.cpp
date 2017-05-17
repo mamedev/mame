@@ -182,7 +182,7 @@ public:
 protected:
 
 	// devices
-	optional_device<s16lf01_t> m_vfd;
+	optional_device<s16lf01_device> m_vfd;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_z80pio_1;
 	required_device<z80pio_device> m_z80pio_2;
@@ -318,7 +318,7 @@ void proconn_state::machine_reset()
 	m_vfd->reset(); // reset display1
 }
 
-static MACHINE_CONFIG_START( proconn, proconn_state )
+static MACHINE_CONFIG_START( proconn )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
 	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(proconn_map)

@@ -289,7 +289,7 @@ void fp6000_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( fp6000, fp6000_state )
+static MACHINE_CONFIG_START( fp6000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
 	MCFG_CPU_PROGRAM_MAP(fp6000_map)
@@ -327,5 +327,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1985, fp6000,  0,      0,       fp6000,     fp6000, driver_device,    0,     "Casio",   "FP-6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE            INIT   COMPANY    FULLNAME   FLAGS */
+COMP( 1985, fp6000, 0,      0,       fp6000,    fp6000,  fp6000_state,    0,     "Casio",   "FP-6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

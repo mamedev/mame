@@ -5,7 +5,7 @@
 #include "graphlinkhle.h"
 
 
-device_type const TI8X_GRAPH_LINK_HLE = device_creator<bus::ti8x::graph_link_hle_device>;
+DEFINE_DEVICE_TYPE_NS(TI8X_GRAPH_LINK_HLE, bus::ti8x, graph_link_hle_device, "tii8x_glinkhle", "TI-Graph Link (grey, HLE)")
 
 
 namespace bus { namespace ti8x {
@@ -25,7 +25,7 @@ graph_link_hle_device::graph_link_hle_device(
 		char const *tag,
 		device_t *owner,
 		uint32_t clock)
-	: device_t(mconfig, TI8X_GRAPH_LINK_HLE, "TI-Graph Link (grey, HLE)", tag, owner, clock, "glinkhle", __FILE__)
+	: device_t(mconfig, TI8X_GRAPH_LINK_HLE, tag, owner, clock)
 	, device_ti8x_link_port_byte_interface(mconfig, *this)
 	, device_serial_interface(mconfig, *this)
 	, m_serial_port(*this, "rs232")

@@ -401,7 +401,7 @@ static SLOT_INTERFACE_START( x1_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( x1twin, x1twin_state )
+static MACHINE_CONFIG_START( x1twin )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("x1_cpu", Z80, X1_MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(x1_mem)
@@ -446,7 +446,7 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_SCREEN_ADD("pce_screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, HUC6260_WPF, 70, 70 + 512 + 32, HUC6260_LPF, 14, 14+242)
+	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, huc6260_device::WPF, 70, 70 + 512 + 32, huc6260_device::LPF, 14, 14+242)
 	MCFG_SCREEN_UPDATE_DRIVER(x1twin_state, screen_update_x1pce)
 
 	MCFG_MC6845_ADD("crtc", H46505, "x1_screen", (VDP_CLOCK/48)) //unknown divider
@@ -540,4 +540,4 @@ ROM_START( x1twin )
 	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, BAD_DUMP CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
 ROM_END
 
-COMP( 1986, x1twin,    x1,     0,       x1twin,      x1twin, x1_state,         x1_kanji,"Sharp",  "X1 Twin (CZ-830C)",    MACHINE_NOT_WORKING )
+COMP( 1986, x1twin,    x1,     0,       x1twin,      x1twin, x1twin_state, x1_kanji,"Sharp",  "X1 Twin (CZ-830C)",    MACHINE_NOT_WORKING )

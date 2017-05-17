@@ -774,7 +774,7 @@ static GFXDECODE_START( gsword )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gsword, gsword_state )
+static MACHINE_CONFIG_START( gsword )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6) /* verified on pcb */
@@ -828,11 +828,11 @@ static MACHINE_CONFIG_START( gsword, gsword_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* vclk input mode    */
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( josvolly, josvolly_state )
+static MACHINE_CONFIG_START( josvolly )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18000000/4) /* ? */
@@ -1042,6 +1042,6 @@ ROM_START( josvolly )
 ROM_END
 
 
-GAME( 1983, josvolly, 0,      josvolly, josvolly, driver_device,  0,       ROT90, "Allumer / Taito Corporation", "Joshi Volleyball", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, josvolly, 0,      josvolly, josvolly, josvolly_state, 0,       ROT90, "Allumer / Taito Corporation", "Joshi Volleyball",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gsword,   0,      gsword,   gsword,   gsword_state,   gsword,  ROT0,  "Allumer / Taito Corporation", "Great Swordsman (World?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gsword2,  gsword, gsword,   gsword,   gsword_state,   gsword2, ROT0,  "Allumer / Taito Corporation", "Great Swordsman (Japan?)", MACHINE_SUPPORTS_SAVE )

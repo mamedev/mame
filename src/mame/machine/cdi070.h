@@ -21,8 +21,10 @@ TODO:
 
 *******************************************************************************/
 
-#ifndef _MACHINE_CDI68070_H_
-#define _MACHINE_CDI68070_H_
+#ifndef MAME_MACHINE_CDI070_H
+#define MAME_MACHINE_CDI070_H
+
+#pragma once
 
 
 #define ISR_MST     0x80    // Master
@@ -297,6 +299,6 @@ private:
 };
 
 // device type definition
-extern const device_type MACHINE_CDI68070;
+DECLARE_DEVICE_TYPE(MACHINE_CDI68070, cdi68070_device)
 
-#endif // _MACHINE_CDI68070_H_
+#endif // MAME_MACHINE_CDI070_H

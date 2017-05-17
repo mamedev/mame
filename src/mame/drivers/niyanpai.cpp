@@ -718,7 +718,7 @@ static const z80_daisy_config daisy_chain_sound[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
+static MACHINE_CONFIG_START( niyanpai )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12288000/2) /* TMP68301, 6.144 MHz */

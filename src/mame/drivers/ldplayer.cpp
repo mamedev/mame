@@ -620,13 +620,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( ldplayer_ntsc, ldplayer_state )
+static MACHINE_CONFIG_START( ldplayer_ntsc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( ldv1000, ldplayer_ntsc, ldv1000_state )
+static MACHINE_CONFIG_DERIVED( ldv1000, ldplayer_ntsc )
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_GET_DISC(laserdisc_get_disc_delegate(&ldplayer_state::get_disc_static, device))
+	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldplayer_state::get_disc_static, device))
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -636,9 +636,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( ldv1000, ldplayer_ntsc, ldv1000_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( pr8210, ldplayer_ntsc, pr8210_state )
+static MACHINE_CONFIG_DERIVED( pr8210, ldplayer_ntsc )
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_GET_DISC(laserdisc_get_disc_delegate(&ldplayer_state::get_disc_static, device))
+	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldplayer_state::get_disc_static, device))
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -672,5 +672,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 2008, simldv1000, 0, ldv1000, ldplayer, driver_device, 0, ROT0, "MAME", "Pioneer LDV-1000 Simulator", 0 )
-GAMEL(2008, simpr8210,  0, pr8210,  ldplayer, driver_device, 0, ROT0, "MAME", "Pioneer PR-8210 Simulator", 0, layout_pr8210 )
+GAME( 2008, simldv1000, 0, ldv1000, ldplayer, ldv1000_state, 0, ROT0, "MAME", "Pioneer LDV-1000 Simulator", 0 )
+GAMEL(2008, simpr8210,  0, pr8210,  ldplayer, pr8210_state,  0, ROT0, "MAME", "Pioneer PR-8210 Simulator",  0, layout_pr8210 )

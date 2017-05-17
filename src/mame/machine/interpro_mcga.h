@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#pragma once
+#ifndef MAME_MACHINE_INTERPRO_MCGA_H
+#define MAME_MACHINE_INTERPRO_MCGA_H
 
-#ifndef INTERPRO_MCGA_H_
-#define INTERPRO_MCGA_H_
+#pragma once
 
 
 // mcga control register
@@ -39,6 +39,6 @@ private:
 };
 
 // device type definition
-extern const device_type INTERPRO_MCGA;
+DECLARE_DEVICE_TYPE(INTERPRO_MCGA, interpro_mcga_device)
 
-#endif
+#endif // MAME_MACHINE_INTERPRO_MCGA_H

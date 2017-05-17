@@ -344,7 +344,7 @@ void tceptor_state::machine_reset()
 
 /*******************************************************************/
 
-static MACHINE_CONFIG_START( tceptor, tceptor_state )
+static MACHINE_CONFIG_START( tceptor )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 49152000/32)
@@ -542,6 +542,6 @@ ROM_START( tceptor2 )
 ROM_END
 
 
-/*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR   COMPANY FULLNAME ) */
-GAME ( 1986, tceptor,  0,        tceptor,  tceptor, driver_device,  0,        ROT0,     "Namco",  "Thunder Ceptor", 0)
-GAMEL( 1986, tceptor2, tceptor,  tceptor,  tceptor2, driver_device, 0,        ROT0,     "Namco",  "Thunder Ceptor II", 0, layout_tceptor2)
+//   ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      MONITOR   COMPANY   FULLNAME             FLAGS )
+GAME ( 1986, tceptor,  0,        tceptor,  tceptor,  tceptor_state, 0,        ROT0,     "Namco",  "Thunder Ceptor",    0)
+GAMEL( 1986, tceptor2, tceptor,  tceptor,  tceptor2, tceptor_state, 0,        ROT0,     "Namco",  "Thunder Ceptor II", 0, layout_tceptor2)

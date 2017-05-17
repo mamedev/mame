@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_NEWBRAIN_FDC_H
+#define MAME_BUS_NEWBRAIN_FDC_H
 
-#ifndef __NEWBRAIN_FDC__
-#define __NEWBRAIN_FDC__
+#pragma once
 
 #include "exp.h"
 #include "cpu/z80/z80.h"
@@ -21,14 +21,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> newbrain_fdc_t
+// ======================> newbrain_fdc_device
 
-class newbrain_fdc_t :  public device_t,
-						public device_newbrain_expansion_slot_interface
+class newbrain_fdc_device :  public device_t, public device_newbrain_expansion_slot_interface
 {
 public:
 	// construction/destruction
-	newbrain_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	newbrain_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -57,7 +56,7 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
-	required_device<newbrain_expansion_slot_t> m_exp;
+	required_device<newbrain_expansion_slot_device> m_exp;
 
 	void moton(int state);
 
@@ -71,8 +70,6 @@ private:
 
 
 // device type definition
-extern const device_type NEWBRAIN_FDC;
+DECLARE_DEVICE_TYPE(NEWBRAIN_FDC, newbrain_fdc_device)
 
-
-
-#endif
+#endif // MAME_BUS_NEWBRAIN_FDC_H

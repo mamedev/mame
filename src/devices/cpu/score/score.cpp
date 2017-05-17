@@ -16,7 +16,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-const device_type SCORE7 = device_creator<score7_cpu_device>;
+DEFINE_DEVICE_TYPE(SCORE7, score7_cpu_device, "score7", "S+core 7")
 
 
 //**************************************************************************
@@ -53,10 +53,10 @@ const score7_cpu_device::op_handler score7_cpu_device::s_opcode16_table[8] =
 //-------------------------------------------------
 
 score7_cpu_device::score7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SCORE7, "S+core 7", tag, owner, clock, "score7", __FILE__),
-		m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0),
-		m_pc(0),
-		m_ppc(0)
+	: cpu_device(mconfig, SCORE7, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_pc(0)
+	, m_ppc(0)
 {
 	memset(m_gpr, 0x00, sizeof(m_gpr));
 	memset(m_cr, 0x00, sizeof(m_cr));

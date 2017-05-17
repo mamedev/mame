@@ -7,8 +7,10 @@ Research Machines RM 380Z
 
 */
 
-#ifndef RM380Z_H_
-#define RM380Z_H_
+#ifndef MAME_INCLUDES_RM380Z_H
+#define MAME_INCLUDES_RM380Z_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
@@ -85,10 +87,12 @@ private:
 	int m_videomode;
 	int m_old_videomode;
 
+	emu_timer *m_static_vblank_timer;
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<ram_device> m_messram;
-	optional_device<fd1771_t> m_fdc;
+	optional_device<fd1771_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 
@@ -123,7 +127,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(disk_0_control);
 
-	DECLARE_WRITE8_MEMBER( keyboard_put );
+	void keyboard_put(u8 data);
 
 	DECLARE_DRIVER_INIT(rm380z);
 	DECLARE_DRIVER_INIT(rm380z34d);
@@ -138,5 +142,4 @@ public:
 	TIMER_CALLBACK_MEMBER(static_vblank_timer);
 };
 
-
-#endif
+#endif // MAME_INCLUDES_RM380Z_H

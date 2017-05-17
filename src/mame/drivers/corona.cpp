@@ -1343,7 +1343,7 @@ INPUT_PORTS_END
 *             Machine Drivers              *
 *******************************************/
 
-static MACHINE_CONFIG_START( winner81, corona_state )
+static MACHINE_CONFIG_START( winner81 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, WC81_MAIN_XTAL/8)  /* measured */
 	MCFG_CPU_PROGRAM_MAP(winner81_map)
@@ -1378,7 +1378,7 @@ static MACHINE_CONFIG_START( winner81, corona_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( winner82, corona_state )
+static MACHINE_CONFIG_START( winner82 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)  /* measured */
 	MCFG_CPU_PROGRAM_MAP(winner82_map)
@@ -1412,7 +1412,7 @@ static MACHINE_CONFIG_START( winner82, corona_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( re800, corona_state )
+static MACHINE_CONFIG_START( re800 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_map)
@@ -1447,7 +1447,7 @@ static MACHINE_CONFIG_START( re800, corona_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rcirulet, corona_state )
+static MACHINE_CONFIG_START( rcirulet )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_map)
@@ -1481,7 +1481,7 @@ static MACHINE_CONFIG_START( rcirulet, corona_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( luckyrlt, corona_state )
+static MACHINE_CONFIG_START( luckyrlt )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(luckyrlt_map)
@@ -1714,13 +1714,13 @@ ROM_END
 *              Game Drivers               *
 ******************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT      ROT      COMPANY                     FULLNAME                                   FLAGS                   LAYOUT      */
-GAME(  1981, winner81,  winner82, winner81, winner81, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           MACHINE_IMPERFECT_SOUND )
-GAME(  1981, winner81b, winner82, winner82, winner82, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
-GAME(  1982, winner82,  0,        winner82, winner82, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
-GAME(  198?, legrandc,  winner82, winner82, winner82, driver_device, 0,        ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                           MACHINE_IMPERFECT_COLORS )
-GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                      layout_re800 )
-GAMEL( 1991, re800v1,   0,        re800,    re800,    driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                      layout_re800 )
-GAMEL( 1991, re800v3,   0,        re800,    re800v3,  driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     MACHINE_IMPERFECT_COLORS,  layout_re800 )
-GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                      layout_re800 )
-GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, driver_device, 0,        ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                      layout_luckyrlt )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE         INIT      ROT      COMPANY                     FULLNAME                                   FLAGS                     LAYOUT
+GAME(  1981, winner81,  winner82, winner81, winner81, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           MACHINE_IMPERFECT_SOUND )
+GAME(  1981, winner81b, winner82, winner82, winner82, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
+GAME(  1982, winner82,  0,        winner82, winner82, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
+GAME(  198?, legrandc,  winner82, winner82, winner82, corona_state, 0,        ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                           MACHINE_IMPERFECT_COLORS )
+GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                        layout_re800 )
+GAMEL( 1991, re800v1,   0,        re800,    re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                        layout_re800 )
+GAMEL( 1991, re800v3,   0,        re800,    re800v3,  corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     MACHINE_IMPERFECT_COLORS, layout_re800 )
+GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                        layout_re800 )
+GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, corona_state, 0,        ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                        layout_luckyrlt )

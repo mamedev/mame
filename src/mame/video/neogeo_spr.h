@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
 // thanks-to:Fuzz
-#define VERBOSE     (0)
+#ifndef MAME_VIDEO_NEOGEO_SPR_H
+#define MAME_VIDEO_NEOGEO_SPR_H
+
+#pragma once
 
 // todo, move these back, currently the sprite code needs some of the values tho
 #define NEOGEO_MASTER_CLOCK                     (24000000)
@@ -80,12 +83,9 @@ protected:
 	neosprite_base_device(
 			const machine_config &mconfig,
 			device_type type,
-			const char *name,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock,
-			const char *shortname,
-			const char *source);
+			uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -97,8 +97,6 @@ protected:
 	const pen_t   *m_pens;
 };
 
-//extern const device_type NEOGEO_SPRITE_BASE;
-
 
 class neosprite_regular_device : public neosprite_base_device
 {
@@ -109,7 +107,7 @@ public:
 
 };
 
-extern const device_type NEOGEO_SPRITE_REGULAR;
+DECLARE_DEVICE_TYPE(NEOGEO_SPRITE_REGULAR, neosprite_regular_device)
 
 
 class neosprite_optimized_device : public neosprite_base_device
@@ -126,10 +124,7 @@ private:
 	uint32_t optimize_helper(std::vector<uint8_t> &spritegfx, uint8_t* region_sprites, uint32_t region_sprites_size);
 };
 
-extern const device_type NEOGEO_SPRITE_OPTIMZIED;
-
-
-
+DECLARE_DEVICE_TYPE(NEOGEO_SPRITE_OPTIMZIED, neosprite_optimized_device)
 
 
 class neosprite_midas_device : public neosprite_base_device
@@ -149,4 +144,6 @@ public:
 
 };
 
-extern const device_type NEOGEO_SPRITE_MIDAS;
+DECLARE_DEVICE_TYPE(NEOGEO_SPRITE_MIDAS, neosprite_midas_device)
+
+#endif // MAME_VIDEO_NEOGEO_SPR_H

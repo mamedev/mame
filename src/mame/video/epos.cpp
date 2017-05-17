@@ -55,17 +55,10 @@ void epos_state::set_pal_color( uint8_t offset, uint8_t data )
 	m_palette->set_pen_color(offset, rgb_t(r,g,b));
 }
 
-// later games uses a dynamic palette instead of prom
+// later (tristar 9000) games uses a dynamic palette instead of prom
 WRITE8_MEMBER(epos_state::dealer_pal_w)
 {
 	set_pal_color(offset,data);
-}
-
-WRITE8_MEMBER(epos_state::flip_screen_w)
-{	
-	flip_screen_set(BIT(data, 7));
-
-	// bit 6: ay8910 port A/B multiplexer read? 
 }
 
 WRITE8_MEMBER(epos_state::port_1_w)

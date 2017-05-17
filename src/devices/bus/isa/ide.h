@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-#pragma once
+#ifndef MAME_BUS_ISA_IDE_H
+#define MAME_BUS_ISA_IDE_H
 
-#ifndef __ISA_IDE_H__
-#define __ISA_IDE_H__
+#pragma once
 
 #include "isa.h"
 #include "machine/idectrl.h"
@@ -44,6 +44,6 @@ private:
 
 
 // device type definition
-extern const device_type ISA16_IDE;
+DECLARE_DEVICE_TYPE(ISA16_IDE, isa16_ide_device)
 
-#endif  /* __ISA_IDE_H__ */
+#endif // MAME_BUS_ISA_IDE_H

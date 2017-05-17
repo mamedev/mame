@@ -218,10 +218,10 @@ WRITE8_MEMBER(nemesis_state::nemesis_filter_w)
 {
 	int C1 = /* offset & 0x1000 ? 4700 : */ 0; // is this right? 4.7uF seems too large
 	int C2 = offset & 0x0800 ? 33 : 0;         // 0.033uF = 33 nF
-	m_filter1->filter_rc_set_RC(FLT_RC_LOWPASS, (AY8910_INTERNAL_RESISTANCE + 12000) / 3, 0, 0, CAP_N(C1)); // unused?
-	m_filter2->filter_rc_set_RC(FLT_RC_LOWPASS, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
-	m_filter3->filter_rc_set_RC(FLT_RC_LOWPASS, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
-	m_filter4->filter_rc_set_RC(FLT_RC_LOWPASS, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
+	m_filter1->filter_rc_set_RC(filter_rc_device::LOWPASS, (AY8910_INTERNAL_RESISTANCE + 12000) / 3, 0, 0, CAP_N(C1)); // unused?
+	m_filter2->filter_rc_set_RC(filter_rc_device::LOWPASS, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
+	m_filter3->filter_rc_set_RC(filter_rc_device::LOWPASS, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
+	m_filter4->filter_rc_set_RC(filter_rc_device::LOWPASS, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
 
 	// konamigt also uses bits 0x0018, what are they for?
 }
@@ -1485,7 +1485,7 @@ void nemesis_state::machine_reset()
 	m_irq_port_last = 0;
 }
 
-static MACHINE_CONFIG_START( nemesis, nemesis_state )
+static MACHINE_CONFIG_START( nemesis )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1542,7 +1542,7 @@ static MACHINE_CONFIG_START( nemesis, nemesis_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gx400, nemesis_state )
+static MACHINE_CONFIG_START( gx400 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
@@ -1603,7 +1603,7 @@ static MACHINE_CONFIG_START( gx400, nemesis_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( konamigt, nemesis_state )
+static MACHINE_CONFIG_START( konamigt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1659,7 +1659,7 @@ static MACHINE_CONFIG_START( konamigt, nemesis_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rf2_gx400, nemesis_state )
+static MACHINE_CONFIG_START( rf2_gx400 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
@@ -1720,7 +1720,7 @@ static MACHINE_CONFIG_START( rf2_gx400, nemesis_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( salamand, nemesis_state )
+static MACHINE_CONFIG_START( salamand )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)       /* 9.216MHz */
@@ -1771,7 +1771,7 @@ static MACHINE_CONFIG_START( salamand, nemesis_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( blkpnthr, nemesis_state )
+static MACHINE_CONFIG_START( blkpnthr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1817,7 +1817,7 @@ static MACHINE_CONFIG_START( blkpnthr, nemesis_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( citybomb, nemesis_state )
+static MACHINE_CONFIG_START( citybomb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1867,7 +1867,7 @@ static MACHINE_CONFIG_START( citybomb, nemesis_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( nyanpani, nemesis_state )
+static MACHINE_CONFIG_START( nyanpani )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1917,7 +1917,7 @@ static MACHINE_CONFIG_START( nyanpani, nemesis_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hcrash, nemesis_state )
+static MACHINE_CONFIG_START( hcrash )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/3)         /* 6.144MHz */
@@ -2379,24 +2379,24 @@ ROM_END
 
 
 
-GAME( 1985, nemesis,   0,         nemesis,    nemesis, driver_device,   0,    ROT0,   "Konami", "Nemesis (ROM version)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nemesisuk, nemesis,   nemesis,    nemesuk, driver_device,   0,    ROT0,   "Konami", "Nemesis (World?, ROM version)",  MACHINE_SUPPORTS_SAVE )
-GAMEL(1985, konamigt,  0,         konamigt,   konamigt, driver_device,  0,    ROT0,   "Konami", "Konami GT",  MACHINE_SUPPORTS_SAVE, layout_konamigt )
-GAME( 1985, rf2,       konamigt,  rf2_gx400,  rf2, driver_device,       0,    ROT0,   "Konami", "Konami RF2 - Red Fighter",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, twinbee,   0,         gx400,      twinbee, driver_device,   0,    ROT90,  "Konami", "TwinBee (ROM version)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gradius,   nemesis,   gx400,      gradius, driver_device,   0,    ROT0,   "Konami", "Gradius (Japan, ROM version)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gwarrior,  0,         gx400,      gwarrior, driver_device,  0,    ROT0,   "Konami", "Galactic Warriors",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, salamand,  0,         salamand,   salamand, driver_device,  0,    ROT0,   "Konami", "Salamander (version D)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, salamandj, salamand,  salamand,   salamand, driver_device,  0,    ROT0,   "Konami", "Salamander (version J)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lifefrce,  salamand,  salamand,   salamand, driver_device,  0,    ROT0,   "Konami", "Lifeforce (US)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, lifefrcej, salamand,  salamand,   lifefrcj, driver_device,  0,    ROT0,   "Konami", "Lifeforce (Japan)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blkpnthr,  0,         blkpnthr,   blkpnthr, driver_device,  0,    ROT0,   "Konami", "Black Panther",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, citybomb,  0,         citybomb,   citybomb, driver_device,  0,    ROT270, "Konami", "City Bomber (World)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, citybombj, citybomb,  citybomb,   citybomb, driver_device,  0,    ROT270, "Konami", "City Bomber (Japan)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hcrash,    0,         hcrash,     hcrash, driver_device,    0,    ROT0,   "Konami", "Hyper Crash (version D)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hcrashc,   hcrash,    hcrash,     hcrash, driver_device,    0,    ROT0,   "Konami", "Hyper Crash (version C)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kittenk,   0,         nyanpani,   nyanpani, driver_device,  0,    ROT0,   "Konami", "Kitten Kaboodle",  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, nyanpani,  kittenk,   nyanpani,   nyanpani, driver_device,  0,    ROT0,   "Konami", "Nyan Nyan Panic (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nemesis,   0,         nemesis,    nemesis,  nemesis_state,  0,    ROT0,   "Konami", "Nemesis (ROM version)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nemesisuk, nemesis,   nemesis,    nemesuk,  nemesis_state,  0,    ROT0,   "Konami", "Nemesis (World?, ROM version)",  MACHINE_SUPPORTS_SAVE )
+GAMEL(1985, konamigt,  0,         konamigt,   konamigt, nemesis_state,  0,    ROT0,   "Konami", "Konami GT",                      MACHINE_SUPPORTS_SAVE, layout_konamigt )
+GAME( 1985, rf2,       konamigt,  rf2_gx400,  rf2,      nemesis_state,  0,    ROT0,   "Konami", "Konami RF2 - Red Fighter",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, twinbee,   0,         gx400,      twinbee,  nemesis_state,  0,    ROT90,  "Konami", "TwinBee (ROM version)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gradius,   nemesis,   gx400,      gradius,  nemesis_state,  0,    ROT0,   "Konami", "Gradius (Japan, ROM version)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gwarrior,  0,         gx400,      gwarrior, nemesis_state,  0,    ROT0,   "Konami", "Galactic Warriors",              MACHINE_SUPPORTS_SAVE )
+GAME( 1986, salamand,  0,         salamand,   salamand, nemesis_state,  0,    ROT0,   "Konami", "Salamander (version D)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1986, salamandj, salamand,  salamand,   salamand, nemesis_state,  0,    ROT0,   "Konami", "Salamander (version J)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lifefrce,  salamand,  salamand,   salamand, nemesis_state,  0,    ROT0,   "Konami", "Lifeforce (US)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, lifefrcej, salamand,  salamand,   lifefrcj, nemesis_state,  0,    ROT0,   "Konami", "Lifeforce (Japan)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blkpnthr,  0,         blkpnthr,   blkpnthr, nemesis_state,  0,    ROT0,   "Konami", "Black Panther",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, citybomb,  0,         citybomb,   citybomb, nemesis_state,  0,    ROT270, "Konami", "City Bomber (World)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, citybombj, citybomb,  citybomb,   citybomb, nemesis_state,  0,    ROT270, "Konami", "City Bomber (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hcrash,    0,         hcrash,     hcrash,   nemesis_state,  0,    ROT0,   "Konami", "Hyper Crash (version D)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hcrashc,   hcrash,    hcrash,     hcrash,   nemesis_state,  0,    ROT0,   "Konami", "Hyper Crash (version C)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kittenk,   0,         nyanpani,   nyanpani, nemesis_state,  0,    ROT0,   "Konami", "Kitten Kaboodle",                MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nyanpani,  kittenk,   nyanpani,   nyanpani, nemesis_state,  0,    ROT0,   "Konami", "Nyan Nyan Panic (Japan)",        MACHINE_SUPPORTS_SAVE )
 
 /*
 
@@ -2665,7 +2665,7 @@ Manual says SW4, 5, 6, 7 & 8 not used, leave off
 
 */
 
-static MACHINE_CONFIG_START( bubsys, nemesis_state )
+static MACHINE_CONFIG_START( bubsys )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
@@ -2747,4 +2747,4 @@ ROM_START( bubsys )
 	ROM_LOAD( "sram2.ic3", 0x2000, 0x2000, CRC(dda768be) SHA1(e98bae3ccf63eb67193346e9c40257a3ddb88e59) )
 ROM_END
 
-GAME( 1985, bubsys,   0,         bubsys,    nemesis, driver_device,   0,    ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+GAME( 1985, bubsys,   0,         bubsys,    nemesis, nemesis_state,   0,    ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )

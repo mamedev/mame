@@ -625,7 +625,7 @@ PALETTE_INIT_MEMBER(megaduck_state, megaduck)
 }
 
 
-static MACHINE_CONFIG_START( gameboy, gb_state )
+static MACHINE_CONFIG_START( gameboy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz)
@@ -665,7 +665,7 @@ static MACHINE_CONFIG_START( gameboy, gb_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( supergb, gb_state )
+static MACHINE_CONFIG_START( supergb )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, 4295454) /* 4.295454 MHz, derived from SNES xtal */
 	MCFG_CPU_PROGRAM_MAP(sgb_map)
@@ -740,7 +740,7 @@ static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 	MCFG_MGB_PPU_ADD("ppu", "maincpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gbcolor, gb_state )
+static MACHINE_CONFIG_START( gbcolor )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz) // todo XTAL_8_388MHz
@@ -786,7 +786,7 @@ static MACHINE_CONFIG_START( gbcolor, gb_state )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gb_list","gameboy")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( megaduck, megaduck_state )
+static MACHINE_CONFIG_START( megaduck )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, XTAL_4_194304Mhz) /* 4.194304 MHz */
@@ -866,12 +866,12 @@ ROM_START(megaduck)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 ROM_END
 
-/*   YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  COMPANY     FULLNAME */
-CONS(1990, gameboy,  0,       0,       gameboy,  gameboy, driver_device, 0,    "Nintendo", "Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1994, supergb,  gameboy, 0,       supergb,  gameboy, driver_device, 0,    "Nintendo", "Super Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1998, supergb2, gameboy, 0,       supergb2, gameboy, driver_device, 0,    "Nintendo", "Super Game Boy 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1996, gbpocket, gameboy, 0,       gbpocket, gameboy, driver_device, 0,    "Nintendo", "Game Boy Pocket", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1998, gbcolor,  0,       0,       gbcolor,  gameboy, driver_device, 0,    "Nintendo", "Game Boy Color", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+/*   YEAR  NAME       PARENT   COMPAT   MACHINE   INPUT    STATE           INIT  COMPANY     FULLNAME */
+CONS(1990, gameboy,   0,       0,       gameboy,  gameboy, gb_state,       0,    "Nintendo", "Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1994, supergb,   gameboy, 0,       supergb,  gameboy, gb_state,       0,    "Nintendo", "Super Game Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1998, supergb2,  gameboy, 0,       supergb2, gameboy, gb_state,       0,    "Nintendo", "Super Game Boy 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1996, gbpocket,  gameboy, 0,       gbpocket, gameboy, gb_state,       0,    "Nintendo", "Game Boy Pocket", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1998, gbcolor,   0,       0,       gbcolor,  gameboy, gb_state,       0,    "Nintendo", "Game Boy Color", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
 // Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real system there's no way to verify.
-CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, driver_device, 0,    "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, megaduck_state, 0,    "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

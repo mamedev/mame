@@ -5,13 +5,16 @@
 
 #include "cpu/i86/i86.h"
 #include "cpu/tms7000/tms7000.h"
+#include "imagedev/floppy.h"
 #include "machine/m24_kbd.h"
 #include "machine/m24_z8000.h"
 #include "machine/mm58274c.h"
 #include "machine/genpc.h"
+
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 #include "formats/m20_dsk.h"
+
 #include "softlist.h"
 
 class m24_state : public driver_device
@@ -58,7 +61,7 @@ void m24_state::machine_reset()
 	m_i86_halt = false;
 	m_i86_halt_perm = false;
 	if(m_z8000_apb)
-		m_z8000_apb->m_z8000->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_z8000_apb->halt_w(ASSERT_LINE);
 }
 
 READ8_MEMBER(m24_state::keyboard_r)
@@ -140,7 +143,7 @@ WRITE_LINE_MEMBER(m24_state::dma_hrq_w)
 	if(!m_i86_halt)
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	if(m_z8000_apb && !m_z8000_apb->halted())
-		m_z8000_apb->m_z8000->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+		m_z8000_apb->halt_w(state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	m_mb->m_dma8237->hack_w(state);
@@ -151,7 +154,7 @@ WRITE_LINE_MEMBER(m24_state::int_w)
 	if(!m_i86_halt)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 	if(m_z8000_apb && !m_z8000_apb->halted())
-		m_z8000_apb->m_z8000->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
+		m_z8000_apb->int_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(m24_state::halt_i86_w)
@@ -243,7 +246,7 @@ static MACHINE_CONFIG_FRAGMENT( cfg_m20_format )
 	static_cast<floppy_connector *>(device)->set_formats(m24_state::floppy_formats);
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( olivetti, m24_state )
+static MACHINE_CONFIG_START( olivetti )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(m24_map)
@@ -308,5 +311,5 @@ ROM_START( m240 )
 	ROM_LOAD("pdbd.tms2516.keyboardmcureplacementdaughterboard_10u", 0x000, 0x800, BAD_DUMP CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
 ROM_END
 
-COMP( 1983, m24,        ibm5150,    0,          olivetti,   m24, driver_device,      0,      "Olivetti", "M24", MACHINE_NOT_WORKING)
-COMP( 1987, m240,       ibm5150,    0,          olivetti,   m24, driver_device,      0,      "Olivetti", "M240", MACHINE_NOT_WORKING)
+COMP( 1983, m24,        ibm5150,    0,          olivetti,   m24, m24_state,      0,      "Olivetti", "M24",  MACHINE_NOT_WORKING )
+COMP( 1987, m240,       ibm5150,    0,          olivetti,   m24, m24_state,      0,      "Olivetti", "M240", MACHINE_NOT_WORKING )

@@ -1753,7 +1753,7 @@ uint32_t pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-static MACHINE_CONFIG_START( pokemini, pokemini_state )
+static MACHINE_CONFIG_START( pokemini )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MINX, 4000000)
 	MCFG_CPU_PROGRAM_MAP(pokemini_mem_map)
@@ -1797,4 +1797,4 @@ ROM_START( pokemini )
 ROM_END
 
 
-CONS( 2001, pokemini, 0, 0, pokemini, pokemini, driver_device, 0, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )
+CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini_state, 0, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )

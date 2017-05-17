@@ -19,7 +19,7 @@
 #include "emu.h"
 #include "machine/tmp68301.h"
 
-const device_type TMP68301 = device_creator<tmp68301_device>;
+DEFINE_DEVICE_TYPE(TMP68301, tmp68301_device, "tmp68301", "Toshiba TMP68301")
 
 static ADDRESS_MAP_START( tmp68301_regs, AS_0, 16, tmp68301_device )
 //  AM_RANGE(0x000,0x3ff) AM_RAM
@@ -100,7 +100,7 @@ WRITE16_MEMBER(tmp68301_device::pdr_w)
 
 
 tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TMP68301, "TMP68301", tag, owner, clock, "tmp68301", __FILE__),
+	: device_t(mconfig, TMP68301, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_in_parallel_cb(*this),
 		m_out_parallel_cb(*this),

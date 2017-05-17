@@ -526,7 +526,7 @@ void popper_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( popper, popper_state )
+static MACHINE_CONFIG_START( popper )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/3/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
@@ -587,5 +587,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS          INIT  ROTATION  COMPANY  FULLNAME  FLAGS
-GAME( 1983, popper, 0,      popper,  popper, driver_device, 0,    ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT  ROTATION  COMPANY  FULLNAME  FLAGS
+GAME( 1983, popper, 0,      popper,  popper, popper_state, 0,    ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )

@@ -27,6 +27,6 @@ private:
 	uint8_t m_enabled;  // keyboard enabled?
 };
 
-extern const device_type X68K_KEYBOARD;
+DECLARE_DEVICE_TYPE(X68K_KEYBOARD, x68k_keyboard_device)
 
 #endif // MAME_MACHINE_X68K_KBD_H

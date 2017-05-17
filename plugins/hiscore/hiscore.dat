@@ -1382,6 +1382,7 @@ bionicc:
 bionicc1:
 bionicc2:
 bioniccbl:
+bioniccbl2:
 topsecrt:
 @:maincpu,program,fff9e2,4f,00,4d
 @:maincpu,program,ffc57a,4,00,00
@@ -1660,6 +1661,56 @@ sdtennis:
 
 
 ;@s:bublbobl.cpp
+
+bublboblb:
+@:maincpu,program,e654,23,00,48
+@:maincpu,program,e67b,3,1f,13
+@:maincpu,program,e64c,3,00,00
+@:maincpu,program,e5df,1,00,00
+@:maincpu,program,e5e0,1,00,00
+@:maincpu,program,e5e4,1,00,00
+@:maincpu,program,e5e6,1,00,00
+@:maincpu,program,e5e1,1,00,00
+@:maincpu,program,e5e2,1,00,00
+@:maincpu,program,e5e3,1,00,00
+@:maincpu,program,e5e7,1,00,00
+@:maincpu,program,e5e8,1,00,00
+@:maincpu,program,e5e9,1,00,00
+@:maincpu,program,e5ea,1,00,00
+@:maincpu,program,e5eb,1,00,00
+@:maincpu,program,e5f6,1,00,00
+@:maincpu,program,e5f7,1,00,00
+@:maincpu,program,e5ee,1,00,00
+@:maincpu,program,e5ef,1,00,00
+@:maincpu,program,e5f0,1,00,00
+@:maincpu,program,e5ec,1,00,00
+@:maincpu,program,e5ed,1,00,00
+@:maincpu,program,e5f3,1,00,00
+@:maincpu,program,e5f4,1,00,00
+@:maincpu,program,e5d9,1,00,00
+@:maincpu,program,e5da,1,00,00
+@:maincpu,program,f457,1,00,00
+@:maincpu,program,f458,1,00,00
+@:maincpu,program,e601,1,00,00
+@:maincpu,program,e602,1,00,00
+@:maincpu,program,e600,1,00,00
+@:maincpu,program,e5ff,1,00,00
+@:maincpu,program,e5fd,1,00,00
+@:maincpu,program,e5fc,1,00,00
+@:maincpu,program,e5fb,1,00,00
+@:maincpu,program,e5fa,1,00,00
+@:maincpu,program,e5f9,1,00,00
+@:maincpu,program,e5f8,1,00,00
+@:maincpu,program,e5fe,1,00,00
+@:maincpu,program,e604,1,00,00
+@:maincpu,program,e605,1,00,00
+@:maincpu,program,e606,1,00,00
+@:maincpu,program,e607,1,00,00
+@:maincpu,program,e609,1,00,00
+@:maincpu,program,e60a,1,00,00
+@:maincpu,program,e611,1,00,00
+@:maincpu,program,e60b,2,00,00
+
 
 bbredux:
 @:maincpu,program,e654,23,00,48
@@ -2859,6 +2910,77 @@ cosmica2:
 
 ;@s:cps1.cpp
 
+sf2:
+sf2b:
+sf2eb:
+sf2ebbl:
+sf2ebbl2:
+sf2ebbl3:
+sf2ed:
+sf2ee:
+sf2em:
+sf2j:
+sf2ja:
+sf2jc:
+sf2jf:
+sf2jh:
+sf2jl:
+sf2qp1:
+sf2rk:
+sf2stt:
+sf2thndr:
+sf2ua:
+sf2ub:
+sf2uc:
+sf2ue:
+sf2uf:
+sf2ug:
+sf2ui:
+sf2uk:
+@:maincpu,program,ffd28a,30,00,20
+@:maincpu,program,ffd302,04,00,00
+
+
+sf2acc:
+sf2acca:
+sf2amf:
+sf2amf2:
+sf2bhh:
+sf2ce:
+sf2ceblp:
+sf2ceea:
+sf2ceja:
+sf2cejb:
+sf2cejc:
+sf2ceua:
+sf2ceub:
+sf2ceuc:
+sf2ceupl:
+sf2dkot2:
+sf2dongb:
+sf2hfj:
+sf2hfu:
+sf2koryu:
+sf2m1:
+sf2m2:
+sf2m4:
+sf2m5:
+sf2m6:
+sf2m7:
+sf2m8:
+sf2m9:
+sf2mdt:
+sf2mdta:
+sf2mdtb:
+sf2rb:
+sf2rb2:
+sf2rb3:
+sf2yyc:
+@:maincpu,program,ffd276,28,00,20
+@:maincpu,program,ffd2c6,14,ff,96
+@:maincpu,program,ffd2ee,04,00,00
+
+
 qad:
 @:maincpu,program,ffe96e,3c,00,70
 
@@ -2956,6 +3078,7 @@ sf2ebbl2:
 sf2ebbl3:
 sf2ed:
 sf2ee:
+sf2em:
 sf2j:
 sf2ja:
 sf2jc:
@@ -3076,45 +3199,6 @@ pnickj:
 @:maincpu,program,ff2574,28,03,00
 @:maincpu,program,ff259e,50,03,00
 @:maincpu,program,ff8534,04,00,00
-
-
-sf2acc:
-sf2acca:
-sf2amf:
-sf2amf2:
-sf2bhh:
-sf2ce:
-sf2ceblp:
-sf2ceea:
-sf2ceja:
-sf2cejb:
-sf2cejc:
-sf2ceua:
-sf2ceub:
-sf2ceuc:
-sf2dkot2:
-sf2dongb:
-sf2hfj:
-sf2hfu:
-sf2koryu:
-sf2m1:
-sf2m2:
-sf2m4:
-sf2m5:
-sf2m6:
-sf2m7:
-sf2m8:
-sf2m9:
-sf2mdt:
-sf2mdta:
-sf2mdtb:
-sf2rb:
-sf2rb2:
-sf2rb3:
-sf2yyc:
-@:maincpu,program,ffd276,28,00,20
-@:maincpu,program,ffd2c6,14,ff,96
-@:maincpu,program,ffd2ee,04,00,00
 
 
 sf2v004:
@@ -3820,6 +3904,19 @@ ddpdfk10:
 
 ;@s:cvs.cpp
 
+;(logger fixed)
+logger:
+@:maincpu,program,3c09,68,00,00
+
+
+;(radar zone - Fixed)
+outline:
+radarzon:
+radarzon1:
+radarzont:
+@:maincpu,program,1c08,67,00,00
+
+
 ;(gold bug)
 goldbug:
 @:maincpu,program,3D09,1E,00,00
@@ -3860,14 +3957,6 @@ wallst:
 @:maincpu,program,1c19,1e,00,00
 
 
-;(radar zone - ADDED CLONE)
-outline:
-radarzon:
-radarzon1:
-radarzont:
-@:maincpu,program,1c08,35,00,00
-
-
 hero:
 @:maincpu,program,3c00,27,00,30
 
@@ -3901,11 +3990,6 @@ huncholy:
 dazzler:
 @:maincpu,program,3cea,20,00,1b
 @:maincpu,program,3d11,2b,00,00
-
-
-;(logger)
-logger:
-@:maincpu,program,3c09,30,00,00
 
 
 ;(video 8 ball)
@@ -4634,6 +4718,25 @@ djboyj:
 
 ;@s:dkong.cpp
 
+;dkongjrb:******donkey kong jr. (bootleg)
+;dkongjrj:******donkey kong jr. (japan)
+;jrking:******Junior King (bootleg of Donkey Kong Jr.)
+dkingjr:
+dkongjrb:
+dkongjrj:
+jrking:
+maguila:
+@:maincpu,program,6105,9e,10,10
+@:maincpu,program,60b8,3,00,01
+@:maincpu,program,7661,1,10,10
+@:maincpu,program,7641,1,00,00
+@:maincpu,program,7621,1,01,01
+@:maincpu,program,7601,1,01,01
+@:maincpu,program,75e1,1,08,08
+@:maincpu,program,75c1,1,00,00
+@:maincpu,program,75a1,1,00,00
+
+
 ;***** 8ballact / 8ballact2 / 8bpm fixes *******
 8ballact:
 8ballact2:
@@ -4717,24 +4820,6 @@ drakton:
 drktnjr:
 @:maincpu,program,6449,118,00,00
 @:maincpu,program,655d,1,20,20
-
-
-;dkongjrb:******donkey kong jr. (bootleg)
-;dkongjrj:******donkey kong jr. (japan)
-;jrking:******Junior King (bootleg of Donkey Kong Jr.)
-dkingjr:
-dkongjrb:
-dkongjrj:
-jrking:
-@:maincpu,program,6105,9e,10,10
-@:maincpu,program,60b8,3,00,01
-@:maincpu,program,7661,1,10,10
-@:maincpu,program,7641,1,00,00
-@:maincpu,program,7621,1,01,01
-@:maincpu,program,7601,1,01,01
-@:maincpu,program,75e1,1,08,08
-@:maincpu,program,75c1,1,00,00
-@:maincpu,program,75a1,1,00,00
 
 
 radarscp:
@@ -5813,7 +5898,7 @@ dzigzag:
 
 
 gatsbee:
-nebulbee:  ; missing
+nebulbee:
 @:maincpu,program,8a20,2d,00,0e
 @:maincpu,program,83ed,6,00,24
 
@@ -6529,6 +6614,10 @@ youmab2:
 
 ;@s:galpanic.cpp
 
+galpanicb:
+@:maincpu,program,53e5b2,64,30,31
+
+
 ;*******Gals Panic (set 3)
 galpanica:
 @:maincpu,program,c825b6,64,30,31
@@ -6555,6 +6644,7 @@ galspnbl:
 
 ;(megatack) (by GeoMan)
 megatack:
+megatacka:
 @:maincpu,program,00c4,f,00,1a
 
 
@@ -7349,6 +7439,13 @@ tbyahhoo:
 
 ;@s:kyugo.cpp
 
+;(flash gal) (by GeoMan)
+flashgal:
+flashgala:
+flashgalk:
+@:maincpu,program,f690,5e,00,40
+
+
 ;99lstwark:******'99: The Last War (Kyugo)
 99lstwar:
 99lstwara:
@@ -7385,12 +7482,6 @@ skywolf:
 skywolf2:
 skywolf3:
 @:maincpu,program,e71a,5f,00,ff
-
-
-;(flash gal) (by GeoMan)
-flashgal:
-flashgala:
-@:maincpu,program,f690,5e,00,40
 
 
 ;********(legend)
@@ -8018,18 +8109,20 @@ m79amb:
 
 ;@s:m90.cpp
 
-;riskchal:******risky challenge
-gussun:
-riskchal:
-@:maincpu,program,a3c6b,1ba,00,18
-
-
 ;atompunk:******atomic punk (us)
 atompunk:
 dynablst:
 dynablstb:
+dynablstb2:
+dynablstb3:
 @:maincpu,program,a0b2c,8f,03,03
 @:maincpu,program,a0c0f,3,40,00
+
+
+;riskchal:******risky challenge
+gussun:
+riskchal:
+@:maincpu,program,a3c6b,1ba,00,18
 
 
 ;bbmanwj:**** top score not working ????? 
@@ -9353,6 +9446,10 @@ exvaniaj:
 
 ;@s:namconb1.cpp
 
+machbrkrj:
+@:maincpu,program,23f532,f6,03,30
+
+
 ;*******mach breakers (japan)
 machbrkr:
 @:maincpu,program,23f532,f6,03,30
@@ -9516,11 +9613,7 @@ tekken:
 @:maincpu,program,1e0458,1bf,01,53
 
 
-tekkenab:
-@:maincpu,program,1e0148,17f,04,45
-
-
-tekken2ab:
+tekken2b:
 tekken2jb:
 tekken2ub:
 @:maincpu,program,35a504,10f,3f,4e
@@ -9538,7 +9631,11 @@ tekken2jc:
 @:maincpu,program,359dd8,10f,3f,4e
 
 
-tekken2aa:
+tekkenb:
+@:maincpu,program,1e0148,17f,04,45
+
+
+tekken2a:
 @:maincpu,program,352cb8,10f,3f,4e
 
 
@@ -11165,6 +11262,7 @@ powerinsj:
 ;(prehistoric isle in 1930 (world))
 gensitou:
 prehisle:
+prehisleb:
 prehislek:
 prehisleu:
 @:maincpu,program,700a0,4e,00,00
@@ -11362,6 +11460,7 @@ raidenb:
 
 ;@s:raiden2.cpp
 
+;***** raiden dx fixed  (thanks to Takasaki)  **********
 raidendx:
 raidendxa1:
 raidendxa2:
@@ -11371,7 +11470,16 @@ raidendxj:
 raidendxk:
 raidendxnl:
 raidendxu:
-@:maincpu,program,a25a,ef,a0,2a
+@:maincpu,program,a25a,2cf,a0,2a
+
+
+raiden2e:
+raiden2ea:
+raiden2eg:
+raiden2eu:
+raiden2eua:
+raiden2g:
+@:maincpu,program,9de4,ef,50,2a
 
 
 zeroteam:
@@ -11382,14 +11490,6 @@ zeroteamd:
 zeroteams:
 zeroteamsr:
 @:maincpu,program,9212,4b,40,55
-
-
-raiden2e:
-raiden2ea:
-raiden2eu:
-raiden2eua:
-raiden2g:
-@:maincpu,program,9de4,ef,50,2a
 
 
 raiden2:
@@ -11453,6 +11553,7 @@ locomotn:
 
 ;rastan:[Special thanks to Wob for enhancing this entry]
 rastan:
+rastanb:
 rastanu:
 rastanua:
 rastanub:
@@ -12819,6 +12920,7 @@ viprp1u:
 ;@s:seicross.cpp
 
 radrad:
+radradj:
 @:maincpu,program,7802,3,02,00
 @:maincpu,program,91ba,6,24,00
 
@@ -13120,6 +13222,11 @@ shadfrcej:
 
 ;@s:shangha3.cpp
 
+shangha3:
+shangha3up:
+@:maincpu,program,307be4,78,00,1d
+
+
 ;(hebereke no popoon (japan)) (by GeoMan)
 heberpop:
 @:maincpu,program,304920,a0,00,1c
@@ -13134,10 +13241,6 @@ blocken:
 shangha3j:
 shangha3u:
 @:maincpu,program,307be2,78,00,1d
-
-
-shangha3:
-@:maincpu,program,307be4,78,00,1d
 
 
 ;@s:shanghai.cpp
@@ -14685,6 +14788,11 @@ tail2nos:
 
 
 ;@s:taito_b.cpp
+
+sbmj:
+@:maincpu,program,10c000,2,00,73
+@:maincpu,program,10c002,3e,01,00
+
 
 ;** you must wait untill the hiscore table has displayed in attract mode before **
 ;** starting a game, for the save to work ** 

@@ -6,11 +6,11 @@
 
 
 
-const device_type FATFURY2_PROT = device_creator<fatfury2_prot_device>;
+DEFINE_DEVICE_TYPE(NG_FATFURY2_PROT, fatfury2_prot_device, "ng_fatfury_prot", "Neo Geo Fatal Fury 2 Protection")
 
 
 fatfury2_prot_device::fatfury2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, FATFURY2_PROT, "Neo Geo Fatal Fury 2 Protection", tag, owner, clock, "fatfury2_prot", __FILE__),
+	device_t(mconfig, NG_FATFURY2_PROT, tag, owner, clock),
 	m_prot_data(0)
 {
 }

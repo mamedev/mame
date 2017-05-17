@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef EINSTEIN_H_
-#define EINSTEIN_H_
+#ifndef MAME_INCLUDES_EINSTEIN_H
+#define MAME_INCLUDES_EINSTEIN_H
+
+#pragma once
 
 #include "video/mc6845.h"
 #include "cpu/z80/z80daisy.h"
@@ -65,29 +67,54 @@ public:
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
-		m_line0(*this, "LINE0"),
-		m_line1(*this, "LINE1"),
-		m_line2(*this, "LINE2"),
-		m_line3(*this, "LINE3"),
-		m_line4(*this, "LINE4"),
-		m_line5(*this, "LINE5"),
-		m_line6(*this, "LINE6"),
-		m_line7(*this, "LINE7"),
+		m_line(*this, "LINE%u", 0),
 		m_extra(*this, "EXTRA"),
 		m_buttons(*this, "BUTTONS"),
 		m_config(*this, "config"),
 		m_80column_dips(*this, "80column_dips"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{
+	}
 
-	required_device<wd1770_t> m_fdc;
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	DECLARE_WRITE8_MEMBER(einstein_80col_ram_w);
+	DECLARE_READ8_MEMBER(einstein_80col_ram_r);
+	DECLARE_READ8_MEMBER(einstein_80col_state_r);
+	DECLARE_WRITE8_MEMBER(einstein_keyboard_line_write);
+	DECLARE_READ8_MEMBER(einstein_keyboard_data_read);
+	DECLARE_WRITE8_MEMBER(einstein_rom_w);
+	DECLARE_READ8_MEMBER(einstein_kybintmsk_r);
+	DECLARE_WRITE8_MEMBER(einstein_kybintmsk_w);
+	DECLARE_WRITE8_MEMBER(einstein_adcintmsk_w);
+	DECLARE_WRITE8_MEMBER(einstein_fire_int_w);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
+	DECLARE_MACHINE_START(einstein2);
+	DECLARE_MACHINE_RESET(einstein2);
+	uint32_t screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(einstein_keyboard_timer_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(einstein_ctc_trigger_callback);
+	DECLARE_WRITE_LINE_MEMBER(einstein_6845_de_changed);
+	DECLARE_WRITE8_MEMBER(einstein_drsel_w);
+	DECLARE_WRITE_LINE_MEMBER(einstein_serial_transmit_clock);
+	DECLARE_WRITE_LINE_MEMBER(einstein_serial_receive_clock);
+	MC6845_UPDATE_ROW(crtc_update_row);
+
+	int m_interrupt;
+	int m_interrupt_mask;
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<wd1770_device> m_fdc;
 	required_device<screen_device> m_color_screen;
 	required_device<z80ctc_device> m_ctc;
 	required_device<tms9929a_device> m_tms9929a;
 	optional_memory_region m_region_gfx1;
 
 	int m_rom_enabled;
-	int m_interrupt;
-	int m_interrupt_mask;
 	int m_ctc_trigger;
 
 	/* keyboard */
@@ -104,34 +131,6 @@ public:
 	int m_centronics_perror;
 	int m_centronics_fault;
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	DECLARE_WRITE8_MEMBER(einstein_80col_ram_w);
-	DECLARE_READ8_MEMBER(einstein_80col_ram_r);
-	DECLARE_READ8_MEMBER(einstein_80col_state_r);
-	DECLARE_WRITE8_MEMBER(einstein_keyboard_line_write);
-	DECLARE_READ8_MEMBER(einstein_keyboard_data_read);
-	DECLARE_WRITE8_MEMBER(einstein_rom_w);
-	DECLARE_READ8_MEMBER(einstein_kybintmsk_r);
-	DECLARE_WRITE8_MEMBER(einstein_kybintmsk_w);
-	DECLARE_WRITE8_MEMBER(einstein_adcintmsk_w);
-	DECLARE_WRITE8_MEMBER(einstein_fire_int_w);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_MACHINE_START(einstein2);
-	DECLARE_MACHINE_RESET(einstein2);
-	uint32_t screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(einstein_keyboard_timer_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(einstein_ctc_trigger_callback);
-	DECLARE_WRITE_LINE_MEMBER(einstein_6845_de_changed);
-	DECLARE_WRITE8_MEMBER(einstein_drsel_w);
-	DECLARE_WRITE_LINE_MEMBER(einstein_serial_transmit_clock);
-	DECLARE_WRITE_LINE_MEMBER(einstein_serial_receive_clock);
-	MC6845_UPDATE_ROW(crtc_update_row);
-
-protected:
 	required_device<i8251_device> m_uart;
 	required_device<ram_device> m_ram;
 	required_device<centronics_device> m_centronics;
@@ -139,18 +138,12 @@ protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
-	required_ioport m_line0;
-	required_ioport m_line1;
-	required_ioport m_line2;
-	required_ioport m_line3;
-	required_ioport m_line4;
-	required_ioport m_line5;
-	required_ioport m_line6;
-	required_ioport m_line7;
+	required_ioport_array<8> m_line;
 	required_ioport m_extra;
 	required_ioport m_buttons;
 	required_ioport m_config;
 	optional_ioport m_80column_dips;
+
 public:
 	optional_device<palette_device> m_palette;
 
@@ -161,8 +154,7 @@ public:
 
 // ======================> einstein_keyboard_daisy_device
 
-class einstein_keyboard_daisy_device :  public device_t,
-						public device_z80daisy_interface
+class einstein_keyboard_daisy_device : public device_t, public device_z80daisy_interface
 {
 public:
 	// construction/destruction
@@ -176,13 +168,12 @@ private:
 	virtual void z80daisy_irq_reti() override;
 };
 
-extern const device_type EINSTEIN_KEYBOARD_DAISY;
+DECLARE_DEVICE_TYPE(EINSTEIN_KEYBOARD_DAISY, einstein_keyboard_daisy_device)
 
 
 // ======================> einstein_adc_daisy_device
 
-class einstein_adc_daisy_device :   public device_t,
-						public device_z80daisy_interface
+class einstein_adc_daisy_device : public device_t, public device_z80daisy_interface
 {
 public:
 	// construction/destruction
@@ -197,12 +188,11 @@ private:
 
 };
 
-extern const device_type EINSTEIN_ADC_DAISY;
+DECLARE_DEVICE_TYPE(EINSTEIN_ADC_DAISY, einstein_adc_daisy_device)
 
 // ======================> einstein_fire_daisy_device
 
-class einstein_fire_daisy_device :  public device_t,
-						public device_z80daisy_interface
+class einstein_fire_daisy_device : public device_t, public device_z80daisy_interface
 {
 public:
 	// construction/destruction
@@ -216,6 +206,6 @@ private:
 	virtual void z80daisy_irq_reti() override;
 };
 
-extern const device_type EINSTEIN_FIRE_DAISY;
+DECLARE_DEVICE_TYPE(EINSTEIN_FIRE_DAISY, einstein_fire_daisy_device)
 
-#endif /* EINSTEIN_H_ */
+#endif // MAME_INCLUDES_EINSTEIN_H

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAMLINK = device_creator<adamlink_device>;
+DEFINE_DEVICE_TYPE(ADAMLINK, adamlink_device, "adamlink", "AdamLink modem")
 
 
 
@@ -28,8 +28,8 @@ const device_type ADAMLINK = device_creator<adamlink_device>;
 //-------------------------------------------------
 
 adamlink_device::adamlink_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ADAMLINK, "AdamLink modem", tag, owner, clock, "adamlink", __FILE__),
-		device_adam_expansion_slot_card_interface(mconfig, *this)
+	: device_t(mconfig, ADAMLINK, tag, owner, clock)
+	, device_adam_expansion_slot_card_interface(mconfig, *this)
 {
 }
 

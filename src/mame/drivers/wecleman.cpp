@@ -1069,7 +1069,7 @@ MACHINE_RESET_MEMBER(wecleman_state,wecleman)
 	m_k007232->set_bank( 0, 1 );
 }
 
-static MACHINE_CONFIG_START( wecleman, wecleman_state )
+static MACHINE_CONFIG_START( wecleman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* Schems show 10MHz */
@@ -1140,7 +1140,7 @@ MACHINE_RESET_MEMBER(wecleman_state,hotchase)
 }
 
 
-static MACHINE_CONFIG_START( hotchase, wecleman_state )
+static MACHINE_CONFIG_START( hotchase )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */

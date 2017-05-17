@@ -24,7 +24,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type PC9801_KBD = device_creator<pc9801_kbd_device>;
+DEFINE_DEVICE_TYPE(PC9801_KBD, pc9801_kbd_device, "pc9801_kbd", "PC-9801 Keyboard")
 
 
 //**************************************************************************
@@ -36,7 +36,7 @@ const device_type PC9801_KBD = device_creator<pc9801_kbd_device>;
 //-------------------------------------------------
 
 pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PC9801_KBD, "pc9801_kbd", tag, owner, clock, "pc9801_kbd_", __FILE__),
+	device_t(mconfig, PC9801_KBD, tag, owner, clock),
 	m_write_irq(*this)
 {
 }

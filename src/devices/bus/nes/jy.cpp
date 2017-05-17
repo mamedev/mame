@@ -22,7 +22,7 @@
 #include "jy.h"
 
 #include "cpu/m6502/m6502.h"
-#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access PPU_BOTTOM_VISIBLE_SCANLINE
+#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -37,36 +37,34 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_JY_TYPEA = device_creator<nes_jy_typea_device>;
-const device_type NES_JY_TYPEB = device_creator<nes_jy_typeb_device>;
-const device_type NES_JY_TYPEC = device_creator<nes_jy_typec_device>;
+DEFINE_DEVICE_TYPE(NES_JY_TYPEA, nes_jy_typea_device, "nes_jya", "NES Cart JY Company Type A PCB")
+DEFINE_DEVICE_TYPE(NES_JY_TYPEB, nes_jy_typeb_device, "nes_jyb", "NES Cart JY Company Type B PCB")
+DEFINE_DEVICE_TYPE(NES_JY_TYPEC, nes_jy_typec_device, "nes_jyc", "NES Cart JY Company Type C PCB")
 
 
-nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_latch(0), m_extra_chr_bank(0), m_extra_chr_mask(0), m_bank_6000(0),
+nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_extra_chr_bank(0), m_extra_chr_mask(0), m_bank_6000(0),
 	m_irq_mode(0), m_irq_count(0), m_irq_prescale(0), m_irq_prescale_mask(0), m_irq_flip(0), m_irq_enable(0), m_irq_up(0), m_irq_down(0), irq_timer(nullptr)
-				{
-}
-
-nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_JY_TYPEA, "NES Cart JY Company Type A PCB", tag, owner, clock, "nes_jya", __FILE__), m_latch(0), m_extra_chr_bank(0),
-	m_extra_chr_mask(0), m_bank_6000(0), m_irq_mode(0), m_irq_count(0), m_irq_prescale(0), m_irq_prescale_mask(0), m_irq_flip(0), m_irq_enable(0), m_irq_up(0),
-	m_irq_down(0), irq_timer(nullptr)
 {
 }
 
-nes_jy_typeb_device::nes_jy_typeb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: nes_jy_typea_device(mconfig, type, name, tag, owner, clock, shortname, source)
+nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, NES_JY_TYPEA, tag, owner, clock)
+{
+}
+
+nes_jy_typeb_device::nes_jy_typeb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_jy_typea_device(mconfig, type, tag, owner, clock)
 {
 }
 
 nes_jy_typeb_device::nes_jy_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_jy_typea_device(mconfig, NES_JY_TYPEB, "NES Cart JY Company Type B PCB", tag, owner, clock, "nes_jyb", __FILE__)
+	: nes_jy_typeb_device(mconfig, NES_JY_TYPEB, tag, owner, clock)
 {
 }
 
 nes_jy_typec_device::nes_jy_typec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_jy_typeb_device(mconfig, NES_JY_TYPEC, "NES Cart JY Company Type C PCB", tag, owner, clock, "nes_jyc", __FILE__)
+	: nes_jy_typeb_device(mconfig, NES_JY_TYPEC, tag, owner, clock)
 {
 }
 
@@ -238,7 +236,7 @@ void nes_jy_typea_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 void nes_jy_typea_device::scanline_irq(int scanline, int vblank, int blanked)
 {
-	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
+	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 		irq_clock(blanked, 1);
 }
 

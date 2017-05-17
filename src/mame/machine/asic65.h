@@ -5,10 +5,14 @@
  *  Implementation of ASIC65
  *
  *************************************/
+#ifndef MAME_MACHINE_ASIC65_H
+#define MAME_MACHINE_ASIC65_H
 
-	#include "cpu/tms32010/tms32010.h"
+#pragma once
 
-	enum {
+#include "cpu/tms32010/tms32010.h"
+
+enum {
 	ASIC65_STANDARD,
 	ASIC65_STEELTAL,
 	ASIC65_GUARDIANS,
@@ -68,8 +72,10 @@ private:
 	FILE * m_log;
 };
 
-extern const device_type ASIC65;
+DECLARE_DEVICE_TYPE(ASIC65, asic65_device)
 
 #define MCFG_ASIC65_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, ASIC65, 0) \
 	asic65_device::set_type(*device, _type);
+
+#endif // MAME_MACHINE_ASIC65_H

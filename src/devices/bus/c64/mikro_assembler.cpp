@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MIKRO_ASSEMBLER = device_creator<c64_mikro_assembler_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_MIKRO_ASSEMBLER, c64_mikro_assembler_cartridge_device, "c64_mikro_assembler", "C64 Mikro Assembler cartridge")
 
 
 
@@ -28,7 +28,7 @@ const device_type C64_MIKRO_ASSEMBLER = device_creator<c64_mikro_assembler_cartr
 //-------------------------------------------------
 
 c64_mikro_assembler_cartridge_device::c64_mikro_assembler_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_MIKRO_ASSEMBLER, "C64 Mikro Assembler cartridge", tag, owner, clock, "c64_mikro_assembler", __FILE__),
+	device_t(mconfig, C64_MIKRO_ASSEMBLER, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {
 }

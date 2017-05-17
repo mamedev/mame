@@ -11,8 +11,10 @@
 
 */
 
-#ifndef HD20_H_
-#define HD20_H_
+#ifndef MAME_BUS_CPC_HD20_H
+#define MAME_BUS_CPC_HD20_H
+
+#pragma once
 
 #include "cpcexp.h"
 #include "bus/isa/hdc.h"
@@ -44,6 +46,6 @@ private:
 };
 
 // device type definition
-extern const device_type CPC_HD20;
+DECLARE_DEVICE_TYPE(CPC_HD20, cpc_hd20_device)
 
-#endif /* HD20_H_ */
+#endif // MAME_BUS_CPC_HD20_H

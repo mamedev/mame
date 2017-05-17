@@ -29,7 +29,7 @@ void neopcb_state::neopcb_postload()
 	set_outputs();
 }
 
-static MACHINE_CONFIG_DERIVED_CLASS( neopcb, neogeo_arcade, neopcb_state )
+static MACHINE_CONFIG_DERIVED( neopcb, neogeo_arcade )
 	MCFG_CMC_PROT_ADD("cmc50")
 	MCFG_PCM2_PROT_ADD("pcm2")
 	MCFG_PVC_PROT_ADD("pvc")

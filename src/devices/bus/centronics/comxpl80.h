@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CENTRONICS_COMXPL80_H
+#define MAME_BUS_CENTRONICS_COMXPL80_H
 
-#ifndef __COMX_PL80__
-#define __COMX_PL80__
+#pragma once
 
 #include "cpu/m6805/m6805.h"
 #include "bus/centronics/ctronics.h"
@@ -73,8 +73,8 @@ private:
 
 
 // device type definition
-extern const device_type COMX_PL80;
+DECLARE_DEVICE_TYPE(COMX_PL80, comx_pl80_device)
 
 
 
-#endif
+#endif // MAME_BUS_CENTRONICS_COMXPL80_H

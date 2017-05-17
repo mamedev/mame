@@ -70,7 +70,8 @@ Sega System Multi32 Comm PCB 837-8792-91
 #include "emuopts.h"
 #include "machine/s32comm.h"
 
-//#define __S32COMM_VERBOSE__
+#define VERBOSE 0
+#include "logmacro.h"
 
 MACHINE_CONFIG_FRAGMENT( s32comm )
 MACHINE_CONFIG_END
@@ -79,7 +80,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type S32COMM = device_creator<s32comm_device>;
+DEFINE_DEVICE_TYPE(S32COMM, s32comm_device, "s32comm", "System 32 Communication Board")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -100,7 +101,7 @@ machine_config_constructor s32comm_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, S32COMM, "SYSTEM32 COMMUNICATION BD", tag, owner, clock, "s32comm", __FILE__),
+	device_t(mconfig, S32COMM, tag, owner, clock),
 	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
 	m_line_tx(OPEN_FLAG_READ)
 {
@@ -141,34 +142,26 @@ void s32comm_device::device_reset()
 READ8_MEMBER(s32comm_device::zfg_r)
 {
 	uint8_t result = m_zfg | 0xFE;
-#ifdef __S32COMM_VERBOSE__
-	osd_printf_verbose("s32comm-zfg_r: read register %02x for value %02x\n", offset, result);
-#endif
+	LOG("s32comm-zfg_r: read register %02x for value %02x\n", offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(s32comm_device::zfg_w)
 {
-#ifdef __S32COMM_VERBOSE__
-	osd_printf_verbose("s32comm-zfg_w: %02x\n", data);
-#endif
+	LOG("s32comm-zfg_w: %02x\n", data);
 	m_zfg = data & 0x01;
 }
 
 READ8_MEMBER(s32comm_device::share_r)
 {
 	uint8_t result = m_shared[offset];
-#ifdef __S32COMM_VERBOSE__
-	osd_printf_verbose("s32comm-share_r: read shared memory %02x for value %02x\n", offset, result);
-#endif
+	LOG("s32comm-share_r: read shared memory %02x for value %02x\n", offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(s32comm_device::share_w)
 {
-#ifdef __S32COMM_VERBOSE__
-	osd_printf_verbose("s32comm-share_w: %02x %02x\n", offset, data);
-#endif
+	LOG("s32comm-share_w: %02x %02x\n", offset, data);
 	m_shared[offset] = data;
 }
 
@@ -181,7 +174,7 @@ WRITE8_MEMBER(s32comm_device::cn_w)
 {
 	m_cn = data & 0x01;
 
-#ifndef __S32COMM_SIMULATION__
+#ifndef S32COMM_SIMULATION
 	if (!m_cn)
 		device_reset();
 #else
@@ -221,13 +214,13 @@ WRITE8_MEMBER(s32comm_device::fg_w)
 
 void s32comm_device::check_vint_irq()
 {
-#ifndef __S32COMM_SIMULATION__
+#ifndef S32COMM_SIMULATION
 #else
 	comm_tick();
 #endif
 }
 
-#ifdef __S32COMM_SIMULATION__
+#ifdef S32COMM_SIMULATION
 void s32comm_device::set_linktype(uint16_t linktype)
 {
 	m_linktype = linktype;

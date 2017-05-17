@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SAT_CTRL_MULTITAP_H
+#define MAME_BUS_SAT_CTRL_MULTITAP_H
 
-#ifndef __SATURN_MULTITAP__
-#define __SATURN_MULTITAP__
+#pragma once
 
 
 #include "ctrl.h"
@@ -53,7 +53,6 @@ private:
 
 
 // device type definition
-extern const device_type SATURN_MULTITAP;
+DECLARE_DEVICE_TYPE(SATURN_MULTITAP, saturn_multitap_device)
 
-
-#endif
+#endif // MAME_BUS_SAT_CTRL_MULTITAP_H

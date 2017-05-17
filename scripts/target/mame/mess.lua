@@ -524,9 +524,7 @@ MACHINES["RTC65271"] = true
 MACHINES["RTC9701"] = true
 --MACHINES["S2636"] = true
 MACHINES["S3520CF"] = true
-MACHINES["S3C2400"] = true
-MACHINES["S3C2410"] = true
-MACHINES["S3C2440"] = true
+MACHINES["S3C24XX"] = true
 MACHINES["S3C44B0"] = true
 MACHINES["SATURN"] = true
 --MACHINES["SCSI"] = true
@@ -708,7 +706,7 @@ BUSES["SUNKBD"] = true
 BUSES["SVI_EXPANDER"] = true
 BUSES["SVI_SLOT"] = true
 BUSES["TI8X"] = true
-BUSES["TI99PEB"] = true
+BUSES["TI99"] = true
 BUSES["TI99X"] = true
 BUSES["TIKI100"] = true
 BUSES["TVC"] = true
@@ -802,6 +800,7 @@ FORMATS["GTP_CAS"] = true
 FORMATS["HECTOR_MINIDISC"] = true
 FORMATS["HECT_DSK"] = true
 FORMATS["HECT_TAP"] = true
+FORMATS["HPI_DSK"] = true
 FORMATS["HP_IPC_DSK"] = true
 FORMATS["IQ151_DSK"] = true
 FORMATS["ITT3030_DSK"] = true
@@ -1318,8 +1317,8 @@ files {
 	MAME_DIR .. "src/mame/machine/apricotkb.h",
 	MAME_DIR .. "src/mame/drivers/victor9k.cpp",
 	MAME_DIR .. "src/mame/includes/victor9k.h",
-	MAME_DIR .. "src/mame/machine/victor9kb.cpp",
-	MAME_DIR .. "src/mame/machine/victor9kb.h",
+	MAME_DIR .. "src/mame/machine/victor9k_kb.cpp",
+	MAME_DIR .. "src/mame/machine/victor9k_kb.h",
 	MAME_DIR .. "src/mame/machine/victor9k_fdc.cpp",
 	MAME_DIR .. "src/mame/machine/victor9k_fdc.h",
 }
@@ -3157,8 +3156,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/unichamp.cpp",
 	MAME_DIR .. "src/mame/video/gic.cpp",
 	MAME_DIR .. "src/mame/video/gic.h",
-	MAME_DIR .. "src/mame/video/gic.cpp",
-	MAME_DIR .. "src/mame/video/gic.h",
 }
 
 
@@ -3387,8 +3384,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/fk1.cpp",
 	MAME_DIR .. "src/mame/drivers/ft68m.cpp",
 	MAME_DIR .. "src/mame/drivers/gamate.cpp",
-	MAME_DIR .. "src/mame/includes/gamate.h",
 	MAME_DIR .. "src/mame/audio/gamate.cpp",
+	MAME_DIR .. "src/mame/audio/gamate.h",
 	MAME_DIR .. "src/mame/drivers/gameking.cpp",
 	MAME_DIR .. "src/mame/drivers/gimix.cpp",
 	MAME_DIR .. "src/mame/drivers/goupil.cpp",

@@ -92,7 +92,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port20_w);
 	DECLARE_WRITE8_MEMBER(port34_w);
 	DECLARE_WRITE8_MEMBER(port40_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
+
 private:
 	uint8_t m_term_data;
 	uint8_t m_26_count;
@@ -103,7 +104,7 @@ private:
 	floppy_image_device *m_floppy;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	optional_device<mb8877_t> m_fdc;
+	optional_device<mb8877_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 };
 
@@ -130,7 +131,7 @@ static ADDRESS_MAP_START(ccs2422_io, AS_IO, 8, ccs_state)
 	AM_RANGE(0x20, 0x20) AM_READWRITE(port20_r,port20_w)
 	AM_RANGE(0x25, 0x25) AM_READ(port25_r)
 	AM_RANGE(0x26, 0x26) AM_READ(port26_r)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("fdc", mb8877_t, read, write)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("fdc", mb8877_device, read, write)
 	AM_RANGE(0x34, 0x34) AM_READWRITE(port34_r,port34_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)
 ADDRESS_MAP_END
@@ -167,7 +168,7 @@ WRITE8_MEMBER( ccs_state::port20_w )
 	m_terminal->write(space, 0, data & 0x7f);
 }
 
-WRITE8_MEMBER( ccs_state::kbd_put )
+void ccs_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -325,7 +326,7 @@ SLOT_INTERFACE_END
 
 	//SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 
-static MACHINE_CONFIG_START( ccs2810, ccs_state )
+static MACHINE_CONFIG_START( ccs2810 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ccs2810_mem)
@@ -334,13 +335,13 @@ static MACHINE_CONFIG_START( ccs2810, ccs_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ccs_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ccs_state, kbd_put))
 
 	/* Devices */
 	//MCFG_INS8250_ADD( "ins8250", com_intf, XTAL_1_8432MHz )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ccs2422, ccs_state )
+static MACHINE_CONFIG_START( ccs2422 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ccs2810_mem)
@@ -349,7 +350,7 @@ static MACHINE_CONFIG_START( ccs2422, ccs_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ccs_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ccs_state, kbd_put))
 
 	/* Devices */
 	MCFG_MB8877_ADD("fdc", XTAL_16MHz / 8) // UB1793 or MB8877
@@ -375,6 +376,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT    CLASS       INIT          COMPANY                        FULLNAME       FLAGS */
-COMP( 1980, ccs2810,  0,       0,       ccs2810,   ccs2810, ccs_state,  ccs2810,   "California Computer Systems", "CCS Model 2810 CPU card", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT    CLASS       INIT       COMPANY                        FULLNAME                    FLAGS */
+COMP( 1980, ccs2810,  0,       0,       ccs2810,   ccs2810, ccs_state,  ccs2810,   "California Computer Systems", "CCS Model 2810 CPU card",  MACHINE_NO_SOUND_HW)
 COMP( 1980, ccs2422,  ccs2810, 0,       ccs2422,   ccs2810, ccs_state,  ccs2422,   "California Computer Systems", "CCS Model 2422B FDC card", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

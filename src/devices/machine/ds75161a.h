@@ -19,10 +19,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_DS75161A_H
+#define MAME_MACHINE_DS75161A_H
 
-#ifndef __DS75161A__
-#define __DS75161A__
+#pragma once
 
 
 
@@ -91,22 +91,22 @@ public:
 	// construction/destruction
 	ds75161a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_in_ren_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_ren_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_ifc_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_ifc_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_ndac_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_ndac_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_nrfd_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_nrfd_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_dav_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_dav_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_eoi_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_eoi_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_atn_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_atn_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_srq_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_srq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_ren_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_ren_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_ifc_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_ifc_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_ndac_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_ndac_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_nrfd_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_nrfd_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dav_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_dav_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_eoi_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_eoi_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_atn_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_atn_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_srq_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_srq_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_in_ren_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_in_ren_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_ifc_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_in_ifc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_ndac_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_in_ndac_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_nrfd_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_in_nrfd_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_dav_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_in_dav_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_eoi_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_in_eoi_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_atn_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_in_atn_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_srq_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_in_srq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_ren_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_out_ren_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_ifc_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_out_ifc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_ndac_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_out_ndac_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_nrfd_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_out_nrfd_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_dav_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_out_dav_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_eoi_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_out_eoi_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_atn_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_out_atn_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_srq_callback(device_t &device, Object &&cb) { return downcast<ds75161a_device &>(device).m_out_srq_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( te_w );
 	DECLARE_WRITE_LINE_MEMBER( dc_w );
@@ -169,8 +169,6 @@ private:
 
 
 // device type definition
-extern const device_type DS75161A;
+DECLARE_DEVICE_TYPE(DS75161A, ds75161a_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_DS75161A_H

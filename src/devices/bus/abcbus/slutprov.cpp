@@ -9,7 +9,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC_SLUTPROV = device_creator<abc_slutprov_device>;
+DEFINE_DEVICE_TYPE(ABC_SLUTPROV, abc_slutprov_device, "slutprov", "Slutprov")
 
 
 //-------------------------------------------------
@@ -42,7 +42,7 @@ const tiny_rom_entry *abc_slutprov_device::device_rom_region() const
 //-------------------------------------------------
 
 abc_slutprov_device::abc_slutprov_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ABC_SLUTPROV, "Slutprov", tag, owner, clock, "slutprov", __FILE__),
+	: device_t(mconfig, ABC_SLUTPROV, tag, owner, clock),
 		device_abcbus_card_interface(mconfig, *this)
 {
 }

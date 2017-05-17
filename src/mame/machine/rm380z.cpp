@@ -200,7 +200,7 @@ TIMER_CALLBACK_MEMBER(rm380z_state::static_vblank_timer)
 	}
 }
 
-WRITE8_MEMBER( rm380z_state::keyboard_put )
+void rm380z_state::keyboard_put(u8 data)
 {
 	if (data)
 	{
@@ -238,7 +238,8 @@ WRITE8_MEMBER( rm380z_state::disk_0_control )
 
 void rm380z_state::machine_start()
 {
-	machine().scheduler().timer_pulse(attotime::from_hz(TIMER_SPEED), timer_expired_delegate(FUNC(rm380z_state::static_vblank_timer),this));
+	m_static_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rm380z_state::static_vblank_timer), this));
+	m_static_vblank_timer->adjust(attotime::from_hz(TIMER_SPEED), 0, attotime::from_hz(TIMER_SPEED));
 }
 
 DRIVER_INIT_MEMBER( rm380z_state, rm380z )

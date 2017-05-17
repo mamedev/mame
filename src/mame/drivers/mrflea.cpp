@@ -325,7 +325,7 @@ void mrflea_state::machine_reset()
 	m_select1 = 0;
 }
 
-static MACHINE_CONFIG_START( mrflea, mrflea_state )
+static MACHINE_CONFIG_START( mrflea )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
@@ -419,4 +419,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mrflea,   0,        mrflea,   mrflea, driver_device,   0,        ROT270, "Pacific Novelty", "The Amazing Adventures of Mr. F. Lea" , MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrflea,   0,        mrflea,   mrflea, mrflea_state,   0,        ROT270, "Pacific Novelty", "The Amazing Adventures of Mr. F. Lea" , MACHINE_SUPPORTS_SAVE )

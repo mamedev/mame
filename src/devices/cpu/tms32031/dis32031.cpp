@@ -413,7 +413,7 @@ static unsigned dasm_tms3203x(std::ostream &stream, unsigned pc, uint32_t op)
 		case 0x024: disasm_general("ROLC", op, INTEGER, stream);        break;
 		case 0x025: disasm_general("ROR", op, INTEGER, stream);         break;
 		case 0x026: disasm_general("RORC", op, INTEGER, stream);        break;
-		case 0x027: disasm_general("RTPS", op, INTEGER | NODEST, stream); break;
+		case 0x027: disasm_general("RPTS", op, INTEGER | NODEST, stream); break;
 
 		case 0x028: disasm_general("STF", op, FLOAT | SWAPSRCDST, stream);  break;
 		case 0x029: disasm_general("STFI", op, FLOAT | SWAPSRCDST, stream); break;

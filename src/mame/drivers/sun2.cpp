@@ -582,7 +582,7 @@ void sun2_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_START( sun2vme, sun2_state )
+static MACHINE_CONFIG_START( sun2vme )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, 16670000)
 	MCFG_CPU_PROGRAM_MAP(sun2_mem)
@@ -642,7 +642,7 @@ static MACHINE_CONFIG_START( sun2vme, sun2_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun2mbus, sun2_state )
+static MACHINE_CONFIG_START( sun2mbus )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, 16670000)
 	MCFG_CPU_PROGRAM_MAP(sun2_mem)
@@ -722,6 +722,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT                 INIT    COMPANY            FULLNAME       FLAGS */
-COMP( 1984, sun2_50,   0,       0,   sun2vme,   sun2, driver_device,     0,  "Sun Microsystems", "Sun 2/50", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1984, sun2_120,  0,       0,   sun2mbus,  sun2, driver_device,     0,  "Sun Microsystems", "Sun 2/120", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT  STATE       INIT  COMPANY             FULLNAME     FLAGS
+COMP( 1984, sun2_50,  0,      0,      sun2vme,   sun2,  sun2_state, 0,    "Sun Microsystems", "Sun 2/50",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1984, sun2_120, 0,      0,      sun2mbus,  sun2,  sun2_state, 0,    "Sun Microsystems", "Sun 2/120", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

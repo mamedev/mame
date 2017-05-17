@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV806 = device_creator<sv806_device>;
+DEFINE_DEVICE_TYPE(SV806, sv806_device, "sv806", "SV-806 80 Column Cartridge")
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -68,7 +68,7 @@ machine_config_constructor sv806_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 sv806_device::sv806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SV806, "SV-806 80 Column Cartridge", tag, owner, clock, "sv806", __FILE__),
+	device_t(mconfig, SV806, tag, owner, clock),
 	device_svi_slot_interface(mconfig, *this),
 	m_crtc(*this, "crtc"),
 	m_palette(*this, "palette"),

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-#pragma once
+#ifndef MAME_BUS_DMV_RAM_H
+#define MAME_BUS_DMV_RAM_H
 
-#ifndef __DMV_RAM_H__
-#define __DMV_RAM_H__
+#pragma once
 
 #include "dmvbus.h"
 
@@ -13,15 +13,14 @@
 
 // ======================>
 
-class dmv_ram_device :
+class dmv_ram_device_base :
 		public device_t,
 		public device_dmvslot_interface
 {
-public:
-	// construction/destruction
-	dmv_ram_device(const machine_config &mconfig, device_type type, uint32_t size, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 protected:
+	// construction/destruction
+	dmv_ram_device_base(const machine_config &mconfig, device_type type, uint32_t size, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -35,8 +34,7 @@ private:
 };
 
 
-class dmv_k200_device :
-		public dmv_ram_device
+class dmv_k200_device : public dmv_ram_device_base
 {
 public:
 	// construction/destruction
@@ -44,8 +42,7 @@ public:
 };
 
 
-class dmv_k202_device :
-		public dmv_ram_device
+class dmv_k202_device : public dmv_ram_device_base
 {
 public:
 	// construction/destruction
@@ -53,8 +50,7 @@ public:
 };
 
 
-class dmv_k208_device :
-		public dmv_ram_device
+class dmv_k208_device : public dmv_ram_device_base
 {
 public:
 	// construction/destruction
@@ -63,8 +59,8 @@ public:
 
 
 // device type definition
-extern const device_type DMV_K200;
-extern const device_type DMV_K202;
-extern const device_type DMV_K208;
+DECLARE_DEVICE_TYPE(DMV_K200, dmv_k200_device)
+DECLARE_DEVICE_TYPE(DMV_K202, dmv_k202_device)
+DECLARE_DEVICE_TYPE(DMV_K208, dmv_k208_device)
 
-#endif  /* __DMV_RAM_H__ */
+#endif // MAME_BUS_DMV_RAM_H

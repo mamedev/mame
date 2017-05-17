@@ -465,7 +465,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( k28, k28_state )
+static MACHINE_CONFIG_START( k28 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8021, XTAL_3_579545MHz)
@@ -508,5 +508,5 @@ ROM_END
 
 
 
-/*    YEAR  NAME PARENT COMPAT MACHINE INPUT INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1981, k28, 0,     0,     k28,    k28,  driver_device, 0, "Tiger Electronics", "K28: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE   INIT  COMPANY, FULLNAME, FLAGS
+COMP( 1981, k28,  0,      0, k28,    k28,  k28_state, 0, "Tiger Electronics", "K28: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

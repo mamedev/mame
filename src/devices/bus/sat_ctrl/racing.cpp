@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_WHEEL = device_creator<saturn_wheel_device>;
+DEFINE_DEVICE_TYPE(SATURN_WHEEL, saturn_wheel_device, "saturn_racing", "Sega Saturn Racing Wheel")
 
 
 static INPUT_PORTS_START( saturn_racing )
@@ -58,10 +58,10 @@ ioport_constructor saturn_wheel_device::device_input_ports() const
 //-------------------------------------------------
 
 saturn_wheel_device::saturn_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, SATURN_WHEEL, "Sega Saturn Racing Wheel", tag, owner, clock, "saturn_racing", __FILE__),
-					device_saturn_control_port_interface(mconfig, *this),
-					m_joy(*this, "JOY"),
-					m_anx(*this, "ANALOG_X")
+	device_t(mconfig, SATURN_WHEEL, tag, owner, clock),
+	device_saturn_control_port_interface(mconfig, *this),
+	m_joy(*this, "JOY"),
+	m_anx(*this, "ANALOG_X")
 {
 	m_ctrl_id = 0x13;
 }

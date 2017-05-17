@@ -44,13 +44,13 @@ enum
 
 
 
-const device_type MM58274C = device_creator<mm58274c_device>;
+DEFINE_DEVICE_TYPE(MM58274C, mm58274c_device, "mm58274c", "National Semiconductor MM58274C RTC")
 
 
 mm58274c_device::mm58274c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-				: device_t(mconfig, MM58274C, "National Semiconductor MM58274C", tag, owner, clock, "mm58274c", __FILE__),
-					m_mode24(0),
-					m_day1(0)
+	: device_t(mconfig, MM58274C, tag, owner, clock)
+	, m_mode24(0)
+	, m_day1(0)
 {
 }
 

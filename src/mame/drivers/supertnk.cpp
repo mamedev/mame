@@ -422,7 +422,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( supertnk, supertnk_state )
+static MACHINE_CONFIG_START( supertnk )
 
 	// CPU TMS9980A; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2598750, supertnk_map, supertnk_io_map)

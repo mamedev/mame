@@ -8,25 +8,25 @@
 
 *************************************************************************/
 
-#ifndef __MACHINE_ATARIXGA__
-#define __MACHINE_ATARIXGA__
+#ifndef MAME_MACHINE_ATARIXGA_H
+#define MAME_MACHINE_ATARIXGA_H
 
-extern const device_type ATARI_136094_0072;
-extern const device_type ATARI_136095_0072;
+DECLARE_DEVICE_TYPE(ATARI_136094_0072, atari_136094_0072_device)
+DECLARE_DEVICE_TYPE(ATARI_136095_0072, atari_136095_0072_device)
 
 class atari_xga_device : public device_t
 {
 public:
-	// construction/destruction
-	atari_xga_device(const machine_config &mconfig, device_type type, const char *tag,
-					device_t *owner, uint32_t clock, const char *name, const char *shortname)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
-	{}
-
 	virtual DECLARE_WRITE32_MEMBER(write) = 0;
 	virtual DECLARE_READ32_MEMBER(read) = 0;
 
 protected:
+	// construction/destruction
+	atari_xga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, type, tag, owner, clock)
+	{
+	}
+
 	virtual void device_start() override = 0;
 	virtual void device_reset() override = 0;
 
@@ -108,4 +108,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_MACHINE_ATARIXGA_H

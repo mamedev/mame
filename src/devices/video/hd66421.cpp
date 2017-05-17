@@ -11,14 +11,17 @@
 #include "emu.h"
 #include "hd66421.h"
 
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
+//#define HD66421_BRIGHTNESS_DOES_NOT_WORK
+
 #define LOG_LEVEL  1
 #define _logerror(level,x)  do { if (LOG_LEVEL > level) logerror x; } while (0)
 
-#define HD66421_RAM_SIZE  (HD66421_WIDTH * HD66421_HEIGHT / 4) // 2-bits per pixel
+#define HD66421_RAM_SIZE  (hd66421_device::WIDTH * hd66421_device::HEIGHT / 4) // 2-bits per pixel
 
 // R0 - control register 1
 #define LCD_R0_RMW      0x80 // read-modify-write mode
@@ -65,7 +68,7 @@
 //**************************************************************************
 
 // devices
-const device_type HD66421 = device_creator<hd66421_device>;
+DEFINE_DEVICE_TYPE(HD66421, hd66421_device, "hd66421", "Hitachi HD66421 LCD Controller")
 
 
 // default address map
@@ -117,7 +120,7 @@ inline void hd66421_device::writebyte(offs_t address, uint8_t data)
 //-------------------------------------------------
 
 hd66421_device::hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HD66421, "Hitachi HD66421 LCD Controller", tag, owner, clock, "hd66421", __FILE__),
+	: device_t(mconfig, HD66421, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(hd66421)),
 		m_cmd(0),
@@ -181,20 +184,20 @@ WRITE8_MEMBER( hd66421_device::reg_dat_w )
 		case LCD_REG_RAM :
 		{
 			uint8_t r1;
-			writebyte(m_y * (HD66421_WIDTH / 4) + m_x, data);
+			writebyte(m_y * (WIDTH / 4) + m_x, data);
 			r1 = m_reg[LCD_REG_CONTROL_2];
 			if (r1 & 0x02)
 				m_x++;
 			else
 				m_y++;
 
-			if (m_x >= (HD66421_WIDTH / 4))
+			if (m_x >= (WIDTH / 4))
 			{
 				m_x = 0;
 				m_y++;
 			}
 
-			if (m_y >= HD66421_HEIGHT)
+			if (m_y >= HEIGHT)
 				m_y = 0;
 		}
 		break;
@@ -222,11 +225,11 @@ uint32_t hd66421_device::update_screen(screen_device &screen, bitmap_ind16 &bitm
 		if (temp > 31) temp = 31;
 		bright = 1.0 * temp / 31;
 		pen[i] = i;
-		#ifdef HD66421_BRIGHTNESS_DOES_NOT_WORK
+#ifdef HD66421_BRIGHTNESS_DOES_NOT_WORK
 		m_palette->set_pen_color(pen[i], 255 * bright, 255 * bright, 255 * bright);
-		#else
+#else
 		m_palette->set_pen_contrast(pen[i], bright);
-		#endif
+#endif
 	}
 
 	// draw bitmap (bottom to top)
@@ -234,7 +237,7 @@ uint32_t hd66421_device::update_screen(screen_device &screen, bitmap_ind16 &bitm
 	{
 		int x, y;
 		x = 0;
-		y = HD66421_HEIGHT - 1;
+		y = HEIGHT - 1;
 
 		for (int i = 0; i < HD66421_RAM_SIZE; i++)
 		{
@@ -242,7 +245,7 @@ uint32_t hd66421_device::update_screen(screen_device &screen, bitmap_ind16 &bitm
 			plot_pixel(bitmap, x++, y, pen[(readbyte(i) >> 4) & 3]);
 			plot_pixel(bitmap, x++, y, pen[(readbyte(i) >> 2) & 3]);
 			plot_pixel(bitmap, x++, y, pen[(readbyte(i) >> 0) & 3]);
-			if (x >= HD66421_WIDTH)
+			if (x >= WIDTH)
 			{
 				x = 0;
 				y = y - 1;
@@ -251,7 +254,7 @@ uint32_t hd66421_device::update_screen(screen_device &screen, bitmap_ind16 &bitm
 	}
 	else
 	{
-		rectangle rect(0, HD66421_WIDTH - 1, 0, HD66421_HEIGHT - 1);
+		rectangle rect(0, WIDTH - 1, 0, HEIGHT - 1);
 		bitmap.fill(m_palette->white_pen(), rect);
 	}
 

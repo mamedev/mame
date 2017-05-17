@@ -27,11 +27,8 @@ static const char *const SIGNAL_NAME[] = { "EOI", "DAV", "NRFD", "NDAC", "IFC", 
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type IEEE488 = device_creator<ieee488_device>;
-const device_type IEEE488_SLOT = device_creator<ieee488_slot_device>;
-
-template class device_finder<ieee488_device, false>;
-template class device_finder<ieee488_device, true>;
+DEFINE_DEVICE_TYPE(IEEE488,      ieee488_device,      "ieee488",      "IEEE-488 bus")
+DEFINE_DEVICE_TYPE(IEEE488_SLOT, ieee488_slot_device, "ieee488_slot", "IEEE-488 slot")
 
 
 
@@ -44,7 +41,7 @@ template class device_finder<ieee488_device, true>;
 //-------------------------------------------------
 
 device_ieee488_interface::device_ieee488_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device), m_next(nullptr), m_bus(nullptr), m_slot(nullptr)
+	: device_slot_card_interface(mconfig, device), m_bus(nullptr), m_slot(nullptr), m_next(nullptr)
 {
 }
 
@@ -68,8 +65,9 @@ device_ieee488_interface::~device_ieee488_interface()
 //-------------------------------------------------
 
 ieee488_slot_device::ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, IEEE488_SLOT, "IEEE-488 slot", tag, owner, clock, "ieee488_slot", __FILE__),
-		device_slot_interface(mconfig, *this), m_address(0)
+	device_t(mconfig, IEEE488_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_address(0)
 {
 }
 
@@ -104,17 +102,17 @@ void ieee488_slot_device::device_start()
 //  ieee488_device - constructor
 //-------------------------------------------------
 
-ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, IEEE488, "IEEE-488 bus", tag, owner, clock, "ieee488", __FILE__),
-		m_write_eoi(*this),
-		m_write_dav(*this),
-		m_write_nrfd(*this),
-		m_write_ndac(*this),
-		m_write_ifc(*this),
-		m_write_srq(*this),
-		m_write_atn(*this),
-		m_write_ren(*this),
-		m_dio(0xff)
+ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, IEEE488, tag, owner, clock),
+	m_write_eoi(*this),
+	m_write_dav(*this),
+	m_write_nrfd(*this),
+	m_write_ndac(*this),
+	m_write_ifc(*this),
+	m_write_srq(*this),
+	m_write_atn(*this),
+	m_write_ren(*this),
+	m_dio(0xff)
 {
 	for (auto & elem : m_line)
 	{
@@ -398,7 +396,7 @@ SLOT_INTERFACE_START( cbm_ieee488_devices )
 	SLOT_INTERFACE("d9090", D9090)
 	SLOT_INTERFACE("softbox", SOFTBOX)
 	SLOT_INTERFACE("hardbox", HARDBOX)
-	SLOT_INTERFACE("shark", SHARK)
+	SLOT_INTERFACE("shark", MSHARK)
 	SLOT_INTERFACE("c4023", C4023)
 SLOT_INTERFACE_END
 

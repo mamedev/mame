@@ -104,7 +104,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( westdrm, segacoin_state )
+static MACHINE_CONFIG_START( westdrm )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000) // clock frequency unknown
@@ -139,4 +139,4 @@ ROM_START( westdrm )
 ROM_END
 
 
-GAME (1992, westdrm, 0, westdrm, westdrm, driver_device, 0, ROT0, "Sega", "Western Dream", MACHINE_IS_SKELETON_MECHANICAL )
+GAME (1992, westdrm, 0, westdrm, westdrm, segacoin_state, 0, ROT0, "Sega", "Western Dream", MACHINE_IS_SKELETON_MECHANICAL )

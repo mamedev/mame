@@ -69,7 +69,7 @@ public:
 	DECLARE_READ8_MEMBER(port81_r);
 	DECLARE_READ8_MEMBER(portc0_r);
 	DECLARE_WRITE8_MEMBER(port40_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
@@ -183,12 +183,12 @@ static SLOT_INTERFACE_START( czk80_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-WRITE8_MEMBER( czk80_state::kbd_put )
+void czk80_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( czk80, czk80_state )
+static MACHINE_CONFIG_START( czk80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(czk80_mem)
@@ -197,7 +197,7 @@ static MACHINE_CONFIG_START( czk80, czk80_state )
 	MCFG_MACHINE_RESET_OVERRIDE(czk80_state, czk80)
 
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(czk80_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(czk80_state, kbd_put))
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
@@ -226,5 +226,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT   COMPAT MACHINE  INPUT  CLASS         INIT    COMPANY      FULLNAME       FLAGS */
-COMP( 198?, czk80,  0,       0,     czk80,   czk80, czk80_state, czk80, "<unknown>",  "CZK-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT   COMPAT MACHINE  INPUT  CLASS        INIT   COMPANY       FULLNAME  FLAGS
+COMP( 198?, czk80,  0,       0,     czk80,   czk80, czk80_state, czk80, "<unknown>",  "CZK-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

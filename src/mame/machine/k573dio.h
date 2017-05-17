@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#pragma once
+#ifndef MAME_MACHINE_K573DIO_H
+#define MAME_MACHINE_K573DIO_H
 
-#ifndef _K573DIO_H_
-#define _K573DIO_H_
+#pragma once
 
 #include "sound/mas3507d.h"
 #include "machine/ds2401.h"
@@ -80,6 +80,6 @@ private:
 	void output(int offset, uint16_t data);
 };
 
-extern const device_type KONAMI_573_DIGITAL_IO_BOARD;
+DECLARE_DEVICE_TYPE(KONAMI_573_DIGITAL_IO_BOARD, k573dio_device)
 
-#endif
+#endif // MAME_MACHINE_K573DIO_H

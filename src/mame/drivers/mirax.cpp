@@ -474,7 +474,7 @@ INTERRUPT_GEN_MEMBER(mirax_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( mirax, mirax_state )
+static MACHINE_CONFIG_START( mirax )
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
 	MCFG_CPU_PROGRAM_MAP(mirax_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mirax_state, vblank_irq)
@@ -588,5 +588,5 @@ DRIVER_INIT_MEMBER(mirax_state,mirax)
 	m_flipscreen_y = 0;
 }
 
-GAME( 1985, mirax,    0,        mirax,    mirax, mirax_state,    mirax,    ROT90, "Current Technologies", "Mirax (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, mirax,    0,        mirax,    mirax,  mirax_state,   mirax,    ROT90, "Current Technologies", "Mirax (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, miraxa,   mirax,    mirax,    miraxa, mirax_state,   mirax,    ROT90, "Current Technologies", "Mirax (set 2)", MACHINE_SUPPORTS_SAVE )

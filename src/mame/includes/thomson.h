@@ -8,8 +8,10 @@
 
 **********************************************************************/
 
-#ifndef _THOMSON_H_
-#define _THOMSON_H_
+#ifndef MAME_INCLUDES_THOMSON_H
+#define MAME_INCLUDES_THOMSON_H
+
+#pragma once
 
 #include "cpu/m6809/m6809.h"
 #include "formats/thom_cas.h"
@@ -697,9 +699,9 @@ private:
 	int m_dsr;
 };
 
-extern const device_type TO7_IO_LINE;
+DECLARE_DEVICE_TYPE(TO7_IO_LINE, to7_io_line_device)
 
 #define MCFG_TO7_IO_LINE_ADD(_tag)  \
 	MCFG_DEVICE_ADD((_tag), TO7_IO_LINE, 0)
 
-#endif /* _THOMSON_H_ */
+#endif // MAME_INCLUDES_THOMSON_H

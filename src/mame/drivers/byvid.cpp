@@ -740,7 +740,7 @@ uint32_t by133_state::screen_update_granny(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-static MACHINE_CONFIG_START( babypac, by133_state )
+static MACHINE_CONFIG_START( babypac )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz/4) // no xtal, just 2 chips
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -817,8 +817,8 @@ static MACHINE_CONFIG_DERIVED( granny, babypac )
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, TMS9928A_TOTAL_HORZ, TMS9928A_HORZ_DISPLAY_START-12, TMS9928A_HORZ_DISPLAY_START + 256 + 12, \
-			TMS9928A_TOTAL_VERT_NTSC, TMS9928A_VERT_DISPLAY_START_NTSC - 12, TMS9928A_VERT_DISPLAY_START_NTSC + 192 + 12 )
+	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
+			tms9928a_device::TOTAL_VERT_NTSC, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12 )
 	MCFG_SCREEN_UPDATE_DRIVER(by133_state, screen_update_granny)
 MACHINE_CONFIG_END
 
@@ -877,6 +877,6 @@ ROM_START(granny)
 ROM_END
 
 
-GAME( 1982, babypac,  0,        babypac, babypac, driver_device,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1982, babypac2, babypac,  babypac, babypac, driver_device,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1984, granny,   0,        granny,  granny,  driver_device,  0,  ROT0,  "Bally", "Granny and the Gators", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1982, babypac,  0,        babypac, babypac, by133_state,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1982, babypac2, babypac,  babypac, babypac, by133_state,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1984, granny,   0,        granny,  granny,  by133_state,  0,  ROT0,  "Bally",                           "Granny and the Gators", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

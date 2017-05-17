@@ -499,7 +499,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( badlands, badlands_state )
+static MACHINE_CONFIG_START( badlands )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -754,7 +754,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(badlands_state::bootleg_sound_scanline)
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( badlandsb, badlands_state )
+static MACHINE_CONFIG_START( badlandsb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/4)   /* Divisor estimated */
@@ -866,5 +866,5 @@ ROM_END
 
 
 
-GAME( 1989, badlandsb, badlands, badlandsb, badlandsb, driver_device, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", MACHINE_NOT_WORKING )
-GAME( 1989, badlandsb2,badlands, badlandsb, badlandsb, driver_device, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", MACHINE_NOT_WORKING )
+GAME( 1989, badlandsb, badlands, badlandsb, badlandsb, badlands_state, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", MACHINE_NOT_WORKING )
+GAME( 1989, badlandsb2,badlands, badlandsb, badlandsb, badlands_state, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", MACHINE_NOT_WORKING )

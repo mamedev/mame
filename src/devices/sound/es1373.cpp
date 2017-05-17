@@ -11,6 +11,66 @@
 #define LOG_ES_FILE       (0)
 
 
+/* Ensonic ES1373 registers 0x00-0x3f */
+#define ES_INT_CS_CTRL          (0x00/4)
+#define ES_INT_CS_STATUS        (0x04/4)
+#define ES_UART_DATA            (0x08/4)
+#define ES_UART_STATUS          (0x09/4)
+#define ES_UART_CTRL            (0x09/4)
+#define ES_UART_RSVD            (0x0A/4)
+#define ES_MEM_PAGE             (0x0C/4)
+#define ES_SRC_IF               (0x10/4)
+#define ES_CODEC                (0x14/4)
+#define ES_LEGACY               (0x18/4)
+#define ES_CHAN_CTRL            (0x1C/4)
+#define ES_SERIAL_CTRL          (0x20/4)
+#define ES_DAC1_CNT             (0x24/4)
+#define ES_DAC2_CNT             (0x28/4)
+#define ES_ADC_CNT              (0x2C/4)
+#define ES_HOST_IF0             (0x30/4)
+#define ES_HOST_IF1             (0x34/4)
+#define ES_HOST_IF2             (0x38/4)
+#define ES_HOST_IF3             (0x3C/4)
+
+// Interrupt/Chip Select Control Register (ES_INT_CS_CTRL) bits
+#define ICCTRL_ADC_STOP_MASK   0x00002000
+#define ICCTRL_DAC1_EN_MASK    0x00000040
+#define ICCTRL_DAC2_EN_MASK    0x00000020
+#define ICCTRL_ADC_EN_MASK     0x00000010
+#define ICCTRL_UART_EN_MASK    0x00000008
+#define ICCTRL_JYSTK_EN_MASK   0x00000004
+
+// Interrupt/Chip Select Status Register (ES_INT_CS_STATUS) bits
+#define ICSTATUS_INTR_MASK        0x80000000
+#define ICSTATUS_DAC1_INT_MASK    0x00000004
+#define ICSTATUS_DAC2_INT_MASK    0x00000002
+#define ICSTATUS_ADC_INT_MASK     0x00000001
+
+// Serial Interface Control Register (ES_SERIAL_CTRL) bits
+#define SCTRL_P2_END_MASK     0x00380000
+#define SCTRL_P2_START_MASK   0x00070000
+#define SCTRL_R1_LOOP_MASK    0x00008000
+#define SCTRL_P2_LOOP_MASK    0x00004000
+#define SCTRL_P1_LOOP_MASK    0x00002000
+#define SCTRL_P2_PAUSE_MASK   0x00001000
+#define SCTRL_P1_PAUSE_MASK   0x00000800
+#define SCTRL_R1_INT_EN_MASK  0x00000400
+#define SCTRL_P2_INT_EN_MASK  0x00000200
+#define SCTRL_P1_INT_EN_MASK  0x00000100
+#define SCTRL_P1_RELOAD_MASK  0x00000080
+#define SCTRL_P2_STOP_MASK    0x00000040
+#define SCTRL_R1_S_MASK       0x00000030
+#define SCTRL_P2_S_MASK       0x0000000C
+#define SCTRL_P1_S_MASK       0x00000003
+
+#define SCTRL_8BIT_MONO             0x0
+#define SCTRL_8BIT_STEREO           0x1
+#define SCTRL_16BIT_MONO            0x2
+#define SCTRL_16BIT_STEREO      0x3
+
+#define ES_PCI_READ 0
+#define ES_PCI_WRITE 1
+
 static MACHINE_CONFIG_FRAGMENT( es1373 )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
@@ -20,14 +80,14 @@ machine_config_constructor es1373_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( es1373 );
 }
 
-const device_type ES1373 = device_creator<es1373_device>;
+DEFINE_DEVICE_TYPE(ES1373, es1373_device, "es1373", "Creative Labs Ensoniq AudioPCI97 ES1373")
 
 DEVICE_ADDRESS_MAP_START(map, 32, es1373_device)
 	AM_RANGE(0x00, 0x3f) AM_READWRITE  (reg_r,  reg_w)
 ADDRESS_MAP_END
 
 es1373_device::es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, ES1373, "Creative Labs Ensoniq AudioPCI97 ES1373", tag, owner, clock, "es1373", __FILE__),
+	: pci_device(mconfig, ES1373, tag, owner, clock),
 		device_sound_interface(mconfig, *this), m_stream(nullptr),
 		m_eslog(nullptr), m_tempCount(0), m_timer(nullptr), m_memory_space(nullptr), m_cpu_tag(nullptr), m_cpu(nullptr),
 		m_irq_num(-1)
