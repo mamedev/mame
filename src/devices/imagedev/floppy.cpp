@@ -845,6 +845,12 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 
 void floppy_image_device::write_zone(uint32_t *buf, int &cells, int &index, uint32_t spos, uint32_t epos, uint32_t mg)
 {
+	spos = std::min(spos , 200000000U);
+	epos = std::min(epos , 200000000U);
+    if (spos >= epos) {
+		return;
+	}
+
 	while(spos < epos) {
 		while(index != cells-1 && (buf[index+1] & floppy_image::TIME_MASK) <= spos)
 			index++;
