@@ -920,7 +920,7 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 			// calculated as a very small value, even less than minimum_sleep, which will make this
 			// loop to be a busy one wasting cpu resource
 			osd_ticks_t actual_ticks = new_ticks - current_ticks;
-			if (actual_ticks > delta && actual_ticks < delta * 2)
+			if (actual_ticks > delta && actual_ticks < delta * 10)
 			{
 				// take 90% of the previous average plus 10% of the new value
 				osd_ticks_t oversleep_milliticks = 1000 * (actual_ticks - delta) / delta;
