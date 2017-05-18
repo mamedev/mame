@@ -79,7 +79,7 @@ const options_entry cli_option_entries[] =
 	/* core commands */
 	{ nullptr,                              nullptr,   OPTION_HEADER,     "CORE COMMANDS" },
 	{ CLICOMMAND_HELP           ";h;?",     "0",       OPTION_COMMAND,    "show help message" },
-	{ CLICOMMAND_VALIDATE       ";valid",   "0",       OPTION_COMMAND,    "perform driver validation on all game drivers" },
+	{ CLICOMMAND_VALIDATE       ";valid",   "0",       OPTION_COMMAND,    "perform driver validation on game drivers" },
 
 	/* configuration commands */
 	{ nullptr,                              nullptr,   OPTION_HEADER,     "CONFIGURATION COMMANDS" },
@@ -1378,8 +1378,8 @@ void cli_frontend::execute_commands(const char *exename)
 	{
 		validity_checker valid(m_options);
 		valid.set_validate_all(true);
-		const char *sysname = m_options.system_name();
-		bool result = valid.check_all_matching((sysname[0] == 0) ? nullptr : sysname);
+		const char *sysname = m_options.command_arguments().empty() ? nullptr : m_options.command_arguments()[0].c_str();
+		bool result = valid.check_all_matching(sysname);
 		if (!result)
 			throw emu_fatalerror(EMU_ERR_FAILED_VALIDITY, "Validity check failed (%d errors, %d warnings in total)\n", valid.errors(), valid.warnings());
 		return;

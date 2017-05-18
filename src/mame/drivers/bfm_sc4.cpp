@@ -51442,11 +51442,11 @@ GAMEL( 200?, sc4cashg    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma / 
 /****************************************************************************************************************************************************************************************************************/
 
 
-GAMEL( 200?, ad4skill    ,0,         sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Skill Dice (BFM) (Scorpion 4 + Adder 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, ad4film     ,0,         sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // the 68k vectors differ from usual, but it contains the expected strings for an Adder 4 title.   No main program roms tho? :/
-GAMEL( 200?, ad4filma    ,ad4film,   sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // ^^
-GAMEL( 200?, ad4ctl      ,0,         sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, ad4ctla     ,ad4ctl,    sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, ad4skill    ,0,         sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Skill Dice (BFM) (Scorpion 4 + Adder 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, ad4film     ,0,         sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // the 68k vectors differ from usual, but it contains the expected strings for an Adder 4 title.   No main program roms tho? :/
+GAMEL( 200?, ad4filma    ,ad4film,   sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // ^^
+GAMEL( 200?, ad4ctl      ,0,         sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, ad4ctla     ,ad4ctl,    sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 // PR1036 CLUB COP THE LOT         PR1036 CLOT SOUNDS11           COP THE LOT
 // shows nothing on the VFD, but boots (to very little)
 GAMEL( 200?, sc4ctlcl    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
