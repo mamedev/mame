@@ -157,16 +157,31 @@ void m14_state::draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &clip
 	const uint8_t white_pen = 0x1f;
 	const int xoffs = -8; // matches left-right wall bounces
 	const int p_ybase = 184; // matches ball bounce to paddle
+	int resx,resy;
 	
 	// draw ball
 	for(xi=0;xi<4;xi++)
 		for(yi=0;yi<4;yi++)
-			bitmap.pix16(m_bally+yi, m_ballx+xi+xoffs) = m_palette->pen(white_pen);
+		{
+			resx = flip_screen() ?  32*8-(m_ballx+xi+xoffs) : m_ballx+xi+xoffs;
+			resy = flip_screen() ?  28*8-(m_bally+yi) :       m_bally+yi;
 
+			if(cliprect.contains(resx,resy))
+				bitmap.pix16(resy, resx) = m_palette->pen(white_pen);
+		}
+	
 	// draw paddle
 	for(xi=0;xi<16;xi++)
 		for(yi=0;yi<4;yi++)
-			bitmap.pix16(p_ybase+yi, m_paddlex+xi+xoffs) = m_palette->pen(white_pen);
+		{			
+			resx = flip_screen() ? 32*8-(m_paddlex+xi+xoffs) : (m_paddlex+xi+xoffs);
+			resy = flip_screen() ? 28*8-(p_ybase+yi) :         p_ybase+yi;
+			
+			if(cliprect.contains(resx,resy))
+				bitmap.pix16(resy, resx) = m_palette->pen(white_pen);
+		}
+		
+		
 }
 
 
@@ -220,7 +235,9 @@ WRITE8_MEMBER(m14_state::hopper_w)
 {
 	/* ---- x--- coin out */
 	/* ---- --x- hopper/input mux? */
+	/* ---- ---x flip screen */
 	m_hop_mux = data & 2;
+	flip_screen_set(data & 1);
 	//popmessage("%02x",data);
 }
 
@@ -309,12 +326,12 @@ static INPUT_PORTS_START( m14 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Reach")
 
 	PORT_START("DSW") //this whole port is stored at work ram $2112.
-	PORT_DIPNAME( 0x01, 0x01, "Show available tiles" )
+	PORT_DIPNAME( 0x01, 0x01, "Show available tiles" ) // difficulty even
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
