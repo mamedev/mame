@@ -609,7 +609,21 @@ WRITE8_MEMBER(interpro_ioga_device::nmictrl_w)
 	if (previous & IOGA_NMI_PENDING && !(data & IOGA_NMI_PENDING))
 		set_nmi_line(ASSERT_LINE);
 #else
-	m_nmictrl = data & ~IOGA_NMI_PENDING;
+	if (data & IOGA_NMI_PENDING)
+	{
+		m_nmi_forced = true;
+		m_nmictrl = (m_nmictrl & IOGA_NMI_PENDING) | (data & ~IOGA_NMI_PENDING);
+	}
+	else if (m_nmi_forced)
+	{
+		m_nmi_forced = false;
+
+		m_nmictrl = data | IOGA_NMI_PENDING;
+	}
+	else
+		m_nmictrl = data;
+
+	//m_nmictrl = data & ~IOGA_NMI_PENDING;
 #endif
 }
 

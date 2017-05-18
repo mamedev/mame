@@ -239,6 +239,7 @@ private:
 	u32 m_active_interrupt_number;
 
 	u32 m_hwint_forced;
+	bool m_nmi_forced;
 
 	u16 m_hwicr[IOGA_INTERRUPT_COUNT];
 	u8 m_softint;
