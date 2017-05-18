@@ -18,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(EPSON_PF10, epson_pf10_device, "epson_pf10_device", "EPSON PF-10 Portable Floppy Unit")
+DEFINE_DEVICE_TYPE(EPSON_PF10, epson_pf10_device, "epson_pf10", "EPSON PF-10 Portable Floppy Unit")
 
 
 //-------------------------------------------------

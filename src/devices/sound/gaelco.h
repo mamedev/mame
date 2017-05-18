@@ -54,8 +54,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	static constexpr unsigned NUM_CHANNELS     = 0x07;
-	static constexpr unsigned VOLUME_LEVELS    = 0x10;
+	static constexpr int NUM_CHANNELS   = 0x07;
+	static constexpr int VOLUME_LEVELS  = 0x10;
 
 	struct sound_channel
 	{
