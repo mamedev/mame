@@ -19,13 +19,20 @@ DEVICE_ADDRESS_MAP_START(map, 8, ncr5390_device)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(fifo_flags_r, sync_offset_w)
 	AM_RANGE(0x8, 0x8) AM_READWRITE(conf_r, conf_w)
 	AM_RANGE(0x9, 0x9) AM_WRITE(clock_w)
+	AM_RANGE(0xa, 0xa) AM_WRITE(test_w)
+	AM_RANGE(0xb, 0xb) AM_READWRITE(conf2_r, conf2_w)
+	AM_RANGE(0xc, 0xc) AM_READWRITE(conf3_r, conf3_w)
+	AM_RANGE(0xf, 0xf) AM_WRITE(fifo_align_w)
 ADDRESS_MAP_END
 
 ncr5390_device::ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: nscsi_device(mconfig, NCR5390, "5390 SCSI", tag, owner, clock, "ncr5390", __FILE__), tm(nullptr), config(0), status(0), istatus(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0),
 	select_timeout(0), seq(0), tcount(0), mode(0), fifo_pos(0), command_pos(0), state(0), xfr_phase(0), command_length(0), dma_dir(0), irq(false), drq(false),
 	m_irq_handler(*this),
-	m_drq_handler(*this)
+	m_drq_handler(*this),
+	test_mode(false),
+	config2(0),
+	config3(0)
 {
 }
 
@@ -89,6 +96,9 @@ void ncr5390_device::reset_soft()
 	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
 	status &= 0xef;
 	drq = false;
+	test_mode = false;
+	config2 = 0;
+	config3 = 0;
 	m_drq_handler(drq);
 	reset_disconnect();
 }
@@ -815,6 +825,10 @@ WRITE8_MEMBER(ncr5390_device::conf_w)
 {
 	config = data;
 	scsi_id = data & 7;
+
+	// test mode can only be cleared by hard/soft reset
+	if (data & 0x8)
+		test_mode = true;
 }
 
 WRITE8_MEMBER(ncr5390_device::clock_w)
@@ -822,6 +836,11 @@ WRITE8_MEMBER(ncr5390_device::clock_w)
 	clock_conv = data & 0x07;
 }
 
+WRITE8_MEMBER(ncr5390_device::test_w)
+{
+	if (test_mode)
+		logerror("%s: test_w %d (%08x) - test mode not implemented\n", tag(), data, space.device().safe_pc());
+}
 void ncr5390_device::dma_set(int dir)
 {
 	dma_dir = dir;
