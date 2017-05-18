@@ -10,7 +10,9 @@
 #endif
 
 #ifndef _WIN32_WINNT
+#ifdef __GNUC__
 #define _WIN32_WINNT 0x0501 // Windows XP
+#endif
 #endif
 
 #if defined(_WIN32) || defined(WIN32)

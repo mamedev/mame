@@ -27,6 +27,8 @@ ifeq ($(platform),)
 		platform = win
 	else ifneq ($(findstring MINGW,$(UNAME_S)),)
 		platform = win
+	else ifneq ($(findstring MSYS,$(UNAME_S)),)
+		platform = win
 	else ifneq ($(findstring Darwin,$(UNAME_S)),)
 		platform = osx
 	else ifneq ($(findstring win,$(UNAME_S)),)
@@ -103,12 +105,12 @@ endif
 PLATFLAGS =
 
 ifneq ($(platform),android)
-ifneq ($(PTR64),)
-	PLATFLAGS += PTR64=$(PTR64)
-endif
-ifneq ($(platform),)
-	PLATFLAGS += LIBRETRO_OS="$(platform)"
-endif
+	ifneq ($(PTR64),)
+		PLATFLAGS += PTR64=$(PTR64)
+	endif
+	ifneq ($(platform),)
+		PLATFLAGS += LIBRETRO_OS="$(platform)"
+	endif
 endif
 ifeq ($(platform),win)
 	ifeq ($(MSYSTEM),MINGW64)
@@ -168,7 +170,10 @@ all: build
 build:
 	$(MAKE) $(BUILDFLAGS) $(PLATFLAGS) $(TARGETFLAGS)
 
+vs2015:
+	$(MAKE) $(BUILDFLAGS) $(PLATFLAGS) $(TARGETFLAGS) vs2015
+
 clean:
 	$(MAKE) $(BUILDFLAGS) $(PLATFLAGS) $(TARGETFLAGS) clean
 
-.PHONY: all build clean
+.PHONY: all build clean vs2015

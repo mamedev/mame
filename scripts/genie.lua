@@ -552,13 +552,16 @@ dofile ("toolchain.lua")
 
 -- RETRO HACK
 if _OPTIONS["osd"]=="retro" then
-	buildoptions {
-		"-fPIC",
-	}
+	if string.sub(_ACTION,1,4) ~= "vs20" then
+		buildoptions {
+			"-fPIC"
+		}
+	end
 
-	defines {
-		"__LIBRETRO__",
-	}
+	configuration { "*" }
+		defines {
+			"__LIBRETRO__",
+		}
 end
 -- RETRO HACK
 
@@ -1203,7 +1206,6 @@ if _OPTIONS["vs"]==nil or not (string.startswith(_OPTIONS["vs"], "winstore8") or
 end
 
 		buildoptions {
-			"/WX",     -- Treats all compiler warnings as errors.
 			"/wd4025", -- warning C4025: 'number' : based pointer passed to function with variable arguments: parameter number
 			"/wd4003", -- warning C4003: not enough actual parameters for macro 'xxx'
 			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
