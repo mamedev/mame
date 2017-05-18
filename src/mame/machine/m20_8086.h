@@ -3,7 +3,6 @@
 #ifndef M20_8086_H_
 #define M20_8086_H_
 
-#include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
 

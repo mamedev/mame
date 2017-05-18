@@ -12,7 +12,6 @@
 #define __SYSTEM3__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

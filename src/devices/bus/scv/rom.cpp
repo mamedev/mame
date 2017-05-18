@@ -17,13 +17,13 @@
 //  scv_rom_device - constructor
 //-------------------------------------------------
 
-const device_type SCV_ROM8K = &device_creator<scv_rom8_device>;
-const device_type SCV_ROM16K = &device_creator<scv_rom16_device>;
-const device_type SCV_ROM32K = &device_creator<scv_rom32_device>;
-const device_type SCV_ROM32K_RAM8K = &device_creator<scv_rom32ram8_device>;
-const device_type SCV_ROM64K = &device_creator<scv_rom64_device>;
-const device_type SCV_ROM128K = &device_creator<scv_rom128_device>;
-const device_type SCV_ROM128K_RAM4K = &device_creator<scv_rom128ram4_device>;
+const device_type SCV_ROM8K = device_creator<scv_rom8_device>;
+const device_type SCV_ROM16K = device_creator<scv_rom16_device>;
+const device_type SCV_ROM32K = device_creator<scv_rom32_device>;
+const device_type SCV_ROM32K_RAM8K = device_creator<scv_rom32ram8_device>;
+const device_type SCV_ROM64K = device_creator<scv_rom64_device>;
+const device_type SCV_ROM128K = device_creator<scv_rom128_device>;
+const device_type SCV_ROM128K_RAM4K = device_creator<scv_rom128ram4_device>;
 
 
 scv_rom8_device::scv_rom8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
@@ -54,12 +54,12 @@ scv_rom32ram8_device::scv_rom32ram8_device(const machine_config &mconfig, const 
 }
 
 scv_rom64_device::scv_rom64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: scv_rom8_device(mconfig, SCV_ROM16K, "SCV 64K Carts", tag, owner, clock, "scv_rom64", __FILE__), m_bank_base(0)
+					: scv_rom8_device(mconfig, SCV_ROM64K, "SCV 64K Carts", tag, owner, clock, "scv_rom64", __FILE__), m_bank_base(0)
 				{
 }
 
 scv_rom128_device::scv_rom128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: scv_rom8_device(mconfig, SCV_ROM32K, "SCV 128K Carts", tag, owner, clock, "scv_rom128", __FILE__), m_bank_base(0)
+					: scv_rom8_device(mconfig, SCV_ROM128K, "SCV 128K Carts", tag, owner, clock, "scv_rom128", __FILE__), m_bank_base(0)
 				{
 }
 

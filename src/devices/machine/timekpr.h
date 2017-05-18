@@ -19,7 +19,6 @@
 #ifndef __TIMEKPR_H__
 #define __TIMEKPR_H__
 
-#include "emu.h"
 
 
 

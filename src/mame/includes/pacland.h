@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
 #include "sound/namco.h"
+#include "screen.h"
 
 class pacland_state : public driver_device
 {

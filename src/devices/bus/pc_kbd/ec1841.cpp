@@ -11,6 +11,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "ec1841.h"
 
 #define VERBOSE_DBG 0       /* general debug messages */
@@ -38,7 +39,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC_KBD_EC_1841 = &device_creator<ec_1841_keyboard_device>;
+const device_type PC_KBD_EC_1841 = device_creator<ec_1841_keyboard_device>;
 
 
 //-------------------------------------------------

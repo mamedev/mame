@@ -3,6 +3,7 @@
 #include "video/bufsprite.h"
 #include "sound/upd7759.h"
 #include "sound/k007232.h"
+#include "screen.h"
 
 class twin16_state : public driver_device
 {

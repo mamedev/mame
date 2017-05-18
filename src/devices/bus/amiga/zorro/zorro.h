@@ -143,7 +143,6 @@
 #ifndef __ZORRO_H__
 #define __ZORRO_H__
 
-#include "emu.h"
 
 //**************************************************************************
 //  CONSTANTS / MACROS

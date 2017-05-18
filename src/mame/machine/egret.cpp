@@ -39,9 +39,9 @@
 
 #include "emu.h"
 #include "egret.h"
+#include "includes/mac.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/asc.h"
-#include "includes/mac.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -53,7 +53,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EGRET = &device_creator<egret_device>;
+const device_type EGRET = device_creator<egret_device>;
 
 ROM_START( egret )
 	ROM_REGION(0x4400, EGRET_CPU_TAG, 0)
@@ -162,7 +162,7 @@ void egret_device::send_port(address_space &space, uint8_t offset, uint8_t data)
 					printf("EG-> VIA_CLOCK: %d (PC=%x)\n", ((data>>4)&1)^1, m_maincpu->pc());
 					#endif
 					via_clock = (data>>4) & 1;
-					write_via_clock(via_clock^1);
+					write_via_clock(via_clock);
 				}
 			}
 			break;

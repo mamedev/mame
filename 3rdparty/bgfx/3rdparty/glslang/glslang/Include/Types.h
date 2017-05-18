@@ -1,13 +1,13 @@
 //
-//Copyright (C) 2002-2005  3Dlabs Inc. Ltd.
-//Copyright (C) 2012-2016 LunarG, Inc.
-//Copyright (C) 2015-2016 Google, Inc.
+// Copyright (C) 2002-2005  3Dlabs Inc. Ltd.
+// Copyright (C) 2012-2016 LunarG, Inc.
+// Copyright (C) 2015-2016 Google, Inc.
 //
-//All rights reserved.
+// All rights reserved.
 //
-//Redistribution and use in source and binary forms, with or without
-//modification, are permitted provided that the following conditions
-//are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
 //
 //    Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
@@ -21,18 +21,18 @@
 //    contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-//FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-//COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-//INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-//BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-//CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-//LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-//ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-//POSSIBILITY OF SUCH DAMAGE.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+// COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 //
 
 #ifndef _TYPES_INCLUDED
@@ -421,7 +421,7 @@ public:
         clearLayout();
     }
 
-    // Drop just the storage qualification, which perhaps should 
+    // Drop just the storage qualification, which perhaps should
     // never be done, as it is fundamentally inconsistent, but need to
     // explore what downstream consumers need.
     // E.g., in a deference, it is an inconsistency between:
@@ -601,6 +601,9 @@ public:
         layoutPushConstant = false;
 #ifdef NV_EXTENSIONS
         layoutPassthrough = false;
+        layoutViewportRelative = false;
+        // -2048 as the default vaule indicating layoutSecondaryViewportRelative is not set
+        layoutSecondaryViewportRelativeOffset = -2048;
 #endif
     }
     bool hasLayout() const
@@ -657,6 +660,8 @@ public:
 
 #ifdef NV_EXTENSIONS
     bool layoutPassthrough;
+    bool layoutViewportRelative;
+    int layoutSecondaryViewportRelativeOffset;
 #endif
 
     bool hasUniformLayout() const
@@ -927,9 +932,9 @@ struct TShaderQualifiers {
     TLayoutDepth layoutDepth;
     bool blendEquation;       // true if any blend equation was specified
 
-#ifdef NV_EXTENSIONS 
+#ifdef NV_EXTENSIONS
     bool layoutOverrideCoverage;    // true if layout override_coverage set
-#endif 
+#endif
 
     void init()
     {
@@ -950,7 +955,7 @@ struct TShaderQualifiers {
         earlyFragmentTests = false;
         layoutDepth = EldNone;
         blendEquation = false;
-#ifdef NV_EXTENSIONS 
+#ifdef NV_EXTENSIONS
         layoutOverrideCoverage = false;
 #endif
     }
@@ -989,10 +994,10 @@ struct TShaderQualifiers {
             layoutDepth = src.layoutDepth;
         if (src.blendEquation)
             blendEquation = src.blendEquation;
-#ifdef NV_EXTENSIONS 
+#ifdef NV_EXTENSIONS
         if (src.layoutOverrideCoverage)
             layoutOverrideCoverage = src.layoutOverrideCoverage;
-#endif 
+#endif
     }
 };
 
@@ -1085,7 +1090,7 @@ public:
                                 qualifier.storage = q;
                             }
     // for explicit precision qualifier
-    TType(TBasicType t, TStorageQualifier q, TPrecisionQualifier p, int vs = 1, int mc = 0, int mr = 0, 
+    TType(TBasicType t, TStorageQualifier q, TPrecisionQualifier p, int vs = 1, int mc = 0, int mr = 0,
           bool isVector = false) :
                             basicType(t), vectorSize(vs), matrixCols(mc), matrixRows(mr), vector1(isVector && vs == 1),
                             arraySizes(nullptr), structure(nullptr), fieldName(nullptr), typeName(nullptr)
@@ -1223,6 +1228,16 @@ public:
             typeName = NewPoolTString(copyOf.typeName->c_str());
     }
 
+    // Recursively make temporary
+    void makeTemporary()
+    {
+        getQualifier().makeTemporary();
+
+        if (isStruct())
+            for (unsigned int i = 0; i < structure->size(); ++i)
+                (*structure)[i].type->makeTemporary();
+    }
+
     TType* clone() const
     {
         TType *newType = new TType();
@@ -1309,6 +1324,44 @@ public:
     virtual bool isImage() const   { return basicType == EbtSampler && getSampler().isImage(); }
     virtual bool isSubpass() const { return basicType == EbtSampler && getSampler().isSubpass(); }
 
+    virtual bool isBuiltInInterstageIO(EShLanguage language) const
+    {
+        return isPerVertexAndBuiltIn(language) || isLooseAndBuiltIn(language);
+    }
+
+    // Return true if this is an interstage IO builtin
+    virtual bool isPerVertexAndBuiltIn(EShLanguage language) const
+    {
+        if (language == EShLangFragment)
+            return false;
+
+        // Any non-fragment stage
+        switch (getQualifier().builtIn) {
+        case EbvPosition:
+        case EbvPointSize:
+        case EbvClipDistance:
+        case EbvCullDistance:
+#ifdef NV_EXTENSIONS
+        case EbvLayer:
+        case EbvViewportMaskNV:
+        case EbvSecondaryPositionNV:
+        case EbvSecondaryViewportMaskNV:
+#endif
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    // Return true if this is a loose builtin
+    virtual bool isLooseAndBuiltIn(EShLanguage language) const
+    {
+        if (getQualifier().builtIn == EbvNone)
+            return false;
+
+        return !isPerVertexAndBuiltIn(language);
+    }
+    
     // Recursively checks if the type contains the given basic type
     virtual bool containsBasicType(TBasicType checkType) const
     {
@@ -1371,6 +1424,21 @@ public:
             return false;
         for (unsigned int i = 0; i < structure->size(); ++i) {
             if ((*structure)[i].type->containsOpaque())
+                return true;
+        }
+        return false;
+    }
+
+    // Recursively checks if the type contains an interstage IO builtin
+    virtual bool containsBuiltInInterstageIO(EShLanguage language) const
+    {
+        if (isBuiltInInterstageIO(language))
+            return true;
+
+        if (! structure)
+            return false;
+        for (unsigned int i = 0; i < structure->size(); ++i) {
+            if ((*structure)[i].type->containsBuiltInInterstageIO(language))
                 return true;
         }
         return false;
@@ -1547,8 +1615,11 @@ public:
 #ifdef NV_EXTENSIONS
                 if (qualifier.layoutPassthrough)
                     p += snprintf(p, end - p, "passthrough ");
+                if (qualifier.layoutViewportRelative)
+                    p += snprintf(p, end - p, "layoutViewportRelative ");
+                if (qualifier.layoutSecondaryViewportRelativeOffset != -2048)
+                    p += snprintf(p, end - p, "layoutSecondaryViewportRelativeOffset=%d ", qualifier.layoutSecondaryViewportRelativeOffset);
 #endif
-
 
                 p += snprintf(p, end - p, ") ");
             }

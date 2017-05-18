@@ -17,10 +17,7 @@
 #ifdef _MSC_VER
 #include <zmouse.h>
 #endif
-#undef min
-#undef max
 
-#include "emu.h"
 
 
 class debugview_info;

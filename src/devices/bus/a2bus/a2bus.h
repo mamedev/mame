@@ -13,7 +13,6 @@
 #ifndef __A2BUS_H__
 #define __A2BUS_H__
 
-#include "emu.h"
 
 // /INH special addresses
 #define INH_START_INVALID   0xffff;

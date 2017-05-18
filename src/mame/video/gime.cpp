@@ -2017,8 +2017,8 @@ const uint8_t gime_base_device::hires_font[128][12] =
 //  VARIATIONS
 //**************************************************************************
 
-const device_type GIME_NTSC = &device_creator<gime_ntsc_device>;
-const device_type GIME_PAL = &device_creator<gime_pal_device>;
+const device_type GIME_NTSC = device_creator<gime_ntsc_device>;
+const device_type GIME_PAL = device_creator<gime_pal_device>;
 
 
 

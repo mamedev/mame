@@ -9,6 +9,7 @@
 #include "sound/ym2413.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
+#include "screen.h"
 
 class dynax_state : public driver_device
 {

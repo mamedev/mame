@@ -21,12 +21,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/stadhero.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "includes/stadhero.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /******************************************************************************/
 

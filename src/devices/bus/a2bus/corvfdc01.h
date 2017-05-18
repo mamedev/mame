@@ -11,7 +11,6 @@
 #ifndef __A2BUS_CORVFDC01__
 #define __A2BUS_CORVFDC01__
 
-#include "emu.h"
 #include "a2bus.h"
 #include "machine/wd_fdc.h"
 #include "formats/imd_dsk.h"

@@ -19,7 +19,6 @@
 #ifndef __ISA_MUFDC_H__
 #define __ISA_MUFDC_H__
 
-#include "emu.h"
 #include "isa.h"
 #include "imagedev/floppy.h"
 #include "machine/upd765.h"

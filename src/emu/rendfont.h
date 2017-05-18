@@ -27,7 +27,6 @@ class osd_font;
 class render_font
 {
 	friend class render_manager;
-	friend resource_pool_object<render_font>::~resource_pool_object();
 
 	// construction/destruction
 	render_font(render_manager &manager, const char *filename);

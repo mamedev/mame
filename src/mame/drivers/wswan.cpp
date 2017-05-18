@@ -33,8 +33,13 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/wswan.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 #include "wswan.lh"
 
 static ADDRESS_MAP_START (wswan_mem, AS_PROGRAM, 8, wswan_state)

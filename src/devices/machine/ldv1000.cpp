@@ -52,7 +52,7 @@
 //**************************************************************************
 
 // devices
-const device_type PIONEER_LDV1000 = &device_creator<pioneer_ldv1000_device>;
+const device_type PIONEER_LDV1000 = device_creator<pioneer_ldv1000_device>;
 
 
 

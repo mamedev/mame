@@ -283,6 +283,8 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "video/vector.h"
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK (XTAL_12_096MHz)
@@ -477,7 +479,7 @@ static INPUT_PORTS_START( tempest )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_tempest_device, done_r, nullptr)

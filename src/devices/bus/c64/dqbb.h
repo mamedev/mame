@@ -12,7 +12,6 @@
 #define __DQBB__
 
 
-#include "emu.h"
 #include "exp.h"
 #include "machine/nvram.h"
 

@@ -11,7 +11,6 @@
 #ifndef DOUBLER_H_
 #define DOUBLER_H_
 
-#include "emu.h"
 #include "cpcexp.h"
 #include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"

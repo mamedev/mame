@@ -12,7 +12,7 @@
 #include "debugger.h"
 #include "m6502.h"
 
-const device_type M6502 = &device_creator<m6502_device>;
+const device_type M6502 = device_creator<m6502_device>;
 
 m6502_device::m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cpu_device(mconfig, M6502, "M6502", tag, owner, clock, "m6502", __FILE__),

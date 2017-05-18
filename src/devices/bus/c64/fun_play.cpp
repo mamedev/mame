@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "fun_play.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_FUN_PLAY = &device_creator<c64_fun_play_cartridge_device>;
+const device_type C64_FUN_PLAY = device_creator<c64_fun_play_cartridge_device>;
 
 
 

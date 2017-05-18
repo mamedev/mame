@@ -72,7 +72,7 @@ Taito pc090oj
 *****************************************************************************/
 
 
-const device_type PC090OJ = &device_creator<pc090oj_device>;
+const device_type PC090OJ = device_creator<pc090oj_device>;
 
 pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC090OJ, "Taito PC090OJ", tag, owner, clock, "pc090oj", __FILE__),

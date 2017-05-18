@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "a2arcadebd.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -29,7 +30,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_ARCADEBOARD = &device_creator<a2bus_arcboard_device>;
+const device_type A2BUS_ARCADEBOARD = device_creator<a2bus_arcboard_device>;
 
 MACHINE_CONFIG_FRAGMENT( arcadeboard )
 	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL_10_738635MHz / 2 )

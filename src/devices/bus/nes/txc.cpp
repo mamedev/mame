@@ -37,11 +37,11 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_TXC_22211 = &device_creator<nes_txc_22211_device>;
-const device_type NES_TXC_DUMARACING = &device_creator<nes_txc_dumarc_device>;
-const device_type NES_TXC_MJBLOCK = &device_creator<nes_txc_mjblock_device>;
-const device_type NES_TXC_STRIKEW = &device_creator<nes_txc_strikew_device>;
-const device_type NES_TXC_COMMANDOS = &device_creator<nes_txc_commandos_device>;
+const device_type NES_TXC_22211 = device_creator<nes_txc_22211_device>;
+const device_type NES_TXC_DUMARACING = device_creator<nes_txc_dumarc_device>;
+const device_type NES_TXC_MJBLOCK = device_creator<nes_txc_mjblock_device>;
+const device_type NES_TXC_STRIKEW = device_creator<nes_txc_strikew_device>;
+const device_type NES_TXC_COMMANDOS = device_creator<nes_txc_commandos_device>;
 
 
 nes_txc_22211_device::nes_txc_22211_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

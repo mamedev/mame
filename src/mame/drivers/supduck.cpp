@@ -28,6 +28,8 @@ All clock timing comes from crystal 1
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
 #include "video/tigeroad_spr.h"
+#include "screen.h"
+#include "speaker.h"
 
 class supduck_state : public driver_device
 {

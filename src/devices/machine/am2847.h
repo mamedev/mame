@@ -45,7 +45,6 @@
 #ifndef AM2847_H
 #define AM2847_H
 
-#include "emu.h"
 
 #define MCFG_AM2847_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AM2847, 0)

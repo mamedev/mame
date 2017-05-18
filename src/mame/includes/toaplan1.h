@@ -7,6 +7,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "video/toaplan_scu.h"
+#include "screen.h"
 
 class toaplan1_state : public driver_device
 {

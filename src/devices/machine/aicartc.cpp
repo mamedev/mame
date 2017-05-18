@@ -19,7 +19,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type AICARTC = &device_creator<aicartc_device>;
+const device_type AICARTC = device_creator<aicartc_device>;
 
 
 //**************************************************************************

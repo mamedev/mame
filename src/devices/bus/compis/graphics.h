@@ -13,7 +13,6 @@
 #ifndef __COMPIS_GRAPHICS_SLOT__
 #define __COMPIS_GRAPHICS_SLOT__
 
-#include "emu.h"
 
 
 

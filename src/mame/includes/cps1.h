@@ -15,6 +15,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timekpr.h"
 #include "cpu/m68000/m68000.h"
+#include "screen.h"
 
 // Video raw params
 // measured clocks:

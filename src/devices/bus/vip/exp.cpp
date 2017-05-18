@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "exp.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIP_EXPANSION_SLOT = &device_creator<vip_expansion_slot_device>;
+const device_type VIP_EXPANSION_SLOT = device_creator<vip_expansion_slot_device>;
 
 
 

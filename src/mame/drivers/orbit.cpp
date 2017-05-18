@@ -20,10 +20,12 @@ Atari Orbit Driver
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
 #include "includes/orbit.h"
+
+#include "cpu/m6800/m6800.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        XTAL_12_096MHz

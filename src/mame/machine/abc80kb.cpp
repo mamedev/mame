@@ -71,6 +71,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "abc80kb.h"
 
 
@@ -87,7 +88,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC80_KEYBOARD = &device_creator<abc80_keyboard_device>;
+const device_type ABC80_KEYBOARD = device_creator<abc80_keyboard_device>;
 
 
 //-------------------------------------------------

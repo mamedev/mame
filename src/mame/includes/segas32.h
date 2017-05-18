@@ -9,6 +9,7 @@
 #include "machine/eepromser.h"
 #include "sound/multipcm.h"
 #include "machine/s32comm.h"
+#include "screen.h"
 
 
 
@@ -17,6 +18,7 @@ class segas32_state : public device_t
 {
 public:
 	segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	required_shared_ptr<uint8_t> m_z80_shared_ram;
 	optional_shared_ptr<uint8_t> m_ga2_dpram;
@@ -284,6 +286,17 @@ class segas32_v25_state :  public segas32_state
 {
 public:
 	segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+//  virtual void device_reset();
+};
+
+class segas32_upd7725_state :  public segas32_state
+{
+public:
+	segas32_upd7725_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

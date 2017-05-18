@@ -35,6 +35,7 @@
 
 *****************************************************************************/
 
+#include "emu.h"
 #include "joyport.h"
 #include "handset.h"
 #include "mecmouse.h"
@@ -112,4 +113,4 @@ SLOT_INTERFACE_START( joystick_port_994 )
 	SLOT_INTERFACE("handset", HANDSET)
 SLOT_INTERFACE_END
 
-const device_type JOYPORT = &device_creator<joyport_device>;
+const device_type JOYPORT = device_creator<joyport_device>;

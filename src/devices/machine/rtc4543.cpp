@@ -14,6 +14,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "rtc4543.h"
 
 //**************************************************************************
@@ -39,7 +40,7 @@ const char *rtc4543_device::s_reg_names[7] =
 //**************************************************************************
 
 // device type definition
-const device_type RTC4543 = &device_creator<rtc4543_device>;
+const device_type RTC4543 = device_creator<rtc4543_device>;
 
 
 //-------------------------------------------------
@@ -346,7 +347,7 @@ void rtc4543_device::update_effective()
 //**************************************************************************
 
 // device type definition
-const device_type JRC6355E = &device_creator<jrc6355e_device>;
+const device_type JRC6355E = device_creator<jrc6355e_device>;
 
 
 //-------------------------------------------------

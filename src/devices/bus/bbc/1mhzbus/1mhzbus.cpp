@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "1mhzbus.h"
 
 
@@ -13,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_1MHZBUS_SLOT = &device_creator<bbc_1mhzbus_slot_device>;
+const device_type BBC_1MHZBUS_SLOT = device_creator<bbc_1mhzbus_slot_device>;
 
 
 

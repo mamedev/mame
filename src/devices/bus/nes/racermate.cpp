@@ -32,7 +32,7 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_RACERMATE = &device_creator<nes_racermate_device>;
+const device_type NES_RACERMATE = device_creator<nes_racermate_device>;
 
 
 nes_racermate_device::nes_racermate_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

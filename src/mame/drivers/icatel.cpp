@@ -18,11 +18,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs51/mcs51.h"
 #include "video/hd44780.h"
 //#include "sound/speaker.h"
-#include "rendlay.h"
+
 #include "debugger.h"
+#include "rendlay.h"
+#include "screen.h"
+
 
 class icatel_state : public driver_device
 {

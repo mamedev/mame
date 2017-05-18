@@ -2,10 +2,6 @@
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
 /* Sega Saturn VDP2 */
 
-#define DEBUG_MODE 0
-#define TEST_FUNCTIONS 0
-#define POPMESSAGE_DEBUG 0
-
 /*
 
 the dirty marking stuff and tile decoding will probably be removed in the end anyway as we'll need custom
@@ -105,7 +101,15 @@ In other words,the first three types uses the offset and not the color allocated
 */
 
 #include "emu.h"
-#include "includes/saturn.h"
+#include "includes/saturn.h" // FIXME: this is a dependency from devices on MAME
+
+#include "screen.h"
+
+
+#define DEBUG_MODE 0
+#define TEST_FUNCTIONS 0
+#define POPMESSAGE_DEBUG 0
+
 
 enum
 {
@@ -5717,7 +5721,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 			/* latch h/v signals through HV latch*/
 			if(!STV_VDP2_EXLTEN)
 			{
-				if(!space.debugger_access())
+				if(!machine().side_effect_disabled())
 				{
 					m_vdp2.h_count = get_hcounter();
 					m_vdp2.v_count = get_vcounter();
@@ -5744,7 +5748,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 				m_vdp2_regs[offset] |= 1 << 3;
 
 			/* HV latches clears if this register is read */
-			if(!space.debugger_access())
+			if(!machine().side_effect_disabled())
 			{
 				m_vdp2.exltfg &= ~1;
 				m_vdp2.exsyfg &= ~1;
@@ -5758,7 +5762,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 
 			/* Games basically r/w the entire VDP2 register area when this is tripped. (example: Silhouette Mirage)
 			   Disable log for the time being. */
-			//if(!space.debugger_access())
+			//if(!machine().side_effect_disabled())
 			//  printf("Warning: VDP2 version read\n");
 			break;
 		}
@@ -5778,7 +5782,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 		}
 
 		default:
-			//if(!space.debugger_access())
+			//if(!machine().side_effect_disabled())
 			//  printf("VDP2: read from register %08x %08x\n",offset*4,mem_mask);
 			break;
 	}

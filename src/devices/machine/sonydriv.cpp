@@ -525,7 +525,7 @@ void sony_set_speed(int speed)
 }
 
 // device type definition
-const device_type FLOPPY_SONY = &device_creator<sonydriv_floppy_image_device>;
+const device_type FLOPPY_SONY = device_creator<sonydriv_floppy_image_device>;
 
 //-------------------------------------------------
 //  sonydriv_floppy_image_device - constructor

@@ -11,7 +11,6 @@
 #ifndef __ABC_KEYBOARD_PORT__
 #define __ABC_KEYBOARD_PORT__
 
-#include "emu.h"
 
 
 

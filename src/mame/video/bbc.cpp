@@ -20,6 +20,7 @@
 #include "includes/bbc.h"
 #include "video/saa5050.h"
 #include "video/mc6845.h"
+#include "screen.h"
 
 /************************************************************************
  * C0 and C1 along with MA12 output from the 6845 drive 4 NAND gates in ICs 27,36 and 40

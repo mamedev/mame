@@ -1,7 +1,7 @@
 #include "emu.h"
 #include "h8_watchdog.h"
 
-const device_type H8_WATCHDOG = &device_creator<h8_watchdog_device>;
+const device_type H8_WATCHDOG = device_creator<h8_watchdog_device>;
 
 const int h8_watchdog_device::div_bh[8] = { 1, 6, 7, 9, 11, 13, 15, 17 };
 const int h8_watchdog_device::div_s [8] = { 1, 5, 6, 7,  8,  9, 11, 12 };

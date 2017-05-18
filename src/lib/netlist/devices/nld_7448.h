@@ -24,15 +24,7 @@
 #ifndef NLD_7448_H_
 #define NLD_7448_H_
 
-#include "nl_base.h"
-
-/*
- * FIXME: Using truthtable is a lot slower than the explicit device
- *        in breakout. Performance drops by 20%. This can be fixed by
- *        setting param USE_DEACTIVATE for the device.
- */
-
-#define USE_TRUTHTABLE_7448 (0)
+#include "../nl_setup.h"
 
 #ifndef NL_AUTO_DEVICES
 

@@ -9,7 +9,6 @@
 #ifndef _E0C6200_H_
 #define _E0C6200_H_
 
-#include "emu.h"
 
 
 class e0c6200_cpu_device : public cpu_device

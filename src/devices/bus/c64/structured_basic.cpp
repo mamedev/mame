@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "structured_basic.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_STRUCTURED_BASIC = &device_creator<c64_structured_basic_cartridge_device>;
+const device_type C64_STRUCTURED_BASIC = device_creator<c64_structured_basic_cartridge_device>;
 
 
 

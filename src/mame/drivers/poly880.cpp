@@ -26,6 +26,7 @@ Test Paste:
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/poly880.h"
 #include "poly880.lh"
 

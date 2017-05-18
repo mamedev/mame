@@ -2,14 +2,14 @@
 // copyright-holders:Tomasz Slanina, David Haywood
 /* ST0016 - CPU (z80) + Sound + Video */
 
+#ifndef MAME_MACHINE_ST0016_CPU_H
+#define MAME_MACHINE_ST0016_CPU_H
+
 #pragma once
 
-#ifndef __ST0016_CPU__
-#define __ST0016_CPU__
-
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/st0016.h"
+#include "screen.h"
 
 #define ISMACS  (m_game_flag & 0x80)
 #define ISMACS1 (((m_game_flag & 0x180) == 0x180))
@@ -114,4 +114,4 @@ private:
 extern const device_type ST0016_CPU;
 
 
-#endif /// __ST0016_CPU__
+#endif // MAME_MACHINE_ST0016_CPU_H

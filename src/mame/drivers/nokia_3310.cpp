@@ -12,11 +12,14 @@
 // if anybody has solid information to aid in the emulation of this (or other phones) please contribute.
 
 #include "emu.h"
+
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/intelfsh.h"
 #include "video/pcd8544.h"
+
 #include "debugger.h"
+#include "screen.h"
 
 
 #define LOG_MAD2_REGISTER_ACCESS    (0)

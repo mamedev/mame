@@ -6,12 +6,13 @@
  *
  ****************************************************************************/
 
-#ifndef VTECH2_H_
-#define VTECH2_H_
-#include "sound/speaker.h"
-#include "imagedev/cassette.h"
-#include "bus/generic/slot.h"
+#ifndef MAME_INCLUDES_VTECH2_H
+#define MAME_INCLUDES_VTECH2_H
+
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "imagedev/cassette.h"
+#include "sound/spkrdev.h"
 
 #define TRKSIZE_FM  3172    /* size of a standard FM mode track */
 
@@ -93,4 +94,4 @@ public:
 };
 
 
-#endif /* VTECH2_H_ */
+#endif // MAME_INCLUDES_VTECH2_H

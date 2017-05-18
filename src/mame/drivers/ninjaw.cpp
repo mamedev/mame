@@ -316,11 +316,14 @@ rumbling on a subwoofer in the cabinet.)
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ninjaw.h"
+#include "includes/taitoipt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
-#include "includes/taitoipt.h"
-#include "includes/ninjaw.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "ninjaw.lh"
 
@@ -649,7 +652,7 @@ private:
 
 extern const device_type SUBWOOFER;
 
-const device_type SUBWOOFER = &device_creator<subwoofer_device>;
+const device_type SUBWOOFER = device_creator<subwoofer_device>;
 
 subwoofer_device::subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SUBWOOFER, "Subwoofer", tag, owner, clock),

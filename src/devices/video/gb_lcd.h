@@ -9,7 +9,6 @@
 #ifndef __GB_LCD_H__
 #define __GB_LCD_H__
 
-#include "emu.h"
 #include "cpu/lr35902/lr35902.h"
 
 

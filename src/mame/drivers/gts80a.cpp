@@ -11,9 +11,13 @@
 
 *****************************************************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "audio/gottlieb.h"
 #include "cpu/i86/i86.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "gts80a.lh"
 #include "gts80a_caveman.lh"
 

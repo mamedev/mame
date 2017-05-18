@@ -11,7 +11,6 @@
 #ifndef __ISA_WD1002A_WX1__
 #define __ISA_WD1002A_WX1__
 
-#include "emu.h"
 #include "isa.h"
 
 

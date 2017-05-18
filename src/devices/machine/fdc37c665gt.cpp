@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "fdc37c665gt.h"
 
 fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -58,4 +59,4 @@ machine_config_constructor fdc37c665gt_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(fdc37c665gt);
 }
 
-const device_type FDC37C665GT = &device_creator<fdc37c665gt_device>;
+const device_type FDC37C665GT = device_creator<fdc37c665gt_device>;

@@ -36,7 +36,6 @@
 #ifndef __COMX35_EXPANSION_SLOT__
 #define __COMX35_EXPANSION_SLOT__
 
-#include "emu.h"
 
 
 

@@ -101,6 +101,7 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/pckeybrd.h"
+#include "screen.h"
 
 #define VERBOSE 2
 

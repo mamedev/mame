@@ -11,7 +11,6 @@
 #ifndef APPLDRIV_H
 #define APPLDRIV_H
 
-#include "emu.h"
 #include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
 

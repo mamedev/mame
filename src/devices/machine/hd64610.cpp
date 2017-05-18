@@ -14,12 +14,13 @@
 
 */
 
+#include "emu.h"
 #include "hd64610.h"
 #include "coreutil.h"
 
 
 // device type definition
-const device_type HD64610 = &device_creator<hd64610_device>;
+const device_type HD64610 = device_creator<hd64610_device>;
 
 
 //**************************************************************************

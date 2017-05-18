@@ -20,6 +20,8 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "machine/bankdev.h"
+#include "screen.h"
+
 #include "unixpc.lh"
 
 

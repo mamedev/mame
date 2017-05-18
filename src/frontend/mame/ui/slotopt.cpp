@@ -153,22 +153,28 @@ menu_slot_devices::menu_slot_devices(mame_ui_manager &mui, render_container &con
 
 void menu_slot_devices::populate(float &customtop, float &custombottom)
 {
-	/* cycle through all devices for this system */
+	// cycle through all devices for this system
 	for (device_slot_interface &slot : slot_interface_iterator(machine().root_device()))
 	{
-		/* record the menu item */
+		// does this slot have any selectable options?
+		bool has_selectable_options = slot.has_selectable_options();
+
+		// name this option		
+		std::string opt_name("------");
 		const device_slot_option *option = slot_get_current_option(slot);
-		std::string opt_name;
-		if (option == nullptr)
-			opt_name.assign("------");
-		else
+		if (option)
 		{
-			opt_name.assign(option->name());
-			if (slot.fixed() || slot_get_length(slot) == 0)
-				opt_name.append(_(" [internal]"));
+			opt_name = has_selectable_options
+				? option->name()
+				: string_format(_("%s [internal]"), option->name());
 		}
 
-		item_append(slot.device().tag() + 1, opt_name, (slot.fixed() || slot_get_length(slot) == 0) ? 0 : (FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW), (void *)&slot);
+		// choose item flags
+		uint32_t item_flags = has_selectable_options
+			? FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW
+			: FLAG_DISABLE;
+
+		item_append(slot.device().tag() + 1, opt_name, item_flags, (void *)&slot);
 	}
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Reset"), "", 0, (void *)1);

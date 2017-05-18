@@ -92,10 +92,14 @@ A                                                   12.000MHz
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
 #include "includes/himesiki.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MCLK    XTAL_12MHz // this is on the video board
 #define CLK2    XTAL_8MHz // near the CPUs

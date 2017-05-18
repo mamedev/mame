@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "cdp1852.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CDP1852 = &device_creator<cdp1852_device>;
+const device_type CDP1852 = device_creator<cdp1852_device>;
 
 
 

@@ -12,7 +12,6 @@
 #define __VIZASTAR__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

@@ -58,7 +58,7 @@ class tms32051_device : public cpu_device
 public:
 	// construction/destruction
 	tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor internal_pgm, address_map_constructor internal_data);
 
 	DECLARE_READ16_MEMBER( cpuregs_r );
 	DECLARE_WRITE16_MEMBER( cpuregs_w );
@@ -375,7 +375,6 @@ public:
 	tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_config_complete() override;
 	virtual void device_reset() override;
 };
 

@@ -378,14 +378,15 @@ Shark   Zame
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/tms32010/tms32010.h"
-#include "cpu/mcs48/mcs48.h"
-#include "includes/toaplipt.h"
 #include "includes/twincobr.h"
-#include "sound/3812intf.h"
+#include "includes/toaplipt.h"
 
+#include "cpu/m68000/m68000.h"
+#include "cpu/mcs48/mcs48.h"
+#include "cpu/tms32010/tms32010.h"
+#include "cpu/z80/z80.h"
+#include "sound/3812intf.h"
+#include "speaker.h"
 
 
 

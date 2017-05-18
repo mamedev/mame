@@ -16,7 +16,6 @@
 #ifndef __SLAPSTIC__
 #define __SLAPSTIC__
 
-#include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m68000/m68000.h"
 

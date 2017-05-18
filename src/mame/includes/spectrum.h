@@ -6,17 +6,20 @@
  *
  ****************************************************************************/
 
-#ifndef __SPECTRUM_H__
-#define __SPECTRUM_H__
+#ifndef MAME_INCLUDES_SPECTRUM_H
+#define MAME_INCLUDES_SPECTRUM_H
 
-#include "machine/upd765.h"
-#include "sound/speaker.h"
-#include "machine/ram.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#pragma once
+
 #include "machine/spec_snqk.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "sound/spkrdev.h"
 
 /* Spectrum crystals */
 
@@ -254,4 +257,4 @@ INPUT_PORTS_EXTERN( spec_plus );
 
 MACHINE_CONFIG_EXTERN( spectrum );
 
-#endif /* __SPECTRUM_H__ */
+#endif // MAME_INCLUDES_SPECTRUM_H

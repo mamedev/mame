@@ -1388,9 +1388,9 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 	if (field.type_class() == INPUT_CLASS_KEYBOARD && field.specific_name() == nullptr)
 	{
 		// loop through each character on the field
-		for (int which = 0; ; which++)
+		for (int which = 0; which < 4; which++)
 		{
-			char32_t ch = field.keyboard_code(which);
+			char32_t const ch = field.keyboard_code(which);
 			if (ch == 0)
 				break;
 			name.append(string_format("%-*s ", std::max(SPACE_COUNT - 1, 0), field.key_name(which)));

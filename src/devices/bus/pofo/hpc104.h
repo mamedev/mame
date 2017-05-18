@@ -11,7 +11,6 @@
 #ifndef __HPC104__
 #define __HPC104__
 
-#include "emu.h"
 #include "exp.h"
 #include "bus/pofo/ccm.h"
 #include "machine/nvram.h"

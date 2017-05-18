@@ -15,6 +15,7 @@
 #include "emu.h"
 #include "includes/alesis.h"
 #include "sr16.lh"
+#include "screen.h"
 
 
 WRITE8_MEMBER( alesis_state::kb_matrix_w )

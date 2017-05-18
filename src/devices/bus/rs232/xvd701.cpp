@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "xvd701.h"
 
 jvc_xvd701_device::jvc_xvd701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -149,4 +150,4 @@ void jvc_xvd701_device::rcv_complete()
 	}
 }
 
-const device_type JVC_XVD701 = &device_creator<jvc_xvd701_device>;
+const device_type JVC_XVD701 = device_creator<jvc_xvd701_device>;

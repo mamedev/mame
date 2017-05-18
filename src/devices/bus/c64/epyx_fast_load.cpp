@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "epyx_fast_load.h"
 
 
@@ -24,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_EPYX_FAST_LOAD = &device_creator<c64_epyx_fast_load_cartridge_device>;
+const device_type C64_EPYX_FAST_LOAD = device_creator<c64_epyx_fast_load_cartridge_device>;
 
 
 

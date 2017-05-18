@@ -12,6 +12,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "corvfdc02.h"
 #include "formats/concept_dsk.h"
 
@@ -23,7 +24,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_CORVFDC02 = &device_creator<a2bus_corvfdc02_device>;
+const device_type A2BUS_CORVFDC02 = device_creator<a2bus_corvfdc02_device>;
 
 #define FDC02_ROM_REGION    "fdc02_rom"
 #define FDC02_FDC_TAG       "fdc02_fdc"

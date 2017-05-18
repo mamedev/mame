@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#include "emu.h"
 #include "slutprov.h"
 
 
@@ -8,7 +9,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC_SLUTPROV = &device_creator<abc_slutprov_device>;
+const device_type ABC_SLUTPROV = device_creator<abc_slutprov_device>;
 
 
 //-------------------------------------------------

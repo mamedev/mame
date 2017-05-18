@@ -19,13 +19,16 @@ ToDo:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/jupiter.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
-#include "machine/ram.h"
 #include "machine/keyboard.h"
+#include "machine/ram.h"
 #include "machine/terminal.h"
 #include "machine/wd_fdc.h"
-#include "includes/jupiter.h"
+
+#include "screen.h"
 
 
 //**************************************************************************
@@ -71,7 +74,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( jupiter3_mem, AS_PROGRAM, 8, jupiter3_state )
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("p_ram")
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
@@ -127,11 +130,6 @@ WRITE8_MEMBER( jupiter3_state::kbd_put )
 //**************************************************************************
 //  VIDEO
 //**************************************************************************
-
-void jupiter3_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
 
 uint32_t jupiter3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

@@ -50,6 +50,7 @@ tilt the mirror up and down, and the monitor left and right.
 
 #include "emu.h"
 #include "includes/stactics.h"
+#include "screen.h"
 
 
 

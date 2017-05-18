@@ -253,6 +253,17 @@ ToDo:
 
 ****************************************************************************/
 
+// Includes
+#include "emu.h"
+#include "bus/centronics/ctronics.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/6522via.h"
+#include "machine/6850acia.h"
+#include "machine/clock.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+
+
 // Defines
 
 #undef DEBUG_GA2OPR_W
@@ -283,15 +294,6 @@ ToDo:
 #define DEBUG_SWYFT_VIA0 1
 #define DEBUG_SWYFT_VIA1 1
 
-
-// Includes
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/clock.h"
-#include "machine/6850acia.h"
-#include "machine/6522via.h"
-#include "sound/speaker.h"
-#include "bus/centronics/ctronics.h"
 
 class swyft_state : public driver_device
 {

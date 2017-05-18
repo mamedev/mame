@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "epson_sio.h"
 
 // supported devices
@@ -17,7 +18,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type EPSON_SIO = &device_creator<epson_sio_device>;
+const device_type EPSON_SIO = device_creator<epson_sio_device>;
 
 
 //**************************************************************************

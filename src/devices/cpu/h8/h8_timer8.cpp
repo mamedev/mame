@@ -9,8 +9,8 @@
 // 2 = everything
 const int V = 1;
 
-const device_type H8_TIMER8_CHANNEL  = &device_creator<h8_timer8_channel_device>;
-const device_type H8H_TIMER8_CHANNEL = &device_creator<h8h_timer8_channel_device>;
+const device_type H8_TIMER8_CHANNEL  = device_creator<h8_timer8_channel_device>;
+const device_type H8H_TIMER8_CHANNEL = device_creator<h8h_timer8_channel_device>;
 
 h8_timer8_channel_device::h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_TIMER8_CHANNEL, "H8 8-bits timer channel", tag, owner, clock, "h8_8bits_timer_channel", __FILE__),

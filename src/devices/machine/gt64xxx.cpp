@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders: Aaron Giles, Ted Green
+#include "emu.h"
 #include "gt64xxx.h"
 
 /*************************************
@@ -12,7 +13,7 @@
 #define LOG_DMA             (0)
 #define LOG_PCI             (0)
 
-const device_type GT64XXX      = &device_creator<gt64xxx_device>;
+const device_type GT64XXX      = device_creator<gt64xxx_device>;
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, gt64xxx_device)
 	AM_INHERIT_FROM(pci_device::config_map)

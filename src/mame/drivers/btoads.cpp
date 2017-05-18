@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "includes/btoads.h"
 
+#include "speaker.h"
+
 
 #define CPU_CLOCK           XTAL_64MHz
 #define VIDEO_CLOCK         XTAL_20MHz

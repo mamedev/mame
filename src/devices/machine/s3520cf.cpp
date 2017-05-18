@@ -24,7 +24,7 @@ TODO:
 //**************************************************************************
 
 // device type definition
-const device_type S3520CF = &device_creator<s3520cf_device>;
+const device_type S3520CF = device_creator<s3520cf_device>;
 
 
 //**************************************************************************

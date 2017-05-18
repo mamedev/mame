@@ -43,7 +43,7 @@ enum
 #define LOG2(msg)       do { if (VERBOSE >= 2) logerror msg; } while (0)
 
 
-const device_type PIT8253 = &device_creator<pit8253_device>;
+const device_type PIT8253 = device_creator<pit8253_device>;
 
 
 pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -69,7 +69,7 @@ pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, 
 }
 
 
-const device_type PIT8254 = &device_creator<pit8254_device>;
+const device_type PIT8254 = device_creator<pit8254_device>;
 
 pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pit8253_device(mconfig, PIT8254, "8254 PIT", tag, owner, clock, "pit8254", __FILE__)

@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
+#ifndef MAME_VIDEO_K052109_H
+#define MAME_VIDEO_K052109_H
 #pragma once
-#ifndef __K052109_H__
-#define __K052109_H__
+
+#include "screen.h"
 
 typedef device_delegate<void (int layer, int bank, int *code, int *color, int *flags, int *priority)> k052109_cb_delegate;
 #define K052109_CB_MEMBER(_name)   void _name(int layer, int bank, int *code, int *color, int *flags, int *priority)
@@ -116,4 +118,4 @@ private:
 
 extern const device_type K052109;
 
-#endif
+#endif // MAME_VIDEO_K052109_H

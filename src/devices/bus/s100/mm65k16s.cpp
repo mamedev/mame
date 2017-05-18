@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "mm65k16s.h"
 
 
@@ -21,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_MM65K16S = &device_creator<s100_mm65k16s_device>;
+const device_type S100_MM65K16S = device_creator<s100_mm65k16s_device>;
 
 
 //-------------------------------------------------

@@ -9,7 +9,6 @@
 #ifndef _ALPHA8201_H_
 #define _ALPHA8201_H_
 
-#include "emu.h"
 
 class alpha_8201_device : public device_t
 {

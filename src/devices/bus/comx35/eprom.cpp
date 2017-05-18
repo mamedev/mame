@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "eprom.h"
 
 
@@ -20,7 +21,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_EPR = &device_creator<comx_epr_device>;
+const device_type COMX_EPR = device_creator<comx_epr_device>;
 
 
 //-------------------------------------------------

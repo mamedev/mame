@@ -6,9 +6,10 @@
 
 *************************************************************************/
 
+#include "audio/atarijsa.h"
 #include "machine/atarigen.h"
 #include "machine/atarixga.h"
-#include "audio/atarijsa.h"
+#include "video/atarirle.h"
 
 
 class atarigx2_state : public atarigen_state

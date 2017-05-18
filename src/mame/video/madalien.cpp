@@ -9,8 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/mc6845.h"
 #include "includes/madalien.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 
 #define PIXEL_CLOCK (MADALIEN_MAIN_CLOCK / 2)

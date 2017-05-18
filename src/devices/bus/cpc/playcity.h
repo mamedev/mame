@@ -18,7 +18,6 @@
 #define CPC_PLAYCITY_H_
 
 
-#include "emu.h"
 #include "cpcexp.h"
 #include "sound/ay8910.h"
 #include "machine/z80ctc.h"

@@ -69,7 +69,12 @@
  ******************************************************************************/
 
 
+#include "emu.h"
 #include "includes/avigo.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "avigo.lh"
 
 

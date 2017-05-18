@@ -15,7 +15,6 @@
 #ifndef __EVPC__
 #define __EVPC__
 
-#include "emu.h"
 #include "peribox.h"
 #include "video/v9938.h"
 #include "sound/sn76496.h"

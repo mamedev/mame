@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "sound/namco.h"
 #include "sound/discrete.h"
+#include "screen.h"
 
 struct filter2_context
 {
@@ -106,8 +107,6 @@ public:
 	DECLARE_WRITE16_MEMBER(polepos_alpha16_w);
 	DECLARE_READ8_MEMBER(polepos_alpha_r);
 	DECLARE_WRITE8_MEMBER(polepos_alpha_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(high_port_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(low_port_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(auto_start_r);
 	DECLARE_WRITE8_MEMBER(out_0);
 	DECLARE_WRITE8_MEMBER(out_1);

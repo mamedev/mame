@@ -12,7 +12,6 @@
 #define __COMAL80__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

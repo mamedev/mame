@@ -5,7 +5,6 @@
 #ifndef __XOR100__
 #define __XOR100__
 
-#include "emu.h"
 #include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"

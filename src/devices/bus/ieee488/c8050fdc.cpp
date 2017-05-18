@@ -15,6 +15,7 @@
 
 */
 
+#include "emu.h"
 #include "c8050fdc.h"
 
 
@@ -39,7 +40,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C8050_FDC = &device_creator<c8050_fdc_t>;
+const device_type C8050_FDC = device_creator<c8050_fdc_t>;
 
 
 //-------------------------------------------------

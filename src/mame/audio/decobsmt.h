@@ -5,7 +5,6 @@
 #ifndef __DECOBSMT_H__
 #define __DECOBSMT_H__
 
-#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/bsmt2000.h"
 

@@ -20,10 +20,11 @@
 
 
 #include "emu.h"
+#include "includes/batman.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "video/atarimo.h"
-#include "includes/batman.h"
+#include "speaker.h"
 
 
 

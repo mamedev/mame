@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
 
+#include "emu.h"
 #include "loopback.h"
 
-const device_type RS232_LOOPBACK = &device_creator<rs232_loopback_device>;
+const device_type RS232_LOOPBACK = device_creator<rs232_loopback_device>;
 
 rs232_loopback_device::rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RS232_LOOPBACK, "RS232 Loopback", tag, owner, clock, "rs232_loopback", __FILE__),

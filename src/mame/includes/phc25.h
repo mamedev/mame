@@ -6,7 +6,6 @@
 #define __PHC25__
 
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"

@@ -8,7 +8,7 @@
 #include "bunsetsu.h"
 
 
-const device_type MSX_SLOT_BUNSETSU = &device_creator<msx_slot_bunsetsu_device>;
+const device_type MSX_SLOT_BUNSETSU = device_creator<msx_slot_bunsetsu_device>;
 
 
 msx_slot_bunsetsu_device::msx_slot_bunsetsu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

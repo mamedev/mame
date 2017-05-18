@@ -62,16 +62,12 @@ public:
 	midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	midway_serial_pic_emu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	DECLARE_READ_LINE_MEMBER(PIC16C5X_T0_clk_r);
 	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_READ8_MEMBER(read_b);
 	DECLARE_READ8_MEMBER(read_c);
 	DECLARE_WRITE8_MEMBER(write_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
-
-
-
 
 protected:
 	// device-level overrides

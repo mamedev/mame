@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/rohga.h"
+#include "screen.h"
 
 
 WRITE16_MEMBER(rohga_state::rohga_buffer_spriteram16_w)

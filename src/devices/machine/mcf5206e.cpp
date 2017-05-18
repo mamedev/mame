@@ -822,7 +822,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TCN1_w)
 //**************************************************************************
 
 // device type definition
-const device_type MCF5206E_PERIPHERAL = &device_creator<mcf5206e_peripheral_device>;
+const device_type MCF5206E_PERIPHERAL = device_creator<mcf5206e_peripheral_device>;
 
 //-------------------------------------------------
 //  mcf5206e_peripheral_device - constructor
@@ -833,16 +833,6 @@ mcf5206e_peripheral_device::mcf5206e_peripheral_device(const machine_config &mco
 		device_memory_interface(mconfig, *this),
 		m_space_config("coldfire_regs", ENDIANNESS_BIG, 32,10, 0, nullptr, *ADDRESS_MAP_NAME(coldfire_regs_map))
 
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mcf5206e_peripheral_device::device_config_complete()
 {
 }
 

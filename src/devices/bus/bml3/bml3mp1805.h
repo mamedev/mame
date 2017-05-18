@@ -12,7 +12,6 @@
 #ifndef __BML3BUS_MP1805__
 #define __BML3BUS_MP1805__
 
-#include "emu.h"
 #include "bml3bus.h"
 #include "imagedev/flopdrv.h"
 #include "machine/mc6843.h"

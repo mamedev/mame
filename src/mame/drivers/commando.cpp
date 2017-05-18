@@ -45,10 +45,13 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/commando.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "includes/commando.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* Memory Maps */

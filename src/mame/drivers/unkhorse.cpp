@@ -22,7 +22,10 @@ TODO:
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class horse_state : public driver_device
 {

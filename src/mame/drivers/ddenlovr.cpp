@@ -113,13 +113,16 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/dynax.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/gen_latch.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
-#include "includes/dynax.h"
+
+#include "speaker.h"
 
 
 /***************************************************************************

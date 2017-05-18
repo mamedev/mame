@@ -6,7 +6,6 @@
 #ifndef INTERPRO_IOGA_H_
 #define INTERPRO_IOGA_H_
 
-#include "emu.h"
 
 #define MCFG_INTERPRO_IOGA_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, INTERPRO_IOGA, XTAL_12_5MHz)
@@ -36,10 +35,10 @@
 #define IOGA_TIMER1_EXPIRED 0x20000
 
 // best guess for timer 3 is 12.5MHz based on typical value of 12500 for a delay of 1ms
-#define IOGA_TIMER3_CLOCK	XTAL_12_5MHz
+#define IOGA_TIMER3_CLOCK   XTAL_12_5MHz
 #define IOGA_TIMER3_IRQ     1
 #define IOGA_TIMER3_VMASK   0x3fffffff
-#define IOGA_TIMER3_START	0x40000000
+#define IOGA_TIMER3_START   0x40000000
 #define IOGA_TIMER3_EXPIRED 0x80000000
 
 #define IOGA_INTERRUPT_COUNT           19
@@ -148,7 +147,7 @@ public:
 	DECLARE_READ32_MEMBER(timer2_r) { return m_timer_reg[2]; }
 	DECLARE_READ32_MEMBER(timer3_r);
 
-	DECLARE_WRITE32_MEMBER(timer_prescaler_w) { 
+	DECLARE_WRITE32_MEMBER(timer_prescaler_w) {
 		// this logic satisfies prescaler tests, but fails timer prescaler tests
 		if ((data & 0x7fff) < 0x100 && (data & 0x7fff) != 0)
 			m_prescaler = (data ^ 0xffff0000);

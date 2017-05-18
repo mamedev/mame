@@ -212,6 +212,9 @@ suspicious code:
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static const int ZOOM_TABLE_SIZE=1<<14;
 static const int NUM_SCANLINES=256-8;

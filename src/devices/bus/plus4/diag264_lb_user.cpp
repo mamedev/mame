@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "diag264_lb_user.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type DIAG264_USER_PORT_LOOPBACK = &device_creator<diag264_user_port_loopback_device>;
+const device_type DIAG264_USER_PORT_LOOPBACK = device_creator<diag264_user_port_loopback_device>;
 
 
 

@@ -38,6 +38,7 @@
 */
 
 
+#include "emu.h"
 #include "hardbox.h"
 
 
@@ -57,7 +58,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type HARDBOX = &device_creator<hardbox_device>;
+const device_type HARDBOX = device_creator<hardbox_device>;
 
 
 //-------------------------------------------------

@@ -43,7 +43,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type F3853 = &device_creator<f3853_device>;
+const device_type F3853 = device_creator<f3853_device>;
 
 //-------------------------------------------------
 //  f3853_device - constructor

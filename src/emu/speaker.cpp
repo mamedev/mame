@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "speaker.h"
 
 
 
@@ -27,7 +28,10 @@
 //**************************************************************************
 
 // device type definition
-const device_type SPEAKER = &device_creator<speaker_device>;
+const device_type SPEAKER = device_creator<speaker_device>;
+
+template class device_finder<speaker_device, false>;
+template class device_finder<speaker_device, true>;
 
 
 

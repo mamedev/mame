@@ -72,13 +72,17 @@ are almost identical, except for much darker BG layer colors).
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/dooyong.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/dooyong.h"
+#include "sound/ym2151.h"
+
+#include "speaker.h"
+
 
 WRITE8_MEMBER(dooyong_z80_state::bankswitch_w)
 {

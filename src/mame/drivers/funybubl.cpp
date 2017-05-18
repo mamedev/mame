@@ -51,8 +51,11 @@ Note: SW2, SW3 & SW4 not populated
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/funybubl.h"
+
+#include "cpu/z80/z80.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(funybubl_state::funybubl_vidram_bank_w)

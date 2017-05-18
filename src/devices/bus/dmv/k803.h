@@ -5,7 +5,6 @@
 #ifndef __DMV_K803_H__
 #define __DMV_K803_H__
 
-#include "emu.h"
 #include "dmvbus.h"
 #include "machine/mm58167.h"
 

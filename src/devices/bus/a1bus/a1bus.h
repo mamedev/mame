@@ -11,7 +11,6 @@
 #ifndef __A1BUS_H__
 #define __A1BUS_H__
 
-#include "emu.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS

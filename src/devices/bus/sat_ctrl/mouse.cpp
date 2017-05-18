@@ -8,13 +8,14 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "mouse.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_MOUSE = &device_creator<saturn_mouse_device>;
+const device_type SATURN_MOUSE = device_creator<saturn_mouse_device>;
 
 
 static INPUT_PORTS_START( saturn_mouse )

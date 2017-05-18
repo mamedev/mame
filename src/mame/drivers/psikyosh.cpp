@@ -274,13 +274,14 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/psikyosh.h"
 
 #include "cpu/sh2/sh2.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/ymf278b.h"
+#include "speaker.h"
 
-#include "includes/psikyosh.h"
 
 static const gfx_layout layout_16x16x4 =
 {

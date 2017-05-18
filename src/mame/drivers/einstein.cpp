@@ -55,13 +55,17 @@
  ******************************************************************************/
 
 #include "emu.h"
-#include "machine/z80pio.h"
+#include "includes/einstein.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
+#include "machine/z80pio.h"
 #include "sound/ay8910.h"
+
 #include "rendlay.h"
-#include "includes/einstein.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define VERBOSE_KEYBOARD    0
 #define VERBOSE_DISK        0

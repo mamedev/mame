@@ -1051,7 +1051,7 @@ deco146port_xx port104_table[] = {
 
 
 
-const device_type DECO104PROT = &device_creator<deco104_device>;
+const device_type DECO104PROT = device_creator<deco104_device>;
 
 
 
@@ -1070,10 +1070,6 @@ deco104_device::deco104_device(const machine_config &mconfig, const char *tag, d
 
 
 
-
-void deco104_device::device_config_complete()
-{
-}
 
 void deco104_device::device_start()
 {

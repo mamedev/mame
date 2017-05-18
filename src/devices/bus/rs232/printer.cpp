@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "printer.h"
 
 serial_printer_device::serial_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -82,4 +83,4 @@ void serial_printer_device::rcv_complete()
 	m_printer->output(get_received_char());
 }
 
-const device_type SERIAL_PRINTER = &device_creator<serial_printer_device>;
+const device_type SERIAL_PRINTER = device_creator<serial_printer_device>;

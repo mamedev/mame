@@ -2,9 +2,10 @@
 // copyright-holders:David Haywood
 /* 68340 */
 
+#include "emu.h"
 #include "68340.h"
 
-
+const device_type M68340 = device_creator<m68340cpu_device>;
 
 
 int m68340_calc_cs(m68340cpu_device *m68k, offs_t address)

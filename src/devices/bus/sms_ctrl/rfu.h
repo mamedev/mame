@@ -12,7 +12,6 @@
 #define __SMS_RAPID_FIRE__
 
 
-#include "emu.h"
 #include "smsctrl.h"
 
 

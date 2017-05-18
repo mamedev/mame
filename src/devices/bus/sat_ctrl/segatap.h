@@ -12,7 +12,6 @@
 #define __SATURN_SEGATAP__
 
 
-#include "emu.h"
 #include "ctrl.h"
 
 

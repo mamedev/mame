@@ -7,6 +7,7 @@
 #include "machine/upd4992.h"
 #include "sound/okim9810.h"
 #include "sound/x1_010.h"
+#include "screen.h"
 
 class seta2_state : public driver_device
 {

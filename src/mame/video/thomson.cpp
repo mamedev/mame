@@ -8,6 +8,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include <math.h>
 #include "includes/thomson.h"
 

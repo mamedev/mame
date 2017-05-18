@@ -25,7 +25,7 @@ control registers:
 
 #define TC0280GRD_RAM_SIZE 0x2000
 
-const device_type TC0280GRD = &device_creator<tc0280grd_device>;
+const device_type TC0280GRD = device_creator<tc0280grd_device>;
 
 tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0280GRD, "Taito TC0280GRD & TC0430GRW", tag, owner, clock, "tc0280grd", __FILE__),

@@ -6,6 +6,7 @@
 
 *************************************************************************/
 #include "sound/okim6295.h"
+#include "screen.h"
 
 class psikyo_state : public driver_device
 {

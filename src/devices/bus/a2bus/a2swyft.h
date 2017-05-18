@@ -11,7 +11,6 @@
 #ifndef __A2BUS_SWYFT__
 #define __A2BUS_SWYFT__
 
-#include "emu.h"
 #include "a2bus.h"
 
 //**************************************************************************

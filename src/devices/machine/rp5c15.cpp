@@ -16,6 +16,7 @@
 
 */
 
+#include "emu.h"
 #include "rp5c15.h"
 
 
@@ -105,7 +106,7 @@ enum
 //**************************************************************************
 
 // devices
-const device_type RP5C15 = &device_creator<rp5c15_device>;
+const device_type RP5C15 = device_creator<rp5c15_device>;
 
 
 

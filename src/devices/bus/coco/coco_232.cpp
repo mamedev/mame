@@ -31,7 +31,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_232 = &device_creator<coco_232_device>;
+const device_type COCO_232 = device_creator<coco_232_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

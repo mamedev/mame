@@ -283,25 +283,31 @@ http://blog.system11.org/?p=1943
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "machine/pcecommn.h"
+
+#include "cpu/h6280/h6280.h"
+#include "cpu/i8085/i8085.h"
 #include "video/huc6260.h"
 #include "video/huc6270.h"
-#include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
 #include "machine/i8155.h"
-#include "softlist.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 
 class tourvision_state : public pce_common_state
 {
 public:
 	tourvision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pce_common_state(mconfig, type, tag),
-		m_subcpu(*this, "subcpu"),
-		m_cart(*this, "cartslot")
-		{ }
+		: pce_common_state(mconfig, type, tag)
+		, m_subcpu(*this, "subcpu")
+		, m_cart(*this, "cartslot")
+	{ }
 
 	DECLARE_WRITE8_MEMBER(tourvision_8085_d000_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_a_w);

@@ -8,7 +8,6 @@
 #ifndef __ZEUS2_H__
 #define __ZEUS2_H__
 
-#include "emu.h"
 #include "video/poly.h"
 #include "video/rgbutil.h"
 #include "cpu/tms32031/tms32031.h"

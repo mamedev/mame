@@ -195,16 +195,16 @@ static const uint8_t fcmp_cr_table_source[32] =
 };
 
 
-const device_type PPC601 = &device_creator<ppc601_device>;
-const device_type PPC602 = &device_creator<ppc602_device>;
-const device_type PPC603 = &device_creator<ppc603_device>;
-const device_type PPC603E = &device_creator<ppc603e_device>;
-const device_type PPC603R = &device_creator<ppc603r_device>;
-const device_type PPC604 = &device_creator<ppc604_device>;
-const device_type MPC8240 = &device_creator<mpc8240_device>;
-const device_type PPC403GA = &device_creator<ppc403ga_device>;
-const device_type PPC403GCX = &device_creator<ppc403gcx_device>;
-const device_type PPC405GP = &device_creator<ppc405gp_device>;
+const device_type PPC601 = device_creator<ppc601_device>;
+const device_type PPC602 = device_creator<ppc602_device>;
+const device_type PPC603 = device_creator<ppc603_device>;
+const device_type PPC603E = device_creator<ppc603e_device>;
+const device_type PPC603R = device_creator<ppc603r_device>;
+const device_type PPC604 = device_creator<ppc604_device>;
+const device_type MPC8240 = device_creator<mpc8240_device>;
+const device_type PPC403GA = device_creator<ppc403ga_device>;
+const device_type PPC403GCX = device_creator<ppc403gcx_device>;
+const device_type PPC405GP = device_creator<ppc405gp_device>;
 
 
 ppc_device::ppc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map)

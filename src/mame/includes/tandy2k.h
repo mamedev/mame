@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef __TANDY2K__
-#define __TANDY2K__
+#ifndef MAME_INCLUDES_TANDY2K_H
+#define MAME_INCLUDES_TANDY2K_H
 
-#include "emu.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i186.h"
@@ -17,7 +16,7 @@
 #include "machine/ram.h"
 #include "machine/tandy2kb.h"
 #include "machine/upd765.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "video/crt9007.h"
 #include "video/crt9021.h"
 #include "video/crt9212.h"
@@ -226,4 +225,4 @@ public:
 	int m_centronics_busy;
 };
 
-#endif
+#endif // MAME_INCLUDES_TANDY2K_H

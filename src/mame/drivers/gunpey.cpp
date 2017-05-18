@@ -192,6 +192,8 @@ Release:                         November 1999
 #include "cpu/nec/nec.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class gunpey_state : public driver_device

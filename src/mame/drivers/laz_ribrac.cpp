@@ -15,6 +15,7 @@ http://ohwow-arcade.com/Assets/Game_Manuals/RIBBIT%20RACIN.PDF
 
 #include "emu.h"
 #include "sound/okim6295.h"
+#include "speaker.h"
 
 
 class laz_ribrac_state : public driver_device

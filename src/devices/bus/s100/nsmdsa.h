@@ -11,7 +11,6 @@
 #ifndef __S100_MDS_A__
 #define __S100_MDS_A__
 
-#include "emu.h"
 #include "s100.h"
 #include "imagedev/floppy.h"
 

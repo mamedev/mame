@@ -11,7 +11,6 @@
 #ifndef __VIDEOBRAIN_STANDARD_CARTRIDGE__
 #define __VIDEOBRAIN_STANDARD_CARTRIDGE__
 
-#include "emu.h"
 #include "exp.h"
 
 

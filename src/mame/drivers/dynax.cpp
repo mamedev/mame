@@ -77,14 +77,18 @@ TODO:
 *********************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/dynax.h"
+
 #include "cpu/tlcs90/tlcs90.h"
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
-#include "machine/nvram.h"
+
 #include "rendlay.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 
@@ -4183,7 +4187,7 @@ static INPUT_PORTS_START( gekisha )
 	PORT_DIPNAME( 0x03, 0x03, "Odds Rate" )
 	PORT_DIPSETTING(    0x03, "1 2 4 8 12 16 24 32" )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x01, "1 2 3 5 10 25 50 100 " )
+	PORT_DIPSETTING(    0x01, "1 2 3 5 10 25 50 100" )
 	PORT_DIPSETTING(    0x02, "1 2 3 5 10 50 100 200" )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )

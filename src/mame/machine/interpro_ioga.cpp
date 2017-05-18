@@ -15,6 +15,7 @@
  * TODO
  *   - too long to list
  */
+#include "emu.h"
 #include "interpro_ioga.h"
 
 #define LOG_HWINT_ENABLE ((1<<2) | LOG_GENERAL)
@@ -62,7 +63,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_ioga_device)
 	AM_RANGE(0xb0, 0xbf) AM_READWRITE16(softint_vector_r, softint_vector_w, 0xffffffff)
 ADDRESS_MAP_END
 
-const device_type INTERPRO_IOGA = &device_creator<interpro_ioga_device>;
+const device_type INTERPRO_IOGA = device_creator<interpro_ioga_device>;
 
 interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INTERPRO_IOGA, "InterPro IOGA", tag, owner, clock, "ioga", __FILE__),
@@ -164,7 +165,7 @@ void interpro_ioga_device::device_reset()
   Timers
 ******************************************************************************/
 READ32_MEMBER(interpro_ioga_device::timer1_r)
-{ 
+{
 	uint32_t result = m_timer1_count & IOGA_TIMER1_VMASK;
 
 	// set the start bit if the timer is currently enabled
@@ -185,7 +186,7 @@ READ32_MEMBER(interpro_ioga_device::timer3_r)
 	else if (m_timer[3]->param())
 		result |= IOGA_TIMER3_EXPIRED;
 
-	return result; 
+	return result;
 }
 
 void interpro_ioga_device::write_timer(int timer, u32 value, device_timer_id id)
@@ -284,7 +285,6 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 	case IOGA_TIMER_DMA:
 		dma_clock(param);
 		break;
-	break;
 
 	case IOGA_CLOCK:
 		interrupt_clock();
@@ -707,9 +707,9 @@ void interpro_ioga_device::drq(int state, int channel)
 /*
 0x94: error address reg: expect 0x7f200000 after bus error (from dma virtual address)
 0x98: error cycle type: expect 0x52f0 (after failed dma?)
-		0x5331 - forced berr with nmi/interrupts disabled?
-		0xc2f0
-		0x62f0
+        0x5331 - forced berr with nmi/interrupts disabled?
+        0xc2f0
+        0x62f0
 */
 // TODO: 7.0266 - forced BERR not working
 

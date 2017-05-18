@@ -5,7 +5,6 @@
 
 // NE1000 is 8bit has 8KB ram; NE2000 is 16bit has 16KB ram
 
-#include "emu.h"
 #include "isa.h"
 #include "machine/dp8390.h"
 

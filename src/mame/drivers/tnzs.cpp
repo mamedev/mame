@@ -623,10 +623,14 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 #include "emu.h"
 #include "includes/tnzs.h"
 #include "includes/taitoipt.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 SAMPLES_START_CB_MEMBER(kageki_state::init_samples)
 {

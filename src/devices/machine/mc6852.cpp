@@ -21,6 +21,7 @@
 
 */
 
+#include "emu.h"
 #include "mc6852.h"
 
 
@@ -28,7 +29,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MC6852 = &device_creator<mc6852_device>;
+const device_type MC6852 = device_creator<mc6852_device>;
 
 
 

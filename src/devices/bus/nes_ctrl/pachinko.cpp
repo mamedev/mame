@@ -6,13 +6,14 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "pachinko.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_PACHINKO = &device_creator<nes_pachinko_device>;
+const device_type NES_PACHINKO = device_creator<nes_pachinko_device>;
 
 
 static INPUT_PORTS_START( nes_pachinko )

@@ -10,9 +10,10 @@
 
 #include "emu.h"
 #include "mb60553.h"
+#include "screen.h"
 
 
-const device_type MB60553 = &device_creator<mb60553_zooming_tilemap_device>;
+const device_type MB60553 = device_creator<mb60553_zooming_tilemap_device>;
 
 mb60553_zooming_tilemap_device::mb60553_zooming_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MB60553, "MB60553 Zooming Tilemap", tag, owner, clock, "mb60553", __FILE__),

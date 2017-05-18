@@ -107,14 +107,15 @@ Interrupts:
 *******************************************************************************/
 
 #include "emu.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
 #include "includes/primo.h"
+
 #include "cpu/z80/z80.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/primoptp.h"
-#include "bus/cbmiec/cbmiec.h"
+
 
 static ADDRESS_MAP_START( primoa_port, AS_IO, 8, primo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)

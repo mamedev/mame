@@ -11,7 +11,6 @@
 #ifndef __A2BUS_VIDEOTERM__
 #define __A2BUS_VIDEOTERM__
 
-#include "emu.h"
 #include "a2bus.h"
 #include "video/mc6845.h"
 

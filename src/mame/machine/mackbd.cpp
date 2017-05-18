@@ -65,7 +65,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MACKBD = &device_creator<mackbd_device>;
+const device_type MACKBD = device_creator<mackbd_device>;
 
 ROM_START( mackbd )
 	ROM_REGION(0x800, MACKBD_CPU_TAG, 0)

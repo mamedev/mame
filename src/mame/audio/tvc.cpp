@@ -10,7 +10,7 @@
 #include "tvc.h"
 
 // device type definition
-const device_type TVC_SOUND = &device_creator<tvc_sound_device>;
+const device_type TVC_SOUND = device_creator<tvc_sound_device>;
 
 //-------------------------------------------------
 //  tvc_sound_device - constructor

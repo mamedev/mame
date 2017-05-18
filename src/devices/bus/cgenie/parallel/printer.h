@@ -11,7 +11,6 @@
 #ifndef __CGENIE_PARALLEL_PRINTER_H__
 #define __CGENIE_PARALLEL_PRINTER_H__
 
-#include "emu.h"
 #include "parallel.h"
 #include "bus/centronics/ctronics.h"
 

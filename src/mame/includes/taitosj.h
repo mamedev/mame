@@ -9,6 +9,8 @@
 #include "sound/discrete.h"
 #include "sound/ay8910.h"
 
+#include "screen.h"
+
 
 class taitosj_state : public driver_device
 {

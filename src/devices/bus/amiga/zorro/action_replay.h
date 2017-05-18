@@ -13,7 +13,6 @@
 #ifndef __ACTION_REPLAY_H__
 #define __ACTION_REPLAY_H__
 
-#include "emu.h"
 #include "zorro.h"
 
 

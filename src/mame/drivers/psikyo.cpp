@@ -66,12 +66,14 @@ This was pointed out by Bart Puype
 *****/
 
 #include "emu.h"
+#include "includes/psikyo.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
 #include "sound/ymf278b.h"
 #include "sound/okim6295.h"
-#include "includes/psikyo.h"
+#include "speaker.h"
 
 
 /***************************************************************************

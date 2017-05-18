@@ -12,7 +12,6 @@
 #ifndef __PSXRCNT_H__
 #define __PSXRCNT_H__
 
-#include "emu.h"
 
 extern const device_type PSX_RCNT;
 

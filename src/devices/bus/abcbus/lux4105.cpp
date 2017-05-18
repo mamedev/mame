@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "lux4105.h"
 #include "bus/scsi/scsihd.h"
 #include "bus/scsi/s1410.h"
@@ -24,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type LUXOR_4105 = &device_creator<luxor_4105_device>;
+const device_type LUXOR_4105 = device_creator<luxor_4105_device>;
 
 
 WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_bsy )

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "pcml_qdisk.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PCML_Q_DISK_INTERFACE = &device_creator<pcml_q_disk_interface_t>;
+const device_type PCML_Q_DISK_INTERFACE = device_creator<pcml_q_disk_interface_t>;
 
 
 //-------------------------------------------------

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "printer.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_PRN = &device_creator<adam_printer_device>;
+const device_type ADAM_PRN = device_creator<adam_printer_device>;
 
 
 //-------------------------------------------------

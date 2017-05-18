@@ -7,6 +7,7 @@
 ******************************************************************************/
 
 #include "sound/samples.h"
+#include "screen.h"
 
 class ninjakd2_state : public driver_device
 {

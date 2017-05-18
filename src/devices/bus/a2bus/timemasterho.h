@@ -11,7 +11,6 @@
 #ifndef __A2BUS_TIMEMASTERHO__
 #define __A2BUS_TIMEMASTERHO__
 
-#include "emu.h"
 #include "a2bus.h"
 #include "machine/6821pia.h"
 #include "machine/msm5832.h"

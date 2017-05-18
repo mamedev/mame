@@ -14,7 +14,10 @@
 
 */
 
+#include "emu.h"
 #include "tig.h"
+
+#include "screen.h"
 
 
 
@@ -52,7 +55,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_TIG = &device_creator<wangpc_tig_device>;
+const device_type WANGPC_TIG = device_creator<wangpc_tig_device>;
 
 
 //-------------------------------------------------

@@ -10,7 +10,6 @@
 #ifndef __HUC6260_H_
 #define __HUC6260_H_
 
-#include "emu.h"
 
 
 #define HUC6260_PALETTE_SIZE    1024

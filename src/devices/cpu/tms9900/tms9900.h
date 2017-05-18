@@ -11,7 +11,6 @@
 #ifndef __TMS9900_H__
 #define __TMS9900_H__
 
-#include "emu.h"
 #include "debugger.h"
 #include "tms99com.h"
 

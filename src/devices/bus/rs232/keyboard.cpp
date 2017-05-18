@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "keyboard.h"
 
 namespace {
@@ -99,4 +100,4 @@ void serial_keyboard_device::received_byte(uint8_t byte)
 {
 }
 
-const device_type SERIAL_KEYBOARD = &device_creator<serial_keyboard_device>;
+const device_type SERIAL_KEYBOARD = device_creator<serial_keyboard_device>;

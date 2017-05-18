@@ -27,13 +27,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "video/k053250.h"
-#include "machine/eepromser.h"
-#include "cpu/m6809/m6809.h"
-#include "sound/ym2151.h"
-#include "sound/k053260.h"
 #include "includes/overdriv.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/m6809/m6809.h"
+#include "machine/eepromser.h"
+#include "sound/k053260.h"
+#include "sound/ym2151.h"
+#include "video/k053250.h"
+#include "speaker.h"
 
 #include "overdriv.lh"
 

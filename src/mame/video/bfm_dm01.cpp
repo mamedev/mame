@@ -51,7 +51,7 @@ Standard dm01 memorymap
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-const device_type BF_DM01 = &device_creator<bfmdm01_device>;
+const device_type BF_DM01 = device_creator<bfmdm01_device>;
 
 
 bfmdm01_device::bfmdm01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

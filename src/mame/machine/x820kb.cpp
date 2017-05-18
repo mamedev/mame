@@ -40,6 +40,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "x820kb.h"
 
 
@@ -56,7 +57,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type XEROX_820_KEYBOARD = &device_creator<xerox_820_keyboard_t>;
+const device_type XEROX_820_KEYBOARD = device_creator<xerox_820_keyboard_t>;
 
 
 //-------------------------------------------------

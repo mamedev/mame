@@ -11,7 +11,6 @@
 #ifndef PC_JOY_H
 #define PC_JOY_H
 
-#include "emu.h"
 
 #define MCFG_PC_JOY_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PC_JOY, 0) \

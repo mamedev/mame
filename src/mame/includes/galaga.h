@@ -1,8 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_GALAGA_H
+#define MAME_INCLUDES_GALAGA_H
+
+#pragma once
+
 #include "sound/discrete.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
+#include "screen.h"
 
 class galaga_state : public driver_device
 {
@@ -92,3 +98,5 @@ public:
 
 DISCRETE_SOUND_EXTERN( galaga );
 DISCRETE_SOUND_EXTERN( bosco );
+
+#endif // MAME_INCLUDES_GALAGA_H

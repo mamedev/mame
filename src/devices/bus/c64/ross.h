@@ -12,7 +12,6 @@
 #define __ROSS__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

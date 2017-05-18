@@ -83,6 +83,7 @@ Notes:
 */
 
 
+#include "emu.h"
 #include "s1410.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/harddriv.h"
@@ -101,7 +102,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S1410 = &device_creator<s1410_device>;
+const device_type S1410 = device_creator<s1410_device>;
 
 //-------------------------------------------------
 //  ROM( s1410 )

@@ -20,8 +20,8 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type SNS_HIROM_SPC7110 = &device_creator<sns_rom_spc7110_device>;
-const device_type SNS_HIROM_SPC7110_RTC = &device_creator<sns_rom_spc7110rtc_device>;
+const device_type SNS_HIROM_SPC7110 = device_creator<sns_rom_spc7110_device>;
+const device_type SNS_HIROM_SPC7110_RTC = device_creator<sns_rom_spc7110rtc_device>;
 
 
 sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

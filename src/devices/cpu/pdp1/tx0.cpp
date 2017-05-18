@@ -40,8 +40,8 @@
 #define INCREMENT_PC_8KW    (PC = (PC+1) & ADDRESS_MASK_8KW)
 
 
-const device_type TX0_8KW  = &device_creator<tx0_8kw_device>;
-const device_type TX0_64KW = &device_creator<tx0_64kw_device>;
+const device_type TX0_8KW  = device_creator<tx0_8kw_device>;
+const device_type TX0_64KW = device_creator<tx0_64kw_device>;
 
 
 tx0_device::tx0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int addr_bits, int address_mask, int ir_mask)

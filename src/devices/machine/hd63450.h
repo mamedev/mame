@@ -7,7 +7,6 @@
 #define HD63450_H
 #pragma once
 
-#include "emu.h"
 
 
 #define MCFG_HD63450_DMA_END_CB(_devcb) \

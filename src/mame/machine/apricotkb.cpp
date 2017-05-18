@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "apricotkb.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type APRICOT_KEYBOARD = &device_creator<apricot_keyboard_device>;
+const device_type APRICOT_KEYBOARD = device_creator<apricot_keyboard_device>;
 
 
 //-------------------------------------------------

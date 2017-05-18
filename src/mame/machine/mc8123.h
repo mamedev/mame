@@ -9,4 +9,4 @@
 // this function assumes a fixed portion of ROM at 0000-7FFF, and
 // an arbitrary amount of banks at 8000-BFFF.
 
-void mc8123_decode(uint8_t *rom, uint8_t *opcodes, const uint8_t *key, int length);
+void mc8123_decode(u8 *rom, u8 *opcodes, u8 const *key, unsigned length);

@@ -9,7 +9,6 @@
 #ifndef EINSTEIN_H_
 #define EINSTEIN_H_
 
-#include "emu.h"
 #include "video/mc6845.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/wd_fdc.h"
@@ -18,6 +17,7 @@
 #include "machine/ram.h"
 #include "machine/i8251.h"
 #include "bus/centronics/ctronics.h"
+#include "screen.h"
 
 /***************************************************************************
     CONSTANTS

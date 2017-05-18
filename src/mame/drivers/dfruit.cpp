@@ -19,9 +19,11 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
-#include "machine/tc009xlvc.h"
 #include "machine/i8255.h"
+#include "machine/tc009xlvc.h"
+#include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 class dfruit_state : public driver_device
 {
@@ -30,7 +32,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vdp(*this, "tc0091lvc")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdp;

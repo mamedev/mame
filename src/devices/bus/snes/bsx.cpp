@@ -18,10 +18,10 @@
 //  sns_rom_bsx_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_ROM_BSX = &device_creator<sns_rom_bsx_device>;
-const device_type SNS_LOROM_BSX = &device_creator<sns_rom_bsxlo_device>;
-const device_type SNS_HIROM_BSX = &device_creator<sns_rom_bsxhi_device>;
-const device_type SNS_BSMEMPAK = &device_creator<sns_rom_bsmempak_device>;
+const device_type SNS_ROM_BSX = device_creator<sns_rom_bsx_device>;
+const device_type SNS_LOROM_BSX = device_creator<sns_rom_bsxlo_device>;
+const device_type SNS_HIROM_BSX = device_creator<sns_rom_bsxhi_device>;
+const device_type SNS_BSMEMPAK = device_creator<sns_rom_bsmempak_device>;
 
 
 sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

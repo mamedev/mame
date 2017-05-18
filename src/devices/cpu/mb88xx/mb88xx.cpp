@@ -20,13 +20,13 @@
 #include "mb88xx.h"
 
 
-const device_type MB88 = &device_creator<mb88_cpu_device>;
-const device_type MB88201 = &device_creator<mb88201_cpu_device>;
-const device_type MB88202 = &device_creator<mb88202_cpu_device>;
-const device_type MB8841 = &device_creator<mb8841_cpu_device>;
-const device_type MB8842 = &device_creator<mb8842_cpu_device>;
-const device_type MB8843 = &device_creator<mb8843_cpu_device>;
-const device_type MB8844 = &device_creator<mb8844_cpu_device>;
+const device_type MB88 = device_creator<mb88_cpu_device>;
+const device_type MB88201 = device_creator<mb88201_cpu_device>;
+const device_type MB88202 = device_creator<mb88202_cpu_device>;
+const device_type MB8841 = device_creator<mb8841_cpu_device>;
+const device_type MB8842 = device_creator<mb8842_cpu_device>;
+const device_type MB8843 = device_creator<mb8843_cpu_device>;
+const device_type MB8844 = device_creator<mb8844_cpu_device>;
 
 
 /***************************************************************************

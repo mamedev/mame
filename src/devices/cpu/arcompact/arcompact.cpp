@@ -24,7 +24,7 @@
 #include "arcompact_common.h"
 
 
-const device_type ARCA5 = &device_creator<arcompact_device>;
+const device_type ARCA5 = device_creator<arcompact_device>;
 
 
 READ32_MEMBER( arcompact_device::arcompact_auxreg002_LPSTART_r) { return m_LP_START&0xfffffffe; }

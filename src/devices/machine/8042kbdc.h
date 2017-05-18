@@ -12,7 +12,6 @@
 #ifndef KBDC8042_H
 #define KBDC8042_H
 
-#include "emu.h"
 #include "machine/pckeybrd.h"
 
 enum kbdc8042_type_t

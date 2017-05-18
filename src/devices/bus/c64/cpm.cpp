@@ -16,6 +16,7 @@
 
 */
 
+#include "emu.h"
 #include "cpm.h"
 
 
@@ -32,7 +33,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_CPM = &device_creator<c64_cpm_cartridge_device>;
+const device_type C64_CPM = device_creator<c64_cpm_cartridge_device>;
 
 
 //-------------------------------------------------

@@ -11,7 +11,6 @@
 #ifndef __C8050__
 #define __C8050__
 
-#include "emu.h"
 #include "ieee488.h"
 #include "c8050fdc.h"
 #include "cpu/m6502/m6502.h"

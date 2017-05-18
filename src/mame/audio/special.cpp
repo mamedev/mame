@@ -9,11 +9,12 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "special.h"
 
 
 // device type definition
-const device_type SPECIMX_SND = &device_creator<specimx_sound_device>;
+const device_type SPECIMX_SND = device_creator<specimx_sound_device>;
 
 
 //**************************************************************************

@@ -11,6 +11,7 @@
 **********************************************************************/
 
 
+#include "emu.h"
 #include "watford.h"
 
 
@@ -18,8 +19,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_WEDDB2 = &device_creator<bbc_weddb2_device>;
-const device_type BBC_WEDDB3 = &device_creator<bbc_weddb3_device>;
+const device_type BBC_WEDDB2 = device_creator<bbc_weddb2_device>;
+const device_type BBC_WEDDB3 = device_creator<bbc_weddb3_device>;
 
 
 //-------------------------------------------------

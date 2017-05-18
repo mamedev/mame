@@ -83,7 +83,7 @@ enum submode_flags
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PSXCD = &device_creator<psxcd_device>;
+const device_type PSXCD = device_creator<psxcd_device>;
 
 psxcd_device::psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cdrom_image_device(mconfig, PSXCD, "PSX Cdrom", tag, owner, clock, "psx_cd", __FILE__),

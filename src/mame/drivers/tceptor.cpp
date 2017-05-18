@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/tceptor.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
@@ -19,7 +20,10 @@
 #include "sound/ym2151.h"
 #include "sound/volt_reg.h"
 #include "rendlay.h"
+#include "speaker.h"
+
 #include "tceptor2.lh"
+
 
 /*******************************************************************/
 

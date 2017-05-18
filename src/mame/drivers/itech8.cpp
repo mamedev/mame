@@ -497,18 +497,21 @@
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/itech8.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
+#include "cpu/z80/z80.h"
 #include "machine/6522via.h"
+#include "machine/6821pia.h"
 #include "machine/nvram.h"
-#include "includes/itech8.h"
 #include "sound/2203intf.h"
 #include "sound/2608intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+
+#include "speaker.h"
 
 
 #define FULL_LOGGING    0

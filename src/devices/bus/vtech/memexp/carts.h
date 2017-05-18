@@ -11,7 +11,6 @@
 #ifndef __VTECH_MEMEXP_CARTS_H__
 #define __VTECH_MEMEXP_CARTS_H__
 
-#include "emu.h"
 
 #include "floppy.h"
 #include "memory.h"

@@ -21,7 +21,7 @@ The following basic program can be useful for identifying scancodes:
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PC_KBDC_SLOT = &device_creator<pc_kbdc_slot_device>;
+const device_type PC_KBDC_SLOT = device_creator<pc_kbdc_slot_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -63,7 +63,7 @@ void pc_kbdc_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PC_KBDC = &device_creator<pc_kbdc_device>;
+const device_type PC_KBDC = device_creator<pc_kbdc_device>;
 
 
 //-------------------------------------------------

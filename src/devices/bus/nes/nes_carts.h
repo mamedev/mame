@@ -11,7 +11,6 @@
 #ifndef __NES_CARTS_H__
 #define __NES_CARTS_H__
 
-#include "emu.h"
 
 // official PCBs
 #include "nxrom.h"
@@ -59,6 +58,7 @@
 #include "tengen.h"
 #include "txc.h"
 #include "waixing.h"
+#include "zemina.h"
 // misc unlicensed/bootleg/pirate PCBs
 #include "bootleg.h"
 #include "multigame.h"

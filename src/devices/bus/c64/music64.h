@@ -11,7 +11,6 @@
 #ifndef __MUSIC64__
 #define __MUSIC64__
 
-#include "emu.h"
 #include "exp.h"
 
 

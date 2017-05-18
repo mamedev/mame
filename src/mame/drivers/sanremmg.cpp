@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "screen.h"
 
 
 class sanremmg_state : public driver_device

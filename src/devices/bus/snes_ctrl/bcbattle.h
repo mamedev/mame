@@ -12,7 +12,6 @@
 #define __SNES_BCBATTLE__
 
 
-#include "emu.h"
 #include "ctrl.h"
 #include "machine/bcreader.h"
 

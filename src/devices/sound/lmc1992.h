@@ -29,7 +29,6 @@
 #ifndef __LMC1992__
 #define __LMC1992__
 
-#include "emu.h"
 
 
 

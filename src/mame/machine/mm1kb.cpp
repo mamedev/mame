@@ -6,7 +6,10 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "mm1kb.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -14,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MM1_KEYBOARD = &device_creator<mm1_keyboard_t>;
+const device_type MM1_KEYBOARD = device_creator<mm1_keyboard_t>;
 
 
 //-------------------------------------------------

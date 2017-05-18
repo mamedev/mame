@@ -12,6 +12,7 @@
 ***************************************************************************/
 
 
+#include "emu.h"
 #include "includes/arcadia.h"
 
 //known UVI audio clocks
@@ -41,7 +42,7 @@
 
 
 // device type definition
-const device_type ARCADIA_SOUND = &device_creator<arcadia_sound_device>;
+const device_type ARCADIA_SOUND = device_creator<arcadia_sound_device>;
 
 //-------------------------------------------------
 //  arcadia_sound_device - constructor

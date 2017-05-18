@@ -29,7 +29,7 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // device type definition
-const device_type RAMDAC = &device_creator<ramdac_device>;
+const device_type RAMDAC = device_creator<ramdac_device>;
 
 
 //**************************************************************************

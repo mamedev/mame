@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "rtype.h"
 
-const device_type MSX_CART_RTYPE = &device_creator<msx_cart_rtype>;
+const device_type MSX_CART_RTYPE = device_creator<msx_cart_rtype>;
 
 
 msx_cart_rtype::msx_cart_rtype(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

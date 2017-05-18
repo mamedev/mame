@@ -65,7 +65,7 @@
 
 */
 
-const device_type KONAMI_573_DIGITAL_IO_BOARD = &device_creator<k573dio_device>;
+const device_type KONAMI_573_DIGITAL_IO_BOARD = device_creator<k573dio_device>;
 
 DEVICE_ADDRESS_MAP_START(amap, 16, k573dio_device)
 	AM_RANGE(0x00, 0x01) AM_READ(a00_r)

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "idehd.h"
 
 /***************************************************************************
@@ -773,7 +774,7 @@ void ata_mass_storage_device::process_command()
 //**************************************************************************
 
 // device type definition
-const device_type IDE_HARDDISK = &device_creator<ide_hdd_device>;
+const device_type IDE_HARDDISK = device_creator<ide_hdd_device>;
 
 //-------------------------------------------------
 //  ide_hdd_device - constructor

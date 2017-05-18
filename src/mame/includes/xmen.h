@@ -7,6 +7,7 @@
 #include "video/k053251.h"
 #include "video/k052109.h"
 #include "video/konami_helper.h"
+#include "screen.h"
 
 class xmen_state : public driver_device
 {

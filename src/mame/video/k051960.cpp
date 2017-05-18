@@ -63,7 +63,7 @@ memory map:
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-const device_type K051960 = &device_creator<k051960_device>;
+const device_type K051960 = device_creator<k051960_device>;
 
 const gfx_layout k051960_device::spritelayout =
 {

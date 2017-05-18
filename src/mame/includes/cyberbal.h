@@ -12,6 +12,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
+#include "screen.h"
 
 class cyberbal_state : public atarigen_state
 {

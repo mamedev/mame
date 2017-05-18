@@ -132,16 +132,19 @@
 
 *******************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_12_4725MHz    /* 12.4725 MHz */
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "video/mc6845.h"
 #include "machine/6821pia.h"
-#include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "miniboy7.lh"
+
+
+#define MASTER_CLOCK    XTAL_12_4725MHz    /* 12.4725 MHz */
 
 
 class miniboy7_state : public driver_device

@@ -147,11 +147,13 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "includes/abc80x.h"
 #include "video/abc800.h"
 #include "video/abc802.h"
 #include "video/abc806.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************

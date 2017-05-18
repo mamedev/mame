@@ -24,6 +24,7 @@ WRITE8_MEMBER( xxx_state::kbd_put )
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "machine/keyboard.ipp"
 
 
@@ -233,7 +234,7 @@ INPUT_PORTS_END
     DEVICE TYPE GLOBALS
 ***************************************************************************/
 
-device_type const GENERIC_KEYBOARD = &device_creator<generic_keyboard_device>;
+device_type const GENERIC_KEYBOARD = device_creator<generic_keyboard_device>;
 
 
 

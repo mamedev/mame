@@ -51,7 +51,7 @@ static const double tx1_engine_gains[16] =
 };
 
 
-const device_type TX1 = &device_creator<tx1_sound_device>;
+const device_type TX1 = device_creator<tx1_sound_device>;
 
 tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TX1, "TX-1 Audio Custom", tag, owner, clock, "tx1_sound", __FILE__),
@@ -80,15 +80,6 @@ tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type ty
 		m_ym1_outputa(0),
 		m_ym2_outputa(0),
 		m_ym2_outputb(0)
-{
-}
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tx1_sound_device::device_config_complete()
 {
 }
 
@@ -344,20 +335,10 @@ static const double bb_engine_gains[16] =
 	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2S + BUGGYBOY_R3S + BUGGYBOY_R4S) + 1.0/100e3)/100e3,
 };
 
-const device_type BUGGYBOY = &device_creator<buggyboy_sound_device>;
+const device_type BUGGYBOY = device_creator<buggyboy_sound_device>;
 
 buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tx1_sound_device(mconfig, BUGGYBOY, "Buggy Boy Audio Custom", tag, owner, clock, "buggyboy_sound", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void buggyboy_sound_device::device_config_complete()
 {
 }
 

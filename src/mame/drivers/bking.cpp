@@ -19,12 +19,14 @@ DIP Locations verified for:
 
 #include "emu.h"
 #include "includes/bking.h"
+
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(bking_state::bking_sndnmi_disable_r)

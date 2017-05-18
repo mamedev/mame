@@ -8,6 +8,7 @@
 
 #include "sound/samples.h"
 #include "machine/74123.h"
+#include "screen.h"
 
 #define IREMM10_MASTER_CLOCK        (12500000)
 

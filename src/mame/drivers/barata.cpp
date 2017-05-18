@@ -34,12 +34,14 @@
 
 **************************************************************************/
 
-#define CPU_CLOCK       (XTAL_6MHz)         /* main cpu clock */
-
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "barata.lh"
 #include "rendlay.h"
+#include "speaker.h"
+
+#include "barata.lh"
+
+#define CPU_CLOCK       (XTAL_6MHz)         /* main cpu clock */
 
 class barata_state : public driver_device
 {

@@ -138,10 +138,13 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/2610intf.h"
 #include "includes/mcatadv.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "sound/2610intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*** Main CPU ***/

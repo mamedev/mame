@@ -28,7 +28,6 @@
 #ifndef __CRT9021__
 #define __CRT9021__
 
-#include "emu.h"
 
 
 

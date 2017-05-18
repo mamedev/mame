@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "compis_fdc.h"
 
 
@@ -21,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMPIS_FDC = &device_creator<compis_fdc_device>;
+const device_type COMPIS_FDC = device_creator<compis_fdc_device>;
 
 
 //-------------------------------------------------

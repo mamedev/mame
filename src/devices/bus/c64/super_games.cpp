@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "super_games.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SUPER_GAMES = &device_creator<c64_super_games_cartridge_device>;
+const device_type C64_SUPER_GAMES = device_creator<c64_super_games_cartridge_device>;
 
 
 

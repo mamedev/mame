@@ -13,7 +13,6 @@
 #ifndef __GTIA_H__
 #define __GTIA_H__
 
-#include "emu.h"
 
 
 /* reading registers */

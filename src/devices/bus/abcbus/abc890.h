@@ -11,7 +11,6 @@
 #ifndef __ABC890__
 #define __ABC890__
 
-#include "emu.h"
 #include "abcbus.h"
 
 

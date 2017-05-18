@@ -47,8 +47,7 @@
 #ifndef __EP64_EXPANSION_BUS__
 #define __EP64_EXPANSION_BUS__
 
-#include "emu.h"
-#include "audio/dave.h"
+#include "sound/dave.h"
 
 
 

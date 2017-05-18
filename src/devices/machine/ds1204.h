@@ -12,7 +12,6 @@
 #ifndef __DS1204_H__
 #define __DS1204_H__
 
-#include "emu.h"
 
 #define MCFG_DS1204_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, DS1204, 0 )

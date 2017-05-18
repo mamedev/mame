@@ -5,7 +5,6 @@
 #ifndef __IQ151_MINIGRAF_H__
 #define __IQ151_MINIGRAF_H__
 
-#include "emu.h"
 #include "iq151.h"
 
 //**************************************************************************

@@ -3,7 +3,6 @@
 #ifndef _DP8390_H_
 #define _DP8390_H_
 
-#include "emu.h"
 
 
 // device stuff

@@ -147,20 +147,19 @@ http://www.z88forever.org.uk/zxplus3e/
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
 #include "includes/spec128.h"
 #include "includes/timex.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
-#include "sound/speaker.h"
-#include "sound/ay8910.h"
-#include "formats/tzx_cas.h"
-#include "machine/spec_snqk.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/beta.h"
-#include "machine/ram.h"
+#include "sound/ay8910.h"
+
+#include "screen.h"
 #include "softlist.h"
-#include "machine/spec_snqk.h"
+
+#include "formats/tzx_cas.h"
+
 
 /****************************************************************************************************/
 /* TS2048 specific functions */
@@ -602,7 +601,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 {
 	uint32_t size = m_dock->common_get_size("rom");
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		uint8_t *DOCK;
 		int chunks_in_file = 0;
@@ -614,7 +613,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
 			return image_init_result::FAIL;
 		}
-		if (image.software_entry() != nullptr)
+		if (!image.loaded_through_softlist())
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Loading from softlist is not supported yet");
 			return image_init_result::FAIL;

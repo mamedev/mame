@@ -13,7 +13,6 @@
 #ifndef __WOZFDC_H__
 #define __WOZFDC_H__
 
-#include "emu.h"
 #include "imagedev/floppy.h"
 #include "formats/flopimg.h"
 

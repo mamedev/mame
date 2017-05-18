@@ -5,7 +5,6 @@
 #ifndef _ESQPUMP_H_
 #define _ESQPUMP_H_
 
-#include "emu.h"
 #include "sound/es5506.h"
 #include "cpu/es5510/es5510.h"
 

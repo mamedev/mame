@@ -15,6 +15,7 @@
 
 */
 
+#include "emu.h"
 #include "e0c6s46.h"
 
 enum
@@ -27,7 +28,7 @@ enum
 	IRQREG_INPUT1
 };
 
-const device_type E0C6S46 = &device_creator<e0c6s46_device>;
+const device_type E0C6S46 = device_creator<e0c6s46_device>;
 
 
 // internal memory maps
@@ -627,7 +628,7 @@ READ8_MEMBER(e0c6s46_device::io_r)
 		{
 			// irq flags are reset(acked) when read
 			u8 flag = m_irqflag[offset];
-			if (!space.debugger_access())
+			if (!machine().side_effect_disabled())
 				m_irqflag[offset] = 0;
 			return flag;
 		}
@@ -704,7 +705,7 @@ READ8_MEMBER(e0c6s46_device::io_r)
 			break;
 
 		default:
-			if (!space.debugger_access())
+			if (!machine().side_effect_disabled())
 				logerror("%s unknown io_r from $0F%02X at $%04X\n", tag(), offset, m_prev_pc);
 			break;
 	}

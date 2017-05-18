@@ -295,11 +295,13 @@ Pin 22 Solder Side - Gun 2 Trigger
 
 #include "emu.h"
 #include "cpu/psx/psx.h"
-#include "video/psx.h"
 #include "machine/at28c16.h"
 #include "machine/namcomcu.h"
 #include "machine/ns11prot.h"
+#include "machine/ram.h"
 #include "sound/c352.h"
+#include "video/psx.h"
+#include "speaker.h"
 
 #define C76_SPEEDUP   ( 1 ) /* sound cpu idle skipping */
 #define VERBOSE_LEVEL ( 0 )
@@ -1188,7 +1190,7 @@ ROM_START( primglex )
 	ROM_LOAD( "pg1sprog.6d",  0x0000000, 0x040000, CRC(e7c3396d) SHA1(12bbb8ebcaab1b40462a12917dd9b58bd9ab8663) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
-	ROM_LOAD( "pg1wave.8k",   0x0000000, 0x400000, CRC(fc9ad9eb) SHA1(ce5bb2288ed8cf1348825c39423cbb99d9324b9c) )
+	ROM_LOAD16_WORD_SWAP( "pg1wave.8k",   0x0000000, 0x400000, CRC(fc9ad9eb) SHA1(ce5bb2288ed8cf1348825c39423cbb99d9324b9c) )
 	ROM_RELOAD( 0x800000, 0x400000 )
 ROM_END
 

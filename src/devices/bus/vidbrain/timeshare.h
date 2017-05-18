@@ -11,7 +11,6 @@
 #ifndef __VIDEOBRAIN_TIMESHARE_CARTRIDGE__
 #define __VIDEOBRAIN_TIMESHARE_CARTRIDGE__
 
-#include "emu.h"
 #include "exp.h"
 
 

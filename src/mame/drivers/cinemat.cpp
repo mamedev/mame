@@ -33,7 +33,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/ccpu/ccpu.h"
 #include "includes/cinemat.h"
 
 #include "armora.lh"

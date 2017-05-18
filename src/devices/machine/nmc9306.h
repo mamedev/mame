@@ -18,7 +18,6 @@
 #ifndef __NMC9306__
 #define __NMC9306__
 
-#include "emu.h"
 
 
 

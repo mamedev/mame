@@ -86,11 +86,15 @@ DM81LS95 = TriState buffer
 **************************************************************************/
 
 #include "emu.h"
+#include "includes/portrait.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
-#include "includes/portrait.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(portrait_state::ctrl_w)
 {

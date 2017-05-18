@@ -22,11 +22,12 @@
 *********************************************************************/
 
 
+#include "emu.h"
 #include "upd65031.h"
 
 
 // device type definition
-const device_type UPD65031 = &device_creator<upd65031_device>;
+const device_type UPD65031 = device_creator<upd65031_device>;
 
 
 //**************************************************************************

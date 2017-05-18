@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#include "emu.h"
 #include "includes/kyocera.h"
+
 #include "rendlay.h"
+#include "screen.h"
+
 
 PALETTE_INIT_MEMBER(kc85_state,kc85)
 {

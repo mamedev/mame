@@ -15,7 +15,6 @@
 #ifndef __SAMSMEM__
 #define __SAMSMEM__
 
-#include "emu.h"
 #include "peribox.h"
 #include "machine/ram.h"
 

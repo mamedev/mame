@@ -6,10 +6,11 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "scsicd.h"
 
 // device type definition
-const device_type SCSICD = &device_creator<scsicd_device>;
+const device_type SCSICD = device_creator<scsicd_device>;
 
 scsicd_device::scsicd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	scsihle_device(mconfig, SCSICD, "SCSI CD", tag, owner, clock, "scsicd", __FILE__)

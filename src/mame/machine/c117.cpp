@@ -31,7 +31,7 @@ static MACHINE_CONFIG_FRAGMENT( namco_c117 )
 MACHINE_CONFIG_END
 
 
-const device_type NAMCO_C117 = &device_creator<namco_c117_device>;
+const device_type NAMCO_C117 = device_creator<namco_c117_device>;
 
 
 //-------------------------------------------------

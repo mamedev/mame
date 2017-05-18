@@ -23,12 +23,12 @@
 //  chanf_rom_device - constructor
 //-------------------------------------------------
 
-const device_type CHANF_ROM_STD = &device_creator<chanf_rom_device>;
-const device_type CHANF_ROM_MAZE = &device_creator<chanf_maze_device>;
-const device_type CHANF_ROM_HANGMAN = &device_creator<chanf_hangman_device>;
-const device_type CHANF_ROM_CHESS = &device_creator<chanf_chess_device>;
-const device_type CHANF_ROM_MULTI_OLD = &device_creator<chanf_multi_old_device>;
-const device_type CHANF_ROM_MULTI_FINAL = &device_creator<chanf_multi_final_device>;
+const device_type CHANF_ROM_STD = device_creator<chanf_rom_device>;
+const device_type CHANF_ROM_MAZE = device_creator<chanf_maze_device>;
+const device_type CHANF_ROM_HANGMAN = device_creator<chanf_hangman_device>;
+const device_type CHANF_ROM_CHESS = device_creator<chanf_chess_device>;
+const device_type CHANF_ROM_MULTI_OLD = device_creator<chanf_multi_old_device>;
+const device_type CHANF_ROM_MULTI_FINAL = device_creator<chanf_multi_final_device>;
 
 
 chanf_rom_device::chanf_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

@@ -15,6 +15,7 @@
 	premake.gcc.cc     = "gcc"
 	premake.gcc.cxx    = "g++"
 	premake.gcc.ar     = "ar"
+	premake.gcc.rc     = "windres"
 	premake.gcc.llvm   = false
 
 

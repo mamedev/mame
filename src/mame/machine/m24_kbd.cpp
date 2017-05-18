@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+#include "emu.h"
 #include "m24_kbd.h"
 
-const device_type M24_KEYBOARD = &device_creator<m24_keyboard_device>;
+const device_type M24_KEYBOARD = device_creator<m24_keyboard_device>;
 
 ROM_START( m24_keyboard )
 	ROM_REGION(0x800, "mcu", 0)

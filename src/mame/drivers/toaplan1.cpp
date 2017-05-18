@@ -606,12 +606,14 @@ Stephh's and AWJ's notes (based on the games M68000 and Z80 code and some tests)
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/toaplan1.h"
+#include "includes/toaplipt.h"
+
+#include "cpu/tms32010/tms32010.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
-#include "cpu/tms32010/tms32010.h"
-#include "includes/toaplipt.h"
-#include "includes/toaplan1.h"
 #include "sound/3812intf.h"
+#include "speaker.h"
 
 
 /***************************** 68000 Memory Map *****************************/

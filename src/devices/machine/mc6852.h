@@ -26,7 +26,6 @@
 #ifndef __MC6852__
 #define __MC6852__
 
-#include "emu.h"
 #include <queue>
 
 

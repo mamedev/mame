@@ -261,7 +261,6 @@ TODO:
     internal timers (similar to the HD63701). I've just mapped the I/O ports since
     that's the only thing required for normal operation, but the program does
     use some of the additional features in its special "test" mode.
-- tokio: doesn't work due to missing MC68705 MCU protection emulation.
 - tokio: sound support is probably incomplete. There are a couple of unknown
   accesses done by the CPU, including to the YM2203 I/O ports. At the
   very least, there should be some filters.
@@ -274,12 +273,15 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/bublbobl.h"
+
 #include "cpu/m6800/m6800.h"
+#include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
-#include "includes/bublbobl.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MAIN_XTAL   XTAL_24MHz

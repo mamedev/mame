@@ -123,23 +123,25 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 */
 
 
-#define MASTER_CLOCK    XTAL_16MHz
-#define MASTER_CPU            ((MASTER_CLOCK)/2)    // 8mhz
-#define SOUND_CLOCK           ((MASTER_CLOCK) /8)   // 2mhz
-
-#define VIDEO_CLOCK           XTAL_33MHz
-#define MC6845_CLOCK          ((VIDEO_CLOCK)/4/16)  // 0.515625 MHZ
-
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
+#include "machine/microtch.h"
+#include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "video/mc6845.h"
 #include "sound/ay8910.h"
-#include "machine/msm6242.h"
-#include "machine/microtch.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_16MHz
+#define MASTER_CPU      ((MASTER_CLOCK)/2)    // 8mhz
+#define SOUND_CLOCK     ((MASTER_CLOCK) /8)   // 2mhz
+
+#define VIDEO_CLOCK     XTAL_33MHz
+#define MC6845_CLOCK    ((VIDEO_CLOCK)/4/16)  // 0.515625 MHZ
 
 
 /***************************************************************************

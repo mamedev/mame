@@ -6,7 +6,6 @@
 #ifndef INTERPRO_SGA_H_
 #define INTERPRO_SGA_H_
 
-#include "emu.h"
 
 #define MCFG_INTERPRO_SGA_BERR_CB(_out_berr) \
 	devcb = &interpro_sga_device::static_set_out_berr_callback(*device, DEVCB_##_out_berr);

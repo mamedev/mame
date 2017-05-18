@@ -88,12 +88,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/capbowl.h"
+
 #include "machine/ticket.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/capbowl.h"
 #include "sound/2203intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK        XTAL_8MHz
 
@@ -355,7 +357,7 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	MCFG_SOUND_ROUTE(2, "speaker", 0.07)
 	MCFG_SOUND_ROUTE(3, "speaker", 0.75)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac", DAC0832, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END

@@ -151,11 +151,14 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/ninjakd2.h"
+
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
 #include "machine/gen_latch.h"
 #include "machine/mc8123.h"
-#include "includes/ninjakd2.h"
+#include "sound/2203intf.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK_12 XTAL_12MHz
 #define MAIN_CLOCK_5  XTAL_5MHz

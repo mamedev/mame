@@ -21,11 +21,11 @@ static const char *const op_names[] =   {   "??",       "nop",  "ex",   "exx",  
 ALLOW_SAVE_TYPE(tlcs90_device::e_mode); // allow save_item on a non-fundamental type
 
 
-const device_type TMP90840 = &device_creator<tmp90840_device>;
-const device_type TMP90841 = &device_creator<tmp90841_device>;
-const device_type TMP90845 = &device_creator<tmp90845_device>;
-const device_type TMP91640 = &device_creator<tmp91640_device>;
-const device_type TMP91641 = &device_creator<tmp91641_device>;
+const device_type TMP90840 = device_creator<tmp90840_device>;
+const device_type TMP90841 = device_creator<tmp90841_device>;
+const device_type TMP90845 = device_creator<tmp90845_device>;
+const device_type TMP91640 = device_creator<tmp91640_device>;
+const device_type TMP91641 = device_creator<tmp91641_device>;
 
 
 static ADDRESS_MAP_START(tmp90840_mem, AS_PROGRAM, 8, tlcs90_device)
@@ -72,7 +72,7 @@ tmp90841_device::tmp90841_device(const machine_config &mconfig, const char *tag,
 }
 
 tmp90845_device::tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90841, "TMP90845", tag, owner, clock, "tmp90845", __FILE__, ADDRESS_MAP_NAME(tmp90841_mem))
+	: tlcs90_device(mconfig, TMP90845, "TMP90845", tag, owner, clock, "tmp90845", __FILE__, ADDRESS_MAP_NAME(tmp90841_mem))
 {
 }
 

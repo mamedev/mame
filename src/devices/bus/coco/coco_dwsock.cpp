@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "osdcore.h"
-#include "includes/coco.h"
 
 #include "coco_dwsock.h"
 
@@ -18,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COCO_DWSOCK = &device_creator<beckerport_device>;
+const device_type COCO_DWSOCK = device_creator<beckerport_device>;
 
 //-------------------------------------------------
 //  INPUT_PORTS( coco_drivewire )

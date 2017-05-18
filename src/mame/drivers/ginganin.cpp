@@ -53,12 +53,16 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ginganin.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/6840ptm.h"
 #include "sound/ay8910.h"
 #include "sound/8950intf.h"
-#include "includes/ginganin.h"
-#include "machine/6840ptm.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MAIN_CLOCK XTAL_6MHz

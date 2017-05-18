@@ -101,6 +101,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class royalmah_state : public driver_device

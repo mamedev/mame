@@ -221,7 +221,7 @@ static const nes_mmc mmc_list[] =
 	{ 187, UNL_KOF96 },
 	{ 188, BANDAI_KARAOKE },
 	{ 189, TXC_TW },
-	// 190 Unused
+	{ 190, ZEMINA_BOARD },
 	{ 191, WAIXING_TYPE_B },
 	{ 192, WAIXING_TYPE_C },
 	{ 193, NTDEC_FIGHTINGHERO },

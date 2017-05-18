@@ -13,7 +13,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type I82439TX = &device_creator<i82439tx_device>;
+const device_type I82439TX = device_creator<i82439tx_device>;
 
 
 i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

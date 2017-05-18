@@ -80,6 +80,7 @@ enum
 	XTAL_4_9152MHz      = 4915200,
 	XTAL_5MHz           = 5000000,      /* Mutant Night */
 	XTAL_5_0688MHz      = 5068800,      /* Xerox 820, DEC VK100 */
+	XTAL_5_3586MHz      = 5358600,      /* Eltec EurocomII */
 	XTAL_5_46MHz        = 5460000,      /* ec1840 and ec1841 keyboard */
 	XTAL_5_626MHz       = 5626000,      /* RCA CDP1869 PAL dot clock */
 	XTAL_5_67MHz        = 5670000,      /* RCA CDP1869 NTSC dot clock */
@@ -105,6 +106,7 @@ enum
 	XTAL_8_945MHz       = 8945000,      /* Hit Me */
 	XTAL_9_216MHz       = 9216000,      /* Conitec PROF-180X */
 	XTAL_9_828MHz       = 9828000,      /* Universal PCBs */
+	XTAL_9_832MHz       = 9832000,      /* Robotron A7150 */
 	XTAL_9_8304MHz      = 9830400,      /* Epson PX-8 */
 	XTAL_9_987MHz       = 9987000,      /* Crazy Balloon */
 	XTAL_10MHz          = 10000000,

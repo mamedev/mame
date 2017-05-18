@@ -37,10 +37,13 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/drgnmst.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
-#include "includes/drgnmst.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(drgnmst_state::drgnmst_coin_w)
@@ -173,12 +176,6 @@ WRITE8_MEMBER(drgnmst_state::drgnmst_snd_control_w)
 					break;
 		default:    break;
 	}
-}
-
-
-READ_LINE_MEMBER(drgnmst_state::PIC16C5X_T0_clk_r)
-{
-	return 0;
 }
 
 
@@ -389,7 +386,6 @@ static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(drgnmst_state, drgnmst_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(drgnmst_state, drgnmst_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(drgnmst_state, drgnmst_snd_control_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(drgnmst_state, PIC16C5X_T0_clk_r))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drgnmst)
 

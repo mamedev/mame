@@ -1,5 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
+
+//! [ne555 example]
 /*
  * ne555_astable.c
  *
@@ -14,6 +16,14 @@ NETLIST_START(ne555_astable)
      *
      */
 
+	/*!
+	 *
+	 * abc | def
+	 * ghj | ddd
+	 * iop | xyz
+	 *
+	 *
+	 */
     /* Standard stuff */
 
     SOLVER(Solver, 48000)
@@ -48,3 +58,4 @@ NETLIST_START(ne555_astable)
     LOG(log3, 555.OUT)
 
 NETLIST_END()
+//! [ne555 example]

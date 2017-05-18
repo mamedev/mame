@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "exp.h"
 
 
@@ -13,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_EXPANSION_SLOT = &device_creator<comx_expansion_slot_device>;
+const device_type COMX_EXPANSION_SLOT = device_creator<comx_expansion_slot_device>;
 
 
 

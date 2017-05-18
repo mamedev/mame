@@ -58,8 +58,10 @@
  ***********************************************************************/
 
 #include "emu.h"
-#include "includes/pgm.h"
 #include "machine/pgmprot_igs027a_type1.h"
+
+#include "screen.h"
+
 
 /**************************** EMULATION *******************************/
 /* used by photoy2k, kovsh */

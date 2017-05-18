@@ -10,7 +10,11 @@
 #include "cpu/z80/z80.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+
 // PV-1000 Sound device
 
 class pv1000_sound_device : public device_t,
@@ -23,7 +27,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 
 	// sound stream update overrides
@@ -44,21 +47,11 @@ private:
 
 extern const device_type PV1000;
 
-const device_type PV1000 = &device_creator<pv1000_sound_device>;
+const device_type PV1000 = device_creator<pv1000_sound_device>;
 
 pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: device_t(mconfig, PV1000, "NEC D65010G031", tag, owner, clock, "pv1000_sound", __FILE__),
 					device_sound_interface(mconfig, *this)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pv1000_sound_device::device_config_complete()
 {
 }
 

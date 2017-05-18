@@ -16,6 +16,9 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/tlc34076.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class xtheball_state : public driver_device
 {

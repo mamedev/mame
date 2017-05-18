@@ -15,14 +15,20 @@
 ************************************************************************/
 
 #include "emu.h"
+#include "video/apple2.h"
+
+#include "cpu/m6502/m6502.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/cassette.h"
+#include "sound/spkrdev.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/ap2_dsk.h"
-#include "cpu/m6502/m6502.h"
-#include "video/apple2.h"
+
 
 #define A2_CPU_TAG "maincpu"
 #define A2_BUS_TAG "a2bus"
@@ -164,7 +170,7 @@ uint32_t tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 // most softswitches don't care about read vs write, so handle them here
 void tk2000_state::do_io(address_space &space, int offset)
 {
-	if(space.debugger_access())
+	if(machine().side_effect_disabled())
 	{
 		return;
 	}

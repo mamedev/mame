@@ -3,7 +3,6 @@
 #ifndef __DSP56K_PARALLEL_MOVE_H__
 #define __DSP56K_PARALLEL_MOVE_H__
 
-#include "emu.h"
 #include "opcode.h"
 #include "tables.h"
 

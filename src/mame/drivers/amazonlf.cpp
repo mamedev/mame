@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/se3208/se3208.h"
+#include "screen.h"
 
 
 class amazonlf_state : public driver_device

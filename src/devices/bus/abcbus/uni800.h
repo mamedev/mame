@@ -5,7 +5,6 @@
 #ifndef __ABC_UNI800__
 #define __ABC_UNI800__
 
-#include "emu.h"
 #include "abcbus.h"
 
 

@@ -5,7 +5,6 @@
 #ifndef __KC_D002_H__
 #define __KC_D002_H__
 
-#include "emu.h"
 #include "kc.h"
 #include "ram.h"
 #include "rom.h"

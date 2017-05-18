@@ -4,7 +4,6 @@
  */
 
 #include "test.h"
-#include <bx/tokenizecmd.h>
 #include <bx/commandline.h>
 #include <string.h>
 
@@ -14,6 +13,8 @@ TEST(commandLine)
 	{
 		"-s",
 		"--long",
+		"--platform",
+		"x",
 	};
 
 	bx::CommandLine cmdLine(BX_COUNTOF(args), args);
@@ -23,6 +24,7 @@ TEST(commandLine)
 
 	// non-existing argument
 	CHECK(!cmdLine.hasArg('x') );
+	CHECK(!cmdLine.hasArg("preprocess") );
 }
 
 TEST(tokenizeCommandLine)

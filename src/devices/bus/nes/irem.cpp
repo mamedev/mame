@@ -35,11 +35,11 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_LROG017 = &device_creator<nes_lrog017_device>;
-const device_type NES_HOLYDIVR = &device_creator<nes_holydivr_device>;
-const device_type NES_TAM_S1 = &device_creator<nes_tam_s1_device>;
-const device_type NES_G101 = &device_creator<nes_g101_device>;
-const device_type NES_H3001 = &device_creator<nes_h3001_device>;
+const device_type NES_LROG017 = device_creator<nes_lrog017_device>;
+const device_type NES_HOLYDIVR = device_creator<nes_holydivr_device>;
+const device_type NES_TAM_S1 = device_creator<nes_tam_s1_device>;
+const device_type NES_G101 = device_creator<nes_g101_device>;
+const device_type NES_H3001 = device_creator<nes_h3001_device>;
 
 
 nes_lrog017_device::nes_lrog017_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

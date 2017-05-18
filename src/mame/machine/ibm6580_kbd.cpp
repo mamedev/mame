@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
+#include "emu.h"
 #include "ibm6580_kbd.h"
 
 #define VERBOSE_DBG 0       /* general debug messages */
@@ -15,7 +16,7 @@
 	} while (0)
 
 
-const device_type DW_KEYBOARD = &device_creator<dw_keyboard_device>;
+const device_type DW_KEYBOARD = device_creator<dw_keyboard_device>;
 
 ROM_START( dw_keyboard )
 	ROM_REGION(0x800, "mcu", 0)

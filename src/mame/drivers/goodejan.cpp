@@ -71,11 +71,14 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/nec.h"
 #include "audio/seibu.h"
+
+#include "cpu/nec/nec.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "video/seibu_crtc.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class goodejan_state : public driver_device

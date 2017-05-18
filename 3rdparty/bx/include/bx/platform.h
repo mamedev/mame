@@ -31,6 +31,7 @@
 // C Runtime
 #define BX_CRT_MSVC   0
 #define BX_CRT_GLIBC  0
+#define BX_CRT_LIBCXX 0
 #define BX_CRT_NEWLIB 0
 #define BX_CRT_MINGW  0
 #define BX_CRT_MUSL   0
@@ -68,7 +69,13 @@
 #	elif defined(__GLIBC__)
 #		undef  BX_CRT_GLIBC
 #		define BX_CRT_GLIBC (__GLIBC__ * 10000 + __GLIBC_MINOR__ * 100)
-#	endif // defined(__GLIBC__)
+#	elif defined(__MINGW32__) || defined(__MINGW64__)
+#		undef  BX_CRT_MINGW
+#		define BX_CRT_MINGW 1
+#	elif defined(__apple_build_version__) || defined(__ANDROID__)
+#		undef  BX_CRT_LIBCXX
+#		define BX_CRT_LIBCXX 1
+#	endif //
 #elif defined(_MSC_VER)
 #	undef  BX_COMPILER_MSVC
 #	define BX_COMPILER_MSVC _MSC_VER
@@ -201,8 +208,7 @@
 // RaspberryPi compiler defines __linux__
 #	undef  BX_PLATFORM_RPI
 #	define BX_PLATFORM_RPI 1
-#elif  defined(__linux__) \
-	|| BX_CPU_RISCV
+#elif  defined(__linux__)
 #	undef  BX_PLATFORM_LINUX
 #	define BX_PLATFORM_LINUX 1
 #elif  defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) \
@@ -231,24 +237,31 @@
 #elif defined(__GNU__)
 #	undef  BX_PLATFORM_HURD
 #	define BX_PLATFORM_HURD 1
-#else
-#	error "BX_PLATFORM_* is not defined!"
 #endif //
 
-#define BX_PLATFORM_POSIX (0 \
-						|| BX_PLATFORM_ANDROID \
-						|| BX_PLATFORM_EMSCRIPTEN \
-						|| BX_PLATFORM_BSD \
-						|| BX_PLATFORM_HURD \
-						|| BX_PLATFORM_IOS \
-						|| BX_PLATFORM_LINUX \
-						|| BX_PLATFORM_NACL \
-						|| BX_PLATFORM_OSX \
-						|| BX_PLATFORM_QNX \
-						|| BX_PLATFORM_STEAMLINK \
-						|| BX_PLATFORM_PS4 \
-						|| BX_PLATFORM_RPI \
-						)
+#define BX_PLATFORM_POSIX (0      \
+		|| BX_PLATFORM_ANDROID    \
+		|| BX_PLATFORM_EMSCRIPTEN \
+		|| BX_PLATFORM_BSD        \
+		|| BX_PLATFORM_HURD       \
+		|| BX_PLATFORM_IOS        \
+		|| BX_PLATFORM_LINUX      \
+		|| BX_PLATFORM_NACL       \
+		|| BX_PLATFORM_OSX        \
+		|| BX_PLATFORM_QNX        \
+		|| BX_PLATFORM_STEAMLINK  \
+		|| BX_PLATFORM_PS4        \
+		|| BX_PLATFORM_RPI        \
+		)
+
+#define BX_CRT_NONE !(0  \
+		|| BX_CRT_MSVC   \
+		|| BX_CRT_GLIBC  \
+		|| BX_CRT_LIBCXX \
+		|| BX_CRT_NEWLIB \
+		|| BX_CRT_MINGW  \
+		|| BX_CRT_MUSL   \
+		)
 
 #ifndef  BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS
 #	define BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS 0
@@ -319,6 +332,8 @@
 #	define BX_PLATFORM_NAME "Xbox 360"
 #elif BX_PLATFORM_XBOXONE
 #	define BX_PLATFORM_NAME "Xbox One"
+#else
+#	define BX_PLATFORM_NAME "None"
 #endif // BX_PLATFORM_
 
 #if BX_CPU_ARM
@@ -334,6 +349,20 @@
 #elif BX_CPU_X86
 #	define BX_CPU_NAME "x86"
 #endif // BX_CPU_
+
+#if BX_CRT_MSVC
+#	define BX_CRT_NAME "MSVC C Runtime"
+#elif BX_CRT_GLIBC
+#	define BX_CRT_NAME "GNU C Library"
+#elif BX_CRT_NEWLIB
+#	define BX_CRT_NAME "Newlib"
+#elif BX_CRT_MINGW
+#	define BX_CRT_NAME "MinGW C Runtime"
+#elif BX_CRT_MUSL
+#	define BX_CRT_NAME "musl libc"
+#else
+#	define BX_CRT_NAME "None"
+#endif // BX_CRT_
 
 #if BX_ARCH_32BIT
 #	define BX_ARCH_NAME "32-bit"

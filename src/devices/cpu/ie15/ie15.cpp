@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
 #include "emu.h"
-#include "debugger.h"
 #include "ie15.h"
+
+#include "debugger.h"
+
 
 //**************************************************************************
 //  MACROS
@@ -19,7 +21,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type IE15 = &device_creator<ie15_device>;
+const device_type IE15 = device_creator<ie15_device>;
 
 //**************************************************************************
 //  DEVICE INTERFACE

@@ -13,7 +13,6 @@
 #ifndef __TIRS232__
 #define __TIRS232__
 
-#include "emu.h"
 #include "peribox.h"
 #include "machine/tms9902.h"
 
@@ -132,7 +131,6 @@ protected:
 	virtual void    device_start(void) override;
 	image_init_result    call_load() override;
 	void    call_unload() override;
-	virtual void    device_config_complete() override;
 
 private:
 	int get_index_from_tagname();
@@ -159,7 +157,6 @@ protected:
 	virtual void    device_start(void) override;
 	image_init_result    call_load() override;
 	void    call_unload() override;
-	virtual void    device_config_complete() override;
 };
 
 #endif

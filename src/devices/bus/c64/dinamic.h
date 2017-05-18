@@ -12,7 +12,6 @@
 #define __DINAMIC__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

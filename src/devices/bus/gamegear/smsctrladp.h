@@ -13,7 +13,6 @@
 #define __SMS_CTRL_ADAPTOR__
 
 
-#include "emu.h"
 #include "ggext.h"
 #include "bus/sms_ctrl/smsctrl.h"
 

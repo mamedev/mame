@@ -170,11 +170,13 @@ Cisco Heat.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/cischeat.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "machine/jalcrpt.h"
-#include "includes/cischeat.h"
+#include "speaker.h"
 
 #include "cischeat.lh"
 #include "f1gpstar.lh"

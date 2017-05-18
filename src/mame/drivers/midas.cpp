@@ -52,11 +52,14 @@
 *************************************************************************************************************/
 
 #include "emu.h"
+#include "includes/neogeo.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/ymz280b.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
-#include "includes/neogeo.h"
+#include "speaker.h"
+
 
 class midas_state : public driver_device
 {
@@ -70,7 +73,7 @@ public:
 		m_sprgen(*this, "spritegen"),
 		m_screen(*this, "screen"),
 		m_zoomram(*this, "zoomtable")
-		{ }
+	{ }
 
 	DECLARE_READ16_MEMBER(ret_ffff);
 	DECLARE_WRITE16_MEMBER(midas_gfxregs_w);

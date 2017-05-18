@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "abcbus.h"
 
 
@@ -14,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ABCBUS_SLOT = &device_creator<abcbus_slot_t>;
+const device_type ABCBUS_SLOT = device_creator<abcbus_slot_t>;
 
 
 

@@ -11,7 +11,6 @@
 #ifndef __MSM6255__
 #define __MSM6255__
 
-#include "emu.h"
 
 
 

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "diag264_lb_tape.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type DIAG264_CASSETTE_LOOPBACK = &device_creator<diag264_cassette_loopback_device>;
+const device_type DIAG264_CASSETTE_LOOPBACK = device_creator<diag264_cassette_loopback_device>;
 
 
 

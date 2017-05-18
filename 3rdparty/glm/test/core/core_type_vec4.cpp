@@ -8,6 +8,10 @@
 #include <ctime>
 #include <vector>
 
+static glm::vec4 v1;
+static glm::vec4 v2(1);
+static glm::vec4 v3(1, 1, 1, 1);
+
 template <int Value>
 struct mask
 {
@@ -315,6 +319,8 @@ int test_vec4_size()
 	Error += 32 == sizeof(glm::highp_dvec4) ? 0 : 1;
 	Error += glm::vec4().length() == 4 ? 0 : 1;
 	Error += glm::dvec4().length() == 4 ? 0 : 1;
+	Error += glm::vec4::length() == 4 ? 0 : 1;
+	Error += glm::dvec4::length() == 4 ? 0 : 1;
 
 	return Error;
 }

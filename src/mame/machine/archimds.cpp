@@ -29,8 +29,8 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "cpu/arm/arm.h"
 #include "includes/archimds.h"
+#include "cpu/arm/arm.h"
 #include "debugger.h"
 
 static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };

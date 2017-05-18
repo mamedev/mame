@@ -29,7 +29,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SATURN_CART_SLOT = &device_creator<sat_cart_slot_device>;
+const device_type SATURN_CART_SLOT = device_creator<sat_cart_slot_device>;
 
 
 //-------------------------------------------------
@@ -126,18 +126,6 @@ void sat_cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_sat_cart_interface *>(get_card_device());
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void sat_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 
 /*-------------------------------------------------
@@ -149,18 +137,18 @@ image_init_result sat_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		bool is_rom = ((software_entry() == nullptr) || ((software_entry() != nullptr) && get_software_region("rom")));
+		bool is_rom = (!loaded_through_softlist() || (loaded_through_softlist() && get_software_region("rom")));
 
 		if (is_rom)
 		{
 			// from fullpath, only ROM carts
-			uint32_t len = (software_entry() != nullptr) ? get_software_region_length("rom") : length();
+			uint32_t len = loaded_through_softlist() ? get_software_region_length("rom") : length();
 			uint32_t *ROM;
 
 			m_cart->rom_alloc(len, tag());
 			ROM = m_cart->get_rom_base();
 
-			if (software_entry() != nullptr)
+			if (loaded_through_softlist())
 				memcpy(ROM, get_software_region("rom"), len);
 			else
 				fread(ROM, len);

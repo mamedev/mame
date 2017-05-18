@@ -7,6 +7,7 @@
 #include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
+#include "screen.h"
 
 class buggychl_state : public driver_device
 {

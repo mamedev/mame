@@ -27,6 +27,7 @@ notes:
 #include "cpu/sh4/sh4.h"
 #include "machine/ins8250.h"
 #include "machine/eepromser.h"
+#include "screen.h"
 
 class aristmk6_state : public driver_device
 {

@@ -13,7 +13,7 @@
 
 #define DECO16_VERBOSE 1
 
-const device_type DECO16 = &device_creator<deco16_device>;
+const device_type DECO16 = device_creator<deco16_device>;
 
 deco16_device::deco16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, DECO16, "DECO16", tag, owner, clock, "deco16", __FILE__),

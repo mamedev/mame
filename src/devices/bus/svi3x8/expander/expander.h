@@ -39,7 +39,6 @@
 #ifndef __SVI3X8_EXPANDER_H__
 #define __SVI3X8_EXPANDER_H__
 
-#include "emu.h"
 
 
 //**************************************************************************

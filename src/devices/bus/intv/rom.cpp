@@ -17,10 +17,10 @@
 //  intv_rom_device - constructor
 //-------------------------------------------------
 
-const device_type INTV_ROM_STD = &device_creator<intv_rom_device>;
-const device_type INTV_ROM_RAM = &device_creator<intv_ram_device>;
-const device_type INTV_ROM_GFACT = &device_creator<intv_gfact_device>;
-const device_type INTV_ROM_WSMLB = &device_creator<intv_wsmlb_device>;
+const device_type INTV_ROM_STD = device_creator<intv_rom_device>;
+const device_type INTV_ROM_RAM = device_creator<intv_ram_device>;
+const device_type INTV_ROM_GFACT = device_creator<intv_gfact_device>;
+const device_type INTV_ROM_WSMLB = device_creator<intv_wsmlb_device>;
 
 
 intv_rom_device::intv_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

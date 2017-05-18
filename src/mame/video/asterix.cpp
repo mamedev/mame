@@ -2,6 +2,7 @@
 // copyright-holders:Olivier Galibert
 #include "emu.h"
 #include "includes/asterix.h"
+#include "screen.h"
 
 
 void asterix_state::reset_spritebank()

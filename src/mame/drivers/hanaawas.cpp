@@ -28,9 +28,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/hanaawas.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/hanaawas.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
 {

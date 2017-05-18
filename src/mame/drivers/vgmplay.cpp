@@ -4,30 +4,33 @@
 // A "virtual" driver to play vgm files
 // Use with mame vgmplay -bitb file.vgm
 
-#include <zlib.h>
-
 #include "emu.h"
-#include "debugger.h"
+
 #include "imagedev/bitbngr.h"
 
-#include "cpu/m6502/n2a03.h"
 #include "cpu/h6280/h6280.h"
-#include "sound/2612intf.h"
-#include "sound/ym2151.h"
-#include "sound/ym2413.h"
+#include "cpu/m6502/n2a03.h"
 #include "sound/2203intf.h"
+#include "sound/2612intf.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
-#include "sound/c6280.h"
-#include "sound/sn76496.h"
-#include "sound/k053260.h"
-#include "sound/segapcm.h"
-#include "sound/multipcm.h"
-#include "sound/gb.h"
-#include "sound/pokey.h"
 #include "sound/c352.h"
+#include "sound/c6280.h"
+#include "sound/gb.h"
+#include "sound/k053260.h"
+#include "sound/multipcm.h"
 #include "sound/okim6295.h"
+#include "sound/pokey.h"
+#include "sound/segapcm.h"
+#include "sound/sn76496.h"
+#include "sound/ym2151.h"
+#include "sound/ym2413.h"
+
+#include "debugger.h"
+#include "speaker.h"
+
+#include <zlib.h>
 
 #define AS_IO16             AS_1
 #define MCFG_CPU_IO16_MAP   MCFG_CPU_DATA_MAP
@@ -125,7 +128,7 @@ private:
 	void blocks_clear();
 };
 
-const device_type VGMPLAY = &device_creator<vgmplay_device>;
+const device_type VGMPLAY = device_creator<vgmplay_device>;
 
 class vgmplay_state : public driver_device
 {

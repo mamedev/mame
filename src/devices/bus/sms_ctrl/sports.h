@@ -12,7 +12,6 @@
 #define __SMS_SPORTS_PAD__
 
 
-#include "emu.h"
 #include "smsctrl.h"
 
 

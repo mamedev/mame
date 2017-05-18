@@ -282,12 +282,16 @@ to the same bank as defined through A20.
 
 
 #include "emu.h"
-#include "cpu/sh2/sh2.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/scsp.h"
+#include "cpu/sh2/sh2.h"
 #include "machine/nvram.h"
+#include "sound/scsp.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "aquastge.lh"
+
 
 #define CLIPMAXX_FULL (496-1)
 #define CLIPMAXY_FULL (384-1)

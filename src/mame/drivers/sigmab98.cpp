@@ -111,13 +111,16 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/bufsprite.h"
-#include "sound/okim9810.h"
-#include "sound/ymz280b.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
+#include "sound/okim9810.h"
+#include "sound/ymz280b.h"
+#include "video/bufsprite.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class sigmab98_state : public driver_device
 {

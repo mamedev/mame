@@ -162,6 +162,8 @@ public:
 	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const = 0;
 	virtual const util::option_guide &create_option_guide() const;
+	virtual const char *custom_instance_name() const { return nullptr; }
+	virtual const char *custom_brief_instance_name() const { return nullptr; }
 
 	const image_device_format *device_get_indexed_creatable_format(int index) const { if (index < m_formatlist.size()) return m_formatlist.at(index).get(); else return nullptr;  }
 	const image_device_format *device_get_named_creatable_format(const std::string &format_name);
@@ -199,10 +201,10 @@ public:
 	const std::string &year() const { return m_year; }
 	u32 supported() const { return m_supported; }
 
-	const software_info *software_entry() const { return m_software_info_ptr; }
+	const software_info *software_entry() const;
 	const software_part *part_entry() const { return m_software_part_ptr; }
 	const char *software_list_name() const { return m_software_list_name.c_str(); }
-	bool loaded_through_softlist() const { return m_software_info_ptr != nullptr; }
+	bool loaded_through_softlist() const { return m_software_part_ptr != nullptr; }
 
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	const std::string &working_directory();
@@ -221,8 +223,8 @@ public:
 
 	const char *image_type_name()  const { return device_typename(image_type()); }
 
-	const char *instance_name() const { return m_instance_name.c_str(); }
-	const char *brief_instance_name() const { return m_brief_instance_name.c_str(); }
+	const std::string &instance_name() const { return m_instance_name; }
+	const std::string &brief_instance_name() const { return m_brief_instance_name; }
 	bool uses_file_extension(const char *file_extension) const;
 	const formatlist_type &formatlist() const { return m_formatlist; }
 
@@ -251,6 +253,9 @@ public:
 	bool user_loadable() const { return m_user_loadable; }
 
 protected:
+	// interface-level overrides
+	virtual void interface_config_complete() override;
+
 	virtual const software_list_loader &get_software_list_loader() const;
 	virtual const bool use_software_list_file_extension_for_filetype() const { return false; }
 
@@ -272,10 +277,9 @@ protected:
 
 	void run_hash(void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *), util::hash_collection &hashes, const char *types);
 	void image_checkhash();
-	void update_names(const device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
 
 	const software_part *find_software_item(const std::string &identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
-	bool load_software_part(const std::string &identifier, const software_part *&swpart, std::string *list_name = nullptr);
+	bool load_software_part(const std::string &identifier);
 	std::string software_get_default_slot(const char *default_card_slot) const;
 
 	void add_format(std::unique_ptr<image_device_format> &&format);
@@ -301,7 +305,6 @@ protected:
 
 	// Software information
 	std::string m_full_software_name;
-	const software_info *m_software_info_ptr;
 	const software_part *m_software_part_ptr;
 	std::string m_software_list_name;
 
@@ -309,6 +312,7 @@ private:
 	static image_error_t image_error_from_file_error(osd_file::error filerr);
 	bool schedule_postload_hard_reset_if_needed();
 	std::vector<u32> determine_open_plan(bool is_create);
+	void update_names();
 
 	// creation info
 	formatlist_type m_formatlist;

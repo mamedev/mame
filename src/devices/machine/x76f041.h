@@ -12,7 +12,6 @@
 #ifndef __X76F041_H__
 #define __X76F041_H__
 
-#include "emu.h"
 
 #define MCFG_X76F041_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, X76F041, 0 )

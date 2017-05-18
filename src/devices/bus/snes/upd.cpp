@@ -26,10 +26,10 @@ inline uint16_t get_data(uint8_t *CPU, uint32_t addr)
 //  constructor
 //-------------------------------------------------
 
-const device_type SNS_LOROM_NECDSP = &device_creator<sns_rom20_necdsp_device>;
-const device_type SNS_HIROM_NECDSP = &device_creator<sns_rom21_necdsp_device>;
-const device_type SNS_LOROM_SETA10 = &device_creator<sns_rom_seta10dsp_device>;
-const device_type SNS_LOROM_SETA11 = &device_creator<sns_rom_seta11dsp_device>;
+const device_type SNS_LOROM_NECDSP = device_creator<sns_rom20_necdsp_device>;
+const device_type SNS_HIROM_NECDSP = device_creator<sns_rom21_necdsp_device>;
+const device_type SNS_LOROM_SETA10 = device_creator<sns_rom_seta10dsp_device>;
+const device_type SNS_LOROM_SETA11 = device_creator<sns_rom_seta11dsp_device>;
 
 
 sns_rom20_necdsp_device::sns_rom20_necdsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
@@ -398,14 +398,14 @@ void sns_rom_setadsp_device::speedup_addon_bios_access()
 
 // Legacy versions including DSP dump roms, in order to support faulty dumps missing DSP data...
 
-const device_type SNS_LOROM_NECDSP1_LEG = &device_creator<sns_rom20_necdsp1_legacy_device>;
-const device_type SNS_LOROM_NECDSP1B_LEG = &device_creator<sns_rom20_necdsp1b_legacy_device>;
-const device_type SNS_LOROM_NECDSP2_LEG = &device_creator<sns_rom20_necdsp2_legacy_device>;
-const device_type SNS_LOROM_NECDSP3_LEG = &device_creator<sns_rom20_necdsp3_legacy_device>;
-const device_type SNS_LOROM_NECDSP4_LEG = &device_creator<sns_rom20_necdsp4_legacy_device>;
-const device_type SNS_HIROM_NECDSP1_LEG = &device_creator<sns_rom21_necdsp1_legacy_device>;
-const device_type SNS_LOROM_SETA10_LEG = &device_creator<sns_rom_seta10dsp_legacy_device>;
-const device_type SNS_LOROM_SETA11_LEG = &device_creator<sns_rom_seta11dsp_legacy_device>;
+const device_type SNS_LOROM_NECDSP1_LEG = device_creator<sns_rom20_necdsp1_legacy_device>;
+const device_type SNS_LOROM_NECDSP1B_LEG = device_creator<sns_rom20_necdsp1b_legacy_device>;
+const device_type SNS_LOROM_NECDSP2_LEG = device_creator<sns_rom20_necdsp2_legacy_device>;
+const device_type SNS_LOROM_NECDSP3_LEG = device_creator<sns_rom20_necdsp3_legacy_device>;
+const device_type SNS_LOROM_NECDSP4_LEG = device_creator<sns_rom20_necdsp4_legacy_device>;
+const device_type SNS_HIROM_NECDSP1_LEG = device_creator<sns_rom21_necdsp1_legacy_device>;
+const device_type SNS_LOROM_SETA10_LEG = device_creator<sns_rom_seta10dsp_legacy_device>;
+const device_type SNS_LOROM_SETA11_LEG = device_creator<sns_rom_seta11dsp_legacy_device>;
 
 
 sns_rom20_necdsp1_legacy_device::sns_rom20_necdsp1_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "exp.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EP64_EXPANSION_BUS_SLOT = &device_creator<ep64_expansion_bus_slot_device>;
+const device_type EP64_EXPANSION_BUS_SLOT = device_creator<ep64_expansion_bus_slot_device>;
 
 
 

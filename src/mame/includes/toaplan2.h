@@ -5,9 +5,6 @@
 //#define USE_HD64x180          /* Define if CPU support is available */
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
 
-// We encode priority with colour in the tilemaps, so need a larger palette
-#define T2PALETTE_LENGTH 0x10000
-
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
@@ -16,6 +13,10 @@
 #include "machine/upd4992.h"
 #include "video/gp9001.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+
+// We encode priority with colour in the tilemaps, so need a larger palette
+#define T2PALETTE_LENGTH 0x10000
 
 class toaplan2_state : public driver_device
 {

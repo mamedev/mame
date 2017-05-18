@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "rex.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_REX = &device_creator<c64_rex_cartridge_device>;
+const device_type C64_REX = device_creator<c64_rex_cartridge_device>;
 
 
 

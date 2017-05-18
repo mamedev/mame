@@ -3908,4 +3908,18 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="data20dm">
+		<description>Data 20 Display Manager</description>
+		<year>1982</year>
+		<publisher>Data 20 Corporation</publisher>
+		<info name="usage" value="SYS 40969 for 40 column mode, SYS 40972 for 80 column mode, SYS 40975 for VIC mode, SYS 40978 to restart 40/80 column mode" />
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<part name="cart" interface="vic1001_cart">
+			<feature name="slot" value="videopak" />
+			<dataarea name="blk5" size="0x800">
+				<rom name="data20.bin" size="0x800" crc="b7b1899f" sha1="aac8388d16d789126a917958282e9bc6da1038c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

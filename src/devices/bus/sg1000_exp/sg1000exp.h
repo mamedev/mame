@@ -14,7 +14,6 @@
 #ifndef __SG1000_EXPANSION_SLOT__
 #define __SG1000_EXPANSION_SLOT__
 
-#include "emu.h"
 
 
 

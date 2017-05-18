@@ -41,6 +41,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "fdc.h"
 
 
@@ -57,7 +58,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_FD = &device_creator<comx_fd_device>;
+const device_type COMX_FD = device_creator<comx_fd_device>;
 
 
 //-------------------------------------------------

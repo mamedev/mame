@@ -6,13 +6,14 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "zapper.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_ZAPPER = &device_creator<nes_zapper_device>;
+const device_type NES_ZAPPER = device_creator<nes_zapper_device>;
 
 
 static INPUT_PORTS_START( nes_zapper )

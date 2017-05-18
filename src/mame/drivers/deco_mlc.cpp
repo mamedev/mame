@@ -100,11 +100,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/deco_mlc.h"
+
 #include "machine/deco156.h"
 #include "machine/eepromser.h"
 #include "cpu/arm/arm.h"
 #include "cpu/sh2/sh2.h"
-#include "includes/deco_mlc.h"
+#include "speaker.h"
 
 
 /***************************************************************************/
@@ -575,6 +577,11 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mlc_5bpp, mlc )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 5bpp)
+
+	// TODO: mono? ch.0 doesn't output any sound in-game
+	MCFG_SOUND_MODIFY("ymz")
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

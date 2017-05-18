@@ -3,8 +3,8 @@
 #include "emu.h"
 #include "h8s2655.h"
 
-const device_type H8S2655 = &device_creator<h8s2655_device>;
-const device_type H8S2653 = &device_creator<h8s2653_device>;
+const device_type H8S2655 = device_creator<h8s2655_device>;
+const device_type H8S2653 = device_creator<h8s2653_device>;
 
 h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	h8s2600_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h8s2655_device::map), this)),

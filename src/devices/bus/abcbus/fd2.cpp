@@ -36,6 +36,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "fd2.h"
 
 
@@ -54,7 +55,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC_FD2 = &device_creator<abc_fd2_t>;
+const device_type ABC_FD2 = device_creator<abc_fd2_t>;
 
 
 //-------------------------------------------------

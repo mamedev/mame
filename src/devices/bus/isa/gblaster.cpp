@@ -8,7 +8,9 @@
 
 #include "emu.h"
 #include "gblaster.h"
-#include "sound/speaker.h"
+
+#include "sound/spkrdev.h"
+#include "speaker.h"
 
 /*
   creative labs game blaster (CMS creative music system)
@@ -76,7 +78,7 @@ WRITE8_MEMBER( isa8_gblaster_device::detect_w )
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_GAME_BLASTER = &device_creator<isa8_gblaster_device>;
+const device_type ISA8_GAME_BLASTER = device_creator<isa8_gblaster_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

@@ -5,8 +5,8 @@
  *
  */
 
-#include <devices/nlid_cmos.h>
-#include "analog/nld_twoterm.h"
+#include "nlid_cmos.h"
+#include "../analog/nlid_twoterm.h"
 #include "nld_4066.h"
 
 namespace netlist
@@ -67,7 +67,7 @@ namespace netlist
 			{
 				m_R.update_dev();
 				m_R.set_R(R);
-				m_R.m_P.schedule_after(NLTIME_FROM_NS(1));
+				m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 			}
 			else
 			{

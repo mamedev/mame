@@ -4,12 +4,13 @@
     Ensoniq LCD dotmatrix Displays
     derived by Parduz from the VFD Emulation by R. Belmont
 */
+#include "emu.h"
 #include "esqlcd.h"
 #include "esq2by16.lh"
 
 //#define VERBOSE
 
-const device_type ESQ2x16_SQ1 = &device_creator<esq2x16_sq1_t>;
+const device_type ESQ2x16_SQ1 = device_creator<esq2x16_sq1_t>;
 
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
 static MACHINE_CONFIG_FRAGMENT(esq2x16)

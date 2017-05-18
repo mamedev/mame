@@ -6,13 +6,14 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "partytap.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_PARTYTAP = &device_creator<nes_partytap_device>;
+const device_type NES_PARTYTAP = device_creator<nes_partytap_device>;
 
 
 static INPUT_PORTS_START( nes_partytap )

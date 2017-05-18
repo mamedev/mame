@@ -1604,10 +1604,11 @@ namespace bgfx { namespace d3d12
 
 			void* data;
 			readback->Map(0, NULL, (void**)&data);
-			imageSwizzleBgra8(width
+			imageSwizzleBgra8(
+				  data
+				, width
 				, height
 				, (uint32_t)pitch
-				, data
 				, data
 				);
 			g_callback->screenShot(_filePath
@@ -2396,8 +2397,8 @@ data.NumQualityLevels = 0;
 					{
 						if (0 != memcmp(&program.m_fsh->m_code->data[ii], &temp->data[ii], 16) )
 						{
-// 							dbgPrintfData(&program.m_fsh->m_code->data[ii], temp->size-ii, "");
-// 							dbgPrintfData(&temp->data[ii], temp->size-ii, "");
+// 							bx::debugPrintfData(&program.m_fsh->m_code->data[ii], temp->size-ii, "");
+// 							bx::debugPrintfData(&temp->data[ii], temp->size-ii, "");
 							break;
 						}
 					}
@@ -4070,11 +4071,11 @@ data.NumQualityLevels = 0;
 							uint32_t slice = bx::strideAlign( (mip.m_height/blockInfo.blockHeight)*pitch,           D3D12_TEXTURE_DATA_PLACEMENT_ALIGNMENT);
 
 							uint8_t* temp = (uint8_t*)BX_ALLOC(g_allocator, slice);
-							imageCopy(mip.m_height/blockInfo.blockHeight
+							imageCopy(temp
+									, mip.m_height/blockInfo.blockHeight
 									, (mip.m_width /blockInfo.blockWidth )*mip.m_blockSize
 									, mip.m_data
 									, pitch
-									, temp
 									);
 
 							srd[kk].pData      = temp;
@@ -4088,11 +4089,11 @@ data.NumQualityLevels = 0;
 							const uint32_t slice = bx::strideAlign(pitch * mip.m_height,      D3D12_TEXTURE_DATA_PLACEMENT_ALIGNMENT);
 
 							uint8_t* temp = (uint8_t*)BX_ALLOC(g_allocator, slice);
-							imageCopy(mip.m_height
+							imageCopy(temp
+									, mip.m_height
 									, mip.m_width*mip.m_bpp / 8
 									, mip.m_data
 									, pitch
-									, temp
 									);
 
 							srd[kk].pData = temp;
@@ -4103,7 +4104,7 @@ data.NumQualityLevels = 0;
 
  						if (swizzle)
  						{
-// 							imageSwizzleBgra8(width, height, mip.m_width*4, data, temp);
+// 							imageSwizzleBgra8(temp, width, height, mip.m_width*4, data);
  						}
 
 						srd[kk].SlicePitch = mip.m_height*srd[kk].RowPitch;
@@ -4428,6 +4429,7 @@ data.NumQualityLevels = 0;
 
 	void FrameBufferD3D12::create(uint8_t _num, const Attachment* _attachment)
 	{
+		m_denseIdx = UINT16_MAX;
 		m_numTh = _num;
 		memcpy(m_attachment, _attachment, _num*sizeof(Attachment) );
 
@@ -5371,6 +5373,11 @@ data.NumQualityLevels = 0;
 							restoreScissor = true;
 							Rect scissorRect;
 							scissorRect.intersect(viewScissorRect,_render->m_rectCache.m_cache[scissor]);
+							if (scissorRect.isZeroArea() )
+							{
+								continue;
+							}
+
 							D3D12_RECT rc;
 							rc.left   = scissorRect.m_x;
 							rc.top    = scissorRect.m_y;
@@ -5489,10 +5496,11 @@ data.NumQualityLevels = 0;
 		perfStats.numCompute    = statsKeyType[1];
 		perfStats.maxGpuLatency = maxGpuLatency;
 
-		if (_render->m_debug & (BGFX_DEBUG_IFH | BGFX_DEBUG_STATS) )
+		if (_render->m_debug & (BGFX_DEBUG_IFH|BGFX_DEBUG_STATS) )
 		{
 //			PIX_BEGINEVENT(D3DCOLOR_FRAME, L"debugstats");
 
+//			m_needPresent = true;
 			TextVideoMem& tvm = m_textVideoMem;
 
 			static int64_t next = now;

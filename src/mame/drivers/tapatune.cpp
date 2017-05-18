@@ -41,6 +41,8 @@
 #include "machine/ticket.h"
 #include "sound/bsmt2000.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

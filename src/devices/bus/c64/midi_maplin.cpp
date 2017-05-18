@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "midi_maplin.h"
 #include "machine/clock.h"
 #include "bus/midi/midi.h"
@@ -24,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MIDI_MAPLIN = &device_creator<c64_maplin_midi_cartridge_device>;
+const device_type C64_MIDI_MAPLIN = device_creator<c64_maplin_midi_cartridge_device>;
 
 
 WRITE_LINE_MEMBER( c64_maplin_midi_cartridge_device::acia_irq_w )

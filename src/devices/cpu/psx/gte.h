@@ -12,7 +12,6 @@
 #ifndef __PSXGTE_H__
 #define __PSXGTE_H__
 
-#include "emu.h"
 
 #define GTE_SF( op ) ( ( op >> 19 ) & 1 )
 #define GTE_MX( op ) ( ( op >> 17 ) & 3 )

@@ -11,7 +11,6 @@
 #ifndef __PET_64K__
 #define __PET_64K__
 
-#include "emu.h"
 #include "exp.h"
 
 

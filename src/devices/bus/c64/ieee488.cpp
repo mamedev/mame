@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "ieee488.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_IEEE488 = &device_creator<c64_ieee488_device>;
+const device_type C64_IEEE488 = device_creator<c64_ieee488_device>;
 
 
 //-------------------------------------------------

@@ -8,6 +8,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "miracle.h"
 
 #define MIRACLE_MIDI_WAITING 0
@@ -18,7 +19,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_MIRACLE = &device_creator<nes_miracle_device>;
+const device_type NES_MIRACLE = device_creator<nes_miracle_device>;
 
 
 MACHINE_CONFIG_FRAGMENT( nes_miracle )

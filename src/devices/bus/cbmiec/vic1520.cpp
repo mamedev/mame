@@ -35,6 +35,7 @@ PD6 Y MOTOR COM C
 PD7 Y MOTOR COM D
 */
 
+#include "emu.h"
 #include "vic1520.h"
 
 
@@ -51,7 +52,7 @@ PD7 Y MOTOR COM D
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC1520 = &device_creator<vic1520_t>;
+const device_type VIC1520 = device_creator<vic1520_t>;
 
 
 //-------------------------------------------------

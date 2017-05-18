@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "t6721a.h"
 
 
@@ -23,7 +24,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type T6721A = &device_creator<t6721a_device>;
+const device_type T6721A = device_creator<t6721a_device>;
 
 
 

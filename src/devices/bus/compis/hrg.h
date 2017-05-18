@@ -11,7 +11,6 @@
 #ifndef __COMPIS_HRG__
 #define __COMPIS_HRG__
 
-#include "emu.h"
 #include "graphics.h"
 #include "video/upd7220.h"
 

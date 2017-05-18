@@ -174,7 +174,7 @@ WRITE8_MEMBER( namco_06xx_device::ctrl_w )
 }
 
 
-const device_type NAMCO_06XX = &device_creator<namco_06xx_device>;
+const device_type NAMCO_06XX = device_creator<namco_06xx_device>;
 
 namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NAMCO_06XX, "Namco 06xx", tag, owner, clock, "namco06xx", __FILE__)

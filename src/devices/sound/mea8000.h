@@ -11,9 +11,6 @@
 #ifndef __MEA8000_H__
 #define __MEA8000_H__
 
-#define MCFG_MEA8000_DAC(_tag) \
-	mea8000_device::static_set_dac_tag(*device, "^" _tag);
-
 #define MCFG_MEA8000_REQ_CALLBACK(_write) \
 	devcb = &mea8000_device::set_reqwr_callback(*device, DEVCB_##_write);
 

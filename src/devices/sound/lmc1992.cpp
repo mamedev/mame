@@ -20,6 +20,7 @@
 
 */
 
+#include "emu.h"
 #include "lmc1992.h"
 
 
@@ -63,7 +64,7 @@ enum
 //**************************************************************************
 
 // devices
-const device_type LMC1992 = &device_creator<lmc1992_device>;
+const device_type LMC1992 = device_creator<lmc1992_device>;
 
 
 

@@ -238,12 +238,14 @@ Notes:
 #include "machine/ataintf.h"
 #include "machine/fdc37c665gt.h"
 #include "machine/i2cmem.h"
+#include "machine/ram.h"
 #include "machine/rtc65271.h"
 #include "machine/watchdog.h"
 #include "machine/x76f041.h"
 #include "sound/spu.h"
 #include "sound/cdda.h"
 #include "sound/rf5c400.h"
+#include "speaker.h"
 
 class twinkle_state : public driver_device
 {

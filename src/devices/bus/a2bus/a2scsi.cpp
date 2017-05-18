@@ -31,8 +31,8 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2scsi.h"
-#include "includes/apple2.h"
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
 
@@ -44,7 +44,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_SCSI = &device_creator<a2bus_scsi_device>;
+const device_type A2BUS_SCSI = device_creator<a2bus_scsi_device>;
 
 #define SCSI_ROM_REGION  "scsi_rom"
 #define SCSI_BUS_TAG     "scsibus"

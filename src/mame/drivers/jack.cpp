@@ -81,9 +81,12 @@ Stephh's Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/jack.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/jack.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 

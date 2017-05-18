@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "16kb.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_16KB = &device_creator<c64_16kb_cartridge_device>;
+const device_type C64_16KB = device_creator<c64_16kb_cartridge_device>;
 
 
 //-------------------------------------------------

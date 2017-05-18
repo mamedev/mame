@@ -13,6 +13,8 @@
 
 #include "emu.h"
 #include "nubus_m2video.h"
+#include "screen.h"
+
 
 #define M2VIDEO_SCREEN_NAME "m2video_screen"
 #define M2VIDEO_ROM_REGION  "m2video_rom"
@@ -36,7 +38,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_M2VIDEO = &device_creator<nubus_m2video_device>;
+const device_type NUBUS_M2VIDEO = device_creator<nubus_m2video_device>;
 
 
 //-------------------------------------------------

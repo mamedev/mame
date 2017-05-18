@@ -52,7 +52,9 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "abc99.h"
+#include "speaker.h"
 
 
 
@@ -69,7 +71,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC99 = &device_creator<abc99_device>;
+const device_type ABC99 = device_creator<abc99_device>;
 
 
 //-------------------------------------------------

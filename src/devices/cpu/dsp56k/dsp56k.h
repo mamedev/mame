@@ -14,7 +14,6 @@
 #ifndef __DSP56K_H__
 #define __DSP56K_H__
 
-#include "emu.h"
 
 
 // IRQ Lines

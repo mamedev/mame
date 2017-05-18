@@ -23,10 +23,12 @@
 
 */
 
-#ifndef __TMS9928A_H__
-#define __TMS9928A_H__
+#ifndef MAME_DEVICES_VIDEO_TMS9928A_H
+#define MAME_DEVICES_VIDEO_TMS9928A_H
 
-#include "emu.h"
+#pragma once
+
+#include "screen.h"
 
 
 #define TMS9928A_PALETTE_SIZE               16
@@ -214,4 +216,4 @@ public:
 };
 
 
-#endif
+#endif // MAME_DEVICES_VIDEO_TMS9928A_H

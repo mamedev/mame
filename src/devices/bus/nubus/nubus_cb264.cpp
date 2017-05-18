@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "nubus_cb264.h"
+#include "screen.h"
 
 #define CB264_SCREEN_NAME   "cb264_screen"
 #define CB264_ROM_REGION    "cb264_rom"
@@ -39,7 +40,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_CB264 = &device_creator<nubus_cb264_device>;
+const device_type NUBUS_CB264 = device_creator<nubus_cb264_device>;
 
 
 //-------------------------------------------------

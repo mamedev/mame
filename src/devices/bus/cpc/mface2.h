@@ -20,7 +20,6 @@
 #ifndef MFACE2_H_
 #define MFACE2_H_
 
-#include "emu.h"
 #include "cpcexp.h"
 
 /* stop button has been pressed */

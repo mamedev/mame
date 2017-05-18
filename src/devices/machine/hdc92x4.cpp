@@ -1746,9 +1746,9 @@ void hdc92x4_device::seek_read_id()
 	}
 
 	int cont = NEXT;
-	bool step_enable = (current_command() & 0x04)==1;
-	bool wait_seek_comp = (current_command() & 0x02)==1;
-	bool do_verify = (current_command() & 0x01)==1;
+	bool step_enable = BIT(current_command(), 2);
+	bool wait_seek_comp = BIT(current_command(), 1);
+	bool do_verify = BIT(current_command(), 0);
 	m_logical = true;
 
 	while (cont == NEXT)
@@ -4823,5 +4823,5 @@ void hdc92x4_device::device_reset()
 	m_out_dmarq(CLEAR_LINE);
 }
 
-const device_type HDC9224 = &device_creator<hdc9224_device>;
-const device_type HDC9234 = &device_creator<hdc9234_device>;
+const device_type HDC9224 = device_creator<hdc9224_device>;
+const device_type HDC9234 = device_creator<hdc9234_device>;

@@ -40,7 +40,7 @@ enum
 	status_unit_shift   = 13
 };
 
-const device_type FD800 = &device_creator<fd800_legacy_device>;
+const device_type FD800 = device_creator<fd800_legacy_device>;
 
 fd800_legacy_device::fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, FD800, "TI FD800 Diablo floppy disk controller", tag, owner, clock, "fd800", __FILE__),

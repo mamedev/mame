@@ -12,7 +12,6 @@
 #define __REX__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

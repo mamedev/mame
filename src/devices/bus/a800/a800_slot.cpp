@@ -29,9 +29,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A800_CART_SLOT = &device_creator<a800_cart_slot_device>;
-const device_type A5200_CART_SLOT = &device_creator<a5200_cart_slot_device>;
-const device_type XEGS_CART_SLOT = &device_creator<xegs_cart_slot_device>;
+const device_type A800_CART_SLOT = device_creator<a800_cart_slot_device>;
+const device_type A5200_CART_SLOT = device_creator<a5200_cart_slot_device>;
+const device_type XEGS_CART_SLOT = device_creator<xegs_cart_slot_device>;
 
 
 //-------------------------------------------------
@@ -153,18 +153,6 @@ void a800_cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_a800_cart_interface  *>(get_card_device());
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void a800_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 
 /*-------------------------------------------------
@@ -242,7 +230,7 @@ image_init_result a800_cart_slot_device::call_load()
 	{
 		uint32_t len;
 
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 		{
 			const char *pcb_name;
 			len = get_software_region_length("rom");

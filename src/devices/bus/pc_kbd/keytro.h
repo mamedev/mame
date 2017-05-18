@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef __KB_KEYTRO_H__
-#define __KB_KEYTRO_H__
+#ifndef MAME_BUS_PC_KBD_KEYTRO_H
+#define MAME_BUS_PC_KBD_KEYTRO_H
 
 #include "pc_kbdc.h"
 
@@ -44,6 +44,16 @@ public:
 	DECLARE_WRITE8_MEMBER( p3_write );
 
 protected:
+	pc_kbd_keytronic_pc3270_device(
+			machine_config const &mconfig,
+			device_type type,
+			char const *name,
+			char const *tag,
+			device_t *owner,
+			uint32_t clock,
+			char const *shortname,
+			char const *source);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -60,10 +70,7 @@ class pc_kbd_keytronic_pc3270_at_device : public pc_kbd_keytronic_pc3270_device
 {
 public:
 	// construction/destruction
-	pc_kbd_keytronic_pc3270_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: pc_kbd_keytronic_pc3270_device(mconfig, tag, owner, clock)
-	{
-	}
+	pc_kbd_keytronic_pc3270_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 };
@@ -73,4 +80,4 @@ public:
 extern const device_type PC_KBD_KEYTRONIC_PC3270;
 extern const device_type PC_KBD_KEYTRONIC_PC3270_AT;
 
-#endif  /* __KB_KEYTRO_H__ */
+#endif // MAME_BUS_PC_KBD_KEYTRO_H

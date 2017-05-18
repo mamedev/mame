@@ -40,12 +40,13 @@ ToDo (granny):
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "video/tms9928a.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/tms9928a.h"
+#include "speaker.h"
 
 class by133_state : public driver_device
 {

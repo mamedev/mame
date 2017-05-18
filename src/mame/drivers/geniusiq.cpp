@@ -239,6 +239,7 @@ TMP47C241MG = TCLS-47 series 4-bit CPU with 2048x8 internal ROM
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "screen.h"
 #include "softlist.h"
 
 #define KEYBOARD_QUEUE_SIZE     0x80
@@ -770,7 +771,7 @@ DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state,iq128_cart)
 
 	m_cart_state = IQ128_ROM_CART;
 
-	if (image.software_entry() != nullptr)
+	if (image.loaded_through_softlist())
 	{
 		const char *pcb_type = image.get_feature("pcb_type");
 		if (pcb_type)

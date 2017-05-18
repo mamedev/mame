@@ -13,7 +13,6 @@
 #ifndef __GENBOARD__
 #define __GENBOARD__
 
-#include "emu.h"
 #include "ti99defs.h"
 #include "machine/mm58274c.h"
 #include "video/v9938.h"

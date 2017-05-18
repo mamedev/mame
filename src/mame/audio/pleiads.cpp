@@ -18,7 +18,7 @@
 #define TONE1_CLOCK  8000
 
 
-const device_type PLEIADS = &device_creator<pleiads_sound_device>;
+const device_type PLEIADS = device_creator<pleiads_sound_device>;
 
 pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PLEIADS, "Pleiads Audio Custom", tag, owner, clock, "pleiads_sound", __FILE__),
@@ -39,16 +39,6 @@ pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, device
 		m_pc5_resistor(0),
 		m_polybit_resistor(0),
 		m_opamp_resistor(0)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pleiads_sound_device::device_config_complete()
 {
 }
 
@@ -117,20 +107,10 @@ void pleiads_sound_device::device_start()
 	common_start();
 }
 
-const device_type NAUGHTYB = &device_creator<naughtyb_sound_device>;
+const device_type NAUGHTYB = device_creator<naughtyb_sound_device>;
 
 naughtyb_sound_device::naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pleiads_sound_device(mconfig, NAUGHTYB, "Naughty Boy Audio Custom", tag, owner, clock, "naughtyb_sound", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void naughtyb_sound_device::device_config_complete()
 {
 }
 
@@ -195,20 +175,10 @@ void naughtyb_sound_device::device_start()
 	common_start();
 }
 
-const device_type POPFLAME = &device_creator<popflame_sound_device>;
+const device_type POPFLAME = device_creator<popflame_sound_device>;
 
 popflame_sound_device::popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pleiads_sound_device(mconfig, POPFLAME, "Pop Flamer Audio Custom", tag, owner, clock, "popflame_sound", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void popflame_sound_device::device_config_complete()
 {
 }
 

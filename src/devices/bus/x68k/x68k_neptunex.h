@@ -13,7 +13,6 @@
 #ifndef X68K_NEPTUNEX_H_
 #define X68K_NEPTUNEX_H_
 
-#include "emu.h"
 #include "machine/dp8390.h"
 #include "x68kexp.h"
 

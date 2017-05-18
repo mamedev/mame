@@ -13,11 +13,12 @@ The noise taps and behavior are the same as the Virtual Boy.
 
 **************************************************************************************/
 
+#include "emu.h"
 #include "wswan.h"
 
 
 // device type definition
-const device_type WSWAN_SND = &device_creator<wswan_sound_device>;
+const device_type WSWAN_SND = device_creator<wswan_sound_device>;
 
 
 //**************************************************************************

@@ -11,7 +11,7 @@
 #include "rendutil.h"
 #include "video/rgbutil.h"
 
-const device_type POWERVR2 = &device_creator<powervr2_device>;
+const device_type POWERVR2 = device_creator<powervr2_device>;
 
 DEVICE_ADDRESS_MAP_START(ta_map, 32, powervr2_device)
 	AM_RANGE(0x0000, 0x0003) AM_READ(     id_r)
@@ -3499,6 +3499,7 @@ WRITE32_MEMBER( powervr2_device::pvr2_ta_w )
 	//printf("PVR2 %08x %08x\n",reg,dat);
 }
 
+// TODO: move to specific device
 READ32_MEMBER( powervr2_device::elan_regs_r )
 {
 	switch(offset)

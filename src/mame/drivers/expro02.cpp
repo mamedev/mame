@@ -205,13 +205,17 @@ TODO:
 */
 
 #include "emu.h"
+#include "includes/galpnipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/kaneko_hit.h"
 #include "machine/watchdog.h"
 #include "video/kaneko_tmap.h"
 #include "video/kaneko_spr.h"
-#include "includes/galpnipt.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class expro02_state : public driver_device
 {

@@ -12,7 +12,6 @@
 #define __OCEAN__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

@@ -44,14 +44,18 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/taitoipt.h"
+#include "audio/taitosnd.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
 #include "cpu/z80/z80.h"
-#include "includes/taitoipt.h"
 #include "machine/z80ctc.h"
-#include "audio/taitosnd.h"
-#include "sound/ym2151.h"
 #include "sound/msm5205.h"
+#include "sound/ym2151.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 

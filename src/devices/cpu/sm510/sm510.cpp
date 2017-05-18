@@ -34,6 +34,7 @@
 
 */
 
+#include "emu.h"
 #include "sm510.h"
 #include "debugger.h"
 

@@ -10,6 +10,7 @@
 #include "sound/sn76496.h"
 #include "audio/segasnd.h"
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 
 class sega005_sound_device;
@@ -174,7 +175,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 
 	// sound stream update overrides

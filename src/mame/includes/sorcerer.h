@@ -9,7 +9,6 @@
 #ifndef SORCERER_H_
 #define SORCERER_H_
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
 #include "machine/ay31015.h"

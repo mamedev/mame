@@ -7,10 +7,12 @@
  *    Z80 @ 4MHz
  */
 
+#include "emu.h"
 #include "decodmd1.h"
 #include "rendlay.h"
+#include "screen.h"
 
-const device_type DECODMD1 = &device_creator<decodmd_type1_device>;
+const device_type DECODMD1 = device_creator<decodmd_type1_device>;
 
 READ8_MEMBER( decodmd_type1_device::latch_r )
 {

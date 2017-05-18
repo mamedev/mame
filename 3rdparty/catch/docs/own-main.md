@@ -16,7 +16,7 @@ If you just need to have code that executes before and/ or after Catch this is t
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 
-int main( int argc, char* const argv[] )
+int main( int argc, char* argv[] )
 {
   // global setup...
 
@@ -24,7 +24,7 @@ int main( int argc, char* const argv[] )
 
   // global clean-up...
 
-  return result;
+  return ( result < 0xff ? result : 0xff );
 }
 ```
 
@@ -36,9 +36,9 @@ If you still want Catch to process the command line, but you want to programatic
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 
-int main( int argc, char* const argv[] )
+int main( int argc, char* argv[] )
 {
-  Catch::Session session; // There must be exactly once instance
+  Catch::Session session; // There must be exactly one instance
 
   // writing to session.configData() here sets defaults
   // this is the preferred way to set them
@@ -51,7 +51,11 @@ int main( int argc, char* const argv[] )
   // overrides command line args
   // only do this if you know you need to
 
-  return session.run();
+  int numFailed = session.run();
+  // Note that on unices only the lower 8 bits are usually used, clamping
+  // the return value to 255 prevents false negative when some multiple
+  // of 256 tests has failed
+  return ( numFailed < 0xff ? numFailed : 0xff );
 }
 ```
 

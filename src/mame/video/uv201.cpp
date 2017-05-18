@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "uv201.h"
 
 
@@ -89,7 +90,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type UV201 = &device_creator<uv201_device>;
+const device_type UV201 = device_creator<uv201_device>;
 
 
 //-------------------------------------------------

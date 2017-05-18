@@ -12,11 +12,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/exedexes.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
-#include "includes/exedexes.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(exedexes_state::exedexes_scanline)

@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "iskr1030.h"
 
 #define VERBOSE_DBG 1       /* general debug messages */
@@ -33,7 +34,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC_KBD_ISKR_1030 = &device_creator<iskr_1030_keyboard_device>;
+const device_type PC_KBD_ISKR_1030 = device_creator<iskr_1030_keyboard_device>;
 
 
 //-------------------------------------------------

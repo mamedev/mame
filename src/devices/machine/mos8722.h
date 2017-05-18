@@ -38,7 +38,6 @@
 #ifndef __MOS8722__
 #define __MOS8722__
 
-#include "emu.h"
 
 
 

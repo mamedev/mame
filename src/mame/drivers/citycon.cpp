@@ -10,11 +10,14 @@ Dip locations added from dip listing at crazykong.com
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/citycon.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
-#include "includes/citycon.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(citycon_state::citycon_in_r)

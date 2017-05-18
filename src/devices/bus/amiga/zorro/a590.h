@@ -13,7 +13,6 @@
 #ifndef __A590_H__
 #define __A590_H__
 
-#include "emu.h"
 #include "zorro.h"
 #include "machine/dmac.h"
 #include "machine/wd33c93.h"

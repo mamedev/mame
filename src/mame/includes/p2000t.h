@@ -6,12 +6,13 @@
  *
  ****************************************************************************/
 
-#ifndef P2000T_H_
-#define P2000T_H_
+#ifndef MAME_INCLUDES_P2000T_H
+#define MAME_INCLUDES_P2000T_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "video/saa5050.h"
 
 
@@ -56,4 +57,4 @@ public:
 	INTERRUPT_GEN_MEMBER(p2000_interrupt);
 };
 
-#endif /* P2000T_H_ */
+#endif // MAME_INCLUDES_P2000T_H

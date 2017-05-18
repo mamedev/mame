@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "terminal.h"
 
 serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -92,4 +93,4 @@ void serial_terminal_device::received_byte(uint8_t byte)
 	term_write(byte);
 }
 
-const device_type SERIAL_TERMINAL = &device_creator<serial_terminal_device>;
+const device_type SERIAL_TERMINAL = device_creator<serial_terminal_device>;

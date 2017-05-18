@@ -1075,7 +1075,7 @@ void lua_engine::initialize()
 	sol().registry().new_usertype<game_driver>("game_driver", "new", sol::no_constructor,
 			"source_file", sol::readonly(&game_driver::source_file),
 			"parent", sol::readonly(&game_driver::parent),
-			"name", sol::readonly(&game_driver::name),
+			"name", sol::property([] (game_driver const &driver) { return &driver.name[0]; }),
 			"description", sol::readonly(&game_driver::description),
 			"year", sol::readonly(&game_driver::year),
 			"manufacturer", sol::readonly(&game_driver::manufacturer),

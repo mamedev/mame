@@ -6,14 +6,15 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_SEGAIC16_H
+#define MAME_MACHINE_SEGAIC16_H
 
-#ifndef __SEGAIC16_H__
-#define __SEGAIC16_H__
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 #include "machine/fd1089.h"
 #include "machine/fd1094.h"
+#include "screen.h"
 
 
 //**************************************************************************
@@ -274,4 +275,4 @@ extern const device_type SEGA_315_5249_DIVIDER;
 extern const device_type SEGA_315_5250_COMPARE_TIMER;
 
 
-#endif
+#endif // MAME_MACHINE_SEGAIC16_H

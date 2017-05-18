@@ -13,7 +13,7 @@
 
 
 // device type definition
-const device_type ST0016 = &device_creator<st0016_device>;
+const device_type ST0016 = device_creator<st0016_device>;
 
 
 //**************************************************************************

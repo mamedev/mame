@@ -6,7 +6,6 @@
 #define __PX8__
 
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "imagedev/cassette.h"

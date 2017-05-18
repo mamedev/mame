@@ -12,7 +12,6 @@
 #ifndef __ES5510_H__
 #define __ES5510_H__
 
-#include "emu.h"
 
 class es5510_device : public cpu_device {
 public:

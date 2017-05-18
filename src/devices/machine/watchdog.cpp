@@ -9,15 +9,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "watchdog.h"
+
+#include "emuopts.h"
+#include "screen.h"
 
 
 //**************************************************************************
 //  WATCHDOG TIMER DEVICE
 //**************************************************************************
 
-const device_type WATCHDOG_TIMER = &device_creator<watchdog_timer_device>;
+const device_type WATCHDOG_TIMER = device_creator<watchdog_timer_device>;
 
 //-------------------------------------------------
 //  watchdog_timer_device - constructor

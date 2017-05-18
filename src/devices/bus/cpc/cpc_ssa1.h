@@ -44,7 +44,6 @@
 #define CPC_SSA1_H_
 
 
-#include "emu.h"
 #include "cpcexp.h"
 #include "sound/sp0256.h"
 

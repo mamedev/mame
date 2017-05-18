@@ -1238,6 +1238,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mm5740.h,MACHINES["MM5740"] = true
+---------------------------------------------------
+
+if (MACHINES["MM5740"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mm5740.cpp",
+		MAME_DIR .. "src/devices/machine/mm5740.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/kb3600.h,MACHINES["KB3600"] = true
 ---------------------------------------------------
 

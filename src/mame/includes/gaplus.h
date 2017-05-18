@@ -3,6 +3,7 @@
 #include "sound/namco.h"
 #include "sound/samples.h"
 #include "machine/namcoio.h"
+#include "screen.h"
 
 #define MAX_STARS           250
 

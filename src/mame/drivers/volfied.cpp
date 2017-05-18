@@ -44,18 +44,21 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 ********************************************************************/
 
+#include "emu.h"
+#include "includes/volfied.h"
+#include "includes/taitoipt.h"
+#include "audio/taitosnd.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "sound/2203intf.h"
+#include "speaker.h"
+
+
 /* Define clocks based on actual OSC on the PCB */
 
 #define CPU_CLOCK           (XTAL_32MHz / 4)        /* 8 MHz clock for 68000 */
 #define SOUND_CPU_CLOCK     (XTAL_32MHz / 8)        /* 4 MHz clock for Z80 sound CPU */
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "includes/taitoipt.h"
-#include "audio/taitosnd.h"
-#include "sound/2203intf.h"
-#include "includes/volfied.h"
 
 
 /***********************************************************

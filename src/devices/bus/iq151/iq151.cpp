@@ -20,7 +20,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151CART_SLOT = &device_creator<iq151cart_slot_device>;
+const device_type IQ151CART_SLOT = device_creator<iq151cart_slot_device>;
 
 //**************************************************************************
 //    IQ151 cartridge interface
@@ -92,18 +92,6 @@ void iq151cart_slot_device::device_start()
 
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void iq151cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 /*-------------------------------------------------
     read
@@ -171,7 +159,7 @@ image_init_result iq151cart_slot_device::call_load()
 
 		if (cart_base != nullptr)
 		{
-			if (software_entry() == nullptr)
+			if (!loaded_through_softlist())
 			{
 				read_length = length();
 				fread(m_cart->get_cart_base(), read_length);

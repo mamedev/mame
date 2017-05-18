@@ -39,7 +39,9 @@ http://www.stefan-uhlmann.de/cbm/MVM/index.html
 
 */
 
+#include "emu.h"
 #include "magic_voice.h"
+#include "speaker.h"
 
 
 
@@ -64,7 +66,7 @@ http://www.stefan-uhlmann.de/cbm/MVM/index.html
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MAGIC_VOICE = &device_creator<c64_magic_voice_cartridge_device>;
+const device_type C64_MAGIC_VOICE = device_creator<c64_magic_voice_cartridge_device>;
 
 
 //-------------------------------------------------

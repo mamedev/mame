@@ -40,6 +40,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "ctrl.h"
 // slot devices
 #include "4score.h"
@@ -63,7 +64,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NES_CONTROL_PORT = &device_creator<nes_control_port_device>;
+const device_type NES_CONTROL_PORT = device_creator<nes_control_port_device>;
 
 
 

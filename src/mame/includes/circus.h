@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Coates
 #include "sound/discrete.h"
+#include "sound/samples.h"
 
 class circus_state : public driver_device
 {

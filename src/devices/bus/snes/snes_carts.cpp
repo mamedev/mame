@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "snes_carts.h"
 
 SLOT_INTERFACE_START(snes_cart)

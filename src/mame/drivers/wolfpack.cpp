@@ -7,9 +7,11 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/wolfpack.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
-#include "includes/wolfpack.h"
+#include "speaker.h"
 
 
 void wolfpack_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

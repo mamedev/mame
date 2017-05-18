@@ -24,7 +24,6 @@
 #ifndef __6821PIA_H__
 #define __6821PIA_H__
 
-#include "emu.h"
 
 
 

@@ -11,7 +11,6 @@
 #ifndef __MCF5206E_PERIPHERAL_H__
 #define __MCF5206E_PERIPHERAL_H__
 
-#include "emu.h"
 
 
 
@@ -163,7 +162,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override { }

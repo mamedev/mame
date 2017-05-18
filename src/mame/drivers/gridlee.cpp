@@ -80,11 +80,13 @@
 
 
 #include "emu.h"
+#include "includes/gridlee.h"
+
 #include "cpu/m6809/m6809.h"
 #include "sound/samples.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/gridlee.h"
+#include "speaker.h"
 
 
 /* constants */

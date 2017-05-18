@@ -59,9 +59,12 @@ Known issues:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/tankbatt.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/samples.h"
-#include "includes/tankbatt.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void tankbatt_state::machine_start()

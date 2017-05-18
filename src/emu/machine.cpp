@@ -112,6 +112,7 @@ osd_interface &running_machine::osd() const
 running_machine::running_machine(const machine_config &_config, machine_manager &manager)
 	: firstcpu(nullptr),
 		primary_screen(nullptr),
+		m_side_effect_disabled(0),
 		debug_flags(0),
 		m_config(_config),
 		m_system(_config.gamedrv()),
@@ -264,6 +265,7 @@ void running_machine::start()
 	save().register_presave(save_prepost_delegate(FUNC(running_machine::presave_all_devices), this));
 	start_all_devices();
 	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
+	manager().load_cheatfiles(*this);
 
 	// if we're coming in with a savegame request, process it now
 	const char *savegame = options().state();
@@ -1277,7 +1279,7 @@ static ADDRESS_MAP_START(dummy, AS_0, 8, dummy_space_device)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
-const device_type DUMMY_SPACE = &device_creator<dummy_space_device>;
+const device_type DUMMY_SPACE = device_creator<dummy_space_device>;
 
 dummy_space_device::dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, DUMMY_SPACE, "Dummy Space", tag, owner, clock, "dummy_space", __FILE__),

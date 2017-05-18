@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "xin1.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COLECOVISION_XIN1 = &device_creator<colecovision_xin1_cartridge_device>;
+const device_type COLECOVISION_XIN1 = device_creator<colecovision_xin1_cartridge_device>;
 
 
 

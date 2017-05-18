@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "pds30_30hr.h"
+#include "screen.h"
 
 #define XCEED30HR_SCREEN_NAME "x30hr_screen"
 #define XCEED30HR_ROM_REGION  "x30hr_rom"
@@ -38,7 +39,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PDS030_XCEED30HR = &device_creator<nubus_xceed30hr_device>;
+const device_type PDS030_XCEED30HR = device_creator<nubus_xceed30hr_device>;
 
 
 //-------------------------------------------------

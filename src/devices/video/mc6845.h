@@ -9,7 +9,6 @@
 #ifndef __MC6845__
 #define __MC6845__
 
-#include "emu.h"
 
 
 #define MCFG_MC6845_ADD(_tag, _variant, _screen_tag, _clock) \

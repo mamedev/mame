@@ -84,6 +84,8 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/segacrp2_device.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class calorie_state : public driver_device

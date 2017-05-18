@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "qimi.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type QIMI = &device_creator<qimi_t>;
+const device_type QIMI = device_creator<qimi_t>;
 
 
 //-------------------------------------------------

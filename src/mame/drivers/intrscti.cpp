@@ -15,6 +15,7 @@ I've not had a chance to wire up the board yet, but it might be possible to writ
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class intrscti_state : public driver_device

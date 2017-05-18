@@ -56,8 +56,8 @@
 
  */
 
-const device_type MSM5205 = &device_creator<msm5205_device>;
-const device_type MSM6585 = &device_creator<msm6585_device>;
+const device_type MSM5205 = device_creator<msm5205_device>;
+const device_type MSM6585 = device_creator<msm6585_device>;
 
 
 msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)

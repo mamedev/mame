@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "magic_formel.h"
 
 
@@ -30,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MAGIC_FORMEL = &device_creator<c64_magic_formel_cartridge_device>;
+const device_type C64_MAGIC_FORMEL = device_creator<c64_magic_formel_cartridge_device>;
 
 
 WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pa_w )

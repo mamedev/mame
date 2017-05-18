@@ -11,7 +11,6 @@
 #ifndef __VP590__
 #define __VP590__
 
-#include "emu.h"
 #include "machine/rescap.h"
 #include "exp.h"
 #include "video/cdp1862.h"

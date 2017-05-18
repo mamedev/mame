@@ -5,6 +5,7 @@
  *   Xerox AltoII mouse interface
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 #include "a2roms.h"
 

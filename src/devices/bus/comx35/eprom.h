@@ -11,7 +11,6 @@
 #ifndef __COMX_EPR__
 #define __COMX_EPR__
 
-#include "emu.h"
 #include "exp.h"
 
 

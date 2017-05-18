@@ -557,14 +557,8 @@ private:
 	bool generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t reg);
 	bool generate_get_cop0_reg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t reg);
 	bool generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_cop1_fr0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_cop1_fr1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_get_cop1_reg64(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const uint32_t reg, const uml::parameter& param);
-	void generate_get_cop1_reg64_d2i(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const uint32_t reg, const uml::parameter& param);
-	void generate_set_cop1_reg64(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const uint32_t reg, const uml::parameter& param);
-	void generate_set_cop1_reg64_i2d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, const uint32_t reg, const uml::parameter& param);
-	bool generate_cop1x_fr0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_cop1x_fr1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_cop1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_cop1x(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
 	void check_cop0_access(drcuml_block *block);
 	void check_cop1_access(drcuml_block *block);

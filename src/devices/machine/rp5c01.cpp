@@ -16,11 +16,12 @@
 
 */
 
+#include "emu.h"
 #include "rp5c01.h"
 
 
 // device type definition
-const device_type RP5C01 = &device_creator<rp5c01_device>;
+const device_type RP5C01 = device_creator<rp5c01_device>;
 
 
 //**************************************************************************

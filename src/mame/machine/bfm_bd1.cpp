@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "bfm_bd1.h"
 
-const device_type BFM_BD1 = &device_creator<bfm_bd1_t>;
+const device_type BFM_BD1 = device_creator<bfm_bd1_t>;
 
 
 /*

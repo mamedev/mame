@@ -5,7 +5,6 @@
 #ifndef __DMV_K806_H__
 #define __DMV_K806_H__
 
-#include "emu.h"
 #include "dmvbus.h"
 #include "cpu/mcs48/mcs48.h"
 

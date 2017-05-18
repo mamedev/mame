@@ -10,7 +10,6 @@
 #ifndef __ELECTRON_M2105__
 #define __ELECTRON_M2105__
 
-#include "emu.h"
 #include "exp.h"
 #include "machine/6522via.h"
 #include "machine/mc68681.h"

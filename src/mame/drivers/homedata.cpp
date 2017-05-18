@@ -235,11 +235,15 @@ Custom: GX61A01
 
 #include "emu.h"
 #include "includes/homedata.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/upd7810/upd7810.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 INTERRUPT_GEN_MEMBER(homedata_state::homedata_irq)
 {
@@ -584,13 +588,6 @@ static ADDRESS_MAP_START( reikaids_upd7807_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0xff00, 0xffff) AM_RAM /* Internal RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( reikaids_upd7807_io_map, AS_IO, 8, homedata_state )
-	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READWRITE(reikaids_upd7807_porta_r, reikaids_upd7807_porta_w)
-	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_WRITE(reikaids_upd7807_portc_w)
-	AM_RANGE(UPD7807_PORTT, UPD7807_PORTT) AM_READ(reikaids_snd_command_r)
-ADDRESS_MAP_END
-
 /**************************************************************************/
 
 
@@ -617,13 +614,6 @@ static ADDRESS_MAP_START( pteacher_upd7807_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(pteacher_snd_answer_w)
 	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")    /* External ROM (Banked) */
 	AM_RANGE(0xff00, 0xffff) AM_RAM /* Internal RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pteacher_upd7807_io_map, AS_IO, 8, homedata_state )
-	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READWRITE(pteacher_upd7807_porta_r, pteacher_upd7807_porta_w)
-	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_READ_PORT("COIN") AM_WRITE(pteacher_upd7807_portc_w)
-	AM_RANGE(UPD7807_PORTT, UPD7807_PORTT) AM_READ(pteacher_keyboard_r)
 ADDRESS_MAP_END
 
 /**************************************************************************/
@@ -1275,7 +1265,11 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 
 	MCFG_CPU_ADD("audiocpu", UPD7807, 8000000)  /* ??? MHz (max speed for the 7807 is 12MHz) */
 	MCFG_CPU_PROGRAM_MAP(reikaids_upd7807_map)
-	MCFG_CPU_IO_MAP(reikaids_upd7807_io_map)
+	MCFG_UPD7807_PORTA_READ_CB(READ8(homedata_state, reikaids_upd7807_porta_r))
+	MCFG_UPD7807_PORTA_WRITE_CB(WRITE8(homedata_state, reikaids_upd7807_porta_w))
+	MCFG_UPD7807_PORTB_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_UPD7807_PORTC_WRITE_CB(WRITE8(homedata_state, reikaids_upd7807_portc_w))
+	MCFG_UPD7807_PORTT_READ_CB(READ8(homedata_state, reikaids_snd_command_r))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) // very high interleave required to sync for startup tests
@@ -1327,7 +1321,12 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 
 	MCFG_CPU_ADD("audiocpu", UPD7807, 9000000)  /* 9MHz ? */
 	MCFG_CPU_PROGRAM_MAP(pteacher_upd7807_map)
-	MCFG_CPU_IO_MAP(pteacher_upd7807_io_map)
+	MCFG_UPD7807_PORTA_READ_CB(READ8(homedata_state, pteacher_upd7807_porta_r))
+	MCFG_UPD7807_PORTA_WRITE_CB(WRITE8(homedata_state, pteacher_upd7807_porta_w))
+	MCFG_UPD7807_PORTB_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_UPD7807_PORTC_READ_CB(IOPORT("COIN"))
+	MCFG_UPD7807_PORTC_WRITE_CB(WRITE8(homedata_state, pteacher_upd7807_portc_w))
+	MCFG_UPD7807_PORTT_READ_CB(READ8(homedata_state, pteacher_keyboard_r))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // should be enough

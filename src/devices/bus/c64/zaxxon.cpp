@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "zaxxon.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_ZAXXON = &device_creator<c64_zaxxon_cartridge_device>;
+const device_type C64_ZAXXON = device_creator<c64_zaxxon_cartridge_device>;
 
 
 

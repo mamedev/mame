@@ -45,7 +45,6 @@
 #ifndef PROM82S129_H
 #define PROM82S129_H
 
-#include "emu.h"
 
 #define MCFG_82S126_OUTPUT_CB(_devcb) \
 	devcb = &prom82s129_base_device::set_out_cb(*device, DEVCB_##_devcb);

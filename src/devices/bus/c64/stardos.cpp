@@ -26,6 +26,7 @@
 
 */
 
+#include "emu.h"
 #include "stardos.h"
 
 
@@ -43,7 +44,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_STARDOS = &device_creator<c64_stardos_cartridge_device>;
+const device_type C64_STARDOS = device_creator<c64_stardos_cartridge_device>;
 
 
 //-------------------------------------------------

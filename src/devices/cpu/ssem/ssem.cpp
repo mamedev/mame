@@ -76,7 +76,7 @@ inline void ssem_device::program_write32(uint32_t address, uint32_t data)
 
 /*****************************************************************************/
 
-const device_type SSEMCPU = &device_creator<ssem_device>;
+const device_type SSEMCPU = device_creator<ssem_device>;
 
 //-------------------------------------------------
 //  ssem_device - constructor

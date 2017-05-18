@@ -29,6 +29,8 @@ always false - counter was reloaded and incremented before interrupt occurs
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class tugboat_state : public driver_device

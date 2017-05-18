@@ -28,7 +28,6 @@
 #ifndef __MOS8706__
 #define __MOS8706__
 
-#include "emu.h"
 
 
 

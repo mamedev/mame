@@ -50,11 +50,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/lwings.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/lwings.h"
+#include "screen.h"
+#include "speaker.h"
 
 /* Avengers runs on hardware almost identical to Trojan, but with a protection
  * device and some small changes to the memory map and videohardware.

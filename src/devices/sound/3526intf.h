@@ -5,7 +5,6 @@
 #ifndef __3526INTF_H__
 #define __3526INTF_H__
 
-#include "emu.h"
 
 #define MCFG_YM3526_IRQ_HANDLER(_devcb) \
 	devcb = &ym3526_device::set_irq_handler(*device, DEVCB_##_devcb);
@@ -33,7 +32,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;

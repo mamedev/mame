@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "sound/discrete.h"
+#include "screen.h"
 
 
 class copsnrob_state : public driver_device

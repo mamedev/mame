@@ -5,13 +5,13 @@
 
 #pragma once
 
-#define SP_MASK m_sp_mask   // stack pointer mask
-#define SP_LOW  m_sp_low    // stack pointer low water mark
-#define PC      m_pc.w.l    // program counter lower word
-#define S       m_s.w.l     // stack pointer lower word
-#define A       m_a         // accumulator
-#define X       m_x         // index register
-#define CC      m_cc        // condition codes
+#define SP_MASK m_params.m_sp_mask  // stack pointer mask
+#define SP_LOW  m_params.m_sp_floor // stack pointer low water mark
+#define PC      m_pc.w.l            // program counter lower word
+#define S       m_s.w.l             // stack pointer lower word
+#define A       m_a                 // accumulator
+#define X       m_x                 // index register
+#define CC      m_cc                // condition codes
 
 #define EAD     m_ea.d
 #define EA      m_ea.w.l
@@ -116,6 +116,26 @@ inline void m6805_base_device::skipbyte() { rdop_arg(PC++); }
 /* Macros for branch instructions */
 #define BRANCH(f) do { u8 t; immbyte(t); if (bool(f) == bool(C)) PC += SIGNED(t); } while (false)
 
+offs_t CPU_DISASSEMBLE_NAME(m146805)(
+		cpu_device *device,
+		std::ostream &stream,
+		offs_t pc,
+		const u8 *oprom,
+		const u8 *opram,
+		int options,
+		std::pair<u16, char const *> const symbols[],
+		std::size_t symbol_count);
+
+offs_t CPU_DISASSEMBLE_NAME(m68hc05)(
+		cpu_device *device,
+		std::ostream &stream,
+		offs_t pc,
+		const u8 *oprom,
+		const u8 *opram,
+		int options,
+		std::pair<u16, char const *> const symbols[],
+		std::size_t symbol_count);
+
 offs_t CPU_DISASSEMBLE_NAME(m6805)(
 		cpu_device *device,
 		std::ostream &stream,
@@ -137,6 +157,32 @@ inline offs_t CPU_DISASSEMBLE_NAME(m6805)(
 		std::pair<u16, char const *> const (&symbols)[N])
 {
 	return CPU_DISASSEMBLE_NAME(m6805)(device, stream, pc, oprom, opram, options, symbols, N);
+}
+
+template <size_t N>
+inline offs_t CPU_DISASSEMBLE_NAME(m146805)(
+		cpu_device *device,
+		std::ostream &stream,
+		offs_t pc,
+		const u8 *oprom,
+		const u8 *opram,
+		int options,
+		std::pair<u16, char const *> const (&symbols)[N])
+{
+	return CPU_DISASSEMBLE_NAME(m146805)(device, stream, pc, oprom, opram, options, symbols, N);
+}
+
+template <size_t N>
+inline offs_t CPU_DISASSEMBLE_NAME(m68hc05)(
+		cpu_device *device,
+		std::ostream &stream,
+		offs_t pc,
+		const u8 *oprom,
+		const u8 *opram,
+		int options,
+		std::pair<u16, char const *> const (&symbols)[N])
+{
+	return CPU_DISASSEMBLE_NAME(m68hc05)(device, stream, pc, oprom, opram, options, symbols, N);
 }
 
 #endif // MAME_CPU_M6805_M6805DEFS_H

@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "latch.h"
 
-const device_type OUTPUT_LATCH = &device_creator<output_latch_device>;
+const device_type OUTPUT_LATCH = device_creator<output_latch_device>;
 
 output_latch_device::output_latch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OUTPUT_LATCH, "Output Latch", tag, owner, clock, "output_latch", __FILE__),

@@ -42,11 +42,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/mos6551.h"    // debug tty
 #include "machine/mc146818.h"
-#include "bus/rs232/rs232.h"
+#include "screen.h"
+
 
 class tek440x_state : public driver_device
 {

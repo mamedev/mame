@@ -7,10 +7,13 @@ Taito Super Speed Race driver
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/sspeedr.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
+#include "screen.h"
+
 #include "sspeedr.lh"
-#include "includes/sspeedr.h"
 
 
 

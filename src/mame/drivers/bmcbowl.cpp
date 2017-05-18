@@ -109,6 +109,8 @@ Main board:
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define NVRAM_HACK
 

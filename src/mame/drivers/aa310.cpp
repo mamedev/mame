@@ -84,8 +84,9 @@
 
 
 #include "emu.h"
-#include "cpu/arm/arm.h"
 #include "includes/archimds.h"
+
+#include "cpu/arm/arm.h"
 #include "formats/acorn_dsk.h"
 #include "formats/apd_dsk.h"
 #include "machine/i2cmem.h"
@@ -93,6 +94,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/volt_reg.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class aa310_state : public archimedes_state
 {

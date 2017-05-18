@@ -8,6 +8,7 @@
 
 #include "sound/upd7759.h"
 #include "sound/samples.h"
+#include "screen.h"
 
 class homerun_state : public driver_device
 {

@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "eim.h"
 
 
@@ -36,7 +37,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEWBRAIN_EIM = &device_creator<newbrain_eim_t>;
+const device_type NEWBRAIN_EIM = device_creator<newbrain_eim_t>;
 
 
 //-------------------------------------------------

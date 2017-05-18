@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "msm6255.h"
 
 
@@ -51,7 +52,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type MSM6255 = &device_creator<msm6255_device>;
+const device_type MSM6255 = device_creator<msm6255_device>;
 
 // I/O map
 DEVICE_ADDRESS_MAP_START( map, 8, msm6255_device )

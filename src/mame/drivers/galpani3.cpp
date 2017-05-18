@@ -65,12 +65,14 @@ Dumped by Uki
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/ymz280b.h"
-#include "video/sknsspr.h"
 #include "machine/eepromser.h"
-#include "machine/watchdog.h"
 #include "machine/kaneko_toybox.h"
+#include "machine/watchdog.h"
+#include "sound/ymz280b.h"
 #include "video/kaneko_grap2.h"
+#include "video/sknsspr.h"
+#include "screen.h"
+#include "speaker.h"
 
 class galpani3_state : public driver_device
 {

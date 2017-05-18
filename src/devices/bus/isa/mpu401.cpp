@@ -45,7 +45,7 @@ WRITE_LINE_MEMBER( isa8_mpu401_device::mpu_irq_out )
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_MPU401 = &device_creator<isa8_mpu401_device>;
+const device_type ISA8_MPU401 = device_creator<isa8_mpu401_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

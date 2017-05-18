@@ -26,7 +26,11 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "chsuper.lh"
+
 
 class chsuper_state : public driver_device
 {

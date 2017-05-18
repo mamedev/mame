@@ -15,7 +15,6 @@
 #ifndef __GG_EXT_PORT__
 #define __GG_EXT_PORT__
 
-#include "emu.h"
 
 
 

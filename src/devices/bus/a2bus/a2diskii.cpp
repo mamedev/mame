@@ -9,7 +9,6 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "includes/apple2.h"
 #include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
 #include "machine/appldriv.h"
@@ -24,8 +23,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_DISKII = &device_creator<a2bus_diskii_device>;
-const device_type A2BUS_IWM_FDC = &device_creator<a2bus_iwmflop_device>;
+const device_type A2BUS_DISKII = device_creator<a2bus_diskii_device>;
+const device_type A2BUS_IWM_FDC = device_creator<a2bus_iwmflop_device>;
 
 #define DISKII_ROM_REGION  "diskii_rom"
 #define FDC_TAG            "diskii_fdc"

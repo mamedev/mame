@@ -314,6 +314,7 @@ Notes:
 
 #include "emu.h"
 #include "includes/armedf.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
@@ -321,6 +322,8 @@ Notes:
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define LEGION_HACK 0
 

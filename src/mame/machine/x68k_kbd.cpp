@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald,Vas Crabb
+#include "emu.h"
 #include "machine/x68k_kbd.h"
 
 #include "machine/keyboard.ipp"
@@ -301,7 +302,7 @@ void x68k_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, in
 }
 
 
-const device_type X68K_KEYBOARD = &device_creator<x68k_keyboard_device>;
+const device_type X68K_KEYBOARD = device_creator<x68k_keyboard_device>;
 
 #if 0
 

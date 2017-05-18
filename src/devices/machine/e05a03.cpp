@@ -14,7 +14,7 @@
     DEVICE INTERFACE
 *****************************************************************************/
 
-const device_type E05A03 = &device_creator<e05a03_device>;
+const device_type E05A03 = device_creator<e05a03_device>;
 
 e05a03_device::e05a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, E05A03, "E05A03", tag, owner, clock, "e05a03", __FILE__),

@@ -16,11 +16,11 @@ C76     System 11
 #include "namcomcu.h"
 
 
-const device_type NAMCO_C69 = &device_creator<namco_c69_device>;
-const device_type NAMCO_C70 = &device_creator<namco_c70_device>;
-const device_type NAMCO_C74 = &device_creator<namco_c74_device>;
-const device_type NAMCO_C75 = &device_creator<namco_c75_device>;
-const device_type NAMCO_C76 = &device_creator<namco_c76_device>;
+const device_type NAMCO_C69 = device_creator<namco_c69_device>;
+const device_type NAMCO_C70 = device_creator<namco_c70_device>;
+const device_type NAMCO_C74 = device_creator<namco_c74_device>;
+const device_type NAMCO_C75 = device_creator<namco_c75_device>;
+const device_type NAMCO_C76 = device_creator<namco_c76_device>;
 
 
 ROM_START( c69 )

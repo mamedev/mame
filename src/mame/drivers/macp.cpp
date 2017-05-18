@@ -3,6 +3,7 @@
 // PINBALL
 // Skeleton driver for MAC S.A. and CICPlay pinballs. ROM definitions taken from PinMAME.
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8279.h"

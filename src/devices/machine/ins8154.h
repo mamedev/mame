@@ -35,7 +35,6 @@
 #ifndef __INS8154_H__
 #define __INS8154_H__
 
-#include "emu.h"
 
 
 

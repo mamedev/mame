@@ -181,6 +181,7 @@ Check gticlub.c for details on the bottom board.
 #include "video/k001006.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/konami_helper.h"
+#include "speaker.h"
 
 
 class zr107_state : public driver_device

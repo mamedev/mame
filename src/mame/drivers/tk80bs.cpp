@@ -26,6 +26,7 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
+#include "screen.h"
 
 class tk80bs_state : public driver_device
 {
@@ -220,4 +221,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS         INIT     COMPANY                 FULLNAME       FLAGS */
-COMP( 1980, tk80bs,   tk80,   0,       tk80bs,    tk80bs,   driver_device, 0, "Nippon Electronic Company", "TK-80BS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1980, tk80bs,   tk80,   0,       tk80bs,    tk80bs,   driver_device, 0, "NEC", "TK-80BS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

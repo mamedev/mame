@@ -7,6 +7,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "machine/ie15_kbd.h"
 
 /***************************************************************************
@@ -299,4 +300,4 @@ ioport_constructor ie15_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ie15_keyboard);
 }
 
-const device_type IE15_KEYBOARD = &device_creator<ie15_keyboard_device>;
+const device_type IE15_KEYBOARD = device_creator<ie15_keyboard_device>;

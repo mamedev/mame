@@ -14,9 +14,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ESQPANEL1x22 = &device_creator<esqpanel1x22_device>;
-const device_type ESQPANEL2x40 = &device_creator<esqpanel2x40_device>;
-const device_type ESQPANEL2x16_SQ1 = &device_creator<esqpanel2x16_sq1_device>;
+const device_type ESQPANEL1x22 = device_creator<esqpanel1x22_device>;
+const device_type ESQPANEL2x40 = device_creator<esqpanel2x40_device>;
+const device_type ESQPANEL2x16_SQ1 = device_creator<esqpanel2x16_sq1_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

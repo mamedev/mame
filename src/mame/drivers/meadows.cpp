@@ -118,8 +118,12 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/meadows.h"
+
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "deadeye.lh"
 #include "gypsyjug.lh"
 #include "minferno.lh"

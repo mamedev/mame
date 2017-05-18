@@ -43,11 +43,15 @@ ToDo:
 
 ************************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "atari_s1.lh"
 
 

@@ -15,7 +15,9 @@
 */
 
 #include "emu.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/cbmiec/c1541.h"
 #include "bus/c64/exp.h"

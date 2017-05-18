@@ -12,7 +12,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "emuopts.h"
 
 // don't include osd_interface in header files
@@ -32,7 +31,7 @@ public:
 	~cli_frontend();
 
 	// execute based on the incoming argc/argv
-	int execute(int argc, char **argv);
+	int execute(std::vector<std::string> &args);
 
 	// direct access to the command operations
 	void listxml(const char *gamename = "*");
@@ -43,7 +42,6 @@ public:
 	void listcrc(const char *gamename = "*");
 	void listroms(const char *gamename = "*");
 	void listsamples(const char *gamename = "*");
-	static int compare_devices(const void *i1, const void *i2);
 	void listdevices(const char *gamename = "*");
 	void listslots(const char *gamename = "*");
 	void listmedia(const char *gamename = "*");
@@ -61,7 +59,7 @@ private:
 	void display_help(const char *exename);
 	void display_suggestions(const char *gamename);
 	void output_single_softlist(FILE *out, software_list_device &swlist);
-	void start_execution(mame_machine_manager *manager, int argc, char **argv, std::string &option_errors);
+	void start_execution(mame_machine_manager *manager, std::vector<std::string> &args);
 
 	// internal state
 	emu_options &       m_options;

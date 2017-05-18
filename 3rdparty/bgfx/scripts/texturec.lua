@@ -37,12 +37,21 @@ project "texturec"
 		path.join(BGFX_DIR, "tools/texturec/**.h"),
 	}
 
+	links {
+		"bx",
+	}
+
 	configuration { "mingw-*" }
 		targetextension ".exe"
 
 	configuration { "osx" }
 		links {
 			"Cocoa.framework",
+		}
+
+	configuration { "vs20* or mingw*" }
+		links {
+			"psapi",
 		}
 
 	configuration {}

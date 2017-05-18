@@ -5,7 +5,6 @@
 #ifndef __MPZ80__
 #define __MPZ80__
 
-#include "emu.h"
 #include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
@@ -67,7 +66,6 @@ public:
 	DECLARE_WRITE8_MEMBER( mask_w );
 	DECLARE_WRITE_LINE_MEMBER( s100_pint_w );
 	DECLARE_WRITE_LINE_MEMBER( s100_nmi_w );
-	DECLARE_DIRECT_UPDATE_MEMBER(mpz80_direct_update_handler);
 
 	// memory state
 	uint32_t m_addr;

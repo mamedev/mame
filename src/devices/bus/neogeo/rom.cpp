@@ -17,7 +17,7 @@
 //  neogeo_rom_device - constructor
 //-------------------------------------------------
 
-const device_type NEOGEO_ROM = &device_creator<neogeo_rom_device>;
+const device_type NEOGEO_ROM = device_creator<neogeo_rom_device>;
 
 
 neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint16_t clock, const char *shortname, const char *source) :
@@ -69,7 +69,7 @@ WRITE16_MEMBER(neogeo_rom_device::banksel_w)
  V-Liner : this is plain NeoGeo cart + RAM
  **************************************************/
 
-const device_type NEOGEO_VLINER_CART = &device_creator<neogeo_vliner_cart>;
+const device_type NEOGEO_VLINER_CART = device_creator<neogeo_vliner_cart>;
 
 neogeo_vliner_cart::neogeo_vliner_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_rom_device(mconfig, NEOGEO_VLINER_CART, "Neo Geo V-Liner Cart", tag, owner, clock, "neocart_vliner", __FILE__)

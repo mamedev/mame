@@ -11,18 +11,10 @@
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
 
-#include <cstddef>
-#include <memory>
-#include <vector>
-
-#include "analog/nld_twoterm.h"
-#include "nl_base.h"
-#include "nl_time.h"
-#include "plib/palloc.h"
-#include "plib/pfmtlog.h"
-#include "plib/pfunction.h"
-#include "plib/pstring.h"
-#include "plib/putil.h"
+#include "../nl_base.h"
+#include "../nl_setup.h"
+#include "../analog/nlid_twoterm.h"
+#include "../plib/putil.h"
 
 namespace netlist
 {
@@ -127,16 +119,16 @@ namespace netlist
 		, m_cnt(*this, "m_cnt", 0)
 		, m_off(*this, "m_off", netlist_time::zero())
 		{
-			m_inc[0] = netlist_time::from_double(1.0 / (m_freq()*2.0));
+			m_inc[0] = netlist_time::from_double(1.0 / (m_freq() * 2.0));
 
 			connect(m_feedback, m_Q);
 			{
 				netlist_time base = netlist_time::from_double(1.0 / (m_freq()*2.0));
-				plib::pstring_vector_t pat(m_pattern(),",");
+				std::vector<pstring> pat(plib::psplit(m_pattern(),","));
 				m_off = netlist_time::from_double(m_offset());
 
-				unsigned long pati[256];
-				m_size = pat.size();
+				unsigned long pati[32];
+				m_size = static_cast<std::uint8_t>(pat.size());
 				unsigned long total = 0;
 				for (unsigned i=0; i<m_size; i++)
 				{
@@ -163,10 +155,10 @@ namespace netlist
 
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
-		netlist_time m_inc[32];
-		state_var<unsigned> m_cnt;
+		state_var<std::uint8_t> m_cnt;
+		std::uint8_t m_size;
 		state_var<netlist_time> m_off;
-		std::size_t m_size;
+		netlist_time m_inc[32];
 	};
 
 	// -----------------------------------------------------------------------------
@@ -311,8 +303,8 @@ namespace netlist
 	NETLIB_OBJECT(function)
 	{
 		NETLIB_CONSTRUCTOR(function)
-		, m_N(*this, "N", 2)
-		, m_func(*this, "FUNC", "")
+		, m_N(*this, "N", 1)
+		, m_func(*this, "FUNC", "A0")
 		, m_Q(*this, "Q")
 		{
 			std::vector<pstring> inps;
@@ -323,7 +315,7 @@ namespace netlist
 				inps.push_back(n);
 				m_vals.push_back(0.0);
 			}
-			m_precompiled.compile_postfix(inps, m_func());
+			m_precompiled.compile(inps, m_func());
 		}
 
 	protected:

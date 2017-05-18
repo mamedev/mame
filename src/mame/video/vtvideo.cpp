@@ -59,6 +59,7 @@ FIXME: work out the differences and identify common code between VT and Rainbow.
 
 #include "emu.h"
 #include "video/vtvideo.h"
+#include "screen.h"
 
 /***************************************************************************
 PARAMETERS
@@ -69,8 +70,8 @@ PARAMETERS
 #define LOG(x)      do { if (VERBOSE) logerror x; } while (0)
 
 
-const device_type VT100_VIDEO = &device_creator<vt100_video_device>;
-const device_type RAINBOW_VIDEO = &device_creator<rainbow_video_device>;
+const device_type VT100_VIDEO = device_creator<vt100_video_device>;
+const device_type RAINBOW_VIDEO = device_creator<rainbow_video_device>;
 
 
 vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

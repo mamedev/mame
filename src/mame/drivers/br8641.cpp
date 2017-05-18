@@ -28,6 +28,7 @@ ToDo:
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "sound/beep.h"
+#include "speaker.h"
 
 class brandt8641_state : public driver_device
 {

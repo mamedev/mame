@@ -21,12 +21,15 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/sn76496.h"
-#include "sound/beep.h"
-#include "video/mc6845.h"
-#include "machine/wd_fdc.h"
 #include "imagedev/flopdrv.h"
+#include "machine/wd_fdc.h"
+#include "sound/beep.h"
+#include "sound/sn76496.h"
+#include "video/mc6845.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK XTAL_4_028MHz
 

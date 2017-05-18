@@ -127,8 +127,11 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/warpwarp.h"
+
+#include "cpu/i8085/i8085.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "geebee.lh"
 #include "navarone.lh"

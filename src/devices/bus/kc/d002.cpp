@@ -98,7 +98,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type KC_D002 = &device_creator<kc_d002_device>;
+const device_type KC_D002 = device_creator<kc_d002_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

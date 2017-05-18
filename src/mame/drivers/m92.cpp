@@ -201,13 +201,15 @@ psoldier dip locations still need verification.
 *****************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/nec.h"
-#include "cpu/nec/v25.h"
 #include "includes/m92.h"
 #include "includes/iremipt.h"
+
+#include "cpu/nec/nec.h"
+#include "cpu/nec/v25.h"
 #include "machine/irem_cpu.h"
 #include "sound/ym2151.h"
 #include "sound/iremga20.h"
+#include "speaker.h"
 
 
 // I haven't managed to find a way to keep nbbatman happy when using the proper upd71059c device

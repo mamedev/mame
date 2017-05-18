@@ -11,7 +11,6 @@
 #ifndef __A2BUS_APPLICARD__
 #define __A2BUS_APPLICARD__
 
-#include "emu.h"
 #include "a2bus.h"
 
 //**************************************************************************

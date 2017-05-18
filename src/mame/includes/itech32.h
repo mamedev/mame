@@ -8,6 +8,7 @@
 **************************************************************************/
 
 #include "machine/nvram.h"
+#include "screen.h"
 
 #define VIDEO_CLOCK     XTAL_8MHz           /* video (pixel) clock */
 #define CPU_CLOCK       XTAL_12MHz          /* clock for 68000-based systems */

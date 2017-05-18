@@ -15,8 +15,8 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type SATURN_DRAM_8MB = &device_creator<saturn_dram8mb_device>;
-const device_type SATURN_DRAM_32MB = &device_creator<saturn_dram32mb_device>;
+const device_type SATURN_DRAM_8MB = device_creator<saturn_dram8mb_device>;
+const device_type SATURN_DRAM_32MB = device_creator<saturn_dram32mb_device>;
 
 
 saturn_dram_device::saturn_dram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)

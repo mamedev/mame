@@ -175,11 +175,15 @@ TODO:
 *******************************************************************/
 
 #include "emu.h"
+#include "includes/namcos86.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/ym2151.h"
 #include "sound/n63701x.h"
-#include "includes/namcos86.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(namcos86_state::bankswitch1_w)
 {

@@ -17,6 +17,7 @@ TODO:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/wswan.h"
 #include "render.h"
 

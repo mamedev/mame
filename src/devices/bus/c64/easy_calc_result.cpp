@@ -27,6 +27,7 @@
 
 */
 
+#include "emu.h"
 #include "easy_calc_result.h"
 
 
@@ -35,7 +36,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_EASY_CALC_RESULT = &device_creator<c64_easy_calc_result_cartridge_device>;
+const device_type C64_EASY_CALC_RESULT = device_creator<c64_easy_calc_result_cartridge_device>;
 
 
 

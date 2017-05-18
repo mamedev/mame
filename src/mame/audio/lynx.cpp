@@ -85,8 +85,8 @@ AUD_A_RIGHT EQU %00000001
 
 
 // device type definition
-const device_type LYNX_SND = &device_creator<lynx_sound_device>;
-const device_type LYNX2_SND = &device_creator<lynx2_sound_device>;
+const device_type LYNX_SND = device_creator<lynx_sound_device>;
+const device_type LYNX2_SND = device_creator<lynx2_sound_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -115,20 +115,10 @@ lynx2_sound_device::lynx2_sound_device(const machine_config &mconfig, const char
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
 void lynx_sound_device::set_timer_delegate(device_t &device, lynx_sound_timer_delegate cb)
 {
 	lynx_sound_device &dev = downcast<lynx_sound_device &>(device);
 	dev.m_timer_delegate = cb;
-}
-
-void lynx_sound_device::device_config_complete()
-{
 }
 
 //-------------------------------------------------

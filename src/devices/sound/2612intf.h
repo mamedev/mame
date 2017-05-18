@@ -5,7 +5,6 @@
 #ifndef __2612INTF_H__
 #define __2612INTF_H__
 
-#include "emu.h"
 
 void ym2612_update_request(void *param);
 
@@ -31,7 +30,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_post_load() override;
 	virtual void device_stop() override;

@@ -383,6 +383,8 @@ Notes:
 
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
+#include "screen.h"
+
 
 #define CPU_CLOCK (200000000)
 

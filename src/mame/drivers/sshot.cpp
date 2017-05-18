@@ -164,6 +164,7 @@ Given CS numbers this is released after the other GunChamp
 
 #include "emu.h"
 #include "cpu/scmp/scmp.h"
+#include "screen.h"
 
 #include "gunchamps.lh"
 

@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "segabb.h"
 
-const device_type SEGA_LINDBERGH_BASEBOARD = &device_creator<sega_lindbergh_baseboard_device>;
+const device_type SEGA_LINDBERGH_BASEBOARD = device_creator<sega_lindbergh_baseboard_device>;
 
 DEVICE_ADDRESS_MAP_START(map1, 32, sega_lindbergh_baseboard_device)
 ADDRESS_MAP_END

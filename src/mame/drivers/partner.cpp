@@ -10,16 +10,19 @@
 
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
-#include "machine/i8255.h"
-#include "imagedev/cassette.h"
-#include "formats/smx_dsk.h"
-#include "formats/rk_cas.h"
-#include "includes/radio86.h"
-#include "machine/ram.h"
 #include "includes/partner.h"
+
+#include "cpu/i8085/i8085.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/rk_cas.h"
+#include "formats/smx_dsk.h"
+
 
 /* Address maps */
 static ADDRESS_MAP_START(partner_mem, AS_PROGRAM, 8, partner_state )

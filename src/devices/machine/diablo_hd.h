@@ -7,7 +7,6 @@
 #if !defined(_DIABLO_HD_DEVICE_)
 #define _DIABLO_HD_DEVICE_
 
-#include "emu.h"
 #include "imagedev/diablo.h"
 
 #ifndef DIABLO_DEBUG

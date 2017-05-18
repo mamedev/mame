@@ -12,7 +12,6 @@
 #define __WD2010__
 
 
-#include "emu.h"
 
 
 

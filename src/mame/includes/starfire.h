@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "sound/samples.h"
+#include "screen.h"
 
 
 #define STARFIRE_MASTER_CLOCK   (XTAL_20MHz)

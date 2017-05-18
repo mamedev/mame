@@ -9,7 +9,6 @@
 #ifndef __ORICEXT_H__
 #define __ORICEXT_H__
 
-#include "emu.h"
 #include "cpu/m6502/m6502.h"
 
 #define MCFG_ORICEXT_ADD(_tag, _slot_intf, _def_slot, _cputag, _irq)    \

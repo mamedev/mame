@@ -37,7 +37,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151_MINIGRAF = &device_creator<iq151_minigraf_device>;
+const device_type IQ151_MINIGRAF = device_creator<iq151_minigraf_device>;
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -161,7 +161,7 @@ namespace sol {
 					}
 				}
 			}
-			return stack::push(L, nil);
+			return stack::push(L, lua_nil);
 		}
 
 		static int real_index_call_associative(std::false_type, lua_State* L) {
@@ -173,7 +173,7 @@ namespace sol {
 				K k = *maybek;
 #ifdef SOL_SAFE_USERTYPE
 				if (k > src.size() || k < 1) {
-					return stack::push(L, nil);
+					return stack::push(L, lua_nil);
 				}
 #else
 #endif // Safety
@@ -197,7 +197,7 @@ namespace sol {
 				}
 			}
 
-			return stack::push(L, nil);
+			return stack::push(L, lua_nil);
 		}
 
 		static int real_index_call(lua_State* L) {
@@ -234,7 +234,7 @@ namespace sol {
 #ifdef SOL_SAFE_USERTYPE
 			auto maybek = stack::check_get<K>(L, 2);
 			if (!maybek) {
-				return stack::push(L, nil);
+				return stack::push(L, lua_nil);
 			}
 			K k = *maybek;
 #else
@@ -487,7 +487,7 @@ namespace sol {
 		}
 		
 		template<typename T>
-		struct pusher<T, std::enable_if_t<meta::all<is_container<T>, meta::neg<meta::any<std::is_base_of<reference, meta::unqualified_t<T>>, std::is_base_of<stack_reference, meta::unqualified_t<T>>>>>::value>> {
+		struct pusher<T, std::enable_if_t<meta::all<is_container<meta::unqualified_t<T>>, meta::neg<meta::any<std::is_base_of<reference, meta::unqualified_t<T>>, std::is_base_of<stack_reference, meta::unqualified_t<T>>>>>::value>> {
 			static int push(lua_State* L, const T& cont) {
 				stack_detail::metatable_setup<T> fx(L);
 				return pusher<detail::as_value_tag<T>>{}.push_fx(L, fx, cont);
@@ -500,7 +500,7 @@ namespace sol {
 		};
 
 		template<typename T>
-		struct pusher<T*, std::enable_if_t<meta::all<is_container<T>, meta::neg<meta::any<std::is_base_of<reference, meta::unqualified_t<T>>, std::is_base_of<stack_reference, meta::unqualified_t<T>>>>>::value>> {
+		struct pusher<T*, std::enable_if_t<meta::all<is_container<meta::unqualified_t<T>>, meta::neg<meta::any<std::is_base_of<reference, meta::unqualified_t<T>>, std::is_base_of<stack_reference, meta::unqualified_t<T>>>>>::value>> {
 			static int push(lua_State* L, T* cont) {
 				stack_detail::metatable_setup<meta::unqualified_t<std::remove_pointer_t<T>>*> fx(L);
 				return pusher<detail::as_pointer_tag<T>>{}.push_fx(L, fx, cont);

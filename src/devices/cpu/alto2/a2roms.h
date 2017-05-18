@@ -8,7 +8,6 @@
 #ifndef _CPU_A2ROMS_H_
 #define _CPU_A2ROMS_H_
 
-#include "emu.h"
 
 /**
  * @brief structure to define a ROM's or PROM's loading options

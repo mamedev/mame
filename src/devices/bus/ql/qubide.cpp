@@ -46,6 +46,7 @@
   -------------------------------------------------------------------
 */
 
+#include "emu.h"
 #include "qubide.h"
 
 
@@ -54,7 +55,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type QUBIDE = &device_creator<qubide_t>;
+const device_type QUBIDE = device_creator<qubide_t>;
 
 
 //-------------------------------------------------

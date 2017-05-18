@@ -37,7 +37,7 @@
 #include "sound/wave.h"
 #include "formats/a26_cas.h"
 
-const device_type A26_ROM_SUPERCHARGER = &device_creator<a26_rom_ss_device>;
+const device_type A26_ROM_SUPERCHARGER = device_creator<a26_rom_ss_device>;
 
 
 a26_rom_ss_device::a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -116,7 +116,7 @@ inline uint8_t a26_rom_ss_device::read_byte(uint32_t offset)
 
 READ8_MEMBER(a26_rom_ss_device::read_rom)
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return read_byte(offset);
 
 	// Bankswitch

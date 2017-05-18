@@ -16,8 +16,11 @@ ToDo:
 */
 
 
+#include "emu.h"
 #include "includes/mbc55x.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3] =
 {

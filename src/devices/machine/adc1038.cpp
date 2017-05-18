@@ -13,7 +13,7 @@
 #include "adc1038.h"
 
 
-const device_type ADC1038 = &device_creator<adc1038_device>;
+const device_type ADC1038 = device_creator<adc1038_device>;
 
 adc1038_device::adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ADC1038, "ADC1038", tag, owner, clock, "adc1038", __FILE__), m_cycle(0), m_clk(0), m_adr(0), m_data_in(0), m_data_out(0), m_adc_data(0), m_sars(0),

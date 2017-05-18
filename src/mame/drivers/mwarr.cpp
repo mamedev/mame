@@ -43,6 +43,9 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK     XTAL_12MHz
 #define SOUND_CLOCK      XTAL_45MHz

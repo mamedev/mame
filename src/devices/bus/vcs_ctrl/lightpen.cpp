@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "lightpen.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VCS_LIGHTPEN = &device_creator<vcs_lightpen_device>;
+const device_type VCS_LIGHTPEN = device_creator<vcs_lightpen_device>;
 
 
 INPUT_CHANGED_MEMBER( vcs_lightpen_device::trigger )

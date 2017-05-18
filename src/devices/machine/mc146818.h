@@ -14,7 +14,6 @@
 #ifndef __MC146818_H__
 #define __MC146818_H__
 
-#include "emu.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS

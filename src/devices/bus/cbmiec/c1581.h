@@ -11,7 +11,6 @@
 #ifndef __C1581__
 #define __C1581__
 
-#include "emu.h"
 #include "cbmiec.h"
 #include "cpu/m6502/m6502.h"
 #include "formats/d81_dsk.h"

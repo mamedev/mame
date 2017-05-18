@@ -10,7 +10,6 @@
 #ifndef __ELECTRON_PLUS3__
 #define __ELECTRON_PLUS3__
 
-#include "emu.h"
 #include "exp.h"
 #include "machine/wd_fdc.h"
 #include "formats/acorn_dsk.h"

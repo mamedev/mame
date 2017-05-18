@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Priest, David Haywood, Luca Elia
 #include "video/fuukifg.h"
+#include "screen.h"
 
 /* Define clocks based on actual OSC on the PCB */
 

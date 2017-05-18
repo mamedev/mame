@@ -213,7 +213,7 @@ List of default vregs (title screen):
 //**************************************************************************
 
 // device type definition
-const device_type SEIBU_CRTC = &device_creator<seibu_crtc_device>;
+const device_type SEIBU_CRTC = device_creator<seibu_crtc_device>;
 
 static ADDRESS_MAP_START( seibu_crtc_vregs, AS_0, 16, seibu_crtc_device )
 	AM_RANGE(0x0014, 0x0015) AM_WRITE(decrypt_key_w)

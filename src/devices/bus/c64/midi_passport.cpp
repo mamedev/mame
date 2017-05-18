@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "midi_passport.h"
 #include "machine/clock.h"
 #include "bus/midi/midi.h"
@@ -25,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MIDI_PASSPORT = &device_creator<c64_passport_midi_cartridge_device>;
+const device_type C64_MIDI_PASSPORT = device_creator<c64_passport_midi_cartridge_device>;
 
 
 //-------------------------------------------------

@@ -12,7 +12,6 @@
 #define __C64_BN1541__
 
 
-#include "emu.h"
 #include "user.h"
 
 

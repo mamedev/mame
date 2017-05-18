@@ -53,6 +53,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/abc1600.h"
 #include "softlist.h"
 

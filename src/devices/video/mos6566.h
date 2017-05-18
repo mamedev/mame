@@ -82,7 +82,6 @@
 #ifndef __MOS6566__
 #define __MOS6566__
 
-#include "emu.h"
 
 
 

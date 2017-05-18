@@ -10,7 +10,6 @@
 #ifndef S3VIRGE_H_
 #define S3VIRGE_H_
 
-#include "emu.h"
 #include "video/pc_vga.h"
 
 // ======================> s3virge_vga_device

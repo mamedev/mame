@@ -20,18 +20,19 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "video/i8275.h"
+#include "screen.h"
 
 
 class sm1800_state : public driver_device
 {
 public:
 	sm1800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_uart(*this, "i8251"),
-	m_ppi(*this, "i8255"),
-	m_crtc(*this, "i8275"),
-	m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_uart(*this, "i8251")
+		, m_ppi(*this, "i8255")
+		, m_crtc(*this, "i8275")
+		, m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

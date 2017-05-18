@@ -11,7 +11,6 @@
 #ifndef __EPSON_LX800__
 #define __EPSON_LX800__
 
-#include "emu.h"
 #include "ctronics.h"
 #include "cpu/upd7810/upd7810.h"
 #include "machine/e05a03.h"

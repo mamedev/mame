@@ -13,7 +13,6 @@
 #ifndef __VIC1112__
 #define __VIC1112__
 
-#include "emu.h"
 #include "exp.h"
 #include "bus/ieee488/ieee488.h"
 #include "cpu/m6502/m6502.h"

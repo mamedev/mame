@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "mm5837.h"
 
 
@@ -22,7 +23,7 @@ constexpr int mm5837_device::m_frequency[];
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MM5837 = &device_creator<mm5837_device>;
+const device_type MM5837 = device_creator<mm5837_device>;
 
 
 //**************************************************************************

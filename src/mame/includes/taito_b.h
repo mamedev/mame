@@ -4,6 +4,7 @@
 #include "machine/taitoio.h"
 #include "video/hd63484.h"
 #include "video/tc0180vcu.h"
+#include "screen.h"
 
 class taitob_state : public driver_device
 {

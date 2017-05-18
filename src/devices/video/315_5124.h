@@ -8,8 +8,12 @@
 
 **************************************************************************/
 
-#ifndef __SEGA315_5124_H__
-#define __SEGA315_5124_H__
+#ifndef MAME_DEVICES_VIDEO_315_5124_H
+#define MAME_DEVICES_VIDEO_315_5124_H
+
+#pragma once
+
+#include "screen.h"
 
 
 /***************************************************************************
@@ -263,4 +267,4 @@ protected:
 	devcb = &sega315_5378_device::set_pause_callback(*device, DEVCB_##_devcb);
 
 
-#endif /* __SEGA315_5124_H__ */
+#endif // MAME_DEVICES_VIDEO_315_5124_H

@@ -217,9 +217,14 @@ ToDo:
 ***********************************************************************************************************/
 
 #include "emu.h"
-#include "super80.lh"
 #include "includes/super80.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "super80.lh"
+
 
 #define MASTER_CLOCK    (XTAL_12MHz)
 #define PIXEL_CLOCK (MASTER_CLOCK/2)
@@ -803,7 +808,6 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super80v)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )
-	MCFG_VIDEO_START_OVERRIDE(super80_state,super80v)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

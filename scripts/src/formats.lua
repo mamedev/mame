@@ -1051,6 +1051,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/ms0515_dsk.h,FORMATS["MS0515_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["MS0515_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/ms0515_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/ms0515_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/msx_dsk.h,FORMATS["MSX_DSK"] = true
 --------------------------------------------------
 
@@ -1262,6 +1274,18 @@ if (FORMATS["PMD_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/pmd_cas.cpp",
 		MAME_DIR.. "src/lib/formats/pmd_cas.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/ppg_dsk.h,FORMATS["PPG_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["PPG_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/ppg_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/ppg_dsk.h",
 	}
 end
 

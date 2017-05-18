@@ -10,7 +10,6 @@
 #ifndef __BBC_OPUSFDC__
 #define __BBC_OPUSFDC__
 
-#include "emu.h"
 #include "fdc.h"
 #include "machine/wd_fdc.h"
 #include "formats/acorn_dsk.h"

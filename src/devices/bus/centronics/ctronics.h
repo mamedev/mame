@@ -11,7 +11,6 @@
 #ifndef __CTRONICS_H__
 #define __CTRONICS_H__
 
-#include "emu.h"
 #include "machine/buffer.h"
 #include "machine/latch.h"
 

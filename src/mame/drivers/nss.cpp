@@ -294,13 +294,15 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/snes.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/m6m80011ap.h"
 #include "machine/s3520cf.h"
 #include "machine/rp5h01.h"
 #include "video/m50458.h"
-#include "includes/snes.h"
 #include "rendlay.h"
+#include "speaker.h"
 
 
 class nss_state : public snes_state

@@ -12,8 +12,11 @@
 
 #include "emu.h"
 #include "pc_t1t.h"
+
 #include "machine/pic8259.h"
 #include "machine/ram.h"
+#include "screen.h"
+
 
 enum
 {
@@ -28,8 +31,8 @@ enum
 };
 
 
-const device_type PCVIDEO_T1000 = &device_creator<pcvideo_t1000_device>;
-const device_type PCVIDEO_PCJR = &device_creator<pcvideo_pcjr_device>;
+const device_type PCVIDEO_T1000 = device_creator<pcvideo_t1000_device>;
+const device_type PCVIDEO_PCJR = device_creator<pcvideo_pcjr_device>;
 
 pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),

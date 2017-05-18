@@ -69,7 +69,7 @@ WRITE8_MEMBER( isa8_finalchs_device::finalchs_w )
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_FINALCHS = &device_creator<isa8_finalchs_device>;
+const device_type ISA8_FINALCHS = device_creator<isa8_finalchs_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

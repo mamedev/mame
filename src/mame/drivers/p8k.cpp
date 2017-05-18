@@ -49,15 +49,17 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z8000/z8000.h"
 #include "cpu/z80/z80daisy.h"
+#include "cpu/z8000/z8000.h"
+#include "machine/terminal.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
-#include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/z80dma.h"
+#include "machine/z80pio.h"
 #include "sound/beep.h"
-#include "machine/terminal.h"
+#include "speaker.h"
+
 
 #define TERMINAL_TAG "terminal"
 

@@ -83,7 +83,8 @@ public:
 	}
 
 	DECLARE_READ16_MEMBER(mcu_comm_r);
-	DECLARE_WRITE16_MEMBER(mcu_comm_w);
+	DECLARE_WRITE16_MEMBER(pushman_mcu_comm_w);
+	DECLARE_WRITE16_MEMBER(bballs_mcu_comm_w);
 
 	DECLARE_WRITE8_MEMBER(mcu_pa_w);
 	DECLARE_WRITE8_MEMBER(mcu_pb_w);
@@ -98,28 +99,4 @@ protected:
 	u16     m_host_latch, m_mcu_latch;
 	u16     m_mcu_output;
 	u8      m_mcu_latch_ctl;
-};
-
-
-class bballs_state : public tigeroad_state
-{
-public:
-	bballs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tigeroad_state(mconfig, type, tag)
-		, m_mcu_semaphore(false)
-		, m_mcu_latch(0xffff)
-	{
-		m_has_coinlock = false;
-	}
-
-	DECLARE_READ16_MEMBER(bballs_68705_r);
-	DECLARE_WRITE16_MEMBER(bballs_68705_w);
-
-	DECLARE_MACHINE_RESET(bballs);
-
-protected:
-	virtual void machine_start() override;
-
-	bool    m_mcu_semaphore;
-	u16     m_mcu_latch;
 };

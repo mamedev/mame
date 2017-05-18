@@ -31,7 +31,7 @@ TODO:
 
 /**************************************************************************/
 
-const device_type TAITO_ZOOM = &device_creator<taito_zoom_device>;
+const device_type TAITO_ZOOM = device_creator<taito_zoom_device>;
 
 //-------------------------------------------------
 //  taito_zoom_device - constructor

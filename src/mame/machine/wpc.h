@@ -9,7 +9,6 @@
 #ifndef WPC_H_
 #define WPC_H_
 
-#include "emu.h"
 
 /* A = Alpha-numeric
  * M = DMD

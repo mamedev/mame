@@ -26,7 +26,6 @@
 #ifndef __COM8116__
 #define __COM8116__
 
-#include "emu.h"
 
 
 

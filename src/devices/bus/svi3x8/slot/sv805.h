@@ -11,7 +11,6 @@
 #ifndef __SVI3X8_SLOT_SV805_H__
 #define __SVI3X8_SLOT_SV805_H__
 
-#include "emu.h"
 #include "slot.h"
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"

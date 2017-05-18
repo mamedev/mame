@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "exos.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_EXOS = &device_creator<c64_exos_cartridge_device>;
+const device_type C64_EXOS = device_creator<c64_exos_cartridge_device>;
 
 
 

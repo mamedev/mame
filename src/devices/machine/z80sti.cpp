@@ -24,7 +24,7 @@
 
 
 // device type definition
-const device_type Z80STI = &device_creator<z80sti_device>;
+const device_type Z80STI = device_creator<z80sti_device>;
 
 
 

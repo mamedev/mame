@@ -81,10 +81,13 @@
 ******************************************************************************************/
 
 #include "emu.h"
+#include "includes/bionicc.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2151.h"
-#include "includes/bionicc.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

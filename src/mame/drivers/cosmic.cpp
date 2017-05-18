@@ -36,10 +36,12 @@ cosmicg - board can operate in b&w mode if there is no PROM, in this case
 
 #include "emu.h"
 #include "includes/cosmic.h"
+
 #include "cpu/tms9900/tms9980a.h"
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 /* Schematics show 12 triggers for discrete sound circuits */

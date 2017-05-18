@@ -12,7 +12,6 @@
 #ifndef __RTC4543_H__
 #define __RTC4543_H__
 
-#include "emu.h"
 #include "dirtc.h"
 
 

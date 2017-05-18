@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "multitap.h"
 #include "joypad.h"
 #include "twintap.h"
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_MULTITAP = &device_creator<snes_multitap_device>;
+const device_type SNES_MULTITAP = device_creator<snes_multitap_device>;
 
 
 static INPUT_PORTS_START( snes_multitap )

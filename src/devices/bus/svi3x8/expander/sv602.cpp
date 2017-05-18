@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "sv602.h"
 
 
@@ -13,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV602 = &device_creator<sv602_device>;
+const device_type SV602 = device_creator<sv602_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

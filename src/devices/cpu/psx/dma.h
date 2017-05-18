@@ -12,7 +12,6 @@
 #ifndef __PSXDMA_H__
 #define __PSXDMA_H__
 
-#include "emu.h"
 
 extern const device_type PSX_DMA;
 

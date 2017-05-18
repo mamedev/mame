@@ -30,14 +30,15 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "4score.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_4SCORE_P1P3 = &device_creator<nes_4score_p1p3_device>;
-const device_type NES_4SCORE_P2P4 = &device_creator<nes_4score_p2p4_device>;
+const device_type NES_4SCORE_P1P3 = device_creator<nes_4score_p1p3_device>;
+const device_type NES_4SCORE_P2P4 = device_creator<nes_4score_p2p4_device>;
 
 
 static INPUT_PORTS_START( nes_4score_p1p3 )

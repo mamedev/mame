@@ -6,7 +6,6 @@
 
 *********************************************************************/
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/beep.h"
 #include "machine/nvram.h"

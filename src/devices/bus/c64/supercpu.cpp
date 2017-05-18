@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "supercpu.h"
 
 
@@ -21,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SUPERCPU = &device_creator<c64_supercpu_device>;
+const device_type C64_SUPERCPU = device_creator<c64_supercpu_device>;
 
 
 //-------------------------------------------------

@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "sound/discrete.h"
+#include "screen.h"
 
 /* Discrete Sound Input Nodes */
 #define ORBIT_NOTE_FREQ       NODE_01

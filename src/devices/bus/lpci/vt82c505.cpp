@@ -14,7 +14,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type VT82C505 = &device_creator<vt82c505_device>;
+const device_type VT82C505 = device_creator<vt82c505_device>;
 
 
 vt82c505_device::vt82c505_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

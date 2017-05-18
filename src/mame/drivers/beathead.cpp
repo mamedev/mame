@@ -103,6 +103,7 @@
 #include "includes/beathead.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "speaker.h"
 
 
 #define MAX_SCANLINES   262

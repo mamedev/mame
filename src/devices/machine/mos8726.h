@@ -46,7 +46,6 @@
 #ifndef __MOS8726__
 #define __MOS8726__
 
-#include "emu.h"
 
 
 

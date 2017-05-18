@@ -113,8 +113,12 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "includes/tmc1800.h"
+
 #include "sound/beep.h"
+#include "speaker.h"
+
 
 /* Read/Write Handlers */
 

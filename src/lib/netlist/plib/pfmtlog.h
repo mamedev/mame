@@ -7,13 +7,20 @@
 #ifndef PFMT_H_
 #define PFMT_H_
 
-#include <limits>
-
-#include "pconfig.h"
 #include "pstring.h"
 #include "ptypes.h"
 
+#include <limits>
+
 namespace plib {
+
+P_ENUM(plog_level,
+	DEBUG,
+	INFO,
+	VERBOSE,
+	WARNING,
+	ERROR,
+	FATAL)
 
 template <typename T>
 struct ptype_traits_base
@@ -109,8 +116,6 @@ class pformat_base
 {
 public:
 
-	virtual ~pformat_base() { }
-
 	P &operator ()(const double x, const char *f = "") { format_element(f, "", "f", x); return static_cast<P &>(*this); }
 	P &          e(const double x, const char *f = "") { format_element(f, "", "e", x); return static_cast<P &>(*this);  }
 	P &          g(const double x, const char *f = "") { format_element(f, "", "g", x); return static_cast<P &>(*this);  }
@@ -150,6 +155,7 @@ public:
 
 protected:
 
+	~pformat_base() { }
 	virtual void format_element(const char *f, const char *l, const char *fmt_spec, ...) = 0;
 
 };
@@ -157,7 +163,7 @@ protected:
 class pfmt : public pformat_base<pfmt>
 {
 public:
-	explicit pfmt(const pstring fmt);
+	explicit pfmt(const pstring &fmt);
 	virtual ~pfmt();
 
 	operator pstring() const { return pstring(m_str, pstring::UTF8); }
@@ -176,55 +182,52 @@ private:
 	unsigned m_arg;
 };
 
-P_ENUM(plog_level,
-	DEBUG,
-	INFO,
-	VERBOSE,
-	WARNING,
-	ERROR,
-	FATAL)
-
 class plog_dispatch_intf;
 
 template <bool build_enabled = true>
-class pfmt_writer_t
+class pfmt_writer_t : plib::nocopyassignmove
 {
-	P_PREVENT_COPYING(pfmt_writer_t)
 public:
 	explicit pfmt_writer_t() : m_enabled(true)  { }
-	virtual ~pfmt_writer_t() { }
 
-	void operator ()(const pstring fmt) const
+	/* runtime enable */
+	template<bool enabled, typename... Args>
+	void log(const pstring & fmt, Args&&... args) const
+	{
+		if (build_enabled && enabled && m_enabled) (*this)(fmt, std::forward<Args>(args)...);
+	}
+
+	void operator ()(const pstring &fmt) const
 	{
 		if (build_enabled && m_enabled) vdowrite(fmt);
 	}
 
 	template<typename T1>
-	void operator ()(const pstring fmt, const T1 &v1) const
+	void operator ()(const pstring &fmt, const T1 &v1) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1));
 	}
 
 	template<typename T1, typename T2>
-	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2) const
+	void operator ()(const pstring &fmt, const T1 &v1, const T2 &v2) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2));
 	}
 
 	template<typename T1, typename T2, typename T3>
-	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2, const T3 &v3) const
+	void operator ()(const pstring &fmt, const T1 &v1, const T2 &v2, const T3 &v3) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3));
 	}
 
 	template<typename T1, typename T2, typename T3, typename T4>
-	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4) const
+	void operator ()(const pstring &fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3)(v4));
 	}
 
 	template<typename T1, typename T2, typename T3, typename T4, typename T5>
-	void operator ()(const pstring fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4, const T5 &v5) const
+	void operator ()(const pstring &fmt, const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4, const T5 &v5) const
 	{
 		if (build_enabled && m_enabled) vdowrite(pfmt(fmt)(v1)(v2)(v3)(v4)(v5));
 	}
@@ -237,6 +240,7 @@ public:
 	bool is_enabled() const { return m_enabled; }
 
 protected:
+	~pfmt_writer_t() { }
 	virtual void vdowrite(const pstring &ls) const = 0;
 
 private:
@@ -244,7 +248,7 @@ private:
 
 };
 
-template <plog_level::e L, bool build_enabled = true>
+template <plog_level::E L, bool build_enabled = true>
 class plog_channel : public pfmt_writer_t<build_enabled>
 {
 public:
@@ -260,7 +264,7 @@ private:
 
 class plog_dispatch_intf
 {
-	template<plog_level::e, bool> friend class plog_channel;
+	template<plog_level::E, bool> friend class plog_channel;
 
 public:
 	virtual ~plog_dispatch_intf();
@@ -292,7 +296,7 @@ public:
 };
 
 
-template <plog_level::e L, bool build_enabled>
+template <plog_level::E L, bool build_enabled>
 void plog_channel<L, build_enabled>::vdowrite(const pstring &ls) const
 {
 	m_base->vlog(L, ls);

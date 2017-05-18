@@ -8,6 +8,7 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "screen.h"
 
 #define FIRETRUCK_MOTOR_DATA    NODE_01
 #define FIRETRUCK_HORN_EN       NODE_02

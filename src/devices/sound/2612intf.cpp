@@ -13,6 +13,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "2612intf.h"
 #include "fm.h"
 
@@ -163,7 +164,7 @@ WRITE8_MEMBER( ym2612_device::write )
 }
 
 
-const device_type YM2612 = &device_creator<ym2612_device>;
+const device_type YM2612 = device_creator<ym2612_device>;
 
 ym2612_device::ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YM2612, "YM2612", tag, owner, clock, "ym2612", __FILE__),
@@ -179,18 +180,8 @@ ym2612_device::ym2612_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
 
-void ym2612_device::device_config_complete()
-{
-}
-
-
-const device_type YM3438 = &device_creator<ym3438_device>;
+const device_type YM3438 = device_creator<ym3438_device>;
 
 ym3438_device::ym3438_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ym2612_device(mconfig, YM3438, "YM3438", tag, owner, clock, "ym3438", __FILE__)

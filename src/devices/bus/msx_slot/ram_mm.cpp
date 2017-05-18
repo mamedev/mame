@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "ram_mm.h"
 
-const device_type MSX_SLOT_RAM_MM = &device_creator<msx_slot_ram_mm_device>;
+const device_type MSX_SLOT_RAM_MM = device_creator<msx_slot_ram_mm_device>;
 
 msx_slot_ram_mm_device::msx_slot_ram_mm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_SLOT_RAM_MM, "MSX Internal Memory Mapped RAM", tag, owner, clock, "msx_slot_ram_mm", __FILE__)

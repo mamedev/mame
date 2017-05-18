@@ -15,7 +15,10 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 //#define JUICEBOX_ENTER_DEBUG_MENU
 //#define JUICEBOX_DISPLAY_ROM_ID

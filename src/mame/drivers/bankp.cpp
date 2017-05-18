@@ -94,9 +94,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/bankp.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "includes/bankp.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK    XTAL_15_468MHz

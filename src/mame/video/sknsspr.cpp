@@ -17,8 +17,9 @@
 
 #include "emu.h"
 #include "sknsspr.h"
+#include "screen.h"
 
-const device_type SKNS_SPRITE = &device_creator<sknsspr_device>;
+const device_type SKNS_SPRITE = device_creator<sknsspr_device>;
 
 
 sknsspr_device::sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

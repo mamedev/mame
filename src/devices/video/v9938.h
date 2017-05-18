@@ -6,11 +6,12 @@
 
 ***************************************************************************/
 
+#ifndef MAME_DEVICES_VIDEO_V9938_H
+#define MAME_DEVICES_VIDEO_V9938_H
+
 #pragma once
 
-#ifndef __V9938_H__
-#define __V9938_H__
-
+#include "screen.h"
 
 
 //**************************************************************************
@@ -51,7 +52,7 @@
 	MCFG_SCREEN_PALETTE(_v9938_tag":palette")
 
 #define MCFG_V99X8_INTERRUPT_CALLBACK(_irq) \
-	downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
+	devcb = &downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
 
 
 //**************************************************************************
@@ -79,8 +80,8 @@ protected:
 	v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, uint32_t clock);
 
 public:
-	template<class _irq> void set_interrupt_callback(_irq irq) {
-		m_int_callback.set_callback(irq);
+	template<class _irq> devcb_base &set_interrupt_callback(_irq irq) {
+		return m_int_callback.set_callback(irq);
 	}
 	int get_transpen();
 	bitmap_ind16 &get_bitmap() { return m_bitmap; }
@@ -296,4 +297,4 @@ protected:
 };
 
 
-#endif
+#endif // MAME_DEVICES_VIDEO_V9938_H

@@ -35,10 +35,13 @@ TODO
 
 #include "emu.h"
 #include "includes/galivan.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/3526intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(galivan_state::galivan_sound_command_w)

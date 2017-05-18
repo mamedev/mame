@@ -53,6 +53,7 @@ Device Control (out)        14              7
 
 
 
+#include "emu.h"
 #include "xtide.h"
 
 
@@ -261,7 +262,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_XTIDE = &device_creator<xtide_device>;
+const device_type ISA8_XTIDE = device_creator<xtide_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

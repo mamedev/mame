@@ -3,7 +3,6 @@
 #ifndef OMTI5100_H_
 #define OMTI5100_H_
 
-#include "emu.h"
 #include "scsi.h"
 #include "scsihd.h"
 #include "imagedev/harddriv.h"

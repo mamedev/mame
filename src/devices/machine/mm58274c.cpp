@@ -44,7 +44,7 @@ enum
 
 
 
-const device_type MM58274C = &device_creator<mm58274c_device>;
+const device_type MM58274C = device_creator<mm58274c_device>;
 
 
 mm58274c_device::mm58274c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

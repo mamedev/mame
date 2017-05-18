@@ -14,7 +14,6 @@
 #ifndef __USBSMART__
 #define __USBSMART__
 
-#include "emu.h"
 #include "peribox.h"
 #include "machine/smartmed.h"
 #include "machine/strata.h"

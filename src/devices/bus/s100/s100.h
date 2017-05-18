@@ -64,7 +64,6 @@
 #ifndef __S100__
 #define __S100__
 
-#include "emu.h"
 
 
 

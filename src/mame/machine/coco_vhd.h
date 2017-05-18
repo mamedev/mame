@@ -46,7 +46,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 
 	void coco_vhd_readwrite(uint8_t data);

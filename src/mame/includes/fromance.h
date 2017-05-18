@@ -10,6 +10,7 @@
 ***************************************************************************/
 #include "sound/msm5205.h"
 #include "video/vsystem_spr2.h"
+#include "screen.h"
 
 class fromance_state : public driver_device
 {

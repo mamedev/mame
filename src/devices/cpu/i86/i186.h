@@ -3,7 +3,6 @@
 #ifndef I186_H__
 #define I186_H__
 
-#include "emu.h"
 #include "i86.h"
 
 extern const device_type I80186;

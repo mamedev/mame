@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef SMS_H_
-#define SMS_H_
+#ifndef MAME_INCLUDES_SMS_H
+#define MAME_INCLUDES_SMS_H
 
 #define LOG_REG
 #define LOG_PAGING
@@ -21,11 +21,16 @@
 #define CONTROL1_TAG   "ctrl1"
 #define CONTROL2_TAG   "ctrl2"
 
+#include "bus/gamegear/ggext.h"
 #include "bus/sega8/sega8_slot.h"
 #include "bus/sg1000_exp/sg1000exp.h"
-#include "bus/sms_exp/smsexp.h"
 #include "bus/sms_ctrl/smsctrl.h"
-#include "bus/gamegear/ggext.h"
+#include "bus/sms_exp/smsexp.h"
+#include "sound/sn76496.h"
+#include "sound/ym2413.h"
+#include "video/315_5124.h"
+
+#include "screen.h"
 
 
 class sms_state : public driver_device
@@ -260,4 +265,4 @@ public:
 #define IO_BIOS_ROM     (0x08)  /* BIOS ROM disabled (1= disabled, 0= enabled) */
 #define IO_CHIP         (0x04)  /* I/O chip disabled (1= disabled, 0= enabled) */
 
-#endif /* SMS_H_ */
+#endif // MAME_INCLUDES_SMS_H

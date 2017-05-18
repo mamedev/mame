@@ -32,9 +32,13 @@ HW info :
 ************************************/
 
 #include "emu.h"
+#include "includes/ssrj.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/ssrj.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 void ssrj_state::machine_start()
 {

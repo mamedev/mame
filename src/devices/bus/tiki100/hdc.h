@@ -11,7 +11,6 @@
 #ifndef __TIKI100_HDC__
 #define __TIKI100_HDC__
 
-#include "emu.h"
 #include "bus/tiki100/exp.h"
 #include "imagedev/harddriv.h"
 #include "machine/wd2010.h"

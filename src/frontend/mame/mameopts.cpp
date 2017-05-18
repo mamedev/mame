@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    mameopts.c
+    mameopts.cpp
 
     Options file and command line management.
 
@@ -10,10 +10,14 @@
 
 #include "emu.h"
 #include "mameopts.h"
+
 #include "drivenum.h"
+#include "screen.h"
 #include "softlist_dev.h"
 
 #include <ctype.h>
+#include <stack>
+
 
 int mame_options::m_slot_options = 0;
 int mame_options::m_device_options = 0;
@@ -23,7 +27,7 @@ int mame_options::m_device_options = 0;
 //  options for the configured system
 //-------------------------------------------------
 
-bool mame_options::add_slot_options(emu_options &options, const software_part *swpart)
+bool mame_options::add_slot_options(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier)
 {
 	// look up the system configured by name; if no match, do nothing
 	const game_driver *cursystem = system(options);
@@ -51,19 +55,10 @@ bool mame_options::add_slot_options(emu_options &options, const software_part *s
 
 			// add the option
 			options.add_entry(name, nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, slot.default_option(), true);
-		}
 
-		// allow software lists to supply their own defaults
-		if (swpart != nullptr)
-		{
-			std::string featurename = std::string(name).append("_default");
-			const char *value = swpart->feature(featurename.c_str());
-			if (value != nullptr && (*value == '\0' || slot.option(value) != nullptr))
-			{
-				// set priority above INIs but below actual command line
-				std::string error;
-				options.set_value(name, value, OPTION_PRIORITY_SUBCMD, error);
-			}
+			// allow opportunity to specify this value
+			if (value_specifier)
+				value_specifier(options, name);
 		}
 	}
 	return (options.options_count() != starting_count);
@@ -82,10 +77,6 @@ void mame_options::update_slot_options(emu_options &options, const software_part
 	if (cursystem == nullptr)
 		return;
 	machine_config config(*cursystem, options);
-
-	// preopen all images (this allows slots to be assigned for all required software)
-	for (device_image_interface &image : image_interface_iterator(config.root_device()))
-		image.open_image_file(options);
 
 	// iterate through all slot devices
 	for (device_slot_interface &slot : slot_interface_iterator(config.root_device()))
@@ -112,7 +103,6 @@ void mame_options::update_slot_options(emu_options &options, const software_part
 			options.set_flag(name, ~OPTION_FLAG_INTERNAL, (option != nullptr && !option->selectable()) ? OPTION_FLAG_INTERNAL : 0);
 		}
 	}
-	while (add_slot_options(options,swpart)) {}
 	add_device_options(options);
 }
 
@@ -122,7 +112,7 @@ void mame_options::update_slot_options(emu_options &options, const software_part
 //  options for the configured system
 //-------------------------------------------------
 
-void mame_options::add_device_options(emu_options &options)
+void mame_options::add_device_options(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier)
 {
 	// look up the system configured by name; if no match, do nothing
 	const game_driver *cursystem = system(options);
@@ -136,23 +126,36 @@ void mame_options::add_device_options(emu_options &options)
 		if (!image.user_loadable())
 			continue;
 
-		// retrieve info about the device instance
-		std::ostringstream option_name;
-		util::stream_format(option_name, "%s;%s", image.instance_name(), image.brief_instance_name());
-		if (strcmp(image.device_typename(image.image_type()), image.instance_name()) == 0)
-			util::stream_format(option_name, ";%s1;%s1", image.instance_name(), image.brief_instance_name());
-
 		// add the option
-		if (!options.exists(image.instance_name()))
+		if (!options.exists(image.instance_name().c_str()))
 		{
 			// first device? add the header as to be pretty
 			if (m_device_options++ == 0)
 				options.add_entry(nullptr, "IMAGE DEVICES", OPTION_HEADER | OPTION_FLAG_DEVICE);
 
 			// add the option
-			options.add_entry(option_name.str().c_str(), nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, nullptr, true);
+			std::string option_name = get_full_option_name(image);
+			options.add_entry(option_name.c_str(), nullptr, OPTION_STRING | OPTION_FLAG_DEVICE, nullptr, true);
+
+			// allow opportunity to specify this value
+			if (value_specifier)
+				value_specifier(options, image.instance_name());
 		}
 	}
+}
+
+
+//-------------------------------------------------
+//  remove_device_options - remove device options
+//-------------------------------------------------
+
+std::string mame_options::get_full_option_name(const device_image_interface &image)
+{
+	std::ostringstream option_name;
+	util::stream_format(option_name, "%s;%s", image.instance_name(), image.brief_instance_name());
+	if (strcmp(image.device_typename(image.image_type()), image.instance_name().c_str()) == 0)
+		util::stream_format(option_name, ";%s1;%s1", image.instance_name(), image.brief_instance_name());
+	return option_name.str();
 }
 
 
@@ -188,32 +191,72 @@ void mame_options::remove_device_options(emu_options &options)
 //  and update slot and image devices
 //-------------------------------------------------
 
-bool mame_options::parse_slot_devices(emu_options &options, int argc, char *argv[], std::string &error_string, const char *name, const char *value, const software_part *swpart)
+void mame_options::parse_slot_devices(emu_options &options, std::function<void(emu_options &options, const std::string &)> value_specifier)
 {
-	// an initial parse to capture the initial set of values
-	bool result;
+	bool still_adding = true;
+	while (still_adding)
+	{
+		// keep adding slot options until we stop seeing new stuff
+		still_adding = false;
+		while (add_slot_options(options, value_specifier))
+			still_adding = true;
 
-	options.parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+		// add device options
+		add_device_options(options, value_specifier);
 
-	// keep adding slot options until we stop seeing new stuff
-	while (add_slot_options(options,swpart))
-		options.parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+		if (reevaluate_slot_options(options))
+			still_adding = true;
+	}
+}
 
-	// add device options and reparse
-	add_device_options(options);
-	if (name != nullptr && options.exists(name))
-		options.set_value(name, value, OPTION_PRIORITY_SUBCMD, error_string);
-	options.parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 
-	int num;
-	do {
-		num = options.options_count();
-		update_slot_options(options,swpart);
-		result = options.parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-	} while (num != options.options_count());
+//-------------------------------------------------
+//  reevaluate_slot_options - based on recent changes
+//	in what images are mounted, give drivers a chance
+//	to specify new default slot options
+//-------------------------------------------------
 
-	options.update_cached_options();
+bool mame_options::reevaluate_slot_options(emu_options &options)
+{
+	bool result = false;
 
+	// look up the system configured by name; if no match, do nothing
+	const game_driver *cursystem = system(options);
+	if (cursystem == nullptr)
+		return result;
+	machine_config config(*cursystem, options);
+
+	// iterate through all slot devices
+	for (device_slot_interface &slot : slot_interface_iterator(config.root_device()))
+	{
+		// retrieve info about the device instance
+		const char *name = slot.device().tag() + 1;
+		if (options.exists(name) && !slot.option_list().empty())
+		{
+			// device_slot_interface::get_default_card_software() is essentially a hook
+			// that lets devices provide a feedback loop to force a specified software
+			// list entry to be loaded
+			//
+			// In the repeated cycle of adding slots and slot devices, this gives a chance
+			// for devices to "plug in" default software list items.  Of course, the fact
+			// that this is all shuffling options is brittle and roundabout, but such is
+			// the nature of software lists.
+			//
+			// In reality, having some sort of hook into the pipeline of slot/device evaluation
+			// makes sense, but the fact that it is joined at the hip to device_image_interface
+			// and device_slot_interface is unfortunate
+			std::string default_card_software = slot.get_default_card_software();
+			if (!default_card_software.empty())
+			{
+				std::string old_value = options.value(name);
+
+				options.set_default_value(name, default_card_software.c_str());
+
+				if (strcmp(old_value.c_str(), options.value(name)))
+					result = true;
+			}
+		}
+	}
 	return result;
 }
 
@@ -223,13 +266,168 @@ bool mame_options::parse_slot_devices(emu_options &options, int argc, char *argv
 //  and update the devices
 //-------------------------------------------------
 
-bool mame_options::parse_command_line(emu_options &options, int argc, char *argv[], std::string &error_string)
+bool mame_options::parse_command_line(emu_options &options, std::vector<std::string> &args, std::string &error_string)
 {
-	// parse as normal
-	options.parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-	bool result = parse_slot_devices(options,argc, argv, error_string);
-	options.update_cached_options();
-	return result;
+	// parse the command line
+	if (!options.parse_command_line(args, OPTION_PRIORITY_CMDLINE, error_string))
+		return false;
+
+	// identify any options as a result of softlists 
+	auto softlist_opts = evaluate_initial_softlist_options(options);
+
+	// assemble a "value specifier" that will be used to specify options set up as a consequence
+	// of slot and device setup
+	auto value_specifier = [&softlist_opts, &args, &error_string](emu_options &options, const std::string &arg)
+	{
+		// first find within the command line
+		std::string arg_value;
+		bool success = options.pluck_from_command_line(args, arg, arg_value);
+
+		// next try to find within softlist-specified options
+		if (!success)
+		{
+			auto iter = softlist_opts.find(arg);
+			if (iter != softlist_opts.end())
+			{
+				arg_value = iter->second;
+				success = true;
+			}
+		}
+
+		// did we find something?
+		if (success)
+			options.set_value(arg.c_str(), arg_value.c_str(), OPTION_PRIORITY_MAXIMUM, error_string);
+	};
+
+	// parse the slot devices
+	parse_slot_devices(options, value_specifier);
+
+	// at this point, we should have handled all arguments; the only argument that shouldn't have
+	// been handled is the file name
+	if (args.size() > 1)
+	{
+		error_string.append(string_format("Error: unknown option: %s\n", args[1]));
+		return false;
+	}
+
+	return true;
+}
+
+
+//-------------------------------------------------
+//  evaluate_initial_softlist_options
+//-------------------------------------------------
+
+std::map<std::string, std::string> mame_options::evaluate_initial_softlist_options(emu_options &options)
+{
+	std::map<std::string, std::string> results;
+
+	// load software specified at the command line (if any of course)
+	std::string software_identifier = options.software_name();
+	if (!software_identifier.empty())
+	{
+		// we have software; first identify the proper game_driver
+		const game_driver *system = mame_options::system(options);
+		if (system == nullptr && *(options.system_name()) != 0)
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", options.system_name());
+
+		// and set up a configuration
+		machine_config config(*system, options);
+		software_list_device_iterator iter(config.root_device());
+		if (iter.count() == 0)
+			throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", options.software_name());
+
+		// and finally set up the stack
+		std::stack<std::string> software_identifier_stack;
+		software_identifier_stack.push(software_identifier);
+
+		// we need to keep evaluating softlist identifiers until the stack is empty
+		while (!software_identifier_stack.empty())
+		{
+			// pop the identifier
+			software_identifier = std::move(software_identifier_stack.top());
+			software_identifier_stack.pop();
+
+			// and parse it
+			std::string list_name, software_name;
+			auto colon_pos = software_identifier.find_first_of(':');
+			if (colon_pos != std::string::npos)
+			{
+				list_name = software_identifier.substr(0, colon_pos);
+				software_name = software_identifier.substr(colon_pos + 1);
+			}
+			else
+			{
+				software_name = software_identifier;
+			}
+
+			// loop through all softlist devices, and try to find one capable of handling the requested software
+			bool found = false;
+			bool compatible = false;
+			for (software_list_device &swlistdev : iter)
+			{
+				if (list_name.empty() || (list_name == swlistdev.list_name()))
+				{
+					const software_info *swinfo = swlistdev.find(software_name);
+					if (swinfo != nullptr)
+					{
+						// loop through all parts
+						for (const software_part &swpart : swinfo->parts())
+						{
+							// only load compatible software this way
+							if (swlistdev.is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
+							{
+								device_image_interface *image = software_list_device::find_mountable_image(config, swpart);
+								if (image != nullptr)
+								{
+									// we've resolved this software
+									results[image->instance_name()] = string_format("%s:%s:%s", swlistdev.list_name(), software_name, swpart.name());
+
+									// does this software part have a requirement on another part?
+									const char *requirement = swpart.feature("requirement");
+									if (requirement)
+										software_identifier_stack.push(requirement);
+								}
+								compatible = true;
+							}
+							found = true;
+						}
+
+						// identify other shared features specified as '<<slot name>>_default'
+						// 
+						// example from SMS:
+						//
+						//	<software name = "alexbmx">
+						//		...
+						//		<sharedfeat name = "ctrl1_default" value = "paddle" />
+						//	</software>
+						for (const feature_list_item &fi : swinfo->shared_info())
+						{
+							const std::string default_suffix = "_default";
+							if (fi.name().size() > default_suffix.size()
+								&& fi.name().compare(fi.name().size() - default_suffix.size(), default_suffix.size(), default_suffix) == 0)
+							{
+								std::string slot_name = fi.name().substr(0, fi.name().size() - default_suffix.size());
+								results[slot_name] = fi.value();
+							}
+						}
+					}
+				}
+				if (compatible)
+					break;
+			}
+
+			if (!compatible)
+			{
+				software_list_device::display_matches(config, nullptr, software_name);
+				if (!found)
+					throw emu_fatalerror(EMU_ERR_FATALERROR, nullptr);
+				else
+					throw emu_fatalerror(EMU_ERR_FATALERROR, "Software '%s' is incompatible with system '%s'\n", software_name.c_str(), options.system_name());
+			}
+		}
+	}
+	return results;
 }
 
 
@@ -310,8 +508,6 @@ void mame_options::parse_standard_inis(emu_options &options, std::string &error_
 
 	// Re-evaluate slot options after loading ini files
 	update_slot_options(options);
-
-	options.update_cached_options();
 }
 
 
@@ -384,7 +580,7 @@ void mame_options::set_system_name(emu_options &options, const char *name)
 		// then add the options
 		if (new_system)
 		{
-			while (add_slot_options(options,swpart)) {}
+			while (add_slot_options(options)) {}
 			add_device_options(options);
 		}
 

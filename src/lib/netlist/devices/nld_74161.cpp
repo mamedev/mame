@@ -8,6 +8,7 @@
 #define MAXCNT 15
 
 #include "nld_74161.h"
+#include "../nl_base.h"
 
 namespace netlist
 {
@@ -107,7 +108,7 @@ namespace netlist
 			}
 			else if (m_ENABLET() && m_ENABLEP())
 			{
-				m_cnt++;
+				++m_cnt;
 				if (m_cnt > MAXCNT)
 					m_cnt = 0;
 			}

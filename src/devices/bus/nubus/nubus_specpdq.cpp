@@ -27,6 +27,8 @@
 
 #include "emu.h"
 #include "nubus_specpdq.h"
+#include "screen.h"
+
 
 #define SPECPDQ_SCREEN_NAME "specpdq_screen"
 #define SPECPDQ_ROM_REGION  "specpdq_rom"
@@ -52,7 +54,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_SPECPDQ = &device_creator<nubus_specpdq_device>;
+const device_type NUBUS_SPECPDQ = device_creator<nubus_specpdq_device>;
 
 
 //-------------------------------------------------

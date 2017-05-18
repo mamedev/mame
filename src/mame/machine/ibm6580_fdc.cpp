@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
+#include "emu.h"
 #include "ibm6580_fdc.h"
 
 
@@ -16,7 +17,7 @@
 	} while (0)
 
 
-const device_type DW_FDC = &device_creator<dw_fdc_device>;
+const device_type DW_FDC = device_creator<dw_fdc_device>;
 
 ROM_START( dw_fdc )
 	ROM_REGION(0x800, "mcu", 0)

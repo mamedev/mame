@@ -32,12 +32,14 @@ Notes:
 
 #include "emu.h"
 #include "includes/nbmj8991.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(nbmj8991_state::soundbank_w)
@@ -1865,7 +1867,7 @@ ROM_START( galkoku )
 	ROM_LOAD( "gkok_20.bin", 0x100000, 0x10000, CRC(36107e6f) SHA1(0872d0ae2add129bdd036754fd5d751627bc142e) )
 ROM_END
 
-ROM_START( hyouban )
+ROM_START( hyouban ) // Medal Series No. 124N, according to dip sheet
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.3d",        0x00000,  0x10000, CRC(307b4f7e) SHA1(303e1818cb12ede15dadec165f18a6a33d564d5e) )
 

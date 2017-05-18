@@ -12,7 +12,6 @@
 #define __PETUJA__
 
 
-#include "emu.h"
 #include "user.h"
 
 

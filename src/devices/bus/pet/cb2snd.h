@@ -11,7 +11,6 @@
 #ifndef __PETUSER_CB2__
 #define __PETUSER_CB2__
 
-#include "emu.h"
 #include "user.h"
 #include "sound/dac.h"
 

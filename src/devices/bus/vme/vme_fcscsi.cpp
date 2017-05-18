@@ -179,7 +179,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_FCSCSI1 = &device_creator<vme_fcscsi1_card_device>;
+const device_type VME_FCSCSI1 = device_creator<vme_fcscsi1_card_device>;
 
 #define CPU_CRYSTAL XTAL_20MHz /* Jauch */
 #define PIT_CRYSTAL XTAL_16MHz /* Jauch */

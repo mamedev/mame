@@ -11,7 +11,6 @@
 #ifndef __C2031__
 #define __C2031__
 
-#include "emu.h"
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/64h156.h"

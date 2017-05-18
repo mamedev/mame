@@ -16,6 +16,7 @@ able to deal with 256byte sectors so fails to load the irmx 512byte sector image
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"

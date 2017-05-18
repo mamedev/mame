@@ -150,15 +150,17 @@
 //
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/hphybrid/hphybrid.h"
-#include "video/i8275.h"
-#include "machine/wd_fdc.h"
 #include "machine/74123.h"
-#include "machine/rescap.h"
-#include "sound/beep.h"
 #include "machine/com8116.h"
 #include "machine/i8251.h"
-#include "bus/rs232/rs232.h"
+#include "machine/rescap.h"
+#include "machine/wd_fdc.h"
+#include "sound/beep.h"
+#include "video/i8275.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define BIT_MASK(n) (1U << (n))
 

@@ -18,6 +18,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "pc1640_iga.h"
 
 
@@ -35,7 +36,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISA8_PC1640_IGA = &device_creator<isa8_pc1640_iga_device>;
+const device_type ISA8_PC1640_IGA = device_creator<isa8_pc1640_iga_device>;
 
 
 //-------------------------------------------------

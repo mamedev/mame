@@ -52,19 +52,24 @@
  */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "sound/ay8910.h"
+#include "machine/am9517a.h"
 #include "machine/msm5832.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/z80pio.h"
-#include "machine/z80ctc.h"
-#include "machine/am9517a.h"
-#include "machine/upd765.h"
+#include "sound/ay8910.h"
 #include "video/tms9927.h"
-#include "machine/ram.h"
-#include "machine/nvram.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class attache_state : public driver_device
 {

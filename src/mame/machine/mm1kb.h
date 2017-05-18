@@ -11,7 +11,6 @@
 #ifndef __MM1_KEYBOARD__
 #define __MM1_KEYBOARD__
 
-#include "emu.h"
 #include "sound/samples.h"
 
 

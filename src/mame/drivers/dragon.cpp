@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/dragon.h"
 #include "includes/dgnalpha.h"
 #include "imagedev/cassette.h"

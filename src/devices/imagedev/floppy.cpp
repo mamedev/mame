@@ -7,9 +7,11 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "zippath.h"
 #include "floppy.h"
+
+#include "speaker.cpp"
 #include "formats/imageutl.h"
+#include "zippath.h"
 
 /*
     Debugging flags. Set to 0 or 1.
@@ -24,94 +26,94 @@
 #define FLOPSND_TAG "floppysound"
 
 // device type definition
-const device_type FLOPPY_CONNECTOR = &device_creator<floppy_connector>;
+const device_type FLOPPY_CONNECTOR = device_creator<floppy_connector>;
 
 // generic 3" drives
-const device_type FLOPPY_3_SSDD = &device_creator<floppy_3_ssdd>;
-const device_type FLOPPY_3_DSDD = &device_creator<floppy_3_dsdd>;
+const device_type FLOPPY_3_SSDD = device_creator<floppy_3_ssdd>;
+const device_type FLOPPY_3_DSDD = device_creator<floppy_3_dsdd>;
 
 // generic 3.5" drives
-const device_type FLOPPY_35_SSDD = &device_creator<floppy_35_ssdd>;
-const device_type FLOPPY_35_DD = &device_creator<floppy_35_dd>;
-const device_type FLOPPY_35_HD = &device_creator<floppy_35_hd>;
-const device_type FLOPPY_35_ED = &device_creator<floppy_35_ed>;
+const device_type FLOPPY_35_SSDD = device_creator<floppy_35_ssdd>;
+const device_type FLOPPY_35_DD = device_creator<floppy_35_dd>;
+const device_type FLOPPY_35_HD = device_creator<floppy_35_hd>;
+const device_type FLOPPY_35_ED = device_creator<floppy_35_ed>;
 
 // generic 5.25" drives
-const device_type FLOPPY_525_SSSD_35T = &device_creator<floppy_525_sssd_35t>;
-const device_type FLOPPY_525_SD_35T = &device_creator<floppy_525_sd_35t>;
-const device_type FLOPPY_525_SSSD = &device_creator<floppy_525_sssd>;
-const device_type FLOPPY_525_SD = &device_creator<floppy_525_sd>;
-const device_type FLOPPY_525_SSDD = &device_creator<floppy_525_ssdd>;
-const device_type FLOPPY_525_DD = &device_creator<floppy_525_dd>;
-const device_type FLOPPY_525_SSQD = &device_creator<floppy_525_ssqd>;
-const device_type FLOPPY_525_QD = &device_creator<floppy_525_qd>;
-const device_type FLOPPY_525_HD = &device_creator<floppy_525_hd>;
+const device_type FLOPPY_525_SSSD_35T = device_creator<floppy_525_sssd_35t>;
+const device_type FLOPPY_525_SD_35T = device_creator<floppy_525_sd_35t>;
+const device_type FLOPPY_525_SSSD = device_creator<floppy_525_sssd>;
+const device_type FLOPPY_525_SD = device_creator<floppy_525_sd>;
+const device_type FLOPPY_525_SSDD = device_creator<floppy_525_ssdd>;
+const device_type FLOPPY_525_DD = device_creator<floppy_525_dd>;
+const device_type FLOPPY_525_SSQD = device_creator<floppy_525_ssqd>;
+const device_type FLOPPY_525_QD = device_creator<floppy_525_qd>;
+const device_type FLOPPY_525_HD = device_creator<floppy_525_hd>;
 
 // generic 8" drives
-const device_type FLOPPY_8_SSSD = &device_creator<floppy_8_sssd>;
-const device_type FLOPPY_8_DSSD = &device_creator<floppy_8_dssd>;
-const device_type FLOPPY_8_SSDD = &device_creator<floppy_8_ssdd>;
-const device_type FLOPPY_8_DSDD = &device_creator<floppy_8_dsdd>;
+const device_type FLOPPY_8_SSSD = device_creator<floppy_8_sssd>;
+const device_type FLOPPY_8_DSSD = device_creator<floppy_8_dssd>;
+const device_type FLOPPY_8_SSDD = device_creator<floppy_8_ssdd>;
+const device_type FLOPPY_8_DSDD = device_creator<floppy_8_dsdd>;
 
 // Epson 3.5" drives
 #if 0
-const device_type EPSON_SMD_110 = &device_creator<epson_smd_110>;
-const device_type EPSON_SMD_120 = &device_creator<epson_smd_120>;
-const device_type EPSON_SMD_125 = &device_creator<epson_smd_125>;
-const device_type EPSON_SMD_130 = &device_creator<epson_smd_130>;
-const device_type EPSON_SMD_140 = &device_creator<epson_smd_140>;
-const device_type EPSON_SMD_150 = &device_creator<epson_smd_150>;
-const device_type EPSON_SMD_160 = &device_creator<epson_smd_160>;
+const device_type EPSON_SMD_110 = device_creator<epson_smd_110>;
+const device_type EPSON_SMD_120 = device_creator<epson_smd_120>;
+const device_type EPSON_SMD_125 = device_creator<epson_smd_125>;
+const device_type EPSON_SMD_130 = device_creator<epson_smd_130>;
+const device_type EPSON_SMD_140 = device_creator<epson_smd_140>;
+const device_type EPSON_SMD_150 = device_creator<epson_smd_150>;
+const device_type EPSON_SMD_160 = device_creator<epson_smd_160>;
 #endif
-const device_type EPSON_SMD_165 = &device_creator<epson_smd_165>;
+const device_type EPSON_SMD_165 = device_creator<epson_smd_165>;
 #if 0
-const device_type EPSON_SMD_170 = &device_creator<epson_smd_170>;
-const device_type EPSON_SMD_180 = &device_creator<epson_smd_180>;
-const device_type EPSON_SMD_240L = &device_creator<epson_smd_240l>;
-const device_type EPSON_SMD_280HL = &device_creator<epson_smd_280hl>;
-const device_type EPSON_SMD_440L = &device_creator<epson_smd_440l>;
-const device_type EPSON_SMD_449L = &device_creator<epson_smd_449l>;
-const device_type EPSON_SMD_480LM = &device_creator<epson_smd_480lm>;
-const device_type EPSON_SMD_489M = &device_creator<epson_smd_489m>;
+const device_type EPSON_SMD_170 = device_creator<epson_smd_170>;
+const device_type EPSON_SMD_180 = device_creator<epson_smd_180>;
+const device_type EPSON_SMD_240L = device_creator<epson_smd_240l>;
+const device_type EPSON_SMD_280HL = device_creator<epson_smd_280hl>;
+const device_type EPSON_SMD_440L = device_creator<epson_smd_440l>;
+const device_type EPSON_SMD_449L = device_creator<epson_smd_449l>;
+const device_type EPSON_SMD_480LM = device_creator<epson_smd_480lm>;
+const device_type EPSON_SMD_489M = device_creator<epson_smd_489m>;
 #endif
 
 // Epson 5.25" drives
 #if 0
-const device_type EPSON_SD_311 = &device_creator<epson_sd_311>;
+const device_type EPSON_SD_311 = device_creator<epson_sd_311>;
 #endif
-const device_type EPSON_SD_320 = &device_creator<epson_sd_320>;
-const device_type EPSON_SD_321 = &device_creator<epson_sd_321>;
+const device_type EPSON_SD_320 = device_creator<epson_sd_320>;
+const device_type EPSON_SD_321 = device_creator<epson_sd_321>;
 #if 0
-const device_type EPSON_SD_521L = &device_creator<epson_sd_531l>;
-const device_type EPSON_SD_525 = &device_creator<epson_sd_525>;
-const device_type EPSON_SD_543 = &device_creator<epson_sd_543>;
-const device_type EPSON_SD_545 = &device_creator<epson_sd_545>;
-const device_type EPSON_SD_560 = &device_creator<epson_sd_560>;
-const device_type EPSON_SD_580L = &device_creator<epson_sd_580l>;
-const device_type EPSON_SD_581L = &device_creator<epson_sd_581l>;
-const device_type EPSON_SD_621L = &device_creator<epson_sd_621l>;
-const device_type EPSON_SD_680L = &device_creator<epson_sd_680l>;
+const device_type EPSON_SD_521L = device_creator<epson_sd_531l>;
+const device_type EPSON_SD_525 = device_creator<epson_sd_525>;
+const device_type EPSON_SD_543 = device_creator<epson_sd_543>;
+const device_type EPSON_SD_545 = device_creator<epson_sd_545>;
+const device_type EPSON_SD_560 = device_creator<epson_sd_560>;
+const device_type EPSON_SD_580L = device_creator<epson_sd_580l>;
+const device_type EPSON_SD_581L = device_creator<epson_sd_581l>;
+const device_type EPSON_SD_621L = device_creator<epson_sd_621l>;
+const device_type EPSON_SD_680L = device_creator<epson_sd_680l>;
 #endif
 
 // Sony 3.5" drives
-const device_type SONY_OA_D31V = &device_creator<sony_oa_d31v>;
-const device_type SONY_OA_D32W = &device_creator<sony_oa_d32w>;
-const device_type SONY_OA_D32V = &device_creator<sony_oa_d32v>;
+const device_type SONY_OA_D31V = device_creator<sony_oa_d31v>;
+const device_type SONY_OA_D32W = device_creator<sony_oa_d32w>;
+const device_type SONY_OA_D32V = device_creator<sony_oa_d32v>;
 
 // TEAC 5.25" drives
 #if 0
-const device_type TEAC_FD_55A = &device_creator<teac_fd_55a>;
-const device_type TEAC_FD_55B = &device_creator<teac_fd_55b>;
+const device_type TEAC_FD_55A = device_creator<teac_fd_55a>;
+const device_type TEAC_FD_55B = device_creator<teac_fd_55b>;
 #endif
-const device_type TEAC_FD_55E = &device_creator<teac_fd_55e>;
-const device_type TEAC_FD_55F = &device_creator<teac_fd_55f>;
-const device_type TEAC_FD_55G = &device_creator<teac_fd_55g>;
+const device_type TEAC_FD_55E = device_creator<teac_fd_55e>;
+const device_type TEAC_FD_55F = device_creator<teac_fd_55f>;
+const device_type TEAC_FD_55G = device_creator<teac_fd_55g>;
 
 // ALPS 5.25" drives
-const device_type ALPS_3255190x = &device_creator<alps_3255190x>;
+const device_type ALPS_3255190x = device_creator<alps_3255190x>;
 
 // IBM 8" drives
-const device_type IBM_6360 = &device_creator<ibm_6360>;
+const device_type IBM_6360 = device_creator<ibm_6360>;
 
 
 template class device_finder<floppy_connector, false>;
@@ -258,9 +260,6 @@ void floppy_image_device::set_formats(const floppy_format_type *formats)
 
 		image_specify_extension( extension_list, 256, fif->extensions() );
 	}
-
-	// set brief and instance name
-	update_names();
 }
 
 floppy_image_format_t *floppy_image_device::get_formats() const
@@ -271,11 +270,6 @@ floppy_image_format_t *floppy_image_device::get_formats() const
 floppy_image_format_t *floppy_image_device::get_load_format() const
 {
 	return input_format;
-}
-
-void floppy_image_device::device_config_complete()
-{
-	update_names();
 }
 
 void floppy_image_device::set_rpm(float _rpm)
@@ -658,7 +652,7 @@ void floppy_image_device::stp_w(int state)
 			}
 			if(ocyl != cyl)
 			{
-				if (TRACE_STEP) logerror("%s: track %d\n", tag(), cyl);
+				if (TRACE_STEP) logerror("track %d\n", cyl);
 				// Do we want a stepper sound?
 				// We plan for 5 zones with possibly specific sounds
 				if (m_make_sound) m_sound_out->step(cyl*5/tracks);
@@ -706,7 +700,7 @@ void floppy_image_device::seek_phase_w(int phases)
 	subcyl = next_pos & 3;
 
 	if(TRACE_STEP && (next_pos != cur_pos))
-		logerror("%s: track %d.%d\n", tag(), cyl, subcyl);
+		logerror("track %d.%d\n", cyl, subcyl);
 
 	/* Update disk detection if applicable */
 	if (exists() && !dskchg_writable)
@@ -1358,7 +1352,7 @@ machine_config_constructor floppy_image_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( floppy_img );
 }
 
-const device_type FLOPPYSOUND = &device_creator<floppy_sound_device>;
+const device_type FLOPPYSOUND = device_creator<floppy_sound_device>;
 
 
 //**************************************************************************
@@ -1708,7 +1702,7 @@ void floppy_525_dd::handled_variants(uint32_t *variants, int &var_count) const
 //-------------------------------------------------
 
 floppy_525_ssqd::floppy_525_ssqd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	floppy_image_device(mconfig, FLOPPY_525_QD, "5.25\" single-sided quad density floppy drive", tag, owner, clock, "floppy_525_ssqd", __FILE__)
+	floppy_image_device(mconfig, FLOPPY_525_SSQD, "5.25\" single-sided quad density floppy drive", tag, owner, clock, "floppy_525_ssqd", __FILE__)
 {
 }
 
@@ -1928,7 +1922,7 @@ void floppy_8_dsdd::handled_variants(uint32_t *variants, int &var_count) const
 //-------------------------------------------------
 
 epson_smd_165::epson_smd_165(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	floppy_image_device(mconfig, EPSON_SD_321, "EPSON SMD-165 Floppy Disk Drive", tag, owner, clock, "epson_smd_165", __FILE__)
+	floppy_image_device(mconfig, EPSON_SMD_165, "EPSON SMD-165 Floppy Disk Drive", tag, owner, clock, "epson_smd_165", __FILE__)
 {
 }
 
@@ -2154,7 +2148,7 @@ void sony_oa_d32v::handled_variants(uint32_t *variants, int &var_count) const
 //-------------------------------------------------
 
 teac_fd_55e::teac_fd_55e(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	floppy_image_device(mconfig, TEAC_FD_55F, "TEAC FD-55E FDD", tag, owner, clock, "teac_fd_55e", __FILE__)
+	floppy_image_device(mconfig, TEAC_FD_55E, "TEAC FD-55E FDD", tag, owner, clock, "teac_fd_55e", __FILE__)
 {
 }
 
@@ -2289,7 +2283,7 @@ void alps_3255190x::handled_variants(uint32_t *variants, int &var_count) const
 //-------------------------------------------------
 
 ibm_6360::ibm_6360(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	floppy_image_device(mconfig, FLOPPY_8_SSSD, "IBM 6360 8\" single density single sided floppy drive", tag, owner, clock, "ibm_6360", __FILE__)
+	floppy_image_device(mconfig, IBM_6360, "IBM 6360 8\" single density single sided floppy drive", tag, owner, clock, "ibm_6360", __FILE__)
 {
 }
 

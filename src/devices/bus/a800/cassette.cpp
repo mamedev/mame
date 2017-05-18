@@ -25,7 +25,7 @@ TODO:
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A8SIO_CASSETTE = &device_creator<a8sio_cassette_device>;
+const device_type A8SIO_CASSETTE = device_creator<a8sio_cassette_device>;
 const device_timer_id TIMER_CASSETTE_READ = 1;
 
 static MACHINE_CONFIG_FRAGMENT( cassette )

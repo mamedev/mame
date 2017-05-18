@@ -11,7 +11,6 @@
 #ifndef __VP585__
 #define __VP585__
 
-#include "emu.h"
 #include "exp.h"
 
 

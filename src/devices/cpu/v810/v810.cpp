@@ -35,7 +35,7 @@
 #define clkMEM 3
 
 
-const device_type V810 = &device_creator<v810_device>;
+const device_type V810 = device_creator<v810_device>;
 
 
 v810_device::v810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

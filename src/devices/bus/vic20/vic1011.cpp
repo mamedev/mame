@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "vic1011.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC1011 = &device_creator<vic1011_device>;
+const device_type VIC1011 = device_creator<vic1011_device>;
 
 
 //-------------------------------------------------

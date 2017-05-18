@@ -19,6 +19,7 @@
  */
 
 #include "sound/discrete.h"
+#include "screen.h"
 
 
 #define STARSHP1_MASTER_CLOCK       (12096000)

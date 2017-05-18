@@ -28,6 +28,7 @@
 170 RETURN
 */
 
+#include "emu.h"
 #include "music64.h"
 
 
@@ -36,7 +37,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MUSIC64 = &device_creator<c64_music64_cartridge_device>;
+const device_type C64_MUSIC64 = device_creator<c64_music64_cartridge_device>;
 
 
 //-------------------------------------------------

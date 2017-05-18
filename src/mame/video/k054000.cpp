@@ -52,20 +52,10 @@ Memory map:
 /*                                                                         */
 /***************************************************************************/
 
-const device_type K054000 = &device_creator<k054000_device>;
+const device_type K054000 = device_creator<k054000_device>;
 
 k054000_device::k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K054000, "K054000 Protection", tag, owner, clock, "k054000", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k054000_device::device_config_complete()
 {
 }
 

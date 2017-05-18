@@ -140,7 +140,7 @@ const int TM_SEARCH_TRANSFER    = 0x03;
 //**************************************************************************
 
 // device type definition
-const device_type Z80DMA = &device_creator<z80dma_device>;
+const device_type Z80DMA = device_creator<z80dma_device>;
 
 //-------------------------------------------------
 //  z80dma_device - constructor

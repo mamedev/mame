@@ -83,6 +83,8 @@ www.andys-arcade.com
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "imolagp.lh"
 

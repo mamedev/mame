@@ -1,5 +1,5 @@
 /* inffast.c -- fast decoding
- * Copyright (C) 1995-2008, 2010, 2013, 2016 Mark Adler
+ * Copyright (C) 1995-2017 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
@@ -8,7 +8,9 @@
 #include "inflate.h"
 #include "inffast.h"
 
-#ifndef ASMINF
+#ifdef ASMINF
+#  pragma message("Assembler code may have bugs -- use at your own risk")
+#else
 
 /*
    Decode literal, length, and distance codes and write out the resulting

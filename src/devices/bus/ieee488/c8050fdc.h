@@ -11,7 +11,6 @@
 #ifndef __C8050_FLOPPY__
 #define __C8050_FLOPPY__
 
-#include "emu.h"
 #include "formats/d80_dsk.h"
 #include "formats/d82_dsk.h"
 #include "imagedev/floppy.h"

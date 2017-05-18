@@ -17,7 +17,6 @@
 #ifndef __HANDSET__
 #define __HANDSET__
 
-#include "emu.h"
 #include "joyport.h"
 
 #define MAX_HANDSETS 4

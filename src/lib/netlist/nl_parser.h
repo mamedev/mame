@@ -15,12 +15,11 @@ namespace netlist
 {
 	class parser_t : public plib::ptokenizer
 	{
-		P_PREVENT_COPYING(parser_t)
 	public:
 		parser_t(plib::putf8_reader &strm, setup_t &setup)
 		: plib::ptokenizer(strm), m_setup(setup) {}
 
-		bool parse(const pstring nlname = "");
+		bool parse(const pstring &nlname = "");
 
 	protected:
 		void parse_netlist(const pstring &nlname);

@@ -12,6 +12,7 @@ ToDo: Fix Sprites & Rowscroll/Select for Cocktail
 
 #include "emu.h"
 #include "includes/mcatadv.h"
+#include "screen.h"
 
 TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info1)
 {

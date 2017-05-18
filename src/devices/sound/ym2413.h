@@ -5,7 +5,6 @@
 #ifndef __YM2413_H__
 #define __YM2413_H__
 
-#include "emu.h"
 
 class ym2413_device : public device_t,
 						public device_sound_interface

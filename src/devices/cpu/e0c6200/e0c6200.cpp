@@ -18,6 +18,7 @@
 
 */
 
+#include "emu.h"
 #include "e0c6200.h"
 #include "debugger.h"
 

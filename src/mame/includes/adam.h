@@ -5,7 +5,6 @@
 #ifndef ADAM_H_
 #define ADAM_H_
 
-#include "emu.h"
 #include "bus/adam/exp.h"
 #include "bus/adamnet/adamnet.h"
 #include "bus/coleco/ctrl.h"

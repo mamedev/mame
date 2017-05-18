@@ -16,7 +16,6 @@
 #ifndef __HSGPL__
 #define __HSGPL__
 
-#include "emu.h"
 #include "peribox.h"
 #include "machine/at29x.h"
 #include "machine/ram.h"

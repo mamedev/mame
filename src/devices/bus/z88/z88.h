@@ -93,7 +93,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// image-level overrides
@@ -116,7 +115,7 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);
-
+	virtual uint8_t* get_cart_base();
 private:
 	static const device_timer_id TIMER_FLP_CLEAR = 0;
 

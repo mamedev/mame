@@ -36,7 +36,6 @@
 #ifndef __VIP_BYTEIO_PORT__
 #define __VIP_BYTEIO_PORT__
 
-#include "emu.h"
 
 
 

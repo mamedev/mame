@@ -28,6 +28,7 @@ Lot of infos available at: http://www.classiccmp.org/cini/ht68k.htm
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"

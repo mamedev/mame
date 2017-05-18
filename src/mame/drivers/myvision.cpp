@@ -24,12 +24,17 @@
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "video/tms9928a.h"
 #include "sound/ay8910.h"
+#include "video/tms9928a.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 class myvision_state : public driver_device
 {

@@ -7,7 +7,6 @@
 #ifndef DECODMD_H_
 #define DECODMD_H_
 
-#include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
 #include "machine/ram.h"

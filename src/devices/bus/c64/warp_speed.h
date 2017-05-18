@@ -12,7 +12,6 @@
 #define __WARP_SPEED__
 
 
-#include "emu.h"
 #include "exp.h"
 
 

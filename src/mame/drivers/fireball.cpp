@@ -17,9 +17,12 @@
 #include "emu.h"
 
 #include "cpu/mcs51/mcs51.h"
-#include "sound/ay8910.h"
-#include "fireball.lh"
 #include "machine/eepromser.h"
+#include "sound/ay8910.h"
+#include "speaker.h"
+
+#include "fireball.lh"
+
 
 /****************************
 *    LOG defines            *

@@ -7,13 +7,14 @@ Konami 037122
 #include "emu.h"
 #include "k037122.h"
 #include "konami_helper.h"
+#include "screen.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 #define K037122_NUM_TILES       16384
 
-const device_type K037122 = &device_creator<k037122_device>;
+const device_type K037122 = device_creator<k037122_device>;
 
 k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K037122, "K037122 2D Tilemap", tag, owner, clock, "k037122", __FILE__),

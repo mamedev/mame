@@ -15,7 +15,6 @@
 #ifndef AMDRUM_H_
 #define AMDRUM_H_
 
-#include "emu.h"
 #include "cpcexp.h"
 #include "sound/dac.h"
 

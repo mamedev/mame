@@ -41,6 +41,8 @@ Dumped by Chackn
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class pinkiri8_state : public driver_device
@@ -106,7 +108,6 @@ public:
 	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_ADDRESS_MAP(map, 8);
 protected:
-	virtual void device_config_complete() override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -131,7 +132,7 @@ DEVICE_ADDRESS_MAP_START( map, 8, janshi_vdp_device )
 	AM_RANGE(0xff6000, 0xff601f) AM_RAM AM_SHARE("crtc_regs")
 ADDRESS_MAP_END
 
-const device_type JANSHIVDP = &device_creator<janshi_vdp_device>;
+const device_type JANSHIVDP = device_creator<janshi_vdp_device>;
 
 janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, JANSHIVDP, "Janshi VDP", tag, owner, clock, "janshi_vdp", __FILE__),
@@ -140,7 +141,6 @@ janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *
 {
 }
 
-void janshi_vdp_device::device_config_complete(){}
 void janshi_vdp_device::device_validity_check(validity_checker &valid) const {}
 void janshi_vdp_device::device_start() {}
 void janshi_vdp_device::device_reset() {}

@@ -108,7 +108,7 @@
  *  Device config
  */
 
-const device_type MB89352A = &device_creator<mb89352_device>;
+const device_type MB89352A = device_creator<mb89352_device>;
 
 
 /*

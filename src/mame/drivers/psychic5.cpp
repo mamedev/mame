@@ -330,10 +330,13 @@ Notes (23-Jan-2016 AS):
 */
 
 #include "emu.h"
+#include "includes/psychic5.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "includes/psychic5.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 MACHINE_START_MEMBER(psychic5_state, psychic5)

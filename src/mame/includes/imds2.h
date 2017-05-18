@@ -5,7 +5,6 @@
 #ifndef _IMDS2_H_
 #define _IMDS2_H_
 
-#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8257.h"

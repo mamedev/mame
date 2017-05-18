@@ -26,11 +26,14 @@ JPM style Reel MCU? Certainly reel data seems to be muxed together in aweird way
 
 
 #include "emu.h"
+#include "video/awpvid.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/i8255.h"
 #include "machine/steppers.h"
-#include "video/awpvid.h"
+#include "speaker.h"
+
 #include "aces1.lh"
 
 // MFME2MAME layouts:

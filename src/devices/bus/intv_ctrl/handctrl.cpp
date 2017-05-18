@@ -6,13 +6,14 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "handctrl.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type INTV_HANDCTRL = &device_creator<intv_handctrl_device>;
+const device_type INTV_HANDCTRL = device_creator<intv_handctrl_device>;
 
 
 static INPUT_PORTS_START( intv_handctrl )

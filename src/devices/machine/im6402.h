@@ -41,7 +41,6 @@
 #ifndef __IM6402__
 #define __IM6402__
 
-#include "emu.h"
 
 
 

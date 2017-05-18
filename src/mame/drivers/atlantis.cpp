@@ -942,6 +942,15 @@ ROM_START( mwskinso )
 	DISK_IMAGE( "mwskins104", 0, SHA1(6917f66718999c144c854795c5856bf5659b85fa) )
 ROM_END
 
+ROM_START( mwskinst )
+	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )  /* 512k for R4310 code */
+	 // not dumped, using the one from mwskins, should be checked, even if it seems to work
+	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, BAD_DUMP CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
+
+	DISK_REGION(PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_IMAGE( "mwskinst", 0, SHA1(1edcf05bd9d5c9d1422e84bd713d1d120940e365) )
+ROM_END
+
 /*************************************
  *
  *  Driver initialization
@@ -961,3 +970,4 @@ DRIVER_INIT_MEMBER(atlantis_state,mwskins)
 GAME( 2000, mwskins,    0,      mwskins, mwskins, atlantis_state,  mwskins,   ROT0, "Midway", "Skins Game (1.06)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2000, mwskinsa, mwskins,  mwskins, mwskins, atlantis_state,  mwskins,   ROT0, "Midway", "Skins Game (1.06, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2000, mwskinso, mwskins,  mwskins, mwskins, atlantis_state,  mwskins,   ROT0, "Midway", "Skins Game (1.04)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, mwskinst, mwskins,  mwskins, mwskins, atlantis_state,  mwskins,   ROT0, "Midway", "Skins Game Tournament Edition", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

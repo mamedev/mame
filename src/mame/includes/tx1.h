@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "screen.h"
+
 
 #define TX1_PIXEL_CLOCK     (XTAL_18MHz / 3)
 #define TX1_HBSTART         256
@@ -266,7 +268,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -320,7 +321,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

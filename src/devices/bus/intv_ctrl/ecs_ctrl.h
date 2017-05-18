@@ -12,7 +12,6 @@
 #ifndef __INTVECS_CONTROL_PORT__
 #define __INTVECS_CONTROL_PORT__
 
-#include "emu.h"
 #include "bus/intv_ctrl/ctrl.h"
 #include "bus/intv_ctrl/handctrl.h"
 

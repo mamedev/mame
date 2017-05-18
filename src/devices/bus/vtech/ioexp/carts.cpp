@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "carts.h"
 
 SLOT_INTERFACE_START( ioexp_slot_carts )

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "exp.h"
 
 
@@ -13,8 +14,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TIKI100_BUS = &device_creator<tiki100_bus_t>;
-const device_type TIKI100_BUS_SLOT = &device_creator<tiki100_bus_slot_t>;
+const device_type TIKI100_BUS = device_creator<tiki100_bus_t>;
+const device_type TIKI100_BUS_SLOT = device_creator<tiki100_bus_slot_t>;
 
 
 

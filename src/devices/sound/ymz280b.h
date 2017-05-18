@@ -12,7 +12,6 @@
 #ifndef __YMZ280B_H__
 #define __YMZ280B_H__
 
-#include "emu.h"
 
 #define MAKE_WAVS           0
 
@@ -41,7 +40,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_post_load() override;
 	virtual void device_reset() override;

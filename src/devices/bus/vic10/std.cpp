@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "std.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC10_STD = &device_creator<vic10_standard_cartridge_device>;
+const device_type VIC10_STD = device_creator<vic10_standard_cartridge_device>;
 
 
 

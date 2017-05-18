@@ -11,7 +11,6 @@
 #ifndef __PC_KBD_IBM_PC_AT_84__
 #define __PC_KBD_IBM_PC_AT_84__
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "pc_kbdc.h"
 #include "machine/rescap.h"

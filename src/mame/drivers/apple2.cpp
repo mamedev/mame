@@ -39,50 +39,49 @@ II Plus: RAM options reduced to 16/32/48 KB.
 ************************************************************************/
 
 #include "emu.h"
-#include "machine/bankdev.h"
-#include "machine/ram.h"
-#include "machine/kb3600.h"
-#include "sound/speaker.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/cassette.h"
-#include "formats/ap2_dsk.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/apple2.h"
 #include "video/apple2.h"
 
-#include "bus/a2bus/a2bus.h"
+#include "machine/bankdev.h"
+#include "imagedev/flopdrv.h"
+
+#include "bus/a2bus/a2alfam2.h"
+#include "bus/a2bus/a2applicard.h"
+#include "bus/a2bus/a2arcadebd.h"
+#include "bus/a2bus/a2cffa.h"
+#include "bus/a2bus/a2corvus.h"
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/a2diskiing.h"
-#include "bus/a2bus/a2mockingboard.h"
-#include "bus/a2bus/a2cffa.h"
+#include "bus/a2bus/a2dx1.h"
+#include "bus/a2bus/a2echoii.h"
+#include "bus/a2bus/a2mcms.h"
 #include "bus/a2bus/a2memexp.h"
+#include "bus/a2bus/a2midi.h"
+#include "bus/a2bus/a2mockingboard.h"
+#include "bus/a2bus/a2pic.h"
+#include "bus/a2bus/a2sam.h"
 #include "bus/a2bus/a2scsi.h"
-#include "bus/a2bus/a2thunderclock.h"
 #include "bus/a2bus/a2softcard.h"
-#include "bus/a2bus/a2videoterm.h"
 #include "bus/a2bus/a2ssc.h"
 #include "bus/a2bus/a2swyft.h"
 #include "bus/a2bus/a2themill.h"
-#include "bus/a2bus/a2sam.h"
-#include "bus/a2bus/a2alfam2.h"
-#include "bus/a2bus/laser128.h"
-#include "bus/a2bus/a2echoii.h"
-#include "bus/a2bus/a2arcadebd.h"
-#include "bus/a2bus/a2midi.h"
-#include "bus/a2bus/a2zipdrive.h"
-#include "bus/a2bus/a2applicard.h"
+#include "bus/a2bus/a2thunderclock.h"
 #include "bus/a2bus/a2ultraterm.h"
-#include "bus/a2bus/a2pic.h"
-#include "bus/a2bus/a2corvus.h"
-#include "bus/a2bus/a2mcms.h"
-#include "bus/a2bus/a2dx1.h"
-#include "bus/a2bus/timemasterho.h"
-#include "bus/a2bus/mouse.h"
-#include "bus/a2bus/ramcard16k.h"
-#include "bus/a2bus/ramcard128k.h"
+#include "bus/a2bus/a2videoterm.h"
+#include "bus/a2bus/a2zipdrive.h"
 #include "bus/a2bus/ezcgi.h"
+#include "bus/a2bus/laser128.h"
+#include "bus/a2bus/mouse.h"
+#include "bus/a2bus/ramcard128k.h"
+#include "bus/a2bus/ramcard16k.h"
+#include "bus/a2bus/timemasterho.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/ap2_dsk.h"
+
 
 #define A2_CPU_TAG "maincpu"
 #define A2_KBDC_TAG "ay3600"
@@ -473,7 +472,7 @@ uint32_t napple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bi
 // most softswitches don't care about read vs write, so handle them here
 void napple2_state::do_io(address_space &space, int offset)
 {
-	if(space.debugger_access())
+	if(machine().side_effect_disabled())
 	{
 		return;
 	}
@@ -642,7 +641,7 @@ WRITE8_MEMBER(napple2_state::c000_w)
 
 READ8_MEMBER(napple2_state::c080_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		int slot;
 
@@ -679,7 +678,7 @@ READ8_MEMBER(napple2_state::c100_r)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
+		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 		}
@@ -698,7 +697,7 @@ WRITE8_MEMBER(napple2_state::c100_w)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
+		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 		}
@@ -711,7 +710,7 @@ READ8_MEMBER(napple2_state::c800_r)
 {
 	if (offset == 0x7ff)
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			m_cnxx_slot = -1;
 		}
@@ -731,7 +730,7 @@ WRITE8_MEMBER(napple2_state::c800_w)
 {
 	if (offset == 0x7ff)
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			m_cnxx_slot = -1;
 		}

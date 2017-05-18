@@ -163,10 +163,12 @@ Added Multiple Coin Feature:
 
 
 #include "emu.h"
+#include "includes/fromance.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"
-#include "includes/fromance.h"
+#include "speaker.h"
 
 
 class pipedrm_state : public fromance_state

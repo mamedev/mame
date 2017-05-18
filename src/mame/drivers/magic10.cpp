@@ -89,18 +89,22 @@
 ****************************************************************************/
 
 
+#include "emu.h"
+
+#include "cpu/m68000/m68000.h"
+#include "machine/nvram.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "sgsafari.lh"
+#include "musicsrt.lh"
+
+
 #define MAIN_CLOCK    XTAL_20MHz
 #define AUX_CLOCK     XTAL_30MHz
 
 #define CPU_CLOCK    MAIN_CLOCK/2
-
-
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
-#include "machine/nvram.h"
-#include "sgsafari.lh"
-#include "musicsrt.lh"
 
 
 class magic10_state : public driver_device

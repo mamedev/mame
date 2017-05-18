@@ -191,4 +191,4 @@ void am53cf96_device::dma_write_data(int bytes, uint8_t *pData)
 	write_data(pData, bytes);
 }
 
-const device_type AM53CF96 = &device_creator<am53cf96_device>;
+const device_type AM53CF96 = device_creator<am53cf96_device>;

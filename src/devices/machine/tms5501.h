@@ -34,7 +34,6 @@
 #ifndef __TMS5501__
 #define __TMS5501__
 
-#include "emu.h"
 
 
 

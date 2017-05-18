@@ -15,8 +15,8 @@
 //  DEVICE DEFINITION
 //**************************************************************************
 
-const device_type PC1512_MOUSE_PORT = &device_creator<pc1512_mouse_port_t>;
-const device_type PC1512_MOUSE = &device_creator<pc1512_mouse_t>;
+const device_type PC1512_MOUSE_PORT = device_creator<pc1512_mouse_port_t>;
+const device_type PC1512_MOUSE = device_creator<pc1512_mouse_t>;
 
 
 

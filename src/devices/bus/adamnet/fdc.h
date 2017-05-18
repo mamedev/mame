@@ -11,7 +11,6 @@
 #ifndef __ADAM_FDC__
 #define __ADAM_FDC__
 
-#include "emu.h"
 #include "adamnet.h"
 #include "cpu/m6800/m6800.h"
 #include "formats/adam_dsk.h"

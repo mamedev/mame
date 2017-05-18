@@ -12,6 +12,7 @@
 
 #define VERBOSE 0
 
+#include "emu.h"
 #include "machine/apollo_kbd.h"
 #include "sound/beep.h"
 
@@ -55,7 +56,7 @@
 ***************************************************************************/
 
 // device type definition
-const device_type APOLLO_KBD = &device_creator<apollo_kbd_device>;
+const device_type APOLLO_KBD = device_creator<apollo_kbd_device>;
 
 //-------------------------------------------------
 // apollo_kbd_device - constructor

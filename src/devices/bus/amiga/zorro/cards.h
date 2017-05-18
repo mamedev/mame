@@ -26,7 +26,6 @@
 #ifndef __CARDS_H__
 #define __CARDS_H__
 
-#include "emu.h"
 
 #include "a2052.h"
 #include "a2232.h"

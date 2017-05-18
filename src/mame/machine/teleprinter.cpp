@@ -1,6 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
+#include "emu.h"
 #include "teleprinter.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 static const uint8_t teleprinter_font[128*8] =
 {
@@ -236,4 +241,4 @@ void teleprinter_device::device_reset()
 	generic_terminal_device::device_reset();
 }
 
-const device_type TELEPRINTER = &device_creator<teleprinter_device>;
+const device_type TELEPRINTER = device_creator<teleprinter_device>;

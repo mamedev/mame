@@ -5,7 +5,6 @@
 #ifndef __DSBZ80_H__
 #define __DSBZ80_H__
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/mpeg_audio.h"
 

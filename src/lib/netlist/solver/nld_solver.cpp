@@ -10,34 +10,37 @@
  */
 
 #if 0
-#pragma GCC optimize "-ffast-math"
-#pragma GCC optimize "-fstrict-aliasing"
-#pragma GCC optimize "-ftree-vectorizer-verbose=2"
-#pragma GCC optimize "-fopt-info-vec"
-#pragma GCC optimize "-fopt-info-vec-missed"
-//#pragma GCC optimize "-ftree-parallelize-loops=4"
-#pragma GCC optimize "-funroll-loops"
-#pragma GCC optimize "-funswitch-loops"
-#pragma GCC optimize "-fvariable-expansion-in-unroller"
-#pragma GCC optimize "-funsafe-loop-optimizations"
-#pragma GCC optimize "-fvect-cost-model"
-#pragma GCC optimize "-fvariable-expansion-in-unroller"
-#pragma GCC optimize "-ftree-loop-if-convert-stores"
-#pragma GCC optimize "-ftree-loop-distribution"
-#pragma GCC optimize "-ftree-loop-im"
-#pragma GCC optimize "-ftree-loop-ivcanon"
-#pragma GCC optimize "-fivopts"
+#pragma GCC optimize "fast-math"
+#pragma GCC optimize "strict-aliasing"
+#pragma GCC optimize "tree-vectorize"
+#pragma GCC optimize "tree-vectorizer-verbose=7"
+#pragma GCC optimize "opt-info-vec"
+#pragma GCC optimize "opt-info-vec-missed"
+//#pragma GCC optimize "tree-parallelize-loops=4"
+#pragma GCC optimize "unroll-loops"
+#pragma GCC optimize "unswitch-loops"
+#pragma GCC optimize "variable-expansion-in-unroller"
+#pragma GCC optimize "unsafe-loop-optimizations"
+#pragma GCC optimize "vect-cost-model"
+#pragma GCC optimize "variable-expansion-in-unroller"
+#pragma GCC optimize "tree-loop-if-convert-stores"
+#pragma GCC optimize "tree-loop-distribution"
+#pragma GCC optimize "tree-loop-im"
+#pragma GCC optimize "tree-loop-ivcanon"
+#pragma GCC optimize "ivopts"
 #endif
 
-#include <iostream>
 #include <algorithm>
-#include "nl_lists.h"
+#include <cmath>  // <<= needed by windows build
+
+#include "../nl_lists.h"
 
 #if HAS_OPENMP
 #include "omp.h"
 #endif
 
-#include "plib/putil.h"
+#include "../nl_factory.h"
+
 #include "nld_solver.h"
 #include "nld_matrix_solver.h"
 
@@ -107,6 +110,10 @@ NETLIB_UPDATE(solver)
 					ATTR_UNUSED const netlist_time ts = m_mat_solvers[i]->solve();
 				}
 		}
+
+		for (auto & solver : m_mat_solvers)
+			if (solver->has_timestep_devices() || force_solve)
+				solver->update_inputs();
 	}
 	else
 		for (int i = 0; i < t_cnt; i++)
@@ -114,82 +121,85 @@ NETLIB_UPDATE(solver)
 			{
 				// Ignore return value
 				ATTR_UNUSED const netlist_time ts = m_mat_solvers[i]->solve();
+				solver->update_inputs();
 			}
 #else
 	for (auto & solver : m_mat_solvers)
 		if (solver->has_timestep_devices() || force_solve)
+		{
 			// Ignore return value
 			ATTR_UNUSED const netlist_time ts = solver->solve();
+			solver->update_inputs();
+		}
 #endif
 
 	/* step circuit */
 	if (!m_Q_step.net().is_queued())
 	{
-		m_Q_step.net().toggle_new_Q();
-		m_Q_step.net().push_to_queue(netlist_time::from_double(m_params.m_max_timestep));
+		m_Q_step.net().toggle_and_push_to_queue(netlist_time::from_double(m_params.m_max_timestep));
 	}
 }
 
 template <class C>
-std::unique_ptr<matrix_solver_t> create_it(netlist_t &nl, pstring name, solver_parameters_t &params, unsigned size)
+std::unique_ptr<matrix_solver_t> create_it(netlist_t &nl, pstring name, solver_parameters_t &params, std::size_t size)
 {
 	typedef C solver;
 	return plib::make_unique<solver>(nl, name, &params, size);
 }
 
-template <int m_N, int storage_N>
-std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(unsigned size, const bool use_specific)
+template <std::size_t m_N, std::size_t storage_N>
+std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
 {
-	pstring solvername = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
-	if (use_specific && m_N == 1)
-		return plib::make_unique<matrix_solver_direct1_t>(netlist(), solvername, &m_params);
-	else if (use_specific && m_N == 2)
-		return plib::make_unique<matrix_solver_direct2_t>(netlist(), solvername, &m_params);
-	else
+	if (pstring("SOR_MAT").equals(m_method()))
 	{
-		if (pstring("SOR_MAT").equals(m_method()))
-		{
-			return create_it<matrix_solver_SOR_mat_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
-			//typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
-			//return plib::make_unique<solver_sor_mat>(netlist(), solvername, &m_params, size);
-		}
-		else if (pstring("MAT_CR").equals(m_method()))
+		return create_it<matrix_solver_SOR_mat_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
+		//typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
+		//return plib::make_unique<solver_sor_mat>(netlist(), solvername, &m_params, size);
+	}
+	else if (pstring("MAT_CR").equals(m_method()))
+	{
+		if (size > 0) // GCR always outperforms MAT solver
 		{
 			typedef matrix_solver_GCR_t<m_N,storage_N> solver_mat;
 			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 		}
-		else if (pstring("MAT").equals(m_method()))
+		else
 		{
 			typedef matrix_solver_direct_t<m_N,storage_N> solver_mat;
 			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 		}
-		else if (pstring("SM").equals(m_method()))
-		{
-			/* Sherman-Morrison Formula */
-			typedef matrix_solver_sm_t<m_N,storage_N> solver_mat;
-			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
-		}
-		else if (pstring("W").equals(m_method()))
-		{
-			/* Woodbury Formula */
-			typedef matrix_solver_w_t<m_N,storage_N> solver_mat;
-			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
-		}
-		else if (pstring("SOR").equals(m_method()))
-		{
-			typedef matrix_solver_SOR_t<m_N,storage_N> solver_GS;
-			return plib::make_unique<solver_GS>(netlist(), solvername, &m_params, size);
-		}
-		else if (pstring("GMRES").equals(m_method()))
-		{
-			typedef matrix_solver_GMRES_t<m_N,storage_N> solver_GMRES;
-			return plib::make_unique<solver_GMRES>(netlist(), solvername, &m_params, size);
-		}
-		else
-		{
-			log().fatal(MF_1_UNKNOWN_SOLVER_TYPE, m_method());
-			return nullptr;
-		}
+	}
+	else if (pstring("MAT").equals(m_method()))
+	{
+		typedef matrix_solver_direct_t<m_N,storage_N> solver_mat;
+		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+	}
+	else if (pstring("SM").equals(m_method()))
+	{
+		/* Sherman-Morrison Formula */
+		typedef matrix_solver_sm_t<m_N,storage_N> solver_mat;
+		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+	}
+	else if (pstring("W").equals(m_method()))
+	{
+		/* Woodbury Formula */
+		typedef matrix_solver_w_t<m_N,storage_N> solver_mat;
+		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+	}
+	else if (pstring("SOR").equals(m_method()))
+	{
+		typedef matrix_solver_SOR_t<m_N,storage_N> solver_GS;
+		return plib::make_unique<solver_GS>(netlist(), solvername, &m_params, size);
+	}
+	else if (pstring("GMRES").equals(m_method()))
+	{
+		typedef matrix_solver_GMRES_t<m_N,storage_N> solver_GMRES;
+		return plib::make_unique<solver_GMRES>(netlist(), solvername, &m_params, size);
+	}
+	else
+	{
+		log().fatal(MF_1_UNKNOWN_SOLVER_TYPE, m_method());
+		return nullptr;
 	}
 }
 
@@ -214,7 +224,7 @@ struct net_splitter
 		groups.back().push_back(n);
 		for (auto &p : n->m_core_terms)
 		{
-			if (p->is_type(terminal_t::TERMINAL))
+			if (p->is_type(detail::terminal_type::TERMINAL))
 			{
 				terminal_t *pt = static_cast<terminal_t *>(p);
 				analog_net_t *other_net = &pt->m_otherterm->net();
@@ -293,78 +303,95 @@ void NETLIB_NAME(solver)::post_start()
 	for (auto & grp : splitter.groups)
 	{
 		std::unique_ptr<matrix_solver_t> ms;
-		unsigned net_count = static_cast<unsigned>(grp.size());
+		std::size_t net_count = grp.size();
+		pstring sname = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 
 		switch (net_count)
 		{
 #if 1
 			case 1:
-				ms = create_solver<1,1>(1, use_specific);
+				if (use_specific)
+					ms = plib::make_unique<matrix_solver_direct1_t>(netlist(), sname, &m_params);
+				else
+					ms = create_solver<1,1>(1, sname);
 				break;
 			case 2:
-				ms = create_solver<2,2>(2, use_specific);
+				if (use_specific)
+					ms =  plib::make_unique<matrix_solver_direct2_t>(netlist(), sname, &m_params);
+				else
+					ms = create_solver<2,2>(2, sname);
 				break;
 			case 3:
-				ms = create_solver<3,3>(3, use_specific);
+				ms = create_solver<3,3>(3, sname);
 				break;
 			case 4:
-				ms = create_solver<4,4>(4, use_specific);
+				ms = create_solver<4,4>(4, sname);
 				break;
 			case 5:
-				ms = create_solver<5,5>(5, use_specific);
+				ms = create_solver<5,5>(5, sname);
 				break;
 			case 6:
-				ms = create_solver<6,6>(6, use_specific);
+				ms = create_solver<6,6>(6, sname);
 				break;
 			case 7:
-				ms = create_solver<7,7>(7, use_specific);
+				ms = create_solver<7,7>(7, sname);
 				break;
 			case 8:
-				ms = create_solver<8,8>(8, use_specific);
+				ms = create_solver<8,8>(8, sname);
+				break;
+			case 9:
+				ms = create_solver<9,9>(9, sname);
 				break;
 			case 10:
-				ms = create_solver<10,10>(10, use_specific);
+				ms = create_solver<10,10>(10, sname);
 				break;
 			case 11:
-				ms = create_solver<11,11>(11, use_specific);
+				ms = create_solver<11,11>(11, sname);
 				break;
 			case 12:
-				ms = create_solver<12,12>(12, use_specific);
+				ms = create_solver<12,12>(12, sname);
 				break;
 			case 15:
-				ms = create_solver<15,15>(15, use_specific);
+				ms = create_solver<15,15>(15, sname);
 				break;
 			case 31:
-				ms = create_solver<31,31>(31, use_specific);
+				ms = create_solver<31,31>(31, sname);
+				break;
+			case 35:
+				ms = create_solver<31,31>(31, sname);
 				break;
 			case 49:
-				ms = create_solver<49,49>(49, use_specific);
+				ms = create_solver<49,49>(49, sname);
 				break;
 #if 0
 			case 87:
-				ms = create_solver<87,87>(87, use_specific);
+				ms = create_solver<87,87>(87, sname);
 				break;
 #endif
 #endif
 			default:
 				log().warning(MW_1_NO_SPECIFIC_SOLVER, net_count);
-				if (net_count <= 16)
+				if (net_count <= 8)
 				{
-					ms = create_solver<0,16>(net_count, use_specific);
+					ms = create_solver<0, 8>(net_count, sname);
+				}
+				else if (net_count <= 16)
+				{
+					ms = create_solver<0,16>(net_count, sname);
 				}
 				else if (net_count <= 32)
 				{
-					ms = create_solver<0,32>(net_count, use_specific);
+					ms = create_solver<0,32>(net_count, sname);
 				}
 				else
 					if (net_count <= 64)
 				{
-					ms = create_solver<0,64>(net_count, use_specific);
+					ms = create_solver<0,64>(net_count, sname);
 				}
 				else
 					if (net_count <= 128)
 				{
-					ms = create_solver<0,128>(net_count, use_specific);
+					ms = create_solver<0,128>(net_count, sname);
 				}
 				else
 				{
@@ -376,7 +403,6 @@ void NETLIB_NAME(solver)::post_start()
 		}
 
 		// FIXME ...
-		ms->set_delegate_pointer();
 		ms->setup(grp);
 
 		log().verbose("Solver {1}", ms->name());
@@ -396,11 +422,13 @@ void NETLIB_NAME(solver)::post_start()
 	}
 }
 
-void NETLIB_NAME(solver)::create_solver_code(plib::postream &strm)
+void NETLIB_NAME(solver)::create_solver_code(std::map<pstring, pstring> &mp)
 {
-	plib::putf8_fmt_writer w(strm);
 	for (auto & s : m_mat_solvers)
-		s->create_solver_code(w);
+	{
+		auto r = s->create_solver_code();
+		mp[r.first] = r.second; // automatically overwrites identical names
+	}
 }
 
 	NETLIB_DEVICE_IMPL(solver)

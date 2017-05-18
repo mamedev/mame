@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "dela_ep64.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_DELA_EP64 = &device_creator<c64_dela_ep64_cartridge_device>;
+const device_type C64_DELA_EP64 = device_creator<c64_dela_ep64_cartridge_device>;
 
 
 //-------------------------------------------------

@@ -2,6 +2,7 @@
 // copyright-holders:Jarek Burczynski, Phil Stroffolino, Tomasz Slanina
 
 #include "cpu/m6805/m68705.h"
+#include "screen.h"
 
 
 class changela_state : public driver_device

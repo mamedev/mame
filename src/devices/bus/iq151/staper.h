@@ -5,7 +5,6 @@
 #ifndef __IQ151_STAPER_H__
 #define __IQ151_STAPER_H__
 
-#include "emu.h"
 #include "iq151.h"
 #include "machine/i8255.h"
 #include "imagedev/printer.h"

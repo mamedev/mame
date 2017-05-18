@@ -19,6 +19,7 @@
 
 */
 
+#include "emu.h"
 #include "ide64.h"
 
 
@@ -38,7 +39,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_IDE64 = &device_creator<c64_ide64_cartridge_device>;
+const device_type C64_IDE64 = device_creator<c64_ide64_cartridge_device>;
 
 
 //-------------------------------------------------

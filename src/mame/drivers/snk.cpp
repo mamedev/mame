@@ -270,13 +270,15 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/snk.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/snkwave.h"
 #include "sound/ay8910.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
 #include "sound/8950intf.h"
+#include "speaker.h"
 
 
 /*********************************************************************/
@@ -284,7 +286,7 @@ TODO:
 
 READ8_MEMBER(snk_state::snk_cpuA_nmi_trigger_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
@@ -298,7 +300,7 @@ WRITE8_MEMBER(snk_state::snk_cpuA_nmi_ack_w)
 
 READ8_MEMBER(snk_state::snk_cpuB_nmi_trigger_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
@@ -4285,7 +4287,7 @@ ROM_START( jcrossa )
 
 	ROM_REGION( 0x6000, "sp16_tiles", 0 )
 	ROM_LOAD( "snk12.bin",     0x0000, 0x2000, CRC(4532509b) SHA1(c99f87e2b06b94d815e6099bccb2aee0edf8c98d) )
-	ROM_LOAD( "snk13.bin ",    0x2000, 0x2000, CRC(70d219bf) SHA1(9ff9f88221edd141e8204ac810434b4290db7cff) )
+	ROM_LOAD( "snk13.bin",     0x2000, 0x2000, CRC(70d219bf) SHA1(9ff9f88221edd141e8204ac810434b4290db7cff) )
 	ROM_LOAD( "snk14.bin",     0x4000, 0x2000, CRC(42a12b9d) SHA1(9f2bdb1f84f444442282cf0fc1f7b3c7f9a9bf48) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )

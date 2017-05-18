@@ -13,7 +13,7 @@ CPU_DISASSEMBLE( i960  );
 #endif
 
 
-const device_type I960 = &device_creator<i960_cpu_device>;
+const device_type I960 = device_creator<i960_cpu_device>;
 
 
 i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

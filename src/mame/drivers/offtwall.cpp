@@ -20,9 +20,11 @@
 
 
 #include "emu.h"
+#include "includes/offtwall.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
-#include "includes/offtwall.h"
+#include "speaker.h"
 
 
 

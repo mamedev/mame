@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "dinamic.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_DINAMIC = &device_creator<c64_dinamic_cartridge_device>;
+const device_type C64_DINAMIC = device_creator<c64_dinamic_cartridge_device>;
 
 
 

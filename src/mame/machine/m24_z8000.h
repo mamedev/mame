@@ -3,7 +3,6 @@
 #ifndef M24_Z8000_H_
 #define M24_Z8000_H_
 
-#include "emu.h"
 #include "cpu/z8000/z8000.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"

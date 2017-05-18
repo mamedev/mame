@@ -10,7 +10,7 @@
 #include "video/decocomn.h"
 
 
-const device_type DECOCOMN = &device_creator<decocomn_device>;
+const device_type DECOCOMN = device_creator<decocomn_device>;
 
 decocomn_device::decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECOCOMN, "DECO Common Video Functions", tag, owner, clock, "decocomn", __FILE__),
@@ -30,16 +30,6 @@ decocomn_device::decocomn_device(const machine_config &mconfig, const char *tag,
 void decocomn_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<decocomn_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void decocomn_device::device_config_complete()
-{
 }
 
 //-------------------------------------------------

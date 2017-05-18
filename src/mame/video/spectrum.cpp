@@ -17,6 +17,8 @@
 
 #include "emu.h"
 #include "includes/spectrum.h"
+#include "screen.h"
+
 
 /***************************************************************************
   Start the video hardware emulation.

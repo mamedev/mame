@@ -28,8 +28,9 @@ typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k05
 #define K056832_BPP_6   2
 #define K056832_BPP_8   3
 #define K056832_BPP_4dj 4
-#define K056832_BPP_8LE 5
-#define K056832_BPP_8TASMAN 6
+#define K056832_BPP_4PIRATESH 5
+#define K056832_BPP_8LE 6
+#define K056832_BPP_8TASMAN 7
 
 #define K056832_DRAW_FLAG_MIRROR      0x00800000
 #define K056382_DRAW_FLAG_FORCE_XYSCROLL        0x00800000
@@ -65,6 +66,8 @@ public:
 	DECLARE_READ32_MEMBER( k_5bpp_rom_long_r );
 	DECLARE_READ32_MEMBER( k_6bpp_rom_long_r );
 	DECLARE_READ16_MEMBER( rom_word_r );
+	DECLARE_READ8_MEMBER( konmedal_rom_r );
+	DECLARE_READ16_MEMBER( piratesh_rom_r );
 	DECLARE_READ16_MEMBER( mw_rom_word_r );
 	DECLARE_READ16_MEMBER( bishi_rom_word_r );
 	DECLARE_READ16_MEMBER( old_rom_word_r );

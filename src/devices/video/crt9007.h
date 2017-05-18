@@ -34,7 +34,6 @@
 #ifndef __CRT9007__
 #define __CRT9007__
 
-#include "emu.h"
 
 
 

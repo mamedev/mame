@@ -10,6 +10,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "pf10.h"
 
 
@@ -17,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EPSON_PF10 = &device_creator<epson_pf10_device>;
+const device_type EPSON_PF10 = device_creator<epson_pf10_device>;
 
 
 //-------------------------------------------------

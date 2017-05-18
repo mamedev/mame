@@ -615,22 +615,38 @@ protected:
 	void _F0();
 };
 
-#define MCFG_TMP95C061_PORT1_READ( _port_read ) tmp95c061_device::set_port1_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C061_PORT1_WRITE( _port_write ) tmp95c061_device::set_port1_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C061_PORT2_WRITE( _port_write ) tmp95c061_device::set_port2_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C061_PORT5_READ( _port_read ) tmp95c061_device::set_port5_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C061_PORT5_WRITE( _port_write ) tmp95c061_device::set_port5_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C061_PORT6_READ( _port_read ) tmp95c061_device::set_port6_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C061_PORT6_WRITE( _port_write ) tmp95c061_device::set_port6_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C061_PORT7_READ( _port_read ) tmp95c061_device::set_port7_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C061_PORT7_WRITE( _port_write ) tmp95c061_device::set_port7_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C061_PORT8_READ( _port_read ) tmp95c061_device::set_port8_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C061_PORT8_WRITE( _port_write ) tmp95c061_device::set_port8_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C061_PORT9_READ( _port_read ) tmp95c061_device::set_port9_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C061_PORTA_READ( _port_read ) tmp95c061_device::set_porta_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C061_PORTA_WRITE( _port_write ) tmp95c061_device::set_porta_write( *device, DEVCB_##_port_write );
-#define MCFG_TMP95C061_PORTB_READ( _port_read ) tmp95c061_device::set_portb_read( *device, DEVCB_##_port_read );
-#define MCFG_TMP95C061_PORTB_WRITE( _port_write ) tmp95c061_device::set_portb_write( *device, DEVCB_##_port_write );
+#define MCFG_TMP95C061_PORT1_READ( _port_read ) \
+	devcb = &tmp95c061_device::set_port1_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C061_PORT1_WRITE( _port_write ) \
+	devcb = &tmp95c061_device::set_port1_write( *device, DEVCB_##_port_write );
+#define MCFG_TMP95C061_PORT2_WRITE( _port_write ) \
+	devcb = &tmp95c061_device::set_port2_write( *device, DEVCB_##_port_write );
+#define MCFG_TMP95C061_PORT5_READ( _port_read ) \
+	devcb = &tmp95c061_device::set_port5_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C061_PORT5_WRITE( _port_write ) \
+	devcb = &tmp95c061_device::set_port5_write( *device, DEVCB_##_port_write );
+#define MCFG_TMP95C061_PORT6_READ( _port_read ) \
+	devcb = &tmp95c061_device::set_port6_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C061_PORT6_WRITE( _port_write ) \
+	devcb = &tmp95c061_device::set_port6_write( *device, DEVCB_##_port_write );
+#define MCFG_TMP95C061_PORT7_READ( _port_read ) \
+	devcb = &tmp95c061_device::set_port7_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C061_PORT7_WRITE( _port_write ) \
+	devcb = &tmp95c061_device::set_port7_write( *device, DEVCB_##_port_write );
+#define MCFG_TMP95C061_PORT8_READ( _port_read ) \
+	devcb = &tmp95c061_device::set_port8_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C061_PORT8_WRITE( _port_write ) \
+	devcb = &mp95c061_device::set_port8_write( *device, DEVCB_##_port_write );
+#define MCFG_TMP95C061_PORT9_READ( _port_read ) \
+	devcb = &tmp95c061_device::set_port9_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C061_PORTA_READ( _port_read ) \
+	devcb = &tmp95c061_device::set_porta_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C061_PORTA_WRITE( _port_write ) \
+	devcb = &tmp95c061_device::set_porta_write( *device, DEVCB_##_port_write );
+#define MCFG_TMP95C061_PORTB_READ( _port_read ) \
+	devcb = &tmp95c061_device::set_portb_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C061_PORTB_WRITE( _port_write ) \
+	devcb = &tmp95c061_device::set_portb_write( *device, DEVCB_##_port_write );
 
 class tmp95c061_device : public tlcs900h_device
 {

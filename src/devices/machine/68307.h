@@ -7,7 +7,6 @@
 #ifndef __M68307_H__
 #define __M68307_H__
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h"
 
 #include "68307sim.h"
@@ -123,7 +122,7 @@ protected:
 	virtual void device_reset() override;
 };
 
-static const device_type M68307 = &device_creator<m68307cpu_device>;
+extern const device_type M68307;
 
 
 #endif

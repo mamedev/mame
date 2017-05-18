@@ -122,9 +122,9 @@
 #define COMPILE_MAX_SEQUENCE            64
 
 
-const device_type SH1 = &device_creator<sh1_device>;
-const device_type SH2 = &device_creator<sh2_device>;
-const device_type SH2A = &device_creator<sh2a_device>;
+const device_type SH1 = device_creator<sh1_device>;
+const device_type SH2 = device_creator<sh2_device>;
+const device_type SH2A = device_creator<sh2a_device>;
 
 /*-------------------------------------------------
     sh2_internal_a5 - read handler for
@@ -229,12 +229,12 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 }
 
 sh2a_device::sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh2_device(mconfig, SH1, "SH-2A", tag, owner, clock, "sh2a", __FILE__, CPU_TYPE_SH2, ADDRESS_MAP_NAME(sh7021_map), 28 )
+	: sh2_device(mconfig, SH2A, "SH-2A", tag, owner, clock, "sh2a", __FILE__, CPU_TYPE_SH2, ADDRESS_MAP_NAME(sh7021_map), 28)
 {
 }
 
 sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh2_device(mconfig, SH1, "SH-1", tag, owner, clock, "sh1", __FILE__, CPU_TYPE_SH1, ADDRESS_MAP_NAME(sh7032_map), 28 )
+	: sh2_device(mconfig, SH1, "SH-1", tag, owner, clock, "sh1", __FILE__, CPU_TYPE_SH1, ADDRESS_MAP_NAME(sh7032_map), 28)
 {
 }
 

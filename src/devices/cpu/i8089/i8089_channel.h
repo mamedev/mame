@@ -13,7 +13,6 @@
 #ifndef __I8089_CHANNEL_H__
 #define __I8089_CHANNEL_H__
 
-#include "emu.h"
 #include "i8089.h"
 
 

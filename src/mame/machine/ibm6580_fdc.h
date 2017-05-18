@@ -3,7 +3,6 @@
 #ifndef DWFDC_H_
 #define DWFDC_H_
 
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8255.h"
 #include "machine/upd765.h"

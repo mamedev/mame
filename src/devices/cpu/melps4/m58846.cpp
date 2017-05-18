@@ -6,10 +6,11 @@
 
 */
 
+#include "emu.h"
 #include "m58846.h"
 
 
-const device_type M58846 = &device_creator<m58846_device>;
+const device_type M58846 = device_creator<m58846_device>;
 
 
 // internal memory maps

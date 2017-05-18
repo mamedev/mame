@@ -11,7 +11,6 @@
 #ifndef __HPC102__
 #define __HPC102__
 
-#include "emu.h"
 #include "exp.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ins8250.h"

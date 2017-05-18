@@ -36,7 +36,6 @@
 #ifndef __VIP_EXPANSION_SLOT__
 #define __VIP_EXPANSION_SLOT__
 
-#include "emu.h"
 
 
 

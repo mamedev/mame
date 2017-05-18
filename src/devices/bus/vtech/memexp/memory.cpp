@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "memory.h"
 
 
@@ -13,10 +14,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type LASER110_16K = &device_creator<laser110_16k_device>;
-const device_type LASER210_16K = &device_creator<laser210_16k_device>;
-const device_type LASER310_16K = &device_creator<laser310_16k_device>;
-const device_type LASER_64K = &device_creator<laser_64k_device>;
+const device_type LASER110_16K = device_creator<laser110_16k_device>;
+const device_type LASER210_16K = device_creator<laser210_16k_device>;
+const device_type LASER310_16K = device_creator<laser310_16k_device>;
+const device_type LASER_64K = device_creator<laser_64k_device>;
 
 
 //**************************************************************************

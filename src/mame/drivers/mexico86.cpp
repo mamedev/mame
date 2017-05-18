@@ -53,6 +53,8 @@ PS4  J8635      PS4  J8541       PS4  J8648
 #include "includes/mexico86.h"
 
 #include "cpu/z80/z80.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************

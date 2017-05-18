@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "exp.h"
 
 
@@ -14,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type BW2_EXPANSION_SLOT = &device_creator<bw2_expansion_slot_device>;
+const device_type BW2_EXPANSION_SLOT = device_creator<bw2_expansion_slot_device>;
 
 
 

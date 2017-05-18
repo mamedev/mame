@@ -112,10 +112,12 @@
 
 */
 
-
 #include "emu.h"
 #include "includes/micronic.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ8_MEMBER( micronic_state::keypad_r )
 {

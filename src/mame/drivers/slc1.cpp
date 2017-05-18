@@ -50,7 +50,9 @@ Pasting doesn't work, but if it did...
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
 #include "slc1.lh"
 
 

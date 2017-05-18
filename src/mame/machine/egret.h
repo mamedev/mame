@@ -5,7 +5,6 @@
 #ifndef __EGRET_H__
 #define __EGRET_H__
 
-#include "emu.h"
 
 
 

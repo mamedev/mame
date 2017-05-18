@@ -35,7 +35,9 @@
 
 */
 
+#include "emu.h"
 #include "includes/cgc7900.h"
+#include "speaker.h"
 
 
 

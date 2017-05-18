@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "comxpl80.h"
 
 
@@ -30,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_PL80 = &device_creator<comx_pl80_device>;
+const device_type COMX_PL80 = device_creator<comx_pl80_device>;
 
 
 //-------------------------------------------------

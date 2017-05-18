@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "cst_q_plus4.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CST_Q_PLUS4 = &device_creator<cst_q_plus4_t>;
+const device_type CST_Q_PLUS4 = device_creator<cst_q_plus4_t>;
 
 
 //-------------------------------------------------

@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Ted Green
+#include "emu.h"
 #include "vrc4373.h"
 
 #define LOG_NILE            (0)
 #define LOG_NILE_MASTER     (0)
 #define LOG_NILE_TARGET     (0)
 
-const device_type VRC4373      = &device_creator<vrc4373_device>;
+const device_type VRC4373      = device_creator<vrc4373_device>;
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, vrc4373_device)
 	AM_RANGE(0x40, 0x43) AM_READWRITE  (pcictrl_r,  pcictrl_w)

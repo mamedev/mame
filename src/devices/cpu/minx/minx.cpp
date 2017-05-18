@@ -72,7 +72,7 @@ TODO:
 #define GET_MINX_PC     ( ( m_PC & 0x8000 ) ? ( m_V << 15 ) | (m_PC & 0x7FFF ) : m_PC )
 
 
-const device_type MINX = &device_creator<minx_cpu_device>;
+const device_type MINX = device_creator<minx_cpu_device>;
 
 
 minx_cpu_device::minx_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

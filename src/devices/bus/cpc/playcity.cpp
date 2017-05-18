@@ -10,14 +10,18 @@
    IRQs aren't working currently, the Z80CTC core requires the daisy chain setup to acknowledge IRQs properly, and that can't be used in a slot device currently.
 */
 
+#include "emu.h"
 #include "playcity.h"
-#include "includes/amstrad.h"
+#include "speaker.h"
+
+
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_PLAYCITY = &device_creator<cpc_playcity_device>;
+const device_type CPC_PLAYCITY = device_creator<cpc_playcity_device>;
 
 // device machine config
 static MACHINE_CONFIG_FRAGMENT( cpc_playcity )

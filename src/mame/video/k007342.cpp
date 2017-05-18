@@ -35,7 +35,7 @@ control registers
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-const device_type K007342 = &device_creator<k007342_device>;
+const device_type K007342 = device_creator<k007342_device>;
 
 k007342_device::k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K007342, "K007342 Video Controller", tag, owner, clock, "k007342", __FILE__),

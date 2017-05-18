@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "kb.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_KB = &device_creator<adam_keyboard_device>;
+const device_type ADAM_KB = device_creator<adam_keyboard_device>;
 
 
 //-------------------------------------------------

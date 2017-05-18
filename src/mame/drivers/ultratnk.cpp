@@ -7,9 +7,10 @@ Atari Ultra Tank driver
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/ultratnk.h"
 #include "audio/sprint4.h"
+#include "cpu/m6502/m6502.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK    XTAL_12_096MHz
 

@@ -16,6 +16,7 @@
 
 */
 
+#include "emu.h"
 #include "fe3.h"
 
 
@@ -55,7 +56,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC20_FE3 = &device_creator<vic20_final_expansion_3_t>;
+const device_type VIC20_FE3 = device_creator<vic20_final_expansion_3_t>;
 
 
 //-------------------------------------------------

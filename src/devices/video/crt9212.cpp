@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "crt9212.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CRT9212 = &device_creator<crt9212_t>;
+const device_type CRT9212 = device_creator<crt9212_t>;
 
 
 

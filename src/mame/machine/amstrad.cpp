@@ -38,6 +38,8 @@ This gives a total of 19968 NOPs per frame.
 
 
 #include "emu.h"
+#include "includes/amstrad.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/mc146818.h"
@@ -47,7 +49,6 @@ This gives a total of 19968 NOPs per frame.
 #include "bus/cpc/mface2.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "includes/amstrad.h"
 #include "sound/ay8910.h"
 #include "machine/ram.h"
 
@@ -3291,7 +3292,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 	logerror("IMG: loading CPC+ cartridge file\n");
 
 	// check for .CPR header
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		image.fread(header, 12);
 		if (strncmp((char *)header, "RIFF", 4) != 0)
@@ -3310,7 +3311,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 
 	// actually load the cart into ROM
-	if (image.software_entry() != nullptr)
+	if (image.loaded_through_softlist())
 	{
 		logerror("IMG: raw CPC+ cartridge from softlist\n");
 		memcpy(m_cart->get_rom_base(), image.get_software_region("rom"), size);

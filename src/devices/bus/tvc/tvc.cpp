@@ -18,7 +18,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type TVCEXP_SLOT  = &device_creator<tvcexp_slot_device>;
+const device_type TVCEXP_SLOT  = device_creator<tvcexp_slot_device>;
 
 
 //**************************************************************************

@@ -63,14 +63,15 @@ zooming might be wrong
 
 ***************************************************************************/
 
-
-
 #include "emu.h"
+#include "includes/taotaido.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
-#include "video/vsystem_spr.h"
-#include "includes/taotaido.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define TAOTAIDO_SHOW_ALL_INPUTS    0
 

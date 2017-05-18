@@ -161,9 +161,17 @@ namespace sol {
 		basic_protected_function(proxy_base<Super>&& p, reference eh = get_default_handler()) : basic_protected_function(p.operator basic_function<base_t>(), std::move(eh)) {}
 		template <typename Super>
 		basic_protected_function(const proxy_base<Super>& p, reference eh = get_default_handler()) : basic_protected_function(static_cast<basic_function<base_t>>(p), std::move(eh)) {}
+		template <typename T, meta::enable<meta::neg<std::is_integral<meta::unqualified_t<T>>>, meta::neg<std::is_same<T, ref_index>>> = meta::enabler>
+		basic_protected_function(lua_State* L, T&& r, reference eh) : basic_protected_function(L, sol::ref_index(r.registry_index()), std::move(eh)) {}
 		basic_protected_function(lua_State* L, int index = -1, reference eh = get_default_handler()) : base_t(L, index), error_handler(std::move(eh)) {
 #ifdef SOL_CHECK_ARGUMENTS
 			stack::check<basic_protected_function>(L, index, type_panic);
+#endif // Safety
+		}
+		basic_protected_function(lua_State* L, ref_index index, reference eh = get_default_handler()) : base_t(L, index), error_handler(std::move(eh)) {
+#ifdef SOL_CHECK_ARGUMENTS
+			auto pp = stack::push_pop(*this);
+			stack::check<basic_protected_function>(L, -1, type_panic);
 #endif // Safety
 		}
 

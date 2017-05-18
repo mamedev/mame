@@ -4,7 +4,6 @@
 #ifndef ISBC_208_H_
 #define ISBC_208_H_
 
-#include "emu.h"
 #include "formats/pc_dsk.h"
 #include "machine/upd765.h"
 #include "machine/am9517a.h"

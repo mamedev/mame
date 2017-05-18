@@ -21,7 +21,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h" /* for floppy disc controller */
 #include "machine/i8255.h"
-#include "sound/speaker.h"
 #include "sound/wave.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"
@@ -30,7 +29,9 @@
 #include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
 #include "machine/bankdev.h"
-#include "machine/ram.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 class elwro800_state : public spectrum_state

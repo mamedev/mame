@@ -80,6 +80,7 @@
 #include "bus/a1bus/a1cassette.h"
 #include "bus/a1bus/a1cffa.h"
 
+#include "screen.h"
 #include "softlist.h"
 
 #define A1_CPU_TAG  "maincpu"

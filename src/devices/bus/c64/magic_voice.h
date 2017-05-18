@@ -11,7 +11,6 @@
 #ifndef __MAGIC_VOICE__
 #define __MAGIC_VOICE__
 
-#include "emu.h"
 #include "machine/40105.h"
 #include "machine/6525tpi.h"
 #include "exp.h"

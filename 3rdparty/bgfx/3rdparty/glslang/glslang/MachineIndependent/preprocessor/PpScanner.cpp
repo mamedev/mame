@@ -1,11 +1,11 @@
 //
-//Copyright (C) 2002-2005  3Dlabs Inc. Ltd.
-//Copyright (C) 2013 LunarG, Inc.
-//All rights reserved.
+// Copyright (C) 2002-2005  3Dlabs Inc. Ltd.
+// Copyright (C) 2013 LunarG, Inc.
+// All rights reserved.
 //
-//Redistribution and use in source and binary forms, with or without
-//modification, are permitted provided that the following conditions
-//are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
 //
 //    Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
@@ -19,18 +19,18 @@
 //    contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-//FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-//COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-//INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-//BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-//CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-//LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-//ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-//POSSIBILITY OF SUCH DAMAGE.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+// COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 //
 /****************************************************************************\
 Copyright (c) 2002, NVIDIA Corporation.
@@ -57,7 +57,7 @@ Except as expressly stated in this notice, no other rights or licenses
 express or implied, are granted by NVIDIA herein, including but not
 limited to any patent rights that may be infringed by your derivative
 works or by other works in which the NVIDIA Software may be
-incorporated. No hardware is licensed hereunder. 
+incorporated. No hardware is licensed hereunder.
 
 THE NVIDIA SOFTWARE IS BEING PROVIDED ON AN "AS IS" BASIS, WITHOUT
 WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED,
@@ -100,36 +100,26 @@ namespace glslang {
 int TPpContext::lFloatConst(int len, int ch, TPpToken* ppToken)
 {
     bool HasDecimalOrExponent = false;
-    int declen;
-    int str_len;
     int isDouble = 0;
 #ifdef AMD_EXTENSIONS
     int isFloat16 = 0;
     bool enableFloat16 = parseContext.version >= 450 && parseContext.extensionTurnedOn(E_GL_AMD_gpu_shader_half_float);
 #endif
 
-    declen = 0;
+    const auto saveName = [&](int ch) {
+        if (len <= MaxTokenLength)
+            ppToken->name[len++] = static_cast<char>(ch);
+    };
 
-    str_len=len;
-    char* str = ppToken->name;
+    // Decimal:
+
     if (ch == '.') {
         HasDecimalOrExponent = true;
-        str[len++] = (char)ch;
+        saveName(ch);
         ch = getChar();
         while (ch >= '0' && ch <= '9') {
-            if (len < MaxTokenLength) {
-                declen++;
-                if (len > 0 || ch != '0') {
-                    str[len] = (char)ch;
-                    len++;
-                    str_len++;
-                }
-                ch = getChar();
-            } else {
-                parseContext.ppError(ppToken->loc, "float literal too long", "", "");
-                len = 1;
-                str_len = 1;
-            }
+            saveName(ch);
+            ch = getChar();
         }
     }
 
@@ -137,101 +127,74 @@ int TPpContext::lFloatConst(int len, int ch, TPpToken* ppToken)
 
     if (ch == 'e' || ch == 'E') {
         HasDecimalOrExponent = true;
-        if (len >= MaxTokenLength) {
-            parseContext.ppError(ppToken->loc, "float literal too long", "", "");
-            len = 1;
-            str_len = 1;
-        } else {
-            str[len++] = (char)ch;
+        saveName(ch);
+        ch = getChar();
+        if (ch == '+' || ch == '-') {
+            saveName(ch);
             ch = getChar();
-            if (ch == '+') {
-                str[len++] = (char)ch;
-                ch = getChar();
-            } else if (ch == '-') {
-                str[len++] = (char)ch;
+        }
+        if (ch >= '0' && ch <= '9') {
+            while (ch >= '0' && ch <= '9') {
+                saveName(ch);
                 ch = getChar();
             }
-            if (ch >= '0' && ch <= '9') {
-                while (ch >= '0' && ch <= '9') {
-                    if (len < MaxTokenLength) {
-                        str[len++] = (char)ch;
-                        ch = getChar();
-                    } else {
-                        parseContext.ppError(ppToken->loc, "float literal too long", "", "");
-                        len = 1;
-                        str_len = 1;
-                    }
-                }
-            } else {
-                parseContext.ppError(ppToken->loc, "bad character in float exponent", "", "");
-            }
+        } else {
+            parseContext.ppError(ppToken->loc, "bad character in float exponent", "", "");
         }
     }
 
-    if (len == 0) {
-        ppToken->dval = 0.0;
-        strcpy(str, "0.0");
-    } else {
-        if (ch == 'l' || ch == 'L') {
-            parseContext.doubleCheck(ppToken->loc, "double floating-point suffix");
-            if (! HasDecimalOrExponent)
-                parseContext.ppError(ppToken->loc, "float literal needs a decimal point or exponent", "", "");
-            int ch2 = getChar();
-            if (ch2 != 'f' && ch2 != 'F') {
-                ungetChar();
-                ungetChar();
-            } else {
-                if (len < MaxTokenLength) {
-                    str[len++] = (char)ch;
-                    str[len++] = (char)ch2;
-                    isDouble = 1;
-                } else {
-                    parseContext.ppError(ppToken->loc, "float literal too long", "", "");
-                    len = 1,str_len=1;
-                }
-            }
-#ifdef AMD_EXTENSIONS
-        } else if (enableFloat16 && (ch == 'h' || ch == 'H')) {
-            parseContext.float16Check(ppToken->loc, "half floating-point suffix");
-            if (!HasDecimalOrExponent)
-                parseContext.ppError(ppToken->loc, "float literal needs a decimal point or exponent", "", "");
-            int ch2 = getChar();
-            if (ch2 != 'f' && ch2 != 'F') {
-                ungetChar();
-                ungetChar();
-            }
-            else {
-                if (len < MaxTokenLength) {
-                    str[len++] = (char)ch;
-                    str[len++] = (char)ch2;
-                    isFloat16 = 1;
-                }
-                else {
-                    parseContext.ppError(ppToken->loc, "float literal too long", "", "");
-                    len = 1, str_len = 1;
-                }
-            }
-#endif
-        } else if (ch == 'f' || ch == 'F') {
-            parseContext.profileRequires(ppToken->loc,  EEsProfile, 300, nullptr, "floating-point suffix");
-            if (! parseContext.relaxedErrors())
-                parseContext.profileRequires(ppToken->loc, ~EEsProfile, 120, nullptr, "floating-point suffix");
-            if (! HasDecimalOrExponent)
-                parseContext.ppError(ppToken->loc, "float literal needs a decimal point or exponent", "", "");
-            if (len < MaxTokenLength)
-                str[len++] = (char)ch;
-            else {
-                parseContext.ppError(ppToken->loc, "float literal too long", "", "");
-                len = 1,str_len=1;
-            }
-        } else 
+    // Suffix:
+
+    if (ch == 'l' || ch == 'L') {
+        parseContext.doubleCheck(ppToken->loc, "double floating-point suffix");
+        if (! HasDecimalOrExponent)
+            parseContext.ppError(ppToken->loc, "float literal needs a decimal point or exponent", "", "");
+        int ch2 = getChar();
+        if (ch2 != 'f' && ch2 != 'F') {
             ungetChar();
+            ungetChar();
+        } else {
+            saveName(ch);
+            saveName(ch2);
+            isDouble = 1;
+        }
+#ifdef AMD_EXTENSIONS
+    } else if (enableFloat16 && (ch == 'h' || ch == 'H')) {
+        parseContext.float16Check(ppToken->loc, "half floating-point suffix");
+        if (!HasDecimalOrExponent)
+            parseContext.ppError(ppToken->loc, "float literal needs a decimal point or exponent", "", "");
+        int ch2 = getChar();
+        if (ch2 != 'f' && ch2 != 'F') {
+            ungetChar();
+            ungetChar();
+        } else {
+            saveName(ch);
+            saveName(ch2);
+            isFloat16 = 1;
+        }
+#endif
+    } else if (ch == 'f' || ch == 'F') {
+        parseContext.profileRequires(ppToken->loc,  EEsProfile, 300, nullptr, "floating-point suffix");
+        if (! parseContext.relaxedErrors())
+            parseContext.profileRequires(ppToken->loc, ~EEsProfile, 120, nullptr, "floating-point suffix");
+        if (! HasDecimalOrExponent)
+            parseContext.ppError(ppToken->loc, "float literal needs a decimal point or exponent", "", "");
+        saveName(ch);
+    } else
+        ungetChar();
 
-        str[len]='\0';
+    // Patch up the name, length, etc.
 
-        ppToken->dval = strtod(str, nullptr);
+    if (len > MaxTokenLength) {
+        len = MaxTokenLength;
+        parseContext.ppError(ppToken->loc, "float literal too long", "", "");
     }
+    ppToken->name[len] = '\0';
 
+    // Get the numerical value
+    ppToken->dval = strtod(ppToken->name, nullptr);
+
+    // Return the right token type
     if (isDouble)
         return PpAtomConstDouble;
 #ifdef AMD_EXTENSIONS
@@ -688,6 +651,9 @@ int TPpContext::tStringInput::scan(TPpToken* ppToken)
             }
             break;
         case '"':
+            // TODO: If this gets enhanced to handle escape sequences, or
+            // anything that is different than what #include needs, then
+            // #include needs to use scanHeaderName() for this.
             ch = getch();
             while (ch != '"' && ch != '\n' && ch != EndOfInput) {
                 if (len < MaxTokenLength) {

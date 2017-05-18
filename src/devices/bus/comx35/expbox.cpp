@@ -46,6 +46,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "expbox.h"
 
 
@@ -65,7 +66,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_EB = &device_creator<comx_eb_device>;
+const device_type COMX_EB = device_creator<comx_eb_device>;
 
 
 //-------------------------------------------------

@@ -12,12 +12,14 @@
 #include "emu.h"
 #include "video/sed1520.h"
 
+#include "screen.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SED1520 = &device_creator<sed1520_device>;
+const device_type SED1520 = device_creator<sed1520_device>;
 
 
 //**************************************************************************

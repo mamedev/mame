@@ -190,6 +190,7 @@ static const nes_pcb pcb_list[] =
 	{ "edu2k",            UNL_EDU2K },
 	{ "t230",             UNL_T230 },
 	{ "mk2",              UNL_MK2 },
+	{ "zemina",           ZEMINA_BOARD },
 	// misc bootleg boards
 	{ "ax5705",           UNL_AX5705 },
 	{ "sc127",            UNL_SC127 },

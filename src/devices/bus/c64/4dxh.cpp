@@ -8,6 +8,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "4dxh.h"
 
 
@@ -16,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_4DXH = &device_creator<c64_4dxh_device>;
+const device_type C64_4DXH = device_creator<c64_4dxh_device>;
 
 
 //-------------------------------------------------

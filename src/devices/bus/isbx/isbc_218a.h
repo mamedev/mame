@@ -11,7 +11,6 @@
 #ifndef __ISBC_218A__
 #define __ISBC_218A__
 
-#include "emu.h"
 #include "isbx.h"
 #include "formats/pc_dsk.h"
 #include "machine/upd765.h"

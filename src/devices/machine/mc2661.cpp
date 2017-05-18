@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "mc2661.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MC2661 = &device_creator<mc2661_device>;
+const device_type MC2661 = device_creator<mc2661_device>;
 
 
 

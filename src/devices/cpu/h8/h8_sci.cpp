@@ -11,7 +11,7 @@
 const int V = 1;
 
 
-const device_type H8_SCI = &device_creator<h8_sci_device>;
+const device_type H8_SCI = device_creator<h8_sci_device>;
 
 const char *const h8_sci_device::state_names[] = { "idle", "start", "bit", "parity", "stop", "last-tick" };
 

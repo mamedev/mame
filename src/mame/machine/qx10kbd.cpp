@@ -2,6 +2,7 @@
 // copyright-holders:Carl
 // TODO: dump 8049 mcu; key repeat; LEDs
 
+#include "emu.h"
 #include "machine/qx10kbd.h"
 
 #include "machine/keyboard.ipp"
@@ -243,4 +244,4 @@ ioport_constructor qx10_keyboard_device::device_input_ports() const
 }
 
 
-const device_type QX10_KEYBOARD = &device_creator<qx10_keyboard_device>;
+const device_type QX10_KEYBOARD = device_creator<qx10_keyboard_device>;

@@ -14,7 +14,6 @@
 #ifndef __MECMOUSE__
 #define __MECMOUSE__
 
-#include "emu.h"
 #include "joyport.h"
 
 extern const device_type MECMOUSE;

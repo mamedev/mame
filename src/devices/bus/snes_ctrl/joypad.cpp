@@ -6,13 +6,14 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "joypad.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_JOYPAD = &device_creator<snes_joypad_device>;
+const device_type SNES_JOYPAD = device_creator<snes_joypad_device>;
 
 
 static INPUT_PORTS_START( snes_joypad )

@@ -33,17 +33,17 @@ DOCS= README install.txt usage.txt wizard.txt example.c libjpeg.txt \
         structure.txt coderules.txt filelist.txt change.log
 
 # Makefiles for various systems
-MKFILES= configure Makefile.in makefile.ansi makefile.unix makefile.bcc \
-        makefile.mc6 makefile.dj makefile.wat makefile.vc makejdsw.vc6 \
-        makeadsw.vc6 makejdep.vc6 makejdsp.vc6 makejmak.vc6 makecdep.vc6 \
-        makecdsp.vc6 makecmak.vc6 makeddep.vc6 makeddsp.vc6 makedmak.vc6 \
-        maketdep.vc6 maketdsp.vc6 maketmak.vc6 makerdep.vc6 makerdsp.vc6 \
-        makermak.vc6 makewdep.vc6 makewdsp.vc6 makewmak.vc6 makejsln.v10 \
-        makeasln.v10 makejvcx.v10 makejfil.v10 makecvcx.v10 makecfil.v10 \
-        makedvcx.v10 makedfil.v10 maketvcx.v10 maketfil.v10 makervcx.v10 \
-        makerfil.v10 makewvcx.v10 makewfil.v10 makeproj.mac makcjpeg.st \
-        makdjpeg.st makljpeg.st maktjpeg.st makefile.manx makefile.sas \
-        makefile.mms makefile.vms makvms.opt
+MKFILES= configure Makefile.in makefile.ansi makefile.unix makefile.b32 \
+        makefile.bcc makefile.mc6 makefile.dj makefile.wat makefile.vc \
+        makejdsw.vc6 makeadsw.vc6 makejdep.vc6 makejdsp.vc6 makejmak.vc6 \
+        makecdep.vc6 makecdsp.vc6 makecmak.vc6 makeddep.vc6 makeddsp.vc6 \
+        makedmak.vc6 maketdep.vc6 maketdsp.vc6 maketmak.vc6 makerdep.vc6 \
+        makerdsp.vc6 makermak.vc6 makewdep.vc6 makewdsp.vc6 makewmak.vc6 \
+        makejsln.v10 makeasln.v10 makejvcx.v10 makejfil.v10 makecvcx.v10 \
+        makecfil.v10 makedvcx.v10 makedfil.v10 maketvcx.v10 maketfil.v10 \
+        makervcx.v10 makerfil.v10 makewvcx.v10 makewfil.v10 makeproj.mac \
+        makcjpeg.st makdjpeg.st makljpeg.st maktjpeg.st makefile.manx \
+        makefile.sas makefile.mms makefile.vms makvms.opt
 
 # Configuration files
 CONFIGFILES= jconfig.cfg jconfig.bcc jconfig.mc6 jconfig.dj jconfig.wat \
@@ -51,11 +51,11 @@ CONFIGFILES= jconfig.cfg jconfig.bcc jconfig.mc6 jconfig.dj jconfig.wat \
         jconfig.vms
 
 # Support scripts for configure
-CONFIGUREFILES= config.guess config.sub install-sh ltmain.sh depcomp missing
+CONFIGUREFILES= config.guess config.sub install-sh ltmain.sh depcomp \
+        missing ar-lib
 
 # Miscellaneous support files
-OTHERFILES= jconfig.txt ckconfig.c ansi2knr.c ansi2knr.1 jmemdosa.asm \
-        libjpeg.map
+OTHERFILES= jconfig.txt ckconfig.c jmemdosa.asm libjpeg.map
 
 # Test support files
 TESTFILES= testorig.jpg testimg.ppm testimg.bmp testimg.jpg testprog.jpg \

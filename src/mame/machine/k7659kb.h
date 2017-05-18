@@ -12,7 +12,6 @@
 #define __K7659_KEYBOARD__
 
 
-#include "emu.h"
 
 
 

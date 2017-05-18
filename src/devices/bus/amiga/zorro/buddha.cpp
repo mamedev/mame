@@ -22,6 +22,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "buddha.h"
 
 //**************************************************************************
@@ -35,7 +36,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BUDDHA = &device_creator<buddha_device>;
+const device_type BUDDHA = device_creator<buddha_device>;
 
 //-------------------------------------------------
 //  mmio_map - device-specific memory mapped I/O

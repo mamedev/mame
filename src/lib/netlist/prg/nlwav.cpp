@@ -1,22 +1,22 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-#include <plib/poptions.h>
-#include <cstdio>
 #include <cstring>
-#include "plib/pstring.h"
-#include "plib/plists.h"
-#include "plib/pstream.h"
-#include "nl_setup.h"
-#include <memory>
+#include "../plib/pstring.h"
+#include "../plib/plists.h"
+#include "../plib/pstream.h"
+#include "../plib/pmain.h"
+#include "../plib/ppmf.h"
+#include "../nl_setup.h"
 
-class nlwav_options_t : public plib::options
+class nlwav_app : public plib::app
 {
 public:
-	nlwav_options_t() :
-		plib::options(),
+	nlwav_app() :
+		plib::app(),
 		opt_inp(*this,  "i", "input",       "-",      "input file"),
 		opt_out(*this,  "o", "output",      "-",      "output file"),
 		opt_amp(*this,  "a", "amp",    10000.0,      "amplification after mean correction"),
+		opt_rate(*this, "r", "rate",   48000,        "sample rate of output file"),
 		opt_verb(*this, "v", "verbose",              "be verbose - this produces lots of output"),
 		opt_quiet(*this,"q", "quiet",                "be quiet - no warnings"),
 		opt_version(*this,  "",  "version",          "display version and exit"),
@@ -25,20 +25,21 @@ public:
 	plib::option_str    opt_inp;
 	plib::option_str    opt_out;
 	plib::option_double opt_amp;
+	plib::option_long   opt_rate;
 	plib::option_bool   opt_verb;
 	plib::option_bool   opt_quiet;
 	plib::option_bool   opt_version;
 	plib::option_bool   opt_help;
+
+	int execute();
+	pstring usage();
+
+	plib::pstdin pin_strm;
+private:
+	void convert1(long sample_rate);
+	void convert(long sample_rate);
 };
 
-plib::pstdin pin_strm;
-plib::pstdout pout_strm;
-plib::pstderr perr_strm;
-
-plib::putf8_fmt_writer pout(pout_strm);
-plib::putf8_fmt_writer perr(perr_strm);
-
-nlwav_options_t opts;
 
 /* From: https://ffmpeg.org/pipermail/ffmpeg-devel/2007-October/038122.html
  * The most compatible way to make a wav header for unknown length is to put
@@ -141,17 +142,119 @@ private:
 
 };
 
-static void convert()
+class log_processor
 {
-	plib::postream *fo = (opts.opt_out() == "-" ? &pout_strm : new plib::pofilestream(opts.opt_out()));
-	plib::pistream *fin = (opts.opt_inp() == "-" ? &pin_strm : new plib::pifilestream(opts.opt_inp()));
+public:
+	typedef plib::pmfp<void, double, double> callback_type;
+	log_processor(plib::pistream &is, callback_type cb) : m_is(is), m_cb(cb) { }
+
+	void process()
+	{
+		plib::putf8_reader reader(m_is);
+		pstring line;
+
+		while(reader.readline(line))
+		{
+			double t = 0.0; double v = 0.0;
+			sscanf(line.c_str(), "%lf %lf", &t, &v);
+			m_cb(t, v);
+		}
+	}
+
+private:
+	plib::pistream &m_is;
+	callback_type m_cb;
+};
+
+struct aggregator
+{
+	typedef plib::pmfp<void, double, double> callback_type;
+
+	aggregator(double quantum, callback_type cb)
+	: m_quantum(quantum)
+	, m_cb(cb)
+	, ct(0.0)
+	, lt(0.0)
+	, outsam(0.0)
+	, cursam(0.0)
+	{ }
+	void process(double time, double val)
+	{
+		while (time >= ct)
+		{
+			outsam += (ct - lt) * cursam;
+			outsam = outsam / m_quantum;
+			m_cb(ct, outsam);
+			outsam = 0.0;
+			lt = ct;
+			ct += m_quantum;
+		}
+		outsam += (time-lt)*cursam;
+		lt = time;
+		cursam = val;
+	}
+
+private:
+	double m_quantum;
+	callback_type m_cb;
+	double ct;
+	double lt;
+	double outsam;
+	double cursam;
+};
+
+class wavwriter
+{
+public:
+	wavwriter(plib::postream &fo, unsigned sample_rate, double ampa)
+	: mean(0.0)
+	, means(0.0)
+	, maxsam(-1e9)
+	, minsam(1e9)
+	, n(0)
+	, m_fo(fo)
+	, amp(ampa)
+	, m_wo(m_fo, sample_rate)
+	{ }
+
+	void process(double time, double outsam)
+	{
+		means += outsam;
+		maxsam = std::max(maxsam, outsam);
+		minsam = std::min(minsam, outsam);
+		n++;
+		//mean = means / (double) n;
+		mean += 5.0 / static_cast<double>(m_wo.sample_rate()) * (outsam - mean);
+
+		outsam = (outsam - mean) * amp;
+		outsam = std::max(-32000.0, outsam);
+		outsam = std::min(32000.0, outsam);
+		m_wo.write_sample(static_cast<int>(outsam));
+	}
+
+	double mean;
+	double means;
+	double maxsam;
+	double minsam;
+	std::size_t n;
+
+private:
+	plib::postream &m_fo;
+	double amp;
+	wav_t m_wo;
+};
+
+void nlwav_app::convert(long sample_rate)
+{
+	plib::postream *fo = (opt_out() == "-" ? &pout_strm : plib::palloc<plib::pofilestream>(opt_out()));
+	plib::pistream *fin = (opt_inp() == "-" ? &pin_strm : plib::palloc<plib::pifilestream>(opt_inp()));
 	plib::putf8_reader reader(*fin);
-	wav_t *wo = new wav_t(*fo, 48000);
+	wav_t *wo = plib::palloc<wav_t>(*fo, static_cast<unsigned>(sample_rate));
 
 	double dt = 1.0 / static_cast<double>(wo->sample_rate());
 	double ct = dt;
 	//double mean = 2.4;
-	double amp = opts.opt_amp();
+	double amp = opt_amp();
 	double mean = 0.0;
 	double means = 0.0;
 	double cursam = 0.0;
@@ -213,13 +316,13 @@ static void convert()
 		//printf("%f %f\n", t, v);
 #endif
 	}
-	delete wo;
-	if (opts.opt_inp() != "-")
-		delete fin;
-	if (opts.opt_out() != "-")
-		delete fo;
+	plib::pfree(wo);
+	if (opt_inp() != "-")
+		plib::pfree(fin);
+	if (opt_out() != "-")
+		plib::pfree(fo);
 
-	if (!opts.opt_quiet())
+	if (!opt_quiet())
 	{
 		perr("Mean (low freq filter): {}\n", mean);
 		perr("Mean (static):          {}\n", means / static_cast<double>(n));
@@ -228,31 +331,51 @@ static void convert()
 	}
 }
 
-static void usage(plib::putf8_fmt_writer &fw)
+void nlwav_app::convert1(long sample_rate)
 {
-	fw("{}\n", opts.help("Convert netlist log files into wav files.\n",
-			"nltool [options]").c_str());
+	plib::postream *fo = (opt_out() == "-" ? &pout_strm : plib::palloc<plib::pofilestream>(opt_out()));
+	plib::pistream *fin = (opt_inp() == "-" ? &pin_strm : plib::palloc<plib::pifilestream>(opt_inp()));
+
+	double dt = 1.0 / static_cast<double>(sample_rate);
+
+	wavwriter *wo = plib::palloc<wavwriter>(*fo, static_cast<unsigned>(sample_rate), opt_amp());
+	aggregator ag(dt, aggregator::callback_type(&wavwriter::process, wo));
+	log_processor lp(*fin, log_processor::callback_type(&aggregator::process, &ag));
+
+	lp.process();
+
+	if (!opt_quiet())
+	{
+		perr("Mean (low freq filter): {}\n", wo->mean);
+		perr("Mean (static):          {}\n", wo->means / static_cast<double>(wo->n));
+		perr("Amp + {}\n", 32000.0 / (wo->maxsam - wo->mean));
+		perr("Amp - {}\n", -32000.0 / (wo->minsam - wo->mean));
+	}
+
+	plib::pfree(wo);
+	if (opt_inp() != "-")
+		plib::pfree(fin);
+	if (opt_out() != "-")
+		plib::pfree(fo);
+
+}
+
+pstring nlwav_app::usage()
+{
+	return help("Convert netlist log files into wav files.\n",
+			"nltool [options]");
 }
 
 
-int main(int argc, char *argv[])
+int nlwav_app::execute()
 {
-	int ret;
-
-	if ((ret = opts.parse(argc, argv)) != argc)
+	if (opt_help())
 	{
-		perr("Error parsing {}\n", argv[ret]);
-		usage(perr);
-		return 1;
-	}
-
-	if (opts.opt_help())
-	{
-		usage(pout);
+		pout(usage());
 		return 0;
 	}
 
-	if (opts.opt_version())
+	if (opt_version())
 	{
 		pout(
 			"nlwav (netlist) 0.1\n"
@@ -264,10 +387,15 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	convert();
+	if ((1))
+		convert1(opt_rate());
+	else
+		convert(opt_rate());
 
 	return 0;
 }
+
+PMAIN(nlwav_app)
 
 /*
 Der Daten-Abschnitt enth??lt die Abtastwerte:

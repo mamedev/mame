@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl,Vas Crabb
 
+#include "emu.h"
 #include "machine/m20_kbd.h"
 
 #include "machine/keyboard.ipp"
@@ -234,4 +235,4 @@ void m20_keyboard_device::received_byte(uint8_t byte)
 }
 
 
-const device_type M20_KEYBOARD = &device_creator<m20_keyboard_device>;
+const device_type M20_KEYBOARD = device_creator<m20_keyboard_device>;

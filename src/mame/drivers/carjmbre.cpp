@@ -41,8 +41,10 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 class carjmbre_state : public driver_device
 {

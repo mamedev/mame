@@ -201,6 +201,9 @@ TODO:
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(gladiatr_state::gladiatr_bankswitch_w)
 {

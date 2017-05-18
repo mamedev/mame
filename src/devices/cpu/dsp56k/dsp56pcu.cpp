@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
+#include "emu.h"
 #include "dsp56pcu.h"
 #include "dsp56mem.h"
 

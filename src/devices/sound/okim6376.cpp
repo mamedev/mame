@@ -110,7 +110,7 @@ static void reset_adpcm(struct ADPCMVoice *voice)
 }
 
 
-const device_type OKIM6376 = &device_creator<okim6376_device>;
+const device_type OKIM6376 = device_creator<okim6376_device>;
 
 okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OKIM6376, "OKI6376", tag, owner, clock, "okim6376", __FILE__),
@@ -131,16 +131,6 @@ okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag,
 		m_st_pulses(0),
 		m_ch2_update(0),
 		m_st_update(0)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void okim6376_device::device_config_complete()
 {
 }
 

@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "sound/upd7759.h"
 #include "video/snk68_spr.h"
+#include "screen.h"
 
 class snk68_state : public driver_device
 {

@@ -142,11 +142,12 @@ the wide tilemap mode)
 
 #include "emu.h"
 #include "tc0100scn.h"
+#include "screen.h"
 
 #define TC0100SCN_RAM_SIZE        0x14000   /* enough for double-width tilemaps */
 #define TC0100SCN_TOTAL_CHARS     256
 
-const device_type TC0100SCN = &device_creator<tc0100scn_device>;
+const device_type TC0100SCN = device_creator<tc0100scn_device>;
 
 tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0100SCN, "Taito TC0100SCN", tag, owner, clock, "tc0100scn", __FILE__),

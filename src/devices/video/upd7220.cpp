@@ -37,6 +37,8 @@
 #include "emu.h"
 #include "upd7220.h"
 
+#include "screen.h"
+
 
 
 //**************************************************************************
@@ -143,7 +145,7 @@ static const int y_dir[8] = { 1, 1, 0,-1,-1,-1, 0, 1};
 //**************************************************************************
 
 // devices
-const device_type UPD7220 = &device_creator<upd7220_device>;
+const device_type UPD7220 = device_creator<upd7220_device>;
 
 
 // default address map

@@ -649,7 +649,7 @@ static MACHINE_CONFIG_START (mvme147, mvme147_state)
 	MCFG_CPU_ADD ("maincpu", M68030, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP (mvme147_mem)
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", "slot1", mvme147_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD ("vme", 1, mvme147_vme_cards, nullptr)
 
 	MCFG_M48T02_ADD("m48t18") /* t08 differs only in accepted voltage levels compared to t18 */
 

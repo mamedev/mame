@@ -18,7 +18,10 @@ Notes:
 
 **********************************************************************/
 
+#include "emu.h"
 #include "lphaser.h"
+
+#include "screen.h"
 
 
 
@@ -26,7 +29,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_LIGHT_PHASER = &device_creator<sms_light_phaser_device>;
+const device_type SMS_LIGHT_PHASER = device_creator<sms_light_phaser_device>;
 
 
 #define LGUN_RADIUS           6

@@ -194,6 +194,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "genboard.h"
 
 #define TRACE_READ 0
@@ -486,7 +487,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	decdata debug;
 
 	// For the debugger, do the decoding here with no wait states
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 	{
 		if (m_cpu->is_onchip(offset)) return m_cpu->debug_read_onchip_memory(offset&0xff);
 		dec = &debug;
@@ -503,7 +504,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	switch (dec->function)
 	{
 	case MLGVIDEO:
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			value = m_video->read(space, dec->offset>>1);
 			if (TRACE_READ) logerror("Read video %04x -> %02x\n", dec->offset, value);
@@ -521,7 +522,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 
 	case MLGKEY:
 		// key
-		if (!space.debugger_access()) value = m_keyboard->get_recent_key();
+		if (!machine().side_effect_disabled()) value = m_keyboard->get_recent_key();
 		if (TRACE_READ) logerror("Read keyboard -> %02x\n", value);
 		break;
 
@@ -541,7 +542,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 
 	case MLTKEY:
 		// key
-		if (!space.debugger_access()) value = m_keyboard->get_recent_key();
+		if (!machine().side_effect_disabled()) value = m_keyboard->get_recent_key();
 		if (TRACE_READ) logerror("Read keyboard -> %02x\n", value);
 		break;
 
@@ -563,7 +564,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		// video
 		// ++++ ++-- ---- ---+
 		// 1000 1000 0000 00x0
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			value = m_video->read(space, dec->offset>>1);
 			if (TRACE_READ) logerror("Read video %04x -> %02x\n", dec->offset, value);
@@ -586,7 +587,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		// grom simulation
 		// ++++ ++-- ---- ---+
 		// 1001 1000 0000 00x0
-		if (!space.debugger_access()) value = read_grom(space, dec->offset, 0xff);
+		if (!machine().side_effect_disabled()) value = read_grom(space, dec->offset, 0xff);
 		if (TRACE_READ) logerror("Read GROM %04x -> %02x\n", dec->offset, value);
 		break;
 
@@ -673,7 +674,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 	decdata debug;
 
 	// For the debugger, do the decoding here with no wait states
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 	{
 		dec = &debug;
 		m_debug_no_ws = true;
@@ -693,7 +694,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// ++++ ++++ ++++ ---+
 		// 1111 0001 0000 .cc0
 
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			m_video->write(space, dec->offset>>1, data);
 			if (TRACE_WRITE) logerror("Write video %04x <- %02x\n", offset, data);
@@ -739,7 +740,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// ++++ ++-- ---- ---+
 		// 1000 1100 0000 00c0
 		// Initialize waitstate timer
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			m_video->write(space, dec->offset>>1, data);
 			if (TRACE_WRITE) logerror("Write video %04x <- %02x\n", offset, data);
@@ -1507,7 +1508,7 @@ void geneve_mapper_device::device_reset()
 	}
 }
 
-const device_type GENEVE_MAPPER = &device_creator<geneve_mapper_device>;
+const device_type GENEVE_MAPPER = device_creator<geneve_mapper_device>;
 
 /****************************************************************************
     Keyboard support
@@ -2008,7 +2009,7 @@ ioport_constructor geneve_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME( genkeys );
 }
 
-const device_type GENEVE_KEYBOARD = &device_creator<geneve_keyboard_device>;
+const device_type GENEVE_KEYBOARD = device_creator<geneve_keyboard_device>;
 
 /****************************************************************************
     Mouse support
@@ -2088,4 +2089,4 @@ ioport_constructor geneve_mouse_device::device_input_ports() const
 	return INPUT_PORTS_NAME( genmouse );
 }
 
-const device_type GENEVE_MOUSE = &device_creator<geneve_mouse_device>;
+const device_type GENEVE_MOUSE = device_creator<geneve_mouse_device>;

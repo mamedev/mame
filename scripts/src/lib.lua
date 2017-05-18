@@ -22,6 +22,7 @@ project "utils"
 		ext_includedir("expat"),
 		ext_includedir("zlib"),
 		ext_includedir("flac"),
+		ext_includedir("utf8proc"),
 	}
 
 	files {

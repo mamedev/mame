@@ -9,12 +9,16 @@
  *  Created on: 16/05/2014
  */
 
+#include "emu.h"
 #include "mach32.h"
 
-const device_type ATIMACH32 = &device_creator<mach32_device>;
-const device_type ATIMACH32_8514A = &device_creator<mach32_8514a_device>;
-const device_type ATIMACH64 = &device_creator<mach64_device>;
-const device_type ATIMACH64_8514A = &device_creator<mach64_8514a_device>;
+#include "screen.h"
+
+
+const device_type ATIMACH32 = device_creator<mach32_device>;
+const device_type ATIMACH32_8514A = device_creator<mach32_8514a_device>;
+const device_type ATIMACH64 = device_creator<mach64_device>;
+const device_type ATIMACH64_8514A = device_creator<mach64_8514a_device>;
 
 
 /*

@@ -9,7 +9,6 @@
 #ifndef DAI_SND_H_
 #define DAI_SND_H_
 
-#include "emu.h"
 
 // ======================> dai_sound_device
 

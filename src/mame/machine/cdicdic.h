@@ -26,7 +26,6 @@ TODO:
 #ifndef __CDICDIC_H__
 #define __CDICDIC_H__
 
-#include "emu.h"
 #include "cdrom.h"
 #include "sound/cdda.h"
 

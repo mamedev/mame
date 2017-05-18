@@ -137,7 +137,7 @@ WRITE_LINE_MEMBER( snug_bwg_device::fdc_drq_w )
 SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
 {
 	// Do not allow setaddress for debugger
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	// Selection login in the PAL and some circuits on the board
 
@@ -216,7 +216,7 @@ void snug_bwg_device::debug_write(offs_t offset, uint8_t data)
 */
 READ8Z_MEMBER(snug_bwg_device::readz)
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 	{
 		debug_read(offset, value);
 		return;
@@ -286,7 +286,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 */
 WRITE8_MEMBER(snug_bwg_device::write)
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 	{
 		debug_write(offset, data);
 		return;
@@ -728,4 +728,4 @@ const tiny_rom_entry *snug_bwg_device::device_rom_region() const
 	return ROM_NAME( bwg_fdc );
 }
 
-const device_type TI99_BWG = &device_creator<snug_bwg_device>;
+const device_type TI99_BWG = device_creator<snug_bwg_device>;

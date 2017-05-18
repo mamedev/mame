@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "std.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PLUS4_STD = &device_creator<plus4_standard_cartridge_device>;
+const device_type PLUS4_STD = device_creator<plus4_standard_cartridge_device>;
 
 
 

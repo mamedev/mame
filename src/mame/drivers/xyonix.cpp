@@ -23,9 +23,11 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/xyonix.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "includes/xyonix.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void xyonix_state::machine_start()

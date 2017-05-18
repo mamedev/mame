@@ -12,6 +12,7 @@
 
 */
 
+#include "emu.h"
 #include "turbo232.h"
 
 
@@ -29,7 +30,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_TURBO232 = &device_creator<c64_turbo232_cartridge_device>;
+const device_type C64_TURBO232 = device_creator<c64_turbo232_cartridge_device>;
 
 
 //-------------------------------------------------

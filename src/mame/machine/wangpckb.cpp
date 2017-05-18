@@ -49,8 +49,10 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "wangpckb.h"
 
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -68,7 +70,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_KEYBOARD = &device_creator<wangpc_keyboard_t>;
+const device_type WANGPC_KEYBOARD = device_creator<wangpc_keyboard_t>;
 
 
 

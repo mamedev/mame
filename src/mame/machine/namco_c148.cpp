@@ -54,7 +54,7 @@ Interrupt Controller C148          1C0000-1FFFFF  R/W  D00-D02
 //**************************************************************************
 
 // device type definition
-const device_type NAMCO_C148 = &device_creator<namco_c148_device>;
+const device_type NAMCO_C148 = device_creator<namco_c148_device>;
 
 
 //**************************************************************************
@@ -111,6 +111,14 @@ void namco_c148_device::device_start()
 	m_out_ext2_cb.resolve_safe();
 
 	// TODO: link to SCI, EX and the screen device controller devices
+
+	save_item(NAME(m_irqlevel.cpu));
+	save_item(NAME(m_irqlevel.ex));
+	save_item(NAME(m_irqlevel.sci));
+	save_item(NAME(m_irqlevel.pos));
+	save_item(NAME(m_irqlevel.vblank));
+	save_item(NAME(m_posirq_line));
+	save_item(NAME(m_bus_reg));
 }
 
 

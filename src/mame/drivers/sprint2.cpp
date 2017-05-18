@@ -20,9 +20,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/sprint2.h"
+
+#include "cpu/m6502/m6502.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 #define MACHINE_IS_SPRINT1   (m_game == 1)
 #define MACHINE_IS_SPRINT2   (m_game == 2)

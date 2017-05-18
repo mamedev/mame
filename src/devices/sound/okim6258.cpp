@@ -35,7 +35,7 @@ static int tables_computed = 0;
 
 
 // device type definition
-const device_type OKIM6258 = &device_creator<okim6258_device>;
+const device_type OKIM6258 = device_creator<okim6258_device>;
 
 
 //**************************************************************************

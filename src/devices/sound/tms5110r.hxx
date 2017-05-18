@@ -35,7 +35,15 @@
  */
 
 	/* quick note on derivative analysis:
-	Judging by all the TI chips I (Lord Nightmare) have done this test on, the first derivative between successive values of the LPC tables should follow a roughly triangular or sine shaped curve, the second derivative should start at a value, increase slightly, then decrease smoothly and become negative right around where the LPC curve passes 0, finally increase slightly right near the end. If it doesn't do this, there is probably a wrong value in there somewhere. The pitch and energy tables follow similar patterns but aren't the same since they never cross 0. The chirp table doesn't follow this pattern at all.
+	Judging by all the TI chips I (Lord Nightmare) have done this test on,
+	the first derivative between successive values of the LPC tables should
+	follow a roughly triangular or sine shaped curve, the second derivative
+	should start at a value, increase slightly, then decrease smoothly and
+	become negative right around where the LPC curve passes 0, finally
+	increase slightly right near the end. If it doesn't do this, there is
+	probably a wrong value in there somewhere. The pitch and energy tables
+	follow similar patterns but aren't the same since they never cross 0.
+	The chirp table doesn't follow this pattern at all.
 	*/
 
 	/* Chip types based on die marks from decap:

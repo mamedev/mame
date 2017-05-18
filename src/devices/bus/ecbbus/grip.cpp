@@ -6,7 +6,11 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "grip.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -31,7 +35,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ECB_GRIP21 = &device_creator<grip_device>;
+const device_type ECB_GRIP21 = device_creator<grip_device>;
 
 
 

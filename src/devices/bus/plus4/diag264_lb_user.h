@@ -11,7 +11,6 @@
 #ifndef __DIAG264_USER_PORT_LOOPBACK__
 #define __DIAG264_USER_PORT_LOOPBACK__
 
-#include "emu.h"
 #include "user.h"
 
 

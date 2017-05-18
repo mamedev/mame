@@ -61,13 +61,16 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
-#include "cpu/pic16c5x/pic16c5x.h"
-#include "sound/okim6295.h"
 #include "includes/playmark.h"
-#include "machine/ticket.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/pic16c5x/pic16c5x.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "screen.h"
+#include "sound/okim6295.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(playmark_state::coinctrl_w)
@@ -256,12 +259,6 @@ WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
 //      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",space.device().safe_pcbase(),m_oki_command,m_oki_control,m_snd_command);
 		m_oki->write(space, 0, m_oki_command);
 	}
-}
-
-
-READ_LINE_MEMBER(playmark_state::PIC16C5X_T0_clk_r)
-{
-	return 0;
 }
 
 
@@ -1225,7 +1222,6 @@ static MACHINE_CONFIG_START( bigtwin, playmark_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1266,7 +1262,6 @@ static MACHINE_CONFIG_START( bigtwinb, playmark_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1308,7 +1303,6 @@ static MACHINE_CONFIG_START( wbeachvl, playmark_state )
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
 //  MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w)) // probably closer to this, but this only supports 2 sample bank bits
-	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
@@ -1352,7 +1346,6 @@ static MACHINE_CONFIG_START( excelsr, playmark_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1393,7 +1386,6 @@ static MACHINE_CONFIG_START( hrdtimes, playmark_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 	MCFG_DEVICE_DISABLE()       /* Internal code is not dumped yet */
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
@@ -1435,7 +1427,6 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
@@ -1482,7 +1473,6 @@ static MACHINE_CONFIG_START( luckboomh, playmark_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

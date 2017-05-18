@@ -14,7 +14,6 @@
 #ifndef PCKEYBRD_H
 #define PCKEYBRD_H
 
-#include "emu.h"
 
 class pc_keyboard_device : public device_t
 {

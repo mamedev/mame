@@ -434,13 +434,13 @@ void sn76496_base_device::register_for_save_states()
 //  save_item(NAME(m_sega_style_psg));
 }
 
-const device_type SN76496 = &device_creator<sn76496_device>;
-const device_type U8106 = &device_creator<u8106_device>;
-const device_type Y2404 = &device_creator<y2404_device>;
-const device_type SN76489 = &device_creator<sn76489_device>;
-const device_type SN76489A = &device_creator<sn76489a_device>;
-const device_type SN76494 = &device_creator<sn76494_device>;
-const device_type SN94624 = &device_creator<sn94624_device>;
-const device_type NCR7496 = &device_creator<ncr7496_device>;
-const device_type GAMEGEAR = &device_creator<gamegear_device>;
-const device_type SEGAPSG = &device_creator<segapsg_device>;
+const device_type SN76496 = device_creator<sn76496_device>;
+const device_type U8106 = device_creator<u8106_device>;
+const device_type Y2404 = device_creator<y2404_device>;
+const device_type SN76489 = device_creator<sn76489_device>;
+const device_type SN76489A = device_creator<sn76489a_device>;
+const device_type SN76494 = device_creator<sn76494_device>;
+const device_type SN94624 = device_creator<sn94624_device>;
+const device_type NCR7496 = device_creator<ncr7496_device>;
+const device_type GAMEGEAR = device_creator<gamegear_device>;
+const device_type SEGAPSG = device_creator<segapsg_device>;

@@ -12,11 +12,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ddribble.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "includes/konamipt.h"
-#include "includes/ddribble.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 INTERRUPT_GEN_MEMBER(ddribble_state::ddribble_interrupt_0)

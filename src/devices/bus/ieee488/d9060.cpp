@@ -27,6 +27,7 @@
 
 */
 
+#include "emu.h"
 #include "d9060.h"
 #include "bus/scsi/d9060hd.h"
 
@@ -60,8 +61,8 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type D9060 = &device_creator<d9060_t>;
-const device_type D9090 = &device_creator<d9090_t>;
+const device_type D9060 = device_creator<d9060_t>;
+const device_type D9090 = device_creator<d9090_t>;
 
 
 //-------------------------------------------------

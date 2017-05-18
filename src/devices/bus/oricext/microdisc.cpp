@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "microdisc.h"
 #include "formats/oric_dsk.h"
 
-const device_type MICRODISC = &device_creator<microdisc_device>;
+const device_type MICRODISC = device_creator<microdisc_device>;
 
 ROM_START( microdisc )
 	ROM_REGION( 0x2000, "microdisc", 0 )

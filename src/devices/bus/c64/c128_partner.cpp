@@ -28,6 +28,7 @@
 
 */
 
+#include "emu.h"
 #include "c128_partner.h"
 
 
@@ -36,7 +37,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C128_PARTNER = &device_creator<partner128_t>;
+const device_type C128_PARTNER = device_creator<partner128_t>;
 
 
 //-------------------------------------------------

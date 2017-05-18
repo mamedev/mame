@@ -18,11 +18,12 @@
 
 */
 
+#include "emu.h"
 #include "msm5832.h"
 
 
 // device type definition
-const device_type MSM5832 = &device_creator<msm5832_device>;
+const device_type MSM5832 = device_creator<msm5832_device>;
 
 
 //**************************************************************************

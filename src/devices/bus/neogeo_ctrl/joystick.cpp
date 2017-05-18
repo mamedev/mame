@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "joystick.h"
 
 
@@ -21,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEOGEO_JOY = &device_creator<neogeo_joystick_device>;
+const device_type NEOGEO_JOY = device_creator<neogeo_joystick_device>;
 
 
 static INPUT_PORTS_START( neogeo_joy )
@@ -117,7 +118,7 @@ uint8_t neogeo_joystick_device::read_start_sel()
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEOGEO_JOY_AC = &device_creator<neogeo_joy_ac_device>;
+const device_type NEOGEO_JOY_AC = device_creator<neogeo_joy_ac_device>;
 
 
 static INPUT_PORTS_START( neogeo_joy_ac )

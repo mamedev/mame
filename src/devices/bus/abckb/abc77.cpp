@@ -41,7 +41,9 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "abc77.h"
+#include "speaker.h"
 
 
 
@@ -58,8 +60,8 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC77 = &device_creator<abc77_device>;
-const device_type ABC55 = &device_creator<abc55_device>;
+const device_type ABC77 = device_creator<abc77_device>;
+const device_type ABC55 = device_creator<abc55_device>;
 
 
 //-------------------------------------------------
