@@ -508,26 +508,23 @@ void cli_frontend::listcrc(const std::vector<std::string> &args)
 void cli_frontend::listroms(const std::vector<std::string> &args)
 {
 	const char *gamename = args.empty() ? nullptr : args[0].c_str();
-
-	// determine which drivers to output; return an error if none found
-	driver_enumerator drivlist(m_options, gamename);
-	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
-
-	// iterate through matches
 	bool first = true;
-	while (drivlist.next())
+	auto const list_system_roms = [&first] (device_t &root, char const *type)
 	{
 		// print a header
 		if (!first)
 			osd_printf_info("\n");
 		first = false;
-		osd_printf_info("ROMs required for driver \"%s\".\n"
-						"%-32s %10s %s\n",drivlist.driver().name, "Name", "Size", "Checksum");
+		osd_printf_info(
+				"ROMs required for %s \"%s\".\n"
+				"%-32s %10s %s\n",
+				type, root.shortname(), "Name", "Size", "Checksum");
 
 		// iterate through roms
-		for (device_t &device : device_iterator(drivlist.config()->root_device()))
+		for (device_t &device : device_iterator(root))
+		{
 			for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
+			{
 				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
 					// accumulate the total length of all chunks
@@ -559,7 +556,39 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 					// end with a CR
 					osd_printf_info("\n");
 				}
+			}
+		}
+	};
+
+	// determine which drivers to output
+	driver_enumerator drivlist(m_options, gamename);
+
+	// iterate through matches
+	while (drivlist.next())
+		list_system_roms(drivlist.config()->root_device(), "driver");
+
+	bool const iswild(!gamename || core_iswildstr(gamename));
+	if (iswild || first)
+	{
+		machine_config config(GAME_NAME(___empty), m_options);
+		for (device_type type : registered_device_types)
+		{
+			if (!gamename || !core_strwildcmp(gamename, type.shortname()))
+			{
+				device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+				list_system_roms(*dev, "device");
+				config.device_remove(&config.root_device(), "_tmp");
+
+				// if it wasn't a wildcard, there can only be one
+				if (!iswild)
+					break;
+			}
+		}
 	}
+
+	// return an error if none found
+	if (first)
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
 }
 
 
@@ -829,24 +858,32 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 				summary_string);
 	}
 
-	machine_config config(GAME_NAME(___empty), m_options);
-	for (device_type type : registered_device_types)
+	bool const iswild(!gamename || core_iswildstr(gamename));
+	if (iswild || !matched)
 	{
-		device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
-		if (!gamename || !core_strwildcmp(gamename, dev->shortname()))
+		machine_config config(GAME_NAME(___empty), m_options);
+		for (device_type type : registered_device_types)
 		{
-			matched++;
+			if (!gamename || !core_strwildcmp(gamename, type.shortname()))
+			{
+				matched++;
 
-			// audit the ROMs in this set
-			media_auditor::summary summary = auditor.audit_device(*dev, AUDIT_VALIDATE_FAST);
+				// audit the ROMs in this set
+				device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+				media_auditor::summary summary = auditor.audit_device(*dev, AUDIT_VALIDATE_FAST);
 
-			print_summary(
-					auditor, summary, false,
-					"rom", dev->shortname(), nullptr,
-					correct, incorrect, notfound,
-					summary_string);
+				print_summary(
+						auditor, summary, false,
+						"rom", dev->shortname(), nullptr,
+						correct, incorrect, notfound,
+						summary_string);
+				config.device_remove(&config.root_device(), "_tmp");
+
+				// if it wasn't a wildcard, there can only be one
+				if (!iswild)
+					break;
+			}
 		}
-		config.device_remove(&config.root_device(), "_tmp");
 	}
 
 	// clear out any cached files
@@ -854,7 +891,7 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 
 	// return an error if none found
 	if (matched == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename ? gamename : "");
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename ? gamename : "");
 
 	// if we didn't get anything at all, display a generic end message
 	if (matched > 0 && correct == 0 && incorrect == 0)
