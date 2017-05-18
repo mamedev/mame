@@ -507,7 +507,30 @@ void cli_frontend::listcrc(const std::vector<std::string> &args)
 
 void cli_frontend::listroms(const std::vector<std::string> &args)
 {
-	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+	bool const iswild((1U != args.size()) || core_iswildstr(args[0].c_str()));
+	std::vector<bool> matched(args.size(), false);
+	auto const included = [&args, &matched] (char const *name) -> bool
+	{
+		if (args.empty())
+		{
+			return true;
+		}
+
+		auto it = matched.begin();
+		for (std::string const &pat : args)
+		{
+			if (!core_strwildcmp(pat.c_str(), name))
+			{
+				*it = true;
+				return true;
+			}
+
+			++it;
+		}
+
+		return false;
+	};
+
 	bool first = true;
 	auto const list_system_roms = [&first] (device_t &root, char const *type)
 	{
@@ -561,19 +584,27 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 	};
 
 	// determine which drivers to output
-	driver_enumerator drivlist(m_options, gamename);
+	driver_enumerator drivlist(m_options);
 
 	// iterate through matches
 	while (drivlist.next())
-		list_system_roms(drivlist.config()->root_device(), "driver");
+	{
+		if (included(drivlist.driver().name))
+		{
+			list_system_roms(drivlist.config()->root_device(), "driver");
 
-	bool const iswild(!gamename || core_iswildstr(gamename));
+			// if it wasn't a wildcard, there can only be one
+			if (!iswild)
+				break;
+		}
+	}
+
 	if (iswild || first)
 	{
 		machine_config config(GAME_NAME(___empty), m_options);
 		for (device_type type : registered_device_types)
 		{
-			if (!gamename || !core_strwildcmp(gamename, type.shortname()))
+			if (included(type.shortname()))
 			{
 				device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
 				list_system_roms(*dev, "device");
@@ -587,8 +618,14 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 	}
 
 	// return an error if none found
-	if (first)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
+	auto it = matched.begin();
+	for (std::string const &pat : args)
+	{
+		if (!*it)
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", pat.c_str());
+
+		++it;
+	}
 }
 
 
@@ -830,44 +867,68 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 //-------------------------------------------------
 void cli_frontend::verifyroms(const std::vector<std::string> &args)
 {
-	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+	bool const iswild((1U != args.size()) || core_iswildstr(args[0].c_str()));
+	std::vector<bool> matched(args.size(), false);
+	unsigned matchcount = 0;
+	auto const included = [&args, &matched, &matchcount] (char const *name) -> bool
+	{
+		if (args.empty())
+		{
+			++matchcount;
+			return true;
+		}
 
-	// determine which drivers to output;
-	driver_enumerator drivlist(m_options, gamename);
+		auto it = matched.begin();
+		for (std::string const &pat : args)
+		{
+			if (!core_strwildcmp(pat.c_str(), name))
+			{
+				++matchcount;
+				*it = true;
+				return true;
+			}
+
+			++it;
+		}
+
+		return false;
+	};
 
 	unsigned correct = 0;
 	unsigned incorrect = 0;
 	unsigned notfound = 0;
-	unsigned matched = 0;
 
 	// iterate over drivers
+	driver_enumerator drivlist(m_options);
 	media_auditor auditor(drivlist);
 	util::ovectorstream summary_string;
 	while (drivlist.next())
 	{
-		matched++;
+		if (included(drivlist.driver().name))
+		{
+			// audit the ROMs in this set
+			media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
-		// audit the ROMs in this set
-		media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
+			auto const clone_of = drivlist.clone();
+			print_summary(
+					auditor, summary, true,
+					"rom", drivlist.driver().name, (clone_of >= 0) ? drivlist.driver(clone_of).name : nullptr,
+					correct, incorrect, notfound,
+					summary_string);
 
-		auto const clone_of = drivlist.clone();
-		print_summary(
-				auditor, summary, true,
-				"rom", drivlist.driver().name, (clone_of >= 0) ? drivlist.driver(clone_of).name : nullptr,
-				correct, incorrect, notfound,
-				summary_string);
+			// if it wasn't a wildcard, there can only be one
+			if (!iswild)
+				break;
+		}
 	}
 
-	bool const iswild(!gamename || core_iswildstr(gamename));
-	if (iswild || !matched)
+	if (iswild || !matchcount)
 	{
 		machine_config config(GAME_NAME(___empty), m_options);
 		for (device_type type : registered_device_types)
 		{
-			if (!gamename || !core_strwildcmp(gamename, type.shortname()))
+			if (included(type.shortname()))
 			{
-				matched++;
-
 				// audit the ROMs in this set
 				device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
 				media_auditor::summary summary = auditor.audit_device(*dev, AUDIT_VALIDATE_FAST);
@@ -890,24 +951,30 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 	util::archive_file::cache_clear();
 
 	// return an error if none found
-	if (matched == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename ? gamename : "");
-
-	// if we didn't get anything at all, display a generic end message
-	if (matched > 0 && correct == 0 && incorrect == 0)
+	auto it = matched.begin();
+	for (std::string const &pat : args)
 	{
-		if (notfound > 0)
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" not found!\n", gamename ? gamename : "");
-		else
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" has no roms!\n", gamename ? gamename : "");
+		if (!*it)
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", pat.c_str());
+
+		++it;
 	}
 
-	// otherwise, print a summary
+	if ((1U == args.size()) && (matchcount > 0) && (correct == 0) && (incorrect == 0))
+	{
+		// if we didn't get anything at all, display a generic end message
+		if (notfound > 0)
+			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" not found!\n", args[0].c_str());
+		else
+			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" has no roms!\n", args[0].c_str());
+	}
 	else
 	{
+		// otherwise, print a summary
 		if (incorrect > 0)
 			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u romsets found, %u were OK.\n", correct + incorrect, correct);
-		osd_printf_info("%u romsets found, %u were OK.\n", correct, correct);
+		else
+			osd_printf_info("%u romsets found, %u were OK.\n", correct, correct);
 	}
 }
 
@@ -1482,24 +1549,24 @@ void cli_frontend::execute_commands(const char *exename)
 		const char *usage;
 	} info_commands[] =
 	{
-		{ CLICOMMAND_LISTXML,			0, 1, &cli_frontend::listxml,			"[system name]" },
-		{ CLICOMMAND_LISTFULL,			0, 1, &cli_frontend::listfull,			"[system name]" },
-		{ CLICOMMAND_LISTSOURCE,		0, 1, &cli_frontend::listsource,		"[system name]" },
-		{ CLICOMMAND_LISTCLONES,		0, 1, &cli_frontend::listclones,		"[system name]" },
-		{ CLICOMMAND_LISTBROTHERS,		0, 1, &cli_frontend::listbrothers,		"[system name]" },
-		{ CLICOMMAND_LISTCRC,			0, 1, &cli_frontend::listcrc,			"[system name]" },
-		{ CLICOMMAND_LISTDEVICES,		0, 1, &cli_frontend::listdevices,		"[system name]" },
-		{ CLICOMMAND_LISTSLOTS,			0, 1, &cli_frontend::listslots,			"[system name]" },
-		{ CLICOMMAND_LISTROMS,			0, 1, &cli_frontend::listroms,			"[system name]" },
-		{ CLICOMMAND_LISTSAMPLES,		0, 1, &cli_frontend::listsamples,		"[system name]" },
-		{ CLICOMMAND_VERIFYROMS,		0, 1, &cli_frontend::verifyroms,		"[system name]" },
-		{ CLICOMMAND_VERIFYSAMPLES,		0, 1, &cli_frontend::verifysamples,		"[system name|*]" },
-		{ CLICOMMAND_LISTMEDIA,			0, 1, &cli_frontend::listmedia,			"[system name]" },
-		{ CLICOMMAND_LISTSOFTWARE,		0, 1, &cli_frontend::listsoftware,		"[system name]" },
-		{ CLICOMMAND_VERIFYSOFTWARE,	0, 1, &cli_frontend::verifysoftware,	"[system name|*]" },
-		{ CLICOMMAND_ROMIDENT,			1, 1, &cli_frontend::romident,			"(file or directory path)" },
-		{ CLICOMMAND_GETSOFTLIST,		0, 1, &cli_frontend::getsoftlist,		"[system name|*]" },
-		{ CLICOMMAND_VERIFYSOFTLIST,	0, 1, &cli_frontend::verifysoftlist,	"[system name|*]" },
+		{ CLICOMMAND_LISTXML,           0,  1, &cli_frontend::listxml,          "[system name]" },
+		{ CLICOMMAND_LISTFULL,          0,  1, &cli_frontend::listfull,         "[system name]" },
+		{ CLICOMMAND_LISTSOURCE,        0,  1, &cli_frontend::listsource,       "[system name]" },
+		{ CLICOMMAND_LISTCLONES,        0,  1, &cli_frontend::listclones,       "[system name]" },
+		{ CLICOMMAND_LISTBROTHERS,      0,  1, &cli_frontend::listbrothers,     "[system name]" },
+		{ CLICOMMAND_LISTCRC,           0,  1, &cli_frontend::listcrc,          "[system name]" },
+		{ CLICOMMAND_LISTDEVICES,       0,  1, &cli_frontend::listdevices,      "[system name]" },
+		{ CLICOMMAND_LISTSLOTS,         0,  1, &cli_frontend::listslots,        "[system name]" },
+		{ CLICOMMAND_LISTROMS,          0, -1, &cli_frontend::listroms,         "[system name]" },
+		{ CLICOMMAND_LISTSAMPLES,       0,  1, &cli_frontend::listsamples,      "[system name]" },
+		{ CLICOMMAND_VERIFYROMS,        0, -1, &cli_frontend::verifyroms,       "[system name]" },
+		{ CLICOMMAND_VERIFYSAMPLES,     0,  1, &cli_frontend::verifysamples,    "[system name|*]" },
+		{ CLICOMMAND_LISTMEDIA,         0,  1, &cli_frontend::listmedia,        "[system name]" },
+		{ CLICOMMAND_LISTSOFTWARE,      0,  1, &cli_frontend::listsoftware,     "[system name]" },
+		{ CLICOMMAND_VERIFYSOFTWARE,    0,  1, &cli_frontend::verifysoftware,   "[system name|*]" },
+		{ CLICOMMAND_ROMIDENT,          1,  1, &cli_frontend::romident,         "(file or directory path)" },
+		{ CLICOMMAND_GETSOFTLIST,       0,  1, &cli_frontend::getsoftlist,      "[system name|*]" },
+		{ CLICOMMAND_VERIFYSOFTLIST,    0,  1, &cli_frontend::verifysoftlist,   "[system name|*]" },
 	};
 
 	// find the command
@@ -1511,7 +1578,7 @@ void cli_frontend::execute_commands(const char *exename)
 			const char *error_message = nullptr;
 			if (m_options.command_arguments().size() < info_command.min_args)
 				error_message = "Auxillary verb -%s requires at least %d argument(s)\n";
-			if (m_options.command_arguments().size() > info_command.max_args)
+			if ((info_command.max_args >= 0) && (m_options.command_arguments().size() > info_command.max_args))
 				error_message = "Auxillary verb -%s takes at most %d argument(s)\n";
 			if (error_message)
 			{

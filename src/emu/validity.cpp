@@ -1864,6 +1864,10 @@ void validity_checker::validate_device_types()
 			}
 			else
 			{
+				// make sure the device name is not too long
+				if (strlen(dev->shortname()) > 32)
+					osd_printf_error("Device short name must be 32 characters or less\n");
+
 				// check for invalid characters in shortname
 				for (char const *s = dev->shortname(); *s; ++s)
 				{
