@@ -1026,6 +1026,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/i7220.h,MACHINES["I7220"] = true
+---------------------------------------------------
+
+if (MACHINES["I7220"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i7220.cpp",
+		MAME_DIR .. "src/devices/machine/i7220.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/i8155.h,MACHINES["I8155"] = true
 ---------------------------------------------------
 

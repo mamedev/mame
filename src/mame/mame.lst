@@ -14024,6 +14024,14 @@ grchamp                         // GM  (c) 1981 Taito Corporation
 @source:grfd2301.cpp
 grfd2301                        //
 
+@source:gridcomp.cpp
+grid1101                        //
+grid1109                        //
+grid1121                        //
+grid1129                        //
+grid1131                        //
+grid1139                        //
+
 @source:gridlee.cpp
 gridlee                         // [1983 Videa] prototype - no copyright notice
 
