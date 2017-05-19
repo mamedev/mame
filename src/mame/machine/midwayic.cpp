@@ -1220,7 +1220,8 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 			/* bit  3 = FIFO empty */
 			/* bit  6 = sound input buffer full */
 			/* bit  7 = sound output buffer empty */
-			/* bit 14 = LED? */
+			/* bit 14 = LED */
+			/* bit 15 = TI320Cx Mode Enable */
 			if (LOG_IOASIC && ((oldreg ^ newreg) & 0x3ff6))
 				logerror("IOASIC interrupt control = %04X\n", data);
 			update_ioasic_irq();
