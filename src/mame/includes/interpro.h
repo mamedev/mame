@@ -151,4 +151,4 @@ private:
 	u16 m_system_reg[4];
 };
 
-#endif //MAME_INCLUDES_INTERPRO_H
+#endif // MAME_INCLUDES_INTERPRO_H
