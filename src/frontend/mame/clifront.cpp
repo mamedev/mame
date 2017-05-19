@@ -110,6 +110,7 @@ const options_entry cli_option_entries[] =
 	{ nullptr }
 };
 
+
 void print_summary(
 		const media_auditor &auditor, media_auditor::summary summary, bool record_none_needed,
 		const char *type, const char *name, const char *parent,
@@ -164,7 +165,6 @@ void print_summary(
 }
 
 } // anonymous namespace
-
 
 
 //**************************************************************************
@@ -1445,6 +1445,54 @@ void cli_frontend::romident(const std::vector<std::string> &args)
 
 
 //-------------------------------------------------
+//	find_command
+//-------------------------------------------------
+
+const cli_frontend::info_command_struct *cli_frontend::find_command(const std::string &s)
+{
+	static const info_command_struct s_info_commands[] =
+	{
+		{ CLICOMMAND_LISTXML,           0, -1, false,	&cli_frontend::listxml,          "[pattern] ..." },
+		{ CLICOMMAND_LISTFULL,          0,  1, false,	&cli_frontend::listfull,         "[system name]" },
+		{ CLICOMMAND_LISTSOURCE,        0,  1, false,	&cli_frontend::listsource,       "[system name]" },
+		{ CLICOMMAND_LISTCLONES,        0,  1, false,	&cli_frontend::listclones,       "[system name]" },
+		{ CLICOMMAND_LISTBROTHERS,      0,  1, false,	&cli_frontend::listbrothers,     "[system name]" },
+		{ CLICOMMAND_LISTCRC,           0,  1, false,	&cli_frontend::listcrc,          "[system name]" },
+		{ CLICOMMAND_LISTDEVICES,       0,  1, false,	&cli_frontend::listdevices,      "[system name]" },
+		{ CLICOMMAND_LISTSLOTS,         0,  1, true,	&cli_frontend::listslots,        "[system name]" },
+		{ CLICOMMAND_LISTROMS,          0, -1, false,	&cli_frontend::listroms,         "[pattern] ..." },
+		{ CLICOMMAND_LISTSAMPLES,       0,  1, false,	&cli_frontend::listsamples,      "[system name]" },
+		{ CLICOMMAND_VERIFYROMS,        0, -1, false,	&cli_frontend::verifyroms,       "[pattern] ..." },
+		{ CLICOMMAND_VERIFYSAMPLES,     0,  1, false,	&cli_frontend::verifysamples,    "[system name|*]" },
+		{ CLICOMMAND_LISTMEDIA,         0,  1, true,	&cli_frontend::listmedia,        "[system name]" },
+		{ CLICOMMAND_LISTSOFTWARE,      0,  1, false,	&cli_frontend::listsoftware,     "[system name]" },
+		{ CLICOMMAND_VERIFYSOFTWARE,    0,  1, false,	&cli_frontend::verifysoftware,   "[system name|*]" },
+		{ CLICOMMAND_ROMIDENT,          1,  1, false,	&cli_frontend::romident,         "(file or directory path)" },
+		{ CLICOMMAND_GETSOFTLIST,       0,  1, false,	&cli_frontend::getsoftlist,      "[system name|*]" },
+		{ CLICOMMAND_VERIFYSOFTLIST,    0,  1, false,	&cli_frontend::verifysoftlist,   "[system name|*]" }
+	};
+
+	for (const auto &info_command : s_info_commands)
+	{
+		if (s == info_command.option)
+			return &info_command;
+	}
+	return nullptr;
+}
+
+
+//-------------------------------------------------
+//	parse_slot_options_for_auxverb
+//-------------------------------------------------
+
+bool cli_frontend::parse_slot_options_for_auxverb(const std::string &auxverb)
+{
+	const info_command_struct *command = find_command(auxverb);
+	return command && command->specify_system;
+}
+
+
+//-------------------------------------------------
 //  execute_commands - execute various frontend
 //  commands
 //-------------------------------------------------
@@ -1528,59 +1576,28 @@ void cli_frontend::execute_commands(const char *exename)
 		return;
 	}
 
-	// all other commands call out to one of these helpers
-	static const struct
-	{
-		const char *option;
-		int min_args;
-		int max_args;
-		void (cli_frontend::*function)(const std::vector<std::string> &args);
-		const char *usage;
-	} info_commands[] =
-	{
-		{ CLICOMMAND_LISTXML,           0, -1, &cli_frontend::listxml,          "[pattern] ..." },
-		{ CLICOMMAND_LISTFULL,          0,  1, &cli_frontend::listfull,         "[system name]" },
-		{ CLICOMMAND_LISTSOURCE,        0,  1, &cli_frontend::listsource,       "[system name]" },
-		{ CLICOMMAND_LISTCLONES,        0,  1, &cli_frontend::listclones,       "[system name]" },
-		{ CLICOMMAND_LISTBROTHERS,      0,  1, &cli_frontend::listbrothers,     "[system name]" },
-		{ CLICOMMAND_LISTCRC,           0,  1, &cli_frontend::listcrc,          "[system name]" },
-		{ CLICOMMAND_LISTDEVICES,       0,  1, &cli_frontend::listdevices,      "[system name]" },
-		{ CLICOMMAND_LISTSLOTS,         0,  1, &cli_frontend::listslots,        "[system name]" },
-		{ CLICOMMAND_LISTROMS,          0, -1, &cli_frontend::listroms,         "[pattern] ..." },
-		{ CLICOMMAND_LISTSAMPLES,       0,  1, &cli_frontend::listsamples,      "[system name]" },
-		{ CLICOMMAND_VERIFYROMS,        0, -1, &cli_frontend::verifyroms,       "[pattern] ..." },
-		{ CLICOMMAND_VERIFYSAMPLES,     0,  1, &cli_frontend::verifysamples,    "[system name|*]" },
-		{ CLICOMMAND_LISTMEDIA,         0,  1, &cli_frontend::listmedia,        "[system name]" },
-		{ CLICOMMAND_LISTSOFTWARE,      0,  1, &cli_frontend::listsoftware,     "[system name]" },
-		{ CLICOMMAND_VERIFYSOFTWARE,    0,  1, &cli_frontend::verifysoftware,   "[system name|*]" },
-		{ CLICOMMAND_ROMIDENT,          1,  1, &cli_frontend::romident,         "(file or directory path)" },
-		{ CLICOMMAND_GETSOFTLIST,       0,  1, &cli_frontend::getsoftlist,      "[system name|*]" },
-		{ CLICOMMAND_VERIFYSOFTLIST,    0,  1, &cli_frontend::verifysoftlist,   "[system name|*]" },
-	};
-
+	// all other commands call out to one of the info_commands helpers; first
 	// find the command
-	for (auto & info_command : info_commands)
+	const auto *info_command = find_command(m_options.command());
+	if (info_command)
 	{
-		if (m_options.command() == info_command.option)
+		// validate argument count
+		const char *error_message = nullptr;
+		if (m_options.command_arguments().size() < info_command->min_args)
+			error_message = "Auxillary verb -%s requires at least %d argument(s)\n";
+		if ((info_command->max_args >= 0) && (m_options.command_arguments().size() > info_command->max_args))
+			error_message = "Auxillary verb -%s takes at most %d argument(s)\n";
+		if (error_message)
 		{
-			// validate argument count
-			const char *error_message = nullptr;
-			if (m_options.command_arguments().size() < info_command.min_args)
-				error_message = "Auxillary verb -%s requires at least %d argument(s)\n";
-			if ((info_command.max_args >= 0) && (m_options.command_arguments().size() > info_command.max_args))
-				error_message = "Auxillary verb -%s takes at most %d argument(s)\n";
-			if (error_message)
-			{
-				osd_printf_info(error_message, info_command.option, info_command.max_args);
-				osd_printf_info("\n");
-				osd_printf_info("Usage:  %s -%s %s\n", exename, info_command.option, info_command.usage);
-				return;
-			}
-
-			// invoke the auxillary command!
-			(this->*info_command.function)(m_options.command_arguments());
+			osd_printf_info(error_message, info_command->option, info_command->max_args);
+			osd_printf_info("\n");
+			osd_printf_info("Usage:  %s -%s %s\n", exename, info_command->option, info_command->usage);
 			return;
 		}
+
+		// invoke the auxillary command!
+		(this->*info_command->function)(m_options.command_arguments());
+		return;
 	}
 
 	if (!m_osd.execute_command(m_options.command().c_str()))
