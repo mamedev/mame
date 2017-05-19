@@ -169,7 +169,7 @@ public:
 	DECLARE_WRITE8_MEMBER(softint_w);
 	DECLARE_READ8_MEMBER(nmictrl_r) { return m_nmictrl; }
 	DECLARE_WRITE8_MEMBER(nmictrl_w);
-	
+
 	DECLARE_READ16_MEMBER(softint_vector_r) { return m_swicr[offset]; }
 	DECLARE_WRITE16_MEMBER(softint_vector_w);
 

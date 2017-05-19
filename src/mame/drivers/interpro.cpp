@@ -191,16 +191,17 @@ READ8_MEMBER(interpro_state::rtc_r)
 	}
 }
 
+// these wrappers handle the two alternative scsi drivers, as well as the weird memory mapping on the InterPro
+// that maps consecutive registers at offsets of 0x100 (and with lsb = 1, but we're ignoring that for now
+
 READ8_MEMBER(interpro_state::scsi_r)
 {
 #if NEW_SCSI
-	u8 temp;
-
 	switch (offset >> 6)
 	{
 	case 0x0: return m_scsi->tcount_lo_r(space, 0);
 	case 0x1: return m_scsi->tcount_hi_r(space, 0);
-	case 0x2: temp = m_scsi->fifo_r(space, 0); logerror("fifo_r 0x%02x at %s\n", temp, machine().describe_context()); return temp;
+	case 0x2: return m_scsi->fifo_r(space, 0);
 	case 0x3: return m_scsi->command_r(space, 0);
 	case 0x4: return m_scsi->status_r(space, 0);
 	case 0x5: return m_scsi->istatus_r(space, 0);
@@ -225,7 +226,7 @@ WRITE8_MEMBER(interpro_state::scsi_w)
 	{
 	case 0: m_scsi->tcount_lo_w(space, 0, data); return;
 	case 1: m_scsi->tcount_hi_w(space, 0, data); return;
-	case 2: logerror("fifo_w 0x%02x at %s\n", data, machine().describe_context()); m_scsi->fifo_w(space, 0, data); return;
+	case 2: m_scsi->fifo_w(space, 0, data); return;
 	case 3: m_scsi->command_w(space, 0, data); return;
 	case 4: m_scsi->bus_id_w(space, 0, data); return;
 	case 5: m_scsi->timeout_w(space, 0, data); return;
@@ -250,7 +251,7 @@ READ8_MEMBER(interpro_state::scsi_dma_r)
 #if NEW_SCSI
 	return m_scsi->dma_r();
 #else
-	u8 data;
+	u8 data = 0;
 
 	m_scsi->dma_read_data(1, &data);
 
