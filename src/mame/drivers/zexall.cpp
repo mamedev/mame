@@ -78,7 +78,6 @@ READ8_MEMBER( zexall_state::zexall_output_ack_r )
 	if (m_out_req != m_out_req_last)
 	{
 		m_terminal->write(space,0,m_out_data);
-		fprintf(stderr,"%c",m_out_data);
 		m_out_req_last = m_out_req;
 		m_out_ack++;
 	}
