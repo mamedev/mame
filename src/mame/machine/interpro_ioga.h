@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
+#ifndef MAME_MACHINE_INTERPRO_IOGA_H
+#define MAME_MACHINE_INTERPRO_IOGA_H
+
 #pragma once
-
-#ifndef INTERPRO_IOGA_H_
-#define INTERPRO_IOGA_H_
-
 
 #define MCFG_INTERPRO_IOGA_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, INTERPRO_IOGA, XTAL_12_5MHz)
@@ -275,4 +274,4 @@ private:
 // device type definition
 extern const device_type INTERPRO_IOGA;
 
-#endif
+#endif // MAME_MACHINE_INTERPRO_IOGA_H

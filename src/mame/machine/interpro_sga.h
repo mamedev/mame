@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
+#ifndef MAME_MACHINE_INTERPRO_SGA_H
+#define MAME_MACHINE_INTERPRO_SGA_H
+
 #pragma once
-
-#ifndef INTERPRO_SGA_H_
-#define INTERPRO_SGA_H_
-
 
 #define MCFG_INTERPRO_SGA_BERR_CB(_out_berr) \
 	devcb = &interpro_sga_device::static_set_out_berr_callback(*device, DEVCB_##_out_berr);
@@ -153,4 +152,4 @@ private:
 // device type definition
 extern const device_type INTERPRO_SGA;
 
-#endif
+#endif // MAME_MACHINE_INTERPRO_SGA_H

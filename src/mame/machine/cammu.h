@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
+#ifndef MAME_MACHINE_CAMMU_H
+#define MAME_MACHINE_CAMMU_H
+
 #pragma once
-
-#ifndef CAMMU_H_
-#define CAMMU_H_
-
 
 // the following enables a very crude instruction cache - it has known (future)
 // problems, but speeds up cpu execution quite noticeably in the short term by
@@ -266,4 +265,4 @@ extern const device_type CAMMU_C4T;
 extern const device_type CAMMU_C4I;
 extern const device_type CAMMU_C3;
 
-#endif
+#endif // MAME_MACHINE_CAMMU_H

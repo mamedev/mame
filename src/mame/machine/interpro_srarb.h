@@ -1,12 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
+#ifndef MAME_MACHINE_INTERPRO_SRARB_H
+#define MAME_MACHINE_INTERPRO_SRARB_H
+
 #pragma once
-
-#ifndef INTERPRO_SRARB_H_
-#define INTERPRO_SRARB_H_
-
-#include "emu.h"
 
 class interpro_srarb_device : public device_t
 {
@@ -51,4 +49,4 @@ private:
 // device type definition
 extern const device_type INTERPRO_SRARB;
 
-#endif
+#endif // MAME_MACHINE_INTERPRO_SRARB_H

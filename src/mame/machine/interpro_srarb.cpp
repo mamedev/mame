@@ -11,6 +11,7 @@
 * TODO
 *   - too long to list
 */
+#include "emu.h"
 #include "interpro_srarb.h"
 
 #define VERBOSE 0
@@ -29,7 +30,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_srarb_device)
 	AM_RANGE(0x2c, 0x2f) AM_READWRITE(tmscale_r, tmscale_w)
 ADDRESS_MAP_END
 
-const device_type INTERPRO_SRARB = &device_creator<interpro_srarb_device>;
+const device_type INTERPRO_SRARB = device_creator<interpro_srarb_device>;
 
 interpro_srarb_device::interpro_srarb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INTERPRO_SRARB, "InterPro SRARB", tag, owner, clock, "srarb", __FILE__)

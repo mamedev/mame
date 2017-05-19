@@ -1,20 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
+#ifndef MAME_INCLUDES_INTERPRO_H
+#define MAME_INCLUDES_INTERPRO_H
+
 #pragma once
 
-#ifndef INTERPRO_H_
-#define INTERPRO_H_
-
 #define NEW_SCSI 0
-
-#include "emu.h"
 
 #include "cpu/clipper/clipper.h"
 #include "machine/cammu.h"
 
 #include "machine/interpro_ioga.h"
-#include "machine/interpro_mctl.h"
+#include "machine/interpro_mcga.h"
 #include "machine/interpro_sga.h"
 #include "machine/interpro_srarb.h"
 
@@ -52,7 +50,7 @@
 #define INTERPRO_SCSI_HA_TAG    "adapter"
 
 #define INTERPRO_IOGA_TAG       "ioga"
-#define INTERPRO_MCTL_TAG       "fmcc"
+#define INTERPRO_MCGA_TAG       "fmcc"
 #define INTERPRO_SGA_TAG        "sga"
 #define INTERPRO_SRARB_TAG      "srarb"
 
@@ -104,7 +102,7 @@ public:
 		m_scsi(*this, INTERPRO_SCSI_HA_TAG),
 #endif
 		m_ioga(*this, INTERPRO_IOGA_TAG),
-		m_mctl(*this, INTERPRO_MCTL_TAG),
+		m_mcga(*this, INTERPRO_MCGA_TAG),
 		m_sga(*this, INTERPRO_SGA_TAG),
 		m_srarb(*this, INTERPRO_SRARB_TAG)
 		{ }
@@ -125,7 +123,7 @@ public:
 #endif
 
 	required_device<interpro_ioga_device> m_ioga;
-	required_device<interpro_fmcc_device> m_mctl;
+	required_device<interpro_fmcc_device> m_mcga;
 	required_device<interpro_sga_device> m_sga;
 	required_device<interpro_srarb_device> m_srarb;
 
@@ -153,4 +151,4 @@ private:
 	u16 m_system_reg[4];
 };
 
-#endif
+#endif //MAME_INCLUDES_INTERPRO_H
