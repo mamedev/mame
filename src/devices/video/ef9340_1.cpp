@@ -17,17 +17,17 @@
 
 
 // device type definition
-const device_type EF9340_1 = device_creator<ef9340_1_device>;
+DEFINE_DEVICE_TYPE(EF9340_1, ef9340_1_device, "ef9340_1", "Thomson EF9340+EF9341")
 
 
-static const uint8_t bgr2rgb[8] =
+static constexpr uint8_t bgr2rgb[8] =
 {
 	0x00, 0x04, 0x02, 0x06, 0x01, 0x05, 0x03, 0x07
 };
 
 
 ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, EF9340_1, "EF9340+EF9341", tag, owner, clock, "ef9340_1", __FILE__)
+	: device_t(mconfig, EF9340_1, tag, owner, clock)
 	, device_video_interface(mconfig, *this), m_line_timer(nullptr)
 //, m_start_vpos(START_Y)
 	//, m_start_vblank(START_Y + SCREEN_HEIGHT)

@@ -22,7 +22,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type Z88CART_SLOT = device_creator<z88cart_slot_device>;
+DEFINE_DEVICE_TYPE(Z88CART_SLOT, z88cart_slot_device, "z88cart_slot", "Z88 Cartridge Slot")
 
 
 //**************************************************************************
@@ -56,10 +56,11 @@ device_z88cart_interface::~device_z88cart_interface()
 //  z88cart_slot_device - constructor
 //-------------------------------------------------
 z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, Z88CART_SLOT, "Z88 Cartridge Slot", tag, owner, clock, "z88cart_slot", __FILE__),
-		device_image_interface(mconfig, *this),
-		device_slot_interface(mconfig, *this),
-		m_out_flp_cb(*this), m_cart(nullptr), m_flp_timer(nullptr)
+	device_t(mconfig, Z88CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_out_flp_cb(*this),
+	m_cart(nullptr), m_flp_timer(nullptr)
 {
 }
 

@@ -7,15 +7,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include <algorithm>
 #include "ef9369.h"
+
+#include <algorithm>
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EF9369 = device_creator<ef9369_device>;
+DEFINE_DEVICE_TYPE(EF9369, ef9369_device, "ef9369", "Thomson EF9369 Single Chip Color Palette")
 
 
 //**************************************************************************
@@ -27,8 +28,8 @@ const device_type EF9369 = device_creator<ef9369_device>;
 //-------------------------------------------------
 
 ef9369_device::ef9369_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, EF9369, "EF9369 Single Chip Color Palette", tag, owner, clock, "ef9369", __FILE__),
-	m_address(0)
+	: device_t(mconfig, EF9369, tag, owner, clock)
+	, m_address(0)
 {
 	std::fill(m_ca, m_ca + NUMCOLORS, 0);
 	std::fill(m_cb, m_cb + NUMCOLORS, 0);

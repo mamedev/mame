@@ -14,10 +14,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_SOUND_MM5837_H
+#define MAME_SOUND_MM5837_H
 
-#ifndef __MM5837_H__
-#define __MM5837_H__
+#pragma once
 
 
 
@@ -47,8 +47,8 @@ public:
 
 	// configuration
 	static void set_vdd_voltage(device_t &device, int voltage) { downcast<mm5837_device &>(device).m_vdd = voltage; }
-	template<class _Object> static devcb_base &set_output_callback(device_t &device, _Object object)
-		{ return downcast<mm5837_device &>(device).m_output_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_output_callback(device_t &device, Object &&cb)
+	{ return downcast<mm5837_device &>(device).m_output_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides
@@ -75,6 +75,6 @@ private:
 };
 
 // device type definition
-extern const device_type MM5837;
+DECLARE_DEVICE_TYPE(MM5837, mm5837_device)
 
-#endif // __MM5837_H__
+#endif // MAME_SOUND_MM5837_H

@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __VBOY_SLOT_H
-#define __VBOY_SLOT_H
+#ifndef MAME_BUS_VBOY_SLOT_H
+#define MAME_BUS_VBOY_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -25,13 +27,12 @@ class device_vboy_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_vboy_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vboy_cart_interface();
 
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_cart) { return 0xffffffff; }
 	virtual DECLARE_READ32_MEMBER(read_eeprom) { return 0xffffffff; }
-	virtual DECLARE_WRITE32_MEMBER(write_eeprom) {}
+	virtual DECLARE_WRITE32_MEMBER(write_eeprom) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void eeprom_alloc(uint32_t size);
@@ -40,9 +41,11 @@ public:
 	uint32_t get_rom_size() { return m_rom_size; }
 	uint32_t get_eeprom_size() { return m_eeprom.size(); }
 
-	void save_eeprom()  { device().save_item(NAME(m_eeprom)); }
+	void save_eeprom() { device().save_item(NAME(m_eeprom)); }
 
 protected:
+	device_vboy_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint32_t *m_rom;
 	uint32_t m_rom_size;
@@ -61,9 +64,6 @@ public:
 	// construction/destruction
 	vboy_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vboy_cart_slot_device();
-
-	// device-level overrides
-	virtual void device_start() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -92,15 +92,16 @@ public:
 	virtual DECLARE_WRITE32_MEMBER(write_eeprom);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 	int m_type;
-	device_vboy_cart_interface*       m_cart;
+	device_vboy_cart_interface* m_cart;
 };
 
 
-
 // device type definition
-extern const device_type VBOY_CART_SLOT;
+DECLARE_DEVICE_TYPE(VBOY_CART_SLOT, vboy_cart_slot_device)
 
 
 /***************************************************************************
@@ -112,4 +113,5 @@ extern const device_type VBOY_CART_SLOT;
 #define MCFG_VBOY_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, VBOY_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-#endif
+
+#endif // MAME_BUS_VBOY_SLOT_H

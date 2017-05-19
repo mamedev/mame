@@ -17,7 +17,7 @@
 
 
 
-device_type const TI8X_LINK_PORT = device_creator<ti8x_link_port_device>;
+DEFINE_DEVICE_TYPE(TI8X_LINK_PORT, ti8x_link_port_device, "ti8x_link_port", "TI-8x Link Port")
 
 
 ti8x_link_port_device::ti8x_link_port_device(
@@ -25,7 +25,7 @@ ti8x_link_port_device::ti8x_link_port_device(
 		char const *tag,
 		device_t *owner,
 		uint32_t clock)
-	: ti8x_link_port_device(mconfig, TI8X_LINK_PORT, "TI-8x Link Port", tag, owner, clock, "ti8xlink", __FILE__)
+	: ti8x_link_port_device(mconfig, TI8X_LINK_PORT, tag, owner, clock)
 {
 }
 
@@ -33,13 +33,10 @@ ti8x_link_port_device::ti8x_link_port_device(
 ti8x_link_port_device::ti8x_link_port_device(
 		machine_config const &mconfig,
 		device_type type,
-		char const *name,
 		char const *tag,
 		device_t *owner,
-		uint32_t clock,
-		char const *shortname,
-		char const *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 	, m_tip_handler(*this)
 	, m_ring_handler(*this)

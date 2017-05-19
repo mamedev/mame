@@ -1524,7 +1524,7 @@ WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 }
 
 
-static MACHINE_CONFIG_START( segac, segac2_state )
+static MACHINE_CONFIG_START( segac )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)

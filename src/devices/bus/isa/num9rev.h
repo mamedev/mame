@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#pragma once
+#ifndef MAME_BUS_ISA_NUM9REV_H
+#define MAME_BUS_ISA_NUM9REV_H
 
-#ifndef __NUM9REV_H__
-#define __NUM9REV_H__
+#pragma once
 
 #include "isa.h"
 #include "video/upd7220.h"
@@ -57,6 +57,6 @@ private:
 };
 
 // device type definition
-extern const device_type ISA8_NUM_9_REV;
+DECLARE_DEVICE_TYPE(ISA8_NUM_9_REV, isa8_number_9_rev_device)
 
-#endif  /* __NUM9REV_H__ */
+#endif // MAME_BUS_ISA_NUM9REV_H

@@ -148,7 +148,7 @@ uint16_t via6522_device::get_counter1_value()
 //**************************************************************************
 
 // device type definition
-const device_type VIA6522 = device_creator<via6522_device>;
+DEFINE_DEVICE_TYPE(VIA6522, via6522_device, "via6522", "6522 VIA")
 
 DEVICE_ADDRESS_MAP_START( map, 8, via6522_device )
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(read, write)
@@ -159,7 +159,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 via6522_device::via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock, "via6522", __FILE__),
+	: device_t(mconfig, VIA6522, tag, owner, clock),
 		m_in_a_handler(*this),
 		m_in_b_handler(*this),
 		m_out_a_handler(*this),
@@ -405,7 +405,7 @@ void via6522_device::shift_in()
         {
             LOGINT("SHIFT in INT request ");
 //            set_int(INT_SR);// TODO: this interrupt is 1-2 clock cycles too early
-            m_shift_irq_timer->adjust(clocks_to_attotime(2)); // Delay IRQ 2 flanks for all shift INs (mode 1-3)
+            m_shift_irq_timer->adjust(clocks_to_attotime(2)/2); // Delay IRQ 2 flanks for all shift INs (mode 1-3)
         }
     }
     m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all flanks
@@ -439,11 +439,11 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			{
 				if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 				{
-					m_shift_timer->adjust(clocks_to_attotime(1));
+					m_shift_timer->adjust(clocks_to_attotime(1) / 2);
 				}
 				else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
 				{
-					m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
+					m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
 				}
                 else // otherwise we stop it
                 {
@@ -670,12 +670,12 @@ READ8_MEMBER( via6522_device::read )
 		LOGSHIFT(" - ACR: %02x ", m_acr);
 		if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(8)); // 8 flanks to start shifter from a read
+			m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 flanks to start shifter from a read
 			LOGSHIFT(" - read SR starts O2 timer ");
 		}
 		else if (SI_T2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
+			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
 			LOGSHIFT(" - read SR starts T2 timer ");
 		}
 		else if (! SO_T2_RATE(m_acr))
@@ -855,12 +855,12 @@ WRITE8_MEMBER( via6522_device::write )
 		LOGSHIFT(" - ACR is: %02x ", m_acr);
 		if (SO_O2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(8)); // 8 flanks to start shifte from a write
+			m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 flanks to start shifte from a write
 			LOGSHIFT(" - write SR starts O2 timer");
 		}
 		else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
+			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
 			LOGSHIFT(" - write starts T2 timer");
 		}
 		else

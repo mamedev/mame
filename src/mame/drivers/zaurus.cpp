@@ -1747,7 +1747,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
 }
 
 // TODO: main CPU differs greatly between versions!
-static MACHINE_CONFIG_START( zaurus, zaurus_state )
+static MACHINE_CONFIG_START( zaurus )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",PXA255,MAIN_CLOCK)
@@ -1809,9 +1809,9 @@ ROM_START( zslc1000 )
 	ROM_LOAD( "openzaurus 3.5.3 - zimage-sharp sl-c1000-20050427214434.bin", 0x000000, 0x128980, BAD_DUMP  CRC(1e1a9279) SHA1(909ac3f00385eced55822d6a155b79d9d25f43b3) )
 ROM_END
 
-COMP( 2002, zsl5500,  0,   0, zaurus,  zaurus, driver_device,  0,  "Sharp",      "Zaurus SL-5500 \"Collie\"", MACHINE_IS_SKELETON )
-COMP( 2002, zsl5600,  0,   0, zaurus,  zaurus, driver_device,  0,  "Sharp",      "Zaurus SL-5600 / SL-B500 \"Poodle\"", MACHINE_IS_SKELETON )
-COMP( 2003, zslc750,  0,   0, zaurus,  zaurus, driver_device,  0,  "Sharp",      "Zaurus SL-C750 \"Shepherd\" (Japan)", MACHINE_IS_SKELETON )
-COMP( 2004, zslc760,  0,   0, zaurus,  zaurus, driver_device,  0,  "Sharp",      "Zaurus SL-C760 \"Husky\" (Japan)", MACHINE_IS_SKELETON )
-COMP( 200?, zslc3000, 0,   0, zaurus,  zaurus, driver_device,  0,  "Sharp",      "Zaurus SL-C3000 \"Spitz\" (Japan)", MACHINE_IS_SKELETON )
-COMP( 200?, zslc1000, 0,   0, zaurus,  zaurus, driver_device,  0,  "Sharp",      "Zaurus SL-C3000 \"Akita\" (Japan)", MACHINE_IS_SKELETON )
+COMP( 2002, zsl5500,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-5500 \"Collie\"",           MACHINE_IS_SKELETON )
+COMP( 2002, zsl5600,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-5600 / SL-B500 \"Poodle\"", MACHINE_IS_SKELETON )
+COMP( 2003, zslc750,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C750 \"Shepherd\" (Japan)", MACHINE_IS_SKELETON )
+COMP( 2004, zslc760,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C760 \"Husky\" (Japan)",    MACHINE_IS_SKELETON )
+COMP( 200?, zslc3000, 0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C3000 \"Spitz\" (Japan)",   MACHINE_IS_SKELETON )
+COMP( 200?, zslc1000, 0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C3000 \"Akita\" (Japan)",   MACHINE_IS_SKELETON )

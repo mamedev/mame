@@ -42,7 +42,7 @@ void awetoss_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( awetoss, awetoss_state )
+static MACHINE_CONFIG_START( awetoss )
 
 	/* basic machine hardware */
 //  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
@@ -53,7 +53,7 @@ static MACHINE_CONFIG_START( awetoss, awetoss_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // maybe
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // maybe
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -81,4 +81,4 @@ ROM_START( awetoss )
 	ROM_LOAD( "AWSMTOSS.U11", 0x30000, 0x10000, CRC(8ae9d4f0) SHA1(58d1d8972c8e4c9a7c63e9d63e267ea81515d22a) )
 ROM_END
 
-GAME( 19??, awetoss,  0,    awetoss, awetoss, driver_device,  0, ROT0, "Lazer-tron", "Awesome Toss'em (Lazer-tron)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, awetoss,  0,    awetoss, awetoss, awetoss_state,  0, ROT0, "Lazer-tron", "Awesome Toss'em (Lazer-tron)", MACHINE_IS_SKELETON_MECHANICAL )

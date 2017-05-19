@@ -512,10 +512,10 @@ private:
 	optional_ioport_array<2> m_player_ports;
 };
 
-const device_type COBRA_JVS = device_creator<cobra_jvs>;
+DEFINE_DEVICE_TYPE(COBRA_JVS, cobra_jvs, "cobra_jvs", "JVS (COBRA)")
 
 cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: jvs_device(mconfig, COBRA_JVS, "JVS (COBRA)", tag, owner, clock, "cobra_jvs", __FILE__),
+	: jvs_device(mconfig, COBRA_JVS, tag, owner, clock),
 		m_test_port(*this, ":TEST"),
 		m_player_ports(*this, {":P1", ":P2"})
 {
@@ -640,10 +640,10 @@ private:
 	int m_send_ptr;
 };
 
-const device_type COBRA_JVS_HOST = device_creator<cobra_jvs_host>;
+DEFINE_DEVICE_TYPE(COBRA_JVS_HOST, cobra_jvs_host, "cobra_jvs_host", "JVS-HOST (COBRA)")
 
 cobra_jvs_host::cobra_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: jvs_host(mconfig, COBRA_JVS_HOST, "JVS-HOST (COBRA)", tag, owner, clock, "cobra_jvs_host", __FILE__)
+	: jvs_host(mconfig, COBRA_JVS_HOST, tag, owner, clock)
 {
 	m_send_ptr = 0;
 }
@@ -3318,7 +3318,7 @@ void cobra_state::machine_reset()
 	dmadac_set_frequency(&m_dmadac[1], 1, 44100);
 }
 
-static MACHINE_CONFIG_START( cobra, cobra_state )
+static MACHINE_CONFIG_START( cobra )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC603, 100000000)      /* 603EV, 100? MHz */
@@ -3656,5 +3656,5 @@ ROM_END
 
 /*************************************************************************/
 
-GAME( 1997, bujutsu, 0, cobra, cobra, cobra_state, bujutsu, ROT0, "Konami", "Fighting Bujutsu", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, racjamdx, 0, cobra, cobra, cobra_state, racjamdx, ROT0, "Konami", "Racing Jam DX", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, bujutsu,  0, cobra, cobra, cobra_state, bujutsu,  ROT0, "Konami", "Fighting Bujutsu", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, racjamdx, 0, cobra, cobra, cobra_state, racjamdx, ROT0, "Konami", "Racing Jam DX",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

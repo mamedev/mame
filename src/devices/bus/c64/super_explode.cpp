@@ -25,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SUPER_EXPLODE = device_creator<c64_super_explode_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_SUPER_EXPLODE, c64_super_explode_cartridge_device, "c64_super_explode", "C64 Super Explode! cartridge")
 
 
 
@@ -38,7 +38,7 @@ const device_type C64_SUPER_EXPLODE = device_creator<c64_super_explode_cartridge
 //-------------------------------------------------
 
 c64_super_explode_cartridge_device::c64_super_explode_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_SUPER_EXPLODE, "C64 Super Explode! cartridge", tag, owner, clock, "c64_super_explode", __FILE__),
+	device_t(mconfig, C64_SUPER_EXPLODE, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this), m_bank(0), m_exrom_timer(nullptr)
 {
 }

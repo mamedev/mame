@@ -159,7 +159,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal ) // set up terminal to default to 
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( isbc8010, isbc8010_state )
+static MACHINE_CONFIG_START( isbc8010 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18_432MHz/9)
 	MCFG_CPU_PROGRAM_MAP(isbc8010_mem)
@@ -260,7 +260,7 @@ ROM_END
 #define rom_isbc8010a rom_isbc8010
 #define rom_isbc8010b rom_isbc8010
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS           INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1975, isbc8010,  0,        0,      isbc8010,  isbc8010,  driver_device,  0,     "Intel",  "iSBC 80/10",  MACHINE_NO_SOUND_HW )
-COMP( 1977, isbc8010a, isbc8010, 0,      isbc8010a, isbc8010,  driver_device,  0,     "Intel",  "iSBC 80/10A", MACHINE_NO_SOUND_HW )
-COMP( 1979, isbc8010b, isbc8010, 0,      isbc8010b, isbc8010,  driver_device,  0,     "Intel",  "iSBC 80/10B", MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT   COMPANY   FULLNAME       FLAGS */
+COMP( 1975, isbc8010,  0,        0,      isbc8010,  isbc8010,  isbc8010_state,  0,     "Intel",  "iSBC 80/10",  MACHINE_NO_SOUND_HW )
+COMP( 1977, isbc8010a, isbc8010, 0,      isbc8010a, isbc8010,  isbc8010_state,  0,     "Intel",  "iSBC 80/10A", MACHINE_NO_SOUND_HW )
+COMP( 1979, isbc8010b, isbc8010, 0,      isbc8010b, isbc8010,  isbc8010_state,  0,     "Intel",  "iSBC 80/10B", MACHINE_NO_SOUND_HW )

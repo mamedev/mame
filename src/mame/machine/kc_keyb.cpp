@@ -322,13 +322,13 @@ triggers the time measurement by the CTC channel 3."
 #include "kc_keyb.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type KC_KEYBOARD = device_creator<kc_keyboard_device>;
+DEFINE_DEVICE_TYPE(KC_KEYBOARD, kc_keyboard_device, "kc_keyboard", "KC Keyboard")
 
 //**************************************************************************
 //  Input Ports
@@ -436,7 +436,7 @@ INPUT_PORTS_END
 //  kc_keyboard_device - constructor
 //-------------------------------------------------
 kc_keyboard_device::kc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, KC_KEYBOARD, "KC Keyboard", tag, owner, clock, "kc_keyboard", __FILE__),
+	device_t(mconfig, KC_KEYBOARD, tag, owner, clock),
 	m_write_out(*this)
 {
 }
@@ -506,7 +506,7 @@ void kc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			// get current pulse state
 			int pulse_state = (m_transmit_buffer.data[pulse_byte_count]>>pulse_bit_count) & 0x01;
 
-			LOG(("KC keyboard sending pulse: %02x\n", pulse_state));
+			LOG("KC keyboard sending pulse: %02x\n", pulse_state);
 
 			// send pulse
 			m_write_out(pulse_state ? ASSERT_LINE : CLEAR_LINE);
@@ -535,7 +535,7 @@ void kc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int 
 					{
 						// generate fake code
 						uint8_t code = (i<<3) | b;
-						LOG(("Code: %02x\n",code));
+						LOG("Code: %02x\n",code);
 
 						transmit_scancode(code);
 					}
@@ -553,7 +553,7 @@ void kc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int 
 
 void kc_keyboard_device::add_pulse_to_transmit_buffer(int pulse_state, int pulse_number)
 {
-	if (m_transmit_buffer.pulse_count + 1 < KC_TRANSMIT_BUFFER_LENGTH)
+	if (m_transmit_buffer.pulse_count + 1 < TRANSMIT_BUFFER_LENGTH)
 	{
 		for (int i=0; i<pulse_number; i++)
 		{

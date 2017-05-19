@@ -42,10 +42,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_EP64_EXP_H
+#define MAME_BUS_EP64_EXP_H
 
-#ifndef __EP64_EXPANSION_BUS__
-#define __EP64_EXPANSION_BUS__
+#pragma once
 
 #include "sound/dave.h"
 
@@ -99,9 +99,9 @@ public:
 	ep64_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_dave_tag(device_t &device, const char* tag) { downcast<ep64_expansion_bus_slot_device &>(device).m_dave.set_tag(tag); }
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_nmi.set_callback(object); }
-	template<class _Object> static devcb_base &set_wait_wr_callback(device_t &device, _Object object) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_wait.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_nmi_wr_callback(device_t &device, Object &&cb) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_nmi.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_wait_wr_callback(device_t &device, Object &&cb) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_wait.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
@@ -130,21 +130,19 @@ private:
 
 class device_ep64_expansion_bus_card_interface : public device_slot_card_interface
 {
-public:
+protected:
 	// construction/destruction
 	device_ep64_expansion_bus_card_interface(const machine_config &mconfig, device_t &device);
 
-protected:
 	ep64_expansion_bus_slot_device  *m_slot;
 };
 
 
 // device type definition
-extern const device_type EP64_EXPANSION_BUS_SLOT;
+DECLARE_DEVICE_TYPE(EP64_EXPANSION_BUS_SLOT, ep64_expansion_bus_slot_device)
 
 
 SLOT_INTERFACE_EXTERN( ep64_expansion_bus_cards );
 
 
-
-#endif
+#endif // MAME_BUS_EP64_EXP_H

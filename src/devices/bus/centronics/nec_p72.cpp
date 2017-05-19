@@ -9,7 +9,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEC_P72 = device_creator<nec_p72_t>;
+DEFINE_DEVICE_TYPE(NEC_P72, nec_p72_device, "p72", "NEC PinWriter P72")
 
 
 //-------------------------------------------------
@@ -26,7 +26,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *nec_p72_t::device_rom_region() const
+const tiny_rom_entry *nec_p72_device::device_rom_region() const
 {
 	return ROM_NAME( p72 );
 }
@@ -36,7 +36,7 @@ const tiny_rom_entry *nec_p72_t::device_rom_region() const
 //  ADDRESS_MAP( p72_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( p72_mem, AS_PROGRAM, 16, nec_p72_t )
+static ADDRESS_MAP_START( p72_mem, AS_PROGRAM, 16, nec_p72_device )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM /* 1Mbyte firmware */
 	//AM_RANGE(0x100000, 0x1fffff) AM_RAM /* 1Mbyte external RAM */ /* TODO might be 2x1Mbit */
 	// [RH] 29 August 2016: Commented out because the NEC V33 only has 20 address lines, and
@@ -60,7 +60,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor nec_p72_t::device_mconfig_additions() const
+machine_config_constructor nec_p72_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( nec_p72 );
 }
@@ -70,7 +70,7 @@ machine_config_constructor nec_p72_t::device_mconfig_additions() const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void nec_p72_t::device_start()
+void nec_p72_device::device_start()
 {
 }
 
@@ -79,18 +79,16 @@ void nec_p72_t::device_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  nec_p72_t - constructor
+//  nec_p72_device - constructor
 //-------------------------------------------------
 
-nec_p72_t::nec_p72_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NEC_P72, "NEC PinWrite P72", tag, owner, clock, "p72", __FILE__),
-	device_centronics_peripheral_interface(mconfig, *this),
-	m_maincpu(*this, "maincpu")
+nec_p72_device::nec_p72_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nec_p72_device(mconfig, NEC_P72, tag, owner, clock)
 {
 }
 
-nec_p72_t::nec_p72_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+nec_p72_device::nec_p72_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu")
 {

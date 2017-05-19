@@ -5,6 +5,10 @@
     Taito Ensoniq ES5505-based sound hardware
 
 ****************************************************************************/
+#ifndef MAME_AUDIO_TAITO_EN_H
+#define MAME_AUDIO_TAITO_EN_H
+
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 #include "sound/es5506.h"
@@ -16,7 +20,6 @@ class taito_en_device : public device_t
 {
 public:
 	taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~taito_en_device() {}
 
 	DECLARE_READ8_MEMBER( en_68000_share_r );
 	DECLARE_WRITE8_MEMBER( en_68000_share_w );
@@ -56,4 +59,6 @@ private:
 	uint8_t    m_es5510_ram_sel;
 };
 
-extern const device_type TAITO_EN;
+DECLARE_DEVICE_TYPE(TAITO_EN, taito_en_device)
+
+#endif // MAME_AUDIO_TAITO_EN_H

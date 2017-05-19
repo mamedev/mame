@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_TRACK = device_creator<saturn_track_device>;
+DEFINE_DEVICE_TYPE(SATURN_TRACK, saturn_track_device, "saturn_track", "Sega Saturn Pointing Controller / Trackball")
 
 
 static INPUT_PORTS_START( saturn_track )
@@ -52,11 +52,11 @@ ioport_constructor saturn_track_device::device_input_ports() const
 //-------------------------------------------------
 
 saturn_track_device::saturn_track_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, SATURN_TRACK, "Sega Saturn Pointing Controller / Trackball", tag, owner, clock, "saturn_track", __FILE__),
-					device_saturn_control_port_interface(mconfig, *this),
-					m_pointx(*this, "POINT_X"),
-					m_pointy(*this, "POINT_Y"),
-					m_buttons(*this, "BUTTONS")
+	device_t(mconfig, SATURN_TRACK, tag, owner, clock),
+	device_saturn_control_port_interface(mconfig, *this),
+	m_pointx(*this, "POINT_X"),
+	m_pointy(*this, "POINT_Y"),
+	m_buttons(*this, "BUTTONS")
 {
 	m_ctrl_id = 0x23;
 }

@@ -95,7 +95,7 @@ static SLOT_INTERFACE_START(vectrex_cart)
 	SLOT_INTERFACE_INTERNAL("vec_sram",   VECTREX_ROM_SRAM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( vectrex, vectrex_state )
+static MACHINE_CONFIG_START( vectrex )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_6MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(vectrex_map)
@@ -241,7 +241,7 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT       COMPANY FULLNAME */
-CONS(1982, vectrex,  0,        0,      vectrex,  vectrex,  vectrex_state, vectrex,    "General Consumer Electronics",   "Vectrex" , ROT270)
+//   YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     STATE          INIT     MONITOR  COMPANY                         FULLNAME
+CONS(1982, vectrex,  0,        0,       vectrex,  vectrex,  vectrex_state, vectrex,          "General Consumer Electronics", "Vectrex" , ROT270)
 
-GAME(1984, raaspec,  0,        raaspec,  raaspec, vectrex_state,  vectrex, ROT270,    "Roy Abel & Associates",   "Spectrum I+", MACHINE_NOT_WORKING ) //TODO: button labels & timings, a mandatory artwork too?
+GAME(1984, raaspec,  0,                 raaspec, raaspec,   vectrex_state, vectrex, ROT270,  "Roy Abel & Associates",        "Spectrum I+", MACHINE_NOT_WORKING ) //TODO: button labels & timings, a mandatory artwork too?

@@ -12,8 +12,8 @@
 #include "screen.h"
 
 
-static const uint8_t chars_per_row_value[8] = { 20, 32, 40, 64, 72, 80, 96, 132 };
-static const uint8_t skew_bits_value[4] = { 0, 1, 2, 2 };
+static constexpr uint8_t chars_per_row_value[8] = { 20, 32, 40, 64, 72, 80, 96, 132 };
+static constexpr uint8_t skew_bits_value[4] = { 0, 1, 2, 2 };
 
 
 #define HCOUNT               (m_reg[0] + 1)
@@ -31,19 +31,18 @@ static const uint8_t skew_bits_value[4] = { 0, 1, 2, 2 };
 #define CURSOR_ROW_ADDRESS   (m_reg[8] & 0x3f)
 
 
-const device_type TMS9927 = device_creator<tms9927_device>;
-const device_type CRT5027 = device_creator<crt5027_device>;
-const device_type CRT5037 = device_creator<crt5037_device>;
-const device_type CRT5057 = device_creator<crt5057_device>;
+DEFINE_DEVICE_TYPE(TMS9927, tms9927_device, "tms9927", "TMS9927 VTC")
+DEFINE_DEVICE_TYPE(CRT5027, crt5027_device, "crt5027", "CRT5027")
+DEFINE_DEVICE_TYPE(CRT5037, crt5037_device, "crt5037", "CRT5037")
+DEFINE_DEVICE_TYPE(CRT5057, crt5057_device, "crt5057", "CRT5057")
 
 tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms9927_device(mconfig, TMS9927, "TMS9927 VTC", tag, owner, clock, "tms9927", __FILE__)
+	: tms9927_device(mconfig, TMS9927, tag, owner, clock)
 {
-	memset(m_reg, 0x00, sizeof(m_reg));
 }
 
-tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_write_vsyn(*this)
 	, m_hpixels_per_column(0)
@@ -54,21 +53,21 @@ tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, 
 	, m_selfload(*this, finder_base::DUMMY_TAG)
 	, m_reset(0)
 {
-	memset(m_reg, 0x00, sizeof(m_reg));
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 }
 
 crt5027_device::crt5027_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms9927_device(mconfig, CRT5027, "CRT5027", tag, owner, clock, "crt5027", __FILE__)
+	: tms9927_device(mconfig, CRT5027, tag, owner, clock)
 {
 }
 
 crt5037_device::crt5037_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms9927_device(mconfig, CRT5037, "CRT5037", tag, owner, clock, "crt5037", __FILE__)
+	: tms9927_device(mconfig, CRT5037, tag, owner, clock)
 {
 }
 
 crt5057_device::crt5057_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms9927_device(mconfig, CRT5057, "CRT5057", tag, owner, clock, "crt5057", __FILE__)
+	: tms9927_device(mconfig, CRT5057, tag, owner, clock)
 {
 }
 

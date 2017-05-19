@@ -27,7 +27,7 @@
 
 
 // device type definition
-const device_type UPD65031 = device_creator<upd65031_device>;
+DEFINE_DEVICE_TYPE(UPD65031, upd65031_device, "upd65031", "NEC uPD65031")
 
 
 //**************************************************************************
@@ -197,7 +197,7 @@ inline void upd65031_device::set_mode(int mode)
 //-------------------------------------------------
 
 upd65031_device::upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, UPD65031, "NEC uPD65031", tag, owner, clock, "upd65031", __FILE__),
+	: device_t(mconfig, UPD65031, tag, owner, clock),
 	m_read_kb(*this),
 	m_write_int(*this),
 	m_write_nmi(*this),

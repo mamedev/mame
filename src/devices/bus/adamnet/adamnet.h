@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ADAMNET_ADAMNET_H
+#define MAME_BUS_ADAMNET_ADAMNET_H
 
-#ifndef __ADAMNET__
-#define __ADAMNET__
+#pragma once
 
 
 
@@ -107,24 +107,28 @@ protected:
 
 class device_adamnet_card_interface : public device_slot_card_interface
 {
+	friend class adamnet_device;
+
 public:
 	// construction/destruction
-	device_adamnet_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_adamnet_card_interface();
 
 	virtual void adamnet_reset_w(int state) = 0;
+
+protected:
+	device_adamnet_card_interface(const machine_config &mconfig, device_t &device);
 
 	adamnet_device  *m_bus;
 };
 
 
 // device type definitions
-extern const device_type ADAMNET;
-extern const device_type ADAMNET_SLOT;
+DECLARE_DEVICE_TYPE(ADAMNET,      adamnet_device)
+DECLARE_DEVICE_TYPE(ADAMNET_SLOT, adamnet_slot_device)
 
 
 SLOT_INTERFACE_EXTERN( adamnet_devices );
 
 
 
-#endif
+#endif // MAME_BUS_ADAMNET_ADAMNET_H

@@ -445,7 +445,7 @@ MACHINE_RESET_MEMBER(_2mindril_state,drill)
 	m_irq_reg = 0;
 }
 
-static MACHINE_CONFIG_START( drill, _2mindril_state )
+static MACHINE_CONFIG_START( drill )
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000 )
 	MCFG_CPU_PROGRAM_MAP(drill_map)

@@ -33,7 +33,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type P1_HDC = device_creator<p1_hdc_device>;
+DEFINE_DEVICE_TYPE(P1_HDC, p1_hdc_device, "p1_hdc", "Poisk-1 MFM disk B942")
 
 static MACHINE_CONFIG_FRAGMENT( hdc_b942 )
 	MCFG_DEVICE_ADD(KM1809VG7_TAG, WD2010, 5000000) // XXX clock?
@@ -121,7 +121,7 @@ WRITE8_MEMBER(p1_hdc_device::p1_HDC_w)
 //-------------------------------------------------
 
 p1_hdc_device::p1_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, P1_HDC, "Poisk-1 MFM disk B942", tag, owner, clock, "p1_hdc", __FILE__)
+	: device_t(mconfig, P1_HDC, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_hdc(*this, KM1809VG7_TAG)
 {

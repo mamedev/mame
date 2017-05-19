@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_74181_H
+#define MAME_MACHINE_74181_H
 
-#ifndef __74181_H__
-#define __74181_H__
+#pragma once
 
 
 
@@ -73,7 +73,6 @@ private:
 
 
 // device type definition
-extern const device_type TTL74181;
+DECLARE_DEVICE_TYPE(TTL74181, ttl74181_device)
 
-
-#endif  /* __74181_H__ */
+#endif // MAME_MACHINE_74181_H

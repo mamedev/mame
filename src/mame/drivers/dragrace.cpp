@@ -325,7 +325,7 @@ void dragrace_state::machine_reset()
 	m_gear[1] = 0;
 }
 
-static MACHINE_CONFIG_START( dragrace, dragrace_state )
+static MACHINE_CONFIG_START( dragrace )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 12)
@@ -381,4 +381,4 @@ ROM_START( dragrace )
 ROM_END
 
 
-GAMEL(1977, dragrace, 0, dragrace, dragrace, driver_device, 0, 0, "Atari (Kee Games)", "Drag Race", MACHINE_SUPPORTS_SAVE, layout_dragrace )
+GAMEL(1977, dragrace, 0, dragrace, dragrace, dragrace_state, 0, 0, "Atari (Kee Games)", "Drag Race", MACHINE_SUPPORTS_SAVE, layout_dragrace )

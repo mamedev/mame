@@ -6,13 +6,12 @@
 
 */
 
-#ifndef __VT82C505_H__
-#define __VT82C505_H__
+#ifndef MAME_BUS_LPCI_VT82C505_H
+#define MAME_BUS_LPCI_VT82C505_H
 
 #include "pci.h"
 
-class vt82c505_device :  public device_t,
-							public pci_device_interface
+class vt82c505_device : public device_t, public pci_device_interface
 {
 public:
 	// construction/destruction
@@ -32,7 +31,6 @@ private:
 };
 
 // device type definition
-extern const device_type VT82C505;
+DECLARE_DEVICE_TYPE(VT82C505, vt82c505_device)
 
-
-#endif /* __VT82C505_H__ */
+#endif // MAME_BUS_LPCI_VT82C505_H

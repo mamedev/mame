@@ -241,7 +241,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( midxunit, midxunit_state )
+static MACHINE_CONFIG_START( midxunit )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34020, 40000000)

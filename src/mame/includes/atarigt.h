@@ -6,8 +6,9 @@
 
 *************************************************************************/
 
-#include "machine/atarigen.h"
 #include "audio/cage.h"
+#include "machine/atarigen.h"
+#include "video/atarirle.h"
 
 #define CRAM_ENTRIES        0x4000
 #define TRAM_ENTRIES        0x4000

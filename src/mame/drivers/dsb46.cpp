@@ -36,7 +36,7 @@ public:
 
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_WRITE8_MEMBER(port1a_w);
 	DECLARE_DRIVER_INIT(dsb46);
 	DECLARE_MACHINE_RESET(dsb46);
@@ -104,12 +104,12 @@ READ8_MEMBER( dsb46_state::port00_r )
 	return ret;
 }
 
-WRITE8_MEMBER( dsb46_state::kbd_put )
+void dsb46_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( dsb46, dsb46_state )
+static MACHINE_CONFIG_START( dsb46 )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(dsb46_mem)
@@ -118,7 +118,7 @@ static MACHINE_CONFIG_START( dsb46, dsb46_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(dsb46_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dsb46_state, kbd_put))
 MACHINE_CONFIG_END
 
 ROM_START( dsb46 )

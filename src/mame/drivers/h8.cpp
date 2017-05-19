@@ -242,7 +242,7 @@ the data is /INTE while the clock is /M1. If the system is in Single Instruction
 a int20 (output of 2nd flipflop) will occur after 4 M1 steps, to pause the running program.
 But, all of this can only occur if bit 5 of port F0 is low. */
 
-	bool state = (data & I8085_STATUS_M1) ? 0 : 1;
+	bool state = (data & i8080_cpu_device::STATUS_M1) ? 0 : 1;
 	bool c,a = (m_irq_ctl & 0x80) ? 1 : 0;
 
 	if (m_irq_ctl & 2)
@@ -307,7 +307,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_p)
 	}
 }
 
-static MACHINE_CONFIG_START( h8, h8_state )
+static MACHINE_CONFIG_START( h8 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, H8_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(h8_mem)
@@ -366,5 +366,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME PARENT  COMPAT MACHINE INPUT    CLASS,         INIT    COMPANY       FULLNAME       FLAGS */
-COMP( 1977, h8,  0,       0,    h8,     h8,      driver_device,   0, "Heath, Inc.", "Heathkit H8", MACHINE_NOT_WORKING )
+/*    YEAR  NAME PARENT  COMPAT  MACHINE  INPUT    CLASS,      INIT  COMPANY        FULLNAME       FLAGS */
+COMP( 1977, h8,  0,      0,      h8,      h8,      h8_state,   0,    "Heath, Inc.", "Heathkit H8", MACHINE_NOT_WORKING )

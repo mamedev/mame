@@ -55,7 +55,7 @@ public:
 		m_iocard(*this, "dbank"),
 		//m_ibutton(*this, "ibutton"),
 		m_multikey(*this, "multikey")
-		{ }
+	{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
@@ -177,7 +177,7 @@ static MACHINE_CONFIG_FRAGMENT(cdrom)
 	MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( at486, mtxl_state )
+static MACHINE_CONFIG_START( at486 )
 	MCFG_CPU_ADD("maincpu", I486DX4, 33000000)
 	MCFG_CPU_PROGRAM_MAP(at32_map)
 	MCFG_CPU_IO_MAP(at32_io)
@@ -369,14 +369,14 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT           DEVICE              INIT    COMPANY              FULLNAME */
+//     YEAR  NAME        PARENT     COMPAT  MACHINE  INPUT         STATE        INIT  COMPANY              FULLNAME                                 FLAGS
 // Any indicates this is from a CD-R at a trade show that was claimed to be a prototype, but R1 is several versions in?
-COMP ( 1997, mtouchxl,      0,    0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL (Version R1, prototype?)", 0 )
-COMP ( 1998, mtchxl5k,      0,    0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000 (Version R5I)", MACHINE_NOT_WORKING )
-COMP ( 1998, mtchxl5ko,  mtchxl5k,0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000 (Version R5B)", MACHINE_NOT_WORKING )
-COMP ( 1998, mtchxl5ko2, mtchxl5k,0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL Super 5000 (Version R5E)", MACHINE_NOT_WORKING )
-COMP ( 1999, mtchxl6k,      0,    0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000 (Version r07)", 0 )
-COMP ( 1999, mtchxl6ko4, mtchxl6k,0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000 (Version r04)", 0 )
-COMP ( 1999, mtchxl6ko,  mtchxl6k,0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL 6000 (Version r02)", 0 )
-COMP ( 2000, mtchxlgld,     0,    0,       at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL Gold (Version r01)", MACHINE_NOT_WORKING )
-COMP ( 2000, mtchxlgldo, mtchxlgld, 0,     at486,     mtouchxl,       driver_device,      0,      "Merit Industries",  "MegaTouch XL Gold (Version r00)", MACHINE_NOT_WORKING )
+COMP ( 1997, mtouchxl,   0,         0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL (Version R1, prototype?)", 0 )
+COMP ( 1998, mtchxl5k,   0,         0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Super 5000 (Version R5I)", MACHINE_NOT_WORKING )
+COMP ( 1998, mtchxl5ko,  mtchxl5k,  0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Super 5000 (Version R5B)", MACHINE_NOT_WORKING )
+COMP ( 1998, mtchxl5ko2, mtchxl5k,  0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Super 5000 (Version R5E)", MACHINE_NOT_WORKING )
+COMP ( 1999, mtchxl6k,   0,         0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL 6000 (Version r07)",       0 )
+COMP ( 1999, mtchxl6ko4, mtchxl6k,  0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL 6000 (Version r04)",       0 )
+COMP ( 1999, mtchxl6ko,  mtchxl6k,  0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL 6000 (Version r02)",       0 )
+COMP ( 2000, mtchxlgld,  0,         0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Gold (Version r01)",       MACHINE_NOT_WORKING )
+COMP ( 2000, mtchxlgldo, mtchxlgld, 0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Gold (Version r00)",       MACHINE_NOT_WORKING )

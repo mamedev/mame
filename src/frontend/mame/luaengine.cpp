@@ -719,7 +719,7 @@ void lua_engine::initialize()
 	sol::table emu = sol().create_named_table("emu");
 	emu["app_name"] = &emulator_info::get_appname_lower;
 	emu["app_version"] = &emulator_info::get_bare_build_version;
-	emu["gamename"] = [this](){ return machine().system().description; };
+	emu["gamename"] = [this](){ return machine().system().type.fullname(); };
 	emu["romname"] = [this](){ return machine().basename(); };
 	emu["softname"] = [this](){ return machine().options().software_name(); };
 	emu["keypost"] = [this](const char *keys){ machine().ioport().natkeyboard().post_utf8(keys); };
@@ -1074,10 +1074,10 @@ void lua_engine::initialize()
  */
 
 	sol().registry().new_usertype<game_driver>("game_driver", "new", sol::no_constructor,
-			"source_file", sol::readonly(&game_driver::source_file),
+			"source_file", sol::property([] (game_driver const &driver) { return &driver.type.source()[0]; }),
 			"parent", sol::readonly(&game_driver::parent),
 			"name", sol::property([] (game_driver const &driver) { return &driver.name[0]; }),
-			"description", sol::readonly(&game_driver::description),
+			"description", sol::property([] (game_driver const &driver) { return &driver.type.fullname()[0]; }),
 			"year", sol::readonly(&game_driver::year),
 			"manufacturer", sol::readonly(&game_driver::manufacturer),
 			"compatible_with", sol::readonly(&game_driver::compatible_with),

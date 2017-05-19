@@ -26,28 +26,26 @@
 
 // device definitions
 
-const device_type TMS6100 = device_creator<tms6100_device>;
+DEFINE_DEVICE_TYPE(TMS6100, tms6100_device, "tms6100", "TMS6100 VSM")
+DEFINE_DEVICE_TYPE(M58819,  m58819_device,  "m58819s", "M68819S")
 
-tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_rom(*this, DEVICE_SELF),
-	m_reverse_bits(false),
-	m_4bit_mode(false)
+
+tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_rom(*this, DEVICE_SELF)
+	, m_reverse_bits(false)
+	, m_4bit_mode(false)
 {
 }
 
 tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, TMS6100, "TMS6100", tag, owner, clock, "tms6100", __FILE__),
-	m_rom(*this, DEVICE_SELF),
-	m_reverse_bits(false),
-	m_4bit_mode(false)
+	: tms6100_device(mconfig, TMS6100, tag, owner, clock)
 {
 }
 
-const device_type M58819 = device_creator<m58819_device>;
 
 m58819_device::m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms6100_device(mconfig, M58819, "M58819S", tag, owner, clock, "m58819s", __FILE__)
+	: tms6100_device(mconfig, M58819, tag, owner, clock)
 {
 }
 

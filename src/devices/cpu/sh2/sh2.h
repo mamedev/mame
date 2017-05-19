@@ -12,10 +12,10 @@
  *
  *****************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_SH2_SH2_H
+#define MAME_CPU_SH2_SH2_H
 
-#ifndef __SH2_H__
-#define __SH2_H__
+#pragma once
 
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
@@ -48,13 +48,10 @@ enum
 };
 
 
-typedef device_delegate<int (uint32_t src, uint32_t dst, uint32_t data, int size)> sh2_dma_kludge_delegate;
 #define SH2_DMA_KLUDGE_CB(name)  int name(uint32_t src, uint32_t dst, uint32_t data, int size)
 
-typedef device_delegate<int (uint32_t src, uint32_t dst, uint32_t data, int size)> sh2_dma_fifo_data_available_delegate;
 #define SH2_DMA_FIFO_DATA_AVAILABLE_CB(name)  int name(uint32_t src, uint32_t dst, uint32_t data, int size)
 
-typedef device_delegate<void (uint32_t data)> sh2_ftcsr_read_delegate;
 #define SH2_FTCSR_READ_CB(name)  void name(uint32_t data)
 
 
@@ -62,13 +59,13 @@ typedef device_delegate<void (uint32_t data)> sh2_ftcsr_read_delegate;
 	sh2_device::set_is_slave(*device, _slave);
 
 #define MCFG_SH2_DMA_KLUDGE_CB(_class, _method) \
-	sh2_device::set_dma_kludge_callback(*device, sh2_dma_kludge_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	sh2_device::set_dma_kludge_callback(*device, sh2_device::dma_kludge_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_SH2_FIFO_DATA_AVAIL_CB(_class, _method) \
-	sh2_device::set_dma_fifo_data_available_callback(*device, sh2_dma_fifo_data_available_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	sh2_device::set_dma_fifo_data_available_callback(*device, sh2_device::dma_fifo_data_available_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_SH2_FTCSR_READ_CB(_class, _method) \
-	sh2_device::set_ftcsr_read_callback(*device, sh2_ftcsr_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	sh2_device::set_ftcsr_read_callback(*device, sh2_device::ftcsr_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 
 /***************************************************************************
@@ -91,14 +88,17 @@ class sh2_device : public cpu_device
 	friend class sh2_frontend;
 
 public:
+	typedef device_delegate<int (uint32_t src, uint32_t dst, uint32_t data, int size)> dma_kludge_delegate;
+	typedef device_delegate<int (uint32_t src, uint32_t dst, uint32_t data, int size)> dma_fifo_data_available_delegate;
+	typedef device_delegate<void (uint32_t data)> ftcsr_read_delegate;
+
 	// construction/destruction
-	sh2_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
-	sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int cpu_type,address_map_constructor internal_map, int addrlines);
+	sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_is_slave(device_t &device, int slave) { downcast<sh2_device &>(device).m_is_slave = slave; }
-	static void set_dma_kludge_callback(device_t &device, sh2_dma_kludge_delegate callback) { downcast<sh2_device &>(device).m_dma_kludge_cb = callback; }
-	static void set_dma_fifo_data_available_callback(device_t &device, sh2_dma_fifo_data_available_delegate callback) { downcast<sh2_device &>(device).m_dma_fifo_data_available_cb = callback; }
-	static void set_ftcsr_read_callback(device_t &device, sh2_ftcsr_read_delegate callback) { downcast<sh2_device &>(device).m_ftcsr_read_cb = callback; }
+	static void set_dma_kludge_callback(device_t &device, dma_kludge_delegate callback) { downcast<sh2_device &>(device).m_dma_kludge_cb = callback; }
+	static void set_dma_fifo_data_available_callback(device_t &device, dma_fifo_data_available_delegate callback) { downcast<sh2_device &>(device).m_dma_fifo_data_available_cb = callback; }
+	static void set_ftcsr_read_callback(device_t &device, ftcsr_read_delegate callback) { downcast<sh2_device &>(device).m_ftcsr_read_cb = callback; }
 
 	DECLARE_WRITE32_MEMBER( sh7604_w );
 	DECLARE_READ32_MEMBER( sh7604_r );
@@ -112,6 +112,8 @@ public:
 	void sh2_notify_dma_data_available();
 
 protected:
+	sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type,address_map_constructor internal_map, int addrlines);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -126,7 +128,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -212,9 +214,9 @@ private:
 	uint8_t m_wtcsr;
 
 	int     m_is_slave, m_cpu_type;
-	sh2_dma_kludge_delegate              m_dma_kludge_cb;
-	sh2_dma_fifo_data_available_delegate m_dma_fifo_data_available_cb;
-	sh2_ftcsr_read_delegate              m_ftcsr_read_cb;
+	dma_kludge_delegate              m_dma_kludge_cb;
+	dma_fifo_data_available_delegate m_dma_fifo_data_available_cb;
+	ftcsr_read_delegate              m_ftcsr_read_cb;
 
 	drc_cache           m_cache;                  /* pointer to the DRC code cache */
 	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */
@@ -484,7 +486,7 @@ class sh2a_device : public sh2_device
 {
 public:
 	// construction/destruction
-	sh2a_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ32_MEMBER(dma_sar0_r);
 	DECLARE_WRITE32_MEMBER(dma_sar0_w);
@@ -547,9 +549,9 @@ private:
 };
 
 
-extern const device_type SH1;
-extern const device_type SH2;
-extern const device_type SH2A;
+DECLARE_DEVICE_TYPE(SH1,  sh1_device)
+DECLARE_DEVICE_TYPE(SH2,  sh2_device)
+DECLARE_DEVICE_TYPE(SH2A, sh2a_device)
 
 
-#endif /* __SH2_H__ */
+#endif // MAME_CPU_SH2_SH2_H

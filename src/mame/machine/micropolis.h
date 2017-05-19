@@ -9,8 +9,10 @@
 
 *********************************************************************/
 
-#ifndef __MICROPOLIS_H__
-#define __MICROPOLIS_H__
+#ifndef MAME_MACHINE_MICROPOLIS_H
+#define MAME_MACHINE_MICROPOLIS_H
+
+#pragma once
 
 #include "imagedev/flopdrv.h"
 
@@ -42,11 +44,10 @@ class micropolis_device : public device_t
 {
 public:
 	micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~micropolis_device() {}
 
-	template<class _Object> static devcb_base &set_dden_rd_callback(device_t &device, _Object object) { return downcast<micropolis_device &>(device).m_read_dden.set_callback(object); }
-	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<micropolis_device &>(device).m_write_intrq.set_callback(object); }
-	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<micropolis_device &>(device).m_write_drq.set_callback(object); }
+	template <class Object> static devcb_base &set_dden_rd_callback(device_t &device, Object &&cb) { return downcast<micropolis_device &>(device).m_read_dden.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_intrq_wr_callback(device_t &device, Object &&cb) { return downcast<micropolis_device &>(device).m_write_intrq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<micropolis_device &>(device).m_write_drq.set_callback(std::forward<Object>(cb)); }
 
 	static void set_drive_tags(device_t &device, const char *tag1, const char *tag2, const char *tag3, const char *tag4)
 	{
@@ -105,7 +106,7 @@ private:
 	void write_sector();
 };
 
-extern const device_type MICROPOLIS;
+DECLARE_DEVICE_TYPE(MICROPOLIS, micropolis_device)
 
 
-#endif /* __MICROPOLIS_H__ */
+#endif // MAME_MACHINE_MICROPOLIS_H

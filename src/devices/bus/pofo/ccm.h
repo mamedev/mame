@@ -43,10 +43,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_POFO_CCM_H
+#define MAME_BUS_POFO_CCM_H
 
-#ifndef __PORTFOLIO_MEMORY_CARD_SLOT__
-#define __PORTFOLIO_MEMORY_CARD_SLOT__
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -77,40 +77,38 @@
 
 // ======================> device_portfolio_memory_card_slot_interface
 
-class portfolio_memory_card_slot_t;
+class portfolio_memory_card_slot_device;
 
 class device_portfolio_memory_card_slot_interface : public device_slot_card_interface
 {
-	friend class portfolio_memory_card_slot_t;
+	friend class portfolio_memory_card_slot_device;
 
 public:
-	// construction/destruction
-	device_portfolio_memory_card_slot_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_portfolio_memory_card_slot_interface() { }
-
 	virtual bool cdet() { return 1; }
 
-	virtual uint8_t nrdi_r(address_space &space, offs_t offset) { return 0xff; };
-	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data) { };
+	virtual uint8_t nrdi_r(address_space &space, offs_t offset) { return 0xff; }
+	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data) { }
 
 protected:
+	// construction/destruction
+	device_portfolio_memory_card_slot_interface(const machine_config &mconfig, device_t &device);
+
 	optional_shared_ptr<uint8_t> m_rom;
 	optional_shared_ptr<uint8_t> m_nvram;
 
-	portfolio_memory_card_slot_t *m_slot;
+	portfolio_memory_card_slot_device *m_slot;
 };
 
 
-// ======================> portfolio_memory_card_slot_t
+// ======================> portfolio_memory_card_slot_device
 
-class portfolio_memory_card_slot_t : public device_t,
+class portfolio_memory_card_slot_device : public device_t,
 									 public device_slot_interface,
 									 public device_image_interface
 {
 public:
 	// construction/destruction
-	portfolio_memory_card_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~portfolio_memory_card_slot_t() { }
+	portfolio_memory_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// computer interface
 	bool cdet_r() { return (m_card != nullptr) ? m_card->cdet() : 1; }
@@ -145,10 +143,11 @@ protected:
 
 // device type definition
 extern const device_type PORTFOLIO_MEMORY_CARD_SLOT;
+DECLARE_DEVICE_TYPE(PORTFOLIO_MEMORY_CARD_SLOT, portfolio_memory_card_slot_device)
 
 
 SLOT_INTERFACE_EXTERN( portfolio_memory_cards );
 
 
 
-#endif
+#endif // MAME_BUS_POFO_CCM_H

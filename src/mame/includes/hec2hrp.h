@@ -38,6 +38,10 @@
     TODO :  Add the cartridge function,
             Adjust the one shot and A/D timing (sn76477)
 */
+#ifndef MAME_INCLUDES_HEC2HRP_H
+#define MAME_INCLUDES_HEC2HRP_H
+
+#pragma once
 
 #include "machine/upd765.h"
 #include "machine/wd_fdc.h"
@@ -99,7 +103,7 @@ public:
 	optional_shared_ptr<uint8_t> m_hector_videoram;
 	required_ioport_array<9> m_keyboard;
 
-	optional_device<fd1793_t> m_minidisc_fdc;
+	optional_device<fd1793_device> m_minidisc_fdc;
 	optional_device<floppy_connector> m_floppy0;
 
 	uint8_t m_hector_flag_hr;
@@ -197,3 +201,5 @@ public:
 };
 
 MACHINE_CONFIG_EXTERN( hector_audio );
+
+#endif // MAME_INCLUDES_HEC2HRP_H

@@ -46,7 +46,7 @@
 
 
 // device type definition
-const device_type ASTROCADE = device_creator<astrocade_device>;
+DEFINE_DEVICE_TYPE(ASTROCADE, astrocade_device, "astrocade", "Astrocade")
 
 
 //**************************************************************************
@@ -58,7 +58,7 @@ const device_type ASTROCADE = device_creator<astrocade_device>;
 //-------------------------------------------------
 
 astrocade_device::astrocade_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ASTROCADE, "Astrocade", tag, owner, clock, "astrocade", __FILE__),
+	: device_t(mconfig, ASTROCADE, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_master_count(0),

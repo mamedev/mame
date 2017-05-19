@@ -189,7 +189,7 @@ static GFXDECODE_START( tryout )
 	GFXDECODE_ENTRY( nullptr,   0, vramlayout,   0, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tryout, tryout_state )
+static MACHINE_CONFIG_START( tryout )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)     /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)
@@ -247,4 +247,4 @@ ROM_START( tryout )
 	ROM_LOAD( "ch14.bpr",     0x00000, 0x0020, CRC(8ce19925) SHA1(12f8f6022f1148b6ba1d019a34247452637063a7) )
 ROM_END
 
-GAME( 1985, tryout, 0, tryout, tryout, driver_device, 0, ROT90, "Data East Corporation", "Pro Baseball Skill Tryout (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tryout, 0, tryout, tryout, tryout_state, 0, ROT90, "Data East Corporation", "Pro Baseball Skill Tryout (Japan)", MACHINE_SUPPORTS_SAVE )

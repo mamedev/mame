@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_EASYFLASH_H
+#define MAME_BUS_C64_EASYFLASH_H
 
-#ifndef __EASYFLASH__
-#define __EASYFLASH__
+#pragma once
 
 
 #include "exp.h"
@@ -57,7 +57,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_EASYFLASH;
+DECLARE_DEVICE_TYPE(C64_EASYFLASH, c64_easyflash_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_EASYFLASH_H

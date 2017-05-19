@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type X68K_NEPTUNEX = device_creator<x68k_neptune_device>;
+DEFINE_DEVICE_TYPE(X68K_NEPTUNEX, x68k_neptune_device, "x68k_neptunex", "Neptune-X")
 
 // device machine config
 static MACHINE_CONFIG_FRAGMENT( x68k_neptunex )
@@ -29,10 +29,10 @@ machine_config_constructor x68k_neptune_device::device_mconfig_additions() const
 }
 
 x68k_neptune_device::x68k_neptune_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, X68K_NEPTUNEX, "Neptune-X", tag, owner, clock, "x68k_neptunex", __FILE__),
-		device_x68k_expansion_card_interface(mconfig, *this),
-	m_slot(nullptr),
-		m_dp8390(*this, "dp8390d")
+	: device_t(mconfig, X68K_NEPTUNEX, tag, owner, clock)
+	, device_x68k_expansion_card_interface(mconfig, *this)
+	, m_slot(nullptr)
+	, m_dp8390(*this, "dp8390d")
 {
 }
 

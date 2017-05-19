@@ -23,9 +23,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C1526 = device_creator<c1526_t>;
+DEFINE_DEVICE_TYPE(C1526, c1526_device, "c1526", "MPS802/C1526 Printer")
+DEFINE_DEVICE_TYPE(C4023, c4023_device, "c4023", "C4023 Printer")
 const device_type MPS802 = C1526;
-const device_type C4023 = device_creator<c4023_t>;
 
 
 //-------------------------------------------------
@@ -49,7 +49,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *c1526_t::device_rom_region() const
+const tiny_rom_entry *c1526_device::device_rom_region() const
 {
 	return ROM_NAME( c1526 );
 }
@@ -69,7 +69,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *c4023_t::device_rom_region() const
+const tiny_rom_entry *c4023_device::device_rom_region() const
 {
 	return ROM_NAME( c4023 );
 }
@@ -79,7 +79,7 @@ const tiny_rom_entry *c4023_t::device_rom_region() const
 //  ADDRESS_MAP( c1526_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c1526_mem, AS_PROGRAM, 8, c1526_base_t )
+static ADDRESS_MAP_START( c1526_mem, AS_PROGRAM, 8, c1526_device_base )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(M6504_TAG, 0)
 ADDRESS_MAP_END
 
@@ -99,7 +99,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor c1526_t::device_mconfig_additions() const
+machine_config_constructor c1526_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( c1526 );
 }
@@ -120,7 +120,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor c4023_t::device_mconfig_additions() const
+machine_config_constructor c4023_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( c4023 );
 }
@@ -138,7 +138,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor c1526_t::device_input_ports() const
+ioport_constructor c1526_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( c1526 );
 }
@@ -156,7 +156,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor c4023_t::device_input_ports() const
+ioport_constructor c4023_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( c4023 );
 }
@@ -168,32 +168,32 @@ ioport_constructor c4023_t::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  c1526_base_t - constructor
+//  c1526_device_base - constructor
 //-------------------------------------------------
 
-c1526_base_t:: c1526_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+c1526_device_base::c1526_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock)
 {
 }
 
 
 //-------------------------------------------------
-//  c1526_t - constructor
+//  c1526_device - constructor
 //-------------------------------------------------
 
-c1526_t::c1526_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	c1526_base_t(mconfig, C1526, "MPS802/C1526 Printer", tag, owner, clock, "c1526", __FILE__),
+c1526_device::c1526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	c1526_device_base(mconfig, C1526, tag, owner, clock),
 	device_cbm_iec_interface(mconfig, *this)
 {
 }
 
 
 //-------------------------------------------------
-//  c4023_t - constructor
+//  c4023_device - constructor
 //-------------------------------------------------
 
-c4023_t::c4023_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	c1526_base_t(mconfig, C4023, "C4023 Printer", tag, owner, clock, "c4023", __FILE__),
+c4023_device::c4023_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	c1526_device_base(mconfig, C4023, tag, owner, clock),
 	device_ieee488_interface(mconfig, *this)
 {
 }
@@ -203,7 +203,7 @@ c4023_t::c4023_t(const machine_config &mconfig, const char *tag, device_t *owner
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void c1526_base_t::device_start()
+void c1526_device_base::device_start()
 {
 }
 
@@ -212,7 +212,7 @@ void c1526_base_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void c1526_base_t::device_reset()
+void c1526_device_base::device_reset()
 {
 }
 
@@ -221,7 +221,7 @@ void c1526_base_t::device_reset()
 //  cbm_iec_atn -
 //-------------------------------------------------
 
-void c1526_t::cbm_iec_atn(int state)
+void c1526_device::cbm_iec_atn(int state)
 {
 }
 
@@ -230,7 +230,7 @@ void c1526_t::cbm_iec_atn(int state)
 //  cbm_iec_data -
 //-------------------------------------------------
 
-void c1526_t::cbm_iec_data(int state)
+void c1526_device::cbm_iec_data(int state)
 {
 }
 
@@ -239,7 +239,7 @@ void c1526_t::cbm_iec_data(int state)
 //  cbm_iec_reset -
 //-------------------------------------------------
 
-void c1526_t::cbm_iec_reset(int state)
+void c1526_device::cbm_iec_reset(int state)
 {
 	if (!state)
 	{
@@ -252,7 +252,7 @@ void c1526_t::cbm_iec_reset(int state)
 //  ieee488_atn_w -
 //-------------------------------------------------
 
-void c4023_t::ieee488_atn(int state)
+void c4023_device::ieee488_atn(int state)
 {
 }
 
@@ -261,7 +261,7 @@ void c4023_t::ieee488_atn(int state)
 //  ieee488_ifc_w -
 //-------------------------------------------------
 
-void c4023_t::ieee488_ifc(int state)
+void c4023_device::ieee488_ifc(int state)
 {
 	if (!state)
 	{

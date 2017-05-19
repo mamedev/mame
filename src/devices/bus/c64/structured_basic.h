@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_STRUCTURED_BASIC_H
+#define MAME_BUS_C64_STRUCTURED_BASIC_H
 
-#ifndef __STRUCTURED_BASIC__
-#define __STRUCTURED_BASIC__
+#pragma once
 
 
 #include "exp.h"
@@ -44,8 +44,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_STRUCTURED_BASIC;
+DECLARE_DEVICE_TYPE(C64_STRUCTURED_BASIC, c64_structured_basic_cartridge_device)
 
 
-
-#endif
+#endif // MAME_BUS_C64_STRUCTURED_BASIC_H

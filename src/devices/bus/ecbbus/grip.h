@@ -28,14 +28,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> grip_device
+// ======================> ecb_grip21_device
 
-class grip_device : public device_t,
-					public device_ecbbus_card_interface
+class ecb_grip21_device : public device_t, public device_ecbbus_card_interface
 {
 public:
 	// construction/destruction
-	grip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ecb_grip21_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -58,7 +57,8 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 	DECLARE_READ8_MEMBER( sti_gpio_r );
 	DECLARE_WRITE_LINE_MEMBER( speaker_w );
-	DECLARE_WRITE8_MEMBER( kb_w );
+
+	void kb_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
@@ -126,6 +126,6 @@ private:
 
 
 // device type definition
-extern const device_type ECB_GRIP21;
+DECLARE_DEVICE_TYPE(ECB_GRIP21, ecb_grip21_device)
 
 #endif // MAME_BUS_ECBBUS_GRIP_H

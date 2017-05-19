@@ -6,9 +6,41 @@
 #include "megacd.lh"
 
 
-const device_type SEGA_SEGACD_US = device_creator<sega_segacd_us_device>;
-const device_type SEGA_SEGACD_JAPAN = device_creator<sega_segacd_japan_device>;
-const device_type SEGA_SEGACD_EUROPE = device_creator<sega_segacd_europe_device>;
+#define SEGACD_CLOCK      12500000
+
+#define RAM_MODE_2MEG (0)
+#define RAM_MODE_1MEG (2)
+
+#define DMA_PCM  (0x0400)
+#define DMA_PRG  (0x0500)
+#define DMA_WRAM (0x0700)
+
+// irq3 timer
+#define CHECK_SCD_LV3_INTERRUPT \
+	if (m_lc89510_temp->get_segacd_irq_mask() & 0x08) \
+	{ \
+		m_scdcpu->set_input_line(3, HOLD_LINE); \
+	}
+// from master
+#define CHECK_SCD_LV2_INTERRUPT \
+	if (m_lc89510_temp->get_segacd_irq_mask() & 0x04) \
+	{ \
+		m_scdcpu->set_input_line(2, HOLD_LINE); \
+	}
+
+// gfx convert
+#define CHECK_SCD_LV1_INTERRUPT \
+	if (m_lc89510_temp->get_segacd_irq_mask() & 0x02) \
+	{ \
+		m_scdcpu->set_input_line(1, HOLD_LINE); \
+	}
+
+#define SEGACD_IRQ3_TIMER_SPEED (attotime::from_nsec(m_irq3_timer_reg*30720))
+
+
+DEFINE_DEVICE_TYPE(SEGA_SEGACD_US,     sega_segacd_us_device,     "segacd_us",     "Sega Sega CD (US)")
+DEFINE_DEVICE_TYPE(SEGA_SEGACD_JAPAN,  sega_segacd_japan_device,  "segacd_japan",  "Sega Mega-CD (Japan)")
+DEFINE_DEVICE_TYPE(SEGA_SEGACD_EUROPE, sega_segacd_europe_device, "segacd_europe", "Sega Mega-CD (PAL)")
 
 
 /* Callback when the genesis enters interrupt code */
@@ -289,8 +321,8 @@ machine_config_constructor sega_segacd_device::device_mconfig_additions() const
 }
 
 
-sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_gfx_interface(mconfig, *this, GFXDECODE_NAME( segacd )),
 		m_scdcpu(*this, "segacd_68k"),
 		m_rfsnd(*this, "rfsnd"),
@@ -306,17 +338,17 @@ sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_typ
 }
 
 sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sega_segacd_device(mconfig, SEGA_SEGACD_US, "sega_segacd_us", tag, owner, clock, "sega_segacd_us", __FILE__)
+	: sega_segacd_device(mconfig, SEGA_SEGACD_US, tag, owner, clock)
 {
 }
 
 sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sega_segacd_device(mconfig, SEGA_SEGACD_JAPAN, "sega_segacd_japan", tag, owner, clock, "sega_segacd_japan", __FILE__)
+	: sega_segacd_device(mconfig, SEGA_SEGACD_JAPAN, tag, owner, clock)
 {
 }
 
 sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sega_segacd_device(mconfig, SEGA_SEGACD_EUROPE, "sega_segacd_europe", tag, owner, clock, "sega_segacd_europe", __FILE__)
+	: sega_segacd_device(mconfig, SEGA_SEGACD_EUROPE, tag, owner, clock)
 {
 }
 

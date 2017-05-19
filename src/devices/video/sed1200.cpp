@@ -16,10 +16,10 @@
 #include "emu.h"
 #include "sed1200.h"
 
-const device_type SED1200D0A = device_creator<sed1200d0a_device>;
-const device_type SED1200F0A = device_creator<sed1200f0a_device>;
-const device_type SED1200D0B = device_creator<sed1200d0b_device>;
-const device_type SED1200F0B = device_creator<sed1200f0b_device>;
+DEFINE_DEVICE_TYPE(SED1200D0A, sed1200d0a_device, "sed1200da", "Epson SED1200D-0A")
+DEFINE_DEVICE_TYPE(SED1200F0A, sed1200f0a_device, "sed1200fa", "Epson SED1200F-0A")
+DEFINE_DEVICE_TYPE(SED1200D0B, sed1200d0b_device, "sed1200db", "Epson SED1200D-0B")
+DEFINE_DEVICE_TYPE(SED1200F0B, sed1200f0b_device, "sed1200fb", "Epson SED1200F-0B")
 
 ROM_START( sed1200x0a )
 	ROM_REGION( 0x800, "cgrom", 0 )
@@ -31,28 +31,28 @@ ROM_START( sed1200x0b )
 	ROM_LOAD( "sed1200-b.bin", 0x000, 0x800, CRC(d0741f51) SHA1(c8c856f1357286a2c8c806af81724a828345357e))
 ROM_END
 
-sed1200_device::sed1200_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source), cursor_direction(false), cursor_blinking(false), cursor_full(false), cursor_on(false), display_on(false), cursor_address(0), cgram_address(0), cgrom(nullptr)
+sed1200_device::sed1200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock), cursor_direction(false), cursor_blinking(false), cursor_full(false), cursor_on(false), display_on(false), cursor_address(0), cgram_address(0), cgrom(nullptr)
 {
 }
 
 sed1200d0a_device::sed1200d0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sed1200_device(mconfig, SED1200D0A, "sed1200d-0a", tag, owner, clock, "sed1200da", __FILE__)
+	sed1200_device(mconfig, SED1200D0A, tag, owner, clock)
 {
 }
 
 sed1200f0a_device::sed1200f0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sed1200_device(mconfig, SED1200F0A, "sed1200f-0a", tag, owner, clock, "sed1200fa", __FILE__)
+	sed1200_device(mconfig, SED1200F0A, tag, owner, clock)
 {
 }
 
 sed1200d0b_device::sed1200d0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sed1200_device(mconfig, SED1200D0B, "sed1200d-0b", tag, owner, clock, "sed1200db", __FILE__)
+	sed1200_device(mconfig, SED1200D0B, tag, owner, clock)
 {
 }
 
 sed1200f0b_device::sed1200f0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sed1200_device(mconfig, SED1200F0B, "sed1200f-0b", tag, owner, clock, "sed1200fb", __FILE__)
+	sed1200_device(mconfig, SED1200F0B, tag, owner, clock)
 {
 }
 

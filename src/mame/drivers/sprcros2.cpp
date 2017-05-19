@@ -441,7 +441,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::master_scanline)
 		m_master_cpu->set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
+static MACHINE_CONFIG_START( sprcros2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master_cpu",Z80,MAIN_CLOCK/4)
@@ -566,5 +566,5 @@ ROM_START( sprcros2a )
 	ROM_LOAD( "sc-60.4k",    0x0320, 0x0100, CRC(d7a4e57d) SHA1(6db02ec6aa55b05422cb505e63c71e36b4b11b4a) ) //fg clut
 ROM_END
 
-GAME( 1986, sprcros2, 0,        sprcros2, sprcros2, driver_device, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sprcros2a,sprcros2, sprcros2, sprcros2, driver_device, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sprcros2,  0,        sprcros2, sprcros2, sprcros2_state, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sprcros2a, sprcros2, sprcros2, sprcros2, sprcros2_state, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )

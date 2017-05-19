@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef ARCADIA_H_
-#define ARCADIA_H_
+#ifndef MAME_INCLUDES_ARCADIA_H
+#define MAME_INCLUDES_ARCADIA_H
 
 #include "cpu/s2650/s2650.h"
 #include "audio/arcadia.h"
@@ -126,4 +126,4 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 };
-#endif /* ARCADIA_H_ */
+#endif // MAME_INCLUDES_ARCADIA_H

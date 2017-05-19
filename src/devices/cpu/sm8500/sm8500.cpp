@@ -20,26 +20,26 @@ they are internally.
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "sm8500.h"
+#include "debugger.h"
 
 
-const device_type SM8500 = device_creator<sm8500_cpu_device>;
+DEFINE_DEVICE_TYPE(SM8500, sm8500_cpu_device, "sm8500", "SM8500")
 
 
-static const uint8_t sm8500_b2w[8] = {
+static constexpr uint8_t sm8500_b2w[8] = {
 		0, 8, 2, 10, 4, 12, 6, 14
 };
 
 
 sm8500_cpu_device::sm8500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SM8500, "SM8500", tag, owner, clock, "sm8500", __FILE__)
+	: cpu_device(mconfig, SM8500, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_dma_func(*this)
 	, m_timer_func(*this)
 	, m_PC(0), m_IE0(0), m_IE1(0), m_IR0(0), m_IR1(0)
-		, m_SYS(0), m_CKC(0), m_clock_changed(0)
-		, m_SP(0)
+	, m_SYS(0), m_CKC(0), m_clock_changed(0)
+	, m_SP(0)
 	, m_PS0(0)
 	, m_PS1(0), m_IFLAGS(0), m_CheckInterrupts(0), m_halted(0), m_icount(0), m_program(nullptr), m_oldpc(0)
 {

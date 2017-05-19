@@ -21,7 +21,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_ECHOII = device_creator<a2bus_echoii_device>;
+DEFINE_DEVICE_TYPE(A2BUS_ECHOII, a2bus_echoii_device, "a2echoii", "Street Electronics Echo II")
 
 #define TMS_TAG         "tms5220"
 
@@ -49,17 +49,15 @@ machine_config_constructor a2bus_echoii_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_echoii_device::a2bus_echoii_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_echoii_device::a2bus_echoii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
 {
 }
 
 a2bus_echoii_device::a2bus_echoii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_ECHOII, "Street Electronics Echo II", tag, owner, clock, "a2echoii", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_tms(*this, TMS_TAG)
+	a2bus_echoii_device(mconfig, A2BUS_ECHOII, tag, owner, clock)
 {
 }
 

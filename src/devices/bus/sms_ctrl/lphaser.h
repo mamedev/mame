@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SMS_CTRL_LPHASER_H
+#define MAME_BUS_SMS_CTRL_LPHASER_H
 
-#ifndef __SMS_LIGHT_PHASER__
-#define __SMS_LIGHT_PHASER__
+#pragma once
 
 
 #include "smsctrl.h"
@@ -62,7 +62,7 @@ private:
 
 
 // device type definition
-extern const device_type SMS_LIGHT_PHASER;
+DECLARE_DEVICE_TYPE(SMS_LIGHT_PHASER, sms_light_phaser_device)
 
 
-#endif
+#endif // MAME_BUS_SMS_CTRL_LPHASER_H

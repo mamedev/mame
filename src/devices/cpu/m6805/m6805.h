@@ -12,9 +12,9 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type M6805;
-extern const device_type M68HC05EG;
-extern const device_type HD63705;
+DECLARE_DEVICE_TYPE(M6805,     m6805_device)
+DECLARE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device)
+DECLARE_DEVICE_TYPE(HD63705,   hd63705_device)
 
 // ======================> m6805_base_device
 
@@ -92,21 +92,15 @@ protected:
 			device_t *owner,
 			uint32_t clock,
 			device_type const type,
-			char const *name,
-			configuration_params const &params,
-			char const *shortname,
-			char const *source);
+			configuration_params const &params);
 	m6805_base_device(
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
 			uint32_t clock,
 			device_type const type,
-			char const *name,
 			configuration_params const &params,
-			address_map_delegate internal_map,
-			char const *shortname,
-			char const *source);
+			address_map_delegate internal_map);
 
 	// device-level overrides
 	virtual void device_start() override;

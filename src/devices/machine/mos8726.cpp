@@ -29,7 +29,7 @@
 //  DEVICE TYPE DEFINITIONS
 //**************************************************************************
 
-const device_type MOS8726 = device_creator<mos8726_device>;
+DEFINE_DEVICE_TYPE(MOS8726, mos8726_device, "mos8726", "MOS 8726 DMA Controller")
 
 
 
@@ -42,11 +42,12 @@ const device_type MOS8726 = device_creator<mos8726_device>;
 //-------------------------------------------------
 
 mos8726_device::mos8726_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MOS8726, "MOS8726", tag, owner, clock, "mos8726", __FILE__),
-		device_execute_interface(mconfig, *this),
-		m_icount(0),
-		m_bs(1)
-{ }
+	: device_t(mconfig, MOS8726, tag, owner, clock)
+	, device_execute_interface(mconfig, *this)
+	, m_icount(0)
+	, m_bs(1)
+{
+}
 
 
 //-------------------------------------------------

@@ -160,9 +160,8 @@ TODO:
 
 #include "screen.h"
 
-
-#define ENABLE_LOGGING 0
-#define LOG(x) do { if (ENABLE_LOGGING) logerror x; } while(0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 #define LCDCONT     m_vid_regs[0x00]  /* LCD control register                       */
@@ -312,49 +311,44 @@ static const uint8_t ags_oam_fingerprint[0x100] = {
 #endif
 
 
-const device_type DMG_PPU = device_creator<dmg_ppu_device>;
-const device_type MGB_PPU = device_creator<mgb_ppu_device>;
-const device_type SGB_PPU = device_creator<sgb_ppu_device>;
-const device_type CGB_PPU = device_creator<cgb_ppu_device>;
+DEFINE_DEVICE_TYPE(DMG_PPU, dmg_ppu_device, "dmg_ppu", "DMG PPU")
+DEFINE_DEVICE_TYPE(MGB_PPU, mgb_ppu_device, "mgb_ppu", "MGB PPU")
+DEFINE_DEVICE_TYPE(SGB_PPU, sgb_ppu_device, "sgb_ppu", "SGB PPU")
+DEFINE_DEVICE_TYPE(CGB_PPU, cgb_ppu_device, "cgb_ppu", "CGB PPU")
 
 
 
-dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint32_t vram_size)
-				: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-				, device_video_interface(mconfig, *this)
-				, m_lr35902(*this, finder_base::DUMMY_TAG)
-				, m_sgb_border_hack(0)
-				, m_enable_experimental_engine(false)
-				, m_oam_size(0x100)
-				, m_vram_size(vram_size)
+dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_lr35902(*this, finder_base::DUMMY_TAG)
+	, m_sgb_border_hack(0)
+	, m_enable_experimental_engine(false)
+	, m_oam_size(0x100)
+	, m_vram_size(vram_size)
 {
 }
 
 dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-				: device_t(mconfig, DMG_PPU, "DMG PPU", tag, owner, clock, "dmg_ppu", __FILE__)
-				, device_video_interface(mconfig, *this)
-				, m_lr35902(*this, finder_base::DUMMY_TAG)
-				, m_sgb_border_hack(0)
-				, m_oam_size(0x100)
-				, m_vram_size(0x2000)
+	: dmg_ppu_device(mconfig, DMG_PPU, tag, owner, clock, 0x2000)
 {
 	m_enable_experimental_engine = true;
 }
 
 mgb_ppu_device::mgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-				: dmg_ppu_device(mconfig, MGB_PPU, "MGB PPU", tag, owner, clock, "mgb_ppu", __FILE__, 0x2000)
+	: dmg_ppu_device(mconfig, MGB_PPU, tag, owner, clock, 0x2000)
 {
 	m_enable_experimental_engine = true;
 }
 
 sgb_ppu_device::sgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-				: dmg_ppu_device(mconfig, SGB_PPU, "SGB PPU", tag, owner, clock, "sgb_ppu", __FILE__, 0x2000)
+	: dmg_ppu_device(mconfig, SGB_PPU, tag, owner, clock, 0x2000)
 {
 	m_enable_experimental_engine = false;
 }
 
 cgb_ppu_device::cgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-				: dmg_ppu_device(mconfig, CGB_PPU, "CGB PPU", tag, owner, clock, "cgb_ppu", __FILE__, 0x4000)
+	: dmg_ppu_device(mconfig, CGB_PPU, tag, owner, clock, 0x4000)
 {
 	m_enable_experimental_engine = false;
 }
@@ -686,7 +680,7 @@ void dmg_ppu_device::calculate_window_cycles()
 {
 	m_window_cycles = 0;
 
-	LOG(("m_window_x = %d, m_window_y = %d\n", m_window_x, m_window_y));
+	LOG("m_window_x = %d, m_window_y = %d\n", m_window_x, m_window_y);
 
 	if ((LCDCONT & WINDOW_ENABLED) && m_window_x < 167 && m_window_y < 144)
 	{
@@ -785,7 +779,7 @@ void dmg_ppu_device::select_sprites()
 			{
 				if (sprite_occurs[i])
 				{
-					LOG(("sprite_occurs[%d] = %02x\n", i, sprite_occurs[i]));
+					LOG("sprite_occurs[%d] = %02x\n", i, sprite_occurs[i]);
 				}
 
 				if (sprite_occurs[i])
@@ -799,7 +793,7 @@ void dmg_ppu_device::select_sprites()
 				}
 			}
 
-			LOG(("m_sprite_cycles = %d\n", m_sprite_cycles));
+			LOG("m_sprite_cycles = %d\n", m_sprite_cycles);
 		}
 	}
 }
@@ -820,14 +814,14 @@ void dmg_ppu_device::update_line_state(uint64_t cycles)
 			m_line.scrollx_to_apply++;
 		}
 
-//LOG(("tile_cycle = %u, starting = %s, drawing = %s\n", m_line.tile_cycle, m_line.starting ? "true" : "false", m_line.drawing ? "true" : "false"));
+		//LOG("tile_cycle = %u, starting = %s, drawing = %s\n", m_line.tile_cycle, m_line.starting ? "true" : "false", m_line.drawing ? "true" : "false");
 		// output next pixel
 		if (m_line.drawing)
 		{
 			if (m_line.scrollx_to_apply > 0)
 			{
 				// TODO: Determine when the scrollx shifts are applied when window-x is <= 0x07
-LOG(("scrollx_to_apply: %u\n", m_line.scrollx_to_apply));
+				LOG("scrollx_to_apply: %u\n", m_line.scrollx_to_apply);
 				if (!m_line.window_active)
 				{
 					m_line.shift_register <<= 2;
@@ -843,7 +837,7 @@ LOG(("scrollx_to_apply: %u\n", m_line.scrollx_to_apply));
 				{
 					if (m_line.pixels_drawn < 8)
 					{
-						LOG(("draw pixel %u\n", m_line.pixels_drawn));
+						LOG("draw pixel %u\n", m_line.pixels_drawn);
 					}
 					plot_pixel(m_line.pixels_drawn, m_current_line, m_gb_bpal[m_line.shift_register >> 14]);
 					m_bg_zbuf[m_line.pixels_drawn] = m_line.shift_register >> 14;
@@ -875,7 +869,7 @@ LOG(("scrollx_to_apply: %u\n", m_line.scrollx_to_apply));
 			}
 			if (m_line.pixels_drawn < 8)
 			{
-				LOG(("m_current_line: %u, tile_count: %02x, plane0 = %02x, plane1 = %02x, shift_register = %04x\n", m_current_line, m_line.tile_count, m_line.plane0, m_line.plane1, m_line.shift_register));
+				LOG("m_current_line: %u, tile_count: %02x, plane0 = %02x, plane1 = %02x, shift_register = %04x\n", m_current_line, m_line.tile_count, m_line.plane0, m_line.plane1, m_line.shift_register);
 			}
 			if (m_line.sequence_counter >= 2)
 			{
@@ -908,7 +902,7 @@ LOG(("scrollx_to_apply: %u\n", m_line.scrollx_to_apply));
 			m_line.pattern = m_vram.get()[m_line.pattern_address] ^ m_gb_tile_no_mod;
 			if (m_line.tile_count < 8)
 			{
-				LOG(("tile_count = %u, y = %u, pattern = %02x, pattern_address = %04x\n", m_line.tile_count, m_current_line, m_line.pattern, m_line.pattern_address));
+				LOG("tile_count = %u, y = %u, pattern = %02x, pattern_address = %04x\n", m_line.tile_count, m_current_line, m_line.pattern, m_line.pattern_address);
 			}
 			break;
 
@@ -916,7 +910,7 @@ LOG(("scrollx_to_apply: %u\n", m_line.scrollx_to_apply));
 			m_line.tile_address = m_gb_chrgen_offs + ((m_line.pattern << 4) | ((m_line.y & 0x07) << 1));
 			if (m_line.tile_count < 8)
 			{
-				LOG(("tile_count = %u, tile_address = %04x, pattern = %02x, y = %u, m_gb_chrgen_offs = %04x\n", m_line.tile_count, m_line.tile_address, m_line.pattern, m_line.y & 7, m_gb_chrgen_offs));
+				LOG("tile_count = %u, tile_address = %04x, pattern = %02x, y = %u, m_gb_chrgen_offs = %04x\n", m_line.tile_count, m_line.tile_address, m_line.pattern, m_line.y & 7, m_gb_chrgen_offs);
 			}
 			break;
 
@@ -975,7 +969,7 @@ LOG(("scrollx_to_apply: %u\n", m_line.scrollx_to_apply));
 			break;
 
 		case 9:   // eat scrollx delay cycles before starting window
-			LOG(("eating scrollx_to_apply: %u\n", m_line.scrollx_to_apply));
+			LOG("eating scrollx_to_apply: %u\n", m_line.scrollx_to_apply);
 			m_line.window_compare_position--;
 			m_line.scrollx_to_apply--;
 			m_cycles_left++;
@@ -1018,12 +1012,12 @@ void dmg_ppu_device::check_start_of_window()
 	// Check for start of window
 	if (m_line.window_compare_position < 16)
 	{
-		LOG(("check window this line, m_current_line = %u, WNDPOSY = %u, WNDPOSX = %u, m_line.window_compare_position = %u, tile_cycle = %u, window_start_y = %u, pixels_drawn = %u\n", m_current_line, WNDPOSY, WNDPOSX, m_line.window_compare_position, m_line.tile_cycle, m_line.window_start_y[m_line.window_start_y_index], m_line.pixels_drawn));
+		LOG("check window this line, m_current_line = %u, WNDPOSY = %u, WNDPOSX = %u, m_line.window_compare_position = %u, tile_cycle = %u, window_start_y = %u, pixels_drawn = %u\n", m_current_line, WNDPOSY, WNDPOSX, m_line.window_compare_position, m_line.tile_cycle, m_line.window_start_y[m_line.window_start_y_index], m_line.pixels_drawn);
 	}
 
 	if (/*LCDCONT*/(m_line.window_enable[m_line.window_enable_index] & WINDOW_ENABLED) && !m_line.window_active && (m_frame_window_active || /*m_current_line >= m_window_y*/ m_line.window_should_trigger || m_current_line == m_line.window_start_y[m_line.window_start_y_index]) && m_line.window_compare_position == /*WNDPOSX*/ m_line.window_start_x[m_line.window_start_y_index] && m_line.window_compare_position < 0xA6)
 	{
-LOG(("enable window, m_current_line = %u, WNDPOSY = %u, WNDPOSX = %u, m_line.window_compare_position = %u, pixels_drawn = %u\n", m_current_line, WNDPOSY, WNDPOSX, m_line.window_compare_position, m_line.pixels_drawn));
+		LOG("enable window, m_current_line = %u, WNDPOSY = %u, WNDPOSX = %u, m_line.window_compare_position = %u, pixels_drawn = %u\n", m_current_line, WNDPOSY, WNDPOSX, m_line.window_compare_position, m_line.pixels_drawn);
 		m_line.starting = true;
 		m_line.window_active = true;
 		m_frame_window_active = true;
@@ -2050,7 +2044,7 @@ void dmg_ppu_device::update_state()
 
 	if (LCDCONT & ENABLED)
 	{
-		LOG(("m_cycles_left = %u, cycles = %u, CURLINE = %u, m_next_state = %s\n", m_cycles_left, cycles, CURLINE, state_to_string(m_next_state)));
+		LOG("m_cycles_left = %u, cycles = %u, CURLINE = %u, m_next_state = %s\n", m_cycles_left, cycles, CURLINE, state_to_string(m_next_state));
 
 		if (m_cycles_left > 0)
 		{
@@ -2129,7 +2123,7 @@ void dmg_ppu_device::update_state()
 				check_stat_irq();
 
 				m_stat_lyc_int = ((CMPLINE == CURLINE) && (LCDSTAT & LY_LYC_INT_ENABLED)) ? true : false;
-				LOG(("GB_LCD_STATE_LYXX_M0_INC: CMPLINE = %02x, CURLINE = %02x, LCDSTAT = %02x, m_stat_lyc_int = %s\n", CMPLINE, CURLINE, LCDSTAT, m_stat_lyc_int ? "true":"false"));
+				LOG("GB_LCD_STATE_LYXX_M0_INC: CMPLINE = %02x, CURLINE = %02x, LCDSTAT = %02x, m_stat_lyc_int = %s\n", CMPLINE, CURLINE, LCDSTAT, m_stat_lyc_int ? "true":"false");
 				/* Reset LY==LYC STAT bit */
 				LCDSTAT &= ~LY_LYC_FLAG;
 				/* Check if we're going into VBlank next */
@@ -2179,7 +2173,7 @@ void dmg_ppu_device::update_state()
 				{
 					m_line.window_should_trigger = true;
 				}
-LOG(("window should trigger = %s, m_current_line = %u, m_window_y = %u\n", m_line.window_should_trigger ? "true" : "false", m_current_line, m_window_y));
+				LOG("window should trigger = %s, m_current_line = %u, m_window_y = %u\n", m_line.window_should_trigger ? "true" : "false", m_current_line, m_window_y);
 
 				state_cycles = 80 - 8;
 				m_next_state = GB_LCD_STATE_LYXX_M3;
@@ -2221,7 +2215,7 @@ LOG(("window should trigger = %s, m_current_line = %u, m_window_y = %u\n", m_lin
 				{
 					m_line.window_should_trigger = true;
 				}
-LOG(("window should trigger = %s, m_current_line = %u, m_window_y = %u\n", m_line.window_should_trigger ? "true" : "false", m_current_line, m_window_y));
+				LOG("window should trigger = %s, m_current_line = %u, m_window_y = %u\n", m_line.window_should_trigger ? "true" : "false", m_current_line, m_window_y);
 				m_next_state = GB_LCD_STATE_LYXX_M3;
 				state_cycles = 80 - 8;
 				break;
@@ -2305,7 +2299,7 @@ LOG(("window should trigger = %s, m_current_line = %u, m_window_y = %u\n", m_lin
 
 			case GB_LCD_STATE_LY9X_M1_INC:      /* Increment scanline counter */
 				increment_scanline();
-				LOG(("GB_LCD_STATE_LY9X_M1_INC: m_stat_lyc_int = %s\n", m_stat_lyc_int ? "true" : "false"));
+				LOG("GB_LCD_STATE_LY9X_M1_INC: m_stat_lyc_int = %s\n", m_stat_lyc_int ? "true" : "false");
 				/* Reset LY==LYC STAT bit */
 				LCDSTAT &= ~LY_LYC_FLAG;
 				if (m_current_line == 153)
@@ -2439,7 +2433,7 @@ void cgb_ppu_device::update_hdma_state(uint64_t cycles)
 
 void cgb_ppu_device::hdma_trans(uint16_t length)
 {
-	LOG(("hdma_trans\n"));
+	LOG("hdma_trans\n");
 	m_hdma_length = length;
 	m_hdma_cycles_to_start = 4;
 	update_state();
@@ -2448,7 +2442,7 @@ void cgb_ppu_device::hdma_trans(uint16_t length)
 
 void cgb_ppu_device::hdma_trans_execute()
 {
-	LOG(("hdma_trans_execute\n"));
+	LOG("hdma_trans_execute\n");
 	uint16_t length = m_hdma_length;
 	uint16_t src, dst;
 
@@ -2456,7 +2450,7 @@ void cgb_ppu_device::hdma_trans_execute()
 	// 102 Dalmatians uses destination 0000 and expects data to be DMAed.
 	dst = 0x8000 | (HDMA3 << 8) | (HDMA4 & 0xF0);
 
-	//LOG(("length = %04x, src = %04x, dst = %04x\n", length, src, dst));
+	//LOG("length = %04x, src = %04x, dst = %04x\n", length, src, dst);
 	while (length > 0)
 	{
 		if (dst & 0x8000)
@@ -2507,7 +2501,7 @@ void cgb_ppu_device::update_state()
 
 	if (LCDCONT & ENABLED)
 	{
-		LOG(("m_cycles_left = %d, cycles = %d, m_next_state = %s\n", m_cycles_left, cycles, state_to_string(m_next_state)));
+		LOG("m_cycles_left = %d, cycles = %d, m_next_state = %s\n", m_cycles_left, cycles, state_to_string(m_next_state));
 
 		if (m_cycles_left > 0)
 		{
@@ -2595,7 +2589,7 @@ void cgb_ppu_device::update_state()
 				m_stat_mode2_int = (LCDSTAT & MODE_2_INT_ENABLED) ? true : false;
 				check_stat_irq();
 				m_stat_lyc_int = ((m_cmp_line == CURLINE) && (LCDSTAT & LY_LYC_INT_ENABLED)) ? true : false;
-				LOG(("GB_LCD_STATE_LYXX_M0_INC: m_cmp_line = %u, CURLINE = %u, LCDSTAT = %02x, m_stat_lyc_int = %s\n", m_cmp_line, CURLINE, LCDSTAT, m_stat_lyc_int ? "true" : "false"));
+				LOG("GB_LCD_STATE_LYXX_M0_INC: m_cmp_line = %u, CURLINE = %u, LCDSTAT = %02x, m_stat_lyc_int = %s\n", m_cmp_line, CURLINE, LCDSTAT, m_stat_lyc_int ? "true" : "false");
 				m_hdma_possible = 0;
 				/* Check if we're going into VBlank next */
 				if (CURLINE == 144)
@@ -2742,7 +2736,7 @@ void cgb_ppu_device::update_state()
 				break;
 
 			case GB_LCD_STATE_LY00_M1:      /* we stay in VBlank but current line counter should already be incremented */
-				LOG(("GB_LCD_STATE_LY00_M1, CURLINE=%u, CMPLINE=%u, m_stat_lyc_int=%s\n", CURLINE, CMPLINE, m_stat_lyc_int ? "true" : "false"));
+				LOG("GB_LCD_STATE_LY00_M1, CURLINE=%u, CMPLINE=%u, m_stat_lyc_int=%s\n", CURLINE, CMPLINE, m_stat_lyc_int ? "true" : "false");
 				/* Check LY=LYC for line #153 */
 				if (CURLINE == CMPLINE)
 				{
@@ -2760,7 +2754,7 @@ void cgb_ppu_device::update_state()
 			case GB_LCD_STATE_LY00_M1_1:
 				increment_scanline();
 				m_stat_lyc_int = ((CMPLINE == CURLINE) && (LCDSTAT & LY_LYC_INT_ENABLED)) ? true : false;
-				LOG(("GB_LCD_STATE_LY00_M1_1, m_stat_lyc_int = %s\n", m_stat_lyc_int ? "true" : "false"));
+				LOG("GB_LCD_STATE_LY00_M1_1, m_stat_lyc_int = %s\n", m_stat_lyc_int ? "true" : "false");
 				m_next_state = GB_LCD_STATE_LY00_M1_2;
 				state_cycles = 4;
 				break;
@@ -2889,7 +2883,7 @@ READ8_MEMBER(dmg_ppu_device::vram_r)
 	if (!machine().side_effect_disabled())
 	{
 		update_state();
-		LOG(("vram_r: offset=0x%04x\n", offset));
+		LOG("vram_r: offset=0x%04x\n", offset);
 	}
 
 	return (m_vram_locked == LOCKED) ? 0xff : m_vram[offset + (m_vram_bank * 0x2000)];
@@ -2911,7 +2905,7 @@ READ8_MEMBER(dmg_ppu_device::oam_r)
 	if (!machine().side_effect_disabled())
 	{
 		update_state();
-		LOG(("oam_r: offset=0x%02x\n", offset));
+		LOG("oam_r: offset=0x%02x\n", offset);
 	}
 
 	return (m_oam_locked == LOCKED || m_oam_locked_reading == LOCKED || m_oam_dma_processing) ? 0xff : m_oam[offset];
@@ -2934,9 +2928,9 @@ READ8_MEMBER(dmg_ppu_device::video_r)
 	if (!machine().side_effect_disabled())
 	{
 		update_state();
-		if (offset == 1) LOG(("STAT read\n"));
-		if (offset == 0x28) LOG(("BCPS read, palette is %s\n", m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED"));
-		if (offset == 0x29) LOG(("BCPD read, palette is %s\n", m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED"));
+		if (offset == 1) LOG("STAT read\n");
+		if (offset == 0x28) LOG("BCPS read, palette is %s\n", m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED");
+		if (offset == 0x29) LOG("BCPD read, palette is %s\n", m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED");
 	}
 
 	return m_vid_regs[offset];
@@ -2945,7 +2939,7 @@ READ8_MEMBER(dmg_ppu_device::video_r)
 
 bool dmg_ppu_device::stat_write(uint8_t new_data)
 {
-	LOG(("stat_write: old_data = %02x, new_data = %02x\n", LCDSTAT & 0x78, new_data & 0x78));
+	LOG("stat_write: old_data = %02x, new_data = %02x\n", LCDSTAT & 0x78, new_data & 0x78);
 
 	bool new_lyc_int = m_stat_lyc_int;
 
@@ -3040,22 +3034,22 @@ void dmg_ppu_device::check_stat_irq()
 {
 	bool new_stat_int = m_stat_mode0_int || m_stat_mode1_int || m_stat_mode2_int || m_stat_lyc_int || m_stat_write_int;
 
-	LOG(("m_mode = %d, m_stat_mode0_int = %s, m_stat_mode1_int = %s, m_stat_mode2_int = %s, m_stat_lyc_int = %s\n",
+	LOG("m_mode = %d, m_stat_mode0_int = %s, m_stat_mode1_int = %s, m_stat_mode2_int = %s, m_stat_lyc_int = %s\n",
 		m_mode,
 		m_stat_mode0_int ? "true" : "false",
 		m_stat_mode1_int ? "true" : "false",
 		m_stat_mode2_int ? "true" : "false",
 		m_stat_lyc_int ? "true" : "false"
-	));
+	);
 
 	if (new_stat_int && !m_stat_int)
 	{
-		LOG(("--m_stat_mode0_int = %s, m_stat_mode1_int = %s, m_stat_mode2_int = %s, m_stat_lyc_int = %s\n",
+		LOG("--m_stat_mode0_int = %s, m_stat_mode1_int = %s, m_stat_mode2_int = %s, m_stat_lyc_int = %s\n",
 			m_stat_mode0_int ? "true" : "false",
 			m_stat_mode1_int ? "true" : "false",
 			m_stat_mode2_int ? "true" : "false",
 			m_stat_lyc_int ? "true" : "false"
-		));
+		);
 
 		m_lr35902->set_input_line(lr35902_cpu_device::LCD_INT, ASSERT_LINE);
 		m_lr35902->execute_set_input(lr35902_cpu_device::LCD_INT, ASSERT_LINE);
@@ -3069,7 +3063,7 @@ void dmg_ppu_device::check_stat_irq()
 WRITE8_MEMBER(dmg_ppu_device::video_w)
 {
 	update_state();
-	LOG(("video_w: offset = %02x, data = %02x\n", offset, data));
+	LOG("video_w: offset = %02x, data = %02x\n", offset, data);
 
 	switch (offset)
 	{
@@ -3123,7 +3117,7 @@ WRITE8_MEMBER(dmg_ppu_device::video_w)
 		{
 			if (CURLINE == data || (m_state == GB_LCD_STATE_LY00_M1 && CURLINE == 0 && data == 153))
 			{
-				LOG(("write LYC, if\n"));
+				LOG("write LYC, if\n");
 				LCDSTAT |= LY_LYC_FLAG;
 				/* Generate lcd interrupt if requested */
 				if (LCDSTAT & LY_LYC_INT_ENABLED)
@@ -3142,7 +3136,7 @@ WRITE8_MEMBER(dmg_ppu_device::video_w)
 			}
 			else
 			{
-				LOG(("write LYC, else\n"));
+				LOG("write LYC, else\n");
 				LCDSTAT &= ~LY_LYC_FLAG;
 				m_stat_lyc_int = false;
 				check_stat_irq();
@@ -3180,7 +3174,7 @@ WRITE8_MEMBER(dmg_ppu_device::video_w)
 		break;
 	case 0x03:                      /* SCX - Scroll X */
 		update_scanline(m_lr35902->attotime_to_cycles(m_lcd_timer->remaining()));
-		LOG(("SCX: scrollx_delay = %d, m_cycles_left = %d\n", m_line.scrollx_delay, m_cycles_left));
+		LOG("SCX: scrollx_delay = %d, m_cycles_left = %d\n", m_line.scrollx_delay, m_cycles_left);
 		if (m_line.scrollx_delay > 0)
 		{
 			// Additional delay cycles; not sure if this is correct.
@@ -3190,10 +3184,10 @@ WRITE8_MEMBER(dmg_ppu_device::video_w)
 		}
 		break;
 	case 0x0A:                      /* WY - Window Y position */
-		LOG(("WY write, m_cycles_left = %d\n", m_cycles_left));
+		LOG("WY write, m_cycles_left = %d\n", m_cycles_left);
 		break;
 	case 0x0B:                      /* WX - Window X position */
-		LOG(("WX write, m_cycles_left = %d\n", m_cycles_left));
+		LOG("WX write, m_cycles_left = %d\n", m_cycles_left);
 		break;
 	default:                        /* Unknown register, no change */
 		return;
@@ -3206,9 +3200,9 @@ READ8_MEMBER(cgb_ppu_device::video_r)
 	if (!machine().side_effect_disabled())
 	{
 		update_state();
-		if (offset == 1) LOG(("STAT read\n"));
-		if (offset == 0x28) LOG(("BCPS read, palette is %s\n", m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED"));
-		if (offset == 0x29) LOG(("BCPD read, palette is %s\n", m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED"));
+		if (offset == 1) LOG("STAT read\n");
+		if (offset == 0x28) LOG("BCPS read, palette is %s\n", m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED");
+		if (offset == 0x29) LOG("BCPD read, palette is %s\n", m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED");
 	}
 
 	switch (offset)
@@ -3232,7 +3226,7 @@ READ8_MEMBER(cgb_ppu_device::video_r)
 
 bool cgb_ppu_device::stat_write(uint8_t new_data)
 {
-	LOG(("stat_write: old_data = %02x, new_data = %02x\n", LCDSTAT & 0x78, new_data & 0x78));
+	LOG("stat_write: old_data = %02x, new_data = %02x\n", LCDSTAT & 0x78, new_data & 0x78);
 
 	bool new_lyc_int = m_stat_lyc_int;
 
@@ -3292,7 +3286,7 @@ bool cgb_ppu_device::stat_write(uint8_t new_data)
 WRITE8_MEMBER(cgb_ppu_device::video_w)
 {
 	update_state();
-	LOG(("video_w\n"));
+	LOG("video_w\n");
 
 	switch (offset)
 	{
@@ -3343,7 +3337,7 @@ WRITE8_MEMBER(cgb_ppu_device::video_w)
 		{
 			if (CURLINE == data && m_state != GB_LCD_STATE_LY00_M1 && m_state != GB_LCD_STATE_LYXX_M0_PRE_INC)
 			{
-				LOG(("write LYC, if, CURLINE=%u\n", CURLINE));
+				LOG("write LYC, if, CURLINE=%u\n", CURLINE);
 
 				LCDSTAT |= LY_LYC_FLAG;
 				/* Generate lcd interrupt if requested */
@@ -3355,7 +3349,7 @@ WRITE8_MEMBER(cgb_ppu_device::video_w)
 			}
 			else
 			{
-				LOG(("write LYC, else, CURLINE=%u\n", CURLINE));
+				LOG("write LYC, else, CURLINE=%u\n", CURLINE);
 
 				LCDSTAT &= ~LY_LYC_FLAG;
 				check_stat_irq();
@@ -3429,7 +3423,7 @@ WRITE8_MEMBER(cgb_ppu_device::video_w)
 		}
 		break;
 	case 0x28:      /* BCPS - Background palette specification */
-		LOG(("BCPS write %02x\n", data));
+		LOG("BCPS write %02x\n", data);
 
 		GBCBCPS = data;
 		if (data & 0x01)
@@ -3438,7 +3432,7 @@ WRITE8_MEMBER(cgb_ppu_device::video_w)
 			GBCBCPD = m_cgb_bpal[(data >> 1) & 0x1F] & 0xFF;
 		break;
 	case 0x29:      /* BCPD - background palette data */
-		LOG(("BCPD write %02x, palette is %s\n", data, m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED"));
+		LOG("BCPD write %02x, palette is %s\n", data, m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED");
 
 		if (m_pal_locked == LOCKED)
 		{

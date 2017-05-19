@@ -13,11 +13,11 @@ TODO:
 #include "ym2148.h"
 
 
-const device_type YM2148 = device_creator<ym2148_device>;
+DEFINE_DEVICE_TYPE(YM2148, ym2148_device, "ym2148", "Yamaha YM2148 MIDI/Keyboard Interface")
 
 
 ym2148_device::ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, YM2148, "YM2148", tag, owner, clock, "ym2148", __FILE__)
+	: device_t(mconfig, YM2148, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_txd_handler(*this)
 	, m_irq_handler(*this)
@@ -30,7 +30,7 @@ ym2148_device::ym2148_device(const machine_config &mconfig, const char *tag, dev
 	, m_data_in(0)
 	, m_control(0)
 	, m_status(0), m_timer(nullptr)
-		, m_rxd(1)
+	, m_rxd(1)
 	, m_tx_busy(false)
 {
 }

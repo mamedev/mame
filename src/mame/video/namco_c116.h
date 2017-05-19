@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Alex W. Jackson
+#ifndef MAME_VIDEO_NAMCO_C116_H
+#define MAME_VIDEO_NAMCO_C116_H
 
 #pragma once
 
-#ifndef __C116_H__
-#define __C116_H__
 
 
 //***************************************************************************
@@ -39,6 +39,6 @@ private:
 	uint16_t m_regs[8];
 };
 
-extern const device_type NAMCO_C116;
+DECLARE_DEVICE_TYPE(NAMCO_C116, namco_c116_device)
 
-#endif
+#endif // MAME_VIDEO_NAMCO_C116_H

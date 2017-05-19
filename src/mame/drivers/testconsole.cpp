@@ -165,7 +165,7 @@ INPUT_PORTS_START(whousetc)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(whousetc, whouse_testcons_state)
+MACHINE_CONFIG_START(whousetc)
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz)
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -199,4 +199,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     STATE                  INIT      COMPANY         FULLNAME                  FLAGS
-COMP( 1980?, whousetc, 0,      0,      whousetc, whousetc, whouse_testcons_state, whousetc, "Westinghouse", "Test Console Serial #5", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980?, whousetc, 0,      0,      whousetc, whousetc, whouse_testcons_state, whousetc, "Westinghouse", "Test Console Serial #5", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )

@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef __NEXTKBD_H__
-#define __NEXTKBD_H__
+#ifndef MAME_MACHINE_NEXTKBD_H
+#define MAME_MACHINE_NEXTKBD_H
+
+#pragma once
 
 
 #define MCFG_NEXTKBD_INT_CHANGE_CALLBACK(_write) \
@@ -17,9 +19,9 @@ class nextkbd_device : public device_t {
 public:
 	nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_int_change_wr_callback(device_t &device, _Object object) { return downcast<nextkbd_device &>(device).int_change_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_int_power_wr_callback(device_t &device, _Object object) { return downcast<nextkbd_device &>(device).int_power_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_int_nmi_wr_callback(device_t &device, _Object object) { return downcast<nextkbd_device &>(device).int_nmi_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_int_change_wr_callback(device_t &device, Object &&cb) { return downcast<nextkbd_device &>(device).int_change_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_int_power_wr_callback(device_t &device, Object &&cb) { return downcast<nextkbd_device &>(device).int_power_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_int_nmi_wr_callback(device_t &device, Object &&cb) { return downcast<nextkbd_device &>(device).int_nmi_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_ADDRESS_MAP(amap, 32);
 
@@ -113,6 +115,6 @@ private:
 	void handle_command();
 };
 
-extern const device_type NEXTKBD;
+DECLARE_DEVICE_TYPE(NEXTKBD, nextkbd_device)
 
-#endif
+#endif // MAME_MACHINE_NEXTKBD_H

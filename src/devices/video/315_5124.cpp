@@ -68,6 +68,11 @@ PAL frame timing
 #include "video/315_5124.h"
 
 
+#define SEGA315_5124_PALETTE_SIZE     (64 + 16)
+#define SEGA315_5378_PALETTE_SIZE     4096
+
+#define VRAM_SIZE             0x4000
+
 #define STATUS_VINT           0x80  /* Pending vertical interrupt flag */
 #define STATUS_SPROVR         0x40  /* Sprite overflow flag */
 #define STATUS_SPRCOL         0x20  /* Object collision flag */
@@ -84,8 +89,8 @@ PAL frame timing
 #define DISPLAY_DISABLED_HPOS 24 /* not verified, works if above 18 (for 'pstrike2') and below 25 (for 'fantdizzy') */
 #define DISPLAY_CB_HPOS       2  /* fixes 'roadrash' (SMS game) title scrolling, due to line counter reload timing */
 
-#define DRAW_TIME_GG        94      /* 9 + 2 + 14 + 8 + 13 + 96/2 */
-#define DRAW_TIME_SMS       46      /* 9 + 2 + 14 + 8 + 13 */
+#define DRAW_TIME_GG          94      /* 9 + 2 + 14 + 8 + 13 + 96/2 */
+#define DRAW_TIME_SMS         46      /* 9 + 2 + 14 + 8 + 13 */
 
 #define PRIORITY_BIT          0x1000
 #define BACKDROP_COLOR        ((m_vdp_mode == 4 ? 0x10 : 0x00) + (m_reg[0x07] & 0x0f))
@@ -97,17 +102,17 @@ PAL frame timing
 #define BOTTOM_BORDER         4
 #define BOTTOM_BLANKING       5
 
-static const uint8_t ntsc_192[6] = { 3, 13, 27, 192, 24, 3 };
-static const uint8_t ntsc_224[6] = { 3, 13, 11, 224,  8, 3 };
-static const uint8_t ntsc_240[6] = { 3, 13,  3, 240,  0, 3 };
-static const uint8_t pal_192[6]  = { 3, 13, 54, 192, 48, 3 };
-static const uint8_t pal_224[6]  = { 3, 13, 38, 224, 32, 3 };
-static const uint8_t pal_240[6]  = { 3, 13, 30, 240, 24, 3 };
+static constexpr uint8_t ntsc_192[6] = { 3, 13, 27, 192, 24, 3 };
+static constexpr uint8_t ntsc_224[6] = { 3, 13, 11, 224,  8, 3 };
+static constexpr uint8_t ntsc_240[6] = { 3, 13,  3, 240,  0, 3 };
+static constexpr uint8_t pal_192[6]  = { 3, 13, 54, 192, 48, 3 };
+static constexpr uint8_t pal_224[6]  = { 3, 13, 38, 224, 32, 3 };
+static constexpr uint8_t pal_240[6]  = { 3, 13, 30, 240, 24, 3 };
 
 
-const device_type SEGA315_5124 = device_creator<sega315_5124_device>;
-const device_type SEGA315_5246 = device_creator<sega315_5246_device>;
-const device_type SEGA315_5378 = device_creator<sega315_5378_device>;
+DEFINE_DEVICE_TYPE(SEGA315_5124, sega315_5124_device, "sega315_5124", "Sega 315-5124 SMS1 VDP")
+DEFINE_DEVICE_TYPE(SEGA315_5246, sega315_5246_device, "sega315_5246", "Sega 315-5246 SMS2 VDP")
+DEFINE_DEVICE_TYPE(SEGA315_5378, sega315_5378_device, "sega315_5378", "Sega 315-5378 Gamegear VDP")
 
 
 PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
@@ -161,24 +166,13 @@ ADDRESS_MAP_END
 
 
 sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t( mconfig, SEGA315_5124, "Sega 315-5124 VDP", tag, owner, clock, "sega315_5124", __FILE__)
-	, device_memory_interface(mconfig, *this)
-	, device_video_interface(mconfig, *this)
-	, m_cram_size( SEGA315_5124_CRAM_SIZE )
-	, m_palette_offset( 0 )
-	, m_supports_224_240( false )
-	, m_is_pal(false)
-	, m_int_cb(*this)
-	, m_csync_cb(*this)
-	, m_pause_cb(*this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(sega315_5124))
-	, m_palette(*this, "palette")
+	: sega315_5124_device(mconfig, SEGA315_5124, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, false)
 {
 }
 
 
-sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, bool supports_224_240, const char *shortname, const char *source)
-	: device_t( mconfig, type, name, tag, owner, clock, shortname, source)
+sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, bool supports_224_240)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, m_cram_size( cram_size )
@@ -195,13 +189,13 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 
 
 sega315_5246_device::sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sega315_5124_device( mconfig, SEGA315_5246, "Sega 315-5246 VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5246", __FILE__)
+	: sega315_5124_device(mconfig, SEGA315_5246, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true)
 {
 }
 
 
 sega315_5378_device::sega315_5378_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sega315_5124_device( mconfig, SEGA315_5378, "Sega 315-5378 VDP", tag, owner, clock, SEGA315_5378_CRAM_SIZE, 0x10, true, "sega315_5378", __FILE__)
+	: sega315_5124_device(mconfig, SEGA315_5378, tag, owner, clock, SEGA315_5378_CRAM_SIZE, 0x10, true)
 {
 }
 
@@ -318,7 +312,7 @@ void sega315_5124_device::hcount_latch_at_hpos( int hpos )
 	/* The hcount value returned by the VDP seems to be based on the previous hpos */
 	int hclock = hpos - 1;
 	if (hclock < 0)
-		hclock += SEGA315_5124_WIDTH;
+		hclock += WIDTH;
 
 	m_hcounter = ((hclock - active_scr_start) >> 1) & 0xff;
 }
@@ -347,7 +341,7 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 	case TIMER_DRAW:
 		update_palette();
-		draw_scanline( SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, param, m_screen->vpos() - param );
+		draw_scanline( LBORDER_START + LBORDER_WIDTH, param, m_screen->vpos() - param );
 		break;
 
 	case TIMER_LBORDER:
@@ -358,8 +352,8 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 			update_palette();
 
 			/* Draw left border */
-			rec.min_x = SEGA315_5124_LBORDER_START;
-			rec.max_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 1;
+			rec.min_x = LBORDER_START;
+			rec.max_x = LBORDER_START + LBORDER_WIDTH - 1;
 			m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
 			m_y1_bitmap.fill(( m_reg[0x07] & 0x0f ) ? 1 : 0, rec);
 		}
@@ -373,8 +367,8 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 			update_palette();
 
 			/* Draw right border */
-			rec.min_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256;
-			rec.max_x = rec.min_x + SEGA315_5124_RBORDER_WIDTH - 1;
+			rec.min_x = LBORDER_START + LBORDER_WIDTH + 256;
+			rec.max_x = rec.min_x + RBORDER_WIDTH - 1;
 			m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
 			m_y1_bitmap.fill(( m_reg[0x07] & 0x0f ) ? 1 : 0, rec);
 		}
@@ -480,8 +474,8 @@ void sega315_5124_device::process_line_timer()
 		}
 
 		/* Draw borders */
-		m_lborder_timer->adjust( m_screen->time_until_pos( vpos, SEGA315_5124_LBORDER_START ), vpos );
-		m_rborder_timer->adjust( m_screen->time_until_pos( vpos, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 ), vpos );
+		m_lborder_timer->adjust( m_screen->time_until_pos( vpos, LBORDER_START ), vpos );
+		m_rborder_timer->adjust( m_screen->time_until_pos( vpos, LBORDER_START + LBORDER_WIDTH + 256 ), vpos );
 
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function */
@@ -513,8 +507,8 @@ void sega315_5124_device::process_line_timer()
 		}
 
 		/* Draw borders */
-		m_lborder_timer->adjust( m_screen->time_until_pos( vpos, SEGA315_5124_LBORDER_START ), vpos );
-		m_rborder_timer->adjust( m_screen->time_until_pos( vpos, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 ), vpos );
+		m_lborder_timer->adjust( m_screen->time_until_pos( vpos, LBORDER_START ), vpos );
+		m_rborder_timer->adjust( m_screen->time_until_pos( vpos, LBORDER_START + LBORDER_WIDTH + 256 ), vpos );
 
 		/* Draw active display */
 		select_sprites( vpos - vpos_limit );
@@ -536,8 +530,8 @@ void sega315_5124_device::process_line_timer()
 		}
 
 		/* Draw borders */
-		m_lborder_timer->adjust( m_screen->time_until_pos( vpos, SEGA315_5124_LBORDER_START ), vpos );
-		m_rborder_timer->adjust( m_screen->time_until_pos( vpos, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 ), vpos );
+		m_lborder_timer->adjust( m_screen->time_until_pos( vpos, LBORDER_START ), vpos );
+		m_rborder_timer->adjust( m_screen->time_until_pos( vpos, LBORDER_START + LBORDER_WIDTH + 256 ), vpos );
 
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function */
@@ -594,7 +588,7 @@ void sega315_5124_device::check_pending_flags()
 	   remaining time, what could also occur due to the ahead time of the timeslice. */
 	if (m_pending_flags_timer->remaining() == attotime::zero)
 	{
-		hpos = SEGA315_5124_WIDTH - 1;
+		hpos = WIDTH - 1;
 	}
 	else
 	{
@@ -1606,7 +1600,7 @@ void sega315_5124_device::device_start()
 	m_display_timer = timer_alloc(TIMER_LINE);
 	m_display_timer->adjust(m_screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, m_screen->scan_period());
 	m_pending_flags_timer = timer_alloc(TIMER_FLAGS);
-	m_pending_flags_timer->adjust(m_screen->time_until_pos(0, SEGA315_5124_WIDTH - 1), 0, m_screen->scan_period());
+	m_pending_flags_timer->adjust(m_screen->time_until_pos(0, WIDTH - 1), 0, m_screen->scan_period());
 	m_draw_timer = timer_alloc(TIMER_DRAW);
 	m_lborder_timer = timer_alloc(TIMER_LBORDER);
 	m_rborder_timer = timer_alloc(TIMER_RBORDER);

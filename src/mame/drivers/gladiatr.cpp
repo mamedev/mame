@@ -290,16 +290,6 @@ READ8_MEMBER(gladiatr_state::ucpu_p2_r)
 	return BITSWAP8(m_dsw1->read(), 0,1,2,3,4,5,6,7);
 }
 
-READ8_MEMBER(gladiatr_state::cctl_t_r)
-{
-	return BIT(m_coins->read(), offset + 2);
-}
-
-READ8_MEMBER(gladiatr_state::ccpu_t_r)
-{
-	return BIT(m_coins->read(), offset);
-}
-
 WRITE8_MEMBER(gladiatr_state::ccpu_p2_w)
 {
 	// FIXME: active high or active low?  (bootleg MCU never uses these outputs)
@@ -307,13 +297,13 @@ WRITE8_MEMBER(gladiatr_state::ccpu_p2_w)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 7));
 }
 
-READ8_MEMBER(gladiatr_state::tclk_r)
+READ_LINE_MEMBER(gladiatr_state::tclk_r)
 {
 	// fed to t0 on comms MCUs
-	return m_tclk_val ? 0x01 : 0x00;
+	return m_tclk_val ? 1 : 0;
 }
 
-READ8_MEMBER(gladiatr_state::ucpu_t1_r)
+READ_LINE_MEMBER(gladiatr_state::ucpu_t1_r)
 {
 	// connected to p1 on other MCU
 	return BIT(m_csnd_p1, 1);
@@ -332,7 +322,7 @@ WRITE8_MEMBER(gladiatr_state::ucpu_p1_w)
 	m_ucpu_p1 = data;
 }
 
-READ8_MEMBER(gladiatr_state::csnd_t1_r)
+READ_LINE_MEMBER(gladiatr_state::csnd_t1_r)
 {
 	// connected to p1 on other MCU
 	return BIT(m_ucpu_p1, 1);
@@ -540,33 +530,6 @@ static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cctl_io_map, AS_IO, 8, gladiatr_state )
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T1) AM_READ(cctl_t_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(cctl_p1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(cctl_p2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ccpu_io_map, AS_IO, 8, gladiatr_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ_PORT("IN0")
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ_PORT("IN1") AM_WRITE(ccpu_p2_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T1) AM_READ(ccpu_t_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ucpu_io_map, AS_IO, 8, gladiatr_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(ucpu_p1_r, ucpu_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(ucpu_p2_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(tclk_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(ucpu_t1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( csnd_io_map, AS_IO, 8, gladiatr_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(csnd_p1_r, csnd_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(csnd_p2_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(tclk_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(csnd_t1_r)
-ADDRESS_MAP_END
-
-
 static INPUT_PORTS_START( gladiatr )
 	PORT_START("DSW1")      /* (8741-0 parallel port)*/
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:1,2")
@@ -713,7 +676,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( ppking, ppking_state )
+static MACHINE_CONFIG_START( ppking )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
@@ -762,11 +725,11 @@ static MACHINE_CONFIG_START( ppking, ppking_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* vclk input mode    */
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
+static MACHINE_CONFIG_START( gladiatr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
@@ -785,16 +748,31 @@ static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("cctl", I8741, XTAL_12MHz/2) /* verified on pcb */
-	MCFG_CPU_IO_MAP(cctl_io_map)
+	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(3)
+	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(2)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, cctl_p1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, cctl_p2_r))
 
 	MCFG_DEVICE_ADD("ccpu", I8741, XTAL_12MHz/2) /* verified on pcb */
-	MCFG_CPU_IO_MAP(ccpu_io_map)
+	MCFG_MCS48_PORT_P1_IN_CB(IOPORT("IN0"))
+	MCFG_MCS48_PORT_P2_IN_CB(IOPORT("IN1"))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(gladiatr_state, ccpu_p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(1)
+	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(0)
 
 	MCFG_DEVICE_ADD("ucpu", I8741, XTAL_12MHz/2) /* verified on pcb */
-	MCFG_CPU_IO_MAP(ucpu_io_map)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, ucpu_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(gladiatr_state, ucpu_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, ucpu_p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(gladiatr_state, tclk_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(gladiatr_state, ucpu_t1_r))
 
 	MCFG_DEVICE_ADD("csnd", I8741, XTAL_12MHz/2) /* verified on pcb */
-	MCFG_CPU_IO_MAP(csnd_io_map)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, csnd_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(gladiatr_state, csnd_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, csnd_p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(gladiatr_state, tclk_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(gladiatr_state, csnd_t1_r))
 
 	/* lazy way to make polled serial between MCUs work */
 	MCFG_QUANTUM_PERFECT_CPU("ucpu")
@@ -831,7 +809,7 @@ static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* vclk input mode    */
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

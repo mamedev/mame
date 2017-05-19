@@ -238,7 +238,7 @@ void dynadice_state::machine_reset()
 	m_ay_data = 0;
 }
 
-static MACHINE_CONFIG_START( dynadice, dynadice_state )
+static MACHINE_CONFIG_START( dynadice )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080,18432000/8)

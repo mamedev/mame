@@ -275,42 +275,42 @@ ROMs:
 #include "speaker.h"
 
 
-const device_type SEGA_XBD_PCB = device_creator<segaxbd_state>;
+DEFINE_DEVICE_TYPE(SEGA_XBD_PCB, segaxbd_state, "segaxbd_pcb", "Sega X-Board PCB")
 
 segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: segaxbd_state(mconfig, SEGA_XBD_PCB, "Sega X-Board PCB", tag, owner, clock, "segaxbd_pcb", __FILE__)
+	: segaxbd_state(mconfig, SEGA_XBD_PCB, tag, owner, clock)
 {
 }
 
-segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-			m_maincpu(*this, "maincpu"),
-			m_subcpu(*this, "subcpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_soundcpu2(*this, "soundcpu2"),
-			m_mcu(*this, "mcu"),
-			m_watchdog(*this, "watchdog"),
-			m_cmptimer_1(*this, "cmptimer_main"),
-			m_sprites(*this, "sprites"),
-			m_segaic16vid(*this, "segaic16vid"),
-			m_segaic16road(*this, "segaic16road"),
-			m_soundlatch(*this, "soundlatch"),
-			m_subram0(*this, "subram0"),
-			m_road_priority(1),
-			m_scanline_timer(nullptr),
-			m_timer_irq_state(0),
-			m_vblank_irq_state(0),
-			m_pc_0(0),
-			m_loffire_sync(nullptr),
-			m_lastsurv_mux(0),
-			m_paletteram(*this, "paletteram"),
-			m_gprider_hack(false),
-			m_palette_entries(0),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_io0_porta(*this, "IO0PORTA"),
-			m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7"}),
-			m_mux_ports(*this, {"MUX0", "MUX1", "MUX2", "MUX3"})
+segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_soundcpu2(*this, "soundcpu2"),
+		m_mcu(*this, "mcu"),
+		m_watchdog(*this, "watchdog"),
+		m_cmptimer_1(*this, "cmptimer_main"),
+		m_sprites(*this, "sprites"),
+		m_segaic16vid(*this, "segaic16vid"),
+		m_segaic16road(*this, "segaic16road"),
+		m_soundlatch(*this, "soundlatch"),
+		m_subram0(*this, "subram0"),
+		m_road_priority(1),
+		m_scanline_timer(nullptr),
+		m_timer_irq_state(0),
+		m_vblank_irq_state(0),
+		m_pc_0(0),
+		m_loffire_sync(nullptr),
+		m_lastsurv_mux(0),
+		m_paletteram(*this, "paletteram"),
+		m_gprider_hack(false),
+		m_palette_entries(0),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_io0_porta(*this, "IO0PORTA"),
+		m_adc_ports(*this, "ADC%u", 0),
+		m_mux_ports(*this, "MUX%u", 0)
 {
 	memset(m_adc_reverse, 0, sizeof(m_adc_reverse));
 	palette_init();
@@ -1753,10 +1753,10 @@ static MACHINE_CONFIG_FRAGMENT( xboard )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_REGULAR_DEVICE = device_creator<segaxbd_regular_state>;
+DEFINE_DEVICE_TYPE(SEGA_XBD_REGULAR, segaxbd_regular_state, "segaxbd_pcb_reg", "Sega X-Board PCB (regular)")
 
 segaxbd_regular_state::segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, SEGA_XBD_REGULAR_DEVICE, "Sega X-Board PCB regular", tag, owner, clock, "segakbd_pcb_regular", __FILE__)
+	: segaxbd_state(mconfig, SEGA_XBD_REGULAR, tag, owner, clock)
 {
 }
 
@@ -1765,8 +1765,8 @@ machine_config_constructor segaxbd_regular_state::device_mconfig_additions() con
 	return MACHINE_CONFIG_NAME( xboard );
 }
 
-static MACHINE_CONFIG_START( sega_xboard, segaxbd_new_state )
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_REGULAR_DEVICE, 0)
+static MACHINE_CONFIG_START( sega_xboard )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_REGULAR, 0)
 MACHINE_CONFIG_END
 
 
@@ -1779,10 +1779,10 @@ static MACHINE_CONFIG_FRAGMENT( xboard_fd1094 )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_FD1094_DEVICE = device_creator<segaxbd_fd1094_state>;
+DEFINE_DEVICE_TYPE(SEGA_XBD_FD1094, segaxbd_fd1094_state, "segaxbd_pcb_fd1094", "Sega X-Board PCB (FD1094)")
 
 segaxbd_fd1094_state::segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, SEGA_XBD_FD1094_DEVICE, "Sega X-Board PCB FD1094", tag, owner, clock, "segakbd_pcb_fd1094", __FILE__)
+	: segaxbd_state(mconfig, SEGA_XBD_FD1094, tag, owner, clock)
 {
 }
 
@@ -1791,13 +1791,13 @@ machine_config_constructor segaxbd_fd1094_state::device_mconfig_additions() cons
 	return MACHINE_CONFIG_NAME( xboard_fd1094 );
 }
 
-static MACHINE_CONFIG_START( sega_xboard_fd1094, segaxbd_new_state )
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_FD1094_DEVICE, 0)
+static MACHINE_CONFIG_START( sega_xboard_fd1094 )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_FD1094, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_xboard_fd1094_double, segaxbd_new_state_double )
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_FD1094_DEVICE, 0)
-	MCFG_DEVICE_ADD("subpcb", SEGA_XBD_FD1094_DEVICE, 0)
+static MACHINE_CONFIG_START( sega_xboard_fd1094_double )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_FD1094, 0)
+	MCFG_DEVICE_ADD("subpcb", SEGA_XBD_FD1094, 0)
 
 	//MCFG_QUANTUM_PERFECT_CPU("mainpcb:maincpu") // doesn't help..
 MACHINE_CONFIG_END
@@ -1816,10 +1816,10 @@ static MACHINE_CONFIG_FRAGMENT( aburner2 )
 	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segaxbd_state, aburner2_motor_w))
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_ABURNER2_DEVICE = device_creator<segaxbd_aburner2_state>;
+DEFINE_DEVICE_TYPE(SEGA_XBD_ABURNER2_DEVICE, segaxbd_aburner2_state, "segaxbd_pcb_aburner2", "Sega X-Board PCB (After Burner)")
 
 segaxbd_aburner2_state::segaxbd_aburner2_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, SEGA_XBD_ABURNER2_DEVICE, "Sega X-Board After Burner PCB", tag, owner, clock, "segakbd_pcb_aburner2", __FILE__)
+	: segaxbd_state(mconfig, SEGA_XBD_ABURNER2_DEVICE, tag, owner, clock)
 {
 }
 
@@ -1828,7 +1828,7 @@ machine_config_constructor segaxbd_aburner2_state::device_mconfig_additions() co
 	return MACHINE_CONFIG_NAME( aburner2 );
 }
 
-static MACHINE_CONFIG_START( sega_aburner2, segaxbd_new_state )
+static MACHINE_CONFIG_START( sega_aburner2 )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_ABURNER2_DEVICE, 0)
 MACHINE_CONFIG_END
 
@@ -1853,10 +1853,10 @@ static MACHINE_CONFIG_FRAGMENT( lastsurv_fd1094 )
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.43)
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_LASTSURV_FD1094_DEVICE = device_creator<segaxbd_lastsurv_fd1094_state>;
+DEFINE_DEVICE_TYPE(SEGA_XBD_LASTSURV_FD1094, segaxbd_lastsurv_fd1094_state, "segaxbd_pcb_lastsurv_fd1094", "Sega X-Board PCB (Last Survivor, FD1094)")
 
 segaxbd_lastsurv_fd1094_state::segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, SEGA_XBD_LASTSURV_FD1094_DEVICE, "Sega X-Board Last Survivor PCB FD1094", tag, owner, clock, "segakbd_pcb_lastsurv_fd1094", __FILE__)
+	: segaxbd_state(mconfig, SEGA_XBD_LASTSURV_FD1094, tag, owner, clock)
 {
 }
 
@@ -1865,8 +1865,8 @@ machine_config_constructor segaxbd_lastsurv_fd1094_state::device_mconfig_additio
 	return MACHINE_CONFIG_NAME( lastsurv_fd1094 );
 }
 
-static MACHINE_CONFIG_START( sega_lastsurv_fd1094, segaxbd_new_state )
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_LASTSURV_FD1094_DEVICE, 0)
+static MACHINE_CONFIG_START( sega_lastsurv_fd1094 )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_LASTSURV_FD1094, 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( lastsurv )
@@ -1889,10 +1889,10 @@ static MACHINE_CONFIG_FRAGMENT( lastsurv )
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.43)
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_LASTSURV_DEVICE = device_creator<segaxbd_lastsurv_state>;
+DEFINE_DEVICE_TYPE(SEGA_XBD_LASTSURV, segaxbd_lastsurv_state, "segaxbd_pcb_lastsurv", "Sega X-Board PCB (Last Survivor)")
 
 segaxbd_lastsurv_state::segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, SEGA_XBD_LASTSURV_DEVICE, "Sega X-Board Last Survivor PCB", tag, owner, clock, "segakbd_pcb_lastsurv", __FILE__)
+	: segaxbd_state(mconfig, SEGA_XBD_LASTSURV, tag, owner, clock)
 {
 }
 
@@ -1901,8 +1901,8 @@ machine_config_constructor segaxbd_lastsurv_state::device_mconfig_additions() co
 	return MACHINE_CONFIG_NAME( lastsurv );
 }
 
-static MACHINE_CONFIG_START( sega_lastsurv, segaxbd_new_state )
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_LASTSURV_DEVICE, 0)
+static MACHINE_CONFIG_START( sega_lastsurv )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_LASTSURV, 0)
 MACHINE_CONFIG_END
 
 
@@ -1936,10 +1936,10 @@ static MACHINE_CONFIG_FRAGMENT( smgp_fd1094 )
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_SMGP_FD1094_DEVICE = device_creator<segaxbd_smgp_fd1094_state>;
+DEFINE_DEVICE_TYPE(SEGA_XBD_SMGP_FD1094, segaxbd_smgp_fd1094_state, "segaxbd_pcb_smgp_fd1094", "Sega X-Board PCB (SMGP, FD1094)")
 
 segaxbd_smgp_fd1094_state::segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, SEGA_XBD_SMGP_FD1094_DEVICE, "Sega X-Board SMGP PCB FD1094", tag, owner, clock, "segakbd_pcb_smgp_fd1094", __FILE__)
+	: segaxbd_state(mconfig, SEGA_XBD_SMGP_FD1094, tag, owner, clock)
 {
 }
 
@@ -1948,8 +1948,8 @@ machine_config_constructor segaxbd_smgp_fd1094_state::device_mconfig_additions()
 	return MACHINE_CONFIG_NAME( smgp_fd1094 );
 }
 
-static MACHINE_CONFIG_START( sega_smgp_fd1094, segaxbd_new_state )
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_SMGP_FD1094_DEVICE, 0)
+static MACHINE_CONFIG_START( sega_smgp_fd1094 )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_SMGP_FD1094, 0)
 MACHINE_CONFIG_END
 
 
@@ -1983,10 +1983,10 @@ static MACHINE_CONFIG_FRAGMENT( smgp )
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_SMGP_DEVICE = device_creator<segaxbd_smgp_state>;
+DEFINE_DEVICE_TYPE(SEGA_XBD_SMGP, segaxbd_smgp_state, "segaxbd_pcb_smgp", "Sega X-Board PCB (SMGP)")
 
 segaxbd_smgp_state::segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, SEGA_XBD_SMGP_DEVICE, "Sega X-Board SMGP PCB", tag, owner, clock, "segakbd_pcb_smgp", __FILE__)
+	: segaxbd_state(mconfig, SEGA_XBD_SMGP, tag, owner, clock)
 {
 }
 
@@ -1995,8 +1995,8 @@ machine_config_constructor segaxbd_smgp_state::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( smgp );
 }
 
-static MACHINE_CONFIG_START( sega_smgp, segaxbd_new_state )
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_SMGP_DEVICE, 0)
+static MACHINE_CONFIG_START( sega_smgp )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_SMGP, 0)
 MACHINE_CONFIG_END
 
 
@@ -2009,10 +2009,10 @@ static MACHINE_CONFIG_FRAGMENT( rascot  )
 	MCFG_CPU_IO_MAP(rascot_z80_portmap)
 MACHINE_CONFIG_END
 
-const device_type SEGA_XBD_RASCOT_DEVICE = device_creator<segaxbd_rascot_state>;
+DEFINE_DEVICE_TYPE(SEGA_XBD_RASCOT, segaxbd_rascot_state, "segaxbd_pcb_rascot", "Sega X-Board PCB (Royal Ascot)")
 
 segaxbd_rascot_state::segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segaxbd_state(mconfig, SEGA_XBD_RASCOT_DEVICE, "Sega X-Board Royal Ascot PCB", tag, owner, clock, "segakbd_pcb_rascot", __FILE__)
+	: segaxbd_state(mconfig, SEGA_XBD_RASCOT, tag, owner, clock)
 {
 }
 
@@ -2021,8 +2021,8 @@ machine_config_constructor segaxbd_rascot_state::device_mconfig_additions() cons
 	return MACHINE_CONFIG_NAME( rascot );
 }
 
-static MACHINE_CONFIG_START( sega_rascot, segaxbd_new_state )
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_RASCOT_DEVICE, 0)
+static MACHINE_CONFIG_START( sega_rascot )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_RASCOT, 0)
 MACHINE_CONFIG_END
 
 
@@ -4741,22 +4741,22 @@ DRIVER_INIT_MEMBER(segaxbd_new_state_double,gprider_double)
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR, NAME,     PARENT,   MACHINE,        INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
+//    YEAR, NAME,     PARENT,   MACHINE,             INPUT,    STATE,             INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1987, aburner2, 0,        sega_aburner2,       aburner2, segaxbd_new_state, aburner2, ROT0,   "Sega", "After Burner II", 0 )
 GAME( 1987, aburner2g,aburner2, sega_aburner2,       aburner2, segaxbd_new_state, aburner2, ROT0,   "Sega", "After Burner II (German)", 0 )
 
 GAME( 1987, aburner,  aburner2, sega_aburner2,       aburner,  segaxbd_new_state, aburner2, ROT0,   "Sega", "After Burner", 0 )
 
-GAME( 1987, thndrbld, 0,        sega_xboard_fd1094,  thndrbld, driver_device,     0,  ROT0,   "Sega", "Thunder Blade (upright) (FD1094 317-0056)", 0 )
-GAME( 1987, thndrbld1,thndrbld, sega_xboard,         thndrbd1, driver_device,     0,  ROT0,   "Sega", "Thunder Blade (deluxe/standing) (unprotected)", 0 )
+GAME( 1987, thndrbld, 0,        sega_xboard_fd1094,  thndrbld, segaxbd_new_state, 0,        ROT0,   "Sega", "Thunder Blade (upright) (FD1094 317-0056)", 0 )
+GAME( 1987, thndrbld1,thndrbld, sega_xboard,         thndrbd1, segaxbd_new_state, 0,        ROT0,   "Sega", "Thunder Blade (deluxe/standing) (unprotected)", 0 )
 
-GAME( 1989, lastsurv, 0,        sega_lastsurv_fd1094,lastsurv, driver_device,     0,  ROT0,   "Sega", "Last Survivor (Japan) (FD1094 317-0083)", 0 )
+GAME( 1989, lastsurv, 0,        sega_lastsurv_fd1094,lastsurv, driver_device,     0,        ROT0,   "Sega", "Last Survivor (Japan) (FD1094 317-0083)", 0 )
 
 GAME( 1989, loffire,  0,        sega_xboard_fd1094,  loffire,  segaxbd_new_state, loffire,  ROT0,   "Sega", "Line of Fire / Bakudan Yarou (World) (FD1094 317-0136)", 0 )
 GAME( 1989, loffireu, loffire,  sega_xboard_fd1094,  loffire,  segaxbd_new_state, loffire,  ROT0,   "Sega", "Line of Fire / Bakudan Yarou (US) (FD1094 317-0135)", 0 )
 GAME( 1989, loffirej, loffire,  sega_xboard_fd1094,  loffire,  segaxbd_new_state, loffire,  ROT0,   "Sega", "Line of Fire / Bakudan Yarou (Japan) (FD1094 317-0134)", 0 )
 
-GAME( 1989, rachero,  0,        sega_xboard_fd1094,  rachero,  driver_device,     0,  ROT0,   "Sega", "Racing Hero (FD1094 317-0144)", 0 )
+GAME( 1989, rachero,  0,        sega_xboard_fd1094,  rachero,  segaxbd_new_state, 0,        ROT0,   "Sega", "Racing Hero (FD1094 317-0144)", 0 )
 
 GAME( 1989, smgp,     0,        sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (World, Rev B) (FD1094 317-0126a)", 0 )
 GAME( 1989, smgp6,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (World, Rev A) (FD1094 317-0126a)", 0 )
@@ -4767,13 +4767,13 @@ GAME( 1989, smgpu2,   smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state
 GAME( 1989, smgpj,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (Japan, Rev B) (FD1094 317-0124a)", 0 )
 GAME( 1989, smgpja,   smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, smgp,     ROT0,   "Sega", "Super Monaco GP (Japan, Rev A) (FD1094 317-0124a)", 0 )
 
-GAME( 1990, abcop,    0,        sega_xboard_fd1094,  abcop,    driver_device,     0,  ROT0,   "Sega", "A.B. Cop (World) (FD1094 317-0169b)", 0 )
-GAME( 1990, abcopj,   abcop,    sega_xboard_fd1094,  abcop,    driver_device,     0,  ROT0,   "Sega", "A.B. Cop (Japan) (FD1094 317-0169b)", 0 )
+GAME( 1990, abcop,    0,        sega_xboard_fd1094,  abcop,    segaxbd_new_state, 0,        ROT0,   "Sega", "A.B. Cop (World) (FD1094 317-0169b)", 0 )
+GAME( 1990, abcopj,   abcop,    sega_xboard_fd1094,  abcop,    segaxbd_new_state, 0,        ROT0,   "Sega", "A.B. Cop (Japan) (FD1094 317-0169b)", 0 )
 
 // wasn't officially available as a single PCB setup, but runs anyway albeit with messages suggesting you can compete against a rival that doesn't exist?
-GAME( 1990, gpriders, gprider,  sega_xboard_fd1094,  gprider, segaxbd_new_state, gprider,  ROT0,   "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
-GAME( 1990, gpriderus,gprider,  sega_xboard_fd1094,  gprider, segaxbd_new_state, gprider,  ROT0,   "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
-GAME( 1990, gpriderjs,gprider,  sega_xboard_fd1094,  gprider, segaxbd_new_state, gprider,  ROT0,   "Sega", "GP Rider (Japan, FD1094 317-0161)", 0 )
+GAME( 1990, gpriders, gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, gprider,  ROT0,   "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
+GAME( 1990, gpriderus,gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, gprider,  ROT0,   "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
+GAME( 1990, gpriderjs,gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, gprider,  ROT0,   "Sega", "GP Rider (Japan, FD1094 317-0161)", 0 )
 
 // multi X-Board (2 stacks directly connected, shared RAM on bridge PCB - not networked)
 GAME( 1990, gprider, 0,        sega_xboard_fd1094_double, gprider_double,  segaxbd_new_state_double, gprider_double,  ROT0,   "Sega", "GP Rider (World, FD1094 317-0163) (Twin setup)", 0 )
@@ -4781,13 +4781,13 @@ GAME( 1990, gprideru,gprider,  sega_xboard_fd1094_double, gprider_double,  segax
 GAME( 1990, gpriderj,gprider,  sega_xboard_fd1094_double, gprider_double,  segaxbd_new_state_double, gprider_double,  ROT0,   "Sega", "GP Rider (Japan, FD1094 317-0161) (Twin setup)", 0 )
 
 // X-Board + other boards?
-GAME( 1991, rascot,   0,        sega_rascot,         rascot,   segaxbd_new_state, rascot,   ROT0,   "Sega", "Royal Ascot (Japan, terminal?)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1991, rascot,    0,        sega_rascot,  rascot,   segaxbd_new_state, rascot,   ROT0,   "Sega", "Royal Ascot (Japan, terminal?)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // decrypted bootlegs
 
-GAME( 1987, thndrbldd, thndrbld,sega_xboard,  thndrbld, driver_device,     0,  ROT0,   "bootleg", "Thunder Blade (upright) (bootleg of FD1094 317-0056 set)", 0 )
+GAME( 1987, thndrbldd, thndrbld, sega_xboard,  thndrbld, segaxbd_new_state, 0,        ROT0,   "bootleg", "Thunder Blade (upright) (bootleg of FD1094 317-0056 set)", 0 )
 
-GAME( 1989, racherod, rachero,  sega_xboard,  rachero,  driver_device,     0,        ROT0,   "bootleg", "Racing Hero (bootleg of FD1094 317-0144 set)", 0 )
+GAME( 1989, racherod,  rachero,  sega_xboard,  rachero,  segaxbd_new_state, 0,        ROT0,   "bootleg", "Racing Hero (bootleg of FD1094 317-0144 set)", 0 )
 
 GAME( 1989, smgpd,     smgp,     sega_smgp,    smgp,     segaxbd_new_state, smgp,     ROT0,   "bootleg", "Super Monaco GP (World, Rev B) (bootleg of FD1094 317-0126a set)", 0 )
 GAME( 1989, smgp6d,    smgp,     sega_smgp,    smgp,     segaxbd_new_state, smgp,     ROT0,   "bootleg", "Super Monaco GP (World, Rev A) (bootleg of FD1094 317-0126a set)", 0 )
@@ -4797,10 +4797,10 @@ GAME( 1989, smgpu1d,   smgp,     sega_smgp,    smgp,     segaxbd_new_state, smgp
 GAME( 1989, smgpu2d,   smgp,     sega_smgp,    smgp,     segaxbd_new_state, smgp,     ROT0,   "bootleg", "Super Monaco GP (US, Rev A) (bootleg of FD1094 317-0125a set)", 0 )
 GAME( 1989, smgpjd,    smgp,     sega_smgp,    smgp,     segaxbd_new_state, smgp,     ROT0,   "bootleg", "Super Monaco GP (Japan, Rev B) (bootleg of FD1094 317-0124a set)", 0 )
 
-GAME( 1989, lastsurvd,lastsurv, sega_lastsurv,lastsurv, driver_device,     0,        ROT0,   "bootleg", "Last Survivor (Japan) (bootleg of FD1094 317-0083 set)", 0 )
+GAME( 1989, lastsurvd, lastsurv, sega_lastsurv,lastsurv, segaxbd_new_state, 0,        ROT0,   "bootleg", "Last Survivor (Japan) (bootleg of FD1094 317-0083 set)", 0 )
 
-GAME( 1990, abcopd,   abcop,    sega_xboard,  abcop,    driver_device,     0,        ROT0,   "bootleg", "A.B. Cop (World) (bootleg of FD1094 317-0169b set)", 0 )
-GAME( 1990, abcopjd,  abcop,    sega_xboard,  abcop,    driver_device,     0,        ROT0,   "bootleg", "A.B. Cop (Japan) (bootleg of FD1094 317-0169b set)", 0 )
+GAME( 1990, abcopd,    abcop,    sega_xboard,  abcop,    segaxbd_new_state, 0,        ROT0,   "bootleg", "A.B. Cop (World) (bootleg of FD1094 317-0169b set)", 0 )
+GAME( 1990, abcopjd,   abcop,    sega_xboard,  abcop,    segaxbd_new_state, 0,        ROT0,   "bootleg", "A.B. Cop (Japan) (bootleg of FD1094 317-0169b set)", 0 )
 
 GAME( 1989, loffired,  loffire,  sega_xboard,  loffire,  segaxbd_new_state, loffire,  ROT0,   "bootleg", "Line of Fire / Bakudan Yarou (World) (bootleg of FD1094 317-0136 set)", 0 )
 GAME( 1989, loffireud, loffire,  sega_xboard,  loffire,  segaxbd_new_state, loffire,  ROT0,   "bootleg", "Line of Fire / Bakudan Yarou (US) (bootleg of FD1094 317-0135 set)", 0 )

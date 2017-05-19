@@ -109,7 +109,7 @@ static INPUT_PORTS_START( kramermc )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( kramermc, kramermc_state )
+static MACHINE_CONFIG_START( kramermc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 1500000)
 	MCFG_CPU_PROGRAM_MAP(kramermc_mem)
@@ -150,5 +150,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT                 COMPANY                 FULLNAME   FLAGS */
-COMP( 1987, kramermc,     0,      0,    kramermc,   kramermc, kramermc_state,   kramermc,"Manfred Kramer", "Kramer MC",      MACHINE_NO_SOUND)
+/*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT     CLASS           INIT     COMPANY           FULLNAME       FLAGS */
+COMP( 1987, kramermc,  0,      0,      kramermc,  kramermc, kramermc_state, kramermc,"Manfred Kramer", "Kramer MC",   MACHINE_NO_SOUND)

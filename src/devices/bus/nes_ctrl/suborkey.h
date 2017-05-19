@@ -6,13 +6,13 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_NES_CTRL_SUBORKEY_H
+#define MAME_BUS_NES_CTRL_SUBORKEY_H
+
 #pragma once
 
-#ifndef __NES_SUBORKEY__
-#define __NES_SUBORKEY__
-
-
 #include "ctrl.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -44,7 +44,6 @@ private:
 
 
 // device type definition
-extern const device_type NES_SUBORKEYBOARD;
+DECLARE_DEVICE_TYPE(NES_SUBORKEYBOARD, nes_suborkey_device)
 
-
-#endif
+#endif // MAME_BUS_NES_CTRL_SUBORKEY_H

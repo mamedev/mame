@@ -3,10 +3,10 @@
 #include "emu.h"
 #include "h83002.h"
 
-const device_type H83002 = device_creator<h83002_device>;
+DEFINE_DEVICE_TYPE(H83002, h83002_device, "h83002", "H8/3002")
 
 h83002_device::h83002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8h_device(mconfig, H83002, "H8/3002", tag, owner, clock, "h83002", __FILE__, address_map_delegate(FUNC(h83002_device::map), this)),
+	h8h_device(mconfig, H83002, tag, owner, clock, address_map_delegate(FUNC(h83002_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	dma(*this, "dma"),

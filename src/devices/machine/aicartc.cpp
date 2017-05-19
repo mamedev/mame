@@ -19,7 +19,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type AICARTC = device_creator<aicartc_device>;
+DEFINE_DEVICE_TYPE(AICARTC, aicartc_device, "aicartc", "AICA RTC")
 
 
 //**************************************************************************
@@ -31,8 +31,10 @@ const device_type AICARTC = device_creator<aicartc_device>;
 //-------------------------------------------------
 
 aicartc_device::aicartc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AICARTC, "AICA RTC", tag, owner, clock, "aicartc", __FILE__),
-		device_rtc_interface(mconfig, *this), m_rtc_reg_lo(0), m_rtc_reg_hi(0), m_rtc_tick(0), m_we(0), m_clock_timer(nullptr)
+	: device_t(mconfig, AICARTC, tag, owner, clock)
+	, device_rtc_interface(mconfig, *this)
+	, m_rtc_reg_lo(0), m_rtc_reg_hi(0), m_rtc_tick(0), m_we(0)
+	, m_clock_timer(nullptr)
 {
 }
 

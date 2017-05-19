@@ -13,27 +13,28 @@
 
 
 //-------------------------------------------------
-//  neogeo_kof98_cart - constructor
+//  neogeo_kof98_cart_device - constructor
 //-------------------------------------------------
 
-const device_type NEOGEO_KOF98_CART = device_creator<neogeo_kof98_cart>;
+DEFINE_DEVICE_TYPE(NEOGEO_KOF98_CART, neogeo_kof98_cart_device, "neocart_kof98", "Neo Geo KoF 98 Cart")
 
 
-neogeo_kof98_cart::neogeo_kof98_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
-	neogeo_rom_device(mconfig, NEOGEO_KOF98_CART, "Neo Geo KOF 98 Cart", tag, owner, clock, "neocart_kof98", __FILE__),
+neogeo_kof98_cart_device::neogeo_kof98_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
+	neogeo_rom_device(mconfig, NEOGEO_KOF98_CART, tag, owner, clock),
 	m_prot(*this, "kof98_prot")
-{}
+{
+}
 
 
 //-------------------------------------------------
 //  mapper specific start/reset
 //-------------------------------------------------
 
-void neogeo_kof98_cart::device_start()
+void neogeo_kof98_cart_device::device_start()
 {
 }
 
-void neogeo_kof98_cart::device_reset()
+void neogeo_kof98_cart_device::device_reset()
 {
 }
 
@@ -46,12 +47,12 @@ static MACHINE_CONFIG_FRAGMENT( kof98_cart )
 	MCFG_KOF98_PROT_ADD("kof98_prot")
 MACHINE_CONFIG_END
 
-machine_config_constructor neogeo_kof98_cart::device_mconfig_additions() const
+machine_config_constructor neogeo_kof98_cart_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( kof98_cart );
 }
 
-void neogeo_kof98_cart::decrypt_all(DECRYPT_ALL_PARAMS)
+void neogeo_kof98_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {
 	m_prot->decrypt_68k(cpuregion, cpuregion_size);
 }

@@ -140,7 +140,7 @@ static INPUT_PORTS_START( daruma )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( daruma, daruma_state )
+static MACHINE_CONFIG_START( daruma )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32,11059200) //verified on pcb
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
@@ -166,5 +166,5 @@ ROM_START( ds348 )
 	ROM_LOAD( "daruma_ds348_v1_1.rom",   0x0000, 0x10000, CRC(10bf9036) SHA1(d654a13bc582f5384e759ec6fe5309a642bd8e18) )
 ROM_END
 
-/*    YEAR  NAME   PARENT COMPAT MACHINE  INPUT   INIT              COMPANY           FULLNAME                                 FLAGS */
-COMP( 1998, ds348, 0,     0,     daruma,  daruma, driver_device, 0, "Sigtron Daruma", "Print Plus DS348 - Dot matrix printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   STATE      INIT  COMPANY           FULLNAME                                 FLAGS
+COMP( 1998, ds348, 0,      0,      daruma,  daruma, daruma_state, 0, "Sigtron Daruma", "Print Plus DS348 - Dot matrix printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

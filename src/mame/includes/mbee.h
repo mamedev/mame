@@ -160,7 +160,7 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<mc6845_device> m_crtc;
-	optional_device<wd2793_t> m_fdc;
+	optional_device<wd2793_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	optional_device<mc146818_device> m_rtc;
@@ -174,4 +174,4 @@ private:
 	required_device<screen_device> m_screen;
 };
 
-#endif /* MAME_INCLUDES_MBEE_H */
+#endif // MAME_INCLUDES_MBEE_H

@@ -15,47 +15,46 @@
 #include "debugger.h"
 #include "screen.h"
 
+#define LOG_GENERAL      (1U << 0)
+#define LOG_CONTROL_REGS (1U << 1)
+#define LOG_GRAPHICS_OPS (1U << 2)
 
-/***************************************************************************
-    DEBUG STATE & STRUCTURES
-***************************************************************************/
+//#define VERBOSE (LOG_GENERAL | LOG_CONTROL_REGS | LOG_GRAPHICS_OPS)
+#include "logmacro.h"
 
-#define VERBOSE             0
-#define LOG_CONTROL_REGS    0
-#define LOG_GRAPHICS_OPS    0
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+#define LOGCONTROLREGS(...) LOGMASKED(LOG_CONTROL_REGS, __VA_ARGS__)
+#define LOGGRAPHICSOPS(...) LOGMASKED(LOG_GRAPHICS_OPS, __VA_ARGS__)
 
 
-const device_type TMS34010 = device_creator<tms34010_device>;
-const device_type TMS34020 = device_creator<tms34020_device>;
+DEFINE_DEVICE_TYPE(TMS34010, tms34010_device, "tms34010", "TMS34010")
+DEFINE_DEVICE_TYPE(TMS34020, tms34020_device, "tms34020", "TMS34020")
 
 
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
 
-tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3), m_pc(0), m_ppc(0), m_st(0), m_pixel_write(nullptr), m_pixel_read(nullptr), m_raster_op(nullptr), m_pixel_op(nullptr), m_pixel_op_timing(0), m_convsp(0), m_convdp(0), m_convmp(0), m_gfxcycles(0), m_pixelshift(0), m_is_34020(0), m_reset_deferred(false)
-		, m_halt_on_reset(false), m_hblank_stable(0), m_external_host_access(0), m_executing(0), m_program(nullptr), m_direct(nullptr)
-		, m_pixclock(0)
+	, m_halt_on_reset(false), m_hblank_stable(0), m_external_host_access(0), m_executing(0), m_program(nullptr), m_direct(nullptr)
+	, m_pixclock(0)
 	, m_pixperclock(0), m_scantimer(nullptr), m_icount(0)
-		, m_output_int_cb(*this)
+	, m_output_int_cb(*this)
 {
 }
 
 
 tms34010_device::tms34010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms340x0_device(mconfig, TMS34010, "TMS34010", tag, owner, clock, "tms34010")
+	: tms340x0_device(mconfig, TMS34010, tag, owner, clock)
 {
 	m_is_34020 = 0;
 }
 
 
 tms34020_device::tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms340x0_device(mconfig, TMS34020, "TMS34020", tag, owner, clock, "tms34020")
+	: tms340x0_device(mconfig, TMS34020, tag, owner, clock)
 {
 	m_is_34020 = 1;
 }
@@ -489,7 +488,7 @@ void tms340x0_device::check_interrupt()
 	/* check for NMI first */
 	if (IOREG(REG_HSTCTLH) & 0x0100)
 	{
-		LOG(("TMS34010 '%s' takes NMI\n", tag()));
+		LOG("TMS34010 takes NMI\n");
 
 		/* ack the NMI */
 		IOREG(REG_HSTCTLH) &= ~0x0100;
@@ -516,28 +515,28 @@ void tms340x0_device::check_interrupt()
 	/* host interrupt */
 	if (irq & TMS34010_HI)
 	{
-		LOG(("TMS34010 '%s' takes HI\n", tag()));
+		LOG("TMS34010 takes HI\n");
 		vector = 0xfffffec0;
 	}
 
 	/* display interrupt */
 	else if (irq & TMS34010_DI)
 	{
-		LOG(("TMS34010 '%s' takes DI\n", tag()));
+		LOG("TMS34010 takes DI\n");
 		vector = 0xfffffea0;
 	}
 
 	/* window violation interrupt */
 	else if (irq & TMS34010_WV)
 	{
-		LOG(("TMS34010 '%s' takes WV\n", tag()));
+		LOG("TMS34010 takes WV\n");
 		vector = 0xfffffe80;
 	}
 
 	/* external 1 interrupt */
 	else if (irq & TMS34010_INT1)
 	{
-		LOG(("TMS34010 '%s' takes INT1\n", tag()));
+		LOG("TMS34010 takes INT1\n");
 		vector = 0xffffffc0;
 		irqline = 0;
 	}
@@ -545,7 +544,7 @@ void tms340x0_device::check_interrupt()
 	/* external 2 interrupt */
 	else if (irq & TMS34010_INT2)
 	{
-		LOG(("TMS34010 '%s' takes INT2\n", tag()));
+		LOG("TMS34010 takes INT2\n");
 		vector = 0xffffffa0;
 		irqline = 1;
 	}
@@ -666,7 +665,7 @@ void tms340x0_device::device_reset()
 
 void tms340x0_device::execute_set_input(int inputnum, int state)
 {
-	LOG(("TMS34010 '%s' set irq line %d state %d\n", tag(), inputnum, state));
+	LOG("TMS34010 set irq line %d state %d\n", inputnum, state);
 
 	/* set the pending interrupt */
 	switch (inputnum)
@@ -699,7 +698,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::internal_interrupt_callback )
 
 	/* call through to the CPU to generate the int */
 	IOREG(REG_INTPEND) |= type;
-	LOG(("TMS34010 '%s' set internal interrupt $%04x\n", tag(), type));
+	LOG("TMS34010 set internal interrupt $%04x\n", type);
 
 	/* generate triggers so that spin loops can key off them */
 	signal_interrupt_trigger();
@@ -872,7 +871,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 		if (!m_is_34020)
 		{
 			IOREG(REG_DPYADR) = IOREG(REG_DPYSTRT);
-			LOG(("Start of VBLANK, DPYADR = %04X\n", IOREG(REG_DPYADR)));
+			LOG("Start of VBLANK, DPYADR = %04X\n", IOREG(REG_DPYADR));
 		}
 
 		/* 34020 loads DPYNXx with DPYSTx */
@@ -921,8 +920,8 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 					m_hblank_stable++;
 				}
 
-				LOG(("Configuring screen: HTOTAL=%3d BLANK=%3d-%3d VTOTAL=%3d BLANK=%3d-%3d refresh=%f\n",
-						htotal, SMART_IOREG(HEBLNK), SMART_IOREG(HSBLNK), vtotal, veblnk, vsblnk, ATTOSECONDS_TO_HZ(refresh)));
+				LOG("Configuring screen: HTOTAL=%3d BLANK=%3d-%3d VTOTAL=%3d BLANK=%3d-%3d refresh=%f\n",
+						htotal, SMART_IOREG(HEBLNK), SMART_IOREG(HSBLNK), vtotal, veblnk, vsblnk, ATTOSECONDS_TO_HZ(refresh));
 
 				/* interlaced timing not supported */
 				if ((SMART_IOREG(DPYCTL) & 0x4000) == 0)
@@ -973,7 +972,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 }
 
 
-void tms340x0_device::get_display_params(tms34010_display_params *params)
+void tms340x0_device::get_display_params(display_params *params)
 {
 	params->enabled = ((SMART_IOREG(DPYCTL) & 0x8000) != 0);
 	params->vcount = SMART_IOREG(VCOUNT);
@@ -1007,7 +1006,7 @@ void tms340x0_device::get_display_params(tms34010_display_params *params)
 uint32_t tms340x0_device::tms340x0_ind16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	pen_t blackpen = screen.palette().black_pen();
-	tms34010_display_params params;
+	display_params params;
 	int x;
 
 	/* get the display parameters for the screen */
@@ -1017,7 +1016,7 @@ uint32_t tms340x0_device::tms340x0_ind16(screen_device &screen, bitmap_ind16 &bi
 	if (params.enabled)
 	{
 		/* call through to the callback */
-		LOG(("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect.min_y, params.rowaddr, params.coladdr));
+		LOG("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect.min_y, params.rowaddr, params.coladdr);
 		m_scanline_ind16_cb(screen, bitmap, cliprect.min_y, &params);
 	}
 
@@ -1038,7 +1037,7 @@ uint32_t tms340x0_device::tms340x0_ind16(screen_device &screen, bitmap_ind16 &bi
 uint32_t tms340x0_device::tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t blackpen = rgb_t::black();
-	tms34010_display_params params;
+	display_params params;
 	int x;
 
 	/* get the display parameters for the screen */
@@ -1048,7 +1047,7 @@ uint32_t tms340x0_device::tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bi
 	if (params.enabled)
 	{
 		/* call through to the callback */
-		LOG(("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect.min_y, params.rowaddr, params.coladdr));
+		LOG("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect.min_y, params.rowaddr, params.coladdr);
 		m_scanline_rgb32_cb(screen, bitmap, cliprect.min_y, &params);
 	}
 
@@ -1070,7 +1069,6 @@ uint32_t tms340x0_device::tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bi
     I/O REGISTER WRITES
 ***************************************************************************/
 
-#if 0
 static const char *const ioreg_name[] =
 {
 	"HESYNC", "HEBLNK", "HSBLNK", "HTOTAL",
@@ -1083,7 +1081,6 @@ static const char *const ioreg_name[] =
 	"RESERVED", "RESERVED", "RESERVED", "DPYTAP",
 	"HCOUNT", "VCOUNT", "DPYADR", "REFCNT"
 };
-#endif
 
 WRITE16_MEMBER( tms34010_device::io_register_w )
 {
@@ -1206,12 +1203,10 @@ WRITE16_MEMBER( tms34010_device::io_register_w )
 			break;
 	}
 
-//  if (LOG_CONTROL_REGS)
-//      logerror("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg_name[offset], IOREG(offset), m_screen.vpos());
+	LOGCONTROLREGS("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg_name[offset], IOREG(offset), m_screen->vpos());
 }
 
 
-#if 0
 static const char *const ioreg020_name[] =
 {
 	"VESYNC", "HESYNC", "VEBLNK", "HEBLNK",
@@ -1234,7 +1229,6 @@ static const char *const ioreg020_name[] =
 	"IHOST1L", "IHOST1H", "IHOST2L", "IHOST2H",
 	"IHOST3L", "IHOST3H", "IHOST4L", "IHOST4H"
 };
-#endif
 
 WRITE16_MEMBER( tms34020_device::io_register_w )
 {
@@ -1244,8 +1238,7 @@ WRITE16_MEMBER( tms34020_device::io_register_w )
 	oldreg = IOREG(offset);
 	IOREG(offset) = data;
 
-//  if (LOG_CONTROL_REGS)
-//      logerror("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg020_name[offset], IOREG(offset), m_screen.vpos());
+	LOGCONTROLREGS("%s: %s = %04X (%d)\n", machine().describe_context(), ioreg020_name[offset], IOREG(offset), m_screen->vpos());
 
 	switch (offset)
 	{
@@ -1402,8 +1395,7 @@ READ16_MEMBER( tms34010_device::io_register_r )
 {
 	int result, total;
 
-//  if (LOG_CONTROL_REGS)
-//      logerror("%s: read %s\n", machine().describe_context(), ioreg_name[offset]);
+	LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg_name[offset]);
 
 	switch (offset)
 	{
@@ -1444,8 +1436,7 @@ READ16_MEMBER( tms34020_device::io_register_r )
 {
 	int result, total;
 
-//  if (LOG_CONTROL_REGS)
-//      logerror("%s: read %s\n", machine().describe_context(), ioreg_name[offset]);
+	LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg_name[offset]);
 
 	switch (offset)
 	{

@@ -56,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	void kbd_put(u8 data);
 private:
 	uint8_t m_term_data;
 	address_space *m_mem;
@@ -88,7 +88,7 @@ static ADDRESS_MAP_START(ts802_io, AS_IO, 8, ts802_state)
 	// 10: Z80 DMA
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("z80dma", z80dma_device, read, write)
 	// 14-17: WD 1793
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
+	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	// 18: floppy misc.
 	AM_RANGE(0x18, 0x1c) AM_WRITE(port18_w)
 	// 20-23: Z80 SIO #2
@@ -153,7 +153,7 @@ READ8_MEMBER( ts802_state::port0d_r )
 	return ret;
 }
 
-WRITE8_MEMBER( ts802_state::kbd_put )
+void ts802_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -182,7 +182,7 @@ DRIVER_INIT_MEMBER( ts802_state, ts802 )
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-static MACHINE_CONFIG_START( ts802, ts802_state )
+static MACHINE_CONFIG_START( ts802 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ts802_mem)
@@ -192,7 +192,7 @@ static MACHINE_CONFIG_START( ts802, ts802_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ts802_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ts802_state, kbd_put))
 
 	MCFG_DEVICE_ADD("z80dma", Z80DMA, XTAL_16MHz / 4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
@@ -237,6 +237,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT      COMPANY    FULLNAME       FLAGS */
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT    COMPANY      FULLNAME  FLAGS
 COMP( 1982, ts802,   0,       0,     ts802,     ts802, ts802_state,  ts802,  "Televideo", "TS802",  MACHINE_IS_SKELETON )
 COMP( 1982, ts802h,  ts802,   0,     ts802,     ts802, ts802_state,  ts802,  "Televideo", "TS802H", MACHINE_IS_SKELETON )

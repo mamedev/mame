@@ -524,6 +524,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_blit_ram(*this, "blit_ram"),
 		m_maincpu(*this, "maincpu"),
+		m_slavecpu(*this, "slavecpu"),
 		m_palette(*this, "palette")  { }
 
 	required_shared_ptr<uint16_t> m_blit_ram;
@@ -532,7 +533,16 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(unk_irq);
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_slavecpu;
 	required_device<palette_device> m_palette;
+
+	DECLARE_WRITE8_MEMBER(toslave_w);
+	DECLARE_READ8_MEMBER(toslave_r);
+	DECLARE_WRITE8_MEMBER(fromslave_w);
+	DECLARE_READ8_MEMBER(fromslave_r);
+	DECLARE_WRITE16_MEMBER(vip2000_outputs_w);
+	u8 m_toslave;
+	u8 m_fromslave;
 };
 
 
@@ -676,7 +686,7 @@ static GFXDECODE_START( bingor )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( bingor, bingor_state )
+static MACHINE_CONFIG_START( bingor )
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(bingor_map)
 	MCFG_CPU_IO_MAP(bingor_io)
@@ -718,22 +728,51 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vip2000_io, AS_IO, 16, bingor_state )
 	AM_RANGE(0x0000, 0x0001) AM_READNOP // watchdog
 	AM_RANGE(0x0080, 0x009f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
+	AM_RANGE(0x0100, 0x0101) AM_READWRITE8(fromslave_r, toslave_w, 0x00ff)
+	AM_RANGE(0x0280, 0x0281) AM_WRITE(vip2000_outputs_w)
 ADDRESS_MAP_END
+
+WRITE8_MEMBER(bingor_state::toslave_w)
+{
+	m_toslave = data;
+}
+
+READ8_MEMBER(bingor_state::toslave_r)
+{
+	return m_toslave;
+}
+
+WRITE8_MEMBER(bingor_state::fromslave_w)
+{
+	m_fromslave = data;
+}
+
+READ8_MEMBER(bingor_state::fromslave_r)
+{
+	return m_fromslave;
+}
+
+WRITE16_MEMBER(bingor_state::vip2000_outputs_w)
+{
+	m_slavecpu->set_input_line(MCS51_INT0_LINE, BIT(data, 15) ? CLEAR_LINE : ASSERT_LINE);
+}
 
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, bingor_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_io, AS_IO, 8, bingor_state)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(toslave_r, fromslave_w)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( vip2000, bingor_state )
+static MACHINE_CONFIG_START( vip2000 )
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(vip2000_map)
 	MCFG_CPU_IO_MAP(vip2000_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bingor_state,  vblank_irq)
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", bingor_state,  vblank_irq)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bingor_state, nmi_line_pulse,  30)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bingor_state, unk_irq,  30)
+	//MCFG_CPU_PERIODIC_INT_DRIVER(bingor_state, unk_irq,  30)
 
 	MCFG_ATMEL_49F4096_ADD("flash")
 
@@ -875,10 +914,10 @@ ROM_END
 
 
 
-GAME( 2002, bingor1,    0,      bingor,   bingor, driver_device,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 1)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor2,    0,      bingor,   bingor, driver_device,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 2)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor3,    0,      bingor,   bingor, driver_device,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 3)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor4,    0,      bingor,   bingor, driver_device,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 4)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor5,    0,      bingor,   bingor, driver_device,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star V3? (set 5)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor1,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>",          "Bingo Roll / Bell Star? (set 1)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor2,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>",          "Bingo Roll / Bell Star? (set 2)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor3,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>",          "Bingo Roll / Bell Star? (set 3)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor4,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>",          "Bingo Roll / Bell Star? (set 4)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor5,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>",          "Bingo Roll / Bell Star V3? (set 5)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2001, vip2000,    0,      vip2000,  bingor, driver_device,   0,       ROT0,  "Paloma-Elektronik?", "Unknown 'VIP 2000' game",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, vip2000,    0,      vip2000,  bingor, bingor_state,   0,       ROT0,  "Paloma-Elektronik?", "Unknown 'VIP 2000' game",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

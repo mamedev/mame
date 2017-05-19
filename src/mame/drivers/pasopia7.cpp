@@ -114,6 +114,7 @@ private:
 	int m_addr_latch;
 	void pasopia_nmi_trap();
 	uint8_t m_mux_data;
+	emu_timer *m_pio_timer;
 	virtual void machine_reset() override;
 	void fdc_irq(bool state);
 	void draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
@@ -907,7 +908,7 @@ static SLOT_INTERFACE_START( pasopia7_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( p7_base, pasopia7_state )
+static MACHINE_CONFIG_START( p7_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pasopia7_mem)
@@ -1048,17 +1049,19 @@ ROM_END
 DRIVER_INIT_MEMBER(pasopia7_state,p7_raster)
 {
 	m_screen_type = 1;
-	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(pasopia7_state::pio_timer),this));
+	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
+	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
 DRIVER_INIT_MEMBER(pasopia7_state,p7_lcd)
 {
 	m_screen_type = 0;
-	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(pasopia7_state::pio_timer),this));
+	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
+	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
 
 /* Driver */
 
 COMP( 1983, pasopia7,    0,        0,       p7_raster,     pasopia7, pasopia7_state,   p7_raster,  "Toshiba", "Pasopia 7 (Raster)", MACHINE_NOT_WORKING )
-COMP( 1983, pasopia7lcd, pasopia7, 0,       p7_lcd,        pasopia7, pasopia7_state,   p7_lcd,     "Toshiba", "Pasopia 7 (LCD)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, pasopia7lcd, pasopia7, 0,       p7_lcd,        pasopia7, pasopia7_state,   p7_lcd,     "Toshiba", "Pasopia 7 (LCD)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

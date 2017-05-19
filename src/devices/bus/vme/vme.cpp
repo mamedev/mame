@@ -76,17 +76,15 @@
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
 
-#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+//#define VERBOSE (LOG_SETUP | LOG_GENERAL)
 
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+#define LOG_OUTPUT_FUNC printf // logerror is not available here
 
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
+#include "logmacro.h"
 
-#define logerror printf // logerror is not available here
+#define LOG(...)      LOGMASKED(LOG_GENERAL, __VA_ARGS__)
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -98,27 +96,22 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_SLOT = device_creator<vme_slot_device>;
+DEFINE_DEVICE_TYPE(VME_SLOT, vme_slot_device, "vme_slot", "VME slot")
 
 //-------------------------------------------------
 //  vme_slot_device - constructor
 //-------------------------------------------------
-vme_slot_device::vme_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, VME_SLOT, "VME_SLOT", tag, owner, clock, "vme_slot", __FILE__)
-		,device_slot_interface(mconfig, *this)
-		,m_vme_tag(nullptr)
-		,m_vme_slottag(nullptr)
-		,m_vme_j1_callback(*this)
+vme_slot_device::vme_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vme_slot_device(mconfig, VME_SLOT, tag, owner, clock)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
 }
 
-vme_slot_device::vme_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this)
-		,m_vme_tag(nullptr)
-		,m_vme_slottag(nullptr)
-		,m_vme_j1_callback(*this)
+vme_slot_device::vme_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_slot_interface(mconfig, *this)
+	, m_vme_tag(nullptr)
+	, m_vme_slottag(nullptr)
+	, m_vme_j1_callback(*this)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
@@ -210,7 +203,7 @@ SLOT_INTERFACE_END
 // VME device P1
 //
 
-const device_type VME = device_creator<vme_device>;
+DEFINE_DEVICE_TYPE(VME, vme_device, "vme", "VME bus")
 
 // static_set_cputag - used to be able to lookup the CPU owning this VME bus
 void vme_device::static_set_cputag(device_t &device, const char *tag)
@@ -230,18 +223,13 @@ void vme_device::static_use_owner_spaces(device_t &device)
 	vme.m_allocspaces = false;
 }
 
-vme_device::vme_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VME, "VME", tag, owner, clock, "vme", __FILE__)
-	, device_memory_interface(mconfig, *this)
-	, m_a32_config("VME A32", ENDIANNESS_BIG, 32, 32, 0, nullptr)
-	, m_allocspaces(true)
-	, m_cputag("maincpu")
+vme_device::vme_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vme_device(mconfig, VME, tag, owner, clock)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
 }
 
-vme_device::vme_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+vme_device::vme_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_a32_config("VME A32", ENDIANNESS_BIG, 32, 32, 0, nullptr)
 	, m_allocspaces(true)

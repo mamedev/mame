@@ -1,18 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#pragma once
+#ifndef MAME_MACHINE_MPU401_H
+#define MAME_MACHINE_MPU401_H
 
-#ifndef __MPU401_H__
-#define __MPU401_H__
+#pragma once
 
 #include "cpu/m6800/m6800.h"
 
-#define MCFG_MPU401_ADD(_tag, _irqf ) \
-	MCFG_DEVICE_ADD(_tag, MPU401, 0) \
-	MCFG_IRQ_FUNC(_irqf)
+#define MCFG_MPU401_ADD(tag, irqf) \
+		MCFG_DEVICE_ADD((tag), MPU401, 0) \
+		MCFG_IRQ_FUNC(irqf)
 
-#define MCFG_IRQ_FUNC(_irqf) \
-	devcb = &downcast<mpu401_device *>(device)->set_irqf(DEVCB_##_irqf);
+#define MCFG_IRQ_FUNC(irqf) \
+		devcb = &downcast<mpu401_device *>(device)->set_irqf(DEVCB_##irqf);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -29,12 +29,10 @@ public:
 
 	required_device<m6801_cpu_device> m_ourcpu;
 
-	template<class _write> devcb_base &set_irqf(_write wr)
+	template <class Write> devcb_base &set_irqf(Write &&wr)
 	{
-		return write_irq.set_callback(wr);
+		return write_irq.set_callback(std::forward<Write>(wr));
 	}
-
-	devcb_write_line write_irq;
 
 	DECLARE_READ8_MEMBER(regs_mode2_r);
 	DECLARE_WRITE8_MEMBER(regs_mode2_w);
@@ -58,6 +56,8 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	devcb_write_line write_irq;
+
 	uint8_t m_port2;
 	uint8_t m_command;
 	uint8_t m_mpudata;
@@ -66,6 +66,6 @@ private:
 };
 
 // device type definition
-extern const device_type MPU401;
+DECLARE_DEVICE_TYPE(MPU401, mpu401_device)
 
-#endif  /* __MPU401_H__ */
+#endif // MAME_MACHINE_MPU401_H

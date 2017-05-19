@@ -98,7 +98,7 @@ void m6805evs_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( m6805evs, m6805evs_state )
+static MACHINE_CONFIG_START( m6805evs )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6805, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(m6805evs_mem)
@@ -116,5 +116,5 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS         INIT    COMPANY      FULLNAME */
-COMP( 1990, m6805evs, 0,        0,      m6805evs, m6805evs, driver_device, 0,    "Motorola",  "M68HC05EVS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY      FULLNAME      FLAGS
+COMP( 1990, m6805evs, 0,        0,      m6805evs, m6805evs, m6805evs_state, 0,    "Motorola",  "M68HC05EVS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

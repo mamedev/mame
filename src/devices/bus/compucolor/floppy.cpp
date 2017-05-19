@@ -15,8 +15,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMPUCOLOR_FLOPPY_PORT = device_creator<compucolor_floppy_port_device>;
-const device_type COMPUCOLOR_FLOPPY = device_creator<compucolor_floppy_device>;
+DEFINE_DEVICE_TYPE(COMPUCOLOR_FLOPPY_PORT, compucolor_floppy_port_device, "compclr_flp_port", "Compucolor Floppy Port")
+DEFINE_DEVICE_TYPE(COMPUCOLOR_FLOPPY,      compucolor_floppy_device,      "compclr_flp",      "Compucolor floppy")
 
 
 //-------------------------------------------------
@@ -86,7 +86,7 @@ device_compucolor_floppy_port_interface::device_compucolor_floppy_port_interface
 //-------------------------------------------------
 
 compucolor_floppy_port_device::compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: rs232_port_device(mconfig, COMPUCOLOR_FLOPPY_PORT, "Compucolor Floppy Port", tag, owner, clock, "compclr_flp_port", __FILE__), m_dev(nullptr)
+	: rs232_port_device(mconfig, COMPUCOLOR_FLOPPY_PORT, tag, owner, clock), m_dev(nullptr)
 {
 }
 
@@ -96,13 +96,13 @@ compucolor_floppy_port_device::compucolor_floppy_port_device(const machine_confi
 //-------------------------------------------------
 
 compucolor_floppy_device::compucolor_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, COMPUCOLOR_FLOPPY, "Compucolor floppy", tag, owner, clock, "compclr_flp", __FILE__),
-		device_compucolor_floppy_port_interface(mconfig, *this),
-		m_floppy(*this, "floppy:525sssd"),
-		m_rw(1),
-		m_stp(0),
-		m_sel(1),
-		m_period(attotime::from_hz(9600*8))
+	: device_t(mconfig, COMPUCOLOR_FLOPPY, tag, owner, clock)
+	, device_compucolor_floppy_port_interface(mconfig, *this)
+	, m_floppy(*this, "floppy:525sssd")
+	, m_rw(1)
+	, m_stp(0)
+	, m_sel(1)
+	, m_period(attotime::from_hz(9600*8))
 {
 	m_owner = dynamic_cast<compucolor_floppy_port_device *>(this->owner());
 }

@@ -17,7 +17,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_MCD = device_creator<mcd_isa_device>;
+DEFINE_DEVICE_TYPE(ISA16_MCD, mcd_isa_device, "mcd_isa", "Mitsumi ISA CD-ROM Adapter")
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -37,8 +37,8 @@ ioport_constructor mcd_isa_device::device_input_ports() const
 //-------------------------------------------------
 
 mcd_isa_device::mcd_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		cdrom_image_device(mconfig, ISA16_MCD, "Mitsumi ISA CDROM Adapter", tag, owner, clock, "mcd_isa", __FILE__),
-		device_isa16_card_interface( mconfig, *this )
+	cdrom_image_device(mconfig, ISA16_MCD, tag, owner, clock),
+	device_isa16_card_interface( mconfig, *this )
 {
 }
 

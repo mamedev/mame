@@ -492,7 +492,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( fireball_state::int_0 )
 *************************/
 
 
-static MACHINE_CONFIG_START( fireball, fireball_state )
+static MACHINE_CONFIG_START( fireball )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8031, CPU_CLK) //
 	MCFG_CPU_PROGRAM_MAP(fireball_map)
@@ -526,5 +526,5 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
-/*    YEAR  NAME      PARENT     MACHINE   INPUT     STATE          INIT    ROT     COMPANY     FULLNAME    FLAGS*/
-GAME( 1989, fireball, 0,         fireball, fireball, driver_device, 0,      ROT0,   "Valco",    "Fireball", MACHINE_MECHANICAL ) //1989 by rom name
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY  FULLNAME    FLAGS
+GAME( 1989, fireball, 0,      fireball, fireball, fireball_state, 0,    ROT0, "Valco", "Fireball", MACHINE_MECHANICAL ) //1989 by rom name

@@ -8,11 +8,11 @@
 
 ***************************************************************************/
 
-#include "namcoic.h"
-#include "cpu/m6502/m3745x.h"
-#include "video/c45.h"
-#include "machine/namco_c148.h"
 #include "machine/namco_c139.h"
+#include "machine/namco_c148.h"
+#include "video/c45.h"
+
+#include "cpu/m6502/m3745x.h"
 #include "screen.h"
 
 /* CPU reference numbers */

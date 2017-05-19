@@ -5,8 +5,8 @@
 
 */
 
-#ifndef _ATARIFDC_H
-#define _ATARIFDC_H
+#ifndef MAME_MACHINE_ATARIFDC_H
+#define MAME_MACHINE_ATARIFDC_H
 
 #include "imagedev/flopdrv.h"
 
@@ -64,6 +64,6 @@ private:
 	atari_drive m_drv[4];
 };
 
-extern const device_type ATARI_FDC;
+DECLARE_DEVICE_TYPE(ATARI_FDC, atari_fdc_device)
 
-#endif /* _ATARIFDC_H */
+#endif // MAME_MACHINE_ATARIFDC_H

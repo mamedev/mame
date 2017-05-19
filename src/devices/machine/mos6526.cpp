@@ -112,10 +112,10 @@ enum
 //  DEVICE TYPE DEFINITIONS
 //**************************************************************************
 
-const device_type MOS6526 = device_creator<mos6526_device>;
-const device_type MOS6526A = device_creator<mos6526a_device>;
-const device_type MOS8520 = device_creator<mos8520_device>;
-const device_type MOS5710 = device_creator<mos5710_device>;
+DEFINE_DEVICE_TYPE(MOS6526,  mos6526_device,  "mos6526",  "MOS 6526 CIA")
+DEFINE_DEVICE_TYPE(MOS6526A, mos6526a_device, "mos6526a", "MOS 6526A CIA")
+DEFINE_DEVICE_TYPE(MOS8520,  mos8520_device,  "mos8520",  "MOS 8520 CIA")
+DEFINE_DEVICE_TYPE(MOS5710,  mos5710_device,  "mos5710",  "MOS 5710 CIA")
 
 
 
@@ -587,8 +587,8 @@ inline void mos6526_device::synchronize()
 //  mos6526_device - constructor
 //-------------------------------------------------
 
-mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_variant(variant),
@@ -605,29 +605,17 @@ mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, 
 }
 
 mos6526_device::mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MOS6526, "MOS6526", tag, owner, clock, "mos6526", __FILE__),
-		device_execute_interface(mconfig, *this),
-		m_icount(0),
-		m_variant(TYPE_6526),
-		m_tod_clock(0),
-		m_write_irq(*this),
-		m_write_pc(*this),
-		m_write_cnt(*this),
-		m_write_sp(*this),
-		m_read_pa(*this),
-		m_write_pa(*this),
-		m_read_pb(*this),
-		m_write_pb(*this)
+	: mos6526_device(mconfig, MOS6526, tag, owner, clock, TYPE_6526)
 { }
 
 mos6526a_device::mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6526_device(mconfig, MOS6526A, "MOS6526A", tag, owner, clock, TYPE_6526A, "mos6526a", __FILE__) { }
+	: mos6526_device(mconfig, MOS6526A, tag, owner, clock, TYPE_6526A) { }
 
 mos8520_device::mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6526_device(mconfig, MOS8520, "MOS8520", tag, owner, clock, TYPE_8520, "mos8520", __FILE__) { }
+	: mos6526_device(mconfig, MOS8520, tag, owner, clock, TYPE_8520) { }
 
 mos5710_device::mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6526_device(mconfig, MOS5710, "MOS5710", tag, owner, clock, TYPE_5710, "mos5710", __FILE__) { }
+	: mos6526_device(mconfig, MOS5710, tag, owner, clock, TYPE_5710) { }
 
 
 //-------------------------------------------------

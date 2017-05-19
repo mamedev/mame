@@ -206,7 +206,7 @@ void konmedal_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( konmedal, konmedal_state )
+static MACHINE_CONFIG_START( konmedal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
@@ -261,4 +261,4 @@ ROM_START( tsukande )
 	ROM_LOAD( "441a12.10e",   0x080000, 0x080000, CRC(dc2dd5bc) SHA1(28ef6c96c360d706a4296a686f3f2a54fce61bfb) )
 ROM_END
 
-GAME( 1995, tsukande, 0, konmedal, konmedal,  driver_device, 0, 0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
+GAME( 1995, tsukande, 0, konmedal, konmedal,  konmedal_state, 0, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)

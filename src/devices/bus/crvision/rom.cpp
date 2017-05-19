@@ -17,54 +17,53 @@
 //  crvision_rom_device - constructor
 //-------------------------------------------------
 
-const device_type CRVISION_ROM_4K = device_creator<crvision_rom_device>;
-const device_type CRVISION_ROM_6K = device_creator<crvision_rom6k_device>;
-const device_type CRVISION_ROM_8K = device_creator<crvision_rom8k_device>;
-const device_type CRVISION_ROM_10K = device_creator<crvision_rom10k_device>;
-const device_type CRVISION_ROM_12K = device_creator<crvision_rom12k_device>;
-const device_type CRVISION_ROM_16K = device_creator<crvision_rom16k_device>;
-const device_type CRVISION_ROM_18K = device_creator<crvision_rom18k_device>;
+DEFINE_DEVICE_TYPE(CRVISION_ROM_4K,  crvision_rom_device,    "crvision_4k",  "CreatiVision 4K Carts")
+DEFINE_DEVICE_TYPE(CRVISION_ROM_6K,  crvision_rom6k_device,  "crvision_6k",  "CreatiVision 6K Carts")
+DEFINE_DEVICE_TYPE(CRVISION_ROM_8K,  crvision_rom8k_device,  "crvision_8k",  "CreatiVision 8K Carts")
+DEFINE_DEVICE_TYPE(CRVISION_ROM_10K, crvision_rom10k_device, "crvision_10k", "CreatiVision 10K Carts")
+DEFINE_DEVICE_TYPE(CRVISION_ROM_12K, crvision_rom12k_device, "crvision_12k", "CreatiVision 12K Carts")
+DEFINE_DEVICE_TYPE(CRVISION_ROM_16K, crvision_rom16k_device, "crvision_16k", "CreatiVision 16K Carts")
+DEFINE_DEVICE_TYPE(CRVISION_ROM_18K, crvision_rom18k_device, "crvision_18k", "CreatiVision 18K Carts")
 
 
-crvision_rom_device::crvision_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_crvision_cart_interface(mconfig, *this)
+crvision_rom_device::crvision_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_crvision_cart_interface(mconfig, *this)
 {
 }
 
 crvision_rom_device::crvision_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, CRVISION_ROM_4K, "CreatiVision 4K Carts", tag, owner, clock, "crvision_4k", __FILE__),
-						device_crvision_cart_interface(mconfig, *this)
+	: crvision_rom_device(mconfig, CRVISION_ROM_4K, tag, owner, clock)
 {
 }
 
 crvision_rom6k_device::crvision_rom6k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: crvision_rom_device(mconfig, CRVISION_ROM_6K, "CreatiVision 6K Carts", tag, owner, clock, "crvision_6k", __FILE__)
+	: crvision_rom_device(mconfig, CRVISION_ROM_6K, tag, owner, clock)
 {
 }
 
 crvision_rom8k_device::crvision_rom8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: crvision_rom_device(mconfig, CRVISION_ROM_8K, "CreatiVision 8K Carts", tag, owner, clock, "crvision_8k", __FILE__)
+	: crvision_rom_device(mconfig, CRVISION_ROM_8K, tag, owner, clock)
 {
 }
 
 crvision_rom10k_device::crvision_rom10k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: crvision_rom_device(mconfig, CRVISION_ROM_10K, "CreatiVision 10K Carts", tag, owner, clock, "crvision_10k", __FILE__)
+	: crvision_rom_device(mconfig, CRVISION_ROM_10K, tag, owner, clock)
 {
 }
 
 crvision_rom12k_device::crvision_rom12k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: crvision_rom_device(mconfig, CRVISION_ROM_12K, "CreatiVision 12K Carts", tag, owner, clock, "crvision_12k", __FILE__)
+	: crvision_rom_device(mconfig, CRVISION_ROM_12K, tag, owner, clock)
 {
 }
 
 crvision_rom16k_device::crvision_rom16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: crvision_rom_device(mconfig, CRVISION_ROM_16K, "CreatiVision 16K Carts", tag, owner, clock, "crvision_16k", __FILE__)
+	: crvision_rom_device(mconfig, CRVISION_ROM_16K, tag, owner, clock)
 {
 }
 
 crvision_rom18k_device::crvision_rom18k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: crvision_rom_device(mconfig, CRVISION_ROM_18K, "CreatiVision 18K Carts", tag, owner, clock, "crvision_18k", __FILE__)
+	: crvision_rom_device(mconfig, CRVISION_ROM_18K, tag, owner, clock)
 {
 }
 

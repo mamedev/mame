@@ -185,10 +185,20 @@
 #include "includes/slapstic.h"
 
 
-const device_type SLAPSTIC = device_creator<atari_slapstic_device>;
+/*************************************
+ *
+ *  Debugging
+ *
+ *************************************/
+
+#define LOG_SLAPSTIC    (0)
+
+
+
+DEFINE_DEVICE_TYPE(SLAPSTIC, atari_slapstic_device, "slapstic", "Atari Slapstic")
 
 atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SLAPSTIC, "Atari Slapstic", tag, owner, clock, "slapstic", __FILE__),
+	: device_t(mconfig, SLAPSTIC, tag, owner, clock),
 	state(0),
 	current_bank(0),
 	access_68k(-1),

@@ -4,30 +4,30 @@
 #include "dooly.h"
 
 
-const device_type MSX_CART_DOOLY = device_creator<msx_cart_dooly>;
+DEFINE_DEVICE_TYPE(MSX_CART_DOOLY, msx_cart_dooly_device, "msx_cart_dooly", "MSX Cartridge - Dooly")
 
 
-msx_cart_dooly::msx_cart_dooly(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_DOOLY, "MSX Cartridge - Dooly", tag, owner, clock, "msx_cart_dooly", __FILE__)
+msx_cart_dooly_device::msx_cart_dooly_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSX_CART_DOOLY, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_prot(0)
 {
 }
 
 
-void msx_cart_dooly::device_start()
+void msx_cart_dooly_device::device_start()
 {
 	save_item(NAME(m_prot));
 }
 
 
-void msx_cart_dooly::device_reset()
+void msx_cart_dooly_device::device_reset()
 {
 	m_prot = 0;
 }
 
 
-void msx_cart_dooly::initialize_cartridge()
+void msx_cart_dooly_device::initialize_cartridge()
 {
 	if (get_rom_size() != 0x8000)
 	{
@@ -36,7 +36,7 @@ void msx_cart_dooly::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_dooly::read_cart)
+READ8_MEMBER(msx_cart_dooly_device::read_cart)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -54,14 +54,14 @@ READ8_MEMBER(msx_cart_dooly::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_dooly::write_cart)
+WRITE8_MEMBER(msx_cart_dooly_device::write_cart)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
 		m_prot = data & 0x07;
 		if (m_prot != 0 && m_prot != 4)
 		{
-			logerror("msx_cart_dooly: unhandled write %02x to %04x\n", data, offset);
+			logerror("msx_cart_dooly_device: unhandled write %02x to %04x\n", data, offset);
 		}
 	}
 }

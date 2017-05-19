@@ -889,7 +889,7 @@ GFXDECODE_END
 
 =================================================================*/
 
-static MACHINE_CONFIG_START( mcr68, mcr68_state )
+static MACHINE_CONFIG_START( mcr68 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 7723800)

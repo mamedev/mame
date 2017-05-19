@@ -15,7 +15,7 @@
 #include "machine/namco62.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 /***************************************************************************
@@ -42,17 +42,13 @@ ROM_START( namco_62xx )
 ROM_END
 
 
-const device_type NAMCO_62XX = device_creator<namco_62xx_device>;
+DEFINE_DEVICE_TYPE(NAMCO_62XX, namco_62xx_device, "namco62", "Namco 62xx")
 
 namco_62xx_device::namco_62xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_62XX, "Namco 62xx", tag, owner, clock, "namco62", __FILE__),
+	: device_t(mconfig, NAMCO_62XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
-	m_in_0(*this),
-	m_in_1(*this),
-	m_in_2(*this),
-	m_in_3(*this),
-	m_out_0(*this),
-	m_out_1(*this)
+	m_in{ { *this }, { *this }, { *this }, { *this } },
+	m_out{ { *this }, { *this } }
 {
 }
 
@@ -63,14 +59,12 @@ namco_62xx_device::namco_62xx_device(const machine_config &mconfig, const char *
 void namco_62xx_device::device_start()
 {
 	/* resolve our read callbacks */
-	m_in_0.resolve_safe(0);
-	m_in_1.resolve_safe(0);
-	m_in_2.resolve_safe(0);
-	m_in_3.resolve_safe(0);
+	for (devcb_read8 &cb : m_in)
+		cb.resolve_safe(0);
 
 	/* resolve our write callbacks */
-	m_out_0.resolve_safe();
-	m_out_1.resolve_safe();
+	for (devcb_write8 &cb : m_out)
+		cb.resolve_safe();
 }
 
 //-------------------------------------------------

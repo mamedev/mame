@@ -95,7 +95,7 @@ static const floppy_interface lisa_floppy_interface =
 ***************************************************************************/
 
 /* Lisa1 and Lisa 2 machine */
-static MACHINE_CONFIG_START( lisa, lisa_state )
+static MACHINE_CONFIG_START( lisa )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
 	MCFG_CPU_PROGRAM_MAP(lisa_map)
@@ -479,8 +479,8 @@ ROM_END
     Lisa drivers boot MacWorks, but do not boot the Lisa OS, which is why we set
     the MACHINE_NOT_WORKING flag...
 */
-/*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  INIT   COMPANY  FULLNAME */
-COMP( 1983, lisa,     0,    0,  lisa,     lisa, lisa_state,  lisa2,         "Apple Computer",  "Lisa", MACHINE_NOT_WORKING )
-COMP( 1984, lisa2,    0,    0,  lisa,     lisa, lisa_state,  lisa2,         "Apple Computer",  "Lisa2", MACHINE_NOT_WORKING )
-COMP( 1984, lisa210,  lisa2,    0,  lisa210,  lisa, lisa_state,  lisa210,   "Apple Computer",  "Lisa2/10", MACHINE_NOT_WORKING )
-COMP( 1985, macxl,    lisa2,    0,  macxl,    lisa, lisa_state,  mac_xl,    "Apple Computer",  "Macintosh XL", /*MACHINE_NOT_WORKING*/0 )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  STATE        INIT     COMPANY            FULLNAME */
+COMP( 1983, lisa,     0,       0,      lisa,     lisa,  lisa_state,  lisa2,   "Apple Computer",  "Lisa",         MACHINE_NOT_WORKING )
+COMP( 1984, lisa2,    0,       0,      lisa,     lisa,  lisa_state,  lisa2,   "Apple Computer",  "Lisa2",        MACHINE_NOT_WORKING )
+COMP( 1984, lisa210,  lisa2,   0,      lisa210,  lisa,  lisa_state,  lisa210, "Apple Computer",  "Lisa2/10",     MACHINE_NOT_WORKING )
+COMP( 1985, macxl,    lisa2,   0,      macxl,    lisa,  lisa_state,  mac_xl,  "Apple Computer",  "Macintosh XL", /*MACHINE_NOT_WORKING*/0 )

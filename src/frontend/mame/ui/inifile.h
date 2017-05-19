@@ -44,8 +44,8 @@ public:
 	// setters
 	void move_file(int d) { c_file += d; c_cat = 0; }
 	void move_cat(int d) { c_cat += d; }
-	void set_cat(int i) { c_cat = i; }
-	void set_file(int i) { c_file = i; }
+	void set_cat(uint16_t i) { c_cat = i; }
+	void set_file(uint16_t i) { c_file = i; }
 
 private:
 

@@ -18,7 +18,7 @@
 #include "includes/legionna.h"
 
 
-const device_type SEIBU_COP_BOOTLEG = device_creator<seibu_cop_bootleg_device>;
+DEFINE_DEVICE_TYPE(SEIBU_COP_BOOTLEG, seibu_cop_bootleg_device, "seibu_cop_boot", "Seibu COP (bootleg)")
 
 READ16_MEMBER(seibu_cop_bootleg_device::reg_lo_addr_r)
 {
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( seibucopbl_map, AS_0, 16, seibu_cop_bootleg_device )
 ADDRESS_MAP_END
 
 seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEIBU_COP_BOOTLEG, "Seibu COP (Bootleg)", tag, owner, clock, "seibu_cop_boot", __FILE__),
+	: device_t(mconfig, SEIBU_COP_BOOTLEG, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_space_config("regs", ENDIANNESS_LITTLE, 16, 9, 0, nullptr, *ADDRESS_MAP_NAME(seibucopbl_map))
 {

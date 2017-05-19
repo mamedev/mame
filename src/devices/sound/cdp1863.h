@@ -17,10 +17,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_SOUND_CDP1863_H
+#define MAME_SOUND_CDP1863_H
 
-#ifndef __CDP1863__
-#define __CDP1863__
+#pragma once
 
 
 
@@ -81,8 +81,6 @@ private:
 
 
 // device type definition
-extern const device_type CDP1863;
+DECLARE_DEVICE_TYPE(CDP1863, cdp1863_device)
 
-
-
-#endif
+#endif // MAME_SOUND_CDP1863_H

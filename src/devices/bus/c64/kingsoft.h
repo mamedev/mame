@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_KINGSOFT_H
+#define MAME_BUS_C64_KINGSOFT_H
 
-#ifndef __KINGSOFT__
-#define __KINGSOFT__
+#pragma once
 
 
 #include "exp.h"
@@ -42,7 +42,7 @@ protected:
 
 
 // device type definition
-extern const device_type C64_KINGSOFT;
+DECLARE_DEVICE_TYPE(C64_KINGSOFT, c64_kingsoft_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_KINGSOFT_H

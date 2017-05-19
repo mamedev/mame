@@ -263,7 +263,7 @@ void idsa_state::machine_reset()
 	m_irqcnt = 0;
 }
 
-static MACHINE_CONFIG_START( idsa, idsa_state )
+static MACHINE_CONFIG_START( idsa )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
@@ -308,5 +308,5 @@ ROM_START(bsktbllp)
 ROM_END
 
 
-GAME( 1985, v1,       0, idsa, idsa, driver_device, 0, ROT0, "IDSA", "V.1", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, bsktbllp, 0, idsa, idsa, driver_device, 0, ROT0, "IDSA", "Basket Ball", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, v1,       0, idsa, idsa, idsa_state, 0, ROT0, "IDSA", "V.1",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, bsktbllp, 0, idsa, idsa, idsa_state, 0, ROT0, "IDSA", "Basket Ball", MACHINE_IS_SKELETON_MECHANICAL )

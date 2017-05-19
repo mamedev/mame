@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ISBX_COMPIS_FDC_H
+#define MAME_BUS_ISBX_COMPIS_FDC_H
 
-#ifndef __COMPIS_FDC__
-#define __COMPIS_FDC__
+#pragma once
 
 #include "isbx.h"
 #include "formats/cpis_dsk.h"
@@ -58,7 +58,7 @@ private:
 
 
 // device type definition
-extern const device_type COMPIS_FDC;
+DECLARE_DEVICE_TYPE(COMPIS_FDC, compis_fdc_device)
 
 
-#endif
+#endif // MAME_BUS_ISBX_COMPIS_FDC_H

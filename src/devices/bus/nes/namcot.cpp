@@ -41,52 +41,52 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_NAMCOT3433 = device_creator<nes_namcot3433_device>;
-const device_type NES_NAMCOT3446 = device_creator<nes_namcot3446_device>;
-const device_type NES_NAMCOT3425 = device_creator<nes_namcot3425_device>;
-const device_type NES_NAMCOT175 = device_creator<nes_namcot175_device>;
-const device_type NES_NAMCOT340 = device_creator<nes_namcot340_device>;
-const device_type NES_NAMCOT163 = device_creator<nes_namcot163_device>;
+DEFINE_DEVICE_TYPE(NES_NAMCOT3433, nes_namcot3433_device, "nes_namcot3433", "NES Cart Namcot 3433 & 3443 / DxROM PCB")
+DEFINE_DEVICE_TYPE(NES_NAMCOT3446, nes_namcot3446_device, "nes_namcot3446", "NES Cart Namcot 3446 PCB")
+DEFINE_DEVICE_TYPE(NES_NAMCOT3425, nes_namcot3425_device, "nes_namcot3425", "NES Cart Namcot 3425 PCB")
+DEFINE_DEVICE_TYPE(NES_NAMCOT340,  nes_namcot340_device,  "nes_namcot340",  "NES Cart Namcot 340 PCB")
+DEFINE_DEVICE_TYPE(NES_NAMCOT175,  nes_namcot175_device,  "nes_namcot175",  "NES Cart Namcot 175 PCB")
+DEFINE_DEVICE_TYPE(NES_NAMCOT163,  nes_namcot163_device,  "nes_namcot163",  "NES Cart Namcot 163 PCB")
 
 
-nes_namcot3433_device::nes_namcot3433_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_latch(0)
-				{
+nes_namcot3433_device::nes_namcot3433_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0)
+{
 }
 
 nes_namcot3433_device::nes_namcot3433_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_NAMCOT3433, "NES Cart Namcot 3433 & 3443 / DxROM PCB", tag, owner, clock, "nes_namcot3433", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_NAMCOT3433, tag, owner, clock), m_latch(0)
+{
 }
 
 nes_namcot3446_device::nes_namcot3446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_NAMCOT3446, "NES Cart Namcot 3446 PCB", tag, owner, clock, "nes_namcot3446", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_NAMCOT3446, tag, owner, clock), m_latch(0)
+{
 }
 
 nes_namcot3425_device::nes_namcot3425_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_NAMCOT3425, "NES Cart Namcot 3425 PCB", tag, owner, clock, "nes_namcot3425", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_NAMCOT3425, tag, owner, clock), m_latch(0)
+{
 }
 
-nes_namcot340_device::nes_namcot340_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
-				{
+nes_namcot340_device::nes_namcot340_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+{
 }
 
 nes_namcot340_device::nes_namcot340_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_NAMCOT340, "NES Cart Namcot 340 PCB", tag, owner, clock, "nes_namcot340", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
-				{
+	: nes_namcot340_device(mconfig, NES_NAMCOT340, tag, owner, clock)
+{
 }
 
 nes_namcot175_device::nes_namcot175_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_namcot340_device(mconfig, NES_NAMCOT175, "NES Cart Namcot 175 PCB", tag, owner, clock, "nes_namcot175", __FILE__), m_wram_protect(0)
-				{
+	: nes_namcot340_device(mconfig, NES_NAMCOT175, tag, owner, clock), m_wram_protect(0)
+{
 }
 
 nes_namcot163_device::nes_namcot163_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_namcot340_device(mconfig, NES_NAMCOT163, "NES Cart Namcot 163 PCB", tag, owner, clock, "nes_namcot163", __FILE__), m_wram_protect(0), m_latch(0), m_chr_bank(0)
-				{
+	: nes_namcot340_device(mconfig, NES_NAMCOT163, tag, owner, clock), m_wram_protect(0), m_latch(0), m_chr_bank(0)
+{
 }
 
 

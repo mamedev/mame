@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_SH7604_WDT_H
+#define MAME_CPU_SH7604_WDT_H
 
-#ifndef __SH7604_WDTDEV_H__
-#define __SH7604_WDTDEV_H__
+#pragma once
 
 
 
@@ -49,14 +49,6 @@ private:
 
 
 // device type definition
-extern const device_type SH7604_WDT;
+DECLARE_DEVICE_TYPE(SH7604_WDT, sh7604_wdt_device)
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
-
-#endif
+#endif // MAME_CPU_SH7604_WDT_H

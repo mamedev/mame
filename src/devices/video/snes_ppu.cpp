@@ -189,7 +189,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_PPU = device_creator<snes_ppu_device>;
+DEFINE_DEVICE_TYPE(SNES_PPU, snes_ppu_device, "snes_ppu", "SNES PPU")
 
 
 //**************************************************************************
@@ -201,14 +201,14 @@ const device_type SNES_PPU = device_creator<snes_ppu_device>;
 //-------------------------------------------------
 
 snes_ppu_device::snes_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-				: device_t(mconfig, SNES_PPU, "SNES PPU", tag, owner, clock, "snes_ppu", __FILE__),
-					device_video_interface(mconfig, *this),
-					m_openbus_cb(*this),
-					m_options(*this, ":OPTIONS"),
-					m_debug1(*this, ":DEBUG1"),
-					m_debug2(*this, ":DEBUG2"),
-					m_debug3(*this, ":DEBUG3"),
-					m_debug4(*this, ":DEBUG4")
+	: device_t(mconfig, SNES_PPU, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_openbus_cb(*this)
+	, m_options(*this, ":OPTIONS")
+	, m_debug1(*this, ":DEBUG1")
+	, m_debug2(*this, ":DEBUG2")
+	, m_debug3(*this, ":DEBUG3")
+	, m_debug4(*this, ":DEBUG4")
 {
 }
 
@@ -419,7 +419,7 @@ void snes_ppu_device::device_reset()
 	{
 		elem.enable = 0;
 		elem.clip = 0;
-		memset(elem.buffer, 0, SNES_SCR_WIDTH);
+		memset(elem.buffer, 0, SNES_SCR_WIDTH * sizeof(uint16_t));
 		memset(elem.priority, 0, SNES_SCR_WIDTH);
 		memset(elem.layer, 0, SNES_SCR_WIDTH);
 		memset(elem.blend_exception, 0, SNES_SCR_WIDTH);

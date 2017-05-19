@@ -78,7 +78,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_SLOT = device_creator<a2bus_slot_device>;
+DEFINE_DEVICE_TYPE(A2BUS_SLOT, a2bus_slot_device, "a2bus_slot", "Apple II Slot")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -87,15 +87,16 @@ const device_type A2BUS_SLOT = device_creator<a2bus_slot_device>;
 //-------------------------------------------------
 //  a2bus_slot_device - constructor
 //-------------------------------------------------
-a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, A2BUS_SLOT, "Apple II Slot", tag, owner, clock, "a2bus_slot", __FILE__),
-		device_slot_interface(mconfig, *this), m_a2bus_tag(nullptr), m_a2bus_slottag(nullptr)
+a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a2bus_slot_device(mconfig, A2BUS_SLOT, tag, owner, clock)
 {
 }
 
-a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this), m_a2bus_tag(nullptr), m_a2bus_slottag(nullptr)
+a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_slot_interface(mconfig, *this)
+	, m_a2bus_tag(nullptr)
+	, m_a2bus_slottag(nullptr)
 {
 }
 
@@ -121,7 +122,7 @@ void a2bus_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS = device_creator<a2bus_device>;
+DEFINE_DEVICE_TYPE(A2BUS, a2bus_device, "a2bus", "Apple II Bus")
 
 void a2bus_device::static_set_cputag(device_t &device, const char *tag)
 {
@@ -137,19 +138,17 @@ void a2bus_device::static_set_cputag(device_t &device, const char *tag)
 //  a2bus_device - constructor
 //-------------------------------------------------
 
-a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, A2BUS, "Apple II Bus", tag, owner, clock, "a2bus", __FILE__), m_maincpu(nullptr), m_maincpu_space(nullptr),
-		m_out_irq_cb(*this),
-		m_out_nmi_cb(*this),
-		m_out_inh_cb(*this), m_cputag(nullptr), m_slot_irq_mask(0), m_slot_nmi_mask(0)
+a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a2bus_device(mconfig, A2BUS, tag, owner, clock)
 {
 }
 
-a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr), m_maincpu_space(nullptr),
-		m_out_irq_cb(*this),
-		m_out_nmi_cb(*this),
-		m_out_inh_cb(*this), m_cputag(nullptr), m_slot_irq_mask(0), m_slot_nmi_mask(0)
+a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_maincpu(nullptr) , m_maincpu_space(nullptr)
+	, m_out_irq_cb(*this) , m_out_nmi_cb(*this) , m_out_inh_cb(*this)
+	, m_cputag(nullptr)
+	, m_slot_irq_mask(0), m_slot_nmi_mask(0)
 {
 }
 //-------------------------------------------------

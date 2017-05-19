@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Farfetch'd, R. Belmont
-#pragma once
+#ifndef MAME_CPU_I960_I960_H
+#define MAME_CPU_I960_I960_H
 
-#ifndef __I960_H__
-#define __I960_H__
+#pragma once
 
 
 enum
@@ -63,9 +63,6 @@ enum
 };
 
 
-enum { I960_RCACHE_SIZE = 4 };
-
-
 class i960_cpu_device :  public cpu_device
 {
 public:
@@ -79,6 +76,8 @@ public:
 	void i960_stall() { m_IP = m_PIP; }
 
 protected:
+	enum { I960_RCACHE_SIZE = 4 };
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -172,7 +171,6 @@ private:
 };
 
 
-extern const device_type I960;
+DECLARE_DEVICE_TYPE(I960, i960_cpu_device)
 
-
-#endif /* __I960_H__ */
+#endif // MAME_CPU_I960_I960_H

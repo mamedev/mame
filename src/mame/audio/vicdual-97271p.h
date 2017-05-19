@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ariane Fugmann
-#pragma once
-
 #ifndef MAME_AUDIO_VICDUAL_97271P_H
 #define MAME_AUDIO_VICDUAL_97271P_H
+
+#pragma once
 
 #include "sound/samples.h"
 
@@ -38,6 +38,6 @@ private:
 };
 
 // device type definition
-extern const device_type S97271P;
+DECLARE_DEVICE_TYPE(S97271P, s97271p_device)
 
-#endif  /* MAME_AUDIO_VICDUAL_97271P_H */
+#endif // MAME_AUDIO_VICDUAL_97271P_H

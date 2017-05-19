@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEOGEO_KIZ4P = device_creator<neogeo_kizuna4p_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_KIZ4P, neogeo_kizuna4p_device, "neogeo_kiz4p", "SNK Neo Geo Kizuna 4P Controller")
 
 
 static INPUT_PORTS_START( neogeo_kiz4p )
@@ -86,14 +86,14 @@ ioport_constructor neogeo_kizuna4p_device::device_input_ports() const
 //-------------------------------------------------
 
 neogeo_kizuna4p_device::neogeo_kizuna4p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, NEOGEO_KIZ4P, "SNK Neo Geo Kizuna 4P Controller", tag, owner, clock, "neogeo_kiz4p", __FILE__),
-					device_neogeo_ctrl_edge_interface(mconfig, *this),
-					m_joy1(*this, "JOY1"),
-					m_joy2(*this, "JOY2"),
-					m_joy3(*this, "JOY3"),
-					m_joy4(*this, "JOY4"),
-					m_ss1(*this, "START13"),
-					m_ss2(*this, "START24")
+	device_t(mconfig, NEOGEO_KIZ4P, tag, owner, clock),
+	device_neogeo_ctrl_edge_interface(mconfig, *this),
+	m_joy1(*this, "JOY1"),
+	m_joy2(*this, "JOY2"),
+	m_joy3(*this, "JOY3"),
+	m_joy4(*this, "JOY4"),
+	m_ss1(*this, "START13"),
+	m_ss2(*this, "START24")
 {
 }
 

@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_MACHINE_DECO222
+#define MAME_MACHINE_DECO222
+
+#pragma once
 
 #include "cpu/m6502/m6502.h"
 
@@ -42,5 +46,7 @@ protected:
 };
 
 
-extern const device_type DECO_222;
-extern const device_type DECO_C10707;
+DECLARE_DEVICE_TYPE(DECO_222, deco_222_device)
+DECLARE_DEVICE_TYPE(DECO_C10707, deco_c10707_device)
+
+#endif // MAME_MACHINE_DECO222

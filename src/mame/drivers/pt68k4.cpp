@@ -62,8 +62,16 @@ TODO: 68230 device
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
 
+#include "bus/isa/cga.h"
+#include "bus/isa/ega.h"
+#include "bus/isa/fdc.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/isa/lpt.h"
+#include "bus/isa/mda.h"
+#include "bus/isa/vga.h"
+#include "bus/isa/wdxt_gen.h"
+#include "bus/isa/xtide.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 
@@ -125,7 +133,7 @@ private:
 	required_device<mc68681_device> m_duart2;
 	required_device<isa8_device> m_isa;
 	required_device<speaker_sound_device> m_speaker;
-	optional_device<wd1772_t> m_wdfdc;
+	optional_device<wd1772_device> m_wdfdc;
 
 	void irq5_update();
 
@@ -248,7 +256,7 @@ static ADDRESS_MAP_START(pt68k2_mem, AS_PROGRAM, 16, pt68k4_state)
 	AM_RANGE(0xfe0040, 0xfe005f) AM_DEVREADWRITE8(DUART2_TAG, mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0xfe0080, 0xfe00bf) AM_READ8(pia_stub_r, 0x00ff)
 	AM_RANGE(0xfe00c0, 0xfe00ff) AM_WRITE8(fdc_select_w, 0x00ff)
-	AM_RANGE(0xfe0100, 0xfe013f) AM_DEVREADWRITE8(WDFDC_TAG, wd1772_t, read, write, 0x00ff)
+	AM_RANGE(0xfe0100, 0xfe013f) AM_DEVREADWRITE8(WDFDC_TAG, wd1772_device, read, write, 0x00ff)
 	AM_RANGE(0xfe01c0, 0xfe01c3) AM_READWRITE8(keyboard_r, keyboard_w, 0x00ff)
 	AM_RANGE(0xff0000, 0xff0fff) AM_READWRITE8(hiram_r, hiram_w, 0xff00)
 	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE8(TIMEKEEPER_TAG, timekeeper_device, read, write, 0x00ff)
@@ -386,7 +394,7 @@ SLOT_INTERFACE_START( pt68k4_isa8_cards )
 	SLOT_INTERFACE("xtide", ISA8_XTIDE) // Monk only
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pt68k2, pt68k4_state )
+static MACHINE_CONFIG_START( pt68k2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_16MHz/2)    // 68k2 came in 8, 10, and 12 MHz versions
 	MCFG_CPU_PROGRAM_MAP(pt68k2_mem)
@@ -426,7 +434,7 @@ static MACHINE_CONFIG_START( pt68k2, pt68k4_state )
 	MCFG_SOFTWARE_LIST_ADD("flop525_list", "pt68k2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pt68k4, pt68k4_state )
+static MACHINE_CONFIG_START( pt68k4 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(pt68k4_mem)
@@ -493,6 +501,6 @@ ROM_START( pt68k4 )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT     COMPANY             FULLNAME       FLAGS */
-COMP( 1988, pt68k2,  0,       0,     pt68k2,    pt68k4, driver_device, 0,  "Peripheral Technology", "PT68K2", MACHINE_SUPPORTS_SAVE )
-COMP( 1990, pt68k4,  0,       0,     pt68k4,    pt68k4, driver_device, 0,  "Peripheral Technology", "PT68K4", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY                  FULLNAME  FLAGS
+COMP( 1988, pt68k2, 0,      0,      pt68k2,  pt68k4, pt68k4_state, 0,    "Peripheral Technology", "PT68K2", MACHINE_SUPPORTS_SAVE )
+COMP( 1990, pt68k4, 0,      0,      pt68k4,  pt68k4, pt68k4_state, 0,    "Peripheral Technology", "PT68K4", MACHINE_SUPPORTS_SAVE )

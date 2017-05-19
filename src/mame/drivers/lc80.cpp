@@ -325,7 +325,7 @@ void lc80_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( lc80, lc80_state )
+static MACHINE_CONFIG_START( lc80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 900000) /* UD880D */
 	MCFG_CPU_PROGRAM_MAP(lc80_mem)
@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( lc80, lc80_state )
 	MCFG_RAM_EXTRA_OPTIONS("2K,3K,4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lc80_2, lc80_state )
+static MACHINE_CONFIG_START( lc80_2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 1800000) /* UD880D */
 	MCFG_CPU_PROGRAM_MAP(lc80_mem)
@@ -437,7 +437,7 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                 FULLNAME                FLAGS */
-COMP( 1984, lc80,   0,      0,      lc80,   lc80, driver_device,   0, "VEB Mikroelektronik", "Lerncomputer LC 80", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, lc80_2, lc80,   0,      lc80_2, lc80, driver_device,   0, "VEB Mikroelektronik", "Lerncomputer LC 80.2", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, sc80,   lc80,   0,      lc80_2, lc80, driver_device,   0, "VEB Mikroelektronik", "Schachcomputer SC-80", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY                FULLNAME                FLAGS
+COMP( 1984, lc80,   0,      0,      lc80,    lc80,  lc80_state, 0,    "VEB Mikroelektronik", "Lerncomputer LC 80",   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, lc80_2, lc80,   0,      lc80_2,  lc80,  lc80_state, 0,    "VEB Mikroelektronik", "Lerncomputer LC 80.2", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, sc80,   lc80,   0,      lc80_2,  lc80,  lc80_state, 0,    "VEB Mikroelektronik", "Schachcomputer SC-80", MACHINE_SUPPORTS_SAVE )

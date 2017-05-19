@@ -19,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_PIC = device_creator<a2bus_pic_device>;
+DEFINE_DEVICE_TYPE(A2BUS_PIC, a2bus_pic_device, "a2pic", "Apple Parallel Interface Card")
 
 #define PIC_ROM_REGION  "pic_rom"
 #define PIC_CENTRONICS_TAG "pic_ctx"
@@ -100,18 +100,12 @@ const tiny_rom_entry *a2bus_pic_device::device_rom_region() const
 //**************************************************************************
 
 a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, A2BUS_PIC, "Apple Parallel Interface Card", tag, owner, clock, "a2pic", __FILE__),
-		device_a2bus_card_interface(mconfig, *this),
-		m_dsw1(*this, "DSW1"),
-		m_ctx(*this, PIC_CENTRONICS_TAG),
-		m_ctx_data_in(*this, "ctx_data_in"),
-		m_ctx_data_out(*this, "ctx_data_out"), m_rom(nullptr),
-		m_started(false), m_ack(0), m_irqenable(false), m_autostrobe(false), m_timer(nullptr)
+		a2bus_pic_device(mconfig, A2BUS_PIC, tag, owner, clock)
 {
 }
 
-a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, type, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
 		m_ctx(*this, PIC_CENTRONICS_TAG),

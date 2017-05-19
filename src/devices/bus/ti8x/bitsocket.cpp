@@ -5,7 +5,7 @@
 #include "bitsocket.h"
 
 
-device_type const TI8X_BIT_SOCKET = device_creator<bus::ti8x::bit_socket_device>;
+DEFINE_DEVICE_TYPE_NS(TI8X_BIT_SOCKET, bus::ti8x, bit_socket_device, "ti8x_bitsock", "TI-8x Bit Socket")
 
 
 namespace bus { namespace ti8x {
@@ -24,7 +24,7 @@ bit_socket_device::bit_socket_device(
 		char const *tag,
 		device_t *owner,
 		uint32_t clock)
-	: device_t(mconfig, TI8X_BIT_SOCKET, "TI-8x Bit Socket", tag, owner, clock, "ti8xbitsock", __FILE__)
+	: device_t(mconfig, TI8X_BIT_SOCKET, tag, owner, clock)
 	, device_ti8x_link_port_interface(mconfig, *this)
 	, m_stream(*this, "stream")
 	, m_poll_timer(nullptr)

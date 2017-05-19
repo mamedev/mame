@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_VIDEO_HD61830_H
+#define MAME_VIDEO_HD61830_H
 
-#ifndef __HD61830__
-#define __HD61830__
+#pragma once
 
 
 
@@ -37,7 +37,7 @@ public:
 	// construction/destruction
 	hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_rd_rd_callback(device_t &device, _Object object) { return downcast<hd61830_device &>(device).m_read_rd.set_callback(object); }
+	template <class Object> static devcb_base &set_rd_rd_callback(device_t &device, Object &&cb) { return downcast<hd61830_device &>(device).m_read_rd.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( control_w );
@@ -55,10 +55,10 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 
-	inline uint8_t readbyte(offs_t address);
-	inline void writebyte(offs_t address, uint8_t data);
+	uint8_t readbyte(offs_t address) { return space().read_byte(address); }
+	void writebyte(offs_t address, uint8_t data) { space().write_byte(address, data); }
 
 private:
 	enum
@@ -116,9 +116,7 @@ private:
 
 
 // device type definition
-extern const device_type HD61830;
+DECLARE_DEVICE_TYPE(HD61830, hd61830_device)
 extern const device_type HD61830B;
 
-
-
-#endif
+#endif // MAME_VIDEO_HD61830_H

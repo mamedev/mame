@@ -90,7 +90,7 @@ public:
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(v6809_address_w);
 	DECLARE_WRITE8_MEMBER(v6809_register_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_MACHINE_RESET(v6809);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -105,7 +105,7 @@ private:
 	required_device<pia6821_device> m_pia0;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
-	required_device<mb8876_t> m_fdc;
+	required_device<mb8876_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<acia6850_device> m_acia0;
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START(v6809_mem, AS_PROGRAM, 8, v6809_state)
 	AM_RANGE(0xf501, 0xf501) AM_MIRROR(0x36) AM_DEVREADWRITE("acia0", acia6850_device, data_r, data_w)
 	AM_RANGE(0xf508, 0xf508) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w) // printer
 	AM_RANGE(0xf509, 0xf509) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
-	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x3c) AM_DEVREADWRITE("fdc", mb8876_t, read, write)
+	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x3c) AM_DEVREADWRITE("fdc", mb8876_device, read, write)
 	AM_RANGE(0xf640, 0xf64f) AM_MIRROR(0x30) AM_DEVREADWRITE("rtc", mm58274c_device, read, write)
 	AM_RANGE(0xf680, 0xf683) AM_MIRROR(0x3c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0xf6c0, 0xf6c7) AM_MIRROR(0x08) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
@@ -231,7 +231,7 @@ WRITE8_MEMBER( v6809_state::v6809_register_w )
 
 // **** Keyboard ****
 
-WRITE8_MEMBER( v6809_state::kbd_put )
+void v6809_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 	m_pia0->cb1_w(0);
@@ -293,7 +293,7 @@ SLOT_INTERFACE_END
 
 // *** Machine ****
 
-static MACHINE_CONFIG_START( v6809, v6809_state )
+static MACHINE_CONFIG_START( v6809 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(v6809_mem)
@@ -323,7 +323,7 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_MC6845_ADDR_CHANGED_CB(v6809_state, crtc_update_addr)
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(v6809_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(v6809_state, kbd_put))
 
 // port A = drive select and 2 control lines ; port B = keyboard
 // CB2 connects to the interrupt pin of the RTC (the rtc code doesn't support it)
@@ -376,5 +376,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT     COMPANY      FULLNAME       FLAGS */
-COMP( 1982, v6809,  0,      0,       v6809,     v6809, driver_device,   0,     "Microkit", "Vegas 6809", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS          INIT   COMPANY     FULLNAME      FLAGS
+COMP( 1982, v6809,  0,      0,       v6809,     v6809, v6809_state,   0,     "Microkit", "Vegas 6809", MACHINE_NOT_WORKING )

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VCS_WHEEL = device_creator<vcs_wheel_device>;
+DEFINE_DEVICE_TYPE(VCS_WHEEL, vcs_wheel_device, "vcs_wheel", "Atari / CBM Driving Wheel")
 
 
 static INPUT_PORTS_START( vcs_wheel )
@@ -48,7 +48,7 @@ ioport_constructor vcs_wheel_device::device_input_ports() const
 //-------------------------------------------------
 
 vcs_wheel_device::vcs_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VCS_WHEEL, "Atari / CBM Driving Wheel", tag, owner, clock, "vcs_wheel", __FILE__),
+	device_t(mconfig, VCS_WHEEL, tag, owner, clock),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),
 	m_wheel(*this, "WHEEL")

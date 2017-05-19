@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SYSTEM3 = device_creator<c64_system3_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_SYSTEM3, c64_system3_cartridge_device, "c64_system3", "C64 System 3 cartridge")
 
 
 
@@ -28,7 +28,7 @@ const device_type C64_SYSTEM3 = device_creator<c64_system3_cartridge_device>;
 //-------------------------------------------------
 
 c64_system3_cartridge_device::c64_system3_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_SYSTEM3, "C64 System 3 cartridge", tag, owner, clock, "c64_system3", __FILE__),
+	device_t(mconfig, C64_SYSTEM3, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_bank(0)
 {

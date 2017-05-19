@@ -72,6 +72,8 @@
 #include "sound/spu.h"
 #include "debugger.h"
 
+#include "psxdefs.h"
+
 #define LOG_BIOSCALL ( 0 )
 
 #define EXC_INT ( 0 )
@@ -165,12 +167,12 @@ static const char *const delayn[] =
 };
 
 // device type definition
-const device_type CXD8530AQ = device_creator<cxd8530aq_device>;
-const device_type CXD8530BQ = device_creator<cxd8530bq_device>;
-const device_type CXD8530CQ = device_creator<cxd8530cq_device>;
-const device_type CXD8661R = device_creator<cxd8661r_device>;
-const device_type CXD8606BQ = device_creator<cxd8606bq_device>;
-const device_type CXD8606CQ = device_creator<cxd8606cq_device>;
+DEFINE_DEVICE_TYPE(CXD8530AQ, cxd8530aq_device, "cxd8530aq", "CXD8530AQ")
+DEFINE_DEVICE_TYPE(CXD8530BQ, cxd8530bq_device, "cxd8530bq", "CXD8530BQ")
+DEFINE_DEVICE_TYPE(CXD8530CQ, cxd8530cq_device, "cxd8530cq", "CXD8530CQ")
+DEFINE_DEVICE_TYPE(CXD8661R,  cxd8661r_device,  "cxd8661r",  "CXD8661R")
+DEFINE_DEVICE_TYPE(CXD8606BQ, cxd8606bq_device, "cxd8606bq", "CXD8606BQ")
+DEFINE_DEVICE_TYPE(CXD8606CQ, cxd8606cq_device, "cxd8606cq", "CXD8606CQ")
 
 static const uint32_t mtc0_writemask[]=
 {
@@ -1747,8 +1749,8 @@ ADDRESS_MAP_END
 //  psxcpu_device - constructor
 //-------------------------------------------------
 
-psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source ) :
-	cpu_device( mconfig, type, name, tag, owner, clock, shortname, source ),
+psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock ) :
+	cpu_device( mconfig, type, tag, owner, clock ),
 	m_program_config( "program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME( psxcpu_internal_map ) ),
 	m_gpu_read_handler( *this ),
 	m_gpu_write_handler( *this ),
@@ -1762,32 +1764,32 @@ psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, c
 }
 
 cxd8530aq_device::cxd8530aq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: psxcpu_device( mconfig, CXD8530AQ, "CXD8530AQ", tag, owner, clock, "cxd8530aq", __FILE__ )
+	: psxcpu_device( mconfig, CXD8530AQ, tag, owner, clock)
 {
 }
 
 cxd8530bq_device::cxd8530bq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: psxcpu_device( mconfig, CXD8530BQ, "CXD8530BQ", tag, owner, clock, "cxd8530bq", __FILE__ )
+	: psxcpu_device( mconfig, CXD8530BQ, tag, owner, clock)
 {
 }
 
 cxd8530cq_device::cxd8530cq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: psxcpu_device( mconfig, CXD8530CQ, "CXD8530CQ", tag, owner, clock, "cxd8530cq", __FILE__ )
+	: psxcpu_device( mconfig, CXD8530CQ, tag, owner, clock)
 {
 }
 
 cxd8661r_device::cxd8661r_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: psxcpu_device( mconfig, CXD8661R, "CXD8661R", tag, owner, clock, "cxd8661r", __FILE__ )
+	: psxcpu_device( mconfig, CXD8661R, tag, owner, clock)
 {
 }
 
 cxd8606bq_device::cxd8606bq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: psxcpu_device( mconfig, CXD8606BQ, "CXD8606BQ", tag, owner, clock, "cxd8606bq", __FILE__ )
+	: psxcpu_device( mconfig, CXD8606BQ, tag, owner, clock)
 {
 }
 
 cxd8606cq_device::cxd8606cq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: psxcpu_device( mconfig, CXD8606CQ, "CXD8606CQ", tag, owner, clock, "cxd8606cq", __FILE__ )
+	: psxcpu_device( mconfig, CXD8606CQ, tag, owner, clock)
 {
 }
 
@@ -3391,8 +3393,8 @@ static MACHINE_CONFIG_FRAGMENT( psx )
 	MCFG_PSX_DMA_IRQ_HANDLER( DEVWRITELINE("irq", psxirq_device, intin3 ) )
 
 	MCFG_DEVICE_ADD( "mdec", PSX_MDEC, 0 )
-	MCFG_PSX_DMA_CHANNEL_WRITE( DEVICE_SELF, 0, psx_dma_write_delegate(&psxmdec_device::dma_write, (psxmdec_device *) device ) )
-	MCFG_PSX_DMA_CHANNEL_READ( DEVICE_SELF, 1, psx_dma_read_delegate(&psxmdec_device::dma_read, (psxmdec_device *) device ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( DEVICE_SELF, 0, psxdma_device::write_delegate(&psxmdec_device::dma_write, (psxmdec_device *) device ) )
+	MCFG_PSX_DMA_CHANNEL_READ( DEVICE_SELF, 1, psxdma_device::read_delegate(&psxmdec_device::dma_read, (psxmdec_device *) device ) )
 
 	MCFG_DEVICE_ADD( "rcnt", PSX_RCNT, 0 )
 	MCFG_PSX_RCNT_IRQ0_HANDLER( DEVWRITELINE( "irq", psxirq_device, intin4 ) )

@@ -17,14 +17,14 @@
 #include "emu.h"
 #include "cdp1863.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
-
 
 #define CDP1863_DEFAULT_LATCH   0x35
 
@@ -35,7 +35,7 @@
 //**************************************************************************
 
 // devices
-const device_type CDP1863 = device_creator<cdp1863_device>;
+DEFINE_DEVICE_TYPE(CDP1863, cdp1863_device, "cdp1863", "RCA CDP1863")
 
 
 
@@ -48,11 +48,11 @@ const device_type CDP1863 = device_creator<cdp1863_device>;
 //-------------------------------------------------
 
 cdp1863_device::cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CDP1863, "CDP1863", tag, owner, clock, "cdp1863", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_clock1(clock),
-		m_clock2(0)
+	: device_t(mconfig, CDP1863, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_stream(nullptr)
+	, m_clock1(clock)
+	, m_clock2(0)
 {
 }
 

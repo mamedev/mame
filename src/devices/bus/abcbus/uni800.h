@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
+#ifndef MAME_BUS_ABCBUS_UNI800_H
+#define MAME_BUS_ABCBUS_UNI800_H
 
-#ifndef __ABC_UNI800__
-#define __ABC_UNI800__
+#pragma once
 
 #include "abcbus.h"
 
@@ -36,8 +36,6 @@ protected:
 
 
 // device type definition
-extern const device_type ABC_UNI800;
+DECLARE_DEVICE_TYPE(ABC_UNI800, abc_uni800_device)
 
-
-
-#endif
+#endif // MAME_BUS_ABCBUS_UNI800_H

@@ -165,7 +165,7 @@ static GFXDECODE_START( wms )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( wms, wms_state )
+static MACHINE_CONFIG_START( wms )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80188, MAIN_CLOCK )    // AMD N80C188-20, ( 40 MHz. internally divided by 2)
 	MCFG_CPU_PROGRAM_MAP(wms_map)

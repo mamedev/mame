@@ -7,11 +7,13 @@
 #include "emu.h"
 #include "powervr2.h"
 #include "includes/dc.h"
-#include "cpu/sh4/sh4.h"
-#include "rendutil.h"
-#include "video/rgbutil.h"
 
-const device_type POWERVR2 = device_creator<powervr2_device>;
+#include "cpu/sh4/sh4.h"
+#include "video/rgbutil.h"
+#include "rendutil.h"
+
+
+DEFINE_DEVICE_TYPE(POWERVR2, powervr2_device, "powervr2", "PowerVR 2")
 
 DEVICE_ADDRESS_MAP_START(ta_map, 32, powervr2_device)
 	AM_RANGE(0x0000, 0x0003) AM_READ(     id_r)
@@ -3607,7 +3609,7 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 }
 
 powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, POWERVR2, "PowerVR 2", tag, owner, clock, "powervr2", __FILE__),
+	: device_t(mconfig, POWERVR2, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		irq_cb(*this),
 		m_mamedebug(*this, ":MAMEDEBUG")

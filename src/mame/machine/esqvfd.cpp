@@ -7,12 +7,13 @@
 
 #include "emu.h"
 #include "esqvfd.h"
+
 #include "esq1by22.lh"
 #include "esq2by40.lh"
 
-const device_type ESQ1x22 = device_creator<esq1x22_t>;
-const device_type ESQ2x40 = device_creator<esq2x40_t>;
-const device_type ESQ2x40_SQ1 = device_creator<esq2x40_sq1_t>;
+DEFINE_DEVICE_TYPE(ESQ1X22,     esq1x22_device,     "esq1x22",     "Ensoniq 1x22 VFD")
+DEFINE_DEVICE_TYPE(ESQ2X40,     esq2x40_device,     "esq2x40",     "Ensoniq 2x40 VFD")
+DEFINE_DEVICE_TYPE(ESQ2X40_SQ1, esq2x40_sq1_device, "esq2x40_sq1", "Ensoniq 2x40 VFD (SQ-1 variant)")
 
 // adapted from bfm_bd1, rearranged to work with ASCII data used by the Ensoniq h/w
 static const uint16_t font[]=
@@ -115,16 +116,16 @@ static const uint16_t font[]=
 	0x0000, // 0000 0000 0000 0000 (DEL)
 };
 
-esqvfd_t::esqvfd_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock)
 {
 }
 
-void esqvfd_t::device_start()
+void esqvfd_device::device_start()
 {
 }
 
-void esqvfd_t::device_reset()
+void esqvfd_device::device_reset()
 {
 	m_cursx = m_cursy = 0;
 	m_savedx = m_savedy = 0;
@@ -135,12 +136,12 @@ void esqvfd_t::device_reset()
 	memset(m_dirty, 1, sizeof(m_attrs));
 }
 
-void esqvfd_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void esqvfd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 }
 
 // why isn't the font just stored in this order?
-uint32_t esqvfd_t::conv_segments(uint16_t segin)
+uint32_t esqvfd_device::conv_segments(uint16_t segin)
 {
 	uint32_t segout = 0;
 
@@ -164,7 +165,7 @@ uint32_t esqvfd_t::conv_segments(uint16_t segin)
 }
 
 // generic display update; can override from child classes if not good enough
-void esqvfd_t::update_display()
+void esqvfd_device::update_display()
 {
 	for (int row = 0; row < m_rows; row++)
 	{
@@ -194,12 +195,12 @@ static MACHINE_CONFIG_FRAGMENT(esq2x40)
 	MCFG_DEFAULT_LAYOUT(layout_esq2by40)
 MACHINE_CONFIG_END
 
-machine_config_constructor esq2x40_t::device_mconfig_additions() const
+machine_config_constructor esq2x40_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( esq2x40 );
 }
 
-void esq2x40_t::write_char(int data)
+void esq2x40_device::write_char(int data)
 {
 	// ESQ-1 sends (cursor move) 0xfa 0xYY to mark YY characters as underlined at the current cursor location
 	if (m_lastchar == 0xfa)
@@ -282,7 +283,7 @@ void esq2x40_t::write_char(int data)
 	update_display();
 }
 
-esq2x40_t::esq2x40_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_t(mconfig, ESQ2x40, "Ensoniq 2x40 VFD", tag, owner, clock, "esq2x40", __FILE__)
+esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ2X40, tag, owner, clock)
 {
 	m_rows = 2;
 	m_cols = 40;
@@ -294,12 +295,12 @@ static MACHINE_CONFIG_FRAGMENT(esq1x22)
 	MCFG_DEFAULT_LAYOUT(layout_esq1by22)
 MACHINE_CONFIG_END
 
-machine_config_constructor esq1x22_t::device_mconfig_additions() const
+machine_config_constructor esq1x22_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( esq1x22 );
 }
 
-void esq1x22_t::write_char(int data)
+void esq1x22_device::write_char(int data)
 {
 	if (data >= 0x60)
 	{
@@ -335,34 +336,34 @@ void esq1x22_t::write_char(int data)
 	update_display();
 }
 
-esq1x22_t::esq1x22_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_t(mconfig, ESQ1x22, "Ensoniq 1x22 VFD", tag, owner, clock, "esq1x22", __FILE__)
+esq1x22_device::esq1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ1X22, tag, owner, clock)
 {
 	m_rows = 1;
 	m_cols = 22;
 }
 
 /* SQ-1 display, I think it's really an LCD but we'll deal with it for now */
-machine_config_constructor esq2x40_sq1_t::device_mconfig_additions() const
+machine_config_constructor esq2x40_sq1_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( esq2x40 );  // we use the normal 2x40 layout
 }
 
-void esq2x40_sq1_t::write_char(int data)
+void esq2x40_sq1_device::write_char(int data)
 {
 	if (data == 0x09)   // musical note
 	{
 		data = '^'; // approximate for now
 	}
 
-	if (m_Wait87Shift)
+	if (m_wait87shift)
 	{
 		m_cursy = (data >> 4) & 0xf;
 		m_cursx = data & 0xf;
-		m_Wait87Shift = false;
+		m_wait87shift = false;
 	}
-	else if (m_Wait88Shift)
+	else if (m_wait88shift)
 	{
-		m_Wait88Shift = false;
+		m_wait88shift = false;
 	}
 	else if ((data >= 0x20) && (data <= 0x7f))
 	{
@@ -387,11 +388,11 @@ void esq2x40_sq1_t::write_char(int data)
 	}
 	else if (data == 0x87)
 	{
-		m_Wait87Shift = true;
+		m_wait87shift = true;
 	}
 	else if (data == 0x88)
 	{
-		m_Wait88Shift = true;
+		m_wait88shift = true;
 	}
 	else
 	{
@@ -399,10 +400,10 @@ void esq2x40_sq1_t::write_char(int data)
 	}
 }
 
-esq2x40_sq1_t::esq2x40_sq1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_t(mconfig, ESQ2x40_SQ1, "Ensoniq 2x40 VFD (SQ-1 variant)", tag, owner, clock, "esq2x40_sq1", __FILE__)
+esq2x40_sq1_device::esq2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : esqvfd_device(mconfig, ESQ2X40_SQ1, tag, owner, clock)
 {
 	m_rows = 2;
 	m_cols = 40;
-	m_Wait87Shift = false;
-	m_Wait88Shift = false;
+	m_wait87shift = false;
+	m_wait88shift = false;
 }

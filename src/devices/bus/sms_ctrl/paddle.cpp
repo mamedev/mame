@@ -32,7 +32,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_PADDLE = device_creator<sms_paddle_device>;
+DEFINE_DEVICE_TYPE(SMS_PADDLE, sms_paddle_device, "sms_paddle", "Sega SMS Paddle")
 
 // time interval not verified
 // Player 2 of Galactic Protector is the most sensible to this timming.
@@ -91,7 +91,7 @@ ioport_constructor sms_paddle_device::device_input_ports() const
 //-------------------------------------------------
 
 sms_paddle_device::sms_paddle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SMS_PADDLE, "Sega SMS Paddle", tag, owner, clock, "sms_paddle", __FILE__),
+	device_t(mconfig, SMS_PADDLE, tag, owner, clock),
 	device_sms_control_port_interface(mconfig, *this),
 	m_paddle_pins(*this, "CTRL_PORT"),
 	m_paddle_x(*this, "PADDLE_X"),

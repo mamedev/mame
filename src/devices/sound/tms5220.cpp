@@ -438,47 +438,8 @@ static const uint8_t reload_table[4] = { 0, 2, 4, 6 }; //sample count reload for
 #include "tms5110r.hxx"
 
 
-void tms5220_device::set_variant(int variant)
-{
-	switch (variant)
-	{
-		case TMS5220_IS_TMC0281:
-			m_coeff = &T0280B_0281A_coeff;
-			break;
-		case TMS5220_IS_TMC0281D:
-			m_coeff = &T0280D_0281D_coeff;
-			break;
-		case TMS5220_IS_CD2801:
-			m_coeff = &T0280F_2801A_coeff;
-			break;
-		case TMS5220_IS_M58817:
-			m_coeff = &M58817_coeff;
-			break;
-		case TMS5220_IS_CD2802:
-			m_coeff = &T0280F_2802_coeff;
-			break;
-		case TMS5220_IS_TMS5110A:
-			m_coeff = &tms5110a_coeff;
-			break;
-		case TMS5220_IS_5200:
-		case TMS5220_IS_CD2501ECD:
-			m_coeff = &T0285_2501E_coeff;
-			break;
-		case TMS5220_IS_5220C:
-		case TMS5220_IS_5220:
-			m_coeff = &tms5220_coeff;
-			break;
-		default:
-			fatalerror("Unknown variant in tms5220_set_variant\n");
-	}
-	m_variant = variant;
-}
-
-
 void tms5220_device::register_for_save_states()
 {
-	save_item(NAME(m_variant));
-
 	save_item(NAME(m_fifo));
 	save_item(NAME(m_fifo_head));
 	save_item(NAME(m_fifo_tail));
@@ -501,7 +462,7 @@ void tms5220_device::register_for_save_states()
 	save_item(NAME(m_new_frame_energy_idx));
 	save_item(NAME(m_new_frame_pitch_idx));
 	save_item(NAME(m_new_frame_k_idx));
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5220_PERFECT_INTERPOLATION_HACK
 	save_item(NAME(m_old_frame_energy_idx));
 	save_item(NAME(m_old_frame_pitch_idx));
 	save_item(NAME(m_old_frame_k_idx));
@@ -681,7 +642,7 @@ void tms5220_device::data_write(int data)
 				m_uv_zpar = 1; // zero k4-k10 as well
 				m_OLDE = 1; // 'silence/zpar' frames are zero energy
 				m_OLDP = 1; // 'silence/zpar' frames are zero pitch
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5220_PERFECT_INTERPOLATION_HACK
 				m_old_zpar = 1; // zero all the old parameters
 				m_old_uv_zpar = 1; // zero old k4-k10 as well
 #endif
@@ -774,7 +735,7 @@ void tms5220_device::update_fifo_status_and_ints()
 
 	// generate an interrupt if /TS was active, and is now inactive.
 	// also, in this case, regardless if DDIS was set, unset it.
-	if (m_previous_TALK_STATUS == 1 && (TALK_STATUS == 0))
+	if ((m_previous_TALK_STATUS == 1) && (TALK_STATUS() == 0))
 	{
 #ifdef VERBOSE
 		logerror("Talk status WAS 1, is now 0, unsetting DDIS and firing an interrupt!\n");
@@ -782,7 +743,7 @@ void tms5220_device::update_fifo_status_and_ints()
 		set_interrupt_state(1);
 		m_DDIS = 0;
 	}
-	m_previous_TALK_STATUS = TALK_STATUS;
+	m_previous_TALK_STATUS = TALK_STATUS();
 
 }
 
@@ -866,9 +827,9 @@ int tms5220_device::status_read()
 		/* clear the interrupt pin on status read */
 		set_interrupt_state(0);
 #ifdef DEBUG_PIN_READS
-		logerror("Status read: TS=%d BL=%d BE=%d\n", TALK_STATUS, m_buffer_low, m_buffer_empty);
+		logerror("Status read: TS=%d BL=%d BE=%d\n", TALK_STATUS(), m_buffer_low, m_buffer_empty);
 #endif
-		return (TALK_STATUS << 7) | (m_buffer_low << 6) | (m_buffer_empty << 5);
+		return (TALK_STATUS() << 7) | (m_buffer_low << 6) | (m_buffer_empty << 5);
 	}
 }
 
@@ -980,7 +941,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				/* appropriately override the interp count if needed; this will be incremented after the frame parse! */
 				m_IP = reload_table[m_c_variant_rate&0x3];
 
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5220_PERFECT_INTERPOLATION_HACK
 				/* remember previous frame energy, pitch, and coefficients */
 				m_old_frame_energy_idx = m_new_frame_energy_idx;
 				m_old_frame_pitch_idx = m_new_frame_pitch_idx;
@@ -992,7 +953,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				parse_frame();
 
 				/* if the new frame is a stop frame, unset both TALK and SPEN (via TCON). TALKD remains active while the energy is ramping to 0. */
-				if (NEW_FRAME_STOP_FLAG == 1)
+				if (NEW_FRAME_STOP_FLAG())
 				{
 					m_TALK = m_SPEN = 0;
 					update_fifo_status_and_ints(); // probably not necessary...
@@ -1005,18 +966,18 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				 * Old frame was unvoiced, new is voiced
 				 * Old frame was unvoiced, new frame is silence/zero energy (non-existent on tms51xx rev D and F (present and working on tms52xx, present but buggy on tms51xx rev A and B))
 				 */
-				if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && NEW_FRAME_UNVOICED_FLAG)
-					|| ((OLD_FRAME_UNVOICED_FLAG == 1) && !NEW_FRAME_UNVOICED_FLAG)
-					|| ((OLD_FRAME_SILENCE_FLAG == 1) && !NEW_FRAME_SILENCE_FLAG)
-					//|| ((m_inhibit == 1) && (OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 1)) ) //TMS51xx INTERP BUG1
-					|| ((OLD_FRAME_UNVOICED_FLAG == 1) && NEW_FRAME_SILENCE_FLAG) )
+				if ( ((OLD_FRAME_UNVOICED_FLAG() == 0) && NEW_FRAME_UNVOICED_FLAG())
+					|| ((OLD_FRAME_UNVOICED_FLAG() == 1) && !NEW_FRAME_UNVOICED_FLAG())
+					|| ((OLD_FRAME_SILENCE_FLAG() == 1) && !NEW_FRAME_SILENCE_FLAG())
+					//|| ((m_inhibit == 1) && (OLD_FRAME_UNVOICED_FLAG() == 1) && NEW_FRAME_SILENCE_FLAG()) ) //TMS51xx INTERP BUG1
+					|| ((OLD_FRAME_UNVOICED_FLAG() == 1) && NEW_FRAME_SILENCE_FLAG()) )
 					m_inhibit = 1;
 				else // normal frame, normal interpolation
 					m_inhibit = 0;
 
 #ifdef DEBUG_GENERATION
 				/* Debug info for current parsed frame */
-				logerror( "OLDE: %d; NEWE: %d; OLDP: %d; NEWP: %d ", OLD_FRAME_SILENCE_FLAG, NEW_FRAME_SILENCE_FLAG, OLD_FRAME_UNVOICED_FLAG, NEW_FRAME_UNVOICED_FLAG);
+				logerror( "OLDE: %d; NEWE: %d; OLDP: %d; NEWP: %d ", OLD_FRAME_SILENCE_FLAG(), NEW_FRAME_SILENCE_FLAG(), OLD_FRAME_UNVOICED_FLAG(), NEW_FRAME_UNVOICED_FLAG());
 				logerror("Processing new frame: ");
 				if (m_inhibit == 0)
 					logerror( "Normal Frame\n");
@@ -1043,7 +1004,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 			else // Not a new frame, just interpolate the existing frame.
 			{
 				int inhibit_state = ((m_inhibit==1)&&(m_IP != 0)); // disable inhibit when reaching the last interp period, but don't overwrite the m_inhibit value
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5220_PERFECT_INTERPOLATION_HACK
 				int samples_per_frame = m_subc_reload?175:266; // either (13 A cycles + 12 B cycles) * 7 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 7 interps for SPKSLOW
 				//int samples_per_frame = m_subc_reload?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
 				int current_sample = (m_subcycle - m_subc_reload)+(m_PC*(3-m_subc_reload))+((m_subc_reload?25:38)*((m_IP-1)&7));
@@ -1095,7 +1056,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 			}
 
 			// calculate the output
-			if (OLD_FRAME_UNVOICED_FLAG == 1)
+			if (OLD_FRAME_UNVOICED_FLAG() == 1)
 			{
 				// generate unvoiced samples here
 				if (m_RNG & 1)
@@ -1103,7 +1064,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				else
 					m_excitation_data = 0x40;
 			}
-			else /* (OLD_FRAME_UNVOICED_FLAG == 0) */
+			else /* (OLD_FRAME_UNVOICED_FLAG() == 0) */
 			{
 				// generate voiced samples here
 				/* US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
@@ -1136,7 +1097,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 			for (i=0; i<10; i++)
 				logerror("K%d:%04d ", i+1, m_current_k[i]);
 			logerror("Out:%06d ", this_sample);
-//#ifdef PERFECT_INTERPOLATION_HACK
+//#ifdef TMS5220_PERFECT_INTERPOLATION_HACK
 //          logerror("%d%d%d%d",m_old_zpar,m_zpar,m_old_uv_zpar,m_uv_zpar);
 //#else
 //          logerror("x%dx%d",m_zpar,m_uv_zpar);
@@ -1181,9 +1142,9 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 				if (m_IP == 7) // RESETL4
 				{
 					// Latch OLDE and OLDP
-					//if (OLD_FRAME_SILENCE_FLAG) m_uv_zpar = 0; // TMS51xx INTERP BUG2
-					OLD_FRAME_SILENCE_FLAG = NEW_FRAME_SILENCE_FLAG; // m_OLDE
-					OLD_FRAME_UNVOICED_FLAG = NEW_FRAME_UNVOICED_FLAG; // m_OLDP
+					//if (OLD_FRAME_SILENCE_FLAG()) m_uv_zpar = 0; // TMS51xx INTERP BUG2
+					OLD_FRAME_SILENCE_FLAG() = NEW_FRAME_SILENCE_FLAG() ? 1 : 0; // m_OLDE
+					OLD_FRAME_UNVOICED_FLAG() = NEW_FRAME_UNVOICED_FLAG() ? 1 : 0; // m_OLDP
 					/* if TALK was clear last frame, halt speech now, since TALKD (latched from TALK on new frame) just went inactive. */
 #ifdef DEBUG_GENERATION
 					logerror("RESETL4, about to update status: IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
@@ -1395,7 +1356,7 @@ void tms5220_device::process_command(unsigned char cmd)
 		switch (cmd & 0x70)
 		{
 		case 0x10 : /* read byte */
-			if (TALK_STATUS == 0) /* TALKST must be clear for RDBY */
+			if (TALK_STATUS() == 0) /* TALKST must be clear for RDBY */
 			{
 				if (m_schedule_dummy_read)
 				{
@@ -1417,7 +1378,7 @@ void tms5220_device::process_command(unsigned char cmd)
 		break;
 
 		case 0x30 : /* read and branch */
-			if (TALK_STATUS == 0) /* TALKST must be clear for RB */
+			if (TALK_STATUS() == 0) /* TALKST must be clear for RB */
 			{
 #ifdef VERBOSE
 				logerror("read and branch command received\n");
@@ -1429,7 +1390,7 @@ void tms5220_device::process_command(unsigned char cmd)
 			break;
 
 		case 0x40 : /* load address */
-			if (TALK_STATUS == 0) /* TALKST must be clear for LA */
+			if (TALK_STATUS() == 0) /* TALKST must be clear for LA */
 			{
 				/* tms5220 data sheet says that if we load only one 4-bit nibble, it won't work.
 				   This code does not care about this. */
@@ -1455,7 +1416,7 @@ void tms5220_device::process_command(unsigned char cmd)
 			m_uv_zpar = 1; // zero k4-k10 as well
 			m_OLDE = 1; // 'silence/zpar' frames are zero energy
 			m_OLDP = 1; // 'silence/zpar' frames are zero pitch
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5220_PERFECT_INTERPOLATION_HACK
 			m_old_zpar = 1; // zero all the old parameters
 			m_old_uv_zpar = 1; // zero old k4-k10 as well
 #endif
@@ -1479,7 +1440,7 @@ void tms5220_device::process_command(unsigned char cmd)
 			m_uv_zpar = 1; // zero k4-k10 as well
 			m_OLDE = 1; // 'silence/zpar' frames are zero energy
 			m_OLDP = 1; // 'silence/zpar' frames are zero pitch
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5220_PERFECT_INTERPOLATION_HACK
 			m_old_zpar = 1; // zero all the old parameters
 			m_old_uv_zpar = 1; // zero old k4-k10 as well
 #endif
@@ -1519,7 +1480,7 @@ void tms5220_device::process_command(unsigned char cmd)
 void tms5220_device::parse_frame()
 {
 	int i, rep_flag;
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5220_PERFECT_INTERPOLATION_HACK
 	m_old_uv_zpar = m_uv_zpar;
 	m_old_zpar = m_zpar;
 #endif
@@ -1573,7 +1534,7 @@ void tms5220_device::parse_frame()
 	logerror(" ");
 #endif
 	// if the new frame is unvoiced, be sure to zero out the k5-k10 parameters
-	m_uv_zpar = NEW_FRAME_UNVOICED_FLAG;
+	m_uv_zpar = NEW_FRAME_UNVOICED_FLAG() ? 1 : 0;
 	update_fifo_status_and_ints();
 	if (m_DDIS && m_buffer_empty) goto ranout;
 	// if this is a repeat frame, just do nothing, it will reuse the old coefficients
@@ -1682,7 +1643,37 @@ void tms5220_device::device_start()
 		m_speechrom = nullptr;
 	}
 
-	set_variant(TMS5220_IS_5220);
+	switch (m_variant)
+	{
+	case TMS5220_IS_TMC0281:
+		m_coeff = &T0280B_0281A_coeff;
+		break;
+	case TMS5220_IS_TMC0281D:
+		m_coeff = &T0280D_0281D_coeff;
+		break;
+	case TMS5220_IS_CD2801:
+		m_coeff = &T0280F_2801A_coeff;
+		break;
+	case TMS5220_IS_M58817:
+		m_coeff = &M58817_coeff;
+		break;
+	case TMS5220_IS_CD2802:
+		m_coeff = &T0280F_2802_coeff;
+		break;
+	case TMS5220_IS_TMS5110A:
+		m_coeff = &tms5110a_coeff;
+		break;
+	case TMS5220_IS_5200:
+	case TMS5220_IS_CD2501ECD:
+		m_coeff = &T0285_2501E_coeff;
+		break;
+	case TMS5220_IS_5220C:
+	case TMS5220_IS_5220:
+		m_coeff = &tms5220_coeff;
+		break;
+	default:
+		fatalerror("Unknown variant in tms5220_set_variant\n");
+	}
 	m_clock = clock();
 
 	/* resolve callbacks */
@@ -1708,46 +1699,6 @@ void tms5220_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tms5220c_device::device_start()
-{
-	tms5220_device::device_start();
-	set_variant(TMS5220_IS_5220C);
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void cd2501e_device::device_start()
-{
-	tms5220_device::device_start();
-	set_variant(TMS5220_IS_CD2501E);
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tms5200_device::device_start()
-{
-	tms5220_device::device_start();
-	set_variant(TMS5220_IS_5200);
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void cd2501ecd_device::device_start()
-{
-	tms5220_device::device_start();
-	set_variant(TMS5220_IS_CD2501ECD);
-}
-
-//-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
@@ -1768,7 +1719,7 @@ void tms5220_device::device_reset()
 	m_RDB_flag = false;
 
 	/* initialize the energy/pitch/k states */
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5220_PERFECT_INTERPOLATION_HACK
 	m_old_frame_energy_idx = m_old_frame_pitch_idx = 0;
 	memset(m_old_frame_k_idx, 0, sizeof(m_old_frame_k_idx));
 	m_old_zpar = 0;
@@ -2206,64 +2157,54 @@ void tms5220_device::set_frequency(int frequency)
 	m_clock = frequency;
 }
 
-const device_type TMS5220C = device_creator<tms5220c_device>;
+
+DEFINE_DEVICE_TYPE(TMS5220C,  tms5220c_device,  "tms5220c",  "TMS5220C")
+DEFINE_DEVICE_TYPE(TMS5220,   tms5220_device,   "tms5220",   "TMS5220")
+DEFINE_DEVICE_TYPE(CD2501E,   cd2501e_device,   "cd2501e",   "CD2501E")
+DEFINE_DEVICE_TYPE(TMS5200,   tms5200_device,   "tms5200",   "TMS5200")
+DEFINE_DEVICE_TYPE(CD2501ECD, cd2501ecd_device, "cd2501ecd", "CD2501ECD")
+
 
 tms5220c_device::tms5220c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms5220_device(mconfig, TMS5220C, "TMS5220C", tag, owner, clock, "tms5220c", __FILE__)
+	: tms5220_device(mconfig, TMS5220C, tag, owner, clock, TMS5220_IS_5220C)
 {
 }
 
-
-const device_type TMS5220 = device_creator<tms5220_device>;
 
 tms5220_device::tms5220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TMS5220, "TMS5220", tag, owner, clock, "tms5220", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_irq_handler(*this),
-		m_readyq_handler(*this),
-		m_speechrom_tag(nullptr),
-		m_m0_cb(*this),
-		m_m1_cb(*this),
-		m_addr_cb(*this),
-		m_data_cb(*this),
-		m_romclk_cb(*this)
+	: tms5220_device(mconfig, TMS5220, tag, owner, clock, TMS5220_IS_5220)
 {
 }
 
-tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_sound_interface(mconfig, *this),
-		m_irq_handler(*this),
-		m_readyq_handler(*this),
-		m_speechrom_tag(nullptr),
-		m_m0_cb(*this),
-		m_m1_cb(*this),
-		m_addr_cb(*this),
-		m_data_cb(*this),
-		m_romclk_cb(*this)
+tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_variant(variant)
+	, m_irq_handler(*this)
+	, m_readyq_handler(*this)
+	, m_speechrom_tag(nullptr)
+	, m_m0_cb(*this)
+	, m_m1_cb(*this)
+	, m_addr_cb(*this)
+	, m_data_cb(*this)
+	, m_romclk_cb(*this)
 {
 }
 
-
-const device_type CD2501E = device_creator<cd2501e_device>;
 
 cd2501e_device::cd2501e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms5220_device(mconfig, CD2501E, "CD2501E", tag, owner, clock, "cd2501e", __FILE__)
+	: tms5220_device(mconfig, CD2501E, tag, owner, clock, TMS5220_IS_CD2501E)
 {
 }
 
-
-const device_type TMS5200 = device_creator<tms5200_device>;
 
 tms5200_device::tms5200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms5220_device(mconfig, TMS5200, "TMS5200", tag, owner, clock, "tms5200", __FILE__)
+	: tms5220_device(mconfig, TMS5200, tag, owner, clock, TMS5220_IS_5200)
 {
 }
 
 
-const device_type CD2501ECD = device_creator<cd2501ecd_device>;
-
 cd2501ecd_device::cd2501ecd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms5220_device(mconfig, CD2501ECD, "CD2501ECD", tag, owner, clock, "cd2501ecd", __FILE__)
+	: tms5220_device(mconfig, CD2501ECD, tag, owner, clock, TMS5220_IS_CD2501ECD)
 {
 }

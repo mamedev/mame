@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_S100_WUNDERBUS_H
+#define MAME_BUS_S100_WUNDERBUS_H
 
-#ifndef __S100_WUNDERBUS__
-#define __S100_WUNDERBUS__
+#pragma once
 
 #include "s100.h"
 #include "machine/ins8250.h"
@@ -66,7 +66,6 @@ private:
 
 
 // device type definition
-extern const device_type S100_WUNDERBUS;
+DECLARE_DEVICE_TYPE(S100_WUNDERBUS, s100_wunderbus_device)
 
-
-#endif
+#endif // MAME_BUS_S100_WUNDERBUS_H

@@ -128,7 +128,7 @@ private:
 	void blocks_clear();
 };
 
-const device_type VGMPLAY = device_creator<vgmplay_device>;
+DEFINE_DEVICE_TYPE(VGMPLAY, vgmplay_device, "vgmplay_core", "VGM Player engine")
 
 class vgmplay_state : public driver_device
 {
@@ -182,7 +182,7 @@ private:
 };
 
 vgmplay_device::vgmplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	cpu_device(mconfig, VGMPLAY, "VGM Player engine", tag, owner, clock, "vgmplay_core", __FILE__),
+	cpu_device(mconfig, VGMPLAY, tag, owner, clock),
 	m_file_config("file", ENDIANNESS_LITTLE, 8, 32),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 32),
 	m_io16_config("io16", ENDIANNESS_LITTLE, 16, 32)
@@ -1289,7 +1289,7 @@ static ADDRESS_MAP_START( h6280_io_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(0, 3) AM_NOP
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
+static MACHINE_CONFIG_START( vgmplay )
 	MCFG_CPU_ADD("vgmplay", VGMPLAY, 44100)
 	MCFG_CPU_PROGRAM_MAP( file_map )
 	MCFG_CPU_IO_MAP( soundchips_map )
@@ -1396,7 +1396,7 @@ static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_OKIM6295_ADD("okim6295", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("okim6295", 1000000, PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, okim6295_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
@@ -1405,5 +1405,4 @@ MACHINE_CONFIG_END
 ROM_START( vgmplay )
 ROM_END
 
-CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, driver_device, 0, "MAME", "VGM player", 0)
-
+CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, 0, "MAME", "VGM player", 0 )

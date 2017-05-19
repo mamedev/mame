@@ -15,10 +15,10 @@
 //#define ICS2115_ISOLATE 6
 
 // device type definition
-const device_type ICS2115 = device_creator<ics2115_device>;
+DEFINE_DEVICE_TYPE(ICS2115, ics2115_device, "ics2115", "ICS2115")
 
 ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ICS2115, "ICS2115", tag, owner, clock, "ics2115", __FILE__),
+	: device_t(mconfig, ICS2115, tag, owner, clock),
 		device_sound_interface(mconfig, *this), m_stream(nullptr),
 		m_rom(*this, DEVICE_SELF),
 		m_irq_cb(*this), m_active_osc(0), m_osc_select(0), m_reg_select(0), m_irq_enabled(0), m_irq_pending(0), m_irq_on(false), m_vmode(0)
@@ -135,7 +135,7 @@ void ics2115_device::device_reset()
 }
 
 //TODO: improve using next-state logic from column 126 of patent 5809466
-int ics2115_voice::update_volume_envelope()
+int ics2115_device::ics2115_voice::update_volume_envelope()
 {
 	int ret = 0;
 	if(vol_ctrl.bitflags.done || vol_ctrl.bitflags.stop)
@@ -180,7 +180,7 @@ int ics2115_voice::update_volume_envelope()
 	return ret;
 }
 
-/*uint32_t ics2115_voice::next_address()
+/*uint32_t ics2115_device::ics2115_voice::next_address()
 {
     //Patent 6,246,774 B1, Column 111, Row 25
     //LEN   BLEN    DIR     BC      NextAddress
@@ -195,7 +195,7 @@ int ics2115_voice::update_volume_envelope()
 }*/
 
 
-int ics2115_voice::update_oscillator()
+int ics2115_device::ics2115_voice::update_oscillator()
 {
 	int ret = 0;
 	if(osc_conf.bitflags.stop)
@@ -281,12 +281,12 @@ stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
 	return sample;
 }
 
-bool ics2115_voice::playing()
+bool ics2115_device::ics2115_voice::playing()
 {
 	return state.bitflags.on && !((vol_ctrl.bitflags.done || vol_ctrl.bitflags.stop) && osc_conf.bitflags.stop);
 }
 
-void ics2115_voice::update_ramp() {
+void ics2115_device::ics2115_voice::update_ramp() {
 	//slow attack
 	if (state.bitflags.on && !osc_conf.bitflags.stop) {
 		if (state.bitflags.ramp < 0x40)

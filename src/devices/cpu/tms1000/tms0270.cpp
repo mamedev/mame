@@ -15,7 +15,7 @@
 // - 64-term microinstructions PLA between the RAM and ROM, similar to TMS0980,
 //   plus optional separate lines for custom opcode handling
 // - 48-term output PLA above the RAM (rotate opla 90 degrees)
-const device_type TMS0270 = device_creator<tms0270_cpu_device>; // 40-pin DIP, 16 O pins, 8+ R pins (some R pins are internally hooked up to support more I/O)
+DEFINE_DEVICE_TYPE(TMS0270, tms0270_cpu_device, "tms0270", "TMS0270") // 40-pin DIP, 16 O pins, 8+ R pins (some R pins are internally hooked up to support more I/O)
 // newer TMS0270 chips (eg. Speak & Math) have 42 pins
 
 // TMS0260 is same or similar?
@@ -34,11 +34,12 @@ ADDRESS_MAP_END
 
 // device definitions
 tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TMS0270, "TMS0270", tag, owner, clock, 16 /* o pins */, 16 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_144x4), "tms0270", __FILE__)
+	: tms0980_cpu_device(mconfig, TMS0270, tag, owner, clock, 16 /* o pins */, 16 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_144x4))
 	, m_read_ctl(*this)
 	, m_write_ctl(*this)
 	, m_write_pdc(*this)
-{ }
+{
+}
 
 
 // machine configs
@@ -46,11 +47,11 @@ static MACHINE_CONFIG_FRAGMENT(tms0270)
 
 	// main opcodes PLA, microinstructions PLA, output PLA
 	MCFG_PLA_ADD("ipla", 9, 22, 24)
-	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
 	MCFG_PLA_ADD("mpla", 6, 22, 64)
-	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
 	MCFG_PLA_ADD("opla", 6, 16, 48)
-	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
 MACHINE_CONFIG_END
 
 machine_config_constructor tms0270_cpu_device::device_mconfig_additions() const

@@ -354,7 +354,7 @@ void wink_state::machine_reset()
 	m_sound_flag = 0;
 }
 
-static MACHINE_CONFIG_START( wink, wink_state )
+static MACHINE_CONFIG_START( wink )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12000000 / 4)
 	MCFG_CPU_PROGRAM_MAP(wink_map)

@@ -77,23 +77,18 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "pps4.h"
+#include "debugger.h"
 
 
 #define VERBOSE 0       //!< set to 1 to log certain instruction conditions
+#include "logmacro.h"
 
-#if VERBOSE
-#define LOG(x) logerror x
-#else
-#define LOG(x)
-#endif
+DEFINE_DEVICE_TYPE(PPS4,   pps4_device,   "pps4",   "PPS4-4")
+DEFINE_DEVICE_TYPE(PPS4_2, pps4_2_device, "pps4_2", "PPS-4/2")
 
-const device_type PPS4 = device_creator<pps4_device>;
-const device_type PPS4_2 = device_creator<pps4_2_device>;
-
-pps4_device::pps4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *file)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, file)
+pps4_device::pps4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 12)  // 4bit RAM
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8)  // 4bit IO
@@ -104,12 +99,12 @@ pps4_device::pps4_device(const machine_config &mconfig, device_type type, const 
 }
 
 pps4_device::pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: pps4_device(mconfig, PPS4, "PPS-4", tag, owner, clock, "pps4", __FILE__)
+	: pps4_device(mconfig, PPS4, tag, owner, clock)
 {
 }
 
 pps4_2_device::pps4_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: pps4_device(mconfig, PPS4_2, "PPS-4/2", tag, owner, clock, "pps4_2", __FILE__)
+	: pps4_device(mconfig, PPS4_2, tag, owner, clock)
 {
 }
 
@@ -616,7 +611,7 @@ void pps4_device::iLDI()
 {
 	// previous LDI instruction?
 	if (0x70 == (m_Ip & 0xf0)) {
-		LOG(("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1));
+		LOG("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1);
 		return;
 	}
 	m_A = ~m_I1 & 15;
@@ -863,7 +858,7 @@ void pps4_device::iLB()
 {
 	// previous LB or LBL instruction?
 	if (0xc0 == (m_Ip & 0xf0) || 0x00 == m_Ip) {
-		LOG(("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1));
+		LOG("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1);
 		return;
 	}
 	m_SB = m_SA;
@@ -905,7 +900,7 @@ void pps4_device::iLBL()
 	m_I2 = ARG();
 	// previous LB or LBL instruction?
 	if (0xc0 == (m_Ip & 0xf0) || 0x00 == m_Ip) {
-		LOG(("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1));
+		LOG("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1);
 		return;
 	}
 	m_B = ~m_I2 & 255;  // Note: immediate is 1's complement
@@ -931,7 +926,7 @@ void pps4_device::iINCB()
 	u8 bl = m_B & 15;
 	bl = (bl + 1) & 15;
 	if (0 == bl) {
-		LOG(("%s: skip BL=%x\n", __FUNCTION__, bl));
+		LOG("%s: skip BL=%x\n", __FUNCTION__, bl);
 		m_Skip = 1;
 	}
 	m_B = (m_B & ~15) | bl;
@@ -957,7 +952,7 @@ void pps4_device::iDECB()
 	u8 bl = m_B & 15;
 	bl = (bl - 1) & 15;
 	if (15 == bl) {
-		LOG(("%s: skip BL=%x\n", __FUNCTION__, bl));
+		LOG("%s: skip BL=%x\n", __FUNCTION__, bl);
 		m_Skip = 1;
 	}
 	m_B = (m_B & ~15) | bl;
@@ -981,7 +976,7 @@ void pps4_device::iDECB()
 void pps4_device::iT()
 {
 	const u16 p = (m_P & ~63) | (m_I1 & 63);
-	LOG(("%s: P=%03x I=%02x -> P=%03x\n", __FUNCTION__, m_P, m_I1, p));
+	LOG("%s: P=%03x I=%02x -> P=%03x\n", __FUNCTION__, m_P, m_I1, p);
 	m_P = p;
 }
 
@@ -1235,9 +1230,9 @@ void pps4_device::iIOL()
 	u8 ac = (~m_A & 15);
 	m_I2 = ARG();
 	m_io->write_byte(m_I2, ac);
-	LOG(("%s: port:%02x <- %x\n", __FUNCTION__, m_I2, ac));
+	LOG("%s: port:%02x <- %x\n", __FUNCTION__, m_I2, ac);
 	ac = m_io->read_byte(m_I2) & 15;
-	LOG(("%s: port:%02x -> %x\n", __FUNCTION__, m_I2, ac));
+	LOG("%s: port:%02x -> %x\n", __FUNCTION__, m_I2, ac);
 	m_A = ~ac & 15;
 }
 
@@ -1339,7 +1334,7 @@ void pps4_device::execute_one()
 	m_I1 = ROP();
 	if (m_Skip) {
 		m_Skip = 0;
-		LOG(("%s: skip op:%02x\n", __FUNCTION__, m_I1));
+		LOG("%s: skip op:%02x\n", __FUNCTION__, m_I1);
 		return;
 	}
 	switch (m_I1) {

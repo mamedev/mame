@@ -870,7 +870,7 @@ static GFXDECODE_START( rex6000 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( rex6000, rex6000_state )
+static MACHINE_CONFIG_START( rex6000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) //Toshiba microprocessor Z80 compatible at 4.3MHz
 	MCFG_CPU_PROGRAM_MAP(rex6000_mem)
@@ -947,7 +947,7 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( oz750, oz750_state )
+static MACHINE_CONFIG_START( oz750 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_9_8304MHz) //Toshiba microprocessor Z80 compatible at 9.8MHz
 	MCFG_CPU_PROGRAM_MAP(rex6000_mem)
@@ -1053,7 +1053,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 199?, oz750,    0,       0,   oz750  ,    oz750,   driver_device,  0,   "Sharp",            "Wizard OZ-750",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 2000, rex6000,  0,       0,   rex6000,    rex6000, driver_device,  0,   "Xircom / Intel",   "REX 6000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 2000, ds2,      rex6000, 0,   rex6000,    rex6000, driver_device,  0,   "Citizen",          "DataSlim 2",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT    STATE           INIT  COMPANY             FULLNAME          FLAGS */
+COMP( 199?, oz750,    0,       0,   oz750,      oz750,   oz750_state,    0,    "Sharp",            "Wizard OZ-750",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 2000, rex6000,  0,       0,   rex6000,    rex6000, rex6000_state,  0,    "Xircom / Intel",   "REX 6000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 2000, ds2,      rex6000, 0,   rex6000,    rex6000, rex6000_state,  0,    "Citizen",          "DataSlim 2",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

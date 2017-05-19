@@ -162,7 +162,7 @@ static INPUT_PORTS_START( madalien )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( madalien, madalien_state )
+static MACHINE_CONFIG_START( madalien )
 
 	/* main CPU */
 	MCFG_CPU_ADD("maincpu", M6502, MADALIEN_MAIN_CLOCK / 8) /* 1324kHz */
@@ -464,6 +464,6 @@ ROM_START( madalienb )
 ROM_END
 
 /*          set       parent    machine   inp       init */
-GAME( 1980, madalien, 0,        madalien, madalien, driver_device, 0, ROT270, "Data East Corporation", "Mad Alien (set 1)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1980, madaliena,madalien, madalien, madalien, driver_device, 0, ROT270, "Data East Corporation", "Mad Alien (set 2)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1980, madalienb,madalien, madalien, madalien, driver_device, 0, ROT270, "Data East Corporation", "Mad Alien (set 2, alt gfx)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, madalien, 0,        madalien, madalien, madalien_state, 0, ROT270, "Data East Corporation", "Mad Alien (set 1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, madaliena,madalien, madalien, madalien, madalien_state, 0, ROT270, "Data East Corporation", "Mad Alien (set 2)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, madalienb,madalien, madalien, madalien, madalien_state, 0, ROT270, "Data East Corporation", "Mad Alien (set 2, alt gfx)", MACHINE_SUPPORTS_SAVE )

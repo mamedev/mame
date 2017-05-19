@@ -1,17 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#pragma once
+#ifndef MAME_CPU_TLCS870_TLCS870_H
+#define MAME_CPU_TLCS870_TLCS870_H
 
-#ifndef TLCS870_H
-#define TLCS870_H
+#pragma once
 
 class tlcs870_device : public cpu_device
 {
-public:
-	// construction/destruction
-	tlcs870_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor program_map);
-
-
 protected:
 	enum _e_op {
 		UNKNOWN = 0x00,
@@ -87,7 +82,8 @@ protected:
 		COND_F
 	};
 
-	uint32_t m_debugger_temp;
+	// construction/destruction
+	tlcs870_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -115,9 +111,10 @@ protected:
 	virtual void disasm_disassemble_param(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, int type, uint16_t val);
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
+
+	uint32_t m_debugger_temp;
+
 private:
-
-
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 	required_shared_ptr<uint8_t> m_intram;
@@ -187,7 +184,6 @@ public:
 };
 
 
+DECLARE_DEVICE_TYPE(TMP87PH40AN, tmp87ph40an_device)
 
-extern const device_type TMP87PH40AN;
-
-#endif /* TLCS870_H */
+#endif // MAME_CPU_TLCS870_TLCS870_H

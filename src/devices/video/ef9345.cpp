@@ -9,7 +9,7 @@
     This code is based on Daniel Coulom's implementation in DCVG5k
     and DCAlice released by Daniel Coulom under GPL license
 
-    TS9347 variant support added by Jean-François DEL NERO
+    TS9347 variant support added by Jean-FranÃ§ois DEL NERO
 *********************************************************************/
 
 #include "emu.h"
@@ -29,8 +29,8 @@
 //**************************************************************************
 
 // devices
-const device_type EF9345 = device_creator<ef9345_device>;
-const device_type TS9347 = device_creator<ts9347_device>;
+DEFINE_DEVICE_TYPE(EF9345, ef9345_device, "ef9345", "EF9345")
+DEFINE_DEVICE_TYPE(TS9347, ts9347_device, "ts9347", "TS9347")
 
 // default address map
 static ADDRESS_MAP_START( ef9345, AS_0, 8, ef9345_device )
@@ -102,18 +102,12 @@ inline void ef9345_device::inc_y(uint8_t r)
 //-------------------------------------------------
 
 ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, EF9345, "EF9345", tag, owner, clock, "ef9345", __FILE__),
-	device_memory_interface(mconfig, *this),
-	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(ef9345)),
-	m_charset(*this, DEVICE_SELF),
-	m_variant(EF9345_MODE::TYPE_EF9345),
-	m_palette(*this, finder_base::DUMMY_TAG)
+	ef9345_device(mconfig, EF9345, tag, owner, clock, EF9345_MODE::TYPE_EF9345)
 {
 }
 
-ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, EF9345_MODE variant, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, EF9345_MODE variant) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(ef9345)),
@@ -124,7 +118,9 @@ ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, co
 }
 
 ts9347_device::ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ef9345_device(mconfig, TS9347, "TS9347",tag, owner, clock, EF9345_MODE::TYPE_TS9347,"ts9347",__FILE__){ }
+	: ef9345_device(mconfig, TS9347, tag, owner, clock, EF9345_MODE::TYPE_TS9347)
+{
+}
 
 //-------------------------------------------------
 //  static_set_palette_tag: Set the tag of the
@@ -229,26 +225,24 @@ void ef9345_device::set_busy_flag(int period)
 // draw a char in 40 char line mode
 void ef9345_device::draw_char_40(uint8_t *c, uint16_t x, uint16_t y)
 {
-	//verify size limit
-	if (y * 10 >= m_screen->height() || x * 8 >= m_screen->width())
-		return;
-
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	for(int i = 0; i < 10; i++)
-		for(int j = 0; j < 8; j++)
+	const int scan_xsize = std::min( m_screen->width() - (x * 8), 8);
+	const int scan_ysize = std::min( m_screen->height() - (y * 10), 10);
+
+	for(int i = 0; i < scan_ysize; i++)
+		for(int j = 0; j < scan_xsize; j++)
 				m_screen_out.pix32(y * 10 + i, x * 8 + j)  = palette[c[8 * i + j] & 0x07];
 }
 
 // draw a char in 80 char line mode
 void ef9345_device::draw_char_80(uint8_t *c, uint16_t x, uint16_t y)
 {
-	// verify size limit
-	if (y * 10 >= m_screen->height() || x * 6 >= m_screen->width())
-		return;
-
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	for(int i = 0; i < 10; i++)
-		for(int j = 0; j < 6; j++)
+	const int scan_xsize = std::min( m_screen->width() - (x * 6), 6);
+	const int scan_ysize = std::min( m_screen->height() - (y * 10), 10);
+
+	for(int i = 0; i < scan_ysize; i++)
+		for(int j = 0; j < scan_xsize; j++)
 				m_screen_out.pix32(y * 10 + i, x * 6 + j)  = palette[c[6 * i + j] & 0x07];
 }
 

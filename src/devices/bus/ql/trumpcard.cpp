@@ -23,10 +23,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type QL_TRUMP_CARD = device_creator<ql_trump_card_t>;
-const device_type QL_TRUMP_CARD_256K = device_creator<ql_trump_card_256k_t>;
-const device_type QL_TRUMP_CARD_512K = device_creator<ql_trump_card_512k_t>;
-const device_type QL_TRUMP_CARD_768K = device_creator<ql_trump_card_768k_t>;
+DEFINE_DEVICE_TYPE(QL_TRUMP_CARD,      ql_trump_card_device,      "ql_trump",    "QL Trump Card")
+DEFINE_DEVICE_TYPE(QL_TRUMP_CARD_256K, ql_trump_card_256k_device, "ql_trump256", "QL Trump Card 256K")
+DEFINE_DEVICE_TYPE(QL_TRUMP_CARD_512K, ql_trump_card_512k_device, "ql_trump512", "QL Trump Card 512K")
+DEFINE_DEVICE_TYPE(QL_TRUMP_CARD_768K, ql_trump_card_768k_device, "ql_trump768", "QL Trump Card 768K")
 
 
 //-------------------------------------------------
@@ -57,7 +57,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *ql_trump_card_t::device_rom_region() const
+const tiny_rom_entry *ql_trump_card_device::device_rom_region() const
 {
 	return ROM_NAME( ql_trump_card );
 }
@@ -76,7 +76,7 @@ SLOT_INTERFACE_END
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( ql_trump_card_t::floppy_formats )
+FLOPPY_FORMATS_MEMBER( ql_trump_card_device::floppy_formats )
 	FLOPPY_QL_FORMAT
 FLOPPY_FORMATS_END
 
@@ -87,8 +87,8 @@ FLOPPY_FORMATS_END
 
 static MACHINE_CONFIG_FRAGMENT( ql_trump_card )
 	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, 8000000)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", ql_trump_card_floppies, "35dd", ql_trump_card_t::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", ql_trump_card_floppies, nullptr, ql_trump_card_t::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", ql_trump_card_floppies, "35dd", ql_trump_card_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", ql_trump_card_floppies, nullptr, ql_trump_card_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -97,7 +97,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor ql_trump_card_t::device_mconfig_additions() const
+machine_config_constructor ql_trump_card_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( ql_trump_card );
 }
@@ -109,48 +109,48 @@ machine_config_constructor ql_trump_card_t::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  ql_trump_card_t - constructor
+//  ql_trump_card_device - constructor
 //-------------------------------------------------
 
-ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, QL_TRUMP_CARD, "QL Trump Card", tag, owner, clock, "ql_trump", __FILE__),
+ql_trump_card_device::ql_trump_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ql_trump_card_device(mconfig, QL_TRUMP_CARD, tag, owner, clock, 0)
+{
+}
+
+ql_trump_card_device::ql_trump_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int ram_size) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
 	m_floppy0(*this, WD1772_TAG":0"),
 	m_floppy1(*this, WD1772_TAG":1"),
 	m_rom(*this, "rom"),
 	m_ram(*this, "ram"),
-	m_ram_size(0), m_rom_en(false)
+	m_ram_size(ram_size),
+	m_rom_en(false)
 {
 }
 
-ql_trump_card_t::ql_trump_card_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int ram_size) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
-	device_ql_expansion_card_interface(mconfig, *this),
-	m_fdc(*this, WD1772_TAG),
-	m_floppy0(*this, WD1772_TAG":0"),
-	m_floppy1(*this, WD1772_TAG":1"),
-	m_rom(*this, "rom"),
-	m_ram(*this, "ram"),
-	m_ram_size(ram_size), m_rom_en(false)
+ql_trump_card_256k_device::ql_trump_card_256k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ql_trump_card_device(mconfig, QL_TRUMP_CARD_256K, tag, owner, clock, 256*1024)
 {
 }
 
-ql_trump_card_256k_t::ql_trump_card_256k_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_256K, "QL Trump Card 256K", tag, owner, clock, "ql_trump256", __FILE__, 256*1024) { }
+ql_trump_card_512k_device::ql_trump_card_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ql_trump_card_device(mconfig, QL_TRUMP_CARD_512K, tag, owner, clock, 512*1024)
+{
+}
 
-ql_trump_card_512k_t::ql_trump_card_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_512K, "QL Trump Card 512K", tag, owner, clock, "ql_trump512", __FILE__, 512*1024) { }
-
-ql_trump_card_768k_t::ql_trump_card_768k_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ql_trump_card_t(mconfig, QL_TRUMP_CARD_768K, "QL Trump Card 768K", tag, owner, clock, "ql_trump768", __FILE__, 768*1024) { }
+ql_trump_card_768k_device::ql_trump_card_768k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ql_trump_card_device(mconfig, QL_TRUMP_CARD_768K, tag, owner, clock, 768*1024)
+{
+}
 
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void ql_trump_card_t::device_start()
+void ql_trump_card_device::device_start()
 {
 	// allocate memory
 	m_ram.allocate(m_ram_size);
@@ -164,7 +164,7 @@ void ql_trump_card_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void ql_trump_card_t::device_reset()
+void ql_trump_card_device::device_reset()
 {
 	m_fdc->set_floppy(nullptr);
 	m_fdc->dden_w(0);
@@ -177,7 +177,7 @@ void ql_trump_card_t::device_reset()
 //  read -
 //-------------------------------------------------
 
-uint8_t ql_trump_card_t::read(address_space &space, offs_t offset, uint8_t data)
+uint8_t ql_trump_card_device::read(address_space &space, offs_t offset, uint8_t data)
 {
 	if (offset >= 0xc000 && offset < 0x10000)
 	{
@@ -230,7 +230,7 @@ uint8_t ql_trump_card_t::read(address_space &space, offs_t offset, uint8_t data)
 //  write -
 //-------------------------------------------------
 
-void ql_trump_card_t::write(address_space &space, offs_t offset, uint8_t data)
+void ql_trump_card_device::write(address_space &space, offs_t offset, uint8_t data)
 {
 	if (offset >= 0x1c000 && offset <= 0x1c003)
 	{

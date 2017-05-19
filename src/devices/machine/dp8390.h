@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef _DP8390_H_
-#define _DP8390_H_
+#ifndef MAME_MACHINE_DP8390_H
+#define MAME_MACHINE_DP8390_H
 
+#pragma once
 
 
 // device stuff
@@ -32,17 +33,13 @@
 	devcb = &rtl8019a_device::set_mem_write_callback(*device, DEVCB_##_devcb);
 
 
-class dp8390_device : public device_t,
-						public device_network_interface
+class dp8390_device : public device_t, public device_network_interface
 {
 public:
-	// construction/destruction
-	dp8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, float bandwidth, const char *shortname, const char *source);
-
-	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_breq_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_breq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_mem_read_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_mem_read_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_mem_write_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_mem_write_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<dp8390_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_breq_callback(device_t &device, Object &&cb) { return downcast<dp8390_device &>(device).m_breq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_mem_read_callback(device_t &device, Object &&cb) { return downcast<dp8390_device &>(device).m_mem_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_mem_write_callback(device_t &device, Object &&cb) { return downcast<dp8390_device &>(device).m_mem_write_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE16_MEMBER( dp8390_w );
 	DECLARE_READ16_MEMBER( dp8390_r );
@@ -51,16 +48,19 @@ public:
 	void recv_cb(uint8_t *buf, int len) override;
 
 protected:
+	enum class TYPE {
+		DP8390D,
+		RTL8019A
+	};
+
+	// construction/destruction
+	dp8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, TYPE varian, float bandwidth);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	int m_type;
-
-	enum {
-		TYPE_DP8390D = 0,
-		TYPE_RTL8019A
-	};
+	TYPE const m_variant;
 
 private:
 	devcb_write_line    m_irq_cb;
@@ -139,7 +139,7 @@ public:
 };
 
 // device type definition
-extern const device_type DP8390D;
-extern const device_type RTL8019A;
+DECLARE_DEVICE_TYPE(DP8390D,  dp8390d_device)
+DECLARE_DEVICE_TYPE(RTL8019A, rtl8019a_device)
 
-#endif
+#endif // MAME_MACHINE_DP8390_H

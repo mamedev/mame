@@ -8,10 +8,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ELECTRON_FBJOY_H
+#define MAME_BUS_ELECTRON_FBJOY_H
 
-#ifndef __ELECTRON_FBJOY__
-#define __ELECTRON_FBJOY__
+#pragma once
 
 
 #include "exp.h"
@@ -46,7 +46,7 @@ private:
 
 
 // device type definition
-extern const device_type ELECTRON_FBJOY;
+DECLARE_DEVICE_TYPE(ELECTRON_FBJOY, electron_fbjoy_device)
 
 
-#endif
+#endif // MAME_BUS_ELECTRON_FBJOY_H

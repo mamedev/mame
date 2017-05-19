@@ -31,10 +31,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VIC10_EXP_H
+#define MAME_BUS_VIC10_EXP_H
 
-#ifndef __VIC10_EXPANSION_SLOT__
-#define __VIC10_EXPANSION_SLOT__
+#pragma once
 
 #include "softlist_dev.h"
 #include "formats/cbm_crt.h"
@@ -94,10 +94,10 @@ public:
 	// construction/destruction
 	vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb_base &set_res_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_res.set_callback(object); }
-	template<class _Object> static devcb_base &set_cnt_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_cnt.set_callback(object); }
-	template<class _Object> static devcb_base &set_sp_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_sp.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<vic10_expansion_slot_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_res_wr_callback(device_t &device, Object &&cb) { return downcast<vic10_expansion_slot_device &>(device).m_write_res.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_cnt_wr_callback(device_t &device, Object &&cb) { return downcast<vic10_expansion_slot_device &>(device).m_write_cnt.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sp_wr_callback(device_t &device, Object &&cb) { return downcast<vic10_expansion_slot_device &>(device).m_write_sp.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram);
@@ -151,17 +151,18 @@ class device_vic10_expansion_card_interface : public device_slot_card_interface
 
 public:
 	// construction/destruction
-	device_vic10_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vic10_expansion_card_interface();
 
-	virtual uint8_t vic10_cd_r(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram) { return data; };
-	virtual void vic10_cd_w(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram) { };
-	virtual int vic10_p0_r() { return 0; };
-	virtual void vic10_p0_w(int state) { };
-	virtual void vic10_sp_w(int state) { };
-	virtual void vic10_cnt_w(int state) { };
+	virtual uint8_t vic10_cd_r(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram) { return data; }
+	virtual void vic10_cd_w(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram) { }
+	virtual int vic10_p0_r() { return 0; }
+	virtual void vic10_p0_w(int state) { }
+	virtual void vic10_sp_w(int state) { }
+	virtual void vic10_cnt_w(int state) { }
 
 protected:
+	device_vic10_expansion_card_interface(const machine_config &mconfig, device_t &device);
+
 	optional_shared_ptr<uint8_t> m_lorom;
 	optional_shared_ptr<uint8_t> m_exram;
 	optional_shared_ptr<uint8_t> m_uprom;
@@ -171,11 +172,9 @@ protected:
 
 
 // device type definition
-extern const device_type VIC10_EXPANSION_SLOT;
+DECLARE_DEVICE_TYPE(VIC10_EXPANSION_SLOT, vic10_expansion_slot_device)
 
 
 SLOT_INTERFACE_EXTERN( vic10_expansion_cards );
 
-
-
-#endif
+#endif // MAME_BUS_VIC10_EXP_H

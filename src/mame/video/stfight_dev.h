@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Mark McDougall, David Haywood
 
-#ifndef MAME_VIDEO_STFIGHT_VIDEO_H
-#define MAME_VIDEO_STFIGHT_VIDEO_H
+#ifndef MAME_VIDEO_STFIGHT_DEV_H
+#define MAME_VIDEO_STFIGHT_DEV_H
 
 #pragma once
 
 
 
-extern const device_type STFIGHT_VIDEO;
+DECLARE_DEVICE_TYPE(STFIGHT_VIDEO, stfight_video_device)
 
 #define MCFG_STFIGHT_VIDEO_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, STFIGHT_VIDEO, 0)
@@ -73,4 +73,4 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#endif // MAME_VIDEO_STFIGHT_VIDEO_H
+#endif // MAME_VIDEO_STFIGHT_DEV_H

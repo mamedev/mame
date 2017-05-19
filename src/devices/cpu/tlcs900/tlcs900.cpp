@@ -16,12 +16,12 @@ TODO:
 *******************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "tlcs900.h"
+#include "debugger.h"
 
 
-const device_type TMP95C061 = device_creator<tmp95c061_device>;
-const device_type TMP95C063 = device_creator<tmp95c063_device>;
+DEFINE_DEVICE_TYPE(TMP95C061, tmp95c061_device, "tmp95c061", "TMP95C061")
+DEFINE_DEVICE_TYPE(TMP95C063, tmp95c063_device, "tmp95c063", "TMP95C063")
 
 
 static ADDRESS_MAP_START( tmp95c061_mem8, AS_PROGRAM, 8, tmp95c061_device )
@@ -42,14 +42,14 @@ static ADDRESS_MAP_START(tmp95c063_mem16, AS_PROGRAM, 16, tmp95c063_device )
 ADDRESS_MAP_END
 
 
-tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, type, tag, owner, clock),
 	m_am8_16(0)
 {
 }
 
 tmp95c061_device::tmp95c061_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs900h_device(mconfig, TMP95C061, "TMP95C061", tag, owner, clock, "tmp95c061" ),
+	: tlcs900h_device(mconfig, TMP95C061, tag, owner, clock),
 	m_port1_read(*this),
 	m_port1_write(*this),
 	m_port2_write(*this),
@@ -88,7 +88,7 @@ void tmp95c061_device::device_config_complete()
 }
 
 tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs900h_device(mconfig, TMP95C063, "TMP95C063", tag, owner, clock, "tmp95c063"),
+	: tlcs900h_device(mconfig, TMP95C063, tag, owner, clock),
 	m_port1_read(*this),
 	m_port1_write(*this),
 	m_port2_write(*this),

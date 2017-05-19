@@ -67,12 +67,15 @@ public:
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER(sun1_upd7201_r);
 	DECLARE_WRITE16_MEMBER(sun1_upd7201_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
+
+protected:
 	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<uint16_t> m_p_ram;
 	uint8_t m_term_data;
 };
@@ -124,19 +127,19 @@ void sun1_state::machine_reset()
 }
 
 
-WRITE8_MEMBER( sun1_state::kbd_put )
+void sun1_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( sun1, sun1_state )
+static MACHINE_CONFIG_START( sun1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(sun1_mem)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(sun1_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(sun1_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -166,5 +169,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY         FULLNAME       FLAGS */
-COMP( 1982, sun1,  0,       0,       sun1,      sun1, driver_device,     0,  "Sun Microsystems", "Sun-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY             FULLNAME  FLAGS
+COMP( 1982, sun1,  0,      0,       sun1,      sun1,  sun1_state, 0,    "Sun Microsystems", "Sun-1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

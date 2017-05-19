@@ -21,10 +21,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MC6852_H
+#define MAME_MACHINE_MC6852_H
 
-#ifndef __MC6852__
-#define __MC6852__
+#pragma once
 
 #include <queue>
 
@@ -69,10 +69,10 @@ public:
 
 	static void set_rx_clock(device_t &device, int clock) { downcast<mc6852_device &>(device).m_rx_clock = clock; }
 	static void set_tx_clock(device_t &device, int clock) { downcast<mc6852_device &>(device).m_tx_clock = clock; }
-	template<class _Object> static devcb_base &set_tx_data_wr_callback(device_t &device, _Object object) { return downcast<mc6852_device &>(device).m_write_tx_data.set_callback(object); }
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mc6852_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb_base &set_sm_dtr_wr_callback(device_t &device, _Object object) { return downcast<mc6852_device &>(device).m_write_sm_dtr.set_callback(object); }
-	template<class _Object> static devcb_base &set_tuf_wr_callback(device_t &device, _Object object) { return downcast<mc6852_device &>(device).m_write_tuf.set_callback(object); }
+	template <class Object> static devcb_base &set_tx_data_wr_callback(device_t &device, Object &&cb) { return downcast<mc6852_device &>(device).m_write_tx_data.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<mc6852_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sm_dtr_wr_callback(device_t &device, Object &&cb) { return downcast<mc6852_device &>(device).m_write_sm_dtr.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_tuf_wr_callback(device_t &device, Object &&cb) { return downcast<mc6852_device &>(device).m_write_tuf.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -175,8 +175,6 @@ private:
 
 
 // device type definition
-extern const device_type MC6852;
+DECLARE_DEVICE_TYPE(MC6852, mc6852_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_MC6852_H

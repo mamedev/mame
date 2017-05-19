@@ -8,24 +8,21 @@
 #include "fs4600.h"
 
 
-const device_type MSX_SLOT_FS4600 = device_creator<msx_slot_fs4600_device>;
+DEFINE_DEVICE_TYPE(MSX_SLOT_FS4600, msx_slot_fs4600_device, "msx_slot_fs4600", "MSX Internal FS4600 Firmware")
 
 
 msx_slot_fs4600_device::msx_slot_fs4600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_SLOT_FS4600, "MSX Internal FS4600 Firmware", tag, owner, clock, "msx_slot_fs4600", __FILE__)
+	: device_t(mconfig, MSX_SLOT_FS4600, tag, owner, clock)
 	, msx_internal_slot_interface()
 	, m_nvram(*this, "nvram")
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
 	, m_region_offset(0)
 	, m_rom(nullptr)
+	, m_selected_bank{ 0, 0, 0, 0 }
+	, m_bank_base{ nullptr, nullptr, nullptr, nullptr }
 	, m_sram_address(0)
 	, m_control(0)
 {
-	for (int i = 0; i < 4; i++)
-	{
-		m_selected_bank[i] = 0;
-		m_bank_base[i] = nullptr;
-	}
 	memset(m_sram, 0, sizeof(m_sram));
 }
 

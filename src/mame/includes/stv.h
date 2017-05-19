@@ -3,6 +3,7 @@
 
 #include "includes/saturn.h"
 #include "audio/rax.h"
+#include "machine/ticket.h"
 
 class stv_state : public saturn_state
 {
@@ -11,7 +12,8 @@ public:
 		: saturn_state(mconfig, type, tag),
 		m_rax(*this, "rax"),
 		m_cryptdevice(*this, "315_5881"),
-		m_5838crypt(*this, "315_5838")
+		m_5838crypt(*this, "315_5838"),
+		m_hopper(*this, "hopper")
 	{
 	}
 
@@ -60,6 +62,7 @@ public:
 	DECLARE_DRIVER_INIT(znpwfv);
 	DECLARE_DRIVER_INIT(othellos);
 	DECLARE_DRIVER_INIT(mausuke);
+	DECLARE_DRIVER_INIT(hopper);
 
 	DECLARE_READ8_MEMBER(stv_ioga_r);
 	DECLARE_WRITE8_MEMBER(stv_ioga_w);
@@ -77,6 +80,8 @@ public:
 	DECLARE_WRITE32_MEMBER(magzun_ioga_w32);
 	DECLARE_READ32_MEMBER(magzun_hef_hack_r);
 	DECLARE_READ32_MEMBER(magzun_rx_hack_r);
+	DECLARE_WRITE8_MEMBER(hop_ioga_w);
+	DECLARE_WRITE32_MEMBER(hop_ioga_w32);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart1 ) { return load_cart(image, m_cart1); }
@@ -107,6 +112,7 @@ public:
 
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_5838crypt;
+	optional_device<ticket_dispenser_device> m_hopper;
 	uint16_t crypt_read_callback(uint32_t addr);
 	uint16_t crypt_read_callback_ch1(uint32_t addr);
 	uint16_t crypt_read_callback_ch2(uint32_t addr);

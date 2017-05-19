@@ -46,6 +46,10 @@
 #pragma GCC diagnostic ignored "-Wpmf-conversions"
 #endif
 
+#if defined(__GNUC__) && (__GNUC__ > 6)
+#pragma GCC diagnostic ignored "-Wnoexcept-type"
+#endif
+
 namespace plib {
 /*
  * The following class was derived from the MAME delegate.h code.

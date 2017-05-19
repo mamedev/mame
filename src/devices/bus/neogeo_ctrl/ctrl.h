@@ -6,11 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_NEOGEO_CTRL_CTRL_H
+#define MAME_BUS_NEOGEO_CTRL_CTRL_H
 
 #pragma once
-
-#ifndef __NEOGEO_CONTROL_PORT__
-#define __NEOGEO_CONTROL_PORT__
 
 
 //**************************************************************************
@@ -26,21 +25,21 @@ class device_neogeo_control_port_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_neogeo_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_neogeo_control_port_interface();
 
-	virtual uint8_t read_ctrl() { return 0xff; };
-	virtual uint8_t read_start_sel() { return 0xff; };
-	virtual void write_ctrlsel(uint8_t data) { };
+	virtual uint8_t read_ctrl() { return 0xff; }
+	virtual uint8_t read_start_sel() { return 0xff; }
+	virtual void write_ctrlsel(uint8_t data) { }
 
 protected:
+	device_neogeo_control_port_interface(const machine_config &mconfig, device_t &device);
+
 	neogeo_control_port_device *m_port;
 };
 
 // ======================> neogeo_control_port_device
 
-class neogeo_control_port_device : public device_t,
-								public device_slot_interface
+class neogeo_control_port_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -66,7 +65,6 @@ class device_neogeo_ctrl_edge_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_neogeo_ctrl_edge_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_neogeo_ctrl_edge_interface();
 
 	virtual uint8_t read_start_sel() { return 0xff; }
@@ -75,13 +73,14 @@ public:
 	virtual void write_ctrlsel(uint8_t data) { }
 
 protected:
+	device_neogeo_ctrl_edge_interface(const machine_config &mconfig, device_t &device);
+
 	neogeo_ctrl_edge_port_device *m_port;
 };
 
 // ======================> neogeo_ctrl_edge_port_device
 
-class neogeo_ctrl_edge_port_device : public device_t,
-										public device_slot_interface
+class neogeo_ctrl_edge_port_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -102,8 +101,8 @@ protected:
 
 
 // device type definition
-extern const device_type NEOGEO_CONTROL_PORT;
-extern const device_type NEOGEO_CTRL_EDGE_CONNECTOR;
+DECLARE_DEVICE_TYPE(NEOGEO_CONTROL_PORT,        neogeo_control_port_device)
+DECLARE_DEVICE_TYPE(NEOGEO_CTRL_EDGE_CONNECTOR, neogeo_ctrl_edge_port_device)
 
 
 //**************************************************************************
@@ -126,4 +125,4 @@ SLOT_INTERFACE_EXTERN( neogeo_arc_edge_fixed );
 SLOT_INTERFACE_EXTERN( neogeo_arc_pin15 );
 
 
-#endif
+#endif // MAME_BUS_NEOGEO_CTRL_CTRL_H

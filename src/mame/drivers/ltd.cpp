@@ -515,7 +515,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 	}
 }
 
-static MACHINE_CONFIG_START( ltd3, ltd_state )
+static MACHINE_CONFIG_START( ltd3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(ltd3_map)
@@ -531,7 +531,7 @@ static MACHINE_CONFIG_START( ltd3, ltd_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_r", ltd_state, timer_r, attotime::from_hz(500))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ltd4, ltd_state )
+static MACHINE_CONFIG_START( ltd4 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz) // guess, no details available
 	MCFG_CPU_PROGRAM_MAP(ltd4_map)

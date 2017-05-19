@@ -352,24 +352,24 @@ PALETTE_INIT_MEMBER(tia_pal_video_device, tia_pal)
 	extend_palette( palette );
 }
 
-tia_video_device::tia_video_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
-		device_video_interface(mconfig, *this),
-		m_read_input_port_cb(*this),
-		m_databus_contents_cb(*this),
-		m_vsync_cb(*this)
+tia_video_device::tia_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_read_input_port_cb(*this)
+	, m_databus_contents_cb(*this)
+	, m_vsync_cb(*this)
 {
 }
 
 // device type definition
-const device_type TIA_PAL_VIDEO = device_creator<tia_pal_video_device>;
+DEFINE_DEVICE_TYPE(TIA_PAL_VIDEO, tia_pal_video_device, "tia_pal_video", "TIA Video (PAL)")
 
 //-------------------------------------------------
 //  tia_pal_video_device - constructor
 //-------------------------------------------------
 
 tia_pal_video_device::tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tia_video_device(mconfig, TIA_PAL_VIDEO, "TIA Video (PAL)", "tia_pal_video", tag, owner, clock)
+	: tia_video_device(mconfig, TIA_PAL_VIDEO, tag, owner, clock)
 {
 }
 
@@ -389,14 +389,14 @@ machine_config_constructor tia_pal_video_device::device_mconfig_additions() cons
 }
 
 // device type definition
-const device_type TIA_NTSC_VIDEO = device_creator<tia_ntsc_video_device>;
+DEFINE_DEVICE_TYPE(TIA_NTSC_VIDEO, tia_ntsc_video_device, "tia_ntsc_video", "TIA Video (NTSC)")
 
 //-------------------------------------------------
 //  tia_ntsc_video_device - constructor
 //-------------------------------------------------
 
 tia_ntsc_video_device::tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tia_video_device(mconfig, TIA_NTSC_VIDEO, "TIA Video (NTSC)", "tia_ntsc_video", tag, owner, clock)
+	: tia_video_device(mconfig, TIA_NTSC_VIDEO, tag, owner, clock)
 {
 }
 

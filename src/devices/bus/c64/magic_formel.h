@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_MAGIC_FORMEL_H
+#define MAME_BUS_C64_MAGIC_FORMEL_H
 
-#ifndef __MAGIC_FORMEL__
-#define __MAGIC_FORMEL__
+#pragma once
 
 #include "exp.h"
 #include "machine/6821pia.h"
@@ -64,7 +64,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_MAGIC_FORMEL;
+DECLARE_DEVICE_TYPE(C64_MAGIC_FORMEL, c64_magic_formel_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_MAGIC_FORMEL_H

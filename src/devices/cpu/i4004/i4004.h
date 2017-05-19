@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-#ifndef __I4004_H__
-#define __I4004_H__
+#ifndef MAME_CPU_I4004_I4004_H
+#define MAME_CPU_I4004_I4004_H
 
+#pragma once
 
 
 /***************************************************************************
@@ -101,7 +102,6 @@ protected:
 };
 
 
-extern const device_type I4004;
+DECLARE_DEVICE_TYPE(I4004, i4004_cpu_device)
 
-
-#endif
+#endif // MAME_CPU_I4004_I4004_H

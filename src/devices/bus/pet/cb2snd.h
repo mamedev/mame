@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_PET_CB2SND_H
+#define MAME_BUS_PET_CB2SND_H
 
-#ifndef __PETUSER_CB2__
-#define __PETUSER_CB2__
+#pragma once
 
 #include "user.h"
 #include "sound/dac.h"
@@ -29,15 +29,15 @@ public:
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_m ) override;
 
-	required_device<dac_bit_interface> m_dac;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	required_device<dac_bit_interface> m_dac;
 };
 
 
 // device type definition
-extern const device_type PET_USERPORT_CB2_SOUND_DEVICE;
+DECLARE_DEVICE_TYPE(PET_USERPORT_CB2_SOUND_DEVICE, pet_userport_cb2_sound_device)
 
-#endif
+#endif // MAME_BUS_PET_CB2SND_H

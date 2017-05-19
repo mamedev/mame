@@ -13,8 +13,8 @@
 
 **********************************************************************/
 
-#ifndef __LATCH8_H_
-#define __LATCH8_H_
+#ifndef MAME_MACHINE_LATCH8_H
+#define MAME_MACHINE_LATCH8_H
 
 #include "sound/discrete.h"
 
@@ -41,26 +41,26 @@ public:
 	/* read bit x                 */
 	/* return (latch >> x) & 0x01 */
 
-	DECLARE_READ_LINE_MEMBER( bit0_r );
-	DECLARE_READ_LINE_MEMBER( bit1_r );
-	DECLARE_READ_LINE_MEMBER( bit2_r );
-	DECLARE_READ_LINE_MEMBER( bit3_r );
-	DECLARE_READ_LINE_MEMBER( bit4_r );
-	DECLARE_READ_LINE_MEMBER( bit5_r );
-	DECLARE_READ_LINE_MEMBER( bit6_r );
-	DECLARE_READ_LINE_MEMBER( bit7_r );
+	DECLARE_READ_LINE_MEMBER( bit0_r ) { return BIT(m_value, 0); }
+	DECLARE_READ_LINE_MEMBER( bit1_r ) { return BIT(m_value, 1); }
+	DECLARE_READ_LINE_MEMBER( bit2_r ) { return BIT(m_value, 2); }
+	DECLARE_READ_LINE_MEMBER( bit3_r ) { return BIT(m_value, 3); }
+	DECLARE_READ_LINE_MEMBER( bit4_r ) { return BIT(m_value, 4); }
+	DECLARE_READ_LINE_MEMBER( bit5_r ) { return BIT(m_value, 5); }
+	DECLARE_READ_LINE_MEMBER( bit6_r ) { return BIT(m_value, 6); }
+	DECLARE_READ_LINE_MEMBER( bit7_r ) { return BIT(m_value, 7); }
 
 	/* read inverted bit x        */
 	/* return (latch >> x) & 0x01 */
 
-	DECLARE_READ_LINE_MEMBER( bit0_q_r );
-	DECLARE_READ_LINE_MEMBER( bit1_q_r );
-	DECLARE_READ_LINE_MEMBER( bit2_q_r );
-	DECLARE_READ_LINE_MEMBER( bit3_q_r );
-	DECLARE_READ_LINE_MEMBER( bit4_q_r );
-	DECLARE_READ_LINE_MEMBER( bit5_q_r );
-	DECLARE_READ_LINE_MEMBER( bit6_q_r );
-	DECLARE_READ_LINE_MEMBER( bit7_q_r );
+	DECLARE_READ_LINE_MEMBER( bit0_q_r ) { return BIT(m_value, 0) ^ 1; }
+	DECLARE_READ_LINE_MEMBER( bit1_q_r ) { return BIT(m_value, 1) ^ 1; }
+	DECLARE_READ_LINE_MEMBER( bit2_q_r ) { return BIT(m_value, 2) ^ 1; }
+	DECLARE_READ_LINE_MEMBER( bit3_q_r ) { return BIT(m_value, 3) ^ 1; }
+	DECLARE_READ_LINE_MEMBER( bit4_q_r ) { return BIT(m_value, 4) ^ 1; }
+	DECLARE_READ_LINE_MEMBER( bit5_q_r ) { return BIT(m_value, 5) ^ 1; }
+	DECLARE_READ_LINE_MEMBER( bit6_q_r ) { return BIT(m_value, 6) ^ 1; }
+	DECLARE_READ_LINE_MEMBER( bit7_q_r ) { return BIT(m_value, 7) ^ 1; }
 
 	/* write bit x from data into bit determined by offset */
 	/* latch = (latch & ~(1<<offset)) | (((data >> x) & 0x01) << offset) */
@@ -78,9 +78,9 @@ public:
 	static void set_xorvalue(device_t &device, uint32_t xorvalue) { downcast<latch8_device &>(device).m_xorvalue = xorvalue; }
 	static void set_nosync(device_t &device, uint32_t nosync) { downcast<latch8_device &>(device).m_nosync = nosync; }
 
-	template<class _Object> static devcb_base &set_write_cb(device_t &device, int i, _Object object) { return downcast<latch8_device &>(device).m_write_cb[i].set_callback(object); }
+	template <unsigned N, class Object> static devcb_base &set_write_cb(device_t &device, Object &&cb) { return downcast<latch8_device &>(device).m_write_cb[N].set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_read_cb(device_t &device, int i, _Object object) { return downcast<latch8_device &>(device).m_read_cb[i].set_callback(object); }
+	template <unsigned N, class Object> static devcb_base &set_read_cb(device_t &device, Object &&cb) { return downcast<latch8_device &>(device).m_read_cb[N].set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides
@@ -107,7 +107,8 @@ private:
 	devcb_read_line    m_read_cb[8];
 };
 
-extern const device_type LATCH8;
+DECLARE_DEVICE_TYPE(LATCH8, latch8_device)
+
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
@@ -130,53 +131,53 @@ extern const device_type LATCH8;
 
 /* Write bit to discrete node */
 #define MCFG_LATCH8_WRITE_0(_devcb) \
-	devcb = &latch8_device::set_write_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &latch8_device::set_write_cb<0>(*device, DEVCB_##_devcb);
 
 #define MCFG_LATCH8_WRITE_1(_devcb) \
-	devcb = &latch8_device::set_write_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &latch8_device::set_write_cb<1>(*device, DEVCB_##_devcb);
 
 #define MCFG_LATCH8_WRITE_2(_devcb) \
-	devcb = &latch8_device::set_write_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &latch8_device::set_write_cb<2>(*device, DEVCB_##_devcb);
 
 #define MCFG_LATCH8_WRITE_3(_devcb) \
-	devcb = &latch8_device::set_write_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &latch8_device::set_write_cb<3>(*device, DEVCB_##_devcb);
 
 #define MCFG_LATCH8_WRITE_4(_devcb) \
-	devcb = &latch8_device::set_write_cb(*device, 4, DEVCB_##_devcb);
+	devcb = &latch8_device::set_write_cb<4>(*device, DEVCB_##_devcb);
 
 #define MCFG_LATCH8_WRITE_5(_devcb) \
-	devcb = &latch8_device::set_write_cb(*device, 5, DEVCB_##_devcb);
+	devcb = &latch8_device::set_write_cb<5>(*device, DEVCB_##_devcb);
 
 #define MCFG_LATCH8_WRITE_6(_devcb) \
-	devcb = &latch8_device::set_write_cb(*device, 6, DEVCB_##_devcb);
+	devcb = &latch8_device::set_write_cb<6>(*device, DEVCB_##_devcb);
 
 #define MCFG_LATCH8_WRITE_7(_devcb) \
-	devcb = &latch8_device::set_write_cb(*device, 7, DEVCB_##_devcb);
+	devcb = &latch8_device::set_write_cb<7>(*device, DEVCB_##_devcb);
 
 /* Upon read, replace bits by reading from another device handler */
 #define MCFG_LATCH8_READ_0(_devcb) \
-	devcb = &latch8_device::set_read_cb(*device, 0, DEVCB_##_devcb);
+	devcb = &latch8_device::set_read_cb<0>(*device, DEVCB_##_devcb);
 
 #define MCFG_LATCH8_READ_1(_devcb) \
-	devcb = &latch8_device::set_read_cb(*device, 1, DEVCB_##_devcb);
+	devcb = &latch8_device::set_read_cb<1>(*device, DEVCB_##_devcb);
 
 #define MCFG_LATCH8_READ_2(_devcb) \
-	devcb = &latch8_device::set_read_cb(*device, 2, DEVCB_##_devcb);
+	devcb = &latch8_device::set_read_cb<2>(*device, DEVCB_##_devcb);
 
 #define MCFG_LATCH8_READ_3(_devcb) \
-	devcb = &latch8_device::set_read_cb(*device, 3, DEVCB_##_devcb);
+	devcb = &latch8_device::set_read_cb<3>(*device, DEVCB_##_devcb);
 
 #define MCFG_LATCH8_READ_4(_devcb) \
-	devcb = &latch8_device::set_read_cb(*device, 4, DEVCB_##_devcb);
+	devcb = &latch8_device::set_read_cb<4>(*device, DEVCB_##_devcb);
 
 #define MCFG_LATCH8_READ_5(_devcb) \
-	devcb = &latch8_device::set_read_cb(*device, 5, DEVCB_##_devcb);
+	devcb = &latch8_device::set_read_cb<5>(*device, DEVCB_##_devcb);
 
 #define MCFG_LATCH8_READ_6(_devcb) \
-	devcb = &latch8_device::set_read_cb(*device, 6, DEVCB_##_devcb);
+	devcb = &latch8_device::set_read_cb<6>(*device, DEVCB_##_devcb);
 
 #define MCFG_LATCH8_READ_7(_devcb) \
-	devcb = &latch8_device::set_read_cb(*device, 7, DEVCB_##_devcb);
+	devcb = &latch8_device::set_read_cb<7>(*device, DEVCB_##_devcb);
 
 
-#endif /* __LATCH8_H_ */
+#endif // MAME_MACHINE_LATCH8_H

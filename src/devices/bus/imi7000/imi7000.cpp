@@ -23,8 +23,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type IMI7000_BUS = device_creator<imi7000_bus_device>;
-const device_type IMI7000_SLOT = device_creator<imi7000_slot_device>;
+DEFINE_DEVICE_TYPE(IMI7000_BUS,  imi7000_bus_device,  "imi7000",      "IMI7000 bus")
+DEFINE_DEVICE_TYPE(IMI7000_SLOT, imi7000_slot_device, "imi7000_slot", "IMI7000 slot")
 
 
 
@@ -51,9 +51,10 @@ device_imi7000_interface::device_imi7000_interface(const machine_config &mconfig
 //  imi7000_slot_device - constructor
 //-------------------------------------------------
 
-imi7000_slot_device::imi7000_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, IMI7000_SLOT, "IMI 7000 slot", tag, owner, clock, "imi7000_slot", __FILE__),
-		device_slot_interface(mconfig, *this), m_card(nullptr)
+imi7000_slot_device::imi7000_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, IMI7000_SLOT, tag, owner, clock)
+	, device_slot_interface(mconfig, *this)
+	, m_card(nullptr)
 {
 }
 
@@ -76,8 +77,8 @@ void imi7000_slot_device::device_start()
 //  imi7000_bus_device - constructor
 //-------------------------------------------------
 
-imi7000_bus_device::imi7000_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, IMI7000_BUS, "IMI 7000 bus", tag, owner, clock, "imi7000", __FILE__)
+imi7000_bus_device::imi7000_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, IMI7000_BUS, tag, owner, clock)
 {
 }
 

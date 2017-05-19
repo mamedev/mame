@@ -12,7 +12,7 @@
 #include "speaker.h"
 
 
-const device_type ISA16_SB16 = device_creator<sb16_lle_device>;
+DEFINE_DEVICE_TYPE(ISA16_SB16, sb16_lle_device, "sb16", "SoundBlaster 16 Audio Adapter LLE")
 
 READ8_MEMBER( sb16_lle_device::dsp_data_r )
 {
@@ -681,7 +681,7 @@ WRITE8_MEMBER( sb16_lle_device::mpu401_w )
 }
 
 sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISA16_SB16, "SoundBlaster 16 Audio Adapter LLE", tag, owner, clock, "sb16", __FILE__),
+	device_t(mconfig, ISA16_SB16, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
 	m_ldac(*this, "ldac"),
 	m_rdac(*this, "rdac"),

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ADAM_IDE_H
+#define MAME_BUS_ADAM_IDE_H
 
-#ifndef __ADAM_IDE__
-#define __ADAM_IDE__
+#pragma once
 
 #include "exp.h"
 #include "machine/ataintf.h"
@@ -51,8 +51,6 @@ private:
 
 
 // device type definition
-extern const device_type ADAM_IDE;
+DECLARE_DEVICE_TYPE(ADAM_IDE, powermate_ide_device)
 
-
-
-#endif
+#endif // MAME_BUS_ADAM_IDE_H

@@ -43,7 +43,7 @@ public:
 
 	DECLARE_READ8_MEMBER(ppi_custom_r);
 	DECLARE_WRITE8_MEMBER(ppi_custom_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_READ8_MEMBER(port_b_r);
 	uint32_t screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -142,7 +142,7 @@ READ8_MEMBER( tk80bs_state::port_b_r )
 		return 0;
 }
 
-WRITE8_MEMBER( tk80bs_state::kbd_put )
+void tk80bs_state::kbd_put(u8 data)
 {
 	data &= 0x7f;
 	if (data > 0x5f) data-=0x20;
@@ -166,7 +166,7 @@ static GFXDECODE_START( tk80bs )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
+static MACHINE_CONFIG_START( tk80bs )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(tk80bs_mem)
@@ -189,7 +189,7 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 	MCFG_I8255_IN_PORTB_CB(READ8(tk80bs_state, port_b_r))
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(tk80bs_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(tk80bs_state, kbd_put))
 MACHINE_CONFIG_END
 
 
@@ -220,5 +220,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS         INIT     COMPANY                 FULLNAME       FLAGS */
-COMP( 1980, tk80bs,   tk80,   0,       tk80bs,    tk80bs,   driver_device, 0, "NEC", "TK-80BS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS        INIT  COMPANY  FULLNAME   FLAGS
+COMP( 1980, tk80bs,   tk80,   0,       tk80bs,    tk80bs,   tk80bs_state, 0,   "NEC",   "TK-80BS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

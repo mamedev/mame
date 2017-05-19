@@ -34,10 +34,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SVI3X8_EXPANDER_EXPANDER_H
+#define MAME_BUS_SVI3X8_EXPANDER_EXPANDER_H
 
-#ifndef __SVI3X8_EXPANDER_H__
-#define __SVI3X8_EXPANDER_H__
+#pragma once
 
 
 
@@ -86,26 +86,26 @@ public:
 	virtual ~svi_expander_device();
 
 	// callbacks
-	template<class _Object> static devcb_base &set_int_handler(device_t &device, _Object object)
-		{ return downcast<svi_expander_device &>(device).m_int_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_int_handler(device_t &device, Object &&cb)
+	{ return downcast<svi_expander_device &>(device).m_int_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_romdis_handler(device_t &device, _Object object)
-		{ return downcast<svi_expander_device &>(device).m_romdis_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_romdis_handler(device_t &device, Object &&cb)
+	{ return downcast<svi_expander_device &>(device).m_romdis_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_ramdis_handler(device_t &device, _Object object)
-		{ return downcast<svi_expander_device &>(device).m_ramdis_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_ramdis_handler(device_t &device, Object &&cb)
+	{ return downcast<svi_expander_device &>(device).m_ramdis_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_ctrl1_handler(device_t &device, _Object object)
-		{ return downcast<svi_expander_device &>(device).m_ctrl1_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_ctrl1_handler(device_t &device, Object &&cb)
+	{ return downcast<svi_expander_device &>(device).m_ctrl1_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_ctrl2_handler(device_t &device, _Object object)
-		{ return downcast<svi_expander_device &>(device).m_ctrl2_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_ctrl2_handler(device_t &device, Object &&cb)
+	{ return downcast<svi_expander_device &>(device).m_ctrl2_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_excsr_handler(device_t &device, _Object object)
-		{ return downcast<svi_expander_device &>(device).m_excsr_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_excsr_handler(device_t &device, Object &&cb)
+	{ return downcast<svi_expander_device &>(device).m_excsr_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_excsw_handler(device_t &device, _Object object)
-		{ return downcast<svi_expander_device &>(device).m_excsw_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_excsw_handler(device_t &device, Object &&cb)
+	{ return downcast<svi_expander_device &>(device).m_excsw_handler.set_callback(std::forward<Object>(cb)); }
 
 	// called from cart device
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
@@ -152,20 +152,21 @@ class device_svi_expander_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_svi_expander_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_svi_expander_interface();
 
-	virtual DECLARE_READ8_MEMBER( mreq_r ) { return 0xff; };
-	virtual DECLARE_WRITE8_MEMBER( mreq_w ){};
-	virtual DECLARE_READ8_MEMBER( iorq_r ) { return 0xff; };
-	virtual DECLARE_WRITE8_MEMBER( iorq_w ){};
+	virtual DECLARE_READ8_MEMBER( mreq_r ) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER( mreq_w ) { }
+	virtual DECLARE_READ8_MEMBER( iorq_r ) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER( iorq_w ) { }
 
-	virtual void bk21_w(int state) {};
-	virtual void bk22_w(int state) {};
-	virtual void bk31_w(int state) {};
-	virtual void bk32_w(int state) {};
+	virtual void bk21_w(int state) { }
+	virtual void bk22_w(int state) { }
+	virtual void bk31_w(int state) { }
+	virtual void bk32_w(int state) { }
 
 protected:
+	device_svi_expander_interface(const machine_config &mconfig, device_t &device);
+
 	svi_expander_device *m_expander;
 };
 
@@ -175,4 +176,4 @@ extern const device_type SVI_EXPANDER;
 // include here so drivers don't need to
 #include "modules.h"
 
-#endif // __SVI3X8_EXPANDER_H__
+#endif // MAME_BUS_SVI3X8_EXPANDER_EXPANDER_H

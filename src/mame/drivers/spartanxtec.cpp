@@ -356,7 +356,7 @@ PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
 
 
 
-static MACHINE_CONFIG_START( spartanxtec, spartanxtec_state )
+static MACHINE_CONFIG_START( spartanxtec )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
@@ -443,4 +443,4 @@ ROM_END
 
 
 
-GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, driver_device,  0, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )
+GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, spartanxtec_state,  0, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )

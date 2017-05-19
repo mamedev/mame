@@ -56,6 +56,7 @@
 
 #include "emu.h"
 #include "hp9895.h"
+#include "formats/hpi_dsk.h"
 
 // Debugging
 #define VERBOSE 1
@@ -130,7 +131,7 @@ enum {
 #define MIN_SYNC_BITS       29      // Number of bits to synchronize
 
 // device type definition
-const device_type HP9895 = device_creator<hp9895_device>;
+DEFINE_DEVICE_TYPE(HP9895, hp9895_device, "hp9895", "HP9895")
 
 // Masks of drive selectors in XV register
 static const uint8_t xv_drive_masks[] = {
@@ -139,7 +140,7 @@ static const uint8_t xv_drive_masks[] = {
 };
 
 hp9895_device::hp9895_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HP9895, "HP9895", tag, owner, clock, "hp9895", __FILE__),
+	: device_t(mconfig, HP9895, tag, owner, clock),
 	  device_ieee488_interface(mconfig, *this),
 	  m_cpu(*this , "cpu"),
 	  m_phi(*this , "phi"),
@@ -866,6 +867,12 @@ static SLOT_INTERFACE_START(hp9895_floppies)
 	SLOT_INTERFACE("8dsdd" , FLOPPY_8_DSDD)
 SLOT_INTERFACE_END
 
+static const floppy_format_type hp9895_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
+	FLOPPY_HPI_FORMAT,
+	nullptr
+};
+
 static MACHINE_CONFIG_FRAGMENT(hp9895)
 	MCFG_CPU_ADD("cpu" , Z80 , 4000000)
 	MCFG_CPU_PROGRAM_MAP(z80_program_map)
@@ -884,9 +891,9 @@ static MACHINE_CONFIG_FRAGMENT(hp9895)
 	MCFG_PHI_DIO_READWRITE_CB(READ8(hp9895_device , phi_dio_r) , WRITE8(hp9895_device , phi_dio_w))
 	MCFG_PHI_INT_WRITE_CB(WRITELINE(hp9895_device , phi_int_w))
 
-	MCFG_FLOPPY_DRIVE_ADD("floppy0" , hp9895_floppies , "8dsdd" , floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("floppy0" , hp9895_floppies , "8dsdd" , hp9895_floppy_formats)
 	MCFG_SLOT_FIXED(true)
-	MCFG_FLOPPY_DRIVE_ADD("floppy1" , hp9895_floppies , "8dsdd" , floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("floppy1" , hp9895_floppies , "8dsdd" , hp9895_floppy_formats)
 	MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
 

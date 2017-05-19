@@ -43,7 +43,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VP550 = device_creator<vp550_device>;
+DEFINE_DEVICE_TYPE(VP550, vp550_device, "vp550", "VP-550 Super Sound")
 
 
 //-------------------------------------------------
@@ -82,7 +82,7 @@ machine_config_constructor vp550_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 vp550_device::vp550_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VP550, "VP550", tag, owner, clock, "vp550", __FILE__),
+	device_t(mconfig, VP550, tag, owner, clock),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_pfg_a(*this, CDP1863_A_TAG),
 	m_pfg_b(*this, CDP1863_B_TAG), m_sync_timer(nullptr)

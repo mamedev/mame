@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef MAME_DEVICE_BUS_ISA_CGA_H
-#define MAME_DEVICE_BUS_ISA_CGA_H
+#ifndef MAME_BUS_ISA_CGA_H
+#define MAME_BUS_ISA_CGA_H
 
 #pragma once
 
@@ -28,7 +28,6 @@ class isa8_cga_device :
 public:
 	// construction/destruction
 	isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	isa8_cga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_UPDATE_ROW( cga_text_inten_update_row );
@@ -48,6 +47,8 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
+	isa8_cga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	required_ioport m_cga_config;
 
 	// device-level overrides
@@ -88,7 +89,7 @@ public:
 };
 
 // device type definition
-extern const device_type ISA8_CGA;
+DECLARE_DEVICE_TYPE(ISA8_CGA, isa8_cga_device)
 
 
 // ======================> isa8_cga_superimpose_device
@@ -99,11 +100,12 @@ class isa8_cga_superimpose_device :
 public:
 	// construction/destruction
 	isa8_cga_superimpose_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+protected:
+	isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
 // device type definition
-extern const device_type ISA8_CGA_SUPERIMPOSE;
+DECLARE_DEVICE_TYPE(ISA8_CGA_SUPERIMPOSE, isa8_cga_superimpose_device)
 
 
 // ======================> isa8_poisk2_device
@@ -119,7 +121,7 @@ public:
 };
 
 // device type definition
-extern const device_type ISA8_CGA_POISK2;
+DECLARE_DEVICE_TYPE(ISA8_CGA_POISK2, isa8_cga_poisk2_device)
 
 
 // ======================> isa8_pc1512_device
@@ -162,7 +164,7 @@ public:
 };
 
 // device type definition
-extern const device_type ISA8_CGA_PC1512;
+DECLARE_DEVICE_TYPE(ISA8_CGA_PC1512, isa8_cga_pc1512_device)
 
 // ======================> isa8_wyse700_device
 
@@ -192,7 +194,7 @@ public:
 };
 
 // device type definition
-extern const device_type ISA8_WYSE700;
+DECLARE_DEVICE_TYPE(ISA8_WYSE700, isa8_wyse700_device)
 
 // ======================> isa8_ec1841_0002_device
 
@@ -218,7 +220,7 @@ public:
 };
 
 // device type definition
-extern const device_type ISA8_EC1841_0002;
+DECLARE_DEVICE_TYPE(ISA8_EC1841_0002, isa8_ec1841_0002_device)
 
 // ======================> isa8_cga_iskr1031_device
 
@@ -232,7 +234,7 @@ public:
 };
 
 // device type definition
-extern const device_type ISA8_CGA_ISKR1030M;
+DECLARE_DEVICE_TYPE(ISA8_CGA_ISKR1030M, isa8_cga_iskr1030m_device)
 
 // ======================> isa8_cga_iskr1031_device
 
@@ -246,7 +248,7 @@ public:
 };
 
 // device type definition
-extern const device_type ISA8_CGA_ISKR1031;
+DECLARE_DEVICE_TYPE(ISA8_CGA_ISKR1031, isa8_cga_iskr1031_device)
 
 // ======================> isa8_cga_mc1502_device
 
@@ -261,7 +263,7 @@ public:
 };
 
 // device type definition
-extern const device_type ISA8_CGA_MC1502;
+DECLARE_DEVICE_TYPE(ISA8_CGA_MC1502, isa8_cga_mc1502_device)
 
 
 class isa8_cga_m24_device :
@@ -285,6 +287,6 @@ private:
 };
 
 // device type definition
-extern const device_type ISA8_CGA_M24;
+DECLARE_DEVICE_TYPE(ISA8_CGA_M24, isa8_cga_m24_device)
 
-#endif  // MAME_DEVICE_BUS_ISA_CGA_H
+#endif  // MAME_BUS_ISA_CGA_H

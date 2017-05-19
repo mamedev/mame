@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_S100_NSMDSA_H
+#define MAME_BUS_S100_NSMDSA_H
 
-#ifndef __S100_MDS_A__
-#define __S100_MDS_A__
+#pragma once
 
 #include "s100.h"
 #include "imagedev/floppy.h"
@@ -50,8 +50,6 @@ private:
 
 
 // device type definition
-extern const device_type S100_MDS_A;
+DECLARE_DEVICE_TYPE(S100_MDS_A, s100_mds_a_device)
 
-
-
-#endif
+#endif // MAME_BUS_S100_NSMDSA_H

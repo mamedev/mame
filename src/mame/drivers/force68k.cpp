@@ -429,7 +429,7 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (fccpu1, force68k_state)
+static MACHINE_CONFIG_START (fccpu1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
@@ -499,27 +499,27 @@ MACHINE_CONFIG_END
        * CPU-6 family is device and adressmap compatible with CPU-1 but with additions
        * such as an optional 68881 FPU
        */
-static MACHINE_CONFIG_START (fccpu6, force68k_state)
+static MACHINE_CONFIG_START (fccpu6)
 	MCFG_CPU_ADD ("maincpu", M68000, XTAL_8MHz)         /* Jumper B10 Mode B */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START (fccpu6a, force68k_state)
+static MACHINE_CONFIG_START (fccpu6a)
 	MCFG_CPU_ADD ("maincpu", M68000, XTAL_12_5MHz)        /* Jumper B10 Mode A */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START (fccpu6v, force68k_state)
+static MACHINE_CONFIG_START (fccpu6v)
 	MCFG_CPU_ADD ("maincpu", M68010, XTAL_8MHz)         /* Jumper B10 Mode B */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START (fccpu6va, force68k_state)
+static MACHINE_CONFIG_START (fccpu6va)
 	MCFG_CPU_ADD ("maincpu", M68010, XTAL_12_5MHz)        /* Jumper B10 Mode A */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START (fccpu6vb, force68k_state)
+static MACHINE_CONFIG_START (fccpu6vb)
 	MCFG_CPU_ADD ("maincpu", M68010, XTAL_12_5MHz)        /* Jumper B10 Mode A */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
@@ -608,10 +608,10 @@ ROM_END
 #endif
 
 /* Driver */
-/*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT COMPANY                  FULLNAME          FLAGS */
-COMP( 1983, fccpu1,            0,      0,      fccpu1,      force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-1",   MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-//COMP( 1989, fccpu6,   0,      0,       fccpu6,      force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6",   MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6a,  0,      0,       fccpu6a,     force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6a",  MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6v,  0,      0,       fccpu6v,     force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6v",  MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6va, 0,      0,       fccpu6va,    force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6va", MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6vb, 0,      0,       fccpu6vb,    force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6vb", MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE      INPUT     CLASS            INIT  COMPANY                  FULLNAME          FLAGS */
+COMP( 1983, fccpu1,   0,      0,      fccpu1,      force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-1",   MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+//COMP( 1989, fccpu6,   0,      0,      fccpu6,      force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6",   MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6a,  0,      0,      fccpu6a,     force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6a",  MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6v,  0,      0,      fccpu6v,     force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6v",  MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6va, 0,      0,      fccpu6va,    force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6va", MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6vb, 0,      0,      fccpu6vb,    force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6vb", MACHINE_IS_SKELETON )

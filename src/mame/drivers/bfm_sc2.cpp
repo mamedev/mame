@@ -230,9 +230,9 @@ public:
 
 
 	required_device<upd7759_device> m_upd7759;
-	optional_device<bfm_bd1_t> m_vfd0;
-	optional_device<bfm_bd1_t> m_vfd1;
-	optional_device<bfmdm01_device> m_dm01;
+	optional_device<bfm_bd1_device> m_vfd0;
+	optional_device<bfm_bd1_device> m_vfd1;
+	optional_device<bfm_dm01_device> m_dm01;
 	optional_device<meters_device> m_meters; // scorpion2_vid doesn't use this (scorpion2_vidm does)
 
 	int m_sc2gui_update_mmtr; //not used?
@@ -2214,7 +2214,7 @@ MACHINE_START_MEMBER(bfm_sc2_state,bfm_sc2)
 	save_state();
 }
 
-static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
+static MACHINE_CONFIG_START( scorpion2_vid )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 ) // 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap_vid)                    // setup scorpion2 board memorymap
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, timer_irq,  1000)               // generate 1000 IRQ's per second
@@ -3688,7 +3688,7 @@ MACHINE_START_MEMBER(bfm_sc2_state,sc2dmd)
 
 /* machine driver for scorpion2 board */
 
-static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
+static MACHINE_CONFIG_START( scorpion2 )
 	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state,awp_init)
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(memmap_no_vid)
@@ -3749,7 +3749,7 @@ MACHINE_CONFIG_END
 
 
 /* machine driver for scorpion2 board + matrix board */
-static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
+static MACHINE_CONFIG_START( scorpion2_dm01 )
 	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state,dm01_init)
 	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
@@ -3772,8 +3772,8 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sc2_dmd)
-	MCFG_DEVICE_ADD("dm01", BF_DM01, 0)
-	MCFG_BF_DM01_BUSY_CB(WRITELINE(bfm_sc2_state, bfmdm01_busy))
+	MCFG_DEVICE_ADD("dm01", BFM_DM01, 0)
+	MCFG_BFM_DM01_BUSY_CB(WRITELINE(bfm_sc2_state, bfmdm01_busy))
 
 	MCFG_STARPOINT_48STEP_ADD("reel0")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel0_optic_cb))

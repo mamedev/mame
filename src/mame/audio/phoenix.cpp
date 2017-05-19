@@ -11,7 +11,7 @@
 
 
 #include "emu.h"
-#include "includes/phoenix.h"
+#include "audio/phoenix.h"
 
 /****************************************************************************
  * 4006
@@ -48,11 +48,11 @@
 
 
 
-const device_type PHOENIX = device_creator<phoenix_sound_device>;
+DEFINE_DEVICE_TYPE(PHOENIX, phoenix_sound_device, "phoenix_sound", "Phoenix Audio Custom")
 
 phoenix_sound_device::phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PHOENIX, "Phoenix Audio Custom", tag, owner, clock, "phoenix_sound", __FILE__),
-		device_sound_interface(mconfig, *this)
+	: device_t(mconfig, PHOENIX, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 {
 }
 

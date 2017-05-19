@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SMS_CTRL_RFU_H
+#define MAME_BUS_SMS_CTRL_RFU_H
 
-#ifndef __SMS_RAPID_FIRE__
-#define __SMS_RAPID_FIRE__
+#pragma once
 
 
 #include "smsctrl.h"
@@ -55,7 +55,7 @@ private:
 
 
 // device type definition
-extern const device_type SMS_RAPID_FIRE;
+DECLARE_DEVICE_TYPE(SMS_RAPID_FIRE, sms_rapid_fire_device)
 
 
-#endif
+#endif // MAME_BUS_SMS_CTRL_RFU_H

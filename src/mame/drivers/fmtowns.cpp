@@ -2788,12 +2788,12 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M,32M,64M,96M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( towns, towns_state )
+static MACHINE_CONFIG_START( towns )
 	MCFG_FRAGMENT_ADD(towns_base)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( townsux, towns16_state )
+static MACHINE_CONFIG_START( townsux )
 	MCFG_FRAGMENT_ADD(towns_base)
 
 	MCFG_CPU_REPLACE("maincpu",I386SX, 16000000)
@@ -2846,7 +2846,7 @@ static MACHINE_CONFIG_DERIVED( townsftv, towns )
 	MCFG_RAM_EXTRA_OPTIONS("32M,68M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( marty, marty_state )
+static MACHINE_CONFIG_START( marty )
 	MCFG_FRAGMENT_ADD(towns_base)
 
 	MCFG_CPU_REPLACE("maincpu",I386SX, 16000000)
@@ -2985,14 +2985,14 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    INIT    COMPANY      FULLNAME            FLAGS */
-COMP( 1989, fmtowns,  0,        0,      towns,      towns, driver_device,    0,  "Fujitsu",   "FM-Towns",        MACHINE_NOT_WORKING)
-COMP( 1989, fmtownsa, fmtowns,  0,      towns,      towns, driver_device,    0,  "Fujitsu",   "FM-Towns (alternate)", MACHINE_NOT_WORKING)
-COMP( 1991, fmtownsux,fmtowns,  0,      townsux,    towns, driver_device,    0,  "Fujitsu",   "FM-Towns II UX", MACHINE_NOT_WORKING)
-COMP( 1992, fmtownshr,fmtowns,  0,      townshr,    towns, driver_device,    0,  "Fujitsu",   "FM-Towns II HR", MACHINE_NOT_WORKING)
-COMP( 1993, fmtownsmx,fmtowns,  0,      townshr,    towns, driver_device,    0,  "Fujitsu",   "FM-Towns II MX", MACHINE_NOT_WORKING)
-COMP( 1994, fmtownsftv,fmtowns, 0,      townsftv,   towns, driver_device,    0,  "Fujitsu",   "FM-Towns II FreshTV", MACHINE_NOT_WORKING)
-COMP( 19??, fmtownssj,fmtowns,  0,      townssj,    towns, driver_device,    0,  "Fujitsu",   "FM-Towns II SJ", MACHINE_NOT_WORKING)
-CONS( 1993, fmtmarty, 0,        0,      marty,      marty, driver_device,    0,  "Fujitsu",   "FM-Towns Marty",  MACHINE_NOT_WORKING)
-CONS( 1993, fmtmarty2,fmtmarty, 0,      marty,      marty, driver_device,    0,  "Fujitsu",   "FM-Towns Marty 2",  MACHINE_NOT_WORKING)
-CONS( 1994, carmarty, fmtmarty, 0,      marty,      marty, driver_device,    0,  "Fujitsu",   "FM-Towns Car Marty",  MACHINE_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT  STATE           INIT  COMPANY      FULLNAME                FLAGS */
+COMP( 1989, fmtowns,  0,        0,      towns,      towns, towns_state,    0,    "Fujitsu",   "FM-Towns",             MACHINE_NOT_WORKING)
+COMP( 1989, fmtownsa, fmtowns,  0,      towns,      towns, towns_state,    0,    "Fujitsu",   "FM-Towns (alternate)", MACHINE_NOT_WORKING)
+COMP( 1991, fmtownsux,fmtowns,  0,      townsux,    towns, towns16_state,  0,    "Fujitsu",   "FM-Towns II UX",       MACHINE_NOT_WORKING)
+COMP( 1992, fmtownshr,fmtowns,  0,      townshr,    towns, towns_state,    0,    "Fujitsu",   "FM-Towns II HR",       MACHINE_NOT_WORKING)
+COMP( 1993, fmtownsmx,fmtowns,  0,      townshr,    towns, towns_state,    0,    "Fujitsu",   "FM-Towns II MX",       MACHINE_NOT_WORKING)
+COMP( 1994, fmtownsftv,fmtowns, 0,      townsftv,   towns, towns_state,    0,    "Fujitsu",   "FM-Towns II FreshTV",  MACHINE_NOT_WORKING)
+COMP( 19??, fmtownssj,fmtowns,  0,      townssj,    towns, towns_state,    0,    "Fujitsu",   "FM-Towns II SJ",       MACHINE_NOT_WORKING)
+CONS( 1993, fmtmarty, 0,        0,      marty,      marty, marty_state,    0,    "Fujitsu",   "FM-Towns Marty",       MACHINE_NOT_WORKING)
+CONS( 1993, fmtmarty2,fmtmarty, 0,      marty,      marty, marty_state,    0,    "Fujitsu",   "FM-Towns Marty 2",     MACHINE_NOT_WORKING)
+CONS( 1994, carmarty, fmtmarty, 0,      marty,      marty, marty_state,    0,    "Fujitsu",   "FM-Towns Car Marty",   MACHINE_NOT_WORKING)

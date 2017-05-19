@@ -825,8 +825,8 @@ void dcs_audio_device::dcs_register_state()
 //  dcs_audio_device - constructor
 //-------------------------------------------------
 
-dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int rev) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rev) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_cpu(nullptr),
 	m_program(nullptr),
 	m_data(nullptr),
@@ -2488,14 +2488,14 @@ int dcs_audio_device::preprocess_write(uint16_t data)
 	return result;
 }
 
-const device_type DCS_AUDIO_2K = device_creator<dcs_audio_2k_device>;
+DEFINE_DEVICE_TYPE(DCS_AUDIO_2K, dcs_audio_2k_device, "dcs_audio_2k", "DCS Audio 2K")
 
 //-------------------------------------------------
 //  dcs_audio_2k_device - constructor
 //-------------------------------------------------
 
 dcs_audio_2k_device::dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs_audio_device(mconfig, DCS_AUDIO_2K, "DCS Audio 2K", tag, owner, clock, "dcs_audio_2k", __FILE__)
+	dcs_audio_device(mconfig, DCS_AUDIO_2K, tag, owner, clock, 1)
 {
 }
 
@@ -2504,14 +2504,14 @@ machine_config_constructor dcs_audio_2k_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( dcs_audio_2k );
 }
 
-const device_type DCS_AUDIO_2K_UART = device_creator<dcs_audio_2k_uart_device>;
+DEFINE_DEVICE_TYPE(DCS_AUDIO_2K_UART, dcs_audio_2k_uart_device, "dcs_audio_2k_uart", "DCS Audio 2K UART")
 
 //-------------------------------------------------
 //  dcs_audio_2k_uart_device - constructor
 //-------------------------------------------------
 
 dcs_audio_2k_uart_device::dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs_audio_device(mconfig, DCS_AUDIO_2K_UART, "DCS Audio 2K UART", tag, owner, clock, "dcs_audio_2k_uart", __FILE__)
+	dcs_audio_device(mconfig, DCS_AUDIO_2K_UART, tag, owner, clock, 1)
 {
 }
 
@@ -2520,14 +2520,14 @@ machine_config_constructor dcs_audio_2k_uart_device::device_mconfig_additions() 
 	return MACHINE_CONFIG_NAME( dcs_audio_2k_uart );
 }
 
-const device_type DCS_AUDIO_8K = device_creator<dcs_audio_8k_device>;
+DEFINE_DEVICE_TYPE(DCS_AUDIO_8K, dcs_audio_8k_device, "dcs_audio_8k", "DCS Audio 8K")
 
 //-------------------------------------------------
 //  dcs_audio_8k_device - constructor
 //-------------------------------------------------
 
 dcs_audio_8k_device::dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs_audio_device(mconfig, DCS_AUDIO_8K, "DCS Audio 8K", tag, owner, clock, "dcs_audio_8k", __FILE__)
+	dcs_audio_device(mconfig, DCS_AUDIO_8K, tag, owner, clock, 1)
 {
 }
 
@@ -2536,14 +2536,14 @@ machine_config_constructor dcs_audio_8k_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( dcs_audio_8k );
 }
 
-const device_type DCS_AUDIO_WPC = device_creator<dcs_audio_wpc_device>;
+DEFINE_DEVICE_TYPE(DCS_AUDIO_WPC, dcs_audio_wpc_device, "dcs_audio_wpc", "DCS Audio WPC")
 
 //-------------------------------------------------
 //  dcs_audio_wpc_device - constructor
 //-------------------------------------------------
 
 dcs_audio_wpc_device::dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs_audio_device(mconfig, DCS_AUDIO_WPC, "DCS Audio WPC", tag, owner, clock, "dcs_audio_wpc", __FILE__, 15)
+	dcs_audio_device(mconfig, DCS_AUDIO_WPC, tag, owner, clock, 15)
 {
 }
 
@@ -2558,20 +2558,20 @@ machine_config_constructor dcs_audio_wpc_device::device_mconfig_additions() cons
 //  dcs2_audio_device - constructor
 //-------------------------------------------------
 
-dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	dcs_audio_device(mconfig, type, name, tag, owner, clock, shortname, source)
+dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	dcs_audio_device(mconfig, type, tag, owner, clock, 1)
 {
 }
 
 
-const device_type DCS2_AUDIO_2115 = device_creator<dcs2_audio_2115_device>;
+DEFINE_DEVICE_TYPE(DCS2_AUDIO_2115, dcs2_audio_2115_device, "dcs2_audio_2115", "DCS2 Audio 2115")
 
 //-------------------------------------------------
 //  dcs2_audio_2115_device - constructor
 //-------------------------------------------------
 
 dcs2_audio_2115_device::dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs2_audio_device(mconfig, DCS2_AUDIO_2115, "DCS2 Audio 2115", tag, owner, clock, "dcs2_audio_2115", __FILE__)
+	dcs2_audio_device(mconfig, DCS2_AUDIO_2115, tag, owner, clock)
 {
 }
 
@@ -2580,14 +2580,14 @@ machine_config_constructor dcs2_audio_2115_device::device_mconfig_additions() co
 	return MACHINE_CONFIG_NAME( dcs2_audio_2115 );
 }
 
-const device_type DCS2_AUDIO_2104 = device_creator<dcs2_audio_2104_device>;
+DEFINE_DEVICE_TYPE(DCS2_AUDIO_2104, dcs2_audio_2104_device, "dcs2_audio_2104", "DCS2 Audio 2104")
 
 //-------------------------------------------------
 //  dcs2_audio_2104_device - constructor
 //-------------------------------------------------
 
 dcs2_audio_2104_device::dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs2_audio_device(mconfig, DCS2_AUDIO_2104, "DCS2 Audio 2104", tag, owner, clock, "dcs2_audio_2104", __FILE__)
+	dcs2_audio_device(mconfig, DCS2_AUDIO_2104, tag, owner, clock)
 {
 }
 
@@ -2597,14 +2597,14 @@ machine_config_constructor dcs2_audio_2104_device::device_mconfig_additions() co
 }
 
 
-const device_type DCS2_AUDIO_DSIO = device_creator<dcs2_audio_dsio_device>;
+DEFINE_DEVICE_TYPE(DCS2_AUDIO_DSIO, dcs2_audio_dsio_device, "dcs2_audio_dsio", "DCS2 Audio DSIO")
 
 //-------------------------------------------------
 //  dcs2_audio_dsio_device - constructor
 //-------------------------------------------------
 
 dcs2_audio_dsio_device::dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs2_audio_device(mconfig, DCS2_AUDIO_DSIO, "DCS2 Audio DSIO", tag, owner, clock, "dcs2_audio_dsio", __FILE__)
+	dcs2_audio_device(mconfig, DCS2_AUDIO_DSIO, tag, owner, clock)
 {
 }
 
@@ -2613,14 +2613,14 @@ machine_config_constructor dcs2_audio_dsio_device::device_mconfig_additions() co
 	return MACHINE_CONFIG_NAME( dcs2_audio_dsio );
 }
 
-const device_type DCS2_AUDIO_DENVER = device_creator<dcs2_audio_denver_device>;
+DEFINE_DEVICE_TYPE(DCS2_AUDIO_DENVER, dcs2_audio_denver_device, "dcs2_audio_denver", "DCS2 Audio Denver")
 
 //-------------------------------------------------
 //  dcs2_audio_denver_device - constructor
 //-------------------------------------------------
 
 dcs2_audio_denver_device::dcs2_audio_denver_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs2_audio_device(mconfig, DCS2_AUDIO_DENVER, "DCS2 Audio Denver", tag, owner, clock, "dcs2_audio_denver", __FILE__)
+	dcs2_audio_device(mconfig, DCS2_AUDIO_DENVER, tag, owner, clock)
 {
 }
 

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SAT_CTRL_JOY_MD_H
+#define MAME_BUS_SAT_CTRL_JOY_MD_H
 
-#ifndef __SATURN_MDJOY__
-#define __SATURN_MDJOY__
+#pragma once
 
 
 #include "ctrl.h"
@@ -32,8 +32,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override {};
-	virtual void device_reset() override {};
+	virtual void device_start() override { }
+	virtual void device_reset() override { }
 
 	// device_saturn_control_port_interface overrides
 	virtual uint8_t read_ctrl(uint8_t offset) override;
@@ -59,8 +59,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override {};
-	virtual void device_reset() override {};
+	virtual void device_start() override { }
+	virtual void device_reset() override { }
 
 	// device_saturn_control_port_interface overrides
 	virtual uint8_t read_ctrl(uint8_t offset) override;
@@ -73,8 +73,8 @@ private:
 
 
 // device type definition
-extern const device_type SATURN_JOYMD3B;
-extern const device_type SATURN_JOYMD6B;
+DECLARE_DEVICE_TYPE(SATURN_JOYMD3B, saturn_joymd3b_device)
+DECLARE_DEVICE_TYPE(SATURN_JOYMD6B, saturn_joymd6b_device)
 
 
-#endif
+#endif // MAME_BUS_SAT_CTRL_JOY_MD_H

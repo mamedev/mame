@@ -21,10 +21,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_COM8116_H
+#define MAME_MACHINE_COM8116_H
 
-#ifndef __COM8116__
-#define __COM8116__
+#pragma once
 
 
 
@@ -55,15 +55,16 @@ public:
 	// construction/destruction
 	com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_fx4_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_fx4_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_fr_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_fr_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_ft_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_ft_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_fx4_handler(device_t &device, Object &&cb) { return downcast<com8116_device &>(device).m_fx4_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_fr_handler(device_t &device, Object &&cb) { return downcast<com8116_device &>(device).m_fr_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ft_handler(device_t &device, Object &&cb) { return downcast<com8116_device &>(device).m_ft_handler.set_callback(std::forward<Object>(cb)); }
 
 	void str_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER( str_w );
 	void stt_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER( stt_w );
 
+protected:
 	static const int divisors_16X_5_0688MHz[];
 	static const int divisors_16X_6_01835MHz[];
 	static const int divisors_16X_4_9152MHz[];
@@ -74,7 +75,6 @@ public:
 	static const int divisors_16X_4_9152MHz_SY2661_1[];
 	static const int divisors_16X_4_9152MHz_SY2661_2[];
 
-protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -107,6 +107,6 @@ private:
 
 
 // device type definition
-extern const device_type COM8116;
+DECLARE_DEVICE_TYPE(COM8116, com8116_device)
 
-#endif
+#endif // MAME_MACHINE_COM8116_H

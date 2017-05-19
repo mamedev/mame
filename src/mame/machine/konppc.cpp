@@ -14,10 +14,10 @@
 /*****************************************************************************/
 
 
-const device_type KONPPC = device_creator<konppc_device>;
+DEFINE_DEVICE_TYPE(KONPPC, konppc_device, "konppc", "Konami PowerPC Common Functions")
 
 konppc_device::konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, KONPPC, "Konami PowerPC Common Functions", tag, owner, clock, "konppc", __FILE__),
+	: device_t(mconfig, KONPPC, tag, owner, clock),
 	cgboard_type(0),
 	num_cgboards(0)/*,
 	cgboard_id(MAX_CG_BOARDS)*/

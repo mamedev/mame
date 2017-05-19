@@ -4,22 +4,22 @@
 #include "emu.h"
 #include "nomapper.h"
 
-const device_type MSX_CART_NOMAPPER = device_creator<msx_cart_nomapper>;
+DEFINE_DEVICE_TYPE(MSX_CART_NOMAPPER, msx_cart_nomapper_device, "msx_cart_nomapper", "MSX Cartridge - ROM")
 
 
-msx_cart_nomapper::msx_cart_nomapper(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_NOMAPPER, "MSX Cartridge - ROM", tag, owner, clock, "msx_cart_nomapper", __FILE__)
+msx_cart_nomapper_device::msx_cart_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSX_CART_NOMAPPER, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_start_address(0)
 	, m_end_address(0)
 {
 }
 
-void msx_cart_nomapper::device_start()
+void msx_cart_nomapper_device::device_start()
 {
 }
 
-void msx_cart_nomapper::initialize_cartridge()
+void msx_cart_nomapper_device::initialize_cartridge()
 {
 	uint32_t size = get_rom_size();
 	uint8_t *rom = get_rom_base();
@@ -84,7 +84,7 @@ void msx_cart_nomapper::initialize_cartridge()
 	m_end_address = std::min<uint32_t>(m_start_address + size, 0x10000);
 }
 
-READ8_MEMBER(msx_cart_nomapper::read_cart)
+READ8_MEMBER(msx_cart_nomapper_device::read_cart)
 {
 	if ( offset >= m_start_address && offset < m_end_address )
 	{

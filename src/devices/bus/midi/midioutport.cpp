@@ -11,10 +11,10 @@
 #include "emu.h"
 #include "midioutport.h"
 
-const device_type MIDIOUT_PORT = device_creator<midiout_port_device>;
+DEFINE_DEVICE_TYPE(MIDIOUT_PORT, midiout_port_device, "midiout_port", "MIDI Out port")
 
 midiout_port_device::midiout_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDIOUT_PORT, "MIDI Out port", tag, owner, clock, "midiout_port", __FILE__),
+	: device_t(mconfig, MIDIOUT_PORT, tag, owner, clock),
 	device_midi_port_interface(mconfig, *this),
 	m_midiout(*this, "midioutimg")
 {

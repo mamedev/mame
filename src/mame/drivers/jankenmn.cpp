@@ -362,7 +362,7 @@ static const z80_daisy_config daisy_chain[] =
 *               Machine Config               *
 *********************************************/
 
-static MACHINE_CONFIG_START( jankenmn, jankenmn_state )
+static MACHINE_CONFIG_START( jankenmn )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 2.5 MHz */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
@@ -416,5 +416,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY    FULLNAME                   FLAGS...            LAYOUT */
-GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, driver_device, 0,    ROT0, "Sunwise", "Janken Man Kattara Ageru", MACHINE_SUPPORTS_SAVE, layout_jankenmn )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY    FULLNAME                    FLAGS                  LAYOUT
+GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, jankenmn_state, 0,    ROT0, "Sunwise", "Janken Man Kattara Ageru", MACHINE_SUPPORTS_SAVE, layout_jankenmn )

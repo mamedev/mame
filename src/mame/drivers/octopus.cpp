@@ -238,7 +238,7 @@ private:
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<mc146818_device> m_rtc;
-	required_device<fd1793_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<i8251_device> m_kb_uart;
@@ -310,7 +310,7 @@ static ADDRESS_MAP_START( octopus_io, AS_IO, 8, octopus_state )
 	AM_RANGE(0xc8, 0xc8) AM_READWRITE(vidcontrol_r, vidcontrol_w)
 	AM_RANGE(0xc9, 0xca) AM_READWRITE(video_latch_r, video_latch_w)
 	// 0xcf: mode control
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
+	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	AM_RANGE(0xe0, 0xe4) AM_READWRITE(z80_vector_r, z80_vector_w)
 	AM_RANGE(0xf0, 0xf1) AM_READWRITE(parallel_r, parallel_w)
 	AM_RANGE(0xf8, 0xff) AM_DEVREADWRITE("ppi", i8255_device, read, write)
@@ -865,7 +865,7 @@ SLOT_INTERFACE_START(octopus_centronics_devices)
 	SLOT_INTERFACE("printer", CENTRONICS_PRINTER)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( octopus, octopus_state )
+static MACHINE_CONFIG_START( octopus )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_24MHz / 3)  // 8MHz
 	MCFG_CPU_PROGRAM_MAP(octopus_mem)
@@ -897,11 +897,11 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_I8237_IN_MEMR_CB(READ8(octopus_state,dma_read))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(octopus_state,dma_write))
 	//MCFG_I8237_IN_IOR_0_CB(NOOP)
-	MCFG_I8237_IN_IOR_1_CB(DEVREAD8("fdc",fd1793_t,data_r))  // FDC
+	MCFG_I8237_IN_IOR_1_CB(DEVREAD8("fdc",fd1793_device,data_r))  // FDC
 	//MCFG_I8237_IN_IOR_2_CB(NOOP)
 	//MCFG_I8237_IN_IOR_3_CB(NOOP)
 	//MCFG_I8237_OUT_IOW_0_CB(NOOP)
-	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8("fdc",fd1793_t,data_w))  // FDC
+	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8("fdc",fd1793_device,data_w))  // FDC
 	//MCFG_I8237_OUT_IOW_2_CB(NOOP)
 	//MCFG_I8237_OUT_IOW_3_CB(NOOP)
 	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(octopus_state, dack4_w))
@@ -1015,5 +1015,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY             FULLNAME       FLAGS */
-COMP( 1986, octopus,  0,      0,       octopus,   octopus, driver_device, 0,  "Digital Microsystems", "LSI Octopus", MACHINE_NOT_WORKING)
+//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY                 FULLNAME       FLAGS
+COMP( 1986, octopus,  0,      0,       octopus,   octopus, octopus_state, 0,    "Digital Microsystems", "LSI Octopus", MACHINE_NOT_WORKING)

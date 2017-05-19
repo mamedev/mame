@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( os214_io_map, AS_IO, 8, os214_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( os214, os214_state )
+static MACHINE_CONFIG_START( os214 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83002, XTAL_16MHz) /* X1 xtal value is correct,
 	                                                   but there can be some clock divider perhaps ? */
@@ -81,5 +81,5 @@ ROM_START( os214 )
 	ROM_LOAD16_BYTE( "u8_s2a2-4.03_argox_am.u8", 0x000001, 0x040000, CRC(d49f52af) SHA1(0ca5a70c6c3995f275226af26db965f6ba7ed123) )
 ROM_END
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT  COMPANY  FULLNAME                         FLAGS   */
-COMP( 1996, os214,      0,      0,   os214,     0, os214_state, os214, "Argox", "Rabbit Printer (model OS-214)", MACHINE_IS_SKELETON)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT   COMPANY  FULLNAME                         FLAGS
+COMP( 1996, os214, 0,      0,      os214,   0,     os214_state, os214, "Argox", "Rabbit Printer (model OS-214)", MACHINE_IS_SKELETON)

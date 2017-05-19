@@ -39,7 +39,7 @@ bool sorted_game_list(const game_driver *x, const game_driver *y)
 	bool cloney = (y->parent[0] != '0');
 
 	if (!clonex && !cloney)
-		return (cs_stricmp(x->description, y->description) < 0);
+		return (cs_stricmp(x->type.fullname(), y->type.fullname()) < 0);
 
 	int cx = -1, cy = -1;
 	if (clonex)
@@ -57,27 +57,27 @@ bool sorted_game_list(const game_driver *x, const game_driver *y)
 	}
 
 	if (!clonex && !cloney)
-		return (cs_stricmp(x->description, y->description) < 0);
+		return (cs_stricmp(x->type.fullname(), y->type.fullname()) < 0);
 	else if (clonex && cloney)
 	{
 		if (!cs_stricmp(x->parent, y->parent))
-			return (cs_stricmp(x->description, y->description) < 0);
+			return (cs_stricmp(x->type.fullname(), y->type.fullname()) < 0);
 		else
-			return (cs_stricmp(driver_list::driver(cx).description, driver_list::driver(cy).description) < 0);
+			return (cs_stricmp(driver_list::driver(cx).type.fullname(), driver_list::driver(cy).type.fullname()) < 0);
 	}
 	else if (!clonex && cloney)
 	{
 		if (!cs_stricmp(x->name, y->parent))
 			return true;
 		else
-			return (cs_stricmp(x->description, driver_list::driver(cy).description) < 0);
+			return (cs_stricmp(x->type.fullname(), driver_list::driver(cy).type.fullname()) < 0);
 	}
 	else
 	{
 		if (!cs_stricmp(x->parent, y->name))
 			return false;
 		else
-			return (cs_stricmp(driver_list::driver(cx).description, y->description) < 0);
+			return (cs_stricmp(driver_list::driver(cx).type.fullname(), y->type.fullname()) < 0);
 	}
 }
 

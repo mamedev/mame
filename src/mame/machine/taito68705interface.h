@@ -1,13 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Nicola Salmoria, David Haywood, Vas Crabb
+#ifndef MAME_MACHINE_TAITO68705INTERFACE_H
+#define MAME_MACHINE_TAITO68705INTERFACE_H
+
+#pragma once
 
 #include "cpu/m6805/m68705.h"
 
 
-extern const device_type TAITO68705_MCU;
-extern const device_type TAITO68705_MCU_TIGER;
-extern const device_type ARKANOID_68705P3;
-extern const device_type ARKANOID_68705P5;
+DECLARE_DEVICE_TYPE(TAITO68705_MCU,       taito68705_mcu_device)
+DECLARE_DEVICE_TYPE(TAITO68705_MCU_TIGER, taito68705_mcu_tiger_device)
+DECLARE_DEVICE_TYPE(ARKANOID_68705P3,     arkanoid_68705p3_device)
+DECLARE_DEVICE_TYPE(ARKANOID_68705P5,     arkanoid_68705p5_device)
 
 
 class taito68705_mcu_device_base : public device_t
@@ -32,12 +36,9 @@ protected:
 	taito68705_mcu_device_base(
 			machine_config const &mconfig,
 			device_type type,
-			char const *name,
 			char const *tag,
 			device_t *owner,
-			u32 clock,
-			char const *shortname,
-			char const *source);
+			u32 clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -77,7 +78,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_portb_w);
 
 protected:
-	taito68705_mcu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
+	taito68705_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
@@ -117,12 +118,9 @@ protected:
 	arkanoid_mcu_device_base(
 			machine_config const &mconfig,
 			device_type type,
-			char const *name,
 			char const *tag,
 			device_t *owner,
-			u32 clock,
-			char const *shortname,
-			char const *source);
+			u32 clock);
 
 	virtual void device_start() override;
 
@@ -150,3 +148,5 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
+
+#endif // MAME_MACHINE_TAITO68705INTERFACE_H

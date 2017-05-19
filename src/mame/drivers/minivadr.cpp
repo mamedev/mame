@@ -105,7 +105,7 @@ static INPUT_PORTS_START( minivadr )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( minivadr, minivadr_state )
+static MACHINE_CONFIG_START( minivadr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,24000000 / 6)        /* 4 MHz ? */
@@ -136,4 +136,4 @@ ROM_START( minivadr )
 ROM_END
 
 
-GAME( 1990, minivadr, 0, minivadr, minivadr, driver_device, 0, ROT0, "Taito Corporation", "Mini Vaders", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+GAME( 1990, minivadr, 0, minivadr, minivadr, minivadr_state, 0, ROT0, "Taito Corporation", "Mini Vaders", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

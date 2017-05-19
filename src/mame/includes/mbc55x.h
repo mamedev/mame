@@ -116,20 +116,6 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_crtc;
-	required_device<i8251_device> m_kb_uart;
-	required_device<pit8253_device> m_pit;
-	required_device<i8255_device> m_ppi;
-	required_device<pic8259_device> m_pic;
-	required_device<fd1793_t> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<ram_device> m_ram;
-	required_device<palette_device> m_palette;
 	//DECLARE_READ8_MEMBER(pic8259_r);
 	//DECLARE_WRITE8_MEMBER(pic8259_w);
 	//DECLARE_READ8_MEMBER(mbc55x_disk_r);
@@ -154,12 +140,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vid_vsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_t2);
 
-	uint32_t      m_debug_machine;
-	uint32_t      m_debug_video;
-	uint8_t       m_video_mem[VIDEO_MEM_SIZE];
-	uint8_t       m_vram_page;
-
-	keyboard_t  m_keyboard;
 	DECLARE_READ8_MEMBER(mbcpic8259_r);
 	DECLARE_WRITE8_MEMBER(mbcpic8259_w);
 	DECLARE_READ8_MEMBER(mbcpit8253_r);
@@ -169,17 +149,45 @@ public:
 	DECLARE_READ8_MEMBER(mbc55x_kb_usart_r);
 	DECLARE_WRITE8_MEMBER(mbc55x_kb_usart_w);
 	DECLARE_DRIVER_INIT(mbc55x);
+
 	MC6845_UPDATE_ROW(crtc_update_row);
+	DECLARE_PALETTE_INIT(mbc55x);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mbc55x);
+	TIMER_CALLBACK_MEMBER(keyscan_callback);
+
+	required_device<cpu_device> m_maincpu;
+
+	uint32_t      m_debug_machine;
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
-	DECLARE_PALETTE_INIT(mbc55x);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mbc55x);
-	TIMER_CALLBACK_MEMBER(keyscan_callback);
+
 	void keyboard_reset();
 	void scan_keyboard();
 	void set_ram_size();
+
+	required_device<mc6845_device> m_crtc;
+	required_device<i8251_device> m_kb_uart;
+	required_device<pit8253_device> m_pit;
+	required_device<i8255_device> m_ppi;
+	required_device<pic8259_device> m_pic;
+	required_device<fd1793_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<ram_device> m_ram;
+	required_device<palette_device> m_palette;
+
+	uint32_t      m_debug_video;
+	uint8_t       m_video_mem[VIDEO_MEM_SIZE];
+	uint8_t       m_vram_page;
+
+	keyboard_t  m_keyboard;
 
 private:
 	void debug_command(int ref, const std::vector<std::string> &params);

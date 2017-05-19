@@ -12,13 +12,13 @@
 #include "hp9845_io.h"
 
 // device type definition
-const device_type HP9845_IO_SLOT = device_creator<hp9845_io_slot_device>;
+DEFINE_DEVICE_TYPE(HP9845_IO_SLOT, hp9845_io_slot_device, "hp9845_io_slot", "HP9845 I/O Slot")
 
 // +---------------------+
 // |hp9845_io_slot_device|
 // +---------------------+
 hp9845_io_slot_device::hp9845_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, HP9845_IO_SLOT, "HP9845 I/O Slot", tag, owner, clock, "hp9845_io_slot", __FILE__),
+	device_t(mconfig, HP9845_IO_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_irq_cb_func(*this),
 	m_sts_cb_func(*this),
@@ -84,8 +84,8 @@ uint8_t hp9845_io_card_device::get_sc(void)
 	return m_select_code_port->read() + HP9845_IO_FIRST_SC;
 }
 
-hp9845_io_card_device::hp9845_io_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+hp9845_io_card_device::hp9845_io_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_slot_card_interface(mconfig, *this),
 	m_slot_dev(nullptr),
 	m_select_code_port(*this , "SC"),

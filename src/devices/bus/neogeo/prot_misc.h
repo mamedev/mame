@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 
+#ifndef MAME_BUS_NEOGEO_PROT_MISC_H
+#define MAME_BUS_NEOGEO_PROT_MISC_H
+
 #pragma once
 
-#ifndef __NEOBOOT_PROT__
-#define __NEOBOOT_PROT__
-
-extern const device_type NEOBOOT_PROT;
+DECLARE_DEVICE_TYPE(NEOBOOT_PROT, neoboot_prot_device)
 
 #define MCFG_NEOBOOT_PROT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, NEOBOOT_PROT, 0)
@@ -62,4 +62,4 @@ protected:
 	virtual void device_reset() override;
 };
 
-#endif
+#endif // MAME_BUS_NEOGEO_PROT_MISC_H

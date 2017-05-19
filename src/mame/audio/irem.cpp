@@ -14,32 +14,36 @@
 #include "speaker.h"
 
 
-const device_type IREM_M62_AUDIO = device_creator<m62_audio_device>;
-const device_type IREM_M52_SOUNDC_AUDIO = device_creator<m52_soundc_audio_device>;
-const device_type IREM_M52_LARGE_AUDIO = device_creator<m52_large_audio_device>;
+DEFINE_DEVICE_TYPE(IREM_M62_AUDIO,        m62_audio_device,        "m62_audio",        "Irem M62 Audio")
+DEFINE_DEVICE_TYPE(IREM_M52_SOUNDC_AUDIO, m52_soundc_audio_device, "m52_soundc_audio", "Irem M52 SoundC Audio")
+DEFINE_DEVICE_TYPE(IREM_M52_LARGE_AUDIO,  m52_large_audio_device,  "m52_large_audio",  "Irem M52 Large Audio")
 
-irem_audio_device::irem_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_port1(0),
-	m_port2(0),
-	m_soundlatch(*this, "soundlatch")
-	//m_ay_45L(*this, "ay_45l"),
-	//m_ay_45M(*this, "ay_45m")
+irem_audio_device::irem_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_port1(0)
+	, m_port2(0)
+	, m_soundlatch(0)
+	//, m_ay_45L(*this, "ay_45l")
+	//, m_ay_45M(*this, "ay_45m")
+	, m_audio_BD(*this, "snd_nl:ibd")
+	, m_audio_SD(*this, "snd_nl:isd")
+	, m_audio_OH(*this, "snd_nl:ioh")
+	, m_audio_CH(*this, "snd_nl:ich")
 {
 }
 
 m62_audio_device::m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: irem_audio_device(mconfig, IREM_M62_AUDIO, "Irem M62 Audio", tag, owner, clock, "irem_m62_audio", __FILE__)
+	: irem_audio_device(mconfig, IREM_M62_AUDIO, tag, owner, clock)
 {
 }
 
 m52_soundc_audio_device::m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: irem_audio_device(mconfig, IREM_M52_SOUNDC_AUDIO, "Irem M52 SoundC Audio", tag, owner, clock, "irem_m52_soundc_audio", __FILE__)
+	: irem_audio_device(mconfig, IREM_M52_SOUNDC_AUDIO, tag, owner, clock)
 {
 }
 
 m52_large_audio_device::m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: irem_audio_device(mconfig, IREM_M52_LARGE_AUDIO, "Irem M52 Large Audio", tag, owner, clock, "irem_m52_large_audio", __FILE__)
+	: irem_audio_device(mconfig, IREM_M52_LARGE_AUDIO, tag, owner, clock)
 {
 }
 
@@ -54,18 +58,29 @@ void irem_audio_device::device_start()
 	m_ay_45L = subdevice<ay8910_device>("ay_45l");
 	m_ay_45M = subdevice<ay8910_device>("ay_45m");
 
-	m_audio_BD = subdevice<netlist_mame_logic_input_t>("snd_nl:ibd");
-	m_audio_SD = subdevice<netlist_mame_logic_input_t>("snd_nl:isd");
-	m_audio_OH = subdevice<netlist_mame_logic_input_t>("snd_nl:ioh");
-	m_audio_CH = subdevice<netlist_mame_logic_input_t>("snd_nl:ich");
-	m_audio_SINH = subdevice<netlist_mame_logic_input_t>("snd_nl:sinh");
+	m_audio_SINH = subdevice<netlist_mame_logic_input_device>("snd_nl:sinh");
 
 	save_item(NAME(m_port1));
 	save_item(NAME(m_port2));
+	save_item(NAME(m_soundlatch));
 }
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+void irem_audio_device::device_reset()
+{
+	m_adpcm1->reset();
+	if (m_adpcm2) m_adpcm2->reset();
+	m_ay_45L->reset();
+	m_ay_45M->reset();
+	subdevice("iremsound")->reset();
 
-
+	m_port1 = 0; // ?
+	m_port2 = 0; // ?
+	m_soundlatch = 0;
+	subdevice("iremsound")->execute().set_input_line(0, ASSERT_LINE);
+}
 
 /*************************************
  *
@@ -76,13 +91,22 @@ void irem_audio_device::device_start()
 
 WRITE8_MEMBER( irem_audio_device::cmd_w )
 {
+	m_soundlatch = data;
 	if ((data & 0x80) == 0)
-		m_soundlatch->write(space, 0, data & 0x7f);
-	else
 		subdevice("iremsound")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
+/*************************************
+ *
+ *  Sound latch read
+ *
+ *************************************/
+
+READ8_MEMBER( irem_audio_device::soundlatch_r )
+{
+	return m_soundlatch;
+}
 
 /*************************************
  *
@@ -126,7 +150,7 @@ WRITE8_MEMBER( irem_audio_device::m6803_port2_w )
 
 /*************************************
  *
- *  6803 input ports ports
+ *  6803 input ports
  *
  *************************************/
 
@@ -201,7 +225,8 @@ WRITE8_MEMBER( irem_audio_device::ay8910_45L_porta_w )
 
 WRITE8_MEMBER( irem_audio_device::sound_irq_ack_w )
 {
-	subdevice("iremsound")->execute().set_input_line(0, CLEAR_LINE);
+	if ((m_soundlatch & 0x80) != 0)
+		subdevice("iremsound")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -413,12 +438,10 @@ static MACHINE_CONFIG_FRAGMENT( irem_audio_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
 	MCFG_SOUND_ADD("ay_45m", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
 	MCFG_AY8910_RES_LOADS(2000.0, 2000.0, 2000.0)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(irem_audio_device, soundlatch_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(irem_audio_device, ay8910_45M_portb_w))
 	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
@@ -434,11 +457,11 @@ static MACHINE_CONFIG_FRAGMENT( irem_audio_base )
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(irem_audio_device, adpcm_int))          /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* default to 4KHz, but can be changed at run time */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* default to 4KHz, but can be changed at run time */
 	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 6)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)      /* default to 4KHz, but can be changed at run time, slave */
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      /* default to 4KHz, but can be changed at run time, slave */
 	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 7)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
@@ -484,12 +507,10 @@ MACHINE_CONFIG_FRAGMENT( m52_sound_c_audio )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
 	MCFG_SOUND_ADD("ay_45m", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(470, 0, 0)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(irem_audio_device, soundlatch_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(irem_audio_device, ay8910_45M_portb_w))
 	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 0)
 
@@ -501,7 +522,7 @@ MACHINE_CONFIG_FRAGMENT( m52_sound_c_audio )
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(irem_audio_device, adpcm_int))          /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* default to 4KHz, but can be changed at run time */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* default to 4KHz, but can be changed at run time */
 	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 2)
 
 	MCFG_SOUND_ADD("filtermix", DISCRETE, 0)
@@ -520,12 +541,10 @@ MACHINE_CONFIG_FRAGMENT( m52_large_audio)  /* 10 yard fight */
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
 	MCFG_SOUND_ADD("ay_45m", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(470, 0, 0)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(irem_audio_device, soundlatch_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(irem_audio_device, ay8910_45M_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
@@ -537,11 +556,11 @@ MACHINE_CONFIG_FRAGMENT( m52_large_audio)  /* 10 yard fight */
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(irem_audio_device, adpcm_int))          /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* default to 4KHz, but can be changed at run time */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* default to 4KHz, but can be changed at run time */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)      /* default to 4KHz, but can be changed at run time, slave */
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      /* default to 4KHz, but can be changed at run time, slave */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 MACHINE_CONFIG_END

@@ -8,21 +8,21 @@
 
 ***************************************************************************/
 
-#ifndef __VOLTAGE_REGULATOR_H__
-#define __VOLTAGE_REGULATOR_H__
+#ifndef MAME_SOUND_VOLT_REG_H
+#define MAME_SOUND_VOLT_REG_H
+
+#pragma once
 
 
 #define MCFG_VOLTAGE_REGULATOR_OUTPUT(_output) \
 	voltage_regulator_device::set_output(*device, _output);
 
-class voltage_regulator_device : public device_t,
-	public device_sound_interface
+class voltage_regulator_device : public device_t, public device_sound_interface
 {
 public:
 	static void set_output(device_t &device, double analogue_dc) { downcast<voltage_regulator_device &>(device).m_output = (analogue_dc * 32768) / 5.0f; }
 
 	voltage_regulator_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~voltage_regulator_device() { }
 
 	virtual bool issound() override { return false; }
 
@@ -38,6 +38,6 @@ private:
 	stream_sample_t m_output;
 };
 
-extern const device_type VOLTAGE_REGULATOR;
+DECLARE_DEVICE_TYPE(VOLTAGE_REGULATOR, voltage_regulator_device)
 
-#endif
+#endif // MAME_SOUND_VOLT_REG_H

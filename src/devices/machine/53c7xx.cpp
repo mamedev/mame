@@ -49,17 +49,62 @@ static void ATTR_PRINTF(3,4) verbose_log(running_machine &machine, int level, co
 
 
 //**************************************************************************
+//  REGISTER DEFINES (INCOMPLETE)
+//**************************************************************************
+
+#define SCNTL0_TRG          0x01
+#define SCNTL0_AAP          0x02
+#define SCNTL0_EPG          0x04
+#define SCNTL0_EPC          0x08
+#define SCNTL0_WATN         0x10
+#define SCNTL0_START        0x20
+#define SCNTL0_ARB_MASK     3
+#define SCNTL0_ARB_SHIFT    6
+
+#define SSTAT0_PAR          0x01
+#define SSTAT0_RST          0x02
+#define SSTAT0_UDC          0x04
+#define SSTAT0_SGE          0x08
+#define SSTAT0_SEL          0x10
+#define SSTAT0_STO          0x20
+#define SSTAT0_CMP          0x40
+#define SSTAT0_MA           0x80
+
+#define SSTAT1_SDP          0x01
+#define SSTAT1_RST          0x02
+#define SSTAT1_WOA          0x04
+#define SSTAT1_LOA          0x08
+#define SSTAT1_AIP          0x10
+#define SSTAT1_ORF          0x20
+#define SSTAT1_OLF          0x40
+#define SSTAT1_ILF          0x80
+
+#define ISTAT_DIP           0x01
+#define ISTAT_SIP           0x02
+#define ISTAT_PRE           0x04
+#define ISTAT_CON           0x08
+#define ISTAT_ABRT          0x80
+
+#define DSTAT_OPC           0x01
+#define DSTAT_WTD           0x02
+#define DSTAT_SIR           0x04
+#define DSTAT_SSI           0x08
+#define DSTAT_ABRT          0x10
+#define DSTAT_DFE           0x80
+
+
+//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-const device_type NCR53C7XX = device_creator<ncr53c7xx_device>;
+DEFINE_DEVICE_TYPE(NCR53C7XX, ncr53c7xx_device, "ncr537xx", "NCR 53C7xx SCSI")
 
 //-------------------------------------------------
 //  ncr53c7xx_device - constructor/destructor
 //-------------------------------------------------
 
 ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:   nscsi_device(mconfig, NCR53C7XX, "53C7xx SCSI", tag, owner, clock, "ncr537xx", __FILE__),
+	:   nscsi_device(mconfig, NCR53C7XX, tag, owner, clock),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_irq_handler(*this),

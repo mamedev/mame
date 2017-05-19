@@ -73,8 +73,8 @@ DEVICE_ADDRESS_MAP_START(submap, 16, naomi_board)
 	AM_RANGE(0x00, 0xff) AM_READ(default_r)
 ADDRESS_MAP_END
 
-naomi_board::naomi_board(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: naomi_g1_device(mconfig, type, name, tag, owner, clock, shortname, source)
+naomi_board::naomi_board(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: naomi_g1_device(mconfig, type, tag, owner, clock)
 {
 	eeprom_tag = nullptr;
 }

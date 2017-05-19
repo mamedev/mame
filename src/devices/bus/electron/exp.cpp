@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ELECTRON_EXPANSION_SLOT = device_creator<electron_expansion_slot_device>;
+DEFINE_DEVICE_TYPE(ELECTRON_EXPANSION_SLOT, electron_expansion_slot_device, "electron_expansion_slot", "Acorn Electron Expansion port")
 
 
 //**************************************************************************
@@ -50,8 +50,8 @@ device_electron_expansion_interface::~device_electron_expansion_interface()
 //-------------------------------------------------
 
 electron_expansion_slot_device::electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ELECTRON_EXPANSION_SLOT, "Acorn Electron Expansion port", tag, owner, clock, "electron_expansion_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
+	device_t(mconfig, ELECTRON_EXPANSION_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
 	m_card(nullptr),
 	m_irq_handler(*this),
 	m_nmi_handler(*this)

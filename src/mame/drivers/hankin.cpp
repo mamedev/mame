@@ -490,7 +490,7 @@ WRITE_LINE_MEMBER( hankin_state::ic2_cb2_w )
 	m_ic2_cb2 = state;
 }
 
-static MACHINE_CONFIG_START( hankin, hankin_state )
+static MACHINE_CONFIG_START( hankin )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, 3276800)
 	MCFG_CPU_PROGRAM_MAP(hankin_map)
@@ -602,8 +602,8 @@ ROM_START(empsback)
 ROM_END
 
 
-GAME(1978,  fjholden,  0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "FJ Holden", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  orbit1,    0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Orbit 1", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  shark,     0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Shark", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  howzat,    0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Howzat!", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1981,  empsback,  0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "The Empire Strike Back", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  fjholden,  0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "FJ Holden",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  orbit1,    0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "Orbit 1",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  shark,     0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "Shark",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  howzat,    0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "Howzat!",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1981,  empsback,  0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "The Empire Strike Back", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

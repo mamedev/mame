@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SVI3X8_SLOT_SV806_H
+#define MAME_BUS_SVI3X8_SLOT_SV806_H
 
-#ifndef __SVI3X8_SLOT_SV806_H__
-#define __SVI3X8_SLOT_SV806_H__
+#pragma once
 
 #include "slot.h"
 #include "video/mc6845.h"
@@ -49,6 +49,6 @@ private:
 };
 
 // device type definition
-extern const device_type SV806;
+DECLARE_DEVICE_TYPE(SV806, sv806_device)
 
-#endif // __SVI3X8_SLOT_SV806_H__
+#endif // MAME_BUS_SVI3X8_SLOT_SV806_H

@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_APRICOTKB_H
+#define MAME_MACHINE_APRICOTKB_H
 
-#ifndef __APRICOT_KEYBOARD__
-#define __APRICOT_KEYBOARD__
+#pragma once
 
 
 
@@ -77,8 +77,8 @@ private:
 
 
 // device type definition
-extern const device_type APRICOT_KEYBOARD;
+DECLARE_DEVICE_TYPE(APRICOT_KEYBOARD, apricot_keyboard_device)
 
 
 
-#endif
+#endif // MAME_MACHINE_APRICOTKB_H

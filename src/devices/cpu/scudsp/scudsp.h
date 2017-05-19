@@ -6,10 +6,10 @@
  *
  *****************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_SCUDSP_SCUDSP_H
+#define MAME_CPU_SCUDSP_SCUDSP_H
 
-#ifndef __SCUDSP_H__
-#define __SCUDSP_H__
+#pragma once
 
 enum
 {
@@ -48,25 +48,15 @@ enum
 
 #define SCUDSP_RESET        INPUT_LINE_RESET    /* Non-Maskable */
 
-union SCUDSPREG32 {
-	int32_t  si;
-	uint32_t ui;
-};
-
-union SCUDSPREG16 {
-	int16_t  si;
-	uint16_t ui;
-};
-
-class scudsp_cpu_device :  public cpu_device
+class scudsp_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
 	scudsp_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_dma_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_in_dma_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dma_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_out_dma_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<scudsp_cpu_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_dma_callback(device_t &device, Object &&cb) { return downcast<scudsp_cpu_device &>(device).m_in_dma_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_dma_callback(device_t &device, Object &&cb) { return downcast<scudsp_cpu_device &>(device).m_out_dma_cb.set_callback(std::forward<Object>(cb)); }
 
 	/* port 0 */
 	DECLARE_READ32_MEMBER( program_control_r );
@@ -78,7 +68,6 @@ public:
 	/* port 3 */
 	DECLARE_READ32_MEMBER( ram_address_r );
 	DECLARE_WRITE32_MEMBER( ram_address_w );
-//  virtual DECLARE_ADDRESS_MAP(map, 32) = 0;
 
 protected:
 	// device-level overrides
@@ -108,6 +97,16 @@ protected:
 	devcb_write16        m_out_dma_cb;
 
 private:
+	union SCUDSPREG32 {
+		int32_t  si;
+		uint32_t ui;
+	};
+
+	union SCUDSPREG16 {
+		int16_t  si;
+		uint16_t ui;
+	};
+
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 
@@ -156,9 +155,9 @@ private:
 };
 
 
-extern const device_type SCUDSP;
+DECLARE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device)
 
 
 CPU_DISASSEMBLE( scudsp );
 
-#endif /* __SCUDSP_H__ */
+#endif // MAME_CPU_SCUDSP_SCUDSP_H

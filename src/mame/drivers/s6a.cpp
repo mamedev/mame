@@ -379,7 +379,7 @@ DRIVER_INIT_MEMBER( s6a_state, s6a )
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
 }
 
-static MACHINE_CONFIG_START( s6a, s6a_state )
+static MACHINE_CONFIG_START( s6a )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6808, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s6a_main_map)
@@ -507,7 +507,7 @@ ROM_START(alpok_f6)
 ROM_END
 
 
-GAME(1980,algar_l1, 0,       s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Algar (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,alpok_l6, 0,       s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-6)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,alpok_l2, alpok_l6,s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,alpok_f6, alpok_l6,s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-6 French speech)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, algar_l1, 0,        s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Algar (L-1)",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, alpok_l6, 0,        s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-6)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, alpok_l2, alpok_l6, s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, alpok_f6, alpok_l6, s6a, s6a, s6a_state, s6a, ROT0, "Williams", "Alien Poker (L-6 French speech)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

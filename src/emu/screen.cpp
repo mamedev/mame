@@ -31,10 +31,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type SCREEN = device_creator<screen_device>;
-
-template class device_finder<screen_device, false>;
-template class device_finder<screen_device, true>;
+DEFINE_DEVICE_TYPE(SCREEN, screen_device, "screen", "Video Screen")
 
 const attotime screen_device::DEFAULT_FRAME_PERIOD(attotime::from_hz(DEFAULT_FRAME_RATE));
 
@@ -548,7 +545,7 @@ void screen_device_svg_renderer::rebuild_cache()
 //-------------------------------------------------
 
 screen_device::screen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SCREEN, "Video Screen", tag, owner, clock, "screen", __FILE__),
+	: device_t(mconfig, SCREEN, tag, owner, clock),
 		m_type(SCREEN_TYPE_RASTER),
 		m_oldstyle_vblank_supplied(false),
 		m_refresh(0),
@@ -1729,7 +1726,7 @@ void screen_device::finalize_burnin()
 		// add two text entries describing the image
 		sprintf(text,"%s %s", emulator_info::get_appname(), emulator_info::get_build_version());
 		png_add_text(&pnginfo, "Software", text);
-		sprintf(text, "%s %s", machine().system().manufacturer, machine().system().description);
+		sprintf(text, "%s %s", machine().system().manufacturer, machine().system().type.fullname());
 		png_add_text(&pnginfo, "System", text);
 
 		// now do the actual work

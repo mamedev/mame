@@ -326,11 +326,11 @@ field:      X address   D           Function    Y address   D (part 2)
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "apexc.h"
+#include "debugger.h"
 
 
-const device_type APEXC = device_creator<apexc_cpu_device>;
+DEFINE_DEVICE_TYPE(APEXC, apexc_cpu_device, "apexc_cpu", "APEXC")
 
 
 /* decrement ICount by n */
@@ -338,7 +338,7 @@ const device_type APEXC = device_creator<apexc_cpu_device>;
 
 
 apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, APEXC, "APEXC", tag, owner, clock, "apexc_cpu", __FILE__)
+	: cpu_device(mconfig, APEXC, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 15, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 1, 0)
 	, m_a(0)

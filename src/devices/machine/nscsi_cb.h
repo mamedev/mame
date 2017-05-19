@@ -1,9 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef NSCSI_CB_H
-#define NSCSI_CB_H
+#ifndef MAME_MACHINE_NSCSI_CB_H
+#define MAME_MACHINE_NSCSI_CB_H
+
+#pragma once
 
 #include "machine/nscsi_bus.h"
+
 
 #define MCFG_NSCSICB_RST_HANDLER(_line) \
 	devcb = &downcast<nscsi_callback_device *>(device)->set_rst_callback(DEVCB_##_line);
@@ -32,20 +35,21 @@
 #define MCFG_NSCSICB_BSY_HANDLER(_line) \
 	downcast<nscsi_callback_device *>(device)->set_bsy_callback(DEVCB_##_line);
 
+
 class nscsi_callback_device : public nscsi_device
 {
 public:
 	nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _line> devcb_base &set_rst_callback(_line line) { return m_write_rst.set_callback(line); }
-	template<class _line> devcb_base &set_atn_callback(_line line) { return m_write_atn.set_callback(line); }
-	template<class _line> devcb_base &set_ack_callback(_line line) { return m_write_ack.set_callback(line); }
-	template<class _line> devcb_base &set_req_callback(_line line) { return m_write_req.set_callback(line); }
-	template<class _line> devcb_base &set_msg_callback(_line line) { return m_write_msg.set_callback(line); }
-	template<class _line> devcb_base &set_io_callback(_line line)  { return m_write_io.set_callback(line); }
-	template<class _line> devcb_base &set_cd_callback(_line line)  { return m_write_cd.set_callback(line); }
-	template<class _line> devcb_base &set_sel_callback(_line line) { return m_write_sel.set_callback(line); }
-	template<class _line> devcb_base &set_bsy_callback(_line line) { return m_write_bsy.set_callback(line); }
+	template <class Line> devcb_base &set_rst_callback(Line &&cb) { return m_write_rst.set_callback(std::forward<Line>(cb)); }
+	template <class Line> devcb_base &set_atn_callback(Line &&cb) { return m_write_atn.set_callback(std::forward<Line>(cb)); }
+	template <class Line> devcb_base &set_ack_callback(Line &&cb) { return m_write_ack.set_callback(std::forward<Line>(cb)); }
+	template <class Line> devcb_base &set_req_callback(Line &&cb) { return m_write_req.set_callback(std::forward<Line>(cb)); }
+	template <class Line> devcb_base &set_msg_callback(Line &&cb) { return m_write_msg.set_callback(std::forward<Line>(cb)); }
+	template <class Line> devcb_base &set_io_callback(Line &&cb)  { return m_write_io.set_callback(std::forward<Line>(cb)); }
+	template <class Line> devcb_base &set_cd_callback(Line &&cb)  { return m_write_cd.set_callback(std::forward<Line>(cb)); }
+	template <class Line> devcb_base &set_sel_callback(Line &&cb) { return m_write_sel.set_callback(std::forward<Line>(cb)); }
+	template <class Line> devcb_base &set_bsy_callback(Line &&cb) { return m_write_bsy.set_callback(std::forward<Line>(cb)); }
 
 	virtual void scsi_ctrl_changed() override;
 
@@ -91,6 +95,6 @@ protected:
 	uint32_t m_ctrl;
 };
 
-extern const device_type NSCSI_CB;
+DECLARE_DEVICE_TYPE(NSCSI_CB, nscsi_callback_device)
 
-#endif
+#endif // MAME_MACHINE_NSCSI_CB_H

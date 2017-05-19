@@ -20,9 +20,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_OPUS2791 = device_creator<bbc_opus2791_device>;
-const device_type BBC_OPUS2793 = device_creator<bbc_opus2793_device>;
-const device_type BBC_OPUS1770 = device_creator<bbc_opus1770_device>;
+DEFINE_DEVICE_TYPE(BBC_OPUS2791, bbc_opus2791_device, "bbc_opus2791", "Opus 2791 FDC")
+DEFINE_DEVICE_TYPE(BBC_OPUS2793, bbc_opus2793_device, "bbc_opus2793", "Opus 2793 FDC")
+DEFINE_DEVICE_TYPE(BBC_OPUS1770, bbc_opus1770_device, "bbc_opus1770", "Opus D-DOS(B) 1770 FDC")
 
 
 //-------------------------------------------------
@@ -144,8 +144,8 @@ const tiny_rom_entry *bbc_opus1770_device::device_rom_region() const
 //  bbc_opusfdc_device - constructor
 //-------------------------------------------------
 
-bbc_opusfdc_device::bbc_opusfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+bbc_opusfdc_device::bbc_opusfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_dfs_rom(*this, "dfs_rom"),
 	m_fdc(*this, "fdc"),
@@ -155,17 +155,17 @@ bbc_opusfdc_device::bbc_opusfdc_device(const machine_config &mconfig, device_typ
 }
 
 bbc_opus2791_device::bbc_opus2791_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_opusfdc_device(mconfig, BBC_OPUS2791, "Opus 2791 FDC", tag, owner, clock, "bbc_opus2791", __FILE__)
+	: bbc_opusfdc_device(mconfig, BBC_OPUS2791, tag, owner, clock)
 {
 }
 
 bbc_opus2793_device::bbc_opus2793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_opusfdc_device(mconfig, BBC_OPUS2793, "Opus 2793 FDC", tag, owner, clock, "bbc_opus2793", __FILE__)
+	: bbc_opusfdc_device(mconfig, BBC_OPUS2793, tag, owner, clock)
 {
 }
 
 bbc_opus1770_device::bbc_opus1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_opusfdc_device(mconfig, BBC_OPUS1770, "Opus D-DOS(B) 1770 FDC", tag, owner, clock, "bbc_opus1770", __FILE__)
+	: bbc_opusfdc_device(mconfig, BBC_OPUS1770, tag, owner, clock)
 {
 }
 
@@ -179,7 +179,7 @@ void bbc_opusfdc_device::device_start()
 	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_t, write));
+	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, write));
 	space.install_readwrite_handler(0xfe84, 0xfe84, READ8_DELEGATE(bbc_opusfdc_device, ctrl_r), WRITE8_DELEGATE(bbc_opusfdc_device, ctrl_w));
 }
 

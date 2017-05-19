@@ -9,16 +9,10 @@
  *
  *****************************************************************************/
 
+#ifndef MAME_CPU_CP1610_CP1610_H
+#define MAME_CPU_CP1610_CP1610_H
+
 #pragma once
-
-#ifndef __CP1610_H__
-#define __CP1610_H__
-
-enum
-{
-	CP1610_R0=1, CP1610_R1, CP1610_R2, CP1610_R3,
-	CP1610_R4, CP1610_R5, CP1610_R6, CP1610_R7
-};
 
 #define CP1610_INT_NONE     0
 #define CP1610_INT_INTRM    1                   /* Maskable */
@@ -32,12 +26,19 @@ enum
 class cp1610_cpu_device :  public cpu_device
 {
 public:
+	// public because drivers R7 through state interface on machine reset - where does the initial R7 actually come from?
+	enum
+	{
+		CP1610_R0=1, CP1610_R1, CP1610_R2, CP1610_R3,
+		CP1610_R4, CP1610_R5, CP1610_R6, CP1610_R7
+	};
+
 	// construction/destruction
 	cp1610_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	template<class _read> devcb_base &set_bext_callback(_read rd)
+	template <class Object> devcb_base &set_bext_callback(Object &&rd)
 	{
-		return m_read_bext.set_callback(rd);
+		return m_read_bext.set_callback(std::forward<Object>(rd));
 	}
 
 protected:
@@ -208,9 +209,9 @@ private:
 };
 
 
-extern const device_type CP1610;
+DECLARE_DEVICE_TYPE(CP1610, cp1610_cpu_device)
 
 
 CPU_DISASSEMBLE( cp1610 );
 
-#endif /* __CP1610_H__ */
+#endif // MAME_CPU_CP1610_CP1610_H

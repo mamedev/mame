@@ -226,7 +226,7 @@ PALETTE_INIT_MEMBER(tattack_state, tattack)
 }
 
 
-static MACHINE_CONFIG_START( tattack, tattack_state )
+static MACHINE_CONFIG_START( tattack )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000 / 2)   /* 4 MHz ? */

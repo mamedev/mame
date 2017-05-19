@@ -9,8 +9,10 @@
 
 ***************************************************************************/
 
-#ifndef __H8_TIMER16_H__
-#define __H8_TIMER16_H__
+#ifndef MAME_CPU_H8_H8_TIMER16_H
+#define MAME_CPU_H8_H8_TIMER16_H
+
+#pragma once
 
 #include "h8.h"
 #include "h8_intc.h"
@@ -74,7 +76,6 @@ public:
 
 
 	h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	void set_info(int tgr_count, int tbr_count, const char *intc, int irq_base);
 
@@ -118,6 +119,8 @@ protected:
 	uint32_t phase, counter_cycle;
 	bool counter_incrementing;
 	bool channel_active;
+
+	h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -197,9 +200,9 @@ protected:
 	virtual void device_reset() override;
 };
 
-extern const device_type H8_TIMER16;
-extern const device_type H8_TIMER16_CHANNEL;
-extern const device_type H8H_TIMER16_CHANNEL;
-extern const device_type H8S_TIMER16_CHANNEL;
+DECLARE_DEVICE_TYPE(H8_TIMER16,          h8_timer16_device)
+DECLARE_DEVICE_TYPE(H8_TIMER16_CHANNEL,  h8_timer16_channel_device)
+DECLARE_DEVICE_TYPE(H8H_TIMER16_CHANNEL, h8h_timer16_channel_device)
+DECLARE_DEVICE_TYPE(H8S_TIMER16_CHANNEL, h8s_timer16_channel_device)
 
-#endif
+#endif // MAME_CPU_H8_H8_TIMER16_H

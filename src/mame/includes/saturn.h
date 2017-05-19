@@ -161,6 +161,8 @@ public:
 	emu_timer *m_stv_rtc_timer;
 	uint8_t     m_port_sel,m_mux_data;
 	uint8_t     m_system_output;
+	uint8_t		m_ioga_mode;
+	uint8_t		m_ioga_portg;
 	uint16_t    m_serial_tx;
 
 	required_device<sh2_device> m_maincpu;

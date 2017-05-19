@@ -1,9 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski, Hiromitsu Shioya
-#pragma once
+#ifndef MAME_SOUND_MSM5232_H
+#define MAME_SOUND_MSM5232_H
 
-#ifndef __MSM5232_H__
-#define __MSM5232_H__
+#pragma once
 
 
 #define MCFG_MSM5232_SET_CAPACITORS(_a, _b, _c, _d, _e, _f, _g, _h) \
@@ -12,44 +12,15 @@
 #define MCFG_MSM5232_GATE_HANDLER_CB(_devcb) \
 	devcb = &msm5232_device::set_gate_handler_callback(*device, DEVCB_##_devcb);
 
-struct VOICE {
-	uint8_t mode;
-
-	int     TG_count_period;
-	int     TG_count;
-
-	uint8_t   TG_cnt;     /* 7 bits binary counter (frequency output) */
-	uint8_t   TG_out16;   /* bit number (of TG_cnt) for 16' output */
-	uint8_t   TG_out8;    /* bit number (of TG_cnt) for  8' output */
-	uint8_t   TG_out4;    /* bit number (of TG_cnt) for  4' output */
-	uint8_t   TG_out2;    /* bit number (of TG_cnt) for  2' output */
-
-	int     egvol;
-	int     eg_sect;
-	int     counter;
-	int     eg;
-
-	uint8_t   eg_arm;     /* attack/release mode */
-
-	double  ar_rate;
-	double  dr_rate;
-	double  rr_rate;
-
-	int     pitch;          /* current pitch data */
-
-	int GF;
-};
-
 
 class msm5232_device : public device_t,
 									public device_sound_interface
 {
 public:
 	msm5232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~msm5232_device() {}
 
 	static void static_set_capacitors(device_t &device, double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8);
-	template<class _Object> static devcb_base &set_gate_handler_callback(device_t &device, _Object object) { return downcast<msm5232_device &>(device).m_gate_handler_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_gate_handler_callback(device_t &device, Object &&cb) { return downcast<msm5232_device &>(device).m_gate_handler_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	void set_clock(int clock);
@@ -63,7 +34,35 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	private:
+private:
+	struct VOICE {
+		uint8_t mode;
+
+		int     TG_count_period;
+		int     TG_count;
+
+		uint8_t   TG_cnt;     /* 7 bits binary counter (frequency output) */
+		uint8_t   TG_out16;   /* bit number (of TG_cnt) for 16' output */
+		uint8_t   TG_out8;    /* bit number (of TG_cnt) for  8' output */
+		uint8_t   TG_out4;    /* bit number (of TG_cnt) for  4' output */
+		uint8_t   TG_out2;    /* bit number (of TG_cnt) for  2' output */
+
+		int     egvol;
+		int     eg_sect;
+		int     counter;
+		int     eg;
+
+		uint8_t   eg_arm;     /* attack/release mode */
+
+		double  ar_rate;
+		double  dr_rate;
+		double  rr_rate;
+
+		int     pitch;          /* current pitch data */
+
+		int GF;
+	};
+
 	// internal state
 	sound_stream *m_stream;
 
@@ -105,7 +104,6 @@ protected:
 	void postload();
 };
 
-extern const device_type MSM5232;
+DECLARE_DEVICE_TYPE(MSM5232, msm5232_device)
 
-
-#endif /* __MSM5232_H__ */
+#endif // MAME_SOUND_MSM5232_H

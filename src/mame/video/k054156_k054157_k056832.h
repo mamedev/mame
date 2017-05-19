@@ -1,13 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_VIDEO_K054156_K054157_K056832_H
+#define MAME_VIDEO_K054156_K054157_K056832_H
+
 #pragma once
-#ifndef __K056832_H__
-#define __K056832_H__
-
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-
-#include "video/k055555.h"// still needs k055555_get_palette_index
 
 
 typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k056832_cb_delegate;
@@ -36,14 +32,12 @@ typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k05
 #define K056382_DRAW_FLAG_FORCE_XYSCROLL        0x00800000
 
 
+class k055555_device;
+
 class k056832_device : public device_t, public device_gfx_interface
 {
 public:
 	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~k056832_device()
-	{
-		m_k055555 = nullptr;
-	}
 
 	static void set_k056832_callback(device_t &device, k056832_cb_delegate callback) { downcast<k056832_device &>(device).m_k056832_cb = callback; }
 	static void set_config(device_t &device, const char *gfx_reg, int bpp, int big, int djmain_hack, const char *k055555)
@@ -222,13 +216,12 @@ private:
 	int altK056832_update_linemap(screen_device &screen, bitmap_rgb32 &bitmap, int page, int flags);
 };
 
-extern const device_type K056832;
-
-
+DECLARE_DEVICE_TYPE(K056832, k056832_device)
 
 
 #define MCFG_K056832_PALETTE(_palette_tag) \
 	MCFG_GFX_PALETTE(_palette_tag)
 
 
-#endif
+#endif // MAME_VIDEO_K054156_K054157_K056832_H
+

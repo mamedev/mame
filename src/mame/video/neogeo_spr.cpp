@@ -14,13 +14,10 @@
 neosprite_base_device::neosprite_base_device(
 		const machine_config &mconfig,
 		device_type type,
-		const char *name,
 		const char *tag,
 		device_t *owner,
-		uint32_t clock,
-		const char *shortname,
-		const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_bppshift(4)
 {
 }
@@ -649,10 +646,10 @@ void neosprite_base_device::set_pens(const pen_t* pens)
 /* regions          (alternatively I could add an additional size check in the draw routine, but that would be slower)           */
 /*********************************************************************************************************************************/
 
-const device_type NEOGEO_SPRITE_REGULAR = device_creator<neosprite_regular_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_SPRITE_REGULAR, neosprite_regular_device, "neosprite_reg", "Neo-Geo Sprites (regular)")
 
 neosprite_regular_device::neosprite_regular_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: neosprite_base_device(mconfig, NEOGEO_SPRITE_REGULAR, "Neo-Geo Sprites (regular)", tag, owner, clock, "neosprite_reg", __FILE__)
+	: neosprite_base_device(mconfig, NEOGEO_SPRITE_REGULAR, tag, owner, clock)
 {
 }
 
@@ -697,10 +694,10 @@ inline void neosprite_regular_device::draw_pixel(int romaddr, uint32_t* dst, con
 /* for additional speed                                                                                                          */
 /*********************************************************************************************************************************/
 
-const device_type NEOGEO_SPRITE_OPTIMZIED = device_creator<neosprite_optimized_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_SPRITE_OPTIMZIED, neosprite_optimized_device, "neosprite_opt", "Neo-Geo Sprites (optimized)")
 
 neosprite_optimized_device::neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: neosprite_base_device(mconfig, NEOGEO_SPRITE_OPTIMZIED, "Neo-Geo Sprites (optimized)", tag, owner, clock, "neosprite_opt", __FILE__)
+	: neosprite_base_device(mconfig, NEOGEO_SPRITE_OPTIMZIED, tag, owner, clock)
 	, m_spritegfx8(nullptr)
 {
 }
@@ -773,11 +770,11 @@ inline void neosprite_optimized_device::draw_pixel(int romaddr, uint32_t* dst, c
 /* and uploads the zoom table.  The additional videoram buffering is a guess because 'hammer' is very glitchy without it         */
 /*********************************************************************************************************************************/
 
-const device_type NEOGEO_SPRITE_MIDAS = device_creator<neosprite_midas_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_SPRITE_MIDAS, neosprite_midas_device, "midassprite", "MIDAS Sprites")
 
 
 neosprite_midas_device::neosprite_midas_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: neosprite_base_device(mconfig, NEOGEO_SPRITE_MIDAS, "MIDAS Sprites", tag, owner, clock, "midassprite", __FILE__)
+	: neosprite_base_device(mconfig, NEOGEO_SPRITE_MIDAS, tag, owner, clock)
 {
 	m_bppshift = 8;
 }

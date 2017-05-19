@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
-
 #ifndef MAME_MACHINE_VS9209_H
 #define MAME_MACHINE_VS9209_H
+
+#pragma once
 
 //**************************************************************************
 //  CONFIGURATION MACROS
@@ -97,6 +97,6 @@ private:
 };
 
 // device type definition
-extern const device_type VS9209;
+DECLARE_DEVICE_TYPE(VS9209, vs9209_device)
 
-#endif
+#endif // MAME_MACHINE_VS9209_H

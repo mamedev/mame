@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_CTRL_ADAPTOR = device_creator<sms_ctrl_adaptor_device>;
+DEFINE_DEVICE_TYPE(SMS_CTRL_ADAPTOR, sms_ctrl_adaptor_device, "sms_ctrl_adaptor", "SMS Controller Adaptor")
 
 
 //**************************************************************************
@@ -28,7 +28,7 @@ const device_type SMS_CTRL_ADAPTOR = device_creator<sms_ctrl_adaptor_device>;
 //-------------------------------------------------
 
 sms_ctrl_adaptor_device::sms_ctrl_adaptor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SMS_CTRL_ADAPTOR, "SMS Controller Adaptor", tag, owner, clock, "sms_ctrl_adaptor", __FILE__),
+	device_t(mconfig, SMS_CTRL_ADAPTOR, tag, owner, clock),
 	device_gg_ext_port_interface(mconfig, *this),
 	m_subctrl_port(*this, "ctrl")
 {
@@ -41,7 +41,6 @@ sms_ctrl_adaptor_device::sms_ctrl_adaptor_device(const machine_config &mconfig, 
 
 void sms_ctrl_adaptor_device::device_start()
 {
-	m_subctrl_port->device_start();
 }
 
 

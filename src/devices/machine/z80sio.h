@@ -52,8 +52,10 @@
 
 ***************************************************************************/
 
-#ifndef __Z80SIO_H__
-#define __Z80SIO_H__
+#ifndef MAME_MACHINE_Z80SIO_H
+#define MAME_MACHINE_Z80SIO_H
+
+#pragma once
 
 #include "cpu/z80/z80daisy.h"
 
@@ -69,11 +71,11 @@
 	MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb)
 
 #define MCFG_UPD7201_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, UPD7201N, _clock) \
+	MCFG_DEVICE_ADD(_tag, UPD7201_NEW, _clock) \
 	MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb)
 
 #define MCFG_I8274_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, I8274N, _clock) \
+	MCFG_DEVICE_ADD(_tag, I8274_NEW, _clock) \
 	MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb)
 
 /* Generic macros */
@@ -228,7 +230,7 @@ protected:
 	// Read registers
 	enum
 	{
-		REG_RR0_STATUS      = 0,
+		REG_RR0_STATUS          = 0,
 		REG_RR1_SPEC_RCV_COND   = 1,
 		REG_RR2_INTERRUPT_VECT  = 2
 	};
@@ -238,10 +240,10 @@ protected:
 	{
 		REG_WR0_COMMAND_REGPT   = 0,
 		REG_WR1_INT_DMA_ENABLE  = 1,
-		REG_WR2_INT_VECTOR  = 2,
-		REG_WR3_RX_CONTROL  = 3,
-		REG_WR4_RX_TX_MODES = 4,
-		REG_WR5_TX_CONTROL  = 5,
+		REG_WR2_INT_VECTOR      = 2,
+		REG_WR3_RX_CONTROL      = 3,
+		REG_WR4_RX_TX_MODES     = 4,
+		REG_WR5_TX_CONTROL      = 5,
 		REG_WR6_SYNC_OR_SDLC_A  = 6,
 		REG_WR7_SYNC_OR_SDLC_F  = 7
 	};
@@ -250,91 +252,91 @@ protected:
 	{
 		RR0_RX_CHAR_AVAILABLE     = 0x01,
 		RR0_INTERRUPT_PENDING     = 0x02,
-		RR0_TX_BUFFER_EMPTY   = 0x04,
-		RR0_DCD           = 0x08,
-		RR0_SYNC_HUNT         = 0x10,
-		RR0_CTS           = 0x20,
-		RR0_TX_UNDERRUN       = 0x40,
-		RR0_BREAK_ABORT       = 0x80
+		RR0_TX_BUFFER_EMPTY       = 0x04,
+		RR0_DCD                   = 0x08,
+		RR0_SYNC_HUNT             = 0x10,
+		RR0_CTS                   = 0x20,
+		RR0_TX_UNDERRUN           = 0x40,
+		RR0_BREAK_ABORT           = 0x80
 	};
 
 	enum
 	{
-		RR1_ALL_SENT          = 0x01,
+		RR1_ALL_SENT              = 0x01,
 		RR1_RESIDUE_CODE_MASK     = 0x0e,
-		RR1_PARITY_ERROR      = 0x10,
+		RR1_PARITY_ERROR          = 0x10,
 		RR1_RX_OVERRUN_ERROR      = 0x20,
 		RR1_CRC_FRAMING_ERROR     = 0x40,
-		RR1_END_OF_FRAME      = 0x80
+		RR1_END_OF_FRAME          = 0x80
 	};
 
 	enum
 	{
-		RR2_INT_VECTOR_MASK   = 0xff,
-		RR2_INT_VECTOR_V1     = 0x02,
-		RR2_INT_VECTOR_V2     = 0x04,
-		RR2_INT_VECTOR_V3     = 0x08
+		RR2_INT_VECTOR_MASK       = 0xff,
+		RR2_INT_VECTOR_V1         = 0x02,
+		RR2_INT_VECTOR_V2         = 0x04,
+		RR2_INT_VECTOR_V3         = 0x08
 	};
 
 	enum
 	{
-		WR0_REGISTER_MASK   = 0x07,
-		WR0_COMMAND_MASK    = 0x38,
-		WR0_NULL        = 0x00,
-		WR0_SEND_ABORT      = 0x08,
-		WR0_RESET_EXT_STATUS    = 0x10,
-		WR0_CHANNEL_RESET   = 0x18,
-		WR0_ENABLE_INT_NEXT_RX  = 0x20,
-		WR0_RESET_TX_INT    = 0x28,
-		WR0_ERROR_RESET     = 0x30,
-		WR0_RETURN_FROM_INT = 0x38,
-		WR0_CRC_RESET_CODE_MASK = 0xc0,
-		WR0_CRC_RESET_NULL  = 0x00,
-		WR0_CRC_RESET_RX    = 0x40,
-		WR0_CRC_RESET_TX    = 0x80,
+		WR0_REGISTER_MASK         = 0x07,
+		WR0_COMMAND_MASK          = 0x38,
+		WR0_NULL                  = 0x00,
+		WR0_SEND_ABORT            = 0x08,
+		WR0_RESET_EXT_STATUS      = 0x10,
+		WR0_CHANNEL_RESET         = 0x18,
+		WR0_ENABLE_INT_NEXT_RX    = 0x20,
+		WR0_RESET_TX_INT          = 0x28,
+		WR0_ERROR_RESET           = 0x30,
+		WR0_RETURN_FROM_INT       = 0x38,
+		WR0_CRC_RESET_CODE_MASK   = 0xc0,
+		WR0_CRC_RESET_NULL        = 0x00,
+		WR0_CRC_RESET_RX          = 0x40,
+		WR0_CRC_RESET_TX          = 0x80,
 		WR0_CRC_RESET_TX_UNDERRUN = 0xc0
 	};
 
 	enum
 	{
-		WR1_EXT_INT_ENABLE    = 0x01,
-		WR1_TX_INT_ENABLE     = 0x02,
-		WR1_STATUS_VECTOR     = 0x04,
+		WR1_EXT_INT_ENABLE        = 0x01,
+		WR1_TX_INT_ENABLE         = 0x02,
+		WR1_STATUS_VECTOR         = 0x04,
 		WR1_RX_INT_MODE_MASK      = 0x18,
-		WR1_RX_INT_DISABLE    = 0x00,
-		WR1_RX_INT_FIRST      = 0x08,
+		WR1_RX_INT_DISABLE        = 0x00,
+		WR1_RX_INT_FIRST          = 0x08,
 		WR1_RX_INT_ALL_PARITY     = 0x10, // not supported
-		WR1_RX_INT_ALL        = 0x18,
-		WR1_WRDY_ON_RX_TX     = 0x20, // not supported
-		WR1_WRDY_FUNCTION     = 0x40, // not supported
-		WR1_WRDY_ENABLE       = 0x80  // not supported
+		WR1_RX_INT_ALL            = 0x18,
+		WR1_WRDY_ON_RX_TX         = 0x20, // not supported
+		WR1_WRDY_FUNCTION         = 0x40, // not supported
+		WR1_WRDY_ENABLE           = 0x80  // not supported
 	};
 
 	enum
 	{
-		WR2_DATA_XFER_INT     = 0x00, // not supported
+		WR2_DATA_XFER_INT         = 0x00, // not supported
 		WR2_DATA_XFER_DMA_INT     = 0x01, // not supported
-		WR2_DATA_XFER_DMA     = 0x02, // not supported
+		WR2_DATA_XFER_DMA         = 0x02, // not supported
 		WR2_DATA_XFER_ILLEGAL     = 0x03, // not supported
-		WR2_DATA_XFER_MASK    = 0x03, // not supported
-		WR2_PRIORITY          = 0x04, // not supported
-		WR2_MODE_8085_1       = 0x00, // not supported
-		WR2_MODE_8085_2       = 0x08, // not supported
-		WR2_MODE_8086_8088    = 0x10, // not supported
-		WR2_MODE_ILLEGAL      = 0x18, // not supported
-		WR2_MODE_MASK         = 0x18, // not supported
-		WR2_VECTORED_INT      = 0x20, // not supported
+		WR2_DATA_XFER_MASK        = 0x03, // not supported
+		WR2_PRIORITY              = 0x04, // not supported
+		WR2_MODE_8085_1           = 0x00, // not supported
+		WR2_MODE_8085_2           = 0x08, // not supported
+		WR2_MODE_8086_8088        = 0x10, // not supported
+		WR2_MODE_ILLEGAL          = 0x18, // not supported
+		WR2_MODE_MASK             = 0x18, // not supported
+		WR2_VECTORED_INT          = 0x20, // not supported
 		WR2_PIN10_SYNDETB_RTSB    = 0x80  // not supported
 	};
 
 	enum
 	{
-		WR3_RX_ENABLE         = 0x01,
+		WR3_RX_ENABLE             = 0x01,
 		WR3_SYNC_CHAR_LOAD_INHIBIT= 0x02, // not supported
 		WR3_ADDRESS_SEARCH_MODE   = 0x04, // not supported
-		WR3_RX_CRC_ENABLE     = 0x08, // not supported
+		WR3_RX_CRC_ENABLE         = 0x08, // not supported
 		WR3_ENTER_HUNT_PHASE      = 0x10, // not supported
-		WR3_AUTO_ENABLES      = 0x20,
+		WR3_AUTO_ENABLES          = 0x20,
 		WR3_RX_WORD_LENGTH_MASK   = 0xc0,
 		WR3_RX_WORD_LENGTH_5      = 0x00,
 		WR3_RX_WORD_LENGTH_7      = 0x40,
@@ -344,37 +346,37 @@ protected:
 
 	enum
 	{
-		WR4_PARITY_ENABLE     = 0x01,
-		WR4_PARITY_EVEN       = 0x02,
-		WR4_STOP_BITS_MASK    = 0x0c,
-		WR4_STOP_BITS_1       = 0x04,
-		WR4_STOP_BITS_1_5     = 0x08, // not supported
-		WR4_STOP_BITS_2       = 0x0c,
-		WR4_SYNC_MODE_MASK    = 0x30, // not supported
-		WR4_SYNC_MODE_8_BIT   = 0x00, // not supported
+		WR4_PARITY_ENABLE         = 0x01,
+		WR4_PARITY_EVEN           = 0x02,
+		WR4_STOP_BITS_MASK        = 0x0c,
+		WR4_STOP_BITS_1           = 0x04,
+		WR4_STOP_BITS_1_5         = 0x08, // not supported
+		WR4_STOP_BITS_2           = 0x0c,
+		WR4_SYNC_MODE_MASK        = 0x30, // not supported
+		WR4_SYNC_MODE_8_BIT       = 0x00, // not supported
 		WR4_SYNC_MODE_16_BIT      = 0x10, // not supported
-		WR4_SYNC_MODE_SDLC    = 0x20, // not supported
-		WR4_SYNC_MODE_EXT     = 0x30, // not supported
-		WR4_CLOCK_RATE_MASK   = 0xc0,
-		WR4_CLOCK_RATE_X1     = 0x00,
-		WR4_CLOCK_RATE_X16    = 0x40,
-		WR4_CLOCK_RATE_X32    = 0x80,
-		WR4_CLOCK_RATE_X64    = 0xc0
+		WR4_SYNC_MODE_SDLC        = 0x20, // not supported
+		WR4_SYNC_MODE_EXT         = 0x30, // not supported
+		WR4_CLOCK_RATE_MASK       = 0xc0,
+		WR4_CLOCK_RATE_X1         = 0x00,
+		WR4_CLOCK_RATE_X16        = 0x40,
+		WR4_CLOCK_RATE_X32        = 0x80,
+		WR4_CLOCK_RATE_X64        = 0xc0
 	};
 
 	enum
 	{
-		WR5_TX_CRC_ENABLE     = 0x01, // not supported
-		WR5_RTS           = 0x02,
-		WR5_CRC16         = 0x04, // not supported
-		WR5_TX_ENABLE         = 0x08,
-		WR5_SEND_BREAK        = 0x10,
+		WR5_TX_CRC_ENABLE         = 0x01, // not supported
+		WR5_RTS                   = 0x02,
+		WR5_CRC16                 = 0x04, // not supported
+		WR5_TX_ENABLE             = 0x08,
+		WR5_SEND_BREAK            = 0x10,
 		WR5_TX_WORD_LENGTH_MASK   = 0x60,
 		WR5_TX_WORD_LENGTH_5      = 0x00,
 		WR5_TX_WORD_LENGTH_6      = 0x40,
 		WR5_TX_WORD_LENGTH_7      = 0x20,
 		WR5_TX_WORD_LENGTH_8      = 0x60,
-		WR5_DTR           = 0x80
+		WR5_DTR                   = 0x80
 	};
 
 	void update_serial();
@@ -426,24 +428,23 @@ class z80sio_device :  public device_t,
 
 public:
 	// construction/destruction
-	z80sio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
 	z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_txda_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_txda_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dtra_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_dtra_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_rtsa_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_rtsa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_wrdya_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_wrdya_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_synca_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_synca_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_txdb_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_txdb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dtrb_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_dtrb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_rtsb_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_rtsb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_wrdyb_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_wrdyb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_syncb_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_syncb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_int_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_rxdrqa_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_rxdrqa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_txdrqa_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_txdrqa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_rxdrqb_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_rxdrqb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_txdrqb_callback(device_t &device, _Object object) { return downcast<z80sio_device &>(device).m_out_txdrqb_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_txda_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_txda_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_dtra_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_dtra_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_rtsa_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_rtsa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_wrdya_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_wrdya_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_synca_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_synca_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_txdb_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_txdb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_dtrb_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_dtrb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_rtsb_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_rtsb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_wrdyb_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_wrdyb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_syncb_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_syncb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_rxdrqa_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_rxdrqa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_txdrqa_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_txdrqa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_rxdrqb_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_rxdrqb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_txdrqb_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_txdrqb_cb.set_callback(std::forward<Object>(cb)); }
 
 	static void static_set_cputag(device_t &device, const char *tag)
 	{
@@ -493,6 +494,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { m_chanB->sync_w(state); }
 
 protected:
+	z80sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -558,22 +561,22 @@ protected:
 	const char *m_cputag;
 };
 
-class upd7201N_device : public z80sio_device
+class upd7201_new_device : public z80sio_device
 {
-public :
-	upd7201N_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+public:
+	upd7201_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class i8274N_device : public z80sio_device
+class i8274_new_device : public z80sio_device
 {
-public :
-	i8274N_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+public:
+	i8274_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 // device type definition
-extern const device_type Z80SIO;
-extern const device_type Z80SIO_CHANNEL;
-extern const device_type UPD7201N;
-extern const device_type I8274N;
+DECLARE_DEVICE_TYPE(Z80SIO,         z80sio_device)
+DECLARE_DEVICE_TYPE(Z80SIO_CHANNEL, z80sio_channel)
+DECLARE_DEVICE_TYPE(UPD7201_NEW,    upd7201_new_device)
+DECLARE_DEVICE_TYPE(I8274_NEW,      i8274_new_device)
 
-#endif
+#endif // MAME_MACHINE_Z80SIO_H

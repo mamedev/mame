@@ -198,7 +198,7 @@ static INPUT_PORTS_START( pp01 )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( pp01, pp01_state )
+static MACHINE_CONFIG_START( pp01 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(pp01_mem)
@@ -275,5 +275,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS           INIT     COMPANY   FULLNAME   FLAGS */
-COMP( 198?, pp01,   0,      0,      pp01,       pp01,   driver_device,   0,       "ZVT",   "PP-01", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS        INIT  COMPANY  FULLNAME  FLAGS
+COMP( 198?, pp01,   0,      0,      pp01,       pp01,   pp01_state,  0,    "ZVT",   "PP-01",  MACHINE_NOT_WORKING )

@@ -18,10 +18,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_74157_H
+#define MAME_MACHINE_74157_H
 
-#ifndef DEVICES_MACHINE_74157_H
-#define DEVICES_MACHINE_74157_H
+#pragma once
 
 
 
@@ -44,10 +44,9 @@ class ls157_device : public device_t
 public:
 	// construction/destruction
 	ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	ls157_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
 
 	// static configuration
-	template<class _Object> static devcb_base &set_out_callback(device_t &device, _Object object) { return downcast<ls157_device &>(device).m_out_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_callback(device_t &device, Object &&cb) { return downcast<ls157_device &>(device).m_out_cb.set_callback(std::forward<Object>(cb)); }
 
 	// data writes
 	DECLARE_WRITE8_MEMBER(a_w);
@@ -66,6 +65,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(strobe_w);
 
 protected:
+	ls157_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -96,8 +97,7 @@ public:
 //**************************************************************************
 
 // device type definition
-extern const device_type LS157;
-extern const device_type HCT157;
+DECLARE_DEVICE_TYPE(LS157,  ls157_device)
+DECLARE_DEVICE_TYPE(HCT157, hct157_device)
 
-
-#endif
+#endif // MAME_MACHINE_74157_H

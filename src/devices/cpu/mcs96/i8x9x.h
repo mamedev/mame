@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef __I8X9X_H__
-#define __I8X9X_H__
+#ifndef MAME_CPU_MCS96_I8X9X_H
+#define MAME_CPU_MCS96_I8X9X_H
 
 #include "mcs96.h"
 
@@ -21,11 +21,11 @@ public:
 		P0, P1, P2
 	};
 
-	i8x9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	void serial_w(uint8_t val);
 
 protected:
+	i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
@@ -92,7 +92,7 @@ public:
 	p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type C8095;
-extern const device_type P8098;
+DECLARE_DEVICE_TYPE(C8095, c8095_device)
+DECLARE_DEVICE_TYPE(P8098, p8098_device)
 
-#endif
+#endif // MAME_CPU_MCS96_I8X9X_H

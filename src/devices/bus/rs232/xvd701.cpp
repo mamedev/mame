@@ -4,7 +4,7 @@
 #include "xvd701.h"
 
 jvc_xvd701_device::jvc_xvd701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, JVC_XVD701, "JVC XV-D701", tag, owner, clock, "xvd701", __FILE__),
+	: device_t(mconfig, JVC_XVD701, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
 	m_response_index(0),
@@ -150,4 +150,4 @@ void jvc_xvd701_device::rcv_complete()
 	}
 }
 
-const device_type JVC_XVD701 = device_creator<jvc_xvd701_device>;
+DEFINE_DEVICE_TYPE(JVC_XVD701, jvc_xvd701_device, "xvd701", "JVC XV-D701")

@@ -6,8 +6,10 @@
 
 ***********************************************************************************************/
 
-#ifndef __TMS6100_H__
-#define __TMS6100_H__
+#ifndef MAME_MACHINE_TMS6100_H
+#define MAME_MACHINE_TMS6100_H
+
+#pragma once
 
 
 
@@ -19,7 +21,7 @@
 // note: in 4-bit mode, use data_r, otherwise use data_line_r
 
 #define MCFG_TMS6100_4BIT_MODE() \
-	tms6100_device::enable_4bit_mode(*device);
+		tms6100_device::enable_4bit_mode(*device);
 
 
 // pinout reference
@@ -94,7 +96,6 @@ class tms6100_device : public device_t
 {
 public:
 	tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
 
 	static void enable_4bit_mode(device_t &device) { downcast<tms6100_device &>(device).m_4bit_mode = true; }
 
@@ -109,6 +110,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(data_line_r);
 
 protected:
+	tms6100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -147,8 +150,7 @@ protected:
 };
 
 
-extern const device_type TMS6100;
-extern const device_type M58819;
+DECLARE_DEVICE_TYPE(TMS6100, tms6100_device)
+DECLARE_DEVICE_TYPE(M58819,  m58819_device)
 
-
-#endif /* __TMS6100_H__ */
+#endif // MAME_MACHINE_TMS6100_H

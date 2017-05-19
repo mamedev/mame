@@ -3,39 +3,36 @@
 #include "emu.h"
 #include "korean.h"
 
-const device_type MSX_CART_KOREAN_80IN1 = device_creator<msx_cart_korean_80in1>;
-const device_type MSX_CART_KOREAN_90IN1 = device_creator<msx_cart_korean_90in1>;
-const device_type MSX_CART_KOREAN_126IN1 = device_creator<msx_cart_korean_126in1>;
+DEFINE_DEVICE_TYPE(MSX_CART_KOREAN_80IN1,  msx_cart_korean_80in1_device,  "msx_cart_korean_80in1",  "MSX Cartridge - Korean 80-in-1")
+DEFINE_DEVICE_TYPE(MSX_CART_KOREAN_90IN1,  msx_cart_korean_90in1_device,  "msx_cart_korean_90in1",  "MSX Cartridge - Korean 90-in-1")
+DEFINE_DEVICE_TYPE(MSX_CART_KOREAN_126IN1, msx_cart_korean_126in1_device, "msx_cart_korean_126in1", "MSX Cartridge - Korean 126-in-1")
 
 
-msx_cart_korean_80in1::msx_cart_korean_80in1(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_KOREAN_80IN1, "MSX Cartridge - Korean 80-in-1", tag, owner, clock, "msx_cart_korean_80in1", __FILE__)
+msx_cart_korean_80in1_device::msx_cart_korean_80in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSX_CART_KOREAN_80IN1, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
+	, m_selected_bank{ 0, 1, 2, 3 }
+	, m_bank_base{ nullptr, nullptr, nullptr, nullptr }
 {
-	for (int i = 0; i < 4; i++)
-	{
-		m_selected_bank[i] = i;
-		m_bank_base[i] = nullptr;
-	}
 }
 
 
-void msx_cart_korean_80in1::device_start()
+void msx_cart_korean_80in1_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_korean_80in1::restore_banks), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_korean_80in1_device::restore_banks), this));
 }
 
 
-void msx_cart_korean_80in1::setup_bank(uint8_t bank)
+void msx_cart_korean_80in1_device::setup_bank(uint8_t bank)
 {
 	m_bank_base[bank] = get_rom_base() + ( m_selected_bank[bank] & m_bank_mask ) * 0x2000;
 }
 
 
-void msx_cart_korean_80in1::restore_banks()
+void msx_cart_korean_80in1_device::restore_banks()
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -44,7 +41,7 @@ void msx_cart_korean_80in1::restore_banks()
 }
 
 
-void msx_cart_korean_80in1::device_reset()
+void msx_cart_korean_80in1_device::device_reset()
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -53,7 +50,7 @@ void msx_cart_korean_80in1::device_reset()
 }
 
 
-void msx_cart_korean_80in1::initialize_cartridge()
+void msx_cart_korean_80in1_device::initialize_cartridge()
 {
 	uint32_t size = get_rom_size();
 
@@ -75,7 +72,7 @@ void msx_cart_korean_80in1::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_korean_80in1::read_cart)
+READ8_MEMBER(msx_cart_korean_80in1_device::read_cart)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -86,7 +83,7 @@ READ8_MEMBER(msx_cart_korean_80in1::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_korean_80in1::write_cart)
+WRITE8_MEMBER(msx_cart_korean_80in1_device::write_cart)
 {
 	if (offset >= 0x4000 && offset < 0x4004)
 	{
@@ -101,32 +98,29 @@ WRITE8_MEMBER(msx_cart_korean_80in1::write_cart)
 
 
 
-msx_cart_korean_90in1::msx_cart_korean_90in1(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_KOREAN_90IN1, "MSX Cartridge - Korean 90-in-1", tag, owner, clock, "msx_cart_korean_90in1", __FILE__)
+msx_cart_korean_90in1_device::msx_cart_korean_90in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSX_CART_KOREAN_90IN1, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
 	, m_selected_bank(0)
+	, m_bank_base{ nullptr, nullptr, nullptr, nullptr }
 {
-	for (auto & elem : m_bank_base)
-	{
-		elem = nullptr;
-	}
 }
 
 
-void msx_cart_korean_90in1::device_start()
+void msx_cart_korean_90in1_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_korean_90in1::restore_banks), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_korean_90in1_device::restore_banks), this));
 
 	// Install IO read/write handlers
 	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
-	space.install_write_handler(0x77, 0x77, write8_delegate(FUNC(msx_cart_korean_90in1::banking), this));
+	space.install_write_handler(0x77, 0x77, write8_delegate(FUNC(msx_cart_korean_90in1_device::banking), this));
 }
 
 
-void msx_cart_korean_90in1::restore_banks()
+void msx_cart_korean_90in1_device::restore_banks()
 {
 	uint8_t *base = get_rom_base();
 
@@ -159,13 +153,13 @@ void msx_cart_korean_90in1::restore_banks()
 }
 
 
-void msx_cart_korean_90in1::device_reset()
+void msx_cart_korean_90in1_device::device_reset()
 {
 	m_selected_bank = 0;
 }
 
 
-void msx_cart_korean_90in1::initialize_cartridge()
+void msx_cart_korean_90in1_device::initialize_cartridge()
 {
 	uint32_t size = get_rom_size();
 
@@ -187,7 +181,7 @@ void msx_cart_korean_90in1::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_korean_90in1::read_cart)
+READ8_MEMBER(msx_cart_korean_90in1_device::read_cart)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -198,7 +192,7 @@ READ8_MEMBER(msx_cart_korean_90in1::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_korean_90in1::banking)
+WRITE8_MEMBER(msx_cart_korean_90in1_device::banking)
 {
 	m_selected_bank = data;
 	restore_banks();
@@ -208,34 +202,31 @@ WRITE8_MEMBER(msx_cart_korean_90in1::banking)
 
 
 
-msx_cart_korean_126in1::msx_cart_korean_126in1(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_KOREAN_126IN1, "MSX Cartridge - Korean 126-in-1", tag, owner, clock, "msx_cart_korean_126in1", __FILE__)
+msx_cart_korean_126in1_device::msx_cart_korean_126in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSX_CART_KOREAN_126IN1, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
+	, m_selected_bank{ 0, 1 }
+	, m_bank_base{ nullptr, nullptr }
 {
-	for (int i = 0; i < 2; i++)
-	{
-		m_selected_bank[i] = i;
-		m_bank_base[i] = nullptr;
-	}
 }
 
 
-void msx_cart_korean_126in1::device_start()
+void msx_cart_korean_126in1_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_korean_126in1::restore_banks), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_korean_126in1_device::restore_banks), this));
 }
 
 
-void msx_cart_korean_126in1::setup_bank(uint8_t bank)
+void msx_cart_korean_126in1_device::setup_bank(uint8_t bank)
 {
 	m_bank_base[bank] = get_rom_base() + ( m_selected_bank[bank] & m_bank_mask ) * 0x4000;
 }
 
 
-void msx_cart_korean_126in1::restore_banks()
+void msx_cart_korean_126in1_device::restore_banks()
 {
 	for (int i = 0; i < 2; i++)
 	{
@@ -244,7 +235,7 @@ void msx_cart_korean_126in1::restore_banks()
 }
 
 
-void msx_cart_korean_126in1::device_reset()
+void msx_cart_korean_126in1_device::device_reset()
 {
 	for (int i = 0; i < 2; i++)
 	{
@@ -253,7 +244,7 @@ void msx_cart_korean_126in1::device_reset()
 }
 
 
-void msx_cart_korean_126in1::initialize_cartridge()
+void msx_cart_korean_126in1_device::initialize_cartridge()
 {
 	uint32_t size = get_rom_size();
 
@@ -275,7 +266,7 @@ void msx_cart_korean_126in1::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_korean_126in1::read_cart)
+READ8_MEMBER(msx_cart_korean_126in1_device::read_cart)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -286,7 +277,7 @@ READ8_MEMBER(msx_cart_korean_126in1::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_korean_126in1::write_cart)
+WRITE8_MEMBER(msx_cart_korean_126in1_device::write_cart)
 {
 	if (offset >= 0x4000 && offset < 0x4002)
 	{

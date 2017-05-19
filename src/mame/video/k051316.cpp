@@ -41,9 +41,10 @@ control registers
 
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
-const device_type K051316 = device_creator<k051316_device>;
+
+DEFINE_DEVICE_TYPE(K051316, k051316_device, "k051316", "K051316 PSAC")
 
 
 const gfx_layout k051316_device::charlayout4 =
@@ -104,7 +105,7 @@ GFXDECODE_END
 
 
 k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K051316, "K051316 PSAC", tag, owner, clock, "k051316", __FILE__),
+	: device_t(mconfig, K051316, tag, owner, clock),
 		device_gfx_interface(mconfig, *this, gfxinfo),
 		m_zoom_rom(*this, DEVICE_SELF),
 		m_dx(0),
