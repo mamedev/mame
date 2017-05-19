@@ -25,7 +25,7 @@ public:
 
 	virtual ~nl_convert_base_t();
 
-	const pstringbuffer &result() { return m_buf.str(); }
+	const pstring &result() { return m_buf.str(); }
 
 	virtual void convert(const pstring &contents) = 0;
 

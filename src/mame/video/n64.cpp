@@ -165,7 +165,7 @@ uint32_t n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-void n64_state::screen_eof_n64(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(n64_state::screen_vblank_n64)
 {
 }
 
@@ -956,7 +956,7 @@ void n64_rdp::get_dither_values(int32_t x, int32_t y, int32_t* cdith, int32_t* a
 		break;
 	case 14:
 		*cdith = 0;
-		*adith = m_machine->rand() & 7;
+		*adith = machine().rand() & 7;
 		break;
 	case 15:
 		*adith = *cdith = 0;
@@ -1664,7 +1664,7 @@ void n64_rdp::disassemble(char* buffer)
 		case 0x2f:  sprintf(buffer, "Set_Other_Modes        %08X %08X", uint32_t(cmd[0] >> 32), (uint32_t)cmd[0]); break;
 		case 0x30:  sprintf(buffer, "Load_TLUT              %d, %s, %s, %s, %s", tile, sl, tl, sh, th); break;
 		case 0x32:  sprintf(buffer, "Set_Tile_Size          %d, %s, %s, %s, %s", tile, sl, tl, sh, th); break;
-		case 0x33:  sprintf(buffer, "Load_Block             %d, %03X, %03X, %03X, %03X", tile, uint32_t(cmd[0] >> 44) & 0xfff, uint32_t(cmd[0] >> 32) & 0xfff, uint32_t(cmd[0] >> 12) & 0xfff, uint32_t(cmd[1]) & 0xfff); break;
+		case 0x33:  sprintf(buffer, "Load_Block             %d, %03X, %03X, %03X, %03X", tile, uint32_t(cmd[0] >> 44) & 0xfff, uint32_t(cmd[0] >> 32) & 0xfff, uint32_t(cmd[0] >> 12) & 0xfff, uint32_t(cmd[0]) & 0xfff); break;
 		case 0x34:  sprintf(buffer, "Load_Tile              %d, %s, %s, %s, %s", tile, sl, tl, sh, th); break;
 		case 0x35:  sprintf(buffer, "Set_Tile               %d, %s, %s, %d, %04X", tile, format, size, (uint32_t(cmd[0] >> 41) & 0x1ff) * 8, (uint32_t(cmd[0] >> 32) & 0x1ff) * 8); break;
 		case 0x36:  sprintf(buffer, "Fill_Rectangle         %s, %s, %s, %s", sh, th, sl, tl); break;
@@ -3636,7 +3636,7 @@ void n64_rdp::span_draw_1cycle(int32_t scanline, const extent_t &extent, const r
 			uint32_t t0a = userdata->m_texel0_color.get_a();
 			userdata->m_texel0_alpha.set(t0a, t0a, t0a, t0a);
 
-			const uint8_t noise = rand() << 3; // Not accurate
+			const uint8_t noise = machine().rand() << 3; // Not accurate
 			userdata->m_noise_color.set(0, noise, noise, noise);
 
 			rgbaint_t rgbsub_a(*userdata->m_color_inputs.combiner_rgbsub_a[1]);
@@ -3863,7 +3863,7 @@ void n64_rdp::span_draw_2cycle(int32_t scanline, const extent_t &extent, const r
 			userdata->m_texel1_alpha.set(t1a, t1a, t1a, t1a);
 			userdata->m_next_texel_alpha.set(tna, tna, tna, tna);
 
-			const uint8_t noise = rand() << 3; // Not accurate
+			const uint8_t noise = machine().rand() << 3; // Not accurate
 			userdata->m_noise_color.set(0, noise, noise, noise);
 
 			rgbaint_t rgbsub_a(*userdata->m_color_inputs.combiner_rgbsub_a[0]);

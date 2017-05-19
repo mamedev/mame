@@ -36,7 +36,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -90,7 +90,7 @@ READ8_MEMBER( imsai_state::status_r )
 	return (m_term_data) ? 3 : 1;
 }
 
-WRITE8_MEMBER( imsai_state::kbd_put )
+void imsai_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -110,7 +110,7 @@ void imsai_state::machine_reset()
 	m_term_data = 0;
 }
 
-static MACHINE_CONFIG_START( imsai, imsai_state )
+static MACHINE_CONFIG_START( imsai )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(imsai_mem)
@@ -118,7 +118,7 @@ static MACHINE_CONFIG_START( imsai, imsai_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(imsai_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(imsai_state, kbd_put))
 
 	/* Devices */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
@@ -138,5 +138,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT  CLASS         INIT  COMPANY  FULLNAME   FLAGS */
-COMP( 1978, imsai,   0,      0,       imsai,     imsai, driver_device, 0,   "Imsai", "MPU-B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT  COMPANY  FULLNAME  FLAGS
+COMP( 1978, imsai,   0,      0,       imsai,     imsai, imsai_state, 0,    "Imsai", "MPU-B",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

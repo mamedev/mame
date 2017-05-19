@@ -8,10 +8,10 @@
     Data East IC 55 / 56 / 74 / 141
 
 **************************************************************************/
+#ifndef MAME_VIDEO_DECO16IC_H
+#define MAME_VIDEO_DECO16IC_H
 
 #pragma once
-#ifndef __DECO16IC_H__
-#define __DECO16IC_H__
 
 
 
@@ -156,7 +156,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
-extern const device_type DECO16IC;
+DECLARE_DEVICE_TYPE(DECO16IC, deco16ic_device)
 
 
 
@@ -208,4 +208,4 @@ extern const device_type DECO16IC;
 // function definition for a callback
 #define DECO16IC_BANK_CB_MEMBER(_name)     int _name(int bank)
 
-#endif
+#endif // MAME_VIDEO_DECO16IC_H

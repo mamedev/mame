@@ -115,7 +115,7 @@ public:
 	uint32_t screen_update_ninjakd2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_ninjakd2(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_ninjakd2);
 	INTERRUPT_GEN_MEMBER(ninjakd2_interrupt);
 	void robokid_get_bg_tile_info( tile_data& tileinfo, tilemap_memory_index const tile_index, int const gfxnum, const uint8_t* const videoram);
 	void bg_ctrl(int offset, int data, tilemap_t* tilemap);

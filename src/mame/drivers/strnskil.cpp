@@ -342,7 +342,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(strnskil_state::strnskil_irq)
 }
 
 
-static MACHINE_CONFIG_START( strnskil, strnskil_state )
+static MACHINE_CONFIG_START( strnskil )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
@@ -546,7 +546,7 @@ DRIVER_INIT_MEMBER(strnskil_state,banbam)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(strnskil_state::protection_w),this));
 }
 
-GAME( 1984, strnskil, 0,        strnskil, strnskil, driver_device, 0,       ROT0, "Sun Electronics", "Strength & Skill", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, guiness,  strnskil, strnskil, strnskil, driver_device, 0,       ROT0, "Sun Electronics", "The Guiness (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, banbam,   0,        banbam,   banbam, strnskil_state,   banbam,  ROT0, "Sun Electronics", "BanBam", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, pettanp,  banbam,   strnskil, banbam, strnskil_state,   pettanp, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, strnskil, 0,        strnskil, strnskil, strnskil_state, 0,       ROT0, "Sun Electronics", "Strength & Skill",    MACHINE_SUPPORTS_SAVE )
+GAME( 1984, guiness,  strnskil, strnskil, strnskil, strnskil_state, 0,       ROT0, "Sun Electronics", "The Guiness (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, banbam,   0,        banbam,   banbam,   strnskil_state, banbam,  ROT0, "Sun Electronics", "BanBam",              MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pettanp,  banbam,   strnskil, banbam,   strnskil_state, pettanp, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

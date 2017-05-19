@@ -420,7 +420,7 @@ static INPUT_PORTS_START( wpc_dcs )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wpc_dcs, wpc_dcs_state )
+static MACHINE_CONFIG_START( wpc_dcs )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_8MHz/4)
 	MCFG_CPU_PROGRAM_MAP(wpc_dcs_map)

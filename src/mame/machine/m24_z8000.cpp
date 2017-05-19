@@ -3,10 +3,10 @@
 #include "emu.h"
 #include "m24_z8000.h"
 
-const device_type M24_Z8000 = device_creator<m24_z8000_device>;
+DEFINE_DEVICE_TYPE(M24_Z8000, m24_z8000_device, "m24_z8000", "Olivetti M24 Z8000 Adapter")
 
 m24_z8000_device::m24_z8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, M24_Z8000, "Olivetti M24 Z8000 Adapter", tag, owner, clock, "m24_z8000", __FILE__),
+	device_t(mconfig, M24_Z8000, tag, owner, clock),
 	m_z8000(*this, "z8000"),
 	m_maincpu(*this, ":maincpu"),
 	m_pic(*this, ":mb:pic8259"),

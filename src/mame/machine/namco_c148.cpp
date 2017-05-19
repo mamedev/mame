@@ -9,7 +9,7 @@
     Based off implementation from K.Wilkins and Phil Stroffolino
 
     TODO:
-    - hookup C116 device, @see mame/includes/namcoic.h
+    - hookup C116 device, @see mame/machine/namcoic.h
 
 =============================================================================
 Interrupt Controller C148          1C0000-1FFFFF  R/W  D00-D02
@@ -45,7 +45,7 @@ Interrupt Controller C148          1C0000-1FFFFF  R/W  D00-D02
 #include "namco_c148.h"
 
 #define VERBOSE         0
-#define LOG(x) do { if (VERBOSE) printf x; } while (0)
+#include "logmacro.h"
 
 
 
@@ -54,7 +54,7 @@ Interrupt Controller C148          1C0000-1FFFFF  R/W  D00-D02
 //**************************************************************************
 
 // device type definition
-const device_type NAMCO_C148 = device_creator<namco_c148_device>;
+DEFINE_DEVICE_TYPE(NAMCO_C148, namco_c148_device, "namco_c148", "Namco C148 Interrupt Controller")
 
 
 //**************************************************************************
@@ -66,7 +66,7 @@ const device_type NAMCO_C148 = device_creator<namco_c148_device>;
 //-------------------------------------------------
 
 namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_C148, "Namco C148 Interrupt Controller", tag, owner, clock, "namco_c148", __FILE__),
+	: device_t(mconfig, NAMCO_C148, tag, owner, clock),
 	m_out_ext1_cb(*this),
 	m_out_ext2_cb(*this),
 	m_hostcpu_tag(nullptr),
@@ -154,11 +154,11 @@ inline void namco_c148_device::flush_irq_acks()
 		m_hostcpu->set_input_line(i,CLEAR_LINE);
 }
 
-WRITE8_MEMBER( namco_c148_device::pos_irq_level_w )     { m_irqlevel.pos = data & 7;    flush_irq_acks(); if(data != 0) { LOG(("%s: pos IRQ level = %02x\n",this->tag(),data)); }   }
-WRITE8_MEMBER( namco_c148_device::vblank_irq_level_w )  { m_irqlevel.vblank = data & 7; flush_irq_acks(); LOG(("%s: vblank IRQ level = %02x\n",this->tag(),data));  }
-WRITE8_MEMBER( namco_c148_device::cpu_irq_level_w )     { m_irqlevel.cpu = data & 7;    flush_irq_acks(); LOG(("%s: cpu IRQ level = %02x\n",this->tag(),data)); }
-WRITE8_MEMBER( namco_c148_device::ex_irq_level_w )      { m_irqlevel.ex = data & 7;     flush_irq_acks(); LOG(("%s: ex IRQ level = %02x\n",this->tag(),data));  }
-WRITE8_MEMBER( namco_c148_device::sci_irq_level_w )     { m_irqlevel.sci = data & 7;    flush_irq_acks(); LOG(("%s: sci IRQ level = %02x\n",this->tag(),data)); }
+WRITE8_MEMBER( namco_c148_device::pos_irq_level_w )     { m_irqlevel.pos = data & 7;    flush_irq_acks(); if(data != 0) { LOG("%s: pos IRQ level = %02x\n",data); }   }
+WRITE8_MEMBER( namco_c148_device::vblank_irq_level_w )  { m_irqlevel.vblank = data & 7; flush_irq_acks(); LOG("%s: vblank IRQ level = %02x\n",data);  }
+WRITE8_MEMBER( namco_c148_device::cpu_irq_level_w )     { m_irqlevel.cpu = data & 7;    flush_irq_acks(); LOG("%s: cpu IRQ level = %02x\n",data); }
+WRITE8_MEMBER( namco_c148_device::ex_irq_level_w )      { m_irqlevel.ex = data & 7;     flush_irq_acks(); LOG("%s: ex IRQ level = %02x\n",data);  }
+WRITE8_MEMBER( namco_c148_device::sci_irq_level_w )     { m_irqlevel.sci = data & 7;    flush_irq_acks(); LOG("%s: sci IRQ level = %02x\n",data); }
 
 READ16_MEMBER( namco_c148_device::vblank_irq_ack_r )    { m_hostcpu->set_input_line(m_irqlevel.vblank, CLEAR_LINE); return 0; }
 READ16_MEMBER( namco_c148_device::pos_irq_ack_r )       { m_hostcpu->set_input_line(m_irqlevel.pos, CLEAR_LINE);    return 0; }

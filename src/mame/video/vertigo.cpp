@@ -56,7 +56,7 @@
  *************************************/
 
 #define V_ADDPOINT(h,v,c,i) \
-	m_vector->add_point (((h) & 0x7ff) << 14, (0x6ff - ((v) & 0x7ff)) << 14, VECTOR_COLOR444(c), (i))
+	m_vector->add_point (((h) & 0x7ff) << 14, (0x6ff - ((v) & 0x7ff)) << 14, vector_device::color444(c), (i))
 
 #define ADD(r,s,c)  (((r)  + (s) + (c)) & 0xffff)
 #define SUBR(r,s,c) ((~(r) + (s) + (c)) & 0xffff)

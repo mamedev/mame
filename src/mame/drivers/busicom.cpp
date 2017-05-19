@@ -212,7 +212,7 @@ void busicom_state::machine_reset()
 
 //static const char layout_busicom [] = "busicom";
 
-static MACHINE_CONFIG_START( busicom, busicom_state )
+static MACHINE_CONFIG_START( busicom )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I4004, 750000)
 	MCFG_CPU_PROGRAM_MAP(busicom_rom)
@@ -247,5 +247,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1974, busicom,  0,       0,   busicom,    busicom, driver_device,  0,  "Business Computer Corporation",   "Busicom 141-PF",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT COMPANY                          FULLNAME          FLAGS
+COMP( 1974, busicom,  0,       0,   busicom,    busicom, busicom_state, 0,   "Business Computer Corporation", "Busicom 141-PF", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

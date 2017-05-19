@@ -87,6 +87,8 @@ public:
 	bitmap_ind8 m_custom_priority_bitmap;
 	bitmap_ind16 m_secondary_render_bitmap;
 
+	emu_timer * m_raise_irq_timer;
+
 	tilemap_t *m_tx_tilemap;    /* Tilemap for extra-text-layer */
 	DECLARE_READ16_MEMBER(video_count_r);
 	DECLARE_WRITE8_MEMBER(toaplan2_coin_w);
@@ -141,7 +143,7 @@ public:
 	DECLARE_DRIVER_INIT(batrider);
 	DECLARE_DRIVER_INIT(enmadaio);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	DECLARE_MACHINE_START(toaplan2);
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(toaplan2);
 	DECLARE_VIDEO_START(toaplan2);
 	DECLARE_MACHINE_RESET(ghox);
@@ -163,7 +165,7 @@ public:
 	uint32_t screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_toaplan2(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_toaplan2);
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq1);
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq2);
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq4);

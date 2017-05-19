@@ -46,7 +46,7 @@ DRIVER_INIT_MEMBER(kissp_state,kissp)
 {
 }
 
-static MACHINE_CONFIG_START( kissp, kissp_state )
+static MACHINE_CONFIG_START( kissp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8035, 6000000/15)
 	MCFG_CPU_PROGRAM_MAP(kissp_map)
@@ -72,5 +72,5 @@ ROM_START(kissp2)
 	ROM_RELOAD( 0x4800, 0x0800)
 ROM_END
 
-GAME( 1979,  kissp,  kiss,  kissp,  kissp, kissp_state,  kissp,  ROT0,  "Bally", "Kiss (prototype)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979,  kissp,  kiss,  kissp,  kissp, kissp_state,  kissp,  ROT0,  "Bally", "Kiss (prototype)",     MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979,  kissp2, kiss,  kissp,  kissp, kissp_state,  kissp,  ROT0,  "Bally", "Kiss (prototype v.2)", MACHINE_IS_SKELETON_MECHANICAL )

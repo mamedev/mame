@@ -146,7 +146,7 @@ static INPUT_PORTS_START( tourtabl )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( tourtabl, tourtabl_state )
+static MACHINE_CONFIG_START( tourtabl )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 3)    /* actually M6507 */
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -203,5 +203,5 @@ ROM_START( tourtab2 )
 ROM_END
 
 
-GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, driver_device, 0, ROT0, "Atari", "Tournament Table (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1978, tourtab2, tourtabl, tourtabl, tourtabl, driver_device, 0, ROT0, "Atari", "Tournament Table (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, tourtabl_state, 0, ROT0, "Atari", "Tournament Table (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, tourtab2, tourtabl, tourtabl, tourtabl, tourtabl_state, 0, ROT0, "Atari", "Tournament Table (set 2)", MACHINE_SUPPORTS_SAVE )

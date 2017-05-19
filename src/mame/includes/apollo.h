@@ -8,27 +8,32 @@
  *
  */
 
+#ifndef MAME_INCLUDES_APOLLO_H
+#define MAME_INCLUDES_APOLLO_H
+
 #pragma once
 
-#ifndef APOLLO_H_
-#define APOLLO_H_
 
-
-#include "cpu/m68000/m68000.h"
-#include "bus/rs232/rs232.h"
-#include "machine/terminal.h"
-#include "machine/ram.h"
-#include "machine/6840ptm.h"
-#include "machine/mc68681.h"
-#include "machine/am9517a.h"
-#include "machine/pic8259.h"
-#include "machine/mc146818.h"
 #include "machine/apollo_dbg.h"
 #include "machine/apollo_kbd.h"
+
+#include "cpu/m68000/m68000.h"
+
+#include "machine/6840ptm.h"
+#include "machine/am9517a.h"
 #include "machine/clock.h"
+#include "machine/mc146818.h"
+#include "machine/mc68681.h"
+#include "machine/pic8259.h"
+#include "machine/ram.h"
+#include "machine/terminal.h"
+
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/isa/3c505.h"
+
+
+#include "bus/rs232/rs232.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -338,7 +343,7 @@ private:
 	uint8_t m_ip6;
 };
 
-extern const device_type APOLLO_SIO;
+DECLARE_DEVICE_TYPE(APOLLO_SIO, apollo_sio)
 
 /*----------- machine/apollo_ni.c -----------*/
 
@@ -387,7 +392,7 @@ private:
 };
 
 // device type definition
-extern const device_type APOLLO_NI;
+DECLARE_DEVICE_TYPE(APOLLO_NI, apollo_ni)
 
 /*----------- video/apollo.c -----------*/
 
@@ -397,7 +402,6 @@ class apollo_graphics_15i : public device_t
 {
 public:
 	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, const char *name, const char *shortname, const char *source);
 	~apollo_graphics_15i();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -425,6 +429,8 @@ public:
 	int is_mono() { return m_n_planes == 1; }
 
 protected:
+	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -624,7 +630,7 @@ private:
 	running_machine *m_machine;
 };
 
-extern const device_type APOLLO_GRAPHICS;
+DECLARE_DEVICE_TYPE(APOLLO_GRAPHICS, apollo_graphics_15i)
 
 #define MCFG_APOLLO_GRAPHICS_ADD( _tag) \
 	MCFG_FRAGMENT_ADD(apollo_graphics) \
@@ -645,7 +651,7 @@ private:
 	// internal state
 };
 
-extern const device_type APOLLO_MONO19I;
+DECLARE_DEVICE_TYPE(APOLLO_MONO19I, apollo_graphics_19i)
 
 #define MCFG_APOLLO_MONO19I_ADD(_tag) \
 	MCFG_FRAGMENT_ADD(apollo_mono19i) \
@@ -708,7 +714,7 @@ private:
 };
 
 // device type definition
-extern const device_type APOLLO_STDIO;
+DECLARE_DEVICE_TYPE(APOLLO_STDIO, apollo_stdio_device)
 #endif /* APOLLO_XXL */
 
-#endif /* APOLLO_H_ */
+#endif // MAME_INCLUDES_APOLLO_H

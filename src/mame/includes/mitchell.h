@@ -72,7 +72,6 @@ public:
 	int        m_dial_selected;
 	int        m_dir[2];
 	int        m_keymatrix;
-	uint8_t       m_dummy_nvram;
 
 	uint8_t m_irq_source;
 	DECLARE_READ8_MEMBER(pang_port5_r);

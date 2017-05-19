@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( ax80_map, AS_PROGRAM, 8, ax80_state )
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( ax80, ax80_state )
+static MACHINE_CONFIG_START( ax80 )
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ax80_map)
 	//MCFG_CPU_IO_MAP(ax80_io)
@@ -98,4 +98,4 @@ ROM_START( ax80 )
 	ROM_LOAD( "akai ax80 (rev k) rom.bin", 0x001000, 0x002000, CRC(a2f95ccf) SHA1(4e5f2c4c9a08ec1d38146cae786b400261a3dbb7) )
 ROM_END
 
-CONS( 1984, ax80, 0, 0, ax80, ax80, driver_device, 0, "Akai", "AX80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1984, ax80, 0, 0, ax80, ax80, ax80_state, 0, "Akai", "AX80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

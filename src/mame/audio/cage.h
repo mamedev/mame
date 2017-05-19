@@ -6,8 +6,10 @@
 
 ****************************************************************************/
 
-#ifndef __ATARI_CAGE__
-#define __ATARI_CAGE__
+#ifndef MAME_AUDIO_CAGE_H
+#define MAME_AUDIO_CAGE_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/dmadac.h"
@@ -26,10 +28,9 @@ class atari_cage_device : public device_t
 public:
 	// construction/destruction
 	atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	atari_cage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	static void static_set_speedup(device_t &device, offs_t speedup) { downcast<atari_cage_device &>(device).m_speedup = speedup; }
-	template<class _Object> static devcb_base &set_irqhandler_callback(device_t &device, _Object object) { return downcast<atari_cage_device &>(device).m_irqhandler.set_callback(object); }
+	template <class Object> static devcb_base &set_irqhandler_callback(device_t &device, Object &&cb) { return downcast<atari_cage_device &>(device).m_irqhandler.set_callback(std::forward<Object>(cb)); }
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -58,6 +59,8 @@ public:
 	WRITE32_MEMBER( speedup_w );
 
 protected:
+	atari_cage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -94,7 +97,7 @@ private:
 
 
 // device type definition
-extern const device_type ATARI_CAGE;
+DECLARE_DEVICE_TYPE(ATARI_CAGE, atari_cage_device)
 
 class atari_cage_seattle_device : public atari_cage_device
 {
@@ -108,6 +111,6 @@ public:
 };
 
 // device type definition
-extern const device_type ATARI_CAGE_SEATTLE;
+DECLARE_DEVICE_TYPE(ATARI_CAGE_SEATTLE, atari_cage_seattle_device)
 
-#endif // __ATARI_CAGE__
+#endif // MAME_AUDIO_CAGE_H

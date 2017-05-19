@@ -461,7 +461,7 @@ void slapshot_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( slapshot, slapshot_state )
+static MACHINE_CONFIG_START( slapshot )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
@@ -486,7 +486,7 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(slapshot_state, screen_eof_taito_no_buffer)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(slapshot_state, screen_vblank_taito_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
@@ -521,7 +521,7 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( opwolf3, slapshot_state )
+static MACHINE_CONFIG_START( opwolf3 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
@@ -546,7 +546,7 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(slapshot_state, screen_eof_taito_no_buffer)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(slapshot_state, screen_vblank_taito_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
@@ -697,6 +697,6 @@ DRIVER_INIT_MEMBER(slapshot_state,slapshot)
 	}
 }
 
-GAME( 1994, slapshot, 0,       slapshot, slapshot, slapshot_state, slapshot, ROT0, "Taito Corporation",         "Slap Shot (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, opwolf3,  0,       opwolf3,  opwolf3, slapshot_state,  slapshot, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, opwolf3u, opwolf3, opwolf3,  opwolf3, slapshot_state,  slapshot, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, slapshot, 0,       slapshot, slapshot, slapshot_state, slapshot, ROT0, "Taito Corporation",         "Slap Shot (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3,  0,       opwolf3,  opwolf3,  slapshot_state, slapshot, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3u, opwolf3, opwolf3,  opwolf3,  slapshot_state, slapshot, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)",    MACHINE_SUPPORTS_SAVE )

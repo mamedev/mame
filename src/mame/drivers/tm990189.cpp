@@ -316,7 +316,7 @@ WRITE8_MEMBER( tm990189_state::sys9901_interrupt_callback )
 READ8_MEMBER( tm990189_state::sys9901_r )
 {
 	uint8_t data = 0;
-	if (offset == TMS9901_CB_INT7)
+	if (offset == tms9901_device::CB_INT7)
 	{
 		static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
 
@@ -456,11 +456,11 @@ protected:
 	virtual void device_start() override;
 };
 
-const device_type TM990_189_RS232 = device_creator<tm990_189_rs232_image_device>;
+DEFINE_DEVICE_TYPE(TM990_189_RS232, tm990_189_rs232_image_device, "tm990_189_rs232_image", "TM990/189 RS232 port")
 
 tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TM990_189_RS232, "TM990/189 RS232 port", tag, owner, clock, "tm990_189_rs232_image", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, TM990_189_RS232, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -626,7 +626,7 @@ WRITE8_MEMBER( tm990189_state::video_joy_w )
 // user tms9901 setup
 static const tms9901_interface usr9901reset_param =
 {
-    TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT3 | TMS9901_INT4 | TMS9901_INT5 | TMS9901_INT6,    // only input pins whose state is always known
+	tms9901_device::INT1 | tms9901_device::INT2 | tms9901_device::INT3 | tms9901_device::INT4 | tms9901_device::INT5 | tms9901_device::INT6,    // only input pins whose state is always known
 
     // Read handler. Covers all input lines (see tms9901.h)
     DEVCB_NOOP,
@@ -803,7 +803,7 @@ static ADDRESS_MAP_START( tm990_189_cru_map, AS_IO, 8, tm990189_state )
 	AM_RANGE(0x0400, 0x05ff) AM_DEVWRITE("tms9902", tms9902_device, cruwrite)   /* optional tms9902 */
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( tm990_189, tm990189_state )
+static MACHINE_CONFIG_START( tm990_189 )
 	/* basic machine hardware */
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_memmap, tm990_189_cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(tm990189_state, external_operation) )
@@ -860,7 +860,7 @@ static MACHINE_CONFIG_START( tm990_189, tm990189_state )
 	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
+static MACHINE_CONFIG_START( tm990_189_v )
 	/* basic machine hardware */
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_v_memmap, tm990_189_cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(tm990189_state, external_operation) )
@@ -1042,6 +1042,6 @@ static INPUT_PORTS_START(tm990_189)
 	PORT_BIT( 0x3ff, 0x1aa,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0xd2,0x282 ) PORT_PLAYER(2) PORT_REVERSE
 INPUT_PORTS_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT       INIT    COMPANY                 FULLNAME */
-COMP( 1978, 990189,   0,        0,      tm990_189,   tm990_189, driver_device,  0, "Texas Instruments", "TM 990/189 University Board microcomputer" , 0)
-COMP( 1980, 990189v,  990189,   0,      tm990_189_v, tm990_189, driver_device,  0, "Texas Instruments", "TM 990/189 University Board microcomputer with Video Board Interface" , 0)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT      STATE           INIT  COMPANY              FULLNAME                                                                FLAGS
+COMP( 1978, 990189,   0,        0,      tm990_189,   tm990_189, tm990189_state, 0,    "Texas Instruments", "TM 990/189 University Board microcomputer",                            0 )
+COMP( 1980, 990189v,  990189,   0,      tm990_189_v, tm990_189, tm990189_state, 0,    "Texas Instruments", "TM 990/189 University Board microcomputer with Video Board Interface", 0 )

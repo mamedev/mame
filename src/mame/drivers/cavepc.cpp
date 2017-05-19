@@ -106,7 +106,7 @@ void cavepc_state::machine_reset()
 	membank("bank1")->set_base(memregion("bios")->base() + 0x30000);
 }
 
-static MACHINE_CONFIG_START( cavepc, cavepc_state )
+static MACHINE_CONFIG_START( cavepc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 200000000) /*  AMD Athlon 64 X2 5050e Brisbane 2.60GHz, 1024KB L2 Cache ! */
 	MCFG_CPU_PROGRAM_MAP(cavepc_map)

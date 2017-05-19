@@ -446,7 +446,7 @@ void cop01_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( cop01, cop01_state )
+static MACHINE_CONFIG_START( cop01 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown clock / divider */
@@ -488,7 +488,7 @@ static MACHINE_CONFIG_START( cop01, cop01_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mightguy, cop01_state )
+static MACHINE_CONFIG_START( mightguy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown divider */
@@ -667,6 +667,6 @@ DRIVER_INIT_MEMBER(cop01_state,mightguy)
  *
  *************************************/
 
-GAME( 1985, cop01,    0,     cop01,    cop01, driver_device,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cop01a,   cop01, cop01,    cop01, driver_device,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mightguy, 0,     mightguy, mightguy, cop01_state, mightguy, ROT270, "Nichibutsu", "Mighty Guy", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state, 0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state, 0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mightguy, 0,     mightguy, mightguy, cop01_state, mightguy, ROT270, "Nichibutsu", "Mighty Guy",     MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

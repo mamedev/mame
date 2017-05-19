@@ -31,11 +31,11 @@ enum
 };
 
 
-const device_type PCVIDEO_T1000 = device_creator<pcvideo_t1000_device>;
-const device_type PCVIDEO_PCJR = device_creator<pcvideo_pcjr_device>;
+DEFINE_DEVICE_TYPE(PCVIDEO_T1000, pcvideo_t1000_device, "tandy_1000_graphics", "Tandy 1000 Graphics Adapter")
+DEFINE_DEVICE_TYPE(PCVIDEO_PCJR,  pcvideo_pcjr_device,  "pcjr_graphics",       "PC Jr Graphics Adapter")
 
-pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_mc6845(*this, T1000_MC6845_NAME),
 	m_mode_control(0),
@@ -59,12 +59,12 @@ pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, co
 }
 
 pcvideo_t1000_device::pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pc_t1t_device(mconfig, PCVIDEO_T1000, "Tandy 1000 Graphics Adapter", tag, owner, clock, "tandy_1000_graphics_adapter", __FILE__)
+	: pc_t1t_device(mconfig, PCVIDEO_T1000, tag, owner, clock)
 {
 }
 
 pcvideo_pcjr_device::pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pc_t1t_device(mconfig, PCVIDEO_PCJR, "PC Jr Graphics Adapter", tag, owner, clock, "pcjr_graphics_adapter", __FILE__),
+	: pc_t1t_device(mconfig, PCVIDEO_PCJR, tag, owner, clock),
 	m_jxkanji(nullptr)
 {
 }

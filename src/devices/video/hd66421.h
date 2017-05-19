@@ -8,23 +8,11 @@
 
  ***************************************************************************/
 
+#ifndef MAME_VIDEO_HD66421_H
+#define MAME_VIDEO_HD66421_H
+
 #pragma once
 
-#ifndef __HD66421_H__
-#define __HD66421_H__
-
-
-///*************************************************************************
-//  MACROS / CONSTANTS
-///*************************************************************************
-
-//#define HD66421_BRIGHTNESS_DOES_NOT_WORK
-
-#define HD66421_WIDTH   160
-#define HD66421_HEIGHT  100
-
-
-/*----------- defined in video/hd66421.c -----------*/
 
 ///*************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -43,6 +31,9 @@ class hd66421_device :  public device_t,
 						public device_memory_interface
 {
 public:
+	static constexpr unsigned WIDTH   = 160;
+	static constexpr unsigned HEIGHT  = 100;
+
 	// construction/destruction
 	hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -78,7 +69,6 @@ private:
 
 
 // device type definition
-extern const device_type HD66421;
+DECLARE_DEVICE_TYPE(HD66421, hd66421_device)
 
-
-#endif
+#endif // MAME_VIDEO_HD66421_H

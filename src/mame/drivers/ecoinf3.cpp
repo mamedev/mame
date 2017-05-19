@@ -660,7 +660,7 @@ static INPUT_PORTS_START( ecoinf3 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
+static MACHINE_CONFIG_START( ecoinf3_pyramid )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180,8000000) // certainly not a plain z80 at least, invalid opcodes for that
 
@@ -853,15 +853,15 @@ DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3_swap)
 
 
 // another hw type (similar to stuff in ecoinf2.c) (watchdog on port 58?)
-GAME( 19??, ec_pyram,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3_swap,   ROT0,  "Electrocoin", "Pyramid (v1) (Electrocoin)"      , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_pyrama,  ec_pyram , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Pyramid (v6) (Electrocoin)"      , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_sphin,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3_swap,   ROT0,  "Electrocoin", "Sphinx (v2) (Electrocoin) (set 1)"       , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_sphina,  ec_sphin , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Sphinx (v2) (Electrocoin) (set 2)"       , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_sphinb,  ec_sphin , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Sphinx (v1) (Electrocoin)"       , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_penni,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Pennies From Heaven (v1) (Electrocoin)"      , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_pennia,  ec_penni , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Pennies From Heaven (v6) (Electrocoin)"      , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_stair,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Stairway To Heaven (v11) (Electrocoin)"      , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_staira,  ec_stair , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Stairway To Heaven (v1) (Electrocoin)"       , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_laby,    0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Labyrinth (v8) (Electrocoin)"        , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_labya,   ec_laby  , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Labyrinth (v10) (Electrocoin)"       , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_secrt,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Secret Castle (v1) (Electrocoin)"        , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_pyram,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3_swap,   ROT0,  "Electrocoin", "Pyramid (v1) (Electrocoin)",             MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_pyrama,  ec_pyram , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Pyramid (v6) (Electrocoin)",             MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_sphin,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3_swap,   ROT0,  "Electrocoin", "Sphinx (v2) (Electrocoin) (set 1)",      MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_sphina,  ec_sphin , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Sphinx (v2) (Electrocoin) (set 2)",      MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_sphinb,  ec_sphin , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Sphinx (v1) (Electrocoin)",              MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_penni,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Pennies From Heaven (v1) (Electrocoin)", MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_pennia,  ec_penni , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Pennies From Heaven (v6) (Electrocoin)", MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_stair,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Stairway To Heaven (v11) (Electrocoin)", MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_staira,  ec_stair , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Stairway To Heaven (v1) (Electrocoin)",  MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_laby,    0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Labyrinth (v8) (Electrocoin)",           MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_labya,   ec_laby  , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Labyrinth (v10) (Electrocoin)",          MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_secrt,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Secret Castle (v1) (Electrocoin)",       MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)

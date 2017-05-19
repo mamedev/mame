@@ -475,14 +475,14 @@ READ8_MEMBER(mario_state::mario_sh_p2_r)
 	return I8035_P2_R(space) & 0xEF; /* Bit 4 connected to GND! */
 }
 
-READ8_MEMBER(mario_state::mario_sh_t0_r)
+READ_LINE_MEMBER(mario_state::mario_sh_t0_r)
 {
-	return I8035_T_R(space, 0);
+	return I8035_T_R(machine().dummy_space(), 0);
 }
 
-READ8_MEMBER(mario_state::mario_sh_t1_r)
+READ_LINE_MEMBER(mario_state::mario_sh_t1_r)
 {
-	return I8035_T_R(space, 1);
+	return I8035_T_R(machine().dummy_space(), 1);
 }
 
 READ8_MEMBER(mario_state::mario_sh_tune_r)
@@ -612,10 +612,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mario_sound_io_map, AS_IO, 8, mario_state )
 	AM_RANGE(0x00, 0xff) AM_READ(mario_sh_tune_r) AM_WRITE(mario_sh_sound_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mario_sh_p1_r, mario_sh_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mario_sh_p2_r, mario_sh_p2_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(mario_sh_t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(mario_sh_t1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( masao_sound_map, AS_PROGRAM, 8, mario_state )
@@ -641,6 +637,12 @@ MACHINE_CONFIG_FRAGMENT( mario_audio )
 #endif
 	MCFG_CPU_PROGRAM_MAP(mario_sound_map)
 	MCFG_CPU_IO_MAP(mario_sound_io_map)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(mario_state, mario_sh_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(mario_state, mario_sh_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(mario_state, mario_sh_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(mario_state, mario_sh_p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(mario_state, mario_sh_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(mario_state, mario_sh_t1_r))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

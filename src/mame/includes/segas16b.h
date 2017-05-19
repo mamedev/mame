@@ -43,7 +43,7 @@ public:
 			m_soundlatch(*this, "soundlatch"),
 			m_workram(*this, "workram"),
 			m_romboard(ROM_BOARD_INVALID),
-			m_tilemap_type(SEGAIC16_TILEMAP_16B),
+			m_tilemap_type(segaic16_video_device::TILEMAP_16B),
 			m_disable_screen_blanking(false),
 			m_i8751_initial_config(nullptr),
 			m_atomicp_sound_divisor(0),

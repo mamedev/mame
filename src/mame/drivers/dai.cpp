@@ -185,7 +185,7 @@ static GFXDECODE_START( dai )
 GFXDECODE_END
 
 /* machine definition */
-static MACHINE_CONFIG_START( dai, dai_state )
+static MACHINE_CONFIG_START( dai )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(dai_mem)
@@ -245,7 +245,6 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "dai_cass")
 MACHINE_CONFIG_END
 
-#define io_dai      io_NULL
 
 ROM_START(dai)
 	ROM_REGION(0x14000,"maincpu",0)
@@ -258,5 +257,5 @@ ROM_START(dai)
 	ROM_LOAD ("nch.bin", 0x0000, 0x1000, CRC(a9f5b30b) SHA1(24119b2984ab4e50dc0dabae1065ff6d6c1f237d))
 ROM_END
 
-/*    YEAR  NAME PARENT  COMPAT MACHINE INPUT   INIT     COMPANY                FULLNAME */
-COMP( 1978, dai, 0,      0, dai,    dai, driver_device, 0,      "Data Applications International", "DAI Personal Computer", 0)
+/*    YEAR  NAME PARENT  COMPAT MACHINE INPUT  STATE      INIT  COMPANY                            FULLNAME */
+COMP( 1978, dai, 0,      0,     dai,    dai,   dai_state, 0,    "Data Applications International", "DAI Personal Computer", 0)

@@ -101,7 +101,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34061_device> m_tms34061;
 	required_device<sn76489_device> m_sn;
-	required_device<wd1773_t> m_fdc;
+	required_device<wd1773_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<palette_device> m_palette;
 
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( guab_map, AS_PROGRAM, 16, guab_state )
 	AM_RANGE(0x0c00a0, 0x0c00a1) AM_DEVREADWRITE8("acia6850_2", acia6850_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0x0c00a2, 0x0c00a3) AM_DEVREADWRITE8("acia6850_2", acia6850_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x0c00c0, 0x0c00cf) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0x0c00e0, 0x0c00e7) AM_DEVREADWRITE8("fdc", wd1773_t, read, write, 0x00ff)
+	AM_RANGE(0x0c00e0, 0x0c00e7) AM_DEVREADWRITE8("fdc", wd1773_device, read, write, 0x00ff)
 	AM_RANGE(0x080000, 0x080fff) AM_RAM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x100002, 0x100003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
@@ -449,7 +449,7 @@ SLOT_INTERFACE_END
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( guab, guab_state )
+static MACHINE_CONFIG_START( guab )
 	/* TODO: Verify clock */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(guab_map)
@@ -553,7 +553,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT  CLASS          INIT  ROTATION  COMPANY  FULLNAME                FLAGS
-GAME( 1986, guab,     0,      guab,    guab,  driver_device, 0,    ROT0,     "JPM",   "Give us a Break",      0 )
-GAME( 1986, crisscrs, 0,      guab,    guab,  driver_device, 0,    ROT0,     "JPM",   "Criss Cross (Sweden)", MACHINE_NOT_WORKING )
-GAME( 1988, tenup,    0,      guab,    tenup, driver_device, 0,    ROT0,     "JPM",   "Ten Up",               0 )
+//    YEAR  NAME      PARENT  MACHINE  INPUT  CLASS       INIT  ROTATION  COMPANY  FULLNAME                FLAGS
+GAME( 1986, guab,     0,      guab,    guab,  guab_state, 0,    ROT0,     "JPM",   "Give us a Break",      0 )
+GAME( 1986, crisscrs, 0,      guab,    guab,  guab_state, 0,    ROT0,     "JPM",   "Criss Cross (Sweden)", MACHINE_NOT_WORKING )
+GAME( 1988, tenup,    0,      guab,    tenup, guab_state, 0,    ROT0,     "JPM",   "Ten Up",               0 )

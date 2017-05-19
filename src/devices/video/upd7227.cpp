@@ -9,13 +9,8 @@
 #include "emu.h"
 #include "upd7227.h"
 
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LOG 0
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 
@@ -23,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type UPD7227 = device_creator<upd7227_device>;
+DEFINE_DEVICE_TYPE(UPD7227, upd7227_device, "upd7227", "NEC uPD7227")
 
 
 static ADDRESS_MAP_START( upd7227_map, AS_PROGRAM, 8, upd7227_device )
@@ -42,14 +37,14 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 upd7227_device::upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, UPD7227, "uPD7227", tag, owner, clock, "upd7227", __FILE__),
-		device_memory_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_BIG, 8, 7, 0, *ADDRESS_MAP_NAME(upd7227_map)),
-		m_cs(1),
-		m_cd(1),
-		m_sck(1),
-		m_si(1),
-		m_so(1)
+	: device_t(mconfig, UPD7227, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("videoram", ENDIANNESS_BIG, 8, 7, 0, *ADDRESS_MAP_NAME(upd7227_map))
+	, m_cs(1)
+	, m_cd(1)
+	, m_sck(1)
+	, m_si(1)
+	, m_so(1)
 {
 }
 

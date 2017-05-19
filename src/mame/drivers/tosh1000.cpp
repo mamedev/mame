@@ -30,7 +30,7 @@
 
     Useful links:
     - board photo: http://s8.hostingkartinok.com/uploads/images/2016/05/579e9d152bc772d9c16bc8ac611eb97f.jpg
-	- manuals: http://www.minuszerodegrees.net/manuals/Toshiba/Toshiba.htm
+    - manuals: http://www.minuszerodegrees.net/manuals/Toshiba/Toshiba.htm
 
 ***************************************************************************/
 
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tosh1000_io, AS_IO, 8, tosh1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
-	AM_RANGE(0x00c8, 0x00c8) AM_WRITE(romdos_bank_w)	// ROM-DOS page select [p. B-15]
+	AM_RANGE(0x00c8, 0x00c8) AM_WRITE(romdos_bank_w)    // ROM-DOS page select [p. B-15]
 	AM_RANGE(0x02c0, 0x02df) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
 ADDRESS_MAP_END
 
@@ -139,7 +139,7 @@ static MACHINE_CONFIG_FRAGMENT( cfg_fdc_35 )
 	MCFG_DEVICE_REMOVE("fdc:1")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tosh1000, tosh1000_state )
+static MACHINE_CONFIG_START( tosh1000 )
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(tosh1000_map)
 	MCFG_CPU_IO_MAP(tosh1000_io)
@@ -190,5 +190,5 @@ ROM_START( tosh1000 )
 ROM_END
 
 
-/*     YEAR     ROM NAME    PARENT      COMPAT  MACHINE     INPUT                       INIT        COMPANY     FULLNAME */
-COMP ( 1987,    tosh1000,   ibm5150,    0,      tosh1000,   0,        tosh1000_state,   tosh1000,   "Toshiba",  "Toshiba T1000", MACHINE_IS_SKELETON)
+//     YEAR     ROM NAME    PARENT      COMPAT  MACHINE     INPUT     STATE             INIT        COMPANY     FULLNAME         FLAGS
+COMP ( 1987,    tosh1000,   ibm5150,    0,      tosh1000,   0,        tosh1000_state,   tosh1000,   "Toshiba",  "Toshiba T1000", MACHINE_IS_SKELETON )

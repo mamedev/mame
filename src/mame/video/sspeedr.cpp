@@ -253,7 +253,7 @@ uint32_t sspeedr_state::screen_update_sspeedr(screen_device &screen, bitmap_ind1
 }
 
 
-void sspeedr_state::screen_eof_sspeedr(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(sspeedr_state::screen_vblank_sspeedr)
 {
 	// rising edge
 	if (state)

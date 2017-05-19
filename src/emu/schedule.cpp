@@ -299,7 +299,10 @@ void emu_timer::dump() const
 {
 	machine().logerror("%p: en=%d temp=%d exp=%15s start=%15s per=%15s param=%d ptr=%p", this, m_enabled, m_temporary, m_expire.as_string(PRECISION), m_start.as_string(PRECISION), m_period.as_string(PRECISION), m_param, m_ptr);
 	if (m_device == nullptr)
-		machine().logerror(" cb=%s\n", m_callback.name());
+		if (m_callback.name() == nullptr)
+			machine().logerror(" cb=NULL\n");
+		else
+			machine().logerror(" cb=%s\n", m_callback.name());
 	else
 		machine().logerror(" dev=%s id=%d\n", m_device->tag(), m_id);
 }

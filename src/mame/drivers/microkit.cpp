@@ -78,7 +78,7 @@ INPUT_PORTS_END
 READ_LINE_MEMBER( microkit_state::clear_r )
 {
 	if (m_resetcnt < 0x10)
-		m_maincpu->set_state_int(COSMAC_R0, 0x8001); // skip IDL
+		m_maincpu->set_state_int(cosmac_device::COSMAC_R0, 0x8001); // skip IDL
 	if (m_resetcnt < 0x20)
 		m_resetcnt++;
 	// set reset pin to normal
@@ -113,7 +113,7 @@ static DEVICE_INPUT_DEFAULTS_START( serial_keyb )
 DEVICE_INPUT_DEFAULTS_END
 
 
-static MACHINE_CONFIG_START( microkit, microkit_state )
+static MACHINE_CONFIG_START( microkit )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", CDP1802, 1750000)
 	MCFG_CPU_PROGRAM_MAP(microkit_mem)
@@ -134,4 +134,4 @@ ROM_START( microkit )
 	ROM_LOAD( "4.2a", 0x100, 0x100, CRC(27267bad) SHA1(838df9be2dc175584a1a6ee1770039118e49482e) )
 ROM_END
 
-COMP( 1975, microkit,    0,      0,      microkit,        microkit, driver_device, 0,      "RCA",  "COSMAC Microkit",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1975, microkit,    0,      0,      microkit,        microkit, microkit_state, 0,      "RCA",  "COSMAC Microkit",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

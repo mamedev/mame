@@ -396,7 +396,7 @@ MACHINE_RESET_MEMBER(bking_state,bking3)
 	m_addr_l = 0;
 }
 
-static MACHINE_CONFIG_START( bking, bking_state )
+static MACHINE_CONFIG_START( bking )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4) /* 3 MHz */
@@ -421,7 +421,7 @@ static MACHINE_CONFIG_START( bking, bking_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bking_state, screen_update_bking)
-	MCFG_SCREEN_VBLANK_DRIVER(bking_state, screen_eof_bking)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bking_state, screen_vblank_bking))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bking)
@@ -750,6 +750,6 @@ ROM_START( bking3 )
 ROM_END
 
 
-GAME( 1982, bking,  0, bking,  bking,  driver_device, 0, ROT270, "Taito Corporation", "Birdie King", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bking2, 0, bking,  bking2, driver_device, 0, ROT90,  "Taito Corporation", "Birdie King 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bking3, 0, bking3, bking2, driver_device, 0, ROT90,  "Taito Corporation", "Birdie King 3", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bking,  0, bking,  bking,  bking_state, 0, ROT270, "Taito Corporation", "Birdie King",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bking2, 0, bking,  bking2, bking_state, 0, ROT90,  "Taito Corporation", "Birdie King 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bking3, 0, bking3, bking2, bking_state, 0, ROT90,  "Taito Corporation", "Birdie King 3", MACHINE_SUPPORTS_SAVE )

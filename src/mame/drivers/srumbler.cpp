@@ -243,7 +243,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( srumbler, srumbler_state )
+static MACHINE_CONFIG_START( srumbler )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz (?) */
@@ -264,7 +264,7 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(10*8, (64-10)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(srumbler_state, screen_update)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srumbler)
@@ -472,7 +472,7 @@ ROM_END
 
 
 
-GAME( 1986, srumbler,  0,        srumbler, srumbler, driver_device, 0, ROT270, "Capcom", "The Speed Rumbler (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, srumbler2, srumbler, srumbler, srumbler, driver_device, 0, ROT270, "Capcom", "The Speed Rumbler (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, srumbler3, srumbler, srumbler, srumbler, driver_device, 0, ROT270, "Capcom (Tecfri license)", "The Speed Rumbler (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rushcrsh,  srumbler, srumbler, srumbler, driver_device, 0, ROT270, "Capcom", "Rush & Crash (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, srumbler,  0,        srumbler, srumbler, srumbler_state, 0, ROT270, "Capcom", "The Speed Rumbler (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, srumbler2, srumbler, srumbler, srumbler, srumbler_state, 0, ROT270, "Capcom", "The Speed Rumbler (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, srumbler3, srumbler, srumbler, srumbler, srumbler_state, 0, ROT270, "Capcom (Tecfri license)", "The Speed Rumbler (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rushcrsh,  srumbler, srumbler, srumbler, srumbler_state, 0, ROT270, "Capcom", "Rush & Crash (Japan)", MACHINE_SUPPORTS_SAVE )

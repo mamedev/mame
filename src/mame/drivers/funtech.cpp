@@ -484,7 +484,7 @@ void fun_tech_corp_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( funtech, fun_tech_corp_state )
+static MACHINE_CONFIG_START( funtech )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
@@ -530,4 +530,4 @@ ROM_START( fts2in1 )
 	ROM_LOAD16_BYTE( "u30.bin", 0x00001, 0x20000, CRC(d572bddc) SHA1(06499aeb47085a02af9eb4987ed987f9a3a397f7) )
 ROM_END
 
-GAMEL( 1993, fts2in1,  0,    funtech, funtech, driver_device,  0, ROT0, "Fun Tech Corporation", "Super Two In One", 0, layout_fts2in1 )
+GAMEL( 1993, fts2in1,  0,    funtech, funtech, fun_tech_corp_state,  0, ROT0, "Fun Tech Corporation", "Super Two In One", 0, layout_fts2in1 )

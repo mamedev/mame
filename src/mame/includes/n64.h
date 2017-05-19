@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#ifndef _INCLUDES_N64_H_
-#define _INCLUDES_N64_H_
+#ifndef MAME_INCLUDES_N64_H
+#define MAME_INCLUDES_N64_H
+
+#pragma once
 
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
@@ -31,7 +33,7 @@ public:
 	void n64_machine_stop();
 
 	uint32_t screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_n64(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_n64);
 
 	// Getters
 	n64_rdp* rdp() { return m_rdp; }
@@ -307,7 +309,7 @@ private:
 };
 
 // device type definition
-extern const device_type N64PERIPH;
+DECLARE_DEVICE_TYPE(N64PERIPH, n64_periphs)
 
 /*----------- defined in video/n64.c -----------*/
 
@@ -402,4 +404,4 @@ const unsigned int ddStartOffset[16] =
 	{0x0,0x5F15E0,0xB79D00,0x10801A0,0x1523720,0x1963D80,0x1D414C0,0x20BBCE0,
 		0x23196E0,0x28A1E00,0x2DF5DC0,0x3299340,0x36D99A0,0x3AB70E0,0x3E31900,0x4149200};
 
-#endif
+#endif // MAME_INCLUDES_N64_H

@@ -231,7 +231,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_vbowl(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_vbowl);
 	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
 	void wlcc_decrypt();
 	void lhb_decrypt();
@@ -2689,7 +2689,7 @@ READ16_MEMBER(igs011_state::vbowl_unk_r)
 	return 0xffff;
 }
 
-void igs011_state::screen_eof_vbowl(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(igs011_state::screen_vblank_vbowl)
 {
 	// rising edge
 	if (state)
@@ -3989,7 +3989,7 @@ static GFXDECODE_START( igs011_hi )
 GFXDECODE_END
 #endif
 
-static MACHINE_CONFIG_START( igs011_base, igs011_state )
+static MACHINE_CONFIG_START( igs011_base )
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_22MHz/3)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -4009,7 +4009,7 @@ static MACHINE_CONFIG_START( igs011_base, igs011_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz/21, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_22MHz/21, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4130,7 +4130,7 @@ static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 	// irq 4 points to an apparently unneeded routine
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_DRIVER(igs011_state, screen_eof_vbowl)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(igs011_state, screen_vblank_vbowl))
 //  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
 
 	MCFG_DEVICE_REMOVE("oki")

@@ -502,7 +502,7 @@ MACHINE_RESET_MEMBER(deco_mlc_state,mlc)
 	m_raster_irq_timer = machine().device<timer_device>("int_timer");
 }
 
-static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
+static MACHINE_CONFIG_START( avengrgs )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
@@ -519,7 +519,7 @@ static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update_mlc)
-	MCFG_SCREEN_VBLANK_DRIVER(deco_mlc_state, screen_eof_mlc)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deco_mlc)
@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mlc, deco_mlc_state )
+static MACHINE_CONFIG_START( mlc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
@@ -552,7 +552,7 @@ static MACHINE_CONFIG_START( mlc, deco_mlc_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update_mlc)
-	MCFG_SCREEN_VBLANK_DRIVER(deco_mlc_state, screen_eof_mlc)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deco_mlc)

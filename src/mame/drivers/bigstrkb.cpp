@@ -199,7 +199,7 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( bigstrkb, bigstrkb_state )
+static MACHINE_CONFIG_START( bigstrkb )
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(bigstrkb_map)
@@ -222,11 +222,11 @@ static MACHINE_CONFIG_START( bigstrkb, bigstrkb_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 //  MCFG_YM2151_ADD("ymsnd", ym2151_config)
 
-	MCFG_OKIM6295_ADD("oki1", 4000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 4000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_ADD("oki2", 4000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 4000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -297,5 +297,5 @@ ROM_END
 
 /* GAME drivers */
 
-GAME( 1992, bigstrkb, bigstrik, bigstrkb, bigstrkb, driver_device, 0, ROT0, "bootleg", "Big Striker (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bigstrkba,bigstrik, bigstrkb, bigstrkb, driver_device, 0, ROT0, "bootleg", "Big Striker (bootleg w/Italian teams)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bigstrkb, bigstrik, bigstrkb, bigstrkb, bigstrkb_state, 0, ROT0, "bootleg", "Big Striker (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bigstrkba,bigstrik, bigstrkb, bigstrkb, bigstrkb_state, 0, ROT0, "bootleg", "Big Striker (bootleg w/Italian teams)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

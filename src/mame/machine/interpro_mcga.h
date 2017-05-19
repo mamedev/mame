@@ -26,7 +26,6 @@
 class interpro_mcga_device : public device_t
 {
 public:
-	interpro_mcga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	interpro_mcga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 32);
@@ -49,6 +48,8 @@ public:
 	DECLARE_WRITE16_MEMBER(memsize_w) { m_memsize = data; }
 
 protected:
+	interpro_mcga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -78,7 +79,7 @@ private:
 };
 
 // device type definition
-extern const device_type INTERPRO_MCGA;
-extern const device_type INTERPRO_FMCC;
+DECLARE_DEVICE_TYPE(INTERPRO_MCGA, interpro_mcga_device)
+DECLARE_DEVICE_TYPE(INTERPRO_FMCC, interpro_fmcc_device)
 
 #endif // MAME_MACHINE_INTERPRO_MCGA_H

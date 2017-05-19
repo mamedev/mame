@@ -99,8 +99,9 @@ void dcheese_state::video_start()
 	/* the destination bitmap is not directly accessible to the CPU */
 	m_dstbitmap = std::make_unique<bitmap_ind16>(DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT);
 
-	/* create a timer */
+	/* create timers */
 	m_blitter_timer = timer_alloc(TIMER_BLITTER_SCANLINE);
+	m_signal_irq_timer = timer_alloc(TIMER_SIGNAL_IRQ);
 
 	/* register for saving */
 	save_item(NAME(m_blitter_color));
@@ -151,7 +152,7 @@ void dcheese_state::do_clear(  )
 		memset(&m_dstbitmap->pix16(y % DSTBITMAP_HEIGHT), 0, DSTBITMAP_WIDTH * 2);
 
 	/* signal an IRQ when done (timing is just a guess) */
-	timer_set(m_screen->scan_period(), TIMER_SIGNAL_IRQ, 1);
+	m_signal_irq_timer->adjust(m_screen->scan_period(), 1);
 }
 
 
@@ -205,7 +206,7 @@ void dcheese_state::do_blit(  )
 	}
 
 	/* signal an IRQ when done (timing is just a guess) */
-	timer_set(m_screen->scan_period() / 2, TIMER_SIGNAL_IRQ, 2);
+	m_signal_irq_timer->adjust(m_screen->scan_period() / 2, 2);
 
 	/* these extra parameters are written but they are always zero, so I don't know what they do */
 	if (m_blitter_xparam[8] != 0 || m_blitter_xparam[9] != 0 || m_blitter_xparam[10] != 0 || m_blitter_xparam[11] != 0 ||

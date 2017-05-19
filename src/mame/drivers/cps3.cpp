@@ -324,7 +324,7 @@ Notes:
                            DL-2829 CCU SD07-1514  (QFP208) - Probably a companion CPU or co-processor. Decapping
                                                              reveals it is manufactured by Toshiba. The 'Work RAM' is
                                                              connected to it.
-                           DL-2929 IOU SD08-1513  (QFP208) - I/O controller.
+                           DL-2929 IOU SD08-1513  (QFP208) - I/O controller, next to 3.6864MHz XTAL.
                            DL-3329 SSU SD04-1536  (QFP144) - Sound chip, clocked at 21.47725MHz (42.9545/2). It has 32k
                                                              SRAM connected to it.
                            DL-3429 GLL1 SD06-1537 (QFP144) - DMA memory/bus controller.
@@ -1202,7 +1202,7 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 
 							if (!flipx) current_xpos = (xpos+xpos2+((xx*16*xinc)>>16));
 							else current_xpos = (xpos+xpos2-((xx*16*xinc)>>16));
-							//current_xpos +=  rand()&0x3ff;
+							//current_xpos +=  machine().rand()&0x3ff;
 							current_xpos += gscrollx;
 							current_xpos += 1;
 							current_xpos &=0x3ff;
@@ -2519,7 +2519,7 @@ static MACHINE_CONFIG_FRAGMENT( simm6_128mbit )
 	MCFG_FUJITSU_29F016A_ADD("simm6.7")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cps3, cps3_state )
+static MACHINE_CONFIG_START( cps3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the internal multiplier to 4x (this should probably be handled in the core..)
 	MCFG_CPU_PROGRAM_MAP(cps3_map)
@@ -3942,15 +3942,15 @@ GAME( 1999, jojobaner1,jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0
 // bootlegs, hold START1 during bootup to change games
 
 // newest revision, fixes some issues with Warzard decryption.
-GAME( 1999, cps3boot,   0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (V4)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, cps3boota,  cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (V5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3boot,    0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (V4)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3boota,   cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (V5)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1999, cps3booto,  cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, cps3bootao, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3booto,   cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3bootao,  cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older)", MACHINE_IMPERFECT_GRAPHICS )
 // this doesn't play 2nd Impact despite it being listed.  2nd Impact uses separate data/code encryption and can't be decrypted cleanly for a standard SH2.  Selecting it just flashes in a copy of 3rd Strike with the 2nd Impact loading screen
-GAME( 1999, cps3booto2, cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (oldest) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3booto2,  cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (oldest) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", MACHINE_IMPERFECT_GRAPHICS )
 // this does not play Red Earth or the 2 Jojo games.  New Generation and 3rd Strike have been heavily modified to work with the separate code/data encryption a dead cart / 2nd Impact cart has.  Selecting the other games will give an 'invalid CD' message.
 GAME( 1999, cps3bootao2, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (oldest) (New Generation, 2nd Impact and 3rd Strike only)", MACHINE_IMPERFECT_GRAPHICS )
 // these are test bootleg CDs for running 2nd Impact on a standard SH2
-GAME( 1999, cps3bs32,  cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, V3)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, cps3bs32a, cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, older)", MACHINE_IMPERFECT_GRAPHICS ) // older / buggier hack
+GAME( 1999, cps3bs32,    cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, V3)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3bs32a,   cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, older)", MACHINE_IMPERFECT_GRAPHICS ) // older / buggier hack

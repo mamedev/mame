@@ -752,7 +752,7 @@ INTERRUPT_GEN_MEMBER(taitopjc_state::taitopjc_vbi)
 }
 
 
-static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
+static MACHINE_CONFIG_START( taitopjc )
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
 	MCFG_PPC_BUS_FREQUENCY(XTAL_66_6667MHz)    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)
@@ -856,4 +856,4 @@ ROM_START( optiger )
 	// TODO: There are 6 PALs in total on the main PCB.
 ROM_END
 
-GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, optiger, ROT0, "Taito", "Operation Tiger", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, optiger, ROT0, "Taito", "Operation Tiger (Ver 2.14 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

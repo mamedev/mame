@@ -102,7 +102,7 @@ WRITE_LINE_MEMBER( konin_state::clock_w )
 	m_uart->write_rxc(state);
 }
 
-static MACHINE_CONFIG_START( konin, konin_state )
+static MACHINE_CONFIG_START( konin )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(konin_mem)
@@ -140,5 +140,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY       FULLNAME       FLAGS */
-COMP( 198?, konin,  0,      0,       konin,     konin, driver_device,   0,    "Mera-Elzab",   "Konin", MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY       FULLNAME  FLAGS
+COMP( 198?, konin,  0,      0,       konin,     konin, konin_state, 0,    "Mera-Elzab", "Konin",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

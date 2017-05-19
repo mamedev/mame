@@ -494,19 +494,19 @@ MACHINE_CONFIG_FRAGMENT( rax )
 MACHINE_CONFIG_END
 
 
-const device_type ACCLAIM_RAX = device_creator<acclaim_rax_device>;
+DEFINE_DEVICE_TYPE(ACCLAIM_RAX, acclaim_rax_device, "rax_audio", "Acclaim RAX")
 
 //-------------------------------------------------
 //  acclaim_rax_device - constructor
 //-------------------------------------------------
 
 acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ACCLAIM_RAX, "Acclaim RAX", tag, owner, clock, "rax_audio", __FILE__),
-		m_cpu(*this, "adsp"),
-		m_adsp_pram(*this, "adsp_pram"),
-		m_adsp_data_bank(*this, "databank"),
-		m_data_in(*this, "data_in"),
-		m_data_out(*this, "data_out")
+	: device_t(mconfig, ACCLAIM_RAX, tag, owner, clock)
+	, m_cpu(*this, "adsp")
+	, m_adsp_pram(*this, "adsp_pram")
+	, m_adsp_data_bank(*this, "databank")
+	, m_data_in(*this, "data_in")
+	, m_data_out(*this, "data_out")
 {
 
 }

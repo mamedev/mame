@@ -82,7 +82,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	inline void get_tile_info8bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
 	inline void get_tile_info4bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
 	inline void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask, int _N_);

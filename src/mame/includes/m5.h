@@ -51,24 +51,6 @@ public:
 		, m_DIPS(*this, "DIPS")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<z80ctc_device> m_ctc;
-	//I've changed following devices to optional since we have to remove them in BRNO mod (I don't know better solution)
-	optional_device<cpu_device> m_fd5cpu;
-	optional_device<i8255_device> m_ppi;
-	optional_device<upd765a_device> m_fdc;
-	optional_device<floppy_image_device> m_floppy0;
-	required_device<cassette_image_device> m_cassette;
-	optional_device<m5_cart_slot_device> m_cart1;
-	optional_device<m5_cart_slot_device> m_cart2;
-	required_device<centronics_device> m_centronics;
-	required_device<ram_device> m_ram;
-	required_ioport m_reset;
-	optional_ioport m_DIPS;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	DECLARE_READ8_MEMBER( sts_r );
 	DECLARE_WRITE8_MEMBER( com_w );
 	DECLARE_READ8_MEMBER( ppi_pa_r );
@@ -86,10 +68,6 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	// video state
-//  const TMS9928a_interface *m_vdp_intf;
-
-	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
 	DECLARE_DRIVER_INIT(pal);
@@ -101,6 +79,31 @@ public:
 	DECLARE_WRITE8_MEMBER( mem64KBI_w );
 	DECLARE_WRITE8_MEMBER( mem64KBF_w );
 	DECLARE_WRITE8_MEMBER( mem64KRX_w );
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<z80ctc_device> m_ctc;
+	//I've changed following devices to optional since we have to remove them in BRNO mod (I don't know better solution)
+	optional_device<cpu_device> m_fd5cpu;
+	optional_device<i8255_device> m_ppi;
+	optional_device<upd765a_device> m_fdc;
+	optional_device<floppy_image_device> m_floppy0;
+	required_device<cassette_image_device> m_cassette;
+	optional_device<m5_cart_slot_device> m_cart1;
+	optional_device<m5_cart_slot_device> m_cart2;
+	required_device<centronics_device> m_centronics;
+	required_device<ram_device> m_ram;
+	required_ioport m_reset;
+	optional_ioport m_DIPS;
+
+	// video state
+//  const TMS9928a_interface *m_vdp_intf;
+
+	int m_centronics_busy;
+
 	uint8_t m_ram_mode;
 	uint8_t m_ram_type;
 	memory_region *m_cart_rom;
@@ -112,7 +115,6 @@ public:
 	int m_intra;
 	int m_ibfa;
 	int m_obfa;
-
 };
 
 
@@ -120,21 +122,12 @@ class brno_state : public m5_state
 {
 public:
 	brno_state(const machine_config &mconfig, device_type type, const char *tag)
-		: m5_state(mconfig, type, tag),
-
-		m_fdc(*this, WD2797_TAG),
-		m_floppy0(*this, WD2797_TAG":0"),
-		m_floppy1(*this, WD2797_TAG":1")
-		//  m_ramdisk(*this, RAMDISK)
+		: m5_state(mconfig, type, tag)
+		, m_fdc(*this, WD2797_TAG)
+		, m_floppy0(*this, WD2797_TAG":0")
+		, m_floppy1(*this, WD2797_TAG":1")
+		//,  m_ramdisk(*this, RAMDISK)
 	{ }
-
-
-	required_device<wd2797_t> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
-	floppy_image_device *m_floppy;
-
-
 
 	DECLARE_READ8_MEMBER( mmu_r );
 	DECLARE_WRITE8_MEMBER( mmu_w );
@@ -157,15 +150,19 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER( brno );
 //  DECLARE_DEVICE_IMAGE_LOAD_MEMBER(m5_cart);
 
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	required_device<wd2797_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
+	floppy_image_device *m_floppy;
 
 	uint8_t m_rambank; // bank #
 	uint8_t m_ramcpu; //where Ramdisk bank is mapped
 	bool m_romen;
 	bool m_ramen;
-
 
 	uint8_t m_rammap[16]; // memory map
 };

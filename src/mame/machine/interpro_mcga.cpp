@@ -44,21 +44,21 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_fmcc_device)
 	AM_RANGE(0x48, 0x4b) AM_READWRITE16(error_control_r, error_control_w, 0xffff)
 ADDRESS_MAP_END
 
-const device_type INTERPRO_MCGA = device_creator<interpro_mcga_device>;
-const device_type INTERPRO_FMCC = device_creator<interpro_fmcc_device>;
+DEFINE_DEVICE_TYPE(INTERPRO_MCGA, interpro_mcga_device, "mcga", "InterPro MCGA")
+DEFINE_DEVICE_TYPE(INTERPRO_FMCC, interpro_fmcc_device, "fmcc", "InterPro FMCC")
 
-interpro_mcga_device::interpro_mcga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+interpro_mcga_device::interpro_mcga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 {
 }
 
 interpro_mcga_device::interpro_mcga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: interpro_mcga_device(mconfig, INTERPRO_MCGA, "InterPro MCGA", tag, owner, clock, "mcga", __FILE__)
+	: interpro_mcga_device(mconfig, INTERPRO_MCGA, tag, owner, clock)
 {
 }
 
 interpro_fmcc_device::interpro_fmcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: interpro_mcga_device(mconfig, INTERPRO_FMCC, "InterPro FMCC", tag, owner, clock, "fmcc", __FILE__)
+	: interpro_mcga_device(mconfig, INTERPRO_FMCC, tag, owner, clock)
 {
 }
 

@@ -295,7 +295,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( matmania, matmania_state )
+static MACHINE_CONFIG_START( matmania )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( matmania, matmania_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( maniach, matmania_state )
+static MACHINE_CONFIG_START( maniach )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
@@ -614,7 +614,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, matmania, 0,        matmania, matmania, driver_device, 0, ROT270, "Technos Japan (Taito America license)", "Mat Mania", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, excthour, matmania, matmania, maniach,  driver_device, 0, ROT270, "Technos Japan (Taito license)", "Exciting Hour", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maniach,  0,        maniach,  maniach,  driver_device, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maniach2, maniach,  maniach,  maniach,  driver_device, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", MACHINE_SUPPORTS_SAVE ) /* earlier version? */
+GAME( 1985, matmania, 0,        matmania, matmania, matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mat Mania",               MACHINE_SUPPORTS_SAVE )
+GAME( 1985, excthour, matmania, matmania, maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito license)",         "Exciting Hour",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, maniach,  0,        maniach,  maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, maniach2, maniach,  maniach,  maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", MACHINE_SUPPORTS_SAVE ) // earlier version?

@@ -35,7 +35,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( stargame )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( stargame, stargame_state )
+static MACHINE_CONFIG_START( stargame )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 1000000)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
@@ -51,7 +51,7 @@ ROM_START(spcship)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("sss-1g.bin", 0x0000, 0x4000, CRC(119a3064) SHA1(d915ecf44279a9e16a50a723eb9523afec1fb380))
 	ROM_REGION(0x4000, "audiocpu", 0)
-    ROM_LOAD("sss-1a0.bin", 0x0000, 0x4000, CRC(eae78e63) SHA1(9fa3587ae3ee6f674bb16102680e70069e9d275e))
+	ROM_LOAD("sss-1a0.bin", 0x0000, 0x4000, CRC(eae78e63) SHA1(9fa3587ae3ee6f674bb16102680e70069e9d275e))
 ROM_END
 
 
@@ -63,5 +63,5 @@ ROM_START(whtforce)
 ROM_END
 
 
-GAME( 1986, spcship,  0, stargame, stargame, driver_device, 0, ROT0, "Stargame", "Space Ship (Pinball)",  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, whtforce, 0, stargame, stargame, driver_device, 0, ROT0, "Stargame", "White Force", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, spcship,  0, stargame, stargame, stargame_state, 0, ROT0, "Stargame", "Space Ship (Pinball)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, whtforce, 0, stargame, stargame, stargame_state, 0, ROT0, "Stargame", "White Force",           MACHINE_IS_SKELETON_MECHANICAL )

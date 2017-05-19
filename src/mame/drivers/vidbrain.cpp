@@ -500,7 +500,7 @@ void vidbrain_state::machine_reset()
 //  MACHINE_CONFIG( vidbrain )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
+static MACHINE_CONFIG_START( vidbrain )
 	// basic machine hardware
 	MCFG_CPU_ADD(F3850_TAG, F8, XTAL_4MHz/2)
 	MCFG_CPU_PROGRAM_MAP(vidbrain_mem)
@@ -563,5 +563,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME                        FLAGS
-COMP( 1977, vidbrain,   0,      0,      vidbrain,   vidbrain, driver_device,    0,      "VideoBrain Computer Company",  "VideoBrain FamilyComputer",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     STATE           INIT    COMPANY                         FULLNAME                        FLAGS
+COMP( 1977, vidbrain,   0,      0,      vidbrain,   vidbrain, vidbrain_state, 0,      "VideoBrain Computer Company",  "VideoBrain FamilyComputer",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

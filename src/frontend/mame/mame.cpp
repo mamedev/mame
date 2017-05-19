@@ -129,9 +129,9 @@ void mame_machine_manager::start_luaengine()
 			emu_file file(options().ini_path(), OPEN_FLAG_READ);
 			if (file.open("plugin.ini") == osd_file::error::NONE)
 			{
-				bool result = m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+				bool result = m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, error);
 				if (!result)
-					osd_printf_error("**Error loading plugin.ini**");
+					osd_printf_error("**Error loading plugin.ini**\n");
 			}
 		}
 		for (auto &curentry : *m_plugins)
@@ -214,6 +214,11 @@ int mame_machine_manager::execute()
 			validity_checker valid(m_options);
 			valid.set_verbose(false);
 			valid.check_shared_source(*system);
+		}
+
+		// reevaluate slot options until nothing changes
+		while (mame_options::reevaluate_slot_options(m_options))
+		{
 		}
 
 		// create the machine configuration

@@ -98,7 +98,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint16_t> m_zoomram;
 
-	void screen_eof_midas(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_midas);
 
 };
 
@@ -611,14 +611,14 @@ void midas_state::machine_reset()
 {
 }
 
-void midas_state::screen_eof_midas(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(midas_state::screen_vblank_midas)
 {
 	if (state) m_sprgen->buffer_vram();
 }
 
 
 
-static MACHINE_CONFIG_START( livequiz, midas_state )
+static MACHINE_CONFIG_START( livequiz )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
@@ -631,7 +631,7 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
-	MCFG_SCREEN_VBLANK_DRIVER(midas_state, screen_eof_midas)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(midas_state, screen_vblank_midas))
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
@@ -646,7 +646,7 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hammer, midas_state )
+static MACHINE_CONFIG_START( hammer )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
@@ -663,7 +663,7 @@ static MACHINE_CONFIG_START( hammer, midas_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
-	MCFG_SCREEN_VBLANK_DRIVER(midas_state, screen_eof_midas)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(midas_state, screen_vblank_midas))
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
@@ -888,4 +888,4 @@ ROM_START( hammer )
 ROM_END
 
 GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, livequiz, ROT0, "Andamiro", "Live Quiz Show", 0 )
-GAME( 2000, hammer,   0, hammer,   hammer, driver_device,   0,        ROT0, "Andamiro", "Hammer",         0 )
+GAME( 2000, hammer,   0, hammer,   hammer,   midas_state, 0,        ROT0, "Andamiro", "Hammer",         0 )

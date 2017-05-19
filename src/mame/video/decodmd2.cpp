@@ -13,7 +13,7 @@
 #include "rendlay.h"
 #include "screen.h"
 
-const device_type DECODMD2 = device_creator<decodmd_type2_device>;
+DEFINE_DEVICE_TYPE(DECODMD2, decodmd_type2_device, "decodmd2", "Data East Pinball Dot Matrix Display Type 2")
 
 WRITE8_MEMBER( decodmd_type2_device::bank_w )
 {
@@ -161,7 +161,7 @@ machine_config_constructor decodmd_type2_device::device_mconfig_additions() cons
 }
 
 decodmd_type2_device::decodmd_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECODMD2, "Data East Pinball Dot Matrix Display Type 2", tag, owner, clock, "decodmd2", __FILE__),
+	: device_t(mconfig, DECODMD2, tag, owner, clock),
 		m_cpu(*this,"dmdcpu"),
 		m_mc6845(*this,"dmd6845"),
 		m_rombank1(*this,"dmdbank1"),

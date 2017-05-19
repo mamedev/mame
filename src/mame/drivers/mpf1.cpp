@@ -352,7 +352,7 @@ void mpf1_state::machine_reset()
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( mpf1, mpf1_state )
+static MACHINE_CONFIG_START( mpf1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz/2)
@@ -387,7 +387,7 @@ static MACHINE_CONFIG_START( mpf1, mpf1_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mpf1b, mpf1_state )
+static MACHINE_CONFIG_START( mpf1b )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(mpf1b_map)
@@ -424,7 +424,7 @@ static MACHINE_CONFIG_START( mpf1b, mpf1_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mpf1p, mpf1_state )
+static MACHINE_CONFIG_START( mpf1p )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(mpf1p_map)
@@ -486,6 +486,6 @@ DRIVER_INIT_MEMBER(mpf1_state,mpf1)
 	m_program = &m_maincpu->space(AS_PROGRAM);
 }
 
-COMP( 1979, mpf1,  0,    0, mpf1, mpf1, mpf1_state,  mpf1, "Multitech", "Micro Professor 1", 0)
-COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1B", 0)
-COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1 Plus", MACHINE_NOT_WORKING)
+COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1_state, mpf1, "Multitech", "Micro Professor 1",      0 )
+COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1B",     0 )
+COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1 Plus", MACHINE_NOT_WORKING )

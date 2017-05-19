@@ -128,16 +128,13 @@ READ8_MEMBER( scramble_state::hotshock_soundlatch_r )
 
 static void filter_w(device_t *device, int data)
 {
-	int C;
-
-
-	C = 0;
+	int C = 0;
 	if (data & 1)
 		C += 220000;    /* 220000pF = 0.220uF */
 	if (data & 2)
 		C +=  47000;    /*  47000pF = 0.047uF */
-	if (device != nullptr)
-		dynamic_cast<filter_rc_device*>(device)->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 5100, 0, CAP_P(C));
+	if (device)
+		downcast<filter_rc_device*>(device)->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 5100, 0, CAP_P(C));
 }
 
 WRITE8_MEMBER(scramble_state::scramble_filter_w)

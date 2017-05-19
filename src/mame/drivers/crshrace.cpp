@@ -418,7 +418,7 @@ void crshrace_state::machine_reset()
 	m_pending_command = 0;
 }
 
-static MACHINE_CONFIG_START( crshrace, crshrace_state )
+static MACHINE_CONFIG_START( crshrace )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000)    /* 16 MHz ??? */
@@ -436,7 +436,8 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(crshrace_state, screen_update_crshrace)
-	MCFG_SCREEN_VBLANK_DRIVER(crshrace_state, screen_eof_crshrace)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crshrace)
@@ -565,5 +566,5 @@ DRIVER_INIT_MEMBER(crshrace_state,crshrace2)
 }
 
 
-GAME( 1993, crshrace,  0,        crshrace, crshrace, crshrace_state,  crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, crshrace2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

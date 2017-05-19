@@ -281,7 +281,7 @@ void ladyfrog_state::machine_reset()
 	m_snd_data = 0;
 }
 
-static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )
+static MACHINE_CONFIG_START( ladyfrog )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)
@@ -386,8 +386,8 @@ ROM_START( touchemea )
 	ROM_LOAD( "8.ic10",   0x20000, 0x10000, CRC(fc6808bf) SHA1(f1f1b75a79dfdb500012f9b52c6364f0a13dce2d) )
 ROM_END
 
-GAME( 1990, ladyfrog, 0, ladyfrog, ladyfrog, driver_device, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ladyfrog, 0, ladyfrog, ladyfrog, ladyfrog_state, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", MACHINE_SUPPORTS_SAVE )
 
 // toucheme art style is similar to ladyfrog, so it's probably the same manufacturer
-GAME( 19??, toucheme, 0,        toucheme, toucheme, driver_device, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, touchemea,toucheme, toucheme, toucheme, driver_device, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 2, harder)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, toucheme,  0,        toucheme, toucheme, ladyfrog_state, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 19??, touchemea, toucheme, toucheme, toucheme, ladyfrog_state, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 2, harder)", MACHINE_SUPPORTS_SAVE )

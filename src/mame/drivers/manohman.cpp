@@ -140,10 +140,10 @@
 #define SECONDARY_CLOCK     XTAL_3_6864MHz
 
 
-class _manohman_state : public driver_device
+class manohman_state : public driver_device
 {
 public:
-	_manohman_state(const machine_config &mconfig, device_type type, const char *tag)
+	manohman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
@@ -155,7 +155,7 @@ public:
 *           Memory Map Definition            *
 *********************************************/
 
-static ADDRESS_MAP_START( manohman_map, AS_PROGRAM, 16, _manohman_state )
+static ADDRESS_MAP_START( manohman_map, AS_PROGRAM, 16, manohman_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP     // smell to MAX696 watchdog...
 	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
@@ -209,7 +209,7 @@ INPUT_PORTS_END
 *               Machine Config               *
 *********************************************/
 
-static MACHINE_CONFIG_START( manohman, _manohman_state )
+static MACHINE_CONFIG_START( manohman )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)   // 8 MHz
 	MCFG_CPU_PROGRAM_MAP(manohman_map)
@@ -236,5 +236,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT    ROT    COMPANY   FULLNAME        FLAGS... */
-GAME( 199?, manohman, 0,      manohman, manohman, driver_device, 0,      ROT0, "Merkur", "Mann, oh-Mann", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT    ROT   COMPANY   FULLNAME         FLAGS
+GAME( 199?, manohman, 0,      manohman, manohman, manohman_state, 0,      ROT0, "Merkur", "Mann, oh-Mann", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )

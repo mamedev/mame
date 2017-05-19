@@ -103,18 +103,17 @@ private:
 #define MACHINE_CONFIG_NAME(_name) construct_machine_config_##_name
 
 /**
- @def MACHINE_CONFIG_START(_name, _class)
+ @def MACHINE_CONFIG_START(_name)
  Begins a new machine config.
  @param _name name of this config
- @param _class driver_device class for this config
  @hideinitializer
  */
-#define MACHINE_CONFIG_START(_name, _class) \
+#define MACHINE_CONFIG_START(_name) \
 ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
 { \
 	devcb_base *devcb = nullptr; \
 	(void)devcb; \
-	if (owner == nullptr) owner = config.device_add(nullptr, "root", driver_device_creator<_class>, 0);
+	if (owner == nullptr) owner = config.device_add(nullptr, "root", config.gamedrv().type, 0);
 
 /**
  @def MACHINE_CONFIG_FRAGMENT(_name)
@@ -143,22 +142,6 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 	(void)devcb; \
 	owner = MACHINE_CONFIG_NAME(_base)(config, owner, device); \
 	assert(owner != nullptr);
-
-/**
-@def MACHINE_CONFIG_DERIVED_CLASS(_name, _base, _class)
-Begins a machine_config that is derived from another machine_config that can specify an alternate driver_device class
-@param _name name of this config
-@param _base name of the parent config
-@param _class name of the alternate driver_device class
-@hideinitializer
-*/
-#define MACHINE_CONFIG_DERIVED_CLASS(_name, _base, _class) \
-ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
-{ \
-	devcb_base *devcb = nullptr; \
-	(void)devcb; \
-	if (owner == nullptr) owner = config.device_add(nullptr, "root", driver_device_creator<_class>, 0); \
-	owner = MACHINE_CONFIG_NAME(_base)(config, owner, device);
 
 /**
 @def MACHINE_CONFIG_END

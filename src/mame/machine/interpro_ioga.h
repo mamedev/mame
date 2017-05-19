@@ -272,6 +272,6 @@ private:
 };
 
 // device type definition
-extern const device_type INTERPRO_IOGA;
+DECLARE_DEVICE_TYPE(INTERPRO_IOGA, interpro_ioga_device)
 
 #endif // MAME_MACHINE_INTERPRO_IOGA_H

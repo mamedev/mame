@@ -1014,7 +1014,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( fclown, _5clown_state )
+static MACHINE_CONFIG_START( fclown )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)  /* guess, seems ok */
@@ -1060,7 +1060,7 @@ static MACHINE_CONFIG_START( fclown, _5clown_state )
 	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess, seems ok */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki6295", MASTER_CLOCK/12, OKIM6295_PIN7_LOW)    /* guess, seems ok; pin7 guessed, seems ok */
+	MCFG_OKIM6295_ADD("oki6295", MASTER_CLOCK/12, PIN7_LOW)    /* guess, seems ok; pin7 guessed, seems ok */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.20)
 
 MACHINE_CONFIG_END
@@ -1225,7 +1225,7 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE INPUT   INIT    ROT    COMPANY  FULLNAME                      FLAGS... */
+//    YEAR  NAME      PARENT  MACHINE INPUT   STATE          INIT    ROT   COMPANY  FULLNAME                       FLAGS...
 GAME( 1993, 5clown,   0,      fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, 5clowna,  5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, 5clownsp, 5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (Spanish hack)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

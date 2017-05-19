@@ -12,17 +12,384 @@
 #include "screen.h"
 
 
-const device_type STIC = device_creator<stic_device>;
+/****************************************************************************
+ *                                                                          *
+ * MXR      0000[..0007]    MOB X REGISTER                  RW              *
+ *                                                                          *
+ * (MSB)                                       (LSB)                        *
+ * +-+-+-+-+-+-----+---+---+--+--+--+--+--+--+--+--+                        *
+ * | | | | | |XSIZE|VIS|COL|X7|X6|X5|X4|X3|X2|X1|X0|                        *
+ * +-+-+-+-+-+-----+---+---+--+--+--+--+--+--+--+--+                        *
+ *                                                                          *
+ * Xn       x-position                      [0..255]                        *
+ * COL      collision detection             [1=enable]                      *
+ * VIS      visibility                      [1=visible]                     *
+ * XSIZE    double width                    [1=double]                      *
+ *                                                                          *
+ ****************************************************************************
+ *                                                                          *
+ *  NOTES                                                                   *
+ *                                                                          *
+ *  1. If X=0, the sprite is not visible and does not register collisions.  *
+ *  2. The horizontal handle is 8 pixels from the left of the sprite,       *
+ *     regardless of width.                                                 *
+ *                                                                          *
+ ****************************************************************************/
+#define STIC_MXR                    0x0000
+
+#define STIC_MXR_XSIZE              0x0400
+#define STIC_MXR_VIS                0x0200
+#define STIC_MXR_COL                0x0100
+#define STIC_MXR_X                  0x00FF
+
+/****************************************************************************
+ *                                                                          *
+ * MYR      0008[..000F]    MOB Y REGISTER                  RW              *
+ *                                                                          *
+ * (MSB)                                                 (LSB)              *
+ * +-+-+-+-+-----+-----+-----+-----+----+--+--+--+--+--+--+--+              *
+ * | | | | |YFLIP|XFLIP|YSIZE|YFULL|YRES|Y6|Y5|Y4|Y3|Y2|Y1|Y0|              *
+ * +-+-+-+-+-----+-----+-----+-----+----+--+--+--+--+--+--+--+              *
+ *                                                                          *
+ * Yn       y-position                      [0..127]                        *
+ * YRES     y-resolution                    [0=8 scanlines,1=16 scanlines]  *
+ * YFULL    double scanline height          [1=double]                      *
+ * YSIZE    quadruple scanline height       [1=quadruple]                   *
+ * XFLIP    horizontally flip image         [1=flip]                        *
+ * YFLIP    vertically flip image           [1=flip]                        *
+ *                                                                          *
+ ****************************************************************************
+ *                                                                          *
+ *  NOTES                                                                   *
+ *                                                                          *
+ *  1. A sprite with YRES=1 will display two cards.                         *
+ *  2. A sprite with YFULL=0 and YSIZE=0 will have scanlines half the       *
+ *     height of a background card.                                         *
+ *  3, The minimum size of a sprite is 8x8 (XSIZE=YRES=YSIZE=YFULL=0).      *
+ *  4. The maximum size of a sprite is 16x128 (XSIZE=YRES=YSIZE=YFULL=1).   *
+ *  5. The Y-position is measured in double height scanlines.               *
+ *  6. The vertical handle is 8 double height scanlines from the top of the *
+ *     sprite, regardless of height.                                        *
+ *                                                                          *
+ ****************************************************************************/
+#define STIC_MYR                    0x0008
+
+#define STIC_MYR_YFLIP              0x0800
+#define STIC_MYR_XFLIP              0x0400
+#define STIC_MYR_YSIZE              0x0200
+#define STIC_MYR_YFULL              0x0100
+#define STIC_MYR_YRES               0x0080
+#define STIC_MYR_Y                  0x007F
+
+/****************************************************************************
+ *                                                                          *
+ * SAR      0010[..0017]    MOB ATTRIBUTE REGISTER          RW              *
+ *                                                                          *
+ * (MSB)                                         (LSB)                      *
+ * +-+-+---+---+---+-+-+--+--+--+--+--+--+---+---+---+                      *
+ * | | |PRI|FG3|SEL| | |C5|C4|C3|C2|C1|C0|FG2|FG1|FG0|                      *
+ * +-+-+---+---+---+-+-+--+--+--+--+--+--+---+---+---+                      *
+ *                                                                          *
+ * FGn      foreground color                [0..15]                         *
+ * Cn       card #                          [0..63]                         *
+ * SEL      card memory select              [0=GROM, 1=GRAM]                *
+ * PRI      sprite priority                 [1=behind set background bit]   *
+ *                                                                          *
+ ****************************************************************************/
+#define STIC_MAR                    0x0010
+
+#define STIC_MAR_PRI                0x2000
+#define STIC_MAR_FG3                0x1000
+#define STIC_MAR_SEL                0x0800
+#define STIC_MAR_C                  0x07F8
+#define STIC_MAR_FG20               0x0007
+
+/****************************************************************************
+ *                                                                          *
+ * SCR      0018[..001F]    MOB COLLISION REGISTER          RW              *
+ *                                                                          *
+ * (MSB)                                                     (LSB)          *
+ * +-+-+-+-+-+-+----+----+----+----+----+----+----+----+----+----+          *
+ * | | | | | | |BRDR|BKGD|SPR7|SPR6|SPR5|SPR4|SPR3|SPR2|SPR1|SPR0|          *
+ * +-+-+-+-+-+-+----+----+----+----+----+----+----+----+----+----+          *
+ *                                                                          *
+ * SPRn         1=collision with sprite #n                                  *
+ * BKGD         1=collision with set background bit                         *
+ * BRDR         1=collision with screen border                              *
+ *                                                                          *
+ ****************************************************************************
+ *                                                                          *
+ *  NOTES                                                                   *
+ *                                                                          *
+ *  1. All collisions are latched.  Successive reads read from the latch.   *
+ *     A write will reset the latch.                                        *
+ *  2. Sprites with VIS=0 register collisions.                              *
+ *  3. Sprites with X=0 do not register collisions.                         *
+ *  4. Two overlapping sprites with different priorities, one completely    *
+ *     hidden behind the background, still register a collision.            *
+ *                                                                          *
+ ****************************************************************************/
+#define STIC_MCR                    0x0018
+
+#define STIC_MCR_BRDR               0x0200
+#define STIC_MCR_BKGD               0x0100
+#define STIC_MCR_SPR7               0x0080
+#define STIC_MCR_SPR6               0x0040
+#define STIC_MCR_SPR5               0x0020
+#define STIC_MCR_SPR4               0x0010
+#define STIC_MCR_SPR3               0x0008
+#define STIC_MCR_SPR2               0x0004
+#define STIC_MCR_SPR1               0x0002
+#define STIC_MCR_SPR0               0x0001
+
+/****************************************************************************
+ *                                                                          *
+ * DER      0021            DISPLAY ENABLE REGISTER         W               *
+ *                                                                          *
+ * (MSB)                       (LSB)                                        *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                                        *
+ * | | | | | | | | | | | | | | | | |                                        *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                                        *
+ *                                                                          *
+ ****************************************************************************
+ *                                                                          *
+ *  NOTES                                                                   *
+ *                                                                          *
+ *  1. Any write during VBLANK enables STIC output.                         *
+ *                                                                          *
+ ****************************************************************************/
+#define STIC_DER                    0x0020
+
+/****************************************************************************
+ *                                                                          *
+ * GMR      0021            GRAPHICS MODE REGISTER          RW              *
+ *                                                                          *
+ * (MSB)                       (LSB)                                        *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                                        *
+ * | | | | | | | | | | | | | | | | |                                        *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                                        *
+ *                                                                          *
+ ****************************************************************************
+ *                                                                          *
+ *  NOTES                                                                   *
+ *                                                                          *
+ *  1. Any write during VBLANK enables FOREGROUND/BACKGROUND mode.          *
+ *  2. Any read during VBLANK enables COLOR STACK/COLORED SQUARES mode.     *
+ *                                                                          *
+ ****************************************************************************/
+#define STIC_GMR                    0x0021
+
+/****************************************************************************
+ *                                                                          *
+ * CSR      0028            COLOR STACK REGISTER            RW              *
+ *                                                                          *
+ * (MSB)                               (LSB)                                *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+---+---+---+---+                                *
+ * | | | | | | | | | | | | |BG3|BG2|BG1|BG0|                                *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+---+---+---+---+                                *
+ *                                                                          *
+ * BGn      background color                [0..15]                         *
+ *                                                                          *
+ ****************************************************************************/
+#define STIC_CSR                    0x0028
+
+#define STIC_CSR_BG                 0x000F
+
+/****************************************************************************
+ *                                                                          *
+ * BCR      002C            BORDER COLOR REGISTER           RW              *
+ *                                                                          *
+ * (MSB)                               (LSB)                                *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+---+---+---+---+                                *
+ * | | | | | | | | | | | | |BC3|BC2|BC1|BC0|                                *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+---+---+---+---+                                *
+ *                                                                          *
+ * BCn      border color                    [0..15]                         *
+ *                                                                          *
+ ****************************************************************************
+ *                                                                          *
+ *  NOTES                                                                   *
+ *                                                                          *
+ *  1. Affects overscan, and column and row blockouts.                      *
+ *                                                                          *
+ ****************************************************************************/
+#define STIC_BCR                    0x002C
+
+#define STIC_BCR_BC                 0x000F
+
+/****************************************************************************
+ *                                                                          *
+ * HDR      0030            HORIZONTAL DELAY REGISTER       RW              *
+ *                                                                          *
+ * (MSB)                                (LSB)                               *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+----+----+----+                               *
+ * | | | | | | | | | | | | | |DEL2|DEL1|DEL0|                               *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+----+----+----+                               *
+ *                                                                          *
+ * DELn     horizontal delay                [0..7]                          *
+ *                                                                          *
+ ****************************************************************************
+ *                                                                          *
+ *  NOTES                                                                   *
+ *                                                                          *
+ *  1. Affects both BACKTAB and MOBs.                                       *
+ *                                                                          *
+ ****************************************************************************/
+#define STIC_HDR                    0x0030
+
+#define STIC_HDR_DEL                0x0007
+
+/****************************************************************************
+ *                                                                          *
+ * STIC_VDR     0030            VERTICAL DELAY REGISTER         RW          *
+ *                                                                          *
+ * (MSB)                                (LSB)                               *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+----+----+----+                               *
+ * | | | | | | | | | | | | | |DEL2|DEL1|DEL0|                               *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+----+----+----+                               *
+ *                                                                          *
+ * DELn     vertical delay                  [0..7]                          *
+ *                                                                          *
+ ****************************************************************************
+ *                                                                          *
+ *  NOTES                                                                   *
+ *                                                                          *
+ *  1. Affects both BACKTAB and MOBs.                                       *
+ *                                                                          *
+ ****************************************************************************/
+#define STIC_VDR                    0x0031
+
+#define STIC_VDR_DEL                0x0007
+
+/****************************************************************************
+ *                                                                          *
+ * STIC_CBR     0032            CARD BLOCKOUT REGISTER          RW          *
+ *                                                                          *
+ * (MSB)                           (LSB)                                    *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+---+---+                                    *
+ * | | | | | | | | | | | | | | |ROW|COL|                                    *
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+---+---+                                    *
+ *                                                                          *
+ * COL      blockout first card column      [1=blockout]                    *
+ * ROW      blockout first card row         [1=blockout]                    *
+ *                                                                          *
+ ****************************************************************************
+ *                                                                          *
+ *  NOTES                                                                   *
+ *                                                                          *
+ *  1. Generally used in conjunction with HDR and VDR registers, to achieve *
+ *     smooth scrolling.                                                    *
+ *                                                                          *
+ ****************************************************************************/
+#define STIC_CBR                    0x0032
+
+#define STIC_CBR_ROW                0x0002
+#define STIC_CBR_COL                0x0001
+
+/****************************************************************************
+ *                                                                          *
+ * FOREGROUND/BACKGROUND MODE                                               *
+ *                                                                          *
+ * (MSB)                                             (LSB)                  *
+ * +-+-+---+---+---+---+---+--+--+--+--+--+--+---+---+---+                  *
+ * | | |BG2|BG3|SEL|BG1|BG0|C5|C4|C3|C2|C1|C0|FG2|FG1|FG0|                  *
+ * +-+-+---+---+---+---+---+--+--+--+--+--+--+---+---+---+                  *
+ *                                                                          *
+ * FGn      foreground color                [0..7]                          *
+ * Cn       card #                          [0..63]                         *
+ * SEL      card memory select              [0=GROM, 1=GRAM]                *
+ * BGn      background color                [0..15]                         *
+ *                                                                          *
+ ****************************************************************************/
+#define STIC_FBM_BG2                0x2000
+#define STIC_FBM_BG310              0x1600
+#define STIC_FBM_SEL                0x0800
+#define STIC_FBM_C                  0x01F8
+#define STIC_FBM_FG                 0x0007
+
+/****************************************************************************
+ *                                                                          *
+ * COLOR STACK MODE                                                         *
+ *                                                                          *
+ * (MSB)                                           (LSB)                    *
+ * +-+-+---+---+---+--+--+--+--+--+--+--+--+---+---+---+                    *
+ * | | |ADV|FG3|SEL|C7|C6|C5|C4|C3|C2|C1|C0|FG2|FG1|FG0|                    *
+ * +-+-+---+---+---+--+--+--+--+--+--+--+--+---+---+---+                    *
+ *                                                                          *
+ * FGn      foreground color                [0..15]                         *
+ * Cn       card #                          [GROM=0..212, GRAM=0..63]       *
+ * SEL      card memory select              [0=GROM, 1=GRAM]                *
+ * ADV      advance color stack index       [1=advance]                     *
+ *                                                                          *
+ ****************************************************************************
+ *                                                                          *
+ * NOTES:                                                                   *
+ *                                                                          *
+ * 1. When FG3=1 and SEL=0, COLORED SQUARES MODE is enabled.                *
+ * 2. When SEL=1, C7 and C6 can be used as user-defined flags.              *
+ *                                                                          *
+ ****************************************************************************/
+#define STIC_CSTM_ADV               0x2000
+#define STIC_CSTM_FG3               0x1000
+#define STIC_CSTM_SEL               0x0800
+#define STIC_CSTM_C7                0x0400
+#define STIC_CSTM_C6                0x0200
+#define STIC_CSTM_C50               0x01F8
+#define STIC_CSTM_FG20              0x0007
+
+#define STIC_CSTM_C                 (STIC_CSTM_C7|STIC_CSTM_C6|STIC_CSTM_C50)
+
+/****************************************************************************
+ *                                                                          *
+ * COLORED SQUARES MODE                                                     *
+ *                                                                          *
+ * (MSB)                                   (LSB)                            *
+ * +-+-+--+-+-+--+--+--+--+--+--+--+--+--+--+--+                            *
+ * | | |D2|1|0|D1|D0|C2|C1|C0|B2|B1|B0|A2|A1|A0|                            *
+ * +-+-+--+-+-+--+--+--+--+--+--+--+--+--+--+--+                            *
+ *                                                                          *
+ * An       color a                         [0..7]                          *
+ * Bn       color b                         [0..7]                          *
+ * Cn       color c                         [0..7]                          *
+ * Dn       color d                         [0..7]                          *
+ *                                                                          *
+ ****************************************************************************
+ *                                                                          *
+ * NOTES:                                                                   *
+ *                                                                          *
+ * 1. Each color corresponds to one of the following 4 x 4 squares:         *
+ *                                                                          *
+ *      +---+---+                                                           *
+ *      | a | b |                                                           *
+ *      +---+---+                                                           *
+ *      | c | d |                                                           *
+ *      +---+---+                                                           *
+ *                                                                          *
+ * 2. When color 7 is specified, the color is taken from the color stack.   *
+ *                                                                          *
+ ****************************************************************************/
+#define STIC_CSQM_D2                0x2000
+#define STIC_CSQM_D10               0x0600
+#define STIC_CSQM_C                 0x01C0
+#define STIC_CSQM_B                 0x0038
+#define STIC_CSQM_A                 0x0007
+
+#define STIC_CSQM_WIDTH             (CARD_WIDTH / 2)
+#define STIC_CSQM_HEIGHT            (CARD_HEIGHT / 2)
+
+
+
+DEFINE_DEVICE_TYPE(STIC, stic_device, "stic", "STIC (Standard Television Interface Chip) Video Chip");
 
 //-------------------------------------------------
 //  stic_device - constructor
 //-------------------------------------------------
 
 stic_device::stic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-				device_t(mconfig, STIC, "STIC (Standard Television Interface Chip) Video Chip", tag, owner, clock, "stic", __FILE__),
-				m_grom(*this, "grom"),
-				m_x_scale(1),
-				m_y_scale(1)
+	device_t(mconfig, STIC, tag, owner, clock),
+	m_grom(*this, "grom"),
+	m_x_scale(1),
+	m_y_scale(1)
 {
 }
 
@@ -56,7 +423,7 @@ void stic_device::device_start()
 	save_item(NAME(m_left_edge_inhibit));
 	save_item(NAME(m_top_edge_inhibit));
 	save_item(NAME(m_backtab_buffer));
-	for (int sp = 0; sp < STIC_MOBS; sp++)
+	for (int sp = 0; sp < MOBS; sp++)
 	{
 		save_item(m_sprite[sp].visible, "STIC sprite/m_sprite[sp].visible", sp);
 		save_item(m_sprite[sp].xpos, "STIC sprite/m_sprite[sp].xpos", sp);
@@ -80,7 +447,7 @@ void stic_device::device_start()
 
 void stic_device::device_reset()
 {
-	for (int i = 0; i < STIC_MOBS; i++)
+	for (int i = 0; i < MOBS; i++)
 	{
 		intv_sprite_type* s = &m_sprite[i];
 		s->visible = 0;
@@ -178,14 +545,14 @@ bool stic_device::sprites_collide(int spriteNum1, int spriteNum2)
 	intv_sprite_type* s1 = &m_sprite[spriteNum1];
 	intv_sprite_type* s2 = &m_sprite[spriteNum2];
 
-	x0 = STIC_OVERSCAN_LEFT_WIDTH + m_col_delay - STIC_CARD_WIDTH;
-	y0 = STIC_OVERSCAN_TOP_HEIGHT + m_row_delay - STIC_CARD_HEIGHT;
-	x1 = (s1->xpos + x0) * STIC_X_SCALE; y1 = (s1->ypos + y0) * STIC_Y_SCALE;
-	x2 = (s2->xpos + x0) * STIC_X_SCALE; y2 = (s2->ypos + y0) * STIC_Y_SCALE;
-	w1 = (s1->doublex ? 2 : 1) * STIC_CARD_WIDTH;
-	w2 = (s2->doublex ? 2 : 1) * STIC_CARD_WIDTH;
-	h1 = (s1->quady ? 4 : 1) * (s1->doubley ? 2 : 1) * (s1->doubleyres ? 2 : 1) * STIC_CARD_HEIGHT;
-	h2 = (s2->quady ? 4 : 1) * (s2->doubley ? 2 : 1) * (s2->doubleyres ? 2 : 1) * STIC_CARD_HEIGHT;
+	x0 = OVERSCAN_LEFT_WIDTH + m_col_delay - CARD_WIDTH;
+	y0 = OVERSCAN_TOP_HEIGHT + m_row_delay - CARD_HEIGHT;
+	x1 = (s1->xpos + x0) * X_SCALE; y1 = (s1->ypos + y0) * Y_SCALE;
+	x2 = (s2->xpos + x0) * X_SCALE; y2 = (s2->ypos + y0) * Y_SCALE;
+	w1 = (s1->doublex ? 2 : 1) * CARD_WIDTH;
+	w2 = (s2->doublex ? 2 : 1) * CARD_WIDTH;
+	h1 = (s1->quady ? 4 : 1) * (s1->doubley ? 2 : 1) * (s1->doubleyres ? 2 : 1) * CARD_HEIGHT;
+	h2 = (s2->quady ? 4 : 1) * (s2->doubley ? 2 : 1) * (s2->doubleyres ? 2 : 1) * CARD_HEIGHT;
 
 	if ((x1 >= x2 + w2) || (y1 >= y2 + h2) ||
 		(x2 >= x1 + w1) || (y2 >= y1 + h1))
@@ -216,13 +583,13 @@ bool stic_device::sprites_collide(int spriteNum1, int spriteNum2)
 void stic_device::determine_sprite_collisions()
 {
 	// check sprite to sprite collisions
-	for (int i = 0; i < STIC_MOBS - 1; i++)
+	for (int i = 0; i < MOBS - 1; i++)
 	{
 		intv_sprite_type* s1 = &m_sprite[i];
 		if (s1->xpos == 0 || !s1->coll)
 			continue;
 
-		for (int j = i + 1; j < STIC_MOBS; j++)
+		for (int j = i + 1; j < MOBS; j++)
 		{
 			intv_sprite_type* s2 = &m_sprite[j];
 			if (s2->xpos == 0 || !s2->coll)
@@ -247,17 +614,17 @@ void stic_device::render_sprites()
 	int32_t nextY;
 	int32_t xInc;
 
-	for (int i = 0; i < STIC_MOBS; i++)
+	for (int i = 0; i < MOBS; i++)
 	{
 		intv_sprite_type* s = &m_sprite[i];
 
 		if (s->grom)
-			cardMemoryLocation = (s->card * STIC_CARD_HEIGHT);
+			cardMemoryLocation = (s->card * CARD_HEIGHT);
 		else
-			cardMemoryLocation = ((s->card & 0x003F) * STIC_CARD_HEIGHT);
+			cardMemoryLocation = ((s->card & 0x003F) * CARD_HEIGHT);
 
 		pixelSize = (s->quady ? 4 : 1) * (s->doubley ? 2 : 1);
-		spritePixelHeight = pixelSize * (s->doubleyres ? 2 : 1) * STIC_CARD_HEIGHT;
+		spritePixelHeight = pixelSize * (s->doubleyres ? 2 : 1) * CARD_HEIGHT;
 
 		for (int j = 0; j < spritePixelHeight; j++)
 		{
@@ -268,13 +635,13 @@ void stic_device::render_sprites()
 				nextData = m_gram[nextMemoryLocation];
 			else
 				nextData = 0xFFFF;
-			nextX = (s->xflip ? ((s->doublex ? 2 : 1) * STIC_CARD_WIDTH - 1) : 0);
+			nextX = (s->xflip ? ((s->doublex ? 2 : 1) * CARD_WIDTH - 1) : 0);
 			nextY = (s->yflip ? (spritePixelHeight - j - 1) : j);
 			xInc = (s->xflip ? -1: 1);
 
-			for (int k = 0; k < STIC_CARD_WIDTH * (1 + s->doublex); k++)
+			for (int k = 0; k < CARD_WIDTH * (1 + s->doublex); k++)
 			{
-				m_sprite_buffers[i][nextX + k * xInc][nextY] = (nextData & (1 << ((STIC_CARD_WIDTH - 1) - k / (1 + s->doublex)))) != 0;
+				m_sprite_buffers[i][nextX + k * xInc][nextY] = (nextData & (1 << ((CARD_WIDTH - 1) - k / (1 + s->doublex)))) != 0;
 			}
 		}
 	}
@@ -284,9 +651,9 @@ void stic_device::render_line(bitmap_ind16 &bitmap, uint8_t nextByte, uint16_t x
 {
 	uint32_t color;
 
-	for (int i = 0; i < STIC_CARD_WIDTH; i++)
+	for (int i = 0; i < CARD_WIDTH; i++)
 	{
-		color = (nextByte & (1 << ((STIC_CARD_WIDTH - 1) - i)) ? fgcolor : bgcolor);
+		color = (nextByte & (1 << ((CARD_WIDTH - 1) - i)) ? fgcolor : bgcolor);
 		intv_set_pixel(bitmap, x+i, y, color);
 		intv_set_pixel(bitmap, x+i, y+1, color);
 	}
@@ -294,10 +661,10 @@ void stic_device::render_line(bitmap_ind16 &bitmap, uint8_t nextByte, uint16_t x
 
 void stic_device::render_colored_squares(bitmap_ind16 &bitmap, uint16_t x, uint16_t y, uint8_t color0, uint8_t color1, uint8_t color2, uint8_t color3)
 {
-	intv_plot_box(bitmap, x, y, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, color0);
-	intv_plot_box(bitmap, x + STIC_CSQM_WIDTH * STIC_X_SCALE, y, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, color1);
-	intv_plot_box(bitmap, x, y + STIC_CSQM_HEIGHT * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, color2);
-	intv_plot_box(bitmap, x + STIC_CSQM_WIDTH * STIC_X_SCALE, y + STIC_CSQM_HEIGHT * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, color3);
+	intv_plot_box(bitmap, x, y, STIC_CSQM_WIDTH * X_SCALE, STIC_CSQM_HEIGHT * Y_SCALE, color0);
+	intv_plot_box(bitmap, x + STIC_CSQM_WIDTH * X_SCALE, y, STIC_CSQM_WIDTH * X_SCALE, STIC_CSQM_HEIGHT * Y_SCALE, color1);
+	intv_plot_box(bitmap, x, y + STIC_CSQM_HEIGHT * Y_SCALE, STIC_CSQM_WIDTH * X_SCALE, STIC_CSQM_HEIGHT * Y_SCALE, color2);
+	intv_plot_box(bitmap, x + STIC_CSQM_WIDTH * X_SCALE, y + STIC_CSQM_HEIGHT * Y_SCALE, STIC_CSQM_WIDTH * X_SCALE, STIC_CSQM_HEIGHT * Y_SCALE, color3);
 }
 
 void stic_device::render_color_stack_mode(bitmap_ind16 &bitmap)
@@ -306,13 +673,13 @@ void stic_device::render_color_stack_mode(bitmap_ind16 &bitmap)
 	uint8_t csPtr = 0;
 	uint16_t nextCard;
 
-	for (h = 0, nexty = (STIC_OVERSCAN_TOP_HEIGHT + m_row_delay) * STIC_Y_SCALE;
-			h < STIC_BACKTAB_HEIGHT;
-			h++, nexty += STIC_CARD_HEIGHT * STIC_Y_SCALE)
+	for (h = 0, nexty = (OVERSCAN_TOP_HEIGHT + m_row_delay) * Y_SCALE;
+			h < BACKTAB_HEIGHT;
+			h++, nexty += CARD_HEIGHT * Y_SCALE)
 	{
-		for (w = 0, nextx = (STIC_OVERSCAN_LEFT_WIDTH + m_col_delay) * STIC_X_SCALE;
-				w < STIC_BACKTAB_WIDTH;
-				w++, nextx += STIC_CARD_WIDTH * STIC_X_SCALE)
+		for (w = 0, nextx = (OVERSCAN_LEFT_WIDTH + m_col_delay) * X_SCALE;
+				w < BACKTAB_WIDTH;
+				w++, nextx += CARD_WIDTH * X_SCALE)
 		{
 			nextCard = m_backtab_buffer[h][w];
 
@@ -340,7 +707,7 @@ void stic_device::render_color_stack_mode(bitmap_ind16 &bitmap)
 
 				//advance the color pointer, if necessary
 				if (nextCard & STIC_CSTM_ADV)
-					csPtr = (csPtr+1) & (STIC_CSRS - 1);
+					csPtr = (csPtr+1) & (CSRS - 1);
 
 				fgcolor = ((nextCard & STIC_CSTM_FG3) >> 9) |
 				(nextCard & (STIC_CSTM_FG20)) | FOREGROUND_BIT;
@@ -351,17 +718,17 @@ void stic_device::render_color_stack_mode(bitmap_ind16 &bitmap)
 				{
 					memoryLocation = nextCard & STIC_CSTM_C;
 					memory = m_grom;
-					for (int j = 0; j < STIC_CARD_HEIGHT; j++)
+					for (int j = 0; j < CARD_HEIGHT; j++)
 						render_line(bitmap, memory[memoryLocation + j],
-									nextx, nexty + j * STIC_Y_SCALE, fgcolor, bgcolor);
+									nextx, nexty + j * Y_SCALE, fgcolor, bgcolor);
 				}
 				else
 				{
 					memoryLocation = nextCard & STIC_CSTM_C50;
 					memory = m_gram;
-					for (int j = 0; j < STIC_CARD_HEIGHT; j++)
+					for (int j = 0; j < CARD_HEIGHT; j++)
 						render_line(bitmap, memory[memoryLocation + j],
-									nextx, nexty + j * STIC_Y_SCALE, fgcolor, bgcolor);
+									nextx, nexty + j * Y_SCALE, fgcolor, bgcolor);
 				}
 			}
 		}
@@ -375,13 +742,13 @@ void stic_device::render_fg_bg_mode(bitmap_ind16 &bitmap)
 	uint16_t nextCard, memoryLocation;
 	uint8_t* memory;
 
-	for (h = 0, nexty = (STIC_OVERSCAN_TOP_HEIGHT + m_row_delay) * STIC_Y_SCALE;
-			h < STIC_BACKTAB_HEIGHT;
-			h++, nexty += STIC_CARD_HEIGHT * STIC_Y_SCALE)
+	for (h = 0, nexty = (OVERSCAN_TOP_HEIGHT + m_row_delay) * Y_SCALE;
+			h < BACKTAB_HEIGHT;
+			h++, nexty += CARD_HEIGHT * Y_SCALE)
 	{
-		for (w = 0, nextx = (STIC_OVERSCAN_LEFT_WIDTH + m_col_delay) * STIC_X_SCALE;
-				w < STIC_BACKTAB_WIDTH;
-				w++, nextx += STIC_CARD_WIDTH * STIC_X_SCALE)
+		for (w = 0, nextx = (OVERSCAN_LEFT_WIDTH + m_col_delay) * X_SCALE;
+				w < BACKTAB_WIDTH;
+				w++, nextx += CARD_WIDTH * X_SCALE)
 		{
 			nextCard = m_backtab_buffer[h][w];
 			fgcolor = (nextCard & STIC_FBM_FG) | FOREGROUND_BIT;
@@ -393,17 +760,17 @@ void stic_device::render_fg_bg_mode(bitmap_ind16 &bitmap)
 			{
 				memoryLocation = nextCard & STIC_FBM_C;
 				memory = m_grom;
-				for (int j = 0; j < STIC_CARD_HEIGHT; j++)
+				for (int j = 0; j < CARD_HEIGHT; j++)
 					render_line(bitmap, memory[memoryLocation + j],
-								nextx, nexty + j * STIC_Y_SCALE, fgcolor, bgcolor);
+								nextx, nexty + j * Y_SCALE, fgcolor, bgcolor);
 			}
 			else
 			{
 				memoryLocation = nextCard & STIC_FBM_C;
 				memory = m_gram;
-				for (int j = 0; j < STIC_CARD_HEIGHT; j++)
+				for (int j = 0; j < CARD_HEIGHT; j++)
 					render_line(bitmap, memory[memoryLocation + j],
-								nextx, nexty + j * STIC_Y_SCALE, fgcolor, bgcolor);
+								nextx, nexty + j * Y_SCALE, fgcolor, bgcolor);
 			}
 		}
 	}
@@ -418,7 +785,7 @@ void stic_device::copy_sprites_to_background(bitmap_ind16 &bitmap)
 	int16_t leftBorder, rightBorder, topBorder, bottomBorder;
 	int32_t nextX;
 
-	for (int i = STIC_MOBS - 1; i >= 0; i--)
+	for (int i = MOBS - 1; i >= 0; i--)
 	{
 		intv_sprite_type *s = &m_sprite[i];
 		if (s->xpos == 0 || (!s->coll && !s->visible))
@@ -427,16 +794,16 @@ void stic_device::copy_sprites_to_background(bitmap_ind16 &bitmap)
 		borderCollision = false;
 		foregroundCollision = false;
 
-		spritePixelHeight = (s->quady ? 4 : 1) * (s->doubley ? 2 : 1) * (s->doubleyres ? 2 : 1) * STIC_CARD_HEIGHT;
-		width = (s->doublex ? 2 : 1) * STIC_CARD_WIDTH;
+		spritePixelHeight = (s->quady ? 4 : 1) * (s->doubley ? 2 : 1) * (s->doubleyres ? 2 : 1) * CARD_HEIGHT;
+		width = (s->doublex ? 2 : 1) * CARD_WIDTH;
 
-		leftX = (s->xpos - STIC_CARD_WIDTH + STIC_OVERSCAN_LEFT_WIDTH + m_col_delay) * STIC_X_SCALE;
-		nextY = (s->ypos - STIC_CARD_HEIGHT + STIC_OVERSCAN_TOP_HEIGHT + m_row_delay) * STIC_Y_SCALE;
+		leftX = (s->xpos - CARD_WIDTH + OVERSCAN_LEFT_WIDTH + m_col_delay) * X_SCALE;
+		nextY = (s->ypos - CARD_HEIGHT + OVERSCAN_TOP_HEIGHT + m_row_delay) * Y_SCALE;
 
-		leftBorder =  (STIC_OVERSCAN_LEFT_WIDTH + (m_left_edge_inhibit ? STIC_CARD_WIDTH : 0)) * STIC_X_SCALE;
-		rightBorder = (STIC_OVERSCAN_LEFT_WIDTH + STIC_BACKTAB_WIDTH * STIC_CARD_WIDTH - 1 - 1) * STIC_X_SCALE;
-		topBorder = (STIC_OVERSCAN_TOP_HEIGHT + (m_top_edge_inhibit ? STIC_CARD_HEIGHT : 0)) * STIC_Y_SCALE;
-		bottomBorder = (STIC_OVERSCAN_TOP_HEIGHT + STIC_BACKTAB_HEIGHT * STIC_CARD_HEIGHT) * STIC_Y_SCALE - 1;
+		leftBorder =  (OVERSCAN_LEFT_WIDTH + (m_left_edge_inhibit ? CARD_WIDTH : 0)) * X_SCALE;
+		rightBorder = (OVERSCAN_LEFT_WIDTH + BACKTAB_WIDTH * CARD_WIDTH - 1 - 1) * X_SCALE;
+		topBorder = (OVERSCAN_TOP_HEIGHT + (m_top_edge_inhibit ? CARD_HEIGHT : 0)) * Y_SCALE;
+		bottomBorder = (OVERSCAN_TOP_HEIGHT + BACKTAB_HEIGHT * CARD_HEIGHT) * Y_SCALE - 1;
 
 		for (y = 0; y < spritePixelHeight; y++)
 		{
@@ -511,15 +878,15 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 
 	int j;
 
-	int x0 = STIC_OVERSCAN_LEFT_WIDTH + m_col_delay;
-	int y0 = STIC_OVERSCAN_TOP_HEIGHT + m_row_delay;
+	int x0 = OVERSCAN_LEFT_WIDTH + m_col_delay;
+	int y0 = OVERSCAN_TOP_HEIGHT + m_row_delay;
 
 	if (m_color_stack_mode == 1)
 	{
 		m_color_stack_offset = 0;
-		for(row = 0; row < STIC_BACKTAB_HEIGHT; row++)
+		for(row = 0; row < BACKTAB_HEIGHT; row++)
 		{
-			for(col = 0; col < STIC_BACKTAB_WIDTH; col++)
+			for(col = 0; col < BACKTAB_WIDTH; col++)
 			{
 				value = m_ram16[offs];
 
@@ -534,21 +901,21 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 					colorc = (value & STIC_CSQM_C) >> 6;
 					colord = ((n_bit & STIC_CSQM_D2) >> 11) + ((value & STIC_CSQM_D10) >> 9);
 					// color 7 if the top of the color stack in this mode
-					if (colora == 7) colora = m_stic_registers[STIC_CSR + STIC_CSR3];
-					if (colorb == 7) colorb = m_stic_registers[STIC_CSR + STIC_CSR3];
-					if (colorc == 7) colorc = m_stic_registers[STIC_CSR + STIC_CSR3];
-					if (colord == 7) colord = m_stic_registers[STIC_CSR + STIC_CSR3];
-					intv_plot_box(bitmap, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colora);
-					intv_plot_box(bitmap, (x0 + col * STIC_CARD_WIDTH + STIC_CSQM_WIDTH)) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colorb);
-					intv_plot_box(bitmap, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT + STIC_CSQM_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colorc);
-					intv_plot_box(bitmap, (x0 + col * STIC_CARD_WIDTH + STIC_CSQM_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT + STIC_CSQM_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colord);
+					if (colora == 7) colora = m_stic_registers[STIC_CSR + CSR3];
+					if (colorb == 7) colorb = m_stic_registers[STIC_CSR + CSR3];
+					if (colorc == 7) colorc = m_stic_registers[STIC_CSR + CSR3];
+					if (colord == 7) colord = m_stic_registers[STIC_CSR + CSR3];
+					intv_plot_box(bitmap, (x0 + col * CARD_WIDTH) * X_SCALE, (y0 + row * CARD_HEIGHT) * Y_SCALE, STIC_CSQM_WIDTH * X_SCALE, STIC_CSQM_HEIGHT * Y_SCALE, colora);
+					intv_plot_box(bitmap, (x0 + col * CARD_WIDTH + STIC_CSQM_WIDTH)) * X_SCALE, (y0 + row * CARD_HEIGHT) * Y_SCALE, STIC_CSQM_WIDTH * X_SCALE, STIC_CSQM_HEIGHT * Y_SCALE, colorb);
+					intv_plot_box(bitmap, (x0 + col * CARD_WIDTH) * X_SCALE, (y0 + row * CARD_HEIGHT + STIC_CSQM_HEIGHT) * Y_SCALE, STIC_CSQM_WIDTH * X_SCALE, STIC_CSQM_HEIGHT * Y_SCALE, colorc);
+					intv_plot_box(bitmap, (x0 + col * CARD_WIDTH + STIC_CSQM_WIDTH) * X_SCALE, (y0 + row * CARD_HEIGHT + STIC_CSQM_HEIGHT) * Y_SCALE, STIC_CSQM_WIDTH * X_SCALE, STIC_CSQM_HEIGHT * Y_SCALE, colord);
 				}
 				else // normal color stack mode
 				{
 					if (n_bit) // next color
 					{
 						m_color_stack_offset += 1;
-						m_color_stack_offset &= (STIC_CSRS - 1);
+						m_color_stack_offset &= (CSRS - 1);
 					}
 
 					if (p_bit) // pastel color set
@@ -574,12 +941,12 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 						drawgfx(bitmap,m_gfxdecode->gfx(1),
 								code,
 								bgcolor*16+fgcolor,
-								0,0, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE,
+								0,0, (x0 + col * CARD_WIDTH) * X_SCALE, (y0 + row * CARD_HEIGHT) * Y_SCALE,
 								0,transparency,bgcolor);
 
 						for(j=0;j<8;j++)
 						{
-							//intv_set_pixel(bitmap, (x0 + col * STIC_CARD_WIDTH + j) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT + 7) * STIC_Y_SCALE + 1, 1);
+							//intv_set_pixel(bitmap, (x0 + col * CARD_WIDTH + j) * X_SCALE, (y0 + row * CARD_HEIGHT + 7) * Y_SCALE + 1, 1);
 						}
 
 					}
@@ -588,12 +955,12 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 						drawgfx(bitmap,m_gfxdecode->gfx(0),
 								code,
 								bgcolor*16+fgcolor,
-								0,0, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE,
+								0,0, (x0 + col * CARD_WIDTH) * X_SCALE, (y0 + row * CARD_HEIGHT) * Y_SCALE,
 								0,transparency,bgcolor);
 
 						for(j=0;j<8;j++)
 						{
-							//intv_set_pixel(bitmap, (x0 + col * STIC_CARD_WIDTH + j) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT + 7) * STIC_Y_SCALE + 1, 2);
+							//intv_set_pixel(bitmap, (x0 + col * CARD_WIDTH + j) * X_SCALE, (y0 + row * CARD_HEIGHT + 7) * Y_SCALE + 1, 2);
 						}
 					}
 				}
@@ -604,9 +971,9 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 	else
 	{
 		// fg/bg mode goes here
-		for(row = 0; row < STIC_BACKTAB_HEIGHT; row++)
+		for(row = 0; row < BACKTAB_HEIGHT; row++)
 		{
-			for(col = 0; col < STIC_BACKTAB_WIDTH; col++)
+			for(col = 0; col < BACKTAB_WIDTH; col++)
 			{
 				value = m_ram16[offs];
 				fgcolor = value & STIC_FBM_FG;
@@ -627,7 +994,7 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 					drawgfx(bitmap,m_gfxdecode->gfx(1),
 							code,
 							bgcolor*16+fgcolor,
-							0,0, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE,
+							0,0, (x0 + col * CARD_WIDTH) * X_SCALE, (y0 + row * CARD_HEIGHT) * Y_SCALE,
 							0,transparency,bgcolor);
 				}
 				else // read from GROM
@@ -635,7 +1002,7 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 					drawgfx(bitmap,m_gfxdecode->gfx(0),
 							code,
 							bgcolor*16+fgcolor,
-							0,0, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE,
+							0,0, (x0 + col * CARD_WIDTH) * X_SCALE, (y0 + row * CARD_HEIGHT) * Y_SCALE,
 							0,transparency,bgcolor);
 				}
 				offs++;
@@ -650,10 +1017,10 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 {
 	int code;
-	int x0 = STIC_OVERSCAN_LEFT_WIDTH + m_col_delay - STIC_CARD_WIDTH;
-	int y0 = STIC_OVERSCAN_TOP_HEIGHT + m_row_delay - STIC_CARD_HEIGHT;
+	int x0 = OVERSCAN_LEFT_WIDTH + m_col_delay - CARD_WIDTH;
+	int y0 = OVERSCAN_TOP_HEIGHT + m_row_delay - CARD_HEIGHT;
 
-	for (int i = STIC_MOBS - 1; i >= 0; --i)
+	for (int i = MOBS - 1; i >= 0; --i)
 	{
 		intv_sprite_type *s = &m_sprite[i];
 		if (s->visible && (s->behind_foreground == behind_foreground))
@@ -677,7 +1044,7 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 											code,
 											s->color,
 											s->xflip,s->yflip,
-											(s->xpos + x0) * STIC_X_SCALE, (s->ypos + y0) * STIC_Y_SCALE,
+											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE,
 											0x8000 * s->xsize, 0x8000 * s->ysize,0);
 				}
 				else
@@ -700,13 +1067,13 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 											code,
 											s->color,
 											s->xflip,s->yflip,
-											(s->xpos + x0) * STIC_X_SCALE, (s->ypos + y0) * STIC_Y_SCALE + s->yflip * s->ysize * STIC_CARD_HEIGHT,
+											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE + s->yflip * s->ysize * CARD_HEIGHT,
 											0x8000*s->xsize, 0x8000*s->ysize,0);
 					m_gfxdecode->gfx(1)->zoom_transpen(bitmap,&machine().screen[0].visarea,
 											code+1,
 											s->color,
 											s->xflip,s->yflip,
-											(s->xpos + x0) * STIC_X_SCALE, (s->ypos + y0) * STIC_Y_SCALE + (1 - s->yflip) * s->ysize * STIC_CARD_HEIGHT,
+											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE + (1 - s->yflip) * s->ysize * CARD_HEIGHT,
 											0x8000*s->xsize, 0x8000*s->ysize,0);
 				}
 			}
@@ -719,7 +1086,7 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 											code,
 											s->color,
 											s->xflip,s->yflip,
-											(s->xpos + x0) * STIC_X_SCALE, (s->ypos + y0) * STIC_Y_SCALE,
+											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE,
 											0x8000*s->xsize, 0x8000*s->ysize,0);
 				}
 				else
@@ -728,13 +1095,13 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 											code,
 											s->color,
 											s->xflip,s->yflip,
-											(s->xpos + x0) * STIC_X_SCALE, (s->ypos + y0) * STIC_Y_SCALE + s->yflip * s->ysize * STIC_CARD_HEIGHT,
+											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE + s->yflip * s->ysize * CARD_HEIGHT,
 											0x8000*s->xsize, 0x8000*s->ysize,0);
 					m_gfxdecode->gfx(0)->zoom_transpen(bitmap,&machine().screen[0].visarea,
 											code+1,
 											s->color,
 											s->xflip,s->yflip,
-											(s->xpos + x0) * STIC_X_SCALE, (s->ypos + y0) * STIC_Y_SCALE + (1 - s->yflip) * s->ysize * STIC_CARD_HEIGHT,
+											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE + (1 - s->yflip) * s->ysize * CARD_HEIGHT,
 											0x8000*s->xsize, 0x8000*s->ysize,0);
 				}
 			}
@@ -745,11 +1112,11 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 
 void stic_device::draw_borders(bitmap_ind16 &bitmap)
 {
-	intv_plot_box(bitmap, 0, 0, (STIC_OVERSCAN_LEFT_WIDTH + (m_left_edge_inhibit ? STIC_CARD_WIDTH : m_col_delay)) * STIC_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT + STIC_BACKTAB_HEIGHT * STIC_CARD_HEIGHT + STIC_OVERSCAN_BOTTOM_HEIGHT) * STIC_Y_SCALE, m_border_color);
-	intv_plot_box(bitmap, (STIC_OVERSCAN_LEFT_WIDTH + STIC_BACKTAB_WIDTH * STIC_CARD_WIDTH - 1) * STIC_X_SCALE, 0, STIC_OVERSCAN_RIGHT_WIDTH, (STIC_OVERSCAN_TOP_HEIGHT + STIC_BACKTAB_HEIGHT * STIC_CARD_HEIGHT + STIC_OVERSCAN_BOTTOM_HEIGHT) * STIC_Y_SCALE, m_border_color);
+	intv_plot_box(bitmap, 0, 0, (OVERSCAN_LEFT_WIDTH + (m_left_edge_inhibit ? CARD_WIDTH : m_col_delay)) * X_SCALE, (OVERSCAN_TOP_HEIGHT + BACKTAB_HEIGHT * CARD_HEIGHT + OVERSCAN_BOTTOM_HEIGHT) * Y_SCALE, m_border_color);
+	intv_plot_box(bitmap, (OVERSCAN_LEFT_WIDTH + BACKTAB_WIDTH * CARD_WIDTH - 1) * X_SCALE, 0, OVERSCAN_RIGHT_WIDTH, (OVERSCAN_TOP_HEIGHT + BACKTAB_HEIGHT * CARD_HEIGHT + OVERSCAN_BOTTOM_HEIGHT) * Y_SCALE, m_border_color);
 
-	intv_plot_box(bitmap, 0, 0, (STIC_OVERSCAN_LEFT_WIDTH + STIC_BACKTAB_WIDTH * STIC_CARD_WIDTH - 1 + STIC_OVERSCAN_RIGHT_WIDTH) * STIC_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT + (m_top_edge_inhibit ? STIC_CARD_HEIGHT : m_row_delay)) * STIC_Y_SCALE, m_border_color);
-	intv_plot_box(bitmap, 0, (STIC_OVERSCAN_TOP_HEIGHT + STIC_BACKTAB_HEIGHT * STIC_CARD_HEIGHT) * STIC_Y_SCALE, (STIC_OVERSCAN_LEFT_WIDTH + STIC_BACKTAB_WIDTH * STIC_CARD_WIDTH - 1 + STIC_OVERSCAN_RIGHT_WIDTH) * STIC_X_SCALE, STIC_OVERSCAN_BOTTOM_HEIGHT * STIC_Y_SCALE, m_border_color);
+	intv_plot_box(bitmap, 0, 0, (OVERSCAN_LEFT_WIDTH + BACKTAB_WIDTH * CARD_WIDTH - 1 + OVERSCAN_RIGHT_WIDTH) * X_SCALE, (OVERSCAN_TOP_HEIGHT + (m_top_edge_inhibit ? CARD_HEIGHT : m_row_delay)) * Y_SCALE, m_border_color);
+	intv_plot_box(bitmap, 0, (OVERSCAN_TOP_HEIGHT + BACKTAB_HEIGHT * CARD_HEIGHT) * Y_SCALE, (OVERSCAN_LEFT_WIDTH + BACKTAB_WIDTH * CARD_WIDTH - 1 + OVERSCAN_RIGHT_WIDTH) * X_SCALE, OVERSCAN_BOTTOM_HEIGHT * Y_SCALE, m_border_color);
 }
 
 void stic_device::screenrefresh()
@@ -766,7 +1133,7 @@ void stic_device::screenrefresh()
 		// Copy the sprites to the background
 		copy_sprites_to_background(m_bitmap);
 		determine_sprite_collisions();
-		for (int i = 0; i < STIC_MOBS; i++)
+		for (int i = 0; i < MOBS; i++)
 			m_stic_registers[STIC_MCR + i] |= m_sprite[i].collision;
 		/* draw the screen borders if enabled */
 		draw_borders(m_bitmap);
@@ -785,41 +1152,41 @@ READ16_MEMBER( stic_device::read )
 	//logerror("%x = stic_r(%x)\n",0,offset);
 	switch (offset)
 	{
-		case STIC_MXR + STIC_MOB0:
-		case STIC_MXR + STIC_MOB1:
-		case STIC_MXR + STIC_MOB2:
-		case STIC_MXR + STIC_MOB3:
-		case STIC_MXR + STIC_MOB4:
-		case STIC_MXR + STIC_MOB5:
-		case STIC_MXR + STIC_MOB6:
-		case STIC_MXR + STIC_MOB7:
+		case STIC_MXR + MOB0:
+		case STIC_MXR + MOB1:
+		case STIC_MXR + MOB2:
+		case STIC_MXR + MOB3:
+		case STIC_MXR + MOB4:
+		case STIC_MXR + MOB5:
+		case STIC_MXR + MOB6:
+		case STIC_MXR + MOB7:
 			return 0x3800 | (m_stic_registers[offset] & 0x07FF);
-		case STIC_MYR + STIC_MOB0:
-		case STIC_MYR + STIC_MOB1:
-		case STIC_MYR + STIC_MOB2:
-		case STIC_MYR + STIC_MOB3:
-		case STIC_MYR + STIC_MOB4:
-		case STIC_MYR + STIC_MOB5:
-		case STIC_MYR + STIC_MOB6:
-		case STIC_MYR + STIC_MOB7:
+		case STIC_MYR + MOB0:
+		case STIC_MYR + MOB1:
+		case STIC_MYR + MOB2:
+		case STIC_MYR + MOB3:
+		case STIC_MYR + MOB4:
+		case STIC_MYR + MOB5:
+		case STIC_MYR + MOB6:
+		case STIC_MYR + MOB7:
 			return 0x3000 | (m_stic_registers[offset] & 0x0FFF);
-		case STIC_MAR + STIC_MOB0:
-		case STIC_MAR + STIC_MOB1:
-		case STIC_MAR + STIC_MOB2:
-		case STIC_MAR + STIC_MOB3:
-		case STIC_MAR + STIC_MOB4:
-		case STIC_MAR + STIC_MOB5:
-		case STIC_MAR + STIC_MOB6:
-		case STIC_MAR + STIC_MOB7:
+		case STIC_MAR + MOB0:
+		case STIC_MAR + MOB1:
+		case STIC_MAR + MOB2:
+		case STIC_MAR + MOB3:
+		case STIC_MAR + MOB4:
+		case STIC_MAR + MOB5:
+		case STIC_MAR + MOB6:
+		case STIC_MAR + MOB7:
 			return m_stic_registers[offset] & 0x3FFF;
-		case STIC_MCR + STIC_MOB0:
-		case STIC_MCR + STIC_MOB1:
-		case STIC_MCR + STIC_MOB2:
-		case STIC_MCR + STIC_MOB3:
-		case STIC_MCR + STIC_MOB4:
-		case STIC_MCR + STIC_MOB5:
-		case STIC_MCR + STIC_MOB6:
-		case STIC_MCR + STIC_MOB7:
+		case STIC_MCR + MOB0:
+		case STIC_MCR + MOB1:
+		case STIC_MCR + MOB2:
+		case STIC_MCR + MOB3:
+		case STIC_MCR + MOB4:
+		case STIC_MCR + MOB5:
+		case STIC_MCR + MOB6:
+		case STIC_MCR + MOB7:
 			return 0x3C00 | (m_stic_registers[offset] & 0x03FF);
 		case STIC_GMR:
 			m_color_stack_mode = 1;
@@ -827,10 +1194,10 @@ READ16_MEMBER( stic_device::read )
 			/*** fall through ***/
 		case STIC_DER:
 			return 0x3FFF;
-		case STIC_CSR + STIC_CSR0:
-		case STIC_CSR + STIC_CSR1:
-		case STIC_CSR + STIC_CSR2:
-		case STIC_CSR + STIC_CSR3:
+		case STIC_CSR + CSR0:
+		case STIC_CSR + CSR1:
+		case STIC_CSR + CSR2:
+		case STIC_CSR + CSR3:
 		case STIC_BCR:
 			return 0x3FF0 | (m_stic_registers[offset] & 0x000F);
 		case STIC_HDR:
@@ -852,30 +1219,30 @@ WRITE16_MEMBER( stic_device::write )
 	switch (offset)
 	{
 		// X Positions
-		case STIC_MXR + STIC_MOB0:
-		case STIC_MXR + STIC_MOB1:
-		case STIC_MXR + STIC_MOB2:
-		case STIC_MXR + STIC_MOB3:
-		case STIC_MXR + STIC_MOB4:
-		case STIC_MXR + STIC_MOB5:
-		case STIC_MXR + STIC_MOB6:
-		case STIC_MXR + STIC_MOB7:
-			s =  &m_sprite[offset & (STIC_MOBS - 1)];
+		case STIC_MXR + MOB0:
+		case STIC_MXR + MOB1:
+		case STIC_MXR + MOB2:
+		case STIC_MXR + MOB3:
+		case STIC_MXR + MOB4:
+		case STIC_MXR + MOB5:
+		case STIC_MXR + MOB6:
+		case STIC_MXR + MOB7:
+			s =  &m_sprite[offset & (MOBS - 1)];
 			s->doublex = !!(data & STIC_MXR_XSIZE);
 			s->visible = !!(data & STIC_MXR_VIS);
 			s->coll = !!(data & STIC_MXR_COL);
 			s->xpos = (data & STIC_MXR_X);
 			break;
 		// Y Positions
-		case STIC_MYR + STIC_MOB0:
-		case STIC_MYR + STIC_MOB1:
-		case STIC_MYR + STIC_MOB2:
-		case STIC_MYR + STIC_MOB3:
-		case STIC_MYR + STIC_MOB4:
-		case STIC_MYR + STIC_MOB5:
-		case STIC_MYR + STIC_MOB6:
-		case STIC_MYR + STIC_MOB7:
-			s =  &m_sprite[offset & (STIC_MOBS - 1)];
+		case STIC_MYR + MOB0:
+		case STIC_MYR + MOB1:
+		case STIC_MYR + MOB2:
+		case STIC_MYR + MOB3:
+		case STIC_MYR + MOB4:
+		case STIC_MYR + MOB5:
+		case STIC_MYR + MOB6:
+		case STIC_MYR + MOB7:
+			s =  &m_sprite[offset & (MOBS - 1)];
 			s->yflip = !!(data & STIC_MYR_YFLIP);
 			s->xflip = !!(data & STIC_MYR_XFLIP);
 			s->quady = !!(data & STIC_MYR_YSIZE);
@@ -884,32 +1251,32 @@ WRITE16_MEMBER( stic_device::write )
 			s->ypos = (data & STIC_MYR_Y);
 			break;
 		// Attributes
-		case STIC_MAR + STIC_MOB0:
-		case STIC_MAR + STIC_MOB1:
-		case STIC_MAR + STIC_MOB2:
-		case STIC_MAR + STIC_MOB3:
-		case STIC_MAR + STIC_MOB4:
-		case STIC_MAR + STIC_MOB5:
-		case STIC_MAR + STIC_MOB6:
-		case STIC_MAR + STIC_MOB7:
-			s =  &m_sprite[offset & (STIC_MOBS - 1)];
+		case STIC_MAR + MOB0:
+		case STIC_MAR + MOB1:
+		case STIC_MAR + MOB2:
+		case STIC_MAR + MOB3:
+		case STIC_MAR + MOB4:
+		case STIC_MAR + MOB5:
+		case STIC_MAR + MOB6:
+		case STIC_MAR + MOB7:
+			s =  &m_sprite[offset & (MOBS - 1)];
 			s->behind_foreground = !!(data & STIC_MAR_PRI);
 			s->grom = !(data & STIC_MAR_SEL);
 			s->card = ((data & STIC_MAR_C) >> 3);
 			s->color = ((data & STIC_MAR_FG3) >> 9) | (data & STIC_MAR_FG20);
 			break;
 		// Collision Detection - TBD
-		case STIC_MCR + STIC_MOB0:
-		case STIC_MCR + STIC_MOB1:
-		case STIC_MCR + STIC_MOB2:
-		case STIC_MCR + STIC_MOB3:
-		case STIC_MCR + STIC_MOB4:
-		case STIC_MCR + STIC_MOB5:
-		case STIC_MCR + STIC_MOB6:
-		case STIC_MCR + STIC_MOB7:
+		case STIC_MCR + MOB0:
+		case STIC_MCR + MOB1:
+		case STIC_MCR + MOB2:
+		case STIC_MCR + MOB3:
+		case STIC_MCR + MOB4:
+		case STIC_MCR + MOB5:
+		case STIC_MCR + MOB6:
+		case STIC_MCR + MOB7:
 			// a MOB's own collision bit is *always* zero, even if a
 			// one is poked into it
-			data &= ~(1 << (offset & (STIC_MOBS - 1)));
+			data &= ~(1 << (offset & (MOBS - 1)));
 			break;
 		// Display enable
 		case STIC_DER:
@@ -921,11 +1288,11 @@ WRITE16_MEMBER( stic_device::write )
 			m_color_stack_mode = 0;
 			break;
 		// Color Stack
-		case STIC_CSR + STIC_CSR0:
-		case STIC_CSR + STIC_CSR1:
-		case STIC_CSR + STIC_CSR2:
-		case STIC_CSR + STIC_CSR3:
-			//logerror("Setting color_stack[%x] = %x (%x)\n", offset & (STIC_CSRS - 1),data & STIC_CSR_BG, space.device().safe_pc());
+		case STIC_CSR + CSR0:
+		case STIC_CSR + CSR1:
+		case STIC_CSR + CSR2:
+		case STIC_CSR + CSR3:
+			//logerror("Setting color_stack[%x] = %x (%x)\n", offset & (CSRS - 1),data & STIC_CSR_BG, space.device().safe_pc());
 			break;
 		// Border Color
 		case STIC_BCR:

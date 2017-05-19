@@ -1,12 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
+#ifndef MAME_SOUND_T6W28_H
+#define MAME_SOUND_T6W28_H
+
 #pragma once
 
-#ifndef __T6W28_H__
-#define __T6W28_H__
-
-class t6w28_device : public device_t,
-									public device_sound_interface
+class t6w28_device : public device_t, public device_sound_interface
 {
 public:
 	t6w28_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -41,7 +40,6 @@ private:
 	bool m_enabled;
 };
 
-extern const device_type T6W28;
+DECLARE_DEVICE_TYPE(T6W28, t6w28_device)
 
-
-#endif /* __T6W28_H__ */
+#endif // MAME_SOUND_T6W28_H

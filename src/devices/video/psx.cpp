@@ -8,34 +8,33 @@
  */
 
 #include "emu.h"
-
-#define DEBUG_VIEWER ( 0 )
 #include "video/psx.h"
 
 #include "screen.h"
 
 
+#define STOP_ON_ERROR ( 0 )
+
 #define VERBOSE_LEVEL ( 0 )
 
 // device type definition
-const device_type CXD8514Q = device_creator<cxd8514q_device>;
-const device_type CXD8538Q = device_creator<cxd8538q_device>;
-const device_type CXD8561Q = device_creator<cxd8561q_device>;
-const device_type CXD8561BQ = device_creator<cxd8561bq_device>;
-const device_type CXD8561CQ = device_creator<cxd8561cq_device>;
-const device_type CXD8654Q = device_creator<cxd8654q_device>;
+DEFINE_DEVICE_TYPE(CXD8514Q,  cxd8514q_device,  "cxd8514q",  "CXD8514Q GPU")
+DEFINE_DEVICE_TYPE(CXD8538Q,  cxd8538q_device,  "cxd8538q",  "CXD8538Q GPU")
+DEFINE_DEVICE_TYPE(CXD8561Q,  cxd8561q_device,  "cxd8561q",  "CXD8561Q GPU")
+DEFINE_DEVICE_TYPE(CXD8561BQ, cxd8561bq_device, "cxd8561bq", "CXD8561BQ GPU")
+DEFINE_DEVICE_TYPE(CXD8561CQ, cxd8561cq_device, "cxd8561cq", "CXD8561CQ GPU")
+DEFINE_DEVICE_TYPE(CXD8654Q,  cxd8654q_device,  "cxd8654q",  "CXD8654Q GPU")
 
-psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_vblank_handler(*this)
-#if DEBUG_VIEWER
-,
-	m_screen(*this, "screen")
+psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_vblank_handler(*this)
+#if PSXGPU_DEBUG_VIEWER
+	, m_screen(*this, "screen")
 #endif
 {
 }
 
-void psxgpu_device::device_start( void )
+void psxgpu_device::device_start()
 {
 	m_vblank_handler.resolve_safe();
 
@@ -49,38 +48,38 @@ void psxgpu_device::device_start( void )
 	}
 }
 
-void psxgpu_device::device_reset( void )
+void psxgpu_device::device_reset()
 {
 	gpu_reset();
 }
 
 cxd8514q_device::cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: psxgpu_device(mconfig, CXD8514Q, "CXD8514Q GPU", tag, owner, clock, "cxd8514q", __FILE__)
+	: psxgpu_device(mconfig, CXD8514Q, tag, owner, clock)
 {
 }
 
 cxd8538q_device::cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: psxgpu_device(mconfig, CXD8538Q, "CXD8538Q GPU", tag, owner, clock, "cxd8538q", __FILE__)
+	: psxgpu_device(mconfig, CXD8538Q, tag, owner, clock)
 {
 }
 
 cxd8561q_device::cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: psxgpu_device(mconfig, CXD8561Q, "CXD8561Q GPU", tag, owner, clock, "cxd8561q", __FILE__)
+	: psxgpu_device(mconfig, CXD8561Q, tag, owner, clock)
 {
 }
 
 cxd8561bq_device::cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: psxgpu_device(mconfig, CXD8561BQ, "CXD8561BQ", tag, owner, clock, "cxd8561bq", __FILE__)
+	: psxgpu_device(mconfig, CXD8561BQ, tag, owner, clock)
 {
 }
 
 cxd8561cq_device::cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: psxgpu_device(mconfig, CXD8561CQ, "CXD8561CQ GPU", tag, owner, clock, "cxd8561cq", __FILE__)
+	: psxgpu_device(mconfig, CXD8561CQ, tag, owner, clock)
 {
 }
 
 cxd8654q_device::cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: psxgpu_device(mconfig, CXD8654Q, "CXD8654Q GPU", tag, owner, clock, "cxd8654q", __FILE__)
+	: psxgpu_device(mconfig, CXD8654Q, tag, owner, clock)
 {
 }
 
@@ -117,9 +116,9 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 	}
 }
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 
-void psxgpu_device::DebugMeshInit( void )
+void psxgpu_device::DebugMeshInit()
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -241,12 +240,12 @@ void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
 	}
 }
 
-void psxgpu_device::DebugMeshEnd( void )
+void psxgpu_device::DebugMeshEnd()
 {
 	m_debug.n_coord = 0;
 }
 
-void psxgpu_device::DebugCheckKeys( void )
+void psxgpu_device::DebugCheckKeys()
 {
 	if( machine().input().code_pressed_once( KEYCODE_M ) )
 	{
@@ -364,7 +363,7 @@ int psxgpu_device::DebugTextureDisplay( bitmap_ind16 &bitmap )
 				}
 				p_n_interleave[ n_x ] = p_p_vram[ n_yi ][ n_xi ];
 			}
-			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, m_screen->palette()->pens() );
+			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, m_screen->palette().pens() );
 		}
 	}
 	return m_debug.b_texture;
@@ -437,7 +436,7 @@ void psxgpu_device::updatevisiblearea()
 		break;
 	}
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.b_mesh || m_debug.b_texture )
 	{
 		n_screenheight = 1024;
@@ -461,7 +460,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 
 	m_n_gputype = n_gputype;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	DebugMeshInit();
 #endif
 
@@ -622,7 +621,7 @@ uint32_t psxgpu_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 	int n_overscantop;
 	int n_overscanleft;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( DebugMeshDisplay( bitmap, cliprect ) )
 	{
 		return 0;
@@ -1393,7 +1392,7 @@ void psxgpu_device::FlatPolygon( int n_points )
 
 	uint16_t *p_vram;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 1 )
 	{
 		return;
@@ -1546,7 +1545,7 @@ void psxgpu_device::FlatTexturedPolygon( int n_points )
 	uint16_t *p_vram;
 	uint32_t n_bgr;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 2 )
 	{
 		return;
@@ -1745,7 +1744,7 @@ void psxgpu_device::GouraudPolygon( int n_points )
 
 	uint16_t *p_vram;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 3 )
 	{
 		return;
@@ -1956,7 +1955,7 @@ void psxgpu_device::GouraudTexturedPolygon( int n_points )
 	uint16_t *p_vram;
 	uint32_t n_bgr;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 4 )
 	{
 		return;
@@ -2175,7 +2174,7 @@ void psxgpu_device::GouraudTexturedPolygon( int n_points )
 	}
 }
 
-void psxgpu_device::MonochromeLine( void )
+void psxgpu_device::MonochromeLine()
 {
 	PAIR n_x;
 	PAIR n_y;
@@ -2193,7 +2192,7 @@ void psxgpu_device::MonochromeLine( void )
 	uint32_t n_b;
 	uint16_t *p_vram;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 5 )
 	{
 		return;
@@ -2270,7 +2269,7 @@ void psxgpu_device::MonochromeLine( void )
 	}
 }
 
-void psxgpu_device::GouraudLine( void )
+void psxgpu_device::GouraudLine()
 {
 	PAIR n_x;
 	PAIR n_y;
@@ -2297,7 +2296,7 @@ void psxgpu_device::GouraudLine( void )
 	PAIR n_cb2;
 	uint16_t *p_vram;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 6 )
 	{
 		return;
@@ -2386,7 +2385,7 @@ void psxgpu_device::GouraudLine( void )
 	}
 }
 
-void psxgpu_device::FrameBufferRectangleDraw( void )
+void psxgpu_device::FrameBufferRectangleDraw()
 {
 	PAIR n_r;
 	PAIR n_g;
@@ -2397,7 +2396,7 @@ void psxgpu_device::FrameBufferRectangleDraw( void )
 	int16_t n_x;
 	uint16_t *p_vram;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 7 )
 	{
 		return;
@@ -2436,7 +2435,7 @@ void psxgpu_device::FrameBufferRectangleDraw( void )
 	}
 }
 
-void psxgpu_device::FlatRectangle( void )
+void psxgpu_device::FlatRectangle()
 {
 	int16_t n_y;
 	int16_t n_x;
@@ -2459,7 +2458,7 @@ void psxgpu_device::FlatRectangle( void )
 	int32_t n_h;
 	uint16_t *p_vram;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 8 )
 	{
 		return;
@@ -2506,7 +2505,7 @@ void psxgpu_device::FlatRectangle( void )
 	}
 }
 
-void psxgpu_device::FlatRectangle8x8( void )
+void psxgpu_device::FlatRectangle8x8()
 {
 	int16_t n_y;
 	int16_t n_x;
@@ -2529,7 +2528,7 @@ void psxgpu_device::FlatRectangle8x8( void )
 	int32_t n_h;
 	uint16_t *p_vram;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 9 )
 	{
 		return;
@@ -2576,7 +2575,7 @@ void psxgpu_device::FlatRectangle8x8( void )
 	}
 }
 
-void psxgpu_device::FlatRectangle16x16( void )
+void psxgpu_device::FlatRectangle16x16()
 {
 	int16_t n_y;
 	int16_t n_x;
@@ -2599,7 +2598,7 @@ void psxgpu_device::FlatRectangle16x16( void )
 	int32_t n_h;
 	uint16_t *p_vram;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 10 )
 	{
 		return;
@@ -2646,7 +2645,7 @@ void psxgpu_device::FlatRectangle16x16( void )
 	}
 }
 
-void psxgpu_device::FlatTexturedRectangle( void )
+void psxgpu_device::FlatTexturedRectangle()
 {
 	int16_t n_y;
 	int16_t n_x;
@@ -2680,7 +2679,7 @@ void psxgpu_device::FlatTexturedRectangle( void )
 	uint16_t *p_clut;
 	uint16_t n_bgr;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 11 )
 	{
 		return;
@@ -2749,7 +2748,7 @@ void psxgpu_device::FlatTexturedRectangle( void )
 	}
 }
 
-void psxgpu_device::Sprite8x8( void )
+void psxgpu_device::Sprite8x8()
 {
 	int16_t n_y;
 	int16_t n_x;
@@ -2783,7 +2782,7 @@ void psxgpu_device::Sprite8x8( void )
 	uint16_t *p_clut;
 	uint16_t n_bgr;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 12 )
 	{
 		return;
@@ -2852,7 +2851,7 @@ void psxgpu_device::Sprite8x8( void )
 	}
 }
 
-void psxgpu_device::Sprite16x16( void )
+void psxgpu_device::Sprite16x16()
 {
 	int16_t n_y;
 	int16_t n_x;
@@ -2886,7 +2885,7 @@ void psxgpu_device::Sprite16x16( void )
 	uint16_t *p_clut;
 	uint16_t n_bgr;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 13 )
 	{
 		return;
@@ -2955,7 +2954,7 @@ void psxgpu_device::Sprite16x16( void )
 	}
 }
 
-void psxgpu_device::Dot( void )
+void psxgpu_device::Dot()
 {
 	int32_t n_x;
 	int32_t n_y;
@@ -2964,7 +2963,7 @@ void psxgpu_device::Dot( void )
 	uint32_t n_b;
 	uint16_t *p_vram;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 14 )
 	{
 		return;
@@ -2993,7 +2992,7 @@ void psxgpu_device::Dot( void )
 	}
 }
 
-void psxgpu_device::MoveImage( void )
+void psxgpu_device::MoveImage()
 {
 	int16_t n_w;
 	int16_t n_h;
@@ -3003,7 +3002,7 @@ void psxgpu_device::MoveImage( void )
 	int16_t n_dstx;
 	uint16_t *p_vram;
 
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 	if( m_debug.n_skip == 15 )
 	{
 		return;
@@ -3749,7 +3748,7 @@ void psxgpu_device::vblank(screen_device &screen, bool vblank_state)
 {
 	if( vblank_state )
 	{
-#if DEBUG_VIEWER
+#if PSXGPU_DEBUG_VIEWER
 		DebugCheckKeys();
 #endif
 
@@ -3758,7 +3757,7 @@ void psxgpu_device::vblank(screen_device &screen, bool vblank_state)
 	}
 }
 
-void psxgpu_device::gpu_reset( void )
+void psxgpu_device::gpu_reset()
 {
 	verboselog( *this, 1, "reset gpu\n" );
 	n_gpu_buffer_offset = 0;

@@ -79,7 +79,7 @@ public:
 	uint32_t screen_update_tceptor_2d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tceptor_3d_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tceptor_3d_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_tceptor(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tceptor);
 	INTERRUPT_GEN_MEMBER(m6809_vb_interrupt);
 	INTERRUPT_GEN_MEMBER(m68k_vb_interrupt);
 	INTERRUPT_GEN_MEMBER(mcu_vb_interrupt);

@@ -6,11 +6,11 @@
 
 *********************************************************************/
 
+#ifndef MAME_MACHINE_VICTOR9K_KB_H
+#define MAME_MACHINE_VICTOR9K_KB_H
+
+
 #pragma once
-
-#ifndef __VICTOR9K_KEYBOARD__
-#define __VICTOR9K_KEYBOARD__
-
 
 #include "cpu/mcs48/mcs48.h"
 
@@ -21,26 +21,26 @@
 //**************************************************************************
 
 #define MCFG_VICTOR9K_KBRDY_HANDLER(_devcb) \
-	devcb = &victor_9000_keyboard_t::set_kbrdy_cb(*device, DEVCB_##_devcb);
+	devcb = &victor_9000_keyboard_device::set_kbrdy_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_VICTOR9K_KBDATA_HANDLER(_devcb) \
-	devcb = &victor_9000_keyboard_t::set_kbdata_cb(*device, DEVCB_##_devcb);
+	devcb = &victor_9000_keyboard_device::set_kbdata_cb(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> victor_9000_keyboard_t
+// ======================> victor_9000_keyboard_device
 
-class victor_9000_keyboard_t :  public device_t
+class victor_9000_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	victor_9000_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	victor_9000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_kbrdy_cb(device_t &device, _Object object) { return downcast<victor_9000_keyboard_t &>(device).m_kbrdy_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_kbdata_cb(device_t &device, _Object object) { return downcast<victor_9000_keyboard_t &>(device).m_kbdata_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_kbrdy_cb(device_t &device, _Object object) { return downcast<victor_9000_keyboard_device &>(device).m_kbrdy_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_kbdata_cb(device_t &device, _Object object) { return downcast<victor_9000_keyboard_device &>(device).m_kbdata_cb.set_callback(object); }
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -53,7 +53,7 @@ public:
 	DECLARE_READ8_MEMBER( kb_p1_r );
 	DECLARE_WRITE8_MEMBER( kb_p1_w );
 	DECLARE_WRITE8_MEMBER( kb_p2_w );
-	DECLARE_READ8_MEMBER( kb_t1_r );
+	DECLARE_READ_LINE_MEMBER( kb_t1_r );
 
 protected:
 	// device-level overrides
@@ -77,8 +77,8 @@ private:
 
 
 // device type definition
-extern const device_type VICTOR9K_KEYBOARD;
+DECLARE_DEVICE_TYPE(VICTOR9K_KEYBOARD, victor_9000_keyboard_device)
 
 
 
-#endif
+#endif // MAME_MACHINE_VICTOR9K_KB_H

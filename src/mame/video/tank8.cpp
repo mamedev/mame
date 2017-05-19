@@ -193,7 +193,7 @@ uint32_t tank8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-void tank8_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(tank8_state::screen_vblank)
 {
 	// on falling edge
 	if (!state)
@@ -202,7 +202,7 @@ void tank8_state::screen_eof(screen_device &screen, bool state)
 		int y;
 		const rectangle &visarea = m_screen->visible_area();
 
-		m_tilemap->draw(screen, m_helper1, visarea, 0, 0);
+		m_tilemap->draw(*m_screen, m_helper1, visarea, 0, 0);
 
 		m_helper2.fill(8, visarea);
 		m_helper3.fill(8, visarea);
@@ -277,7 +277,7 @@ void tank8_state::screen_eof(screen_device &screen, bool state)
 						index |= 0x80; /* collision on right side */
 				}
 
-				m_collision_timer->adjust(screen.time_until_pos(y, x), index);
+				m_collision_timer->adjust(m_screen->time_until_pos(y, x), index);
 
 				_state = 1;
 			}

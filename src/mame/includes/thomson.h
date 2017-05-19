@@ -8,8 +8,10 @@
 
 **********************************************************************/
 
-#ifndef _THOMSON_H_
-#define _THOMSON_H_
+#ifndef MAME_INCLUDES_THOMSON_H
+#define MAME_INCLUDES_THOMSON_H
+
+#pragma once
 
 #include "cpu/m6809/m6809.h"
 #include "formats/thom_cas.h"
@@ -313,7 +315,7 @@ public:
 	void overlay_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void overlayhalf_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void overlay3_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
-	void thom_vblank( screen_device &screen, bool state );
+	DECLARE_WRITE_LINE_MEMBER(thom_vblank);
 	DECLARE_VIDEO_START( thom );
 
 	DECLARE_READ8_MEMBER( to7_5p14_r );
@@ -697,9 +699,9 @@ private:
 	int m_dsr;
 };
 
-extern const device_type TO7_IO_LINE;
+DECLARE_DEVICE_TYPE(TO7_IO_LINE, to7_io_line_device)
 
 #define MCFG_TO7_IO_LINE_ADD(_tag)  \
 	MCFG_DEVICE_ADD((_tag), TO7_IO_LINE, 0)
 
-#endif /* _THOMSON_H_ */
+#endif // MAME_INCLUDES_THOMSON_H

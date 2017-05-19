@@ -432,7 +432,7 @@ void cv1k_state::machine_reset()
 	m_blitter->reset();
 }
 
-static MACHINE_CONFIG_START( cv1k, cv1k_state )
+static MACHINE_CONFIG_START( cv1k )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH3BE, XTAL_12_8MHz*8) // 102.4MHz

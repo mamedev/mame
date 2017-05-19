@@ -97,5 +97,6 @@ void ondra_state::machine_reset()
 
 void ondra_state::machine_start()
 {
-	machine().scheduler().timer_pulse(attotime::from_hz(10), timer_expired_delegate(FUNC(ondra_state::nmi_check_callback),this));
+	m_nmi_check_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ondra_state::nmi_check_callback), this));
+	m_nmi_check_timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
 }

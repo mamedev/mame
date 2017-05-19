@@ -329,7 +329,7 @@ void gmaster_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( gmaster, gmaster_state )
+static MACHINE_CONFIG_START( gmaster )
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_12MHz/2/*?*/)  // upd78c11 in the unit
 	MCFG_CPU_PROGRAM_MAP(gmaster_mem)
 	MCFG_UPD7810_PORTA_READ_CB(IOPORT("JOY"))

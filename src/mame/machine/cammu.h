@@ -18,9 +18,7 @@
 class cammu_device : public device_t, public device_memory_interface
 {
 public:
-	cammu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
-	template<class _Object> static devcb_base &static_set_ssw_callback(device_t &device, _Object object) { return downcast<cammu_device &>(device).m_ssw_func.set_callback(object); }
+	template <class Object> static devcb_base &static_set_ssw_callback(device_t &device, Object &&cb) { return downcast<cammu_device &>(device).m_ssw_func.set_callback(std::forward<Object>(cb)); }
 
 	virtual DECLARE_ADDRESS_MAP(map, 32) = 0;
 
@@ -30,6 +28,8 @@ public:
 	DECLARE_WRITE32_MEMBER(data_w);
 
 protected:
+	cammu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -77,7 +77,7 @@ private:
 class cammu_c4_device : public cammu_device
 {
 public:
-	cammu_c4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	cammu_c4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ32_MEMBER(s_pdo_r) { return m_s_pdo; }
 	DECLARE_WRITE32_MEMBER(s_pdo_w) { m_s_pdo = data; }
@@ -261,8 +261,8 @@ private:
 };
 
 // device type definitions
-extern const device_type CAMMU_C4T;
-extern const device_type CAMMU_C4I;
-extern const device_type CAMMU_C3;
+DECLARE_DEVICE_TYPE(CAMMU_C4T, cammu_c4t_device)
+DECLARE_DEVICE_TYPE(CAMMU_C4I, cammu_c4i_device)
+DECLARE_DEVICE_TYPE(CAMMU_C3,  cammu_c3_device)
 
 #endif // MAME_MACHINE_CAMMU_H

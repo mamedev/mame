@@ -40,6 +40,7 @@ Memo:
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+#include "video/vsystem_gga.h"
 #include "speaker.h"
 
 
@@ -227,8 +228,7 @@ static ADDRESS_MAP_START( ojankohs_io_map, AS_IO, 8, ojankohs_state )
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x10, 0x10) AM_WRITENOP                // unknown
-	AM_RANGE(0x11, 0x11) AM_WRITENOP                // unknown
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ojankoy_io_map, AS_IO, 8, ojankohs_state )
@@ -253,8 +253,7 @@ static ADDRESS_MAP_START( ccasino_io_map, AS_IO, 8, ojankohs_state )
 	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x08, 0x0f) AM_WRITE(ccasino_palette_w) AM_SHARE("paletteram")     // 16bit address access
-	AM_RANGE(0x10, 0x10) AM_WRITENOP
-	AM_RANGE(0x11, 0x11) AM_WRITENOP
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ojankoc_io_map, AS_IO, 8, ojankohs_state )
@@ -811,7 +810,7 @@ void ojankohs_state::machine_reset()
 	m_screen_refresh = 0;
 }
 
-static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
+static MACHINE_CONFIG_START( ojankohs )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
@@ -834,6 +833,8 @@ static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankohs)
 
 	/* sound hardware */
@@ -846,11 +847,11 @@ static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)          /* 8 KHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ojankoy, ojankohs_state )
+static MACHINE_CONFIG_START( ojankoy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
@@ -886,11 +887,11 @@ static MACHINE_CONFIG_START( ojankoy, ojankohs_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)          /* 8 KHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ccasino, ojankohs_state )
+static MACHINE_CONFIG_START( ccasino )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
@@ -913,6 +914,8 @@ static MACHINE_CONFIG_START( ccasino, ojankohs_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoy)
 
 	/* sound hardware */
@@ -925,11 +928,11 @@ static MACHINE_CONFIG_START( ccasino, ojankohs_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)          /* 8 KHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ojankoc, ojankohs_state )
+static MACHINE_CONFIG_START( ojankoc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)          /* 4.00 MHz */
@@ -963,7 +966,7 @@ static MACHINE_CONFIG_START( ojankoc, ojankohs_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 8000000/22)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)          /* 8 KHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1059,9 +1062,27 @@ ROM_START( ojankoc )
 	ROM_LOAD( "0.1n", 0x50000, 0x8000, CRC(5665016e) SHA1(0f7f0a8e55e93bcb3060c91d9704905a6e827250) )
 ROM_END
 
+ROM_START( ojankoca )
+	ROM_REGION( 0x10000, "maincpu", 0 )   /* CPU */
+	ROM_LOAD( "11.1p", 0x0000, 0x8000, CRC(0c552e32) SHA1(2a8714796b2c95a042d783aae79c135ba03d1958) )
 
-GAME( 1986, ojankoc,  0, ojankoc,  ojankoc, driver_device,  0, ROT0, "V-System Co.", "Ojanko Club (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ojankoy,  0, ojankoy,  ojankoy, driver_device,  0, ROT0, "V-System Co.", "Ojanko Yakata (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ojanko2,  0, ojankoy,  ojankoy, driver_device,  0, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ccasino,  0, ccasino,  ccasino, driver_device,  0, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ojankohs, 0, ojankohs, ojankohs, driver_device, 0, ROT0, "V-System Co.", "Ojanko High School (Japan)", MACHINE_SUPPORTS_SAVE )
+	ROM_REGION( 0x80000, "user1", 0 )  /* BANK */
+	ROM_LOAD( "1.1a", 0x00000, 0x8000, CRC(d40b17eb) SHA1(1e8c16e1562c112ca5150b3187a2d4aa22c1adf0) )
+	ROM_LOAD( "2.1b", 0x08000, 0x8000, CRC(d181172a) SHA1(65d6710464a1f505df705c553558bbf22704359d) )
+	ROM_LOAD( "3.1c", 0x10000, 0x8000, CRC(2e86d5bc) SHA1(0226eb81b31e43325f24b40ab51bce1729bf678c) )
+	ROM_LOAD( "4.1e", 0x18000, 0x8000, CRC(00a780cb) SHA1(f0b4f6f0c58e9d069e0f6794243925679f220f35) )
+	ROM_LOAD( "5.1f", 0x20000, 0x8000, CRC(f9885076) SHA1(ebf4c0769eab6545fd227eb9f4036af2472bcac3) )
+	ROM_LOAD( "6.1h", 0x28000, 0x8000, CRC(42575d0c) SHA1(1f9c187b0c05179798cbdb28eb212202ffdc9fde) )
+	ROM_LOAD( "7.1k", 0x30000, 0x8000, CRC(4d8d8928) SHA1(a5ccf4a1d84ef3a4966db01d66371de83e270701) )
+	ROM_LOAD( "8.1l", 0x38000, 0x8000, CRC(534573b7) SHA1(ec53cad7d652c88508edd29c2412834920fe8ef6) )
+	ROM_LOAD( "9.1m", 0x48000, 0x8000, CRC(2bf88eda) SHA1(55de96d057a0f35d9e74455444751f217aa4741e) )
+	ROM_LOAD( "0.1n", 0x50000, 0x8000, CRC(5665016e) SHA1(0f7f0a8e55e93bcb3060c91d9704905a6e827250) )
+ROM_END
+
+
+GAME( 1986, ojankoc,  0,       ojankoc,  ojankoc,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoca, ojankoc, ojankoc,  ojankoc,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoy,  0,       ojankoy,  ojankoy,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Yakata (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ojanko2,  0,       ojankoy,  ojankoy,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ccasino,  0,       ccasino,  ccasino,  ojankohs_state, 0, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ojankohs, 0,       ojankohs, ojankohs, ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko High School (Japan)",            MACHINE_SUPPORTS_SAVE )

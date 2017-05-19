@@ -346,7 +346,7 @@ void albazg_state::machine_reset()
 	m_prot_lock = 0;
 }
 
-static MACHINE_CONFIG_START( yumefuda, albazg_state )
+static MACHINE_CONFIG_START( yumefuda )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80 , MASTER_CLOCK/2) /* xtal is 12 Mhz, unknown divider*/
@@ -410,4 +410,4 @@ ROM_START( yumefuda )
 	ROM_LOAD("zg1-007.u13", 0x000, 0x100, NO_DUMP ) //could be either PROM or PAL
 ROM_END
 
-GAME( 1991, yumefuda, 0, yumefuda, yumefuda, driver_device, 0, ROT0, "Alba", "Yumefuda [BET]", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, yumefuda, 0, yumefuda, yumefuda, albazg_state, 0, ROT0, "Alba", "Yumefuda [BET]", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

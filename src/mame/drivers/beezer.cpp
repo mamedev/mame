@@ -458,7 +458,7 @@ void beezer_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( beezer, beezer_state )
+static MACHINE_CONFIG_START( beezer )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz / 12)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -596,6 +596,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS          INIT  ROTATION  COMPANY            FULLNAME          FLAGS
-GAME( 1982, beezer,  0,      beezer,  beezer, driver_device, 0,    ROT90,    "Tong Electronic", "Beezer (set 1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, beezer1, beezer, beezer,  beezer, driver_device, 0,    ROT90,    "Tong Electronic", "Beezer (set 2)", MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT  ROTATION  COMPANY            FULLNAME          FLAGS
+GAME( 1982, beezer,  0,      beezer,  beezer, beezer_state, 0,    ROT90,    "Tong Electronic", "Beezer (set 1)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, beezer1, beezer, beezer,  beezer, beezer_state, 0,    ROT90,    "Tong Electronic", "Beezer (set 2)", MACHINE_IMPERFECT_SOUND )

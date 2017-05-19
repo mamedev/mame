@@ -67,10 +67,10 @@ public:
 	DECLARE_WRITE8_MEMBER(n8080_sound_1_w);
 	DECLARE_WRITE8_MEMBER(n8080_sound_2_w);
 	DECLARE_READ8_MEMBER(n8080_8035_p1_r);
-	DECLARE_READ8_MEMBER(n8080_8035_t0_r);
-	DECLARE_READ8_MEMBER(n8080_8035_t1_r);
-	DECLARE_READ8_MEMBER(helifire_8035_t0_r);
-	DECLARE_READ8_MEMBER(helifire_8035_t1_r);
+	DECLARE_READ_LINE_MEMBER(n8080_8035_t0_r);
+	DECLARE_READ_LINE_MEMBER(n8080_8035_t1_r);
+	DECLARE_READ_LINE_MEMBER(helifire_8035_t0_r);
+	DECLARE_READ_LINE_MEMBER(helifire_8035_t1_r);
 	DECLARE_READ8_MEMBER(helifire_8035_external_ram_r);
 	DECLARE_READ8_MEMBER(helifire_8035_p2_r);
 	DECLARE_WRITE8_MEMBER(n8080_dac_w);
@@ -97,7 +97,7 @@ public:
 	uint32_t screen_update_spacefev(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sheriff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_helifire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_helifire(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_helifire);
 	TIMER_CALLBACK_MEMBER(spacefev_stop_red_cannon);
 	TIMER_DEVICE_CALLBACK_MEMBER(rst1_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(rst2_tick);

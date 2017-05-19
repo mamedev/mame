@@ -210,7 +210,7 @@ void ultrsprt_state::machine_reset()
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( ultrsprt, ultrsprt_state )
+static MACHINE_CONFIG_START( ultrsprt )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 25000000)
 	MCFG_CPU_PROGRAM_MAP(ultrsprt_map)
@@ -266,4 +266,4 @@ ROM_START( fiveside )
 ROM_END
 
 // Undumped: Ultra Hockey
-GAME(1995, fiveside, 0, ultrsprt, ultrsprt, driver_device, 0, ROT90, "Konami", "Five a Side Soccer (ver UAA)", 0)
+GAME(1995, fiveside, 0, ultrsprt, ultrsprt, ultrsprt_state, 0, ROT90, "Konami", "Five a Side Soccer (ver UAA)", 0)

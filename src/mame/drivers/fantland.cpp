@@ -839,7 +839,7 @@ INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x80 / 4);
 }
 
-static MACHINE_CONFIG_START( fantland, fantland_state )
+static MACHINE_CONFIG_START( fantland )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)        // ?
@@ -890,7 +890,7 @@ WRITE_LINE_MEMBER(fantland_state::galaxygn_sound_irq)
 	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
 
-static MACHINE_CONFIG_START( galaxygn, fantland_state )
+static MACHINE_CONFIG_START( galaxygn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 8000000)        // ?
@@ -972,7 +972,7 @@ MACHINE_RESET_MEMBER(fantland_state,borntofi)
 	borntofi_adpcm_stop(m_msm4, 3);
 }
 
-static MACHINE_CONFIG_START( borntofi, fantland_state )
+static MACHINE_CONFIG_START( borntofi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
@@ -1006,27 +1006,27 @@ static MACHINE_CONFIG_START( borntofi, fantland_state )
 	// OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_0))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_1))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("msm3", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_2))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("msm4", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_3))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( wheelrun, fantland_state )
+static MACHINE_CONFIG_START( wheelrun )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V20, XTAL_18MHz/2)      // D701080C-8 (V20)
@@ -1416,8 +1416,8 @@ ROM_START( wheelrun )
 ROM_END
 
 
-GAME( 19??, borntofi,  0,        borntofi, borntofi, driver_device, 0, ROT0,  "International Games",       "Born To Fight",        MACHINE_SUPPORTS_SAVE )
-GAME( 19??, fantland,  0,        fantland, fantland, driver_device, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, fantlanda, fantland, fantland, fantland, driver_device, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, driver_device, 0, ROT0,  "International Games",       "Wheels Runner",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, driver_device, 0, ROT90, "Electronic Devices Italy",  "Galaxy Gunners",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, borntofi,  0,        borntofi, borntofi, fantland_state, 0, ROT0,  "International Games",       "Born To Fight",        MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantland,  0,        fantland, fantland, fantland_state, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantlanda, fantland, fantland, fantland, fantland_state, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, fantland_state, 0, ROT0,  "International Games",       "Wheels Runner",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, fantland_state, 0, ROT90, "Electronic Devices Italy",  "Galaxy Gunners",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

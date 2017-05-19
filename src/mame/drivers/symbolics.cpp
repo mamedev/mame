@@ -314,7 +314,7 @@ void symbolics_state::machine_reset()
 	*/
 }
 
-static MACHINE_CONFIG_START( symbolics, symbolics_state )
+static MACHINE_CONFIG_START( symbolics )
 	/* basic machine hardware */
 	// per page 159 of http://bitsavers.trailing-edge.com/pdf/symbolics/3600_series/Lisp_Machine_Hardware_Memos.pdf:
 	//XTALS: 16MHz @H11 (68k CPU clock)
@@ -391,5 +391,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE            INIT        COMPANY      FULLNAME  FLAGS */
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE            INIT        COMPANY      FULLNAME  FLAGS
 COMP( 1984, s3670,      0,      0,      symbolics,  symbolics,  symbolics_state, symbolics,  "Symbolics", "3670",   MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

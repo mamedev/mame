@@ -539,7 +539,7 @@ void macrossp_state::machine_reset()
 	m_snd_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( macrossp, macrossp_state )
+static MACHINE_CONFIG_START( macrossp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 50000000/2)   /* 25 MHz */
@@ -557,7 +557,7 @@ static MACHINE_CONFIG_START( macrossp, macrossp_state )
 	MCFG_SCREEN_SIZE(32*16, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 0*16, 15*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(macrossp_state, screen_update_macrossp)
-	MCFG_SCREEN_VBLANK_DRIVER(macrossp_state, screen_eof_macrossp)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(macrossp_state, screen_vblank_macrossp))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macrossp)
 

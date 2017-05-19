@@ -39,7 +39,7 @@ void state_manager_t::remove_save_items(const void *owner)
 	for (auto i = m_custom.begin(); i != m_custom.end(); )
 	{
 		if (i->get()->m_owner == owner)
-			i = m_save.erase(i);
+			i = m_custom.erase(i);
 		else
 			i++;
 	}

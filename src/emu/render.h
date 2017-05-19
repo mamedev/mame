@@ -1110,7 +1110,7 @@ public:
 	void set_max_texture_size(int maxwidth, int maxheight);
 	void set_transform_container(bool transform_container) { m_transform_container = transform_container; }
 	void set_keepaspect(bool keepaspect) { m_keepaspect = keepaspect; }
-	void set_scale_mode(bool scale_mode) { m_scale_mode = scale_mode; }
+	void set_scale_mode(int scale_mode) { m_scale_mode = scale_mode; }
 
 	// layer config getters
 	bool backdrops_enabled() const { return m_layerconfig.backdrops_enabled(); }

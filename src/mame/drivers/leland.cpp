@@ -60,6 +60,8 @@
 
 #include "emu.h"
 #include "includes/leland.h"
+#include "audio/leland.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/volt_reg.h"
@@ -938,7 +940,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( leland, leland_state )
+static MACHINE_CONFIG_START( leland )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", Z80, MASTER_CLOCK/2)
@@ -1020,7 +1022,7 @@ static MACHINE_CONFIG_DERIVED( lelandi, quarterb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ataxx, leland_state )
+static MACHINE_CONFIG_START( ataxx )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", Z80, 6000000)

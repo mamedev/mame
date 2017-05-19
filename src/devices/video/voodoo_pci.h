@@ -2,8 +2,10 @@
 // copyright-holders:Ted Green
 // 3dfx Voodoo Graphics SST-1/2 emulator.
 
-#ifndef VOODOO_PCI_H
-#define VOODOO_PCI_H
+#ifndef MAME_VIDEO_VOODOO_PCI_H
+#define MAME_VIDEO_VOODOO_PCI_H
+
+#pragma once
 
 #include "machine/pci.h"
 #include "voodoo.h"
@@ -29,6 +31,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
+	void postload(void);
 	void set_cpu_tag(const char *tag);
 	static void set_type(const int type) {m_type = type;}
 	void set_fbmem(const int fbmem) {m_fbmem = fbmem;}
@@ -46,17 +49,17 @@ protected:
 
 private:
 	required_device<voodoo_device> m_voodoo;
-	static int m_type;
+	static int m_type; // FIXME: all voodoo have to be the same?  really?
 	int m_fbmem, m_tmumem0, m_tmumem1;
 	const char *m_cpu_tag;
 
-	uint32_t m_pcictrl_reg[0x10];
+	uint32_t m_pcictrl_reg[0x20];
 	DECLARE_ADDRESS_MAP(voodoo_reg_map, 32);
 	DECLARE_ADDRESS_MAP(banshee_reg_map, 32);
 	DECLARE_ADDRESS_MAP(lfb_map, 32);
 	DECLARE_ADDRESS_MAP(io_map, 32);
 };
 
-extern const device_type VOODOO_PCI;
+DECLARE_DEVICE_TYPE(VOODOO_PCI, voodoo_pci_device)
 
-#endif
+#endif // MAME_VIDEO_VOODOO_PCI_H

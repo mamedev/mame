@@ -62,10 +62,10 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_sga_device)
 	AM_RANGE(0xec, 0xef) AM_READWRITE(dcksum1_r, dcksum1_w) // dma 1 device checksum register 1 (esga)
 ADDRESS_MAP_END
 
-const device_type INTERPRO_SGA = device_creator<interpro_sga_device>;
+DEFINE_DEVICE_TYPE(INTERPRO_SGA, interpro_sga_device, "sga", "InterPro SGA")
 
 interpro_sga_device::interpro_sga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, INTERPRO_SGA, "InterPro SGA", tag, owner, clock, "sga", __FILE__),
+	: device_t(mconfig, INTERPRO_SGA, tag, owner, clock),
 	out_berr_func(*this)
 {
 }

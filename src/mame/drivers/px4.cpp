@@ -1473,7 +1473,7 @@ PALETTE_INIT_MEMBER( px4p_state, px4p )
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( px4, px4_state )
+static MACHINE_CONFIG_START( px4 )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz / 2)    // uPD70008
 	MCFG_CPU_PROGRAM_MAP(px4_mem)
@@ -1539,7 +1539,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( px4p, px4, px4p_state )
+static MACHINE_CONFIG_DERIVED( px4p, px4 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(px4p_io)
 

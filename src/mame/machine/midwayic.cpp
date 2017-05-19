@@ -105,7 +105,7 @@ void midway_serial_pic_device::serial_register_state()
 	save_item(NAME(m_ormask));
 }
 
-const device_type MIDWAY_SERIAL_PIC = device_creator<midway_serial_pic_device>;
+DEFINE_DEVICE_TYPE(MIDWAY_SERIAL_PIC, midway_serial_pic_device, "midway_serial_pic_sim", "Midway Serial PIC Simulation")
 
 
 //-------------------------------------------------
@@ -113,12 +113,12 @@ const device_type MIDWAY_SERIAL_PIC = device_creator<midway_serial_pic_device>;
 //-------------------------------------------------
 
 midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	midway_serial_pic_device(mconfig, MIDWAY_SERIAL_PIC, "Midway Serial Pic Simulation", tag, owner, clock, "midway_serial_pic_sim", __FILE__)
+	midway_serial_pic_device(mconfig, MIDWAY_SERIAL_PIC, tag, owner, clock)
 {
 }
 
-midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_upper(0),
 	m_buff(0),
 	m_idx(0),
@@ -193,7 +193,7 @@ WRITE8_MEMBER(midway_serial_pic_device::write)
  *************************************/
 
 
-const device_type MIDWAY_SERIAL_PIC_EMU = device_creator<midway_serial_pic_emu_device>;
+DEFINE_DEVICE_TYPE(MIDWAY_SERIAL_PIC_EMU, midway_serial_pic_emu_device, "midway_serial_pic_emu", "Midway Serial PIC Emulation")
 
 
 //-------------------------------------------------
@@ -201,7 +201,7 @@ const device_type MIDWAY_SERIAL_PIC_EMU = device_creator<midway_serial_pic_emu_d
 //-------------------------------------------------
 
 midway_serial_pic_emu_device::midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MIDWAY_SERIAL_PIC_EMU, "Midway Serial Pic Emulation", tag, owner, clock, "midway_serial_pic_emu", __FILE__)
+	device_t(mconfig, MIDWAY_SERIAL_PIC_EMU, tag, owner, clock)
 {
 }
 
@@ -278,7 +278,7 @@ static inline uint8_t make_bcd(uint8_t data)
 	return ((data / 10) << 4) | (data % 10);
 }
 
-const device_type MIDWAY_SERIAL_PIC2 = device_creator<midway_serial_pic2_device>;
+DEFINE_DEVICE_TYPE(MIDWAY_SERIAL_PIC2, midway_serial_pic2_device, "midway_serial_pic2", "Midway Serial PIC 2")
 
 
 //-------------------------------------------------
@@ -286,27 +286,12 @@ const device_type MIDWAY_SERIAL_PIC2 = device_creator<midway_serial_pic2_device>
 //-------------------------------------------------
 
 midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	midway_serial_pic_device(mconfig, MIDWAY_SERIAL_PIC2, "Midway Serial Pic 2", tag, owner, clock, "midway_serial_pic2", __FILE__),
-	device_nvram_interface(mconfig, *this),
-	m_latch(0),
-	m_state(0),
-	m_index(0),
-	m_total(0),
-	m_nvram_addr(0),
-	m_time_index(0),
-	m_time_just_written(0),
-	m_yearoffs(0),
-	m_time_write_timer(nullptr)
+	midway_serial_pic2_device(mconfig, MIDWAY_SERIAL_PIC2, tag, owner, clock)
 {
-	memset(m_buffer,0,sizeof(m_buffer));
-	memset(m_time_buf,0,sizeof(m_time_buf));
-	memset(m_nvram,0,sizeof(m_nvram));
-	memset(m_default_nvram,0,sizeof(m_default_nvram));
-
 }
 
-midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	midway_serial_pic_device(mconfig, type, name, tag, owner, clock, shortname, source),
+midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	midway_serial_pic_device(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	m_latch(0),
 	m_state(0),
@@ -655,7 +640,7 @@ void midway_ioasic_device::ioasic_register_state()
 	save_item(NAME(m_fifo_force_buffer_empty_pc));
 }
 
-const device_type MIDWAY_IOASIC = device_creator<midway_ioasic_device>;
+DEFINE_DEVICE_TYPE(MIDWAY_IOASIC, midway_ioasic_device, "midway_ioasic", "Midway IOASIC")
 
 
 //-------------------------------------------------
@@ -663,7 +648,7 @@ const device_type MIDWAY_IOASIC = device_creator<midway_ioasic_device>;
 //-------------------------------------------------
 
 midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	midway_serial_pic2_device(mconfig, MIDWAY_IOASIC, "Midway IOASIC", tag, owner, clock, "midway_ioasic", __FILE__),
+	midway_serial_pic2_device(mconfig, MIDWAY_IOASIC, tag, owner, clock),
 	m_serial_tx_cb(*this),
 	m_has_dcs(0),
 	m_has_cage(0),
@@ -777,9 +762,8 @@ void midway_ioasic_device::update_ioasic_irq()
 	uint16_t irqbits = 0x2000;
 	uint8_t new_state;
 
-	irqbits |= m_sound_irq_state;
-	if (m_reg[IOASIC_UARTIN] & 0x1000)
-		irqbits |= 0x1000;
+	irqbits |= m_sound_irq_state & 0xff;
+	irqbits |= m_reg[IOASIC_UARTIN] & 0x3f00;
 	if (fifo_state & 8)
 		irqbits |= 0x0008;
 	if (irqbits)
@@ -793,6 +777,8 @@ void midway_ioasic_device::update_ioasic_irq()
 		m_irq_state = new_state;
 		if (!m_irq_callback.isnull())
 			m_irq_callback(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+		if (m_irq_state && (m_reg[IOASIC_UARTIN] & 0x1000))
+			logerror("IOASIC: Asserting IRQ INTCTRL=%04x INTSTAT=%04X\n", m_reg[IOASIC_INTCTL], m_reg[IOASIC_INTSTAT]);
 	}
 }
 
@@ -1017,14 +1003,15 @@ READ32_MEMBER( midway_ioasic_device::read )
 	switch (offset)
 	{
 		case IOASIC_PORT0:
-			result = machine().root_device().ioport("DIPS")->read();
-			/* bit 0 seems to be a ready flag before shuffling happens */
+			// bit 0 is PIC ready flag before shuffling happens
+			// bits 15:13 == 001
 			if (!m_shuffle_active)
 			{
-				result |= 0x0001;
 				/* blitz99 wants bit bits 13-15 to be 1 */
-				result &= ~0xe000;
-				result |= 0x2000;
+				result = 0x2001;
+			}
+			else {
+				result = machine().root_device().ioport("DIPS")->read();
 			}
 			break;
 
@@ -1042,6 +1029,12 @@ READ32_MEMBER( midway_ioasic_device::read )
 
 		case IOASIC_UARTIN:
 			m_reg[offset] &= ~0x1000;
+			if (result & 0x1000)
+				logerror("%06X:ioasic_r(%d) = %08X\n", machine().device("maincpu")->safe_pc(), offset, result);
+			// Add lf
+			if ((result & 0xff)==0x0d)
+				m_reg[offset] = 0x300a;
+			update_ioasic_irq();
 			break;
 
 		case IOASIC_SOUNDSTAT:
@@ -1087,7 +1080,7 @@ READ32_MEMBER( midway_ioasic_device::read )
 	}
 
 	if (LOG_IOASIC && offset != IOASIC_SOUNDSTAT && offset != IOASIC_SOUNDIN)
-		logerror("%06X:ioasic_r(%d) = %08X\n", space.device().safe_pc(), offset, result);
+		logerror("%08X:ioasic_r(%d) = %08X\n", space.device().safe_pc(), offset, result);
 
 	return result;
 }
@@ -1101,10 +1094,20 @@ WRITE32_MEMBER( midway_ioasic_device::packed_w )
 		write(space, offset*2+1, data >> 16, 0x0000ffff);
 }
 
-WRITE8_MEMBER(midway_ioasic_device::serial_rx_w)
+void midway_ioasic_device::serial_rx_w(u8 data)
 {
-	m_reg[IOASIC_UARTIN] = data | 0x1000;
-	update_ioasic_irq();
+	// Break Detect        0x0100
+	// Frame Error         0x0200
+	// Overrun             0x0400
+	// Rx FIFO FULL        0x0800
+	// Rx Ready            0x1000
+	// Tx EMPTY            0x2000
+	// CTS IN              0x4000
+	// CTS OUT             0x8000
+	if (m_reg[IOASIC_UARTCONTROL] & 0x200) {
+		m_reg[IOASIC_UARTIN] = data | 0x3000;
+		update_ioasic_irq();
+	}
 
 }
 
@@ -1114,7 +1117,10 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 
 	offset = m_shuffle_active ? m_shuffle_map[offset & 15] : offset;
 	oldreg = m_reg[offset];
-	COMBINE_DATA(&m_reg[offset]);
+	// Block register updates until ioasic is unlocked
+	// mwskins and thegrid use this as test to see if the ioasic is unlocked
+	if (m_shuffle_active)
+		COMBINE_DATA(&m_reg[offset]);
 	newreg = m_reg[offset];
 
 	if (LOG_IOASIC && offset != IOASIC_SOUNDOUT)
@@ -1127,7 +1133,7 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 			if (data == 0xe2)
 			{
 				m_shuffle_active = 1;
-				logerror("*** I/O ASIC shuffling enabled!\n");
+				logerror("*** I/O ASIC unlocked!\n");
 				m_reg[IOASIC_INTCTL] = 0;
 				m_reg[IOASIC_UARTCONTROL] = 0; /* bug in 10th Degree assumes this */
 			}
@@ -1140,20 +1146,27 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 				break;
 			break;
 
+		case IOASIC_UARTCONTROL:
+			logerror("%08X IOASIC uart control = %04X INTCTRL=%04x\n", machine().device("maincpu")->safe_pc(), data, m_reg[IOASIC_INTCTL]);
+			break;
+
 		case IOASIC_UARTOUT:
 			if (m_reg[IOASIC_UARTCONTROL] & 0x800)
 			{
 				/* we're in loopback mode -- copy to the input */
-				m_reg[IOASIC_UARTIN] = (newreg & 0x00ff) | 0x1000;
+				m_reg[IOASIC_UARTIN] = (newreg & 0x00ff) | 0x3000;
 				update_ioasic_irq();
 			}
 			else {
-				m_serial_tx_cb(data & 0xff);
+				m_serial_tx_cb(data);
+				m_reg[IOASIC_UARTIN] |= 0x2000;
+				update_ioasic_irq();
 				if (PRINTF_DEBUG) {
 					osd_printf_info("%c", data & 0xff);
 					logerror("%c", data & 0xff);
 				}
 			}
+			//logerror("IOASIC uart tx data = %04X\n", data);
 			break;
 
 		case IOASIC_SOUNDCTL:
@@ -1209,7 +1222,7 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 			/* bit  7 = sound output buffer empty */
 			/* bit 14 = LED? */
 			if (LOG_IOASIC && ((oldreg ^ newreg) & 0x3ff6))
-				logerror("IOASIC int control = %04X\n", data);
+				logerror("IOASIC interrupt control = %04X\n", data);
 			update_ioasic_irq();
 			break;
 

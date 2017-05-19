@@ -258,7 +258,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( speedbal, speedbal_state )
+static MACHINE_CONFIG_START( speedbal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // 4 MHz

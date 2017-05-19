@@ -633,6 +633,7 @@ Notes:
 #include "emu.h"
 #include "includes/model1.h"
 
+#include "machine/clock.h"
 #include "machine/nvram.h"
 #include "speaker.h"
 
@@ -735,6 +736,7 @@ IRQ_CALLBACK_MEMBER(model1_state::irq_callback)
 void model1_state::irq_init()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_m1uart->write_cts(0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
@@ -748,8 +750,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 	else if(scanline == 384/2)
 	{
 		irq_raise(m_sound_irq);
-
-		m_m1audio->check_fifo_irq();
 
 		if (m_m1comm != nullptr)
 			m_m1comm->check_vint_irq();
@@ -850,47 +850,6 @@ WRITE16_MEMBER(model1_state::mr2_w)
 		logerror("MW 10[r10], %f (%x)\n", *(float *)(m_mr2+0x1f10/2), space.device().safe_pc());
 }
 
-READ16_MEMBER(model1_state::snd_68k_ready_r)
-{
-	if (m_m1audio->ready_r(space, 0) == 0)
-	{
-		space.device().execute().spin_until_time(attotime::from_usec(40));
-		return 0;
-	}
-
-	return 0xff;
-}
-
-WRITE16_MEMBER(model1_state::snd_latch_to_68k_w)
-{
-	m_m1audio->write_fifo(data);
-
-	if (data == 0xae)
-	{
-		m_snd_cmd_state = 0;
-	}
-
-	if (m_dsbz80 != nullptr)
-	{
-//      printf("%d: %02x (last %02x)\n", m_snd_cmd_state, data, m_last_snd_cmd);
-		// HACK: on h/w, who filters out commands the DSB shouldn't see?  Need a wiring diagram.
-		if ((m_snd_cmd_state == 2) && (m_last_snd_cmd == 0x50))
-		{
-			m_dsbz80->latch_w(space, 0, data);
-		}
-		else    // keep in sync but send a "don't care"
-		{
-			m_dsbz80->latch_w(space, 0, 0x70);
-		}
-	}
-
-	m_last_snd_cmd = data;
-	m_snd_cmd_state++;
-
-	// give the 68k time to reply
-	space.device().execute().spin_until_time(attotime::from_usec(40));
-}
-
 static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")
@@ -903,12 +862,12 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_SHARE("display_list1")
 	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
 
-	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
+	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile_device, tile_r, tile_w)
 	AM_RANGE(0x720000, 0x720001) AM_WRITENOP        // Unknown, always 0
 	AM_RANGE(0x740000, 0x740001) AM_WRITENOP        // Horizontal synchronization register
 	AM_RANGE(0x760000, 0x760001) AM_WRITENOP        // Vertical synchronization register
 	AM_RANGE(0x770000, 0x770001) AM_WRITENOP        // Video synchronization switch
-	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
+	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile_device, char_r, char_w)
 
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_SHARE("palette")
 	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_SHARE("color_xlat")
@@ -923,8 +882,8 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 
 	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
-	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
+	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("m1uart", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xc40002, 0xc40003) AM_DEVREADWRITE8("m1uart", i8251_device, status_r, control_w, 0x00ff)
 
 	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(model1_tgp_copro_adr_r, model1_tgp_copro_adr_w)
 	AM_RANGE(0xd20000, 0xd20003) AM_WRITE(model1_tgp_copro_ram_w )
@@ -955,12 +914,12 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_SHARE("display_list1")
 	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
 
-	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
+	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile_device, tile_r, tile_w)
 	AM_RANGE(0x720000, 0x720001) AM_WRITENOP        // Unknown, always 0
 	AM_RANGE(0x740000, 0x740001) AM_WRITENOP        // Horizontal synchronization register
 	AM_RANGE(0x760000, 0x760001) AM_WRITENOP        // Vertical synchronization register
 	AM_RANGE(0x770000, 0x770001) AM_WRITENOP        // Video synchronization switch
-	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
+	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile_device, char_r, char_w)
 
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_SHARE("palette")
 	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_SHARE("color_xlat")
@@ -975,8 +934,8 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 
 	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
-	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
+	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("m1uart", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xc40002, 0xc40003) AM_DEVREADWRITE8("m1uart", i8251_device, status_r, control_w, 0x00ff)
 
 	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(model1_tgp_vr_adr_r, model1_tgp_vr_adr_w)
 	AM_RANGE(0xd20000, 0xd20003) AM_WRITE(model1_vr_tgp_ram_w )
@@ -1152,9 +1111,16 @@ INPUT_PORTS_END
 	ROM_LOAD("opr14745.bin",   0x060000,  0x20000, CRC(4c934d96) SHA1(e3349ece0e47f684d61ad11bfea4a90602287350) ) \
 	ROM_LOAD("opr14746.bin",   0x080000,  0x20000, CRC(2a266cbd) SHA1(34e047a93459406c22acf4c25089d1a4955f94ca) ) \
 	ROM_LOAD("opr14747.bin",   0x0a0000,  0x20000, CRC(a4ad5e19) SHA1(7d7ec300eeb9a8de1590011e37108688c092f329) ) \
-	ROM_LOAD("opr14748.bin",   0x0c0000,  0x20000, CRC(4a532cb8) SHA1(23280ebbcd6b2bc8a8e643a2d07a58d6598301b8) )
+	ROM_LOAD("opr14748.bin",   0x0c0000,  0x20000, CRC(4a532cb8) SHA1(23280ebbcd6b2bc8a8e643a2d07a58d6598301b8) ) \
+\
+	/*ROM_REGION32_LE( 0x2000, "315_5571", 0)*/ \
+	/*ROM_LOAD("315-5571.bin", 0, 0x2000, CRC(1233db2a) SHA1(06760409d40f3d9117fd3e7c7ab62dfd70aa2a4d) )*/ \
+\
+	/*ROM_REGION32_LE( 0x2000, "315_5572", 0)*/ \
+	/*ROM_LOAD("315-5572.bin", 0, 0x2000, CRC(0a534a3b) SHA1(b8c988bc414b3ad3cd036ba5a64b5ee04a4758b4) )*/
 
 ROM_START( vf )
+	MODEL1_CPU_BOARD
 
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD16_BYTE( "epr-16082.14", 0x200000, 0x80000, CRC(b23f22ee) SHA1(9fd5b5a5974703a60a54de3d2bce4301bfc0e533) ) /* Rom board with Sega ID# 834-10170 */
@@ -1171,6 +1137,9 @@ ROM_START( vf )
 	ROM_LOAD16_BYTE( "mpr-16089.11", 0x1200001, 0x80000, CRC(39befbe0) SHA1(362c493092cd0536fadee7326ecc7f973e23fb58) )
 	ROM_LOAD16_BYTE( "mpr-16090.12", 0x1300000, 0x80000, CRC(90c76831) SHA1(5a3c25f2a131cfbb2ad067bef1ab7b1c95645d41) )
 	ROM_LOAD16_BYTE( "mpr-16091.13", 0x1300001, 0x80000, CRC(53115448) SHA1(af798d5b1fcb720d7288a5ac48839d9ace16a2f2) )
+
+	ROM_REGION32_LE( 0x2000, "tgp", 0)
+	ROM_LOAD("315-5724.bin", 0, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-16120.7", 0x00000, 0x20000, CRC(2bff8378) SHA1(854b08ab983e4e98cb666f2f44de9a6829b1eb52) )
@@ -1241,16 +1210,19 @@ ROM_START( vr )
 	ROM_LOAD32_BYTE( "mpr-14901.42", 0x000003, 0x80000, CRC(175b7a9a) SHA1(c86602e771cd49bab425b4ba7926d2f44858bd39) )
 
 	ROM_REGION( 0x2000, "tgp", 0 ) /* TGP program rom */
+	// The real internal TGP rom
+	/*ROM_LOAD("315-5573.bin", 0, 0x2000, CRC(ec913af2) SHA1(a18bf6c9d7b35f8b9e513a7d279f13a30b32a961) )*/
+
 	// this is the Daytona TGP program with some modifications needed for Virtua Racing
-	// the real TGP program is an internal ROM and still needs dumping
-	ROM_LOAD("vr-tgp.bin", 0x000000, 0x2000, BAD_DUMP CRC(3de33c7f) SHA1(acecc779c9d8fe39ded6c22492be5b7c25fd52db) )
+	// Kept here for now to avoid instantly breaking the game until the tgp is up to it
+	ROM_LOAD("vr-tgp.bin", 0x000000, 0x2000, CRC(3de33c7f) SHA1(acecc779c9d8fe39ded6c22492be5b7c25fd52db) )
 
 	ROM_REGION( 0x100, "nvram", 0 ) // default nvram
 	ROM_LOAD( "vr_defaults.nv", 0x000, 0x100, CRC(5ccdc835) SHA1(7e809de470f78fb897b938ca2aee2e12f1c8f3a4) )
 
 	ROM_REGION ( 0x10000, "io_board", 0)
 	ROM_LOAD("epr-14869.25",  0x00000, 0x10000, CRC(6187cd7a) SHA1(b65fdd0ad31794a565a0ca4dc67a3f16b329fd71) )
-	ROM_LOAD("epr-14869b.25", 0x00000, 0x10000, CRC(b410f22b) SHA1(75c5009ca4d21ebb53d54d4e3fb8aa55a4c74a07) )
+	ROM_LOAD("epr-14869b.25", 0x00000, 0x10000, BAD_DUMP CRC(b410f22b) SHA1(75c5009ca4d21ebb53d54d4e3fb8aa55a4c74a07) ) // stray FFs at xx49, xx5F, xxC9, xxDF
 	// there is also epr-14869c in model2 daytona
 ROM_END
 
@@ -1302,13 +1274,18 @@ ROM_START( vformula )
 	ROM_LOAD( "epr-15624.17", 0x00000, 0x20000, CRC(9b3ba315) SHA1(0cd0983cc8b2f2d6b41617d0d0a24cc6c188e62a) )
 
 	ROM_REGION( 0x2000, "tgp", 0 ) /* TGP program rom */
+	// The real internal TGP rom
+	/*ROM_LOAD("315-5573.bin", 0, 0x2000, CRC(ec913af2) SHA1(a18bf6c9d7b35f8b9e513a7d279f13a30b32a961) )*/
+
 	// this is the Daytona TGP program with some modifications needed for Virtua Racing
-	// the real TGP program is an internal ROM and still needs dumping
-	ROM_LOAD("vr-tgp.bin", 0x000000, 0x2000, BAD_DUMP CRC(3de33c7f) SHA1(acecc779c9d8fe39ded6c22492be5b7c25fd52db) )
+	// Kept here for now to avoid instantly breaking the game until the tgp is up to it
+	ROM_LOAD("vr-tgp.bin", 0x000000, 0x2000, CRC(3de33c7f) SHA1(acecc779c9d8fe39ded6c22492be5b7c25fd52db) )
 ROM_END
 
 
 ROM_START( swa )
+	MODEL1_CPU_BOARD
+
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD16_BYTE( "epr-16468.14", 0x200000, 0x80000, CRC(681d03c0) SHA1(4d21e26ce211466d429b84bca69a8147ff31ec6c) )
 	ROM_LOAD16_BYTE( "epr-16469.15", 0x200001, 0x80000, CRC(6f281f7c) SHA1(6a9179e48d14838bb2a1a3f63fdd3a68ed009e03) )
@@ -1316,6 +1293,9 @@ ROM_START( swa )
 	ROM_LOAD( "epr-16467.5", 0xf80000, 0x80000, CRC(605068f5) SHA1(99d7e171ce3353477c282d7567dedb9947206f14) )
 	ROM_RELOAD(          0x000000, 0x80000 )
 	ROM_RELOAD(          0x080000, 0x80000 )
+
+	ROM_REGION32_LE( 0x2000, "tgp", 0)
+	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 		ROM_LOAD16_WORD_SWAP( "epr-16470.bin", 0x000000, 0x020000, CRC(7da18cf7) SHA1(bd432d882d217277faee120e2577357a32eb4a6e) )
@@ -1356,6 +1336,8 @@ ROM_END
 
 
 ROM_START( wingwar )
+	MODEL1_CPU_BOARD
+
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD16_BYTE( "epr-16729.14", 0x200000, 0x80000, CRC(7edec2cc) SHA1(3e423a868ca7c8475fbb5bc1a10526e69d94d865) )
 	ROM_LOAD16_BYTE( "epr-16730.15", 0x200001, 0x80000, CRC(bab24dee) SHA1(26c95139c1aa7f34b6a5cce39e5bd1dd2ef0dd49) )
@@ -1371,6 +1353,9 @@ ROM_START( wingwar )
 	ROM_LOAD16_BYTE( "mpr-16735.9",  0x1100001, 0x80000, CRC(c82fd198) SHA1(d9e53ae1e14dfc8e84a14c0026ef0b904863bb1b) )
 	ROM_LOAD16_BYTE( "mpr-16734.10", 0x1200000, 0x80000, CRC(f76371c1) SHA1(0ff082db3877383d0dd977dc60c932b725e3d164) )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
+
+	ROM_REGION32_LE( 0x2000, "tgp", 0)
+	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-17126.7", 0x000000, 0x20000, CRC(50178e40) SHA1(fb01aecfbe4e90adc997de0d45a63c16ef353b37) )
@@ -1419,6 +1404,9 @@ ROM_START( wingwaru )
 	ROM_LOAD16_BYTE( "mpr-16734.10", 0x1200000, 0x80000, CRC(f76371c1) SHA1(0ff082db3877383d0dd977dc60c932b725e3d164) )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
 
+	ROM_REGION32_LE( 0x2000, "tgp", 0)
+	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16751.7", 0x000000, 0x20000, CRC(23ba5ebc) SHA1(b98aab546c5e980baeedbada4e7472eb4c588260) )
 	ROM_LOAD16_WORD_SWAP("epr-16752.8", 0x020000, 0x20000, CRC(6541c48f) SHA1(9341eff160e31a8574b9545fafc1c4059323fa0c) )
@@ -1450,6 +1438,8 @@ ROM_START( wingwaru )
 ROM_END
 
 ROM_START( wingwarj )
+	MODEL1_CPU_BOARD
+
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD16_BYTE( "epr-16729.14", 0x200000, 0x80000, CRC(7edec2cc) SHA1(3e423a868ca7c8475fbb5bc1a10526e69d94d865) )
 	ROM_LOAD16_BYTE( "epr-16730.15", 0x200001, 0x80000, CRC(bab24dee) SHA1(26c95139c1aa7f34b6a5cce39e5bd1dd2ef0dd49) )
@@ -1465,6 +1455,9 @@ ROM_START( wingwarj )
 	ROM_LOAD16_BYTE( "mpr-16735.9",  0x1100001, 0x80000, CRC(c82fd198) SHA1(d9e53ae1e14dfc8e84a14c0026ef0b904863bb1b) )
 	ROM_LOAD16_BYTE( "mpr-16734.10", 0x1200000, 0x80000, CRC(f76371c1) SHA1(0ff082db3877383d0dd977dc60c932b725e3d164) )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
+
+	ROM_REGION32_LE( 0x2000, "tgp", 0)
+	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16751.7", 0x000000, 0x20000, CRC(23ba5ebc) SHA1(b98aab546c5e980baeedbada4e7472eb4c588260) )
@@ -1499,6 +1492,8 @@ ROM_END
 // Dumper's note: As per other R360 games wingwar is just a slightly modified version with 4 roms different on the rom board.
 
 ROM_START( wingwar360 )
+	MODEL1_CPU_BOARD
+
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD16_BYTE( "epr-16729.14", 0x200000, 0x80000, CRC(7edec2cc) SHA1(3e423a868ca7c8475fbb5bc1a10526e69d94d865) )
 	ROM_LOAD16_BYTE( "epr-16730.15", 0x200001, 0x80000, CRC(bab24dee) SHA1(26c95139c1aa7f34b6a5cce39e5bd1dd2ef0dd49) )
@@ -1514,6 +1509,9 @@ ROM_START( wingwar360 )
 	ROM_LOAD16_BYTE( "mpr-16735.9",  0x1100001, 0x80000, CRC(c82fd198) SHA1(d9e53ae1e14dfc8e84a14c0026ef0b904863bb1b) )
 	ROM_LOAD16_BYTE( "mpr-16734.10", 0x1200000, 0x80000, CRC(f76371c1) SHA1(0ff082db3877383d0dd977dc60c932b725e3d164) )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
+
+	ROM_REGION32_LE( 0x2000, "tgp", 0)
+	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-17126.7", 0x000000, 0x20000, CRC(50178e40) SHA1(fb01aecfbe4e90adc997de0d45a63c16ef353b37) )
@@ -1557,6 +1555,7 @@ ROM_START( wingwar360 )
 ROM_END
 
 ROM_START( netmerc )
+	MODEL1_CPU_BOARD
 
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD( "epr-18120.ic5", 0xf80000, 0x80000, CRC(de489762) SHA1(4e935f11e844489c5b5dc06439dc7902c4fddc9f) ) /* Rom board with Sega ID# ??? */
@@ -1568,6 +1567,9 @@ ROM_START( netmerc )
 	ROM_LOAD16_BYTE( "epr-18125.ic9",  0x1100001, 0x80000, CRC(bd47284f) SHA1(ae9325e6789bb956ab664c7ad9c48b80056f3916) )
 	ROM_LOAD16_BYTE( "epr-18126.ic10", 0x1200000, 0x80000, CRC(43dc5ca8) SHA1(249ed83b90b0237ceabbed814cd42dc60dc7a174) )
 	ROM_LOAD16_BYTE( "epr-18127.ic11", 0x1200001, 0x80000, CRC(d307a4ca) SHA1(5555235f740c1b09f6e1587d0fceb35b23d4a8a8) )
+
+	ROM_REGION32_LE( 0x2000, "tgp", 0)
+	ROM_LOAD("315-5711.bin", 0, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-18121.ic7", 0x00000, 0x80000, CRC(113285b5) SHA1(5d060cee41e8d6a4a918f890c2d169d87dbcad79) )
@@ -1596,7 +1598,7 @@ ROM_START( netmerc )
 	ROM_LOAD( "u2", 0x4000, 0x4000, CRC(c589f428) SHA1(98dc0114a5f89636b4e237ed954e19f1cfd186ab) )
 ROM_END
 
-static MACHINE_CONFIG_START( model1, model1_state )
+static MACHINE_CONFIG_START( model1 )
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_mem)
 	MCFG_CPU_IO_MAP(model1_io)
@@ -1615,7 +1617,7 @@ static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
 	MCFG_SCREEN_UPDATE_DRIVER(model1_state, screen_update_model1)
-	MCFG_SCREEN_VBLANK_DRIVER(model1_state, screen_eof_model1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(model1_state, screen_vblank_model1))
 
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -1623,6 +1625,14 @@ static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
 	MCFG_SEGAM1AUDIO_ADD("m1audio")
+	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_rxd))
+
+	MCFG_DEVICE_ADD("m1uart", I8251, 8000000) // uPD71051C, clock unknown
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("m1audio", segam1audio_device, write_txd))
+
+	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("m1uart", i8251_device, write_rxc))
 
 	MCFG_M1COMM_ADD("m1comm")
 MACHINE_CONFIG_END
@@ -1632,9 +1642,14 @@ static MACHINE_CONFIG_DERIVED(swa, model1)
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "dleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "dright", 1.0)
+
+	// Apparently m1audio has to filter out commands the DSB shouldn't see
+	MCFG_DEVICE_MODIFY("m1audio")
+	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_rxd))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( model1_vr, model1_state )
+static MACHINE_CONFIG_START( model1_vr )
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_vr_mem)
 	MCFG_CPU_IO_MAP(model1_vr_io)
@@ -1659,7 +1674,7 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
 	MCFG_SCREEN_UPDATE_DRIVER(model1_state, screen_update_model1)
-	MCFG_SCREEN_VBLANK_DRIVER(model1_state, screen_eof_model1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(model1_state, screen_vblank_model1))
 
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -1667,6 +1682,14 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
 	MCFG_SEGAM1AUDIO_ADD("m1audio")
+	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_rxd))
+
+	MCFG_DEVICE_ADD("m1uart", I8251, 8000000) // uPD71051C, clock unknown
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("m1audio", segam1audio_device, write_txd))
+
+	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("m1uart", i8251_device, write_rxc))
 
 	MCFG_M1COMM_ADD("m1comm")
 MACHINE_CONFIG_END
@@ -1735,12 +1758,12 @@ WRITE16_MEMBER(model1_state::r360_w)
 	}
 }
 
-GAME( 1993, vf,         0,       model1,    vf, driver_device,      0,          ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1992, vr,         0,       model1_vr, vr, driver_device,      0,          ROT0, "Sega", "Virtua Racing", MACHINE_IMPERFECT_GRAPHICS, layout_vr )
-GAME( 1993, vformula,   vr,      model1_vr, vr, driver_device,      0,          ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,        0,       swa,       swa, driver_device,     0,          ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, wingwar,    0,       model1,    wingwar, driver_device, 0,          ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwaru,   wingwar, model1,    wingwar, driver_device, 0,          ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwarj,   wingwar, model1,    wingwar, driver_device, 0,          ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
+GAME( 1993, vf,         0,       model1,    vf,      model1_state,  0,          ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1992, vr,         0,       model1_vr, vr,      model1_state,  0,          ROT0, "Sega", "Virtua Racing", MACHINE_IMPERFECT_GRAPHICS, layout_vr )
+GAME( 1993, vformula,   vr,      model1_vr, vr,      model1_state,  0,          ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, swa,        0,       swa,       swa,     model1_state,  0,          ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, wingwar,    0,       model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwaru,   wingwar, model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwarj,   wingwar, model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
 GAME( 1994, wingwar360, wingwar, model1,    wingwar, model1_state,  wingwar360, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
-GAME( 1993, netmerc,    0,       model1,    vf, driver_device,      0,          ROT0, "Sega", "NetMerc?", MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       model1,    vf,      model1_state,  0,          ROT0, "Sega", "NetMerc?", MACHINE_NOT_WORKING )

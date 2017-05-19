@@ -108,8 +108,8 @@
 //  ctor
 //-------------------------------------------------
 
-gime_base_device::gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, const char *shortname, const char *source)
-	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, true, 263, 25+192+26+3, false, shortname, source),
+gime_base_device::gime_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata)
+	:   mc6847_friend_device(mconfig, type, tag, owner, clock, fontdata, true, 263, 25+192+26+3, false),
 		m_write_irq(*this),
 		m_write_firq(*this),
 		m_read_floating_bus(*this),
@@ -624,15 +624,15 @@ uint8_t gime_base_device::read(offs_t offset)
 	switch(offset & 0xF0)
 	{
 		case 0x00:
-			data = read_gime_register(offset);
+			data = read_gime_register(offset);          // $FF90 - $FF9F
 			break;
 
 		case 0x10:
-			data = read_mmu_register(offset);
+			data = read_mmu_register(offset);           // $FFA0 - $FFAF
 			break;
 
 		case 0x20:
-			data = read_palette_register(offset);
+			data = read_palette_register(offset);       // $FFB0 - $FFBF
 			break;
 
 		default:
@@ -656,22 +656,14 @@ inline uint8_t gime_base_device::read_gime_register(offs_t offset)
 	uint8_t result;
 	switch(offset)
 	{
-		case 2: // read pending IRQs
+		case 2: // $FF92 - read pending IRQs
 			result = m_irq;
-			if (result != 0x00)
-			{
-				m_irq = 0x00;
-				recalculate_irq();
-			}
+			change_gime_irq(0x00);
 			break;
 
-		case 3: // read pending FIRQs
+		case 3: // $FF93 - read pending FIRQs
 			result = m_firq;
-			if (result != 0x00)
-			{
-				m_firq = 0x00;
-				recalculate_firq();
-			}
+			change_gime_firq(0x00);
 			break;
 
 #ifdef NOPE_NOT_READABLE
@@ -741,20 +733,20 @@ void gime_base_device::write(offs_t offset, uint8_t data)
 	switch(offset & 0xF0)
 	{
 		case 0x00:
-			write_gime_register(offset & 0x0F, data);
+			write_gime_register(offset & 0x0F, data);               // $FF90 - $FF9F
 			break;
 
 		case 0x10:
-			write_mmu_register(offset & 0x0F, data);
+			write_mmu_register(offset & 0x0F, data);                // $FFA0 - $FFAF
 			break;
 
 		case 0x20:
-			write_palette_register(offset & 0x0F, data & 0x3F);
+			write_palette_register(offset & 0x0F, data & 0x3F);     // $FFB0 - $FFBF
 			break;
 
 		case 0x30:
 		case 0x40:
-			write_sam_register(offset - 0x30);
+			write_sam_register(offset - 0x30);                      // $FFC0 - $FFDF
 			break;
 	}
 }
@@ -836,6 +828,13 @@ inline void gime_base_device::write_gime_register(offs_t offset, uint8_t data)
 					(data & 0x02) ? "EI1 " : "",
 					(data & 0x01) ? "EI0 " : "");
 			}
+
+			// While normally interrupts are acknowledged by reading from this
+			// register and not writing to it, the act of disabling these interrupts
+			// has the exact same effect
+			//
+			// Kudos to Glen Hewlett for identifying this problem
+			change_gime_irq(m_irq & data);
 			break;
 
 		case 0x03:
@@ -859,6 +858,13 @@ inline void gime_base_device::write_gime_register(offs_t offset, uint8_t data)
 					(data & 0x02) ? "EI1 " : "",
 					(data & 0x01) ? "EI0 " : "");
 			}
+
+			// While normally interrupts are acknowledged by reading from this
+			// register and not writing to it, the act of disabling these interrupts
+			// has the exact same effect
+			//
+			// Kudos to Glen Hewlett for identifying this problem
+			change_gime_firq(m_firq & data);
 			break;
 
 		case 0x04:
@@ -1041,50 +1047,50 @@ inline void gime_base_device::write_sam_register(offs_t offset)
 }
 
 
-
 //-------------------------------------------------
 //  interrupt_rising_edge
 //-------------------------------------------------
 
 void gime_base_device::interrupt_rising_edge(uint8_t interrupt)
 {
-	/* evaluate IRQ */
+	// evaluate IRQ
 	if ((m_gime_registers[0x00] & 0x20) && (m_gime_registers[0x02] & interrupt))
-	{
-		m_irq |= interrupt;
-		recalculate_irq();
-	}
+		change_gime_irq(m_irq | interrupt);
 
-	/* evaluate FIRQ */
+	// evaluate FIRQ
 	if ((m_gime_registers[0x00] & 0x10) && (m_gime_registers[0x03] & interrupt))
+		change_gime_firq(m_firq | interrupt);
+}
+
+
+//-------------------------------------------------
+//  change_gime_irq
+//-------------------------------------------------
+
+void gime_base_device::change_gime_irq(uint8_t data)
+{
+	// did the value actually change?
+	if (m_irq != data)
 	{
-		m_firq |= interrupt;
-		recalculate_firq();
+		m_irq = data;
+		m_write_irq(irq_r());
 	}
 }
 
 
-
 //-------------------------------------------------
-//  recalculate_irq
+//  change_gime_firq
 //-------------------------------------------------
 
-void gime_base_device::recalculate_irq(void)
+void gime_base_device::change_gime_firq(uint8_t data)
 {
-	m_write_irq(irq_r());
+	// did the value actually change?
+	if (m_firq != data)
+	{
+		m_firq = data;
+		m_write_firq(firq_r());
+	}
 }
-
-
-
-//-------------------------------------------------
-//  recalculate_firq
-//-------------------------------------------------
-
-void gime_base_device::recalculate_firq(void)
-{
-	m_write_firq(firq_r());
-}
-
 
 
 //**************************************************************************
@@ -2017,8 +2023,8 @@ const uint8_t gime_base_device::hires_font[128][12] =
 //  VARIATIONS
 //**************************************************************************
 
-const device_type GIME_NTSC = device_creator<gime_ntsc_device>;
-const device_type GIME_PAL = device_creator<gime_pal_device>;
+DEFINE_DEVICE_TYPE(GIME_NTSC, gime_ntsc_device, "gime_ntsc", "CoCo GIME (NTSC)")
+DEFINE_DEVICE_TYPE(GIME_PAL,  gime_pal_device,  "gime_pal",  "CoCo GIME (PAL)")
 
 
 
@@ -2027,7 +2033,7 @@ const device_type GIME_PAL = device_creator<gime_pal_device>;
 //-------------------------------------------------
 
 gime_ntsc_device::gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gime_base_device(mconfig, GIME_NTSC, "GIME_NTSC", tag, owner, clock, ntsc_round_fontdata8x12, "gime_ntsc", __FILE__)
+	: gime_base_device(mconfig, GIME_NTSC, tag, owner, clock, ntsc_round_fontdata8x12)
 {
 }
 
@@ -2038,6 +2044,6 @@ gime_ntsc_device::gime_ntsc_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 gime_pal_device::gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gime_base_device(mconfig, GIME_PAL, "GIME_PAL", tag, owner, clock, pal_round_fontdata8x12, "gime_pal", __FILE__)
+	: gime_base_device(mconfig, GIME_PAL, tag, owner, clock, pal_round_fontdata8x12)
 {
 }

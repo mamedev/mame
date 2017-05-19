@@ -76,7 +76,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
 	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(acia1_txdata_w);
 	DECLARE_WRITE_LINE_MEMBER(acia1_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(acia2_clock_w);
@@ -128,7 +128,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(proteus3)
 INPUT_PORTS_END
 
-WRITE8_MEMBER( proteus3_state::kbd_put )
+void proteus3_state::kbd_put(u8 data)
 {
 	if (data == 0x08)
 		data = 0x0f; // take care of backspace (bios 1 and 2)
@@ -317,7 +317,7 @@ void proteus3_state::machine_reset()
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( proteus3, proteus3_state )
+static MACHINE_CONFIG_START( proteus3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz)  /* Divided by 4 internally */
 	MCFG_CPU_PROGRAM_MAP(proteus3_mem)
@@ -339,7 +339,7 @@ static MACHINE_CONFIG_START( proteus3, proteus3_state )
 	MCFG_PIA_CA2_HANDLER(WRITELINE(proteus3_state, ca2_w))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(proteus3_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(proteus3_state, kbd_put))
 
 	/* cassette */
 	MCFG_DEVICE_ADD ("acia1", ACIA6850, 0)
@@ -409,5 +409,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     CLASS          INIT      COMPANY                     FULLNAME        FLAGS */
-COMP( 1978, proteus3,   0,          0,      proteus3,   proteus3, driver_device,   0,     "Proteus International", "Proteus III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY                  FULLNAME       FLAGS
+COMP( 1978, proteus3, 0,      0,      proteus3, proteus3, proteus3_state, 0,    "Proteus International", "Proteus III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

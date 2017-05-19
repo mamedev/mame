@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
-#pragma once
+#ifndef MAME_MACHINE_KM035_H
+#define MAME_MACHINE_KM035_H
 
-#ifndef __KM035_H__
-#define __KM035_H__
+#pragma once
 
 #include "cpu/mcs48/mcs48.h"
 #include "sound/beep.h"
@@ -44,8 +44,8 @@ public:
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_READ8_MEMBER( p2_r );
-	DECLARE_READ8_MEMBER( t0_r );
-	DECLARE_READ8_MEMBER( t1_r );
+	DECLARE_READ_LINE_MEMBER( t0_r );
+	DECLARE_READ_LINE_MEMBER( t1_r );
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 
@@ -73,6 +73,6 @@ private:
 };
 
 // device type definition
-extern const device_type KM035;
+DECLARE_DEVICE_TYPE(KM035, km035_device)
 
-#endif
+#endif // MAME_MACHINE_KM035_H

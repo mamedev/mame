@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
-#ifndef ISBC_208_H_
-#define ISBC_208_H_
+#ifndef MAME_MACHINE_ISBC_208_H
+#define MAME_MACHINE_ISBC_208_H
 
-#include "formats/pc_dsk.h"
+#pragma once
+
 #include "machine/upd765.h"
 #include "machine/am9517a.h"
 
@@ -24,7 +25,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	template<class _Object> static devcb_base &static_set_irq_callback(device_t &device, _Object object) { return downcast<isbc_208_device &>(device).m_out_irq_func.set_callback(object); }
+	template <class Object> static devcb_base &static_set_irq_callback(device_t &device, Object &&cb) { return downcast<isbc_208_device &>(device).m_out_irq_func.set_callback(std::forward<Object>(cb)); }
 	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag) { downcast<isbc_208_device &>(device).m_maincpu_tag = maincpu_tag; }
 
 protected:
@@ -47,6 +48,6 @@ private:
 #define MCFG_ISBC_208_IRQ(_irq_line) \
 	devcb = &isbc_208_device::static_set_irq_callback(*device, DEVCB_##_irq_line);
 
-extern const device_type ISBC_208;
+DECLARE_DEVICE_TYPE(ISBC_208, isbc_208_device)
 
-#endif /* ISBC_208_H_ */
+#endif // MAME_MACHINE_ISBC_208_H

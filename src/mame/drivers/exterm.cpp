@@ -397,7 +397,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( exterm, exterm_state )
+static MACHINE_CONFIG_START( exterm )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)
@@ -501,4 +501,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, exterm, 0, exterm, exterm, driver_device, 0, ROT0, "Gottlieb / Premier Technology", "Exterminator", 0 )
+GAME( 1989, exterm, 0, exterm, exterm, exterm_state, 0, ROT0, "Gottlieb / Premier Technology", "Exterminator", 0 )

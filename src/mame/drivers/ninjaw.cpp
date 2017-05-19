@@ -723,7 +723,7 @@ void ninjaw_state::machine_reset()
 	machine().sound().system_enable(true);  /* mixer enabled */
 }
 
-static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
+static MACHINE_CONFIG_START( ninjaw )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
@@ -843,7 +843,7 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( darius2, ninjaw_state )
+static MACHINE_CONFIG_START( darius2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
@@ -1177,8 +1177,8 @@ ROM_END
 
 /* Working Games */
 
-//    YEAR, NAME,    PARENT, MACHINE, INPUT,   INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, ninjaw,  0,      ninjaw,  ninjaw, driver_device,  0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjawj, ninjaw, ninjaw,  ninjawj, driver_device, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjawu, ninjaw, ninjaw,  ninjawj, driver_device,  0,   ROT0,  "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US)", MACHINE_SUPPORTS_SAVE ) /* Uses same coinage as World, see notes */
-GAME( 1989, darius2, 0,      darius2, darius2, driver_device, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,    PARENT, MACHINE, INPUT,   STATE         INIT,MONITOR,COMPANY,                     FULLNAME,FLAGS
+GAME( 1987, ninjaw,  0,      ninjaw,  ninjaw,  ninjaw_state, 0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjawj, ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjawu, ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US)", MACHINE_SUPPORTS_SAVE ) /* Uses same coinage as World, see notes */
+GAME( 1989, darius2, 0,      darius2, darius2, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE )

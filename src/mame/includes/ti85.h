@@ -112,6 +112,9 @@ public:
 	int m_ti_number_of_frames;
 	std::unique_ptr<uint8_t[]> m_frames;
 	uint8_t * m_bios;
+	emu_timer *m_ti85_timer;
+	emu_timer *m_ti83_1st_timer;
+	emu_timer *m_ti83_2nd_timer;
 	DECLARE_READ8_MEMBER(ti85_port_0000_r);
 	DECLARE_READ8_MEMBER(ti8x_keypad_r);
 	DECLARE_READ8_MEMBER(ti85_port_0006_r);
@@ -219,7 +222,6 @@ public:
 	void ti85_setup_snapshot(uint8_t *data);
 	void ti86_setup_snapshot(uint8_t *data);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(ti8x);
-	DECLARE_DIRECT_UPDATE_MEMBER(ti83p_direct_update_handler);
 
 	ti83pse_timer m_ctimer[3];
 

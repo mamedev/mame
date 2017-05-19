@@ -1,12 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef __MIE_H__
-#define __MIE_H__
+#ifndef MAME_MACHINE_MIE_H
+#define MAME_MACHINE_MIE_H
+
+#pragma once
+
+#include "machine/mapledev.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/jvshost.h"
-#include "machine/mapledev.h"
 
 #define MCFG_MIE_ADD(_tag, _clock, _host_tag, _host_port, g0, g1, g2, g3, g4, g5, g6, g7) \
 	MCFG_MAPLE_DEVICE_ADD(_tag "_maple", MIE, _clock, _host_tag, _host_port) \
@@ -128,6 +131,7 @@ public:
 
 
 // device type definition
-extern const device_type MIE, MIE_JVS;
+DECLARE_DEVICE_TYPE(MIE,     mie_device)
+DECLARE_DEVICE_TYPE(MIE_JVS, mie_jvs_device)
 
-#endif /* __MIE_H__ */
+#endif // MAME_MACHINE_MIE_H

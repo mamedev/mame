@@ -484,9 +484,9 @@ static ADDRESS_MAP_START( gdfs_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gdfs_eeprom_w)
 	AM_RANGE(0x540000, 0x540001) AM_READ(gdfs_eeprom_r)
 	AM_RANGE(0x600000, 0x600fff) AM_RAM
-	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w );
-	AM_RANGE(0x8c0000, 0x8c00ff) AM_DEVREADWRITE( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w );
-	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, st0020_gfxram_r, st0020_gfxram_w );
+	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, sprram_r, sprram_w );
+	AM_RANGE(0x8c0000, 0x8c00ff) AM_DEVREADWRITE( "st0020_spr", st0020_device, regs_r,   regs_w   );
+	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, gfxram_r, gfxram_w );
 	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
 
@@ -2567,7 +2567,7 @@ DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init(0); save_item(NAME(m_latche
 #define SSV_VBEND 0
 #define SSV_VBSTART 0xf0
 
-static MACHINE_CONFIG_START( ssv, ssv_state )
+static MACHINE_CONFIG_START( ssv )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V60, SSV_MASTER_CLOCK) /* Based on STA-0001 & STA-0001B System boards */

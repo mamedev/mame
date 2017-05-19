@@ -335,7 +335,7 @@ Y11       104 103 102 101 100 99  98  97      kN/A k.   k00  k0   RGHT LEFT PAUS
 */
 
 #include "emu.h"
-#include "victor9kb.h"
+#include "victor9k_kb.h"
 
 
 
@@ -353,7 +353,7 @@ Y11       104 103 102 101 100 99  98  97      kN/A k.   k00  k0   RGHT LEFT PAUS
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VICTOR9K_KEYBOARD = device_creator<victor_9000_keyboard_t>;
+DEFINE_DEVICE_TYPE(VICTOR9K_KEYBOARD, victor_9000_keyboard_device, "victor9k_kb", "Victor 9000 Keyboard")
 
 
 //-------------------------------------------------
@@ -370,22 +370,10 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *victor_9000_keyboard_t::device_rom_region() const
+const tiny_rom_entry *victor_9000_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( victor9k_keyboard );
 }
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( kb_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( victor9k_keyboard_io, AS_IO, 8, victor_9000_keyboard_t )
-	// P0 is unconnected on pcb
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(kb_p1_r, kb_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(kb_p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(kb_t1_r)
-ADDRESS_MAP_END
 
 
 //-------------------------------------------------
@@ -394,7 +382,11 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( victor9k_keyboard )
 	MCFG_CPU_ADD(I8021_TAG, I8021, XTAL_3_579545MHz)
-	MCFG_CPU_IO_MAP(victor9k_keyboard_io)
+	// P0 is unconnected on pcb
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(victor_9000_keyboard_device, kb_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(victor_9000_keyboard_device, kb_p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(victor_9000_keyboard_device, kb_p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(victor_9000_keyboard_device, kb_t1_r))
 MACHINE_CONFIG_END
 
 
@@ -403,7 +395,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor victor_9000_keyboard_t::device_mconfig_additions() const
+machine_config_constructor victor_9000_keyboard_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( victor9k_keyboard );
 }
@@ -550,7 +542,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor victor_9000_keyboard_t::device_input_ports() const
+ioport_constructor victor_9000_keyboard_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( victor9k_keyboard );
 }
@@ -562,11 +554,11 @@ ioport_constructor victor_9000_keyboard_t::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  victor_9000_keyboard_t - constructor
+//  victor_9000_keyboard_device - constructor
 //-------------------------------------------------
 
-victor_9000_keyboard_t::victor_9000_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VICTOR9K_KEYBOARD, "Victor 9000 Keyboard", tag, owner, clock, "victor9kb", __FILE__),
+victor_9000_keyboard_device::victor_9000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VICTOR9K_KEYBOARD, tag, owner, clock),
 	m_maincpu(*this, I8021_TAG),
 	m_y(*this, "Y%u", 0),
 	m_kbrdy_cb(*this),
@@ -583,7 +575,7 @@ victor_9000_keyboard_t::victor_9000_keyboard_t(const machine_config &mconfig, co
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void victor_9000_keyboard_t::device_start()
+void victor_9000_keyboard_device::device_start()
 {
 	// resolve callbacks
 	m_kbrdy_cb.resolve_safe();
@@ -604,7 +596,7 @@ void victor_9000_keyboard_t::device_start()
 //  kback_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( victor_9000_keyboard_t::kback_w )
+WRITE_LINE_MEMBER( victor_9000_keyboard_device::kback_w )
 {
 	if (LOG) logerror("KBACK %u\n", state);
 
@@ -616,7 +608,7 @@ WRITE_LINE_MEMBER( victor_9000_keyboard_t::kback_w )
 //  kb_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( victor_9000_keyboard_t::kb_p1_r )
+READ8_MEMBER( victor_9000_keyboard_device::kb_p1_r )
 {
 	uint8_t data = 0xff;
 
@@ -638,7 +630,7 @@ READ8_MEMBER( victor_9000_keyboard_t::kb_p1_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( victor_9000_keyboard_t::kb_p1_w )
+WRITE8_MEMBER( victor_9000_keyboard_device::kb_p1_w )
 {
 	m_p1 = data;
 }
@@ -648,7 +640,7 @@ WRITE8_MEMBER( victor_9000_keyboard_t::kb_p1_w )
 //  kb_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( victor_9000_keyboard_t::kb_p2_w )
+WRITE8_MEMBER( victor_9000_keyboard_device::kb_p2_w )
 {
 	/*
 
@@ -680,7 +672,7 @@ WRITE8_MEMBER( victor_9000_keyboard_t::kb_p2_w )
 //  kb_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( victor_9000_keyboard_t::kb_t1_r )
+READ_LINE_MEMBER( victor_9000_keyboard_device::kb_t1_r )
 {
 	return m_kback;
 }

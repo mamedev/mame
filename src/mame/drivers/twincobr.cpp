@@ -654,7 +654,7 @@ static GFXDECODE_START( twincobr )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( twincobr, twincobr_state )
+static MACHINE_CONFIG_START( twincobr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/4)       /* 7MHz - Main board Crystal is 28MHz */
@@ -688,7 +688,7 @@ static MACHINE_CONFIG_START( twincobr, twincobr_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz/4, 446, 0, 320, 286, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(twincobr_state, screen_update_toaplan0)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram16", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram16", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twincobr)

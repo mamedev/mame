@@ -177,6 +177,9 @@ WRITE16_MEMBER(tv990_state::tvi1111_w)
 		if(!m_rowh)
 			m_rowh = 16;
 		m_height = (tvi1111_regs[0xa] - tvi1111_regs[0x9]) / m_rowh;
+		// m_height can be 0 or -1 while machine is starting, leading to a crash on a debug build, so we sanitise it.
+		if(m_height < 8 || m_height > 99)
+			m_height = 0x1a;
 		m_screen->set_visible_area(0, m_width * 16 - 1, 0, m_height * m_rowh - 1);
 	}
 	if(offset == 0x17)
@@ -364,7 +367,7 @@ void tv990_state::device_post_load()
 	m_screen->set_visible_area(0, m_width * 16 - 1, 0, m_height * m_rowh - 1);
 }
 
-static MACHINE_CONFIG_START( tv990, tv990_state )
+static MACHINE_CONFIG_START( tv990 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14967500)   // verified (59.86992/4)
 	MCFG_CPU_PROGRAM_MAP(tv990_mem)
@@ -427,5 +430,5 @@ ROM_START( tv995 )
 ROM_END
 
 /* Driver */
-COMP( 1992, tv990, 0, 0, tv990, tv990, driver_device, 0, "TeleVideo", "TeleVideo 990", MACHINE_SUPPORTS_SAVE)
-COMP( 1994, tv995, 0, 0, tv990, tv990, driver_device, 0, "TeleVideo", "TeleVideo 995-65", MACHINE_SUPPORTS_SAVE)
+COMP( 1992, tv990, 0, 0, tv990, tv990, tv990_state, 0, "TeleVideo", "TeleVideo 990",    MACHINE_SUPPORTS_SAVE )
+COMP( 1994, tv995, 0, 0, tv990, tv990, tv990_state, 0, "TeleVideo", "TeleVideo 995-65", MACHINE_SUPPORTS_SAVE )

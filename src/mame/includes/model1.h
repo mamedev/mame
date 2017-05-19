@@ -10,6 +10,7 @@
 
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/v60/v60.h"
+#include "machine/i8251.h"
 #include "machine/m1comm.h"
 #include "video/segaic24.h"
 
@@ -32,6 +33,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_m1audio(*this, "m1audio")
+		, m_m1uart(*this, "m1uart")
 		, m_m1comm(*this, "m1comm")
 		, m_dsbz80(*this, DSBZ80_TAG)
 		, m_tgp(*this, "tgp")
@@ -64,10 +66,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
-
-	// Sound
-	DECLARE_READ16_MEMBER(snd_68k_ready_r);
-	DECLARE_WRITE16_MEMBER(snd_latch_to_68k_w);
 
 	// TGP
 	DECLARE_READ16_MEMBER(fifoin_status_r);
@@ -107,7 +105,7 @@ public:
 	DECLARE_WRITE16_MEMBER(model1_listctl_w);
 
 	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_model1(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model1);
 
 	struct spoint_t
 	{
@@ -193,6 +191,7 @@ private:
 	// Devices
 	required_device<v60_device> m_maincpu;          // V60
 	required_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
+	required_device<i8251_device> m_m1uart;
 	optional_device<m1comm_device> m_m1comm;        // Model 1 communication board
 	optional_device<dsbz80_device> m_dsbz80;        // Digital Sound Board
 	optional_device<mb86233_cpu_device> m_tgp;
@@ -206,8 +205,6 @@ private:
 
 	// Sound
 	int m_sound_irq;
-	uint8_t m_last_snd_cmd;
-	int m_snd_cmd_state;
 
 	// TGP FIFO
 	uint32_t  fifoout_pop();
@@ -473,7 +470,7 @@ private:
 
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	required_device<palette_device> m_palette;
-	required_device<segas24_tile> m_tiles;
+	required_device<segas24_tile_device> m_tiles;
 
 	// I/O related
 	uint16_t  m_lamp_state;

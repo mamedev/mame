@@ -1,5 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
+/*
+ *
+ *  FM-7 header file
+ *
+ */
+#ifndef MAME_INCLUDES_FM7_H
+#define MAME_INCLUDES_FM7_H
+
+#pragma once
+
+
 #include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
@@ -8,14 +19,6 @@
 #include "machine/wd_fdc.h"
 #include "machine/bankdev.h"
 
-/*
- *
- *  FM-7 header file
- *
- */
-
-#ifndef FM7_H_
-#define FM7_H_
 
 // Interrupt flags
 #define IRQ_FLAG_KEY      0x01
@@ -342,7 +345,7 @@ protected:
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 
-	required_device<mb8877_t> m_fdc;
+	required_device<mb8877_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
@@ -405,4 +408,4 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-#endif /*FM7_H_*/
+#endif // MAME_INCLUDES_FM7_H

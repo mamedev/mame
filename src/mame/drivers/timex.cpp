@@ -703,7 +703,7 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 	MCFG_SCREEN_SIZE(TS2068_SCREEN_WIDTH, TS2068_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, TS2068_SCREEN_WIDTH-1, 0, TS2068_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_ts2068)
-	MCFG_SCREEN_VBLANK_DRIVER(spectrum_state, screen_eof_timex)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(spectrum_state, screen_vblank_timex))
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", ts2068)
 
@@ -748,7 +748,7 @@ static MACHINE_CONFIG_DERIVED( tc2048, spectrum )
 	MCFG_SCREEN_SIZE(TS2068_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, TS2068_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_tc2048)
-	MCFG_SCREEN_VBLANK_DRIVER(spectrum_state, screen_eof_timex)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(spectrum_state, screen_vblank_timex))
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 
@@ -782,7 +782,7 @@ ROM_START(uk2086)
 	ROM_LOAD("ts2068_x.rom",0x14000,0x2000, CRC(ae16233a) SHA1(7e265a2c1f621ed365ea23bdcafdedbc79c1299c))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1984, tc2048,   spectrum, 0,      tc2048,     spectrum, driver_device,    0,      "Timex of Portugal",    "TC-2048" , 0)
-COMP( 1983, ts2068,   spectrum, 0,      ts2068,     spectrum, driver_device,    0,      "Timex Sinclair",       "TS-2068" , 0)
-COMP( 1986, uk2086,   spectrum, 0,      uk2086,     spectrum, driver_device,    0,      "Unipolbrit",           "UK-2086 ver. 1.2" , 0)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT     STATE           INIT  COMPANY               FULLNAME             FLAGS
+COMP( 1984, tc2048,   spectrum, 0,      tc2048,  spectrum, spectrum_state, 0,    "Timex of Portugal",  "TC-2048" ,          0 )
+COMP( 1983, ts2068,   spectrum, 0,      ts2068,  spectrum, spectrum_state, 0,    "Timex Sinclair",     "TS-2068" ,          0 )
+COMP( 1986, uk2086,   spectrum, 0,      uk2086,  spectrum, spectrum_state, 0,    "Unipolbrit",         "UK-2086 ver. 1.2" , 0 )

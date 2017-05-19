@@ -54,6 +54,18 @@
 #define LOGMSG(x)   do {} while (0);
 #endif
 
+/* external status bits */
+#define GAELCOSER_STATUS_READY          0x01
+#define GAELCOSER_STATUS_RTS            0x02
+
+/* only RTS currently understood ! */
+//#define GAELCOSER_STATUS_DTR          0x04
+
+/* internal bits follow ... */
+#define GAELCOSER_STATUS_IRQ_ENABLE     0x10
+#define GAELCOSER_STATUS_RESET          0x20
+#define GAELCOSER_STATUS_SEND           0x40
+
 /*
  * 115200 seems plausible, radikalb won't work below this speed
  * surfplnt will not work below 460800 ....
@@ -82,7 +94,7 @@
 
 /* code below currently works on unix only */
 #ifdef SHARED_MEM_DRIVER
-static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t size)
+gaelco_serial_device::osd_shared_mem *gaelco_serial_device::osd_sharedmem_alloc(const char *path, int create, size_t size)
 {
 	int fd;
 	osd_shared_mem *os_shmem = (osd_shared_mem *)malloc(sizeof(osd_shared_mem));
@@ -117,7 +129,7 @@ static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t 
 	return os_shmem;
 }
 
-static void osd_sharedmem_free(osd_shared_mem *os_shmem)
+void gaelco_serial_device::osd_sharedmem_free(osd_shared_mem *os_shmem)
 {
 	munmap(os_shmem->ptr, os_shmem->size);
 	if (os_shmem->creator)
@@ -126,12 +138,12 @@ static void osd_sharedmem_free(osd_shared_mem *os_shmem)
 	free(os_shmem);
 }
 
-static void *osd_sharedmem_ptr(osd_shared_mem *os_shmem)
+void *gaelco_serial_device::osd_sharedmem_ptr(osd_shared_mem *os_shmem)
 {
 	return os_shmem->ptr;
 }
 #else
-static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t size)
+gaelco_serial_device::osd_shared_mem *gaelco_serial_device::osd_sharedmem_alloc(const char *path, int create, size_t size)
 {
 	osd_shared_mem *os_shmem = (osd_shared_mem *) malloc(sizeof(osd_shared_mem));
 
@@ -142,13 +154,13 @@ static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t 
 	return os_shmem;
 }
 
-static void osd_sharedmem_free(osd_shared_mem *os_shmem)
+void gaelco_serial_device::osd_sharedmem_free(osd_shared_mem *os_shmem)
 {
 	free(os_shmem->ptr);
 	free(os_shmem);
 }
 
-static void *osd_sharedmem_ptr(osd_shared_mem *os_shmem)
+void *gaelco_serial_device::osd_sharedmem_ptr(osd_shared_mem *os_shmem)
 {
 	return os_shmem->ptr;
 }
@@ -160,18 +172,18 @@ static void *osd_sharedmem_ptr(osd_shared_mem *os_shmem)
 
 #define PATH_NAME "/tmp/gaelco_serial"
 
-static void buf_reset(buf_t *buf)
+void gaelco_serial_device::buf_reset(buf_t *buf)
 {
-	buf->stat = GAELCOSER_STATUS_RTS| GAELCOSER_STATUS_RESET;
+	buf->stat = GAELCOSER_STATUS_RTS | GAELCOSER_STATUS_RESET;
 	buf->data = 0;
 	buf->data_cnt = -1;
 	buf->cnt = 0;
 }
 
-const device_type GAELCO_SERIAL = device_creator<gaelco_serial_device>;
+DEFINE_DEVICE_TYPE(GAELCO_SERIAL, gaelco_serial_device, "gaelco_serial", "Gaelco 3D Serial Hardware")
 
 gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GAELCO_SERIAL, "Gaelco 3D Serial Hardware", tag, owner, clock, "gaelco_serial", __FILE__),
+	: device_t(mconfig, GAELCO_SERIAL, tag, owner, clock),
 	m_irq_handler(*this),
 	m_status(0),
 	m_last_in_msg_cnt(0),

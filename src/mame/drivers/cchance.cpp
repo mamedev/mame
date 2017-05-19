@@ -209,7 +209,7 @@ void cchance_state::machine_reset()
 	m_bell_io = 0;
 }
 
-static MACHINE_CONFIG_START( cchance, cchance_state )
+static MACHINE_CONFIG_START( cchance )
 
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -227,7 +227,7 @@ static MACHINE_CONFIG_START( cchance, cchance_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cchance_state, screen_update_tnzs)
-	MCFG_SCREEN_VBLANK_DRIVER(cchance_state, screen_eof_tnzs)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cchance_state, screen_vblank_tnzs))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
@@ -256,4 +256,4 @@ ROM_START( cchance )
 	ROM_LOAD( "prom2", 0x0200, 0x0200, NO_DUMP )
 ROM_END
 
-GAME( 1987?, cchance,  0,    cchance, cchance, driver_device,  0, ROT0, "<unknown>", "Cherry Chance", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987?, cchance,  0,    cchance, cchance, cchance_state,  0, ROT0, "<unknown>", "Cherry Chance", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

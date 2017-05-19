@@ -43,17 +43,17 @@ void main()
 	vec4 p3 = texture2D(decal, v_texcoord0 + vec2(dx, 0) * quad);
 	vec4 p4 = texture2D(decal, v_texcoord0 + vec2(0, dy) * quad);
 
-	vec3 w1  = mul(yuv, texture2D(decal, v_texcoord1.xw).rgb);
-	vec3 w2  = mul(yuv, texture2D(decal, v_texcoord1.yw).rgb);
-	vec3 w3  = mul(yuv, texture2D(decal, v_texcoord1.zw).rgb);
+	vec3 w1  = instMul(texture2D(decal, v_texcoord1.xw).rgb, yuv);
+	vec3 w2  = instMul(texture2D(decal, v_texcoord1.yw).rgb, yuv);
+	vec3 w3  = instMul(texture2D(decal, v_texcoord1.zw).rgb, yuv);
 
-	vec3 w4  = mul(yuv, texture2D(decal, v_texcoord2.xw).rgb);
-	vec3 w5  = mul(yuv, p1.rgb);
-	vec3 w6  = mul(yuv, texture2D(decal, v_texcoord2.zw).rgb);
+	vec3 w4  = instMul(texture2D(decal, v_texcoord2.xw).rgb, yuv);
+	vec3 w5  = instMul(p1.rgb, yuv);
+	vec3 w6  = instMul(texture2D(decal, v_texcoord2.zw).rgb, yuv);
 
-	vec3 w7  = mul(yuv, texture2D(decal, v_texcoord3.xw).rgb);
-	vec3 w8  = mul(yuv, texture2D(decal, v_texcoord3.yw).rgb);
-	vec3 w9  = mul(yuv, texture2D(decal, v_texcoord3.zw).rgb);
+	vec3 w7  = instMul(texture2D(decal, v_texcoord3.xw).rgb, yuv);
+	vec3 w8  = instMul(texture2D(decal, v_texcoord3.yw).rgb, yuv);
+	vec3 w9  = instMul(texture2D(decal, v_texcoord3.zw).rgb, yuv);
 
 	mat3 pattern = mat3(diff(w5, w1), diff(w5, w2), diff(w5, w3), diff(w5, w4), 0.0, diff(w5, w6), diff(w5, w7), diff(w5, w8), diff(w5, w9));
 	vec4 cross = vec4(diff(w4, w2), diff(w2, w6), diff(w8, w4), diff(w6, w8));
@@ -69,7 +69,7 @@ void main()
 	vec4 weights = texture2D(LUT, index * step + offset);
 	float sum = dot(weights, vec4(1.0, 1.0, 1.0, 1.0));
 	mat4 transposed = mat4(vec4(p1.x, p2.x, p3.x, p4.x), vec4(p1.y, p2.y, p3.y, p4.y), vec4(p1.z, p2.z, p3.z, p4.z), vec4(p1.w, p2.w, p3.w, p4.w));
-	vec4 res = mul(transposed, weights / vec4(sum, sum, sum, sum));
+	vec4 res = instMul(weights / vec4(sum, sum, sum, sum), transposed);
 
 	gl_FragColor = vec4(res.rgb, 1.0);
 }

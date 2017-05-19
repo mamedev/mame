@@ -276,7 +276,7 @@ void tmc2000e_state::machine_reset()
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( tmc2000e, tmc2000e_state )
+static MACHINE_CONFIG_START( tmc2000e )
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(tmc2000e_map)
@@ -318,5 +318,5 @@ ROM_START( tmc2000e )
 	ROM_LOAD( "4", 0xd800, 0x0800, NO_DUMP )
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     INIT    COMPANY        FULLNAME
-COMP( 1980, tmc2000e, 0,       0,       tmc2000e, tmc2000e, driver_device, 0,       "Telercas Oy", "Telmac 2000E", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     STATE           INIT  COMPANY        FULLNAME        STATE
+COMP( 1980, tmc2000e, 0,       0,       tmc2000e, tmc2000e, tmc2000e_state, 0,    "Telercas Oy", "Telmac 2000E", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

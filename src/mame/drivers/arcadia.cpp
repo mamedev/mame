@@ -473,7 +473,7 @@ static SLOT_INTERFACE_START(arcadia_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( arcadia, arcadia_state )
+static MACHINE_CONFIG_START( arcadia )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 3580000/4)        /* 0.895 MHz */
 	MCFG_CPU_PROGRAM_MAP(arcadia_mem)
@@ -810,7 +810,7 @@ DRIVER_INIT_MEMBER(arcadia_state,arcadia)
 }
 
 
-/*   YEAR  NAME       PARENT     COMPAT    MACHINE       INPUT     INIT          COMPANY               FULLNAME */
+/*   YEAR  NAME       PARENT     COMPAT    MACHINE       INPUT    STATE           INIT          COMPANY               FULLNAME */
 CONS(1983, advsnha,   arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Advision",           "Advision Home Arcade", MACHINE_IMPERFECT_SOUND )    /* France */
 CONS(1982, bndarc,    arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Bandai",             "Arcadia", MACHINE_IMPERFECT_SOUND )                 /* Japan */
 CONS(1982, arcadia,   0,         0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Emerson",            "Arcadia 2001", MACHINE_IMPERFECT_SOUND )            /* U.S.A. */

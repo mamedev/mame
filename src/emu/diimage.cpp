@@ -34,7 +34,7 @@ const image_device_type_info device_image_interface::m_device_info_array[] =
 		{ IO_CASSETTE,  "cassette",     "cass" }, /*  4 */
 		{ IO_PUNCHCARD, "punchcard",    "pcrd" }, /*  5 */
 		{ IO_PUNCHTAPE, "punchtape",    "ptap" }, /*  6 */
-		{ IO_PRINTER,   "printer",      "prin" }, /*  7 */
+		{ IO_PRINTER,   "printout",     "prin" }, /*  7 */
 		{ IO_SERIAL,    "serial",       "serl" }, /*  8 */
 		{ IO_PARALLEL,  "parallel",     "parl" }, /*  9 */
 		{ IO_SNAPSHOT,  "snapshot",     "dump" }, /* 10 */
@@ -93,7 +93,6 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 		m_supported(0),
 		m_readonly(false),
 		m_created(false),
-		m_init_phase(false),
 		m_create_format(0),
 		m_create_args(nullptr),
 		m_user_loadable(true),
@@ -457,13 +456,11 @@ const software_info *device_image_interface::software_entry() const
 
 u8 *device_image_interface::get_software_region(const char *tag)
 {
-	char full_tag[256];
-
 	if (!loaded_through_softlist())
 		return nullptr;
 
-	sprintf( full_tag, "%s:%s", device().tag(), tag );
-	memory_region *region = device().machine().root_device().memregion(full_tag);
+	std::string full_tag = util::string_format("%s:%s", device().tag(), tag);
+	memory_region *region = device().machine().root_device().memregion(full_tag.c_str());
 	return region != nullptr ? region->base() : nullptr;
 }
 
@@ -474,11 +471,8 @@ u8 *device_image_interface::get_software_region(const char *tag)
 
 u32 device_image_interface::get_software_region_length(const char *tag)
 {
-	char full_tag[256];
-
-	sprintf( full_tag, "%s:%s", device().tag(), tag );
-
-	memory_region *region = device().machine().root_device().memregion(full_tag);
+	std::string full_tag = util::string_format("%s:%s", device().tag(), tag);
+	memory_region *region = device().machine().root_device().memregion(full_tag.c_str());
 	return region != nullptr ? region->bytes() : 0;
 }
 
@@ -519,21 +513,21 @@ bool device_image_interface::load_software_region(const char *tag, optional_shar
 // to be loaded
 // ****************************************************************************
 
-void device_image_interface::run_hash(void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *),
+void device_image_interface::run_hash(util::core_file &file, void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *),
 	util::hash_collection &hashes, const char *types)
 {
 	u32 size;
 	std::vector<u8> buf;
 
 	hashes.reset();
-	size = (u32) length();
+	size = (u32) file.size();
 
 	buf.resize(size);
 	memset(&buf[0], 0, size);
 
 	// read the file
-	fseek(0, SEEK_SET);
-	fread(&buf[0], size);
+	file.seek(0, SEEK_SET);
+	file.read(&buf[0], size);
 
 	if (partialhash)
 		partialhash(hashes, &buf[0], size, types);
@@ -541,7 +535,7 @@ void device_image_interface::run_hash(void (*partialhash)(util::hash_collection 
 		hashes.compute(&buf[0], size, types);
 
 	// cleanup
-	fseek(0, SEEK_SET);
+	file.seek(0, SEEK_SET);
 }
 
 
@@ -566,10 +560,23 @@ void device_image_interface::image_checkhash()
 		// retrieve the partial hash func
 		partialhash = get_partial_hash();
 
-		run_hash(partialhash, m_hash, util::hash_collection::HASH_TYPES_ALL);
+		run_hash(*m_file, partialhash, m_hash, util::hash_collection::HASH_TYPES_ALL);
 	}
 	return;
 }
+
+
+util::hash_collection device_image_interface::calculate_hash_on_file(util::core_file &file) const
+{
+	// retrieve the partial hash func
+	device_image_partialhash_func partialhash = get_partial_hash();
+
+	// and calculate the hash
+	util::hash_collection hash;
+	run_hash(file, partialhash, hash, util::hash_collection::HASH_TYPES_ALL);
+	return hash;
+}
+
 
 u32 device_image_interface::crc()
 {
@@ -990,7 +997,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 //  load_internal - core image loading
 //-------------------------------------------------
 
-image_init_result device_image_interface::load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load)
+image_init_result device_image_interface::load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args)
 {
 	// first unload the image
 	unload();
@@ -1030,7 +1037,7 @@ image_init_result device_image_interface::load_internal(const std::string &path,
 	m_create_format = create_format;
 	m_create_args = create_args;
 
-	if (m_init_phase==false) {
+	if (init_phase()==false) {
 		m_err = (finish_load() == image_init_result::PASS) ? IMAGE_ERROR_SUCCESS : IMAGE_ERROR_INTERNAL;
 		if (m_err)
 			goto done;
@@ -1038,12 +1045,8 @@ image_init_result device_image_interface::load_internal(const std::string &path,
 	// success!
 
 done:
-	if (just_load) {
-		if (m_err) clear();
-		return m_err ? image_init_result::FAIL : image_init_result::PASS;
-	}
 	if (m_err!=0) {
-		if (!m_init_phase)
+		if (!init_phase())
 		{
 			if (device().machine().phase() == MACHINE_PHASE_RUNNING)
 				device().popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
@@ -1052,33 +1055,7 @@ done:
 		}
 		clear();
 	}
-	else {
-		// do we need to reset the CPU? only schedule it if load/create is successful
-		if (!schedule_postload_hard_reset_if_needed())
-		{
-			if (!m_init_phase)
-			{
-				if (device().machine().phase() == MACHINE_PHASE_RUNNING)
-					device().popmessage("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
-				else
-					osd_printf_info("Image '%s' was successfully %s.\n", path.c_str(), is_create ? "created" : "loaded");
-			}
-		}
-	}
 	return m_err ? image_init_result::FAIL : image_init_result::PASS;
-}
-
-
-//-------------------------------------------------
-//  schedule_postload_hard_reset_if_needed
-//-------------------------------------------------
-
-bool device_image_interface::schedule_postload_hard_reset_if_needed()
-{
-	bool postload_hard_reset_needed = device().machine().time() > attotime::zero && is_reset_on_load();
-	if (postload_hard_reset_needed)
-		device().machine().schedule_hard_reset();
-	return postload_hard_reset_needed;
 }
 
 
@@ -1088,7 +1065,14 @@ bool device_image_interface::schedule_postload_hard_reset_if_needed()
 
 image_init_result device_image_interface::load(const std::string &path)
 {
-	return load_internal(path, false, 0, nullptr, false);
+	// is this a reset on load item?
+	if (is_reset_on_load() && !init_phase())
+	{
+		reset_and_load(path);
+		return image_init_result::PASS;
+	}
+
+	return load_internal(path, false, 0, nullptr);
 }
 
 
@@ -1098,6 +1082,13 @@ image_init_result device_image_interface::load(const std::string &path)
 
 image_init_result device_image_interface::load_software(const std::string &software_identifier)
 {
+	// Is this a software part that forces a reset and we're at runtime?  If so, get this loaded through reset_and_load
+	if (is_reset_on_load() && !init_phase())
+	{
+		reset_and_load(software_identifier);
+		return image_init_result::PASS;
+	}
+
 	// Prepare to load
 	unload();
 	clear_error();
@@ -1122,65 +1113,29 @@ image_init_result device_image_interface::load_software(const std::string &softw
 		? core_filename_extract_extension(m_mame_file->filename(), true)
 		: "";
 
-	// check if image should be read-only
-	const char *read_only = get_feature("read_only");
-	if (read_only && !strcmp(read_only, "true"))
-	{
-		// Copy some image information when we have been loaded through a software list
-		software_info &swinfo = m_software_part_ptr->info();
+	// Copy some image information when we have been loaded through a software list
+	software_info &swinfo = m_software_part_ptr->info();
 
-		// sanitize
-		if (swinfo.longname().empty() || swinfo.publisher().empty() || swinfo.year().empty())
-			fatalerror("Each entry in an XML list must have all of the following fields: description, publisher, year!\n");
+	// sanitize
+	if (swinfo.longname().empty() || swinfo.publisher().empty() || swinfo.year().empty())
+		fatalerror("Each entry in an XML list must have all of the following fields: description, publisher, year!\n");
 
-		// store
-		m_longname = swinfo.longname();
-		m_manufacturer = swinfo.publisher();
-		m_year = swinfo.year();
+	// store
+	m_longname = swinfo.longname();
+	m_manufacturer = swinfo.publisher();
+	m_year = swinfo.year();
 
-		// set file type
-		std::string filename = (m_mame_file != nullptr) && (m_mame_file->filename() != nullptr)
-				? m_mame_file->filename()
-				: "";
-		m_filetype = core_filename_extract_extension(filename, true);
-	}
+	// set file type
+	std::string filename = (m_mame_file != nullptr) && (m_mame_file->filename() != nullptr)
+			? m_mame_file->filename()
+			: "";
+	m_filetype = core_filename_extract_extension(filename, true);
 
 	// call finish_load if necessary
-	if (m_init_phase == false && (finish_load() != image_init_result::PASS))
+	if (init_phase() == false && (finish_load() != image_init_result::PASS))
 		return image_init_result::FAIL;
 
-	// do we need to reset the CPU? only schedule it if load is successful
-	if (!schedule_postload_hard_reset_if_needed())
-	{
-		if (!m_init_phase)
-		{
-			if (device().machine().phase() == MACHINE_PHASE_RUNNING)
-				device().popmessage("Image '%s' was successfully loaded.", software_identifier);
-			else
-				osd_printf_info("Image '%s' was successfully loaded.\n", software_identifier.c_str());
-		}
-	}
-
 	return image_init_result::PASS;
-}
-
-
-//-------------------------------------------------
-//  open_image_file - opening plain image file
-//-------------------------------------------------
-
-bool device_image_interface::open_image_file(emu_options &options)
-{
-	const char* path = options.value(instance_name().c_str());
-	if (*path != 0)
-	{
-		set_init_phase();
-		if (load_internal(path, false, 0, nullptr, true) == image_init_result::PASS)
-		{
-			if (!loaded_through_softlist()) return true;
-		}
-	}
-	return false;
 }
 
 
@@ -1220,7 +1175,6 @@ image_init_result device_image_interface::finish_load()
 	m_is_loading = false;
 	m_create_format = 0;
 	m_create_args = nullptr;
-	m_init_phase = false;
 	return err;
 }
 
@@ -1251,7 +1205,23 @@ image_init_result device_image_interface::create(const std::string &path, const 
 		}
 		cnt++;
 	}
-	return load_internal(path, true, format_index, create_args, false);
+	return load_internal(path, true, format_index, create_args);
+}
+
+
+//-------------------------------------------------
+//  reset_and_load - called internally when we try
+//  to load an is_reset_on_load() item; will reset
+//  the emulation and record this image to be loaded
+//-------------------------------------------------
+
+void device_image_interface::reset_and_load(const std::string &path)
+{
+	// first make sure the reset is scheduled
+	device().machine().schedule_hard_reset();
+
+	// and record the new load
+	device().machine().options().image_options()[instance_name()] = path;
 }
 
 
@@ -1442,20 +1412,11 @@ bool device_image_interface::load_software_part(const std::string &identifier)
 		return false;
 	}
 
-	// I'm not sure what m_init_phase is all about; but for now I'm preserving this behavior
-	if (is_reset_on_load())
-		set_init_phase();
-
 	// Load the software part
 	const char *swname = m_software_part_ptr->info().shortname().c_str();
 	const rom_entry *start_entry = m_software_part_ptr->romdata().data();
 	const software_list_loader &loader = get_software_list_loader();
 	bool result = loader.load_software(*this, *swlist, swname, start_entry);
-
-#ifdef UNUSED_VARIABLE
-	// Tell the world which part we actually loaded
-	std::string full_sw_name = string_format("%s:%s:%s", swlist->list_name(), m_software_part_ptr->info().shortname(), m_software_part_ptr->name());
-#endif
 
 	// check compatibility
 	switch (swlist->is_compatible(*m_software_part_ptr))
@@ -1481,10 +1442,7 @@ bool device_image_interface::load_software_part(const std::string &identifier)
 		{
 			device_image_interface *req_image = software_list_device::find_mountable_image(device().mconfig(), *req_swpart);
 			if (req_image != nullptr)
-			{
-				req_image->set_init_phase();
-				req_image->load(requirement);
-			}
+				req_image->load_software(requirement);
 		}
 	}
 
@@ -1498,12 +1456,13 @@ bool device_image_interface::load_software_part(const std::string &identifier)
 
 std::string device_image_interface::software_get_default_slot(const char *default_card_slot) const
 {
-	const char *path = device().mconfig().options().value(instance_name().c_str());
 	std::string result;
-	if (*path != '\0')
+
+	auto iter = device().mconfig().options().image_options().find(instance_name());
+	if (iter != device().mconfig().options().image_options().end() && !iter->second.empty())
 	{
 		result.assign(default_card_slot);
-		const software_part *swpart = find_software_item(path, true);
+		const software_part *swpart = find_software_item(iter->second, true);
 		if (swpart != nullptr)
 		{
 			const char *slot = swpart->feature("slot");
@@ -1513,6 +1472,21 @@ std::string device_image_interface::software_get_default_slot(const char *defaul
 	}
 	return result;
 }
+
+
+//-------------------------------------------------
+//  init_phase
+//-------------------------------------------------
+
+bool device_image_interface::init_phase() const
+{
+	// diimage.cpp has quite a bit of logic that randomly decides to behave
+	// differently at startup; this is an enc[r]apsulation of the "logic"
+	// that switches these behaviors
+	return !device().has_running_machine()
+		|| device().machine().phase() == MACHINE_PHASE_INIT;
+}
+
 
 //----------------------------------------------------------------------------
 

@@ -230,7 +230,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_YIQ_IVALUE";yiqi",                              "1.2",               OPTION_FLOAT,      "I filter cutoff frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_QVALUE";yiqq",                              "0.6",               OPTION_FLOAT,      "Q filter cutoff frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_SCAN_TIME";yiqsc",                          "52.6",              OPTION_FLOAT,      "Horizontal scanline duration for NTSC signal processing (in usec)" },
-	{ WINOPTION_YIQ_PHASE_COUNT";yiqp",                         "2",                 OPTION_INTEGER,    "Phase Count value for NTSC signal processing" },
+	{ WINOPTION_YIQ_PHASE_COUNT";yiqpc",                        "2",                 OPTION_INTEGER,    "Phase Count value for NTSC signal processing" },
 	/* Vector simulation below this line */
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "VECTOR POST-PROCESSING OPTIONS" },
 	{ WINOPTION_VECTOR_BEAM_SMOOTH";vecsmooth",                 "0.0",               OPTION_FLOAT,      "The vector beam smoothness" },
@@ -260,7 +260,7 @@ const options_entry windows_options::s_option_entries[] =
 
 	// input options
 	{ nullptr,                                        nullptr,    OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
-	{ WINOPTION_GLOBAL_INPUTS ";global_inputs",       "0",        OPTION_BOOLEAN,    "enables global inputs" },
+	{ WINOPTION_GLOBAL_INPUTS,                        "0",        OPTION_BOOLEAN,    "enables global inputs" },
 	{ WINOPTION_DUAL_LIGHTGUN ";dual",                "0",        OPTION_BOOLEAN,    "enables dual lightgun input" },
 
 	{ nullptr }

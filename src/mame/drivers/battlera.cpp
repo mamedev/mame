@@ -268,7 +268,7 @@ uint32_t battlera_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-static MACHINE_CONFIG_START( battlera, battlera_state )
+static MACHINE_CONFIG_START( battlera )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280,21477200/3)
@@ -280,7 +280,7 @@ static MACHINE_CONFIG_START( battlera, battlera_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( battlera_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
@@ -304,7 +304,7 @@ static MACHINE_CONFIG_START( battlera, battlera_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(battlera_state, adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz            */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz            */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 
 	MCFG_SOUND_ADD("c6280", C6280, 21477270/6)
@@ -372,6 +372,6 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, battlera, 0,        battlera, battlera, driver_device,  0,   ROT0, "Data East Corporation", "Battle Rangers (World)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bldwolf,  battlera, battlera, battlera, driver_device,  0,   ROT0, "Data East USA", "Bloody Wolf (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bldwolfj, battlera, battlera, battlera, driver_device,  0,   ROT0, "Data East Corporation", "Narazumono Sentoubutai Bloody Wolf (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, battlera, 0,        battlera, battlera, battlera_state,  0,   ROT0, "Data East Corporation", "Battle Rangers (World)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bldwolf,  battlera, battlera, battlera, battlera_state,  0,   ROT0, "Data East USA",         "Bloody Wolf (US)",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bldwolfj, battlera, battlera, battlera, battlera_state,  0,   ROT0, "Data East Corporation", "Narazumono Sentoubutai Bloody Wolf (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

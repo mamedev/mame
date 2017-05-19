@@ -13,10 +13,10 @@ K05324X_CB_MEMBER(rollerg_state::sprite_callback)
 {
 	enum { sprite_colorbase = 256 / 16 };
 #if 0
-	if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x80)) *color = rand();
-	if (machine().input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = rand();
-	if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x20)) *color = rand();
-	if (machine().input().code_pressed(KEYCODE_R) && (*color & 0x10)) *color = rand();
+	if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x80)) *color = machine().rand();
+	if (machine().input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = machine().rand();
+	if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x20)) *color = machine().rand();
+	if (machine().input().code_pressed(KEYCODE_R) && (*color & 0x10)) *color = machine().rand();
 #endif
 	*priority = (*color & 0x10) ? 0 : 0x02;
 	*color = sprite_colorbase + (*color & 0x0f);

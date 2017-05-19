@@ -88,7 +88,7 @@ protected:
 	required_device<i8251_device> m_rs232;
 	required_device<i8251_device> m_lan;
 	required_device<ram_device> m_ram;
-	required_device<fd1793_t> m_wd1793;
+	required_device<fd1793_device> m_wd1793;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;

@@ -6,12 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef GAMATE_H_
-#define GAMATE_H_
-
-#include "cpu/m6502/m6502.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#ifndef MAME_AUDIO_GAMATE_H
+#define MAME_AUDIO_GAMATE_H
 
 
 // ======================> gamate_sound_device
@@ -20,7 +16,6 @@ class gamate_sound_device : public device_t, public device_sound_interface
 {
 public:
 	gamate_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~gamate_sound_device() { }
 
 	DECLARE_WRITE8_MEMBER( device_w );
 	DECLARE_READ8_MEMBER( device_r );
@@ -47,7 +42,8 @@ private:
 			volume(0),
 			pos(0),
 			size(0)
-			{}
+		{
+		}
 
 		bool envelope_on, level;
 		bool tone/*else noise*/, full_cycle/* else square signal/pulse */;
@@ -95,6 +91,6 @@ private:
 	uint8_t reg[14];
 };
 
-extern const device_type GAMATE_SND;
+DECLARE_DEVICE_TYPE(GAMATE_SND, gamate_sound_device)
 
-#endif /* GAMATE_H_ */
+#endif // MAME_AUDIO_GAMATE_H

@@ -55,7 +55,7 @@ public:
 	DECLARE_READ8_MEMBER( controller_r );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
 	DECLARE_WRITE8_MEMBER( av_control_w );
-	DECLARE_READ8_MEMBER( vsync_r );
+	DECLARE_READ_LINE_MEMBER( vsync_r );
 	DECLARE_READ8_MEMBER( sound_cmd_r );
 	DECLARE_WRITE8_MEMBER( sound_g_w );
 	DECLARE_WRITE8_MEMBER( sound_d_w );

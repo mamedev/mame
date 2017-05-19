@@ -5,8 +5,8 @@
     SSi TSI S14001A speech IC emulator
 */
 
-#ifndef __S14001A_H__
-#define __S14001A_H__
+#ifndef MAME_SOUND_S14001A_H
+#define MAME_SOUND_S14001A_H
 
 #define MCFG_S14001A_BSY_HANDLER(_devcb) \
 	devcb = &s14001a_device::set_bsy_handler(*device, DEVCB_##_devcb);
@@ -15,16 +15,14 @@
 	devcb = &s14001a_device::set_ext_read_handler(*device, DEVCB_##_devcb);
 
 
-class s14001a_device : public device_t,
-						public device_sound_interface
+class s14001a_device : public device_t, public device_sound_interface
 {
 public:
 	s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~s14001a_device() {}
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_bsy_handler(device_t &device, _Object object) { return downcast<s14001a_device &>(device).m_bsy_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_ext_read_handler(device_t &device, _Object object) { return downcast<s14001a_device &>(device).m_ext_read_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_bsy_handler(device_t &device, Object &&cb) { return downcast<s14001a_device &>(device).m_bsy_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ext_read_handler(device_t &device, Object &&cb) { return downcast<s14001a_device &>(device).m_ext_read_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ_LINE_MEMBER(busy_r);   // /BUSY (pin 40)
 	DECLARE_READ_LINE_MEMBER(romen_r);  // ROM /EN (pin 9)
@@ -42,25 +40,13 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	required_region_ptr<uint8_t> m_SpeechRom;
-	sound_stream * m_stream;
-
-	devcb_write_line m_bsy_handler;
-	devcb_read8 m_ext_read_handler;
-
 	uint8_t readmem(uint16_t offset, bool phase);
 	bool Clock(); // called once to toggle external clock twice
 
 	// emulator helper functions
-	uint8_t Mux8To2(bool bVoicedP2, uint8_t uPPQtrP2, uint8_t uDeltaAdrP2, uint8_t uRomDataP2);
-	void CalculateIncrement(bool bVoicedP2, uint8_t uPPQtrP2, bool bPPQStartP2, uint8_t uDeltaP2, uint8_t uDeltaOldP2, uint8_t &uDeltaOldP1, uint8_t &uIncrementP2, bool &bAddP2);
-	uint8_t CalculateOutput(bool bVoicedP2, bool bXSilenceP2, uint8_t uPPQtrP2, bool bPPQStartP2, uint8_t uLOutputP2, uint8_t uIncrementP2, bool bAddP2);
 	void ClearStatistics();
 	void GetStatistics(uint32_t &uNPitchPeriods, uint32_t &uNVoiced, uint32_t &uNControlWords);
 	void SetPrintLevel(uint32_t uPrintLevel) { m_uPrintLevel = uPrintLevel; }
-
-	// internal state
-	bool m_bPhase1; // 1 bit internal clock
 
 	enum states
 	{
@@ -73,6 +59,15 @@ private:
 		PLAY,
 		DELAY
 	};
+
+	required_region_ptr<uint8_t> m_SpeechRom;
+	sound_stream * m_stream;
+
+	devcb_write_line m_bsy_handler;
+	devcb_read8 m_ext_read_handler;
+
+	// internal state
+	bool m_bPhase1; // 1 bit internal clock
 
 	// registers
 	states m_uStateP1;          // 3 bits
@@ -132,7 +127,6 @@ private:
 	uint32_t m_uPrintLevel;
 };
 
-extern const device_type S14001A;
+DECLARE_DEVICE_TYPE(S14001A, s14001a_device)
 
-
-#endif /* __S14001A_H__ */
+#endif // MAME_SOUND_S14001A_H

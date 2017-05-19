@@ -8,8 +8,10 @@
 
 **************************************************************************/
 
-#ifndef __TAITOIO_H__
-#define __TAITOIO_H__
+#ifndef MAME_MACHINE_TAITOIO_H
+#define MAME_MACHINE_TAITOIO_H
+
+#pragma once
 
 #include "machine/watchdog.h"
 
@@ -18,13 +20,12 @@ class tc0220ioc_device : public device_t
 {
 public:
 	tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~tc0220ioc_device() {}
 
-	template<class _Object> static devcb_base &set_read_0_callback(device_t &device, _Object object) { return downcast<tc0220ioc_device &>(device).m_read_0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_1_callback(device_t &device, _Object object) { return downcast<tc0220ioc_device &>(device).m_read_1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_2_callback(device_t &device, _Object object) { return downcast<tc0220ioc_device &>(device).m_read_2_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_3_callback(device_t &device, _Object object) { return downcast<tc0220ioc_device &>(device).m_read_3_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_7_callback(device_t &device, _Object object) { return downcast<tc0220ioc_device &>(device).m_read_7_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_read_0_callback(device_t &device, Object &&cb) { return downcast<tc0220ioc_device &>(device).m_read_0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_1_callback(device_t &device, Object &&cb) { return downcast<tc0220ioc_device &>(device).m_read_1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_2_callback(device_t &device, Object &&cb) { return downcast<tc0220ioc_device &>(device).m_read_2_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_3_callback(device_t &device, Object &&cb) { return downcast<tc0220ioc_device &>(device).m_read_3_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_7_callback(device_t &device, Object &&cb) { return downcast<tc0220ioc_device &>(device).m_read_7_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -53,19 +54,18 @@ private:
 	devcb_read8 m_read_7_cb;
 };
 
-extern const device_type TC0220IOC;
+DECLARE_DEVICE_TYPE(TC0220IOC, tc0220ioc_device)
 
 class tc0510nio_device : public device_t
 {
 public:
 	tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~tc0510nio_device() {}
 
-	template<class _Object> static devcb_base &set_read_0_callback(device_t &device, _Object object) { return downcast<tc0510nio_device &>(device).m_read_0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_1_callback(device_t &device, _Object object) { return downcast<tc0510nio_device &>(device).m_read_1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_2_callback(device_t &device, _Object object) { return downcast<tc0510nio_device &>(device).m_read_2_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_3_callback(device_t &device, _Object object) { return downcast<tc0510nio_device &>(device).m_read_3_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_7_callback(device_t &device, _Object object) { return downcast<tc0510nio_device &>(device).m_read_7_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_read_0_callback(device_t &device, Object &&cb) { return downcast<tc0510nio_device &>(device).m_read_0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_1_callback(device_t &device, Object &&cb) { return downcast<tc0510nio_device &>(device).m_read_1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_2_callback(device_t &device, Object &&cb) { return downcast<tc0510nio_device &>(device).m_read_2_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_3_callback(device_t &device, Object &&cb) { return downcast<tc0510nio_device &>(device).m_read_3_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_7_callback(device_t &device, Object &&cb) { return downcast<tc0510nio_device &>(device).m_read_7_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -93,19 +93,18 @@ private:
 	devcb_read8 m_read_7_cb;
 };
 
-extern const device_type TC0510NIO;
+DECLARE_DEVICE_TYPE(TC0510NIO, tc0510nio_device)
 
 class tc0640fio_device : public device_t
 {
 public:
 	tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~tc0640fio_device() {}
 
-	template<class _Object> static devcb_base &set_read_0_callback(device_t &device, _Object object) { return downcast<tc0640fio_device &>(device).m_read_0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_1_callback(device_t &device, _Object object) { return downcast<tc0640fio_device &>(device).m_read_1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_2_callback(device_t &device, _Object object) { return downcast<tc0640fio_device &>(device).m_read_2_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_3_callback(device_t &device, _Object object) { return downcast<tc0640fio_device &>(device).m_read_3_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_7_callback(device_t &device, _Object object) { return downcast<tc0640fio_device &>(device).m_read_7_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_read_0_callback(device_t &device, Object &&cb) { return downcast<tc0640fio_device &>(device).m_read_0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_1_callback(device_t &device, Object &&cb) { return downcast<tc0640fio_device &>(device).m_read_1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_2_callback(device_t &device, Object &&cb) { return downcast<tc0640fio_device &>(device).m_read_2_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_3_callback(device_t &device, Object &&cb) { return downcast<tc0640fio_device &>(device).m_read_3_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_7_callback(device_t &device, Object &&cb) { return downcast<tc0640fio_device &>(device).m_read_7_cb.set_callback(std::forward<Object>(cb)); }
 
 
 	DECLARE_READ8_MEMBER( read );
@@ -134,7 +133,7 @@ protected:
 	devcb_read8 m_read_7_cb;
 };
 
-extern const device_type TC0640FIO;
+DECLARE_DEVICE_TYPE(TC0640FIO, tc0640fio_device)
 
 
 /***************************************************************************
@@ -189,4 +188,4 @@ extern const device_type TC0640FIO;
 	devcb = &tc0640fio_device::set_read_7_callback(*device, DEVCB_##_devcb);
 
 
-#endif  /* __TAITOIO_H__ */
+#endif // MAME_MACHINE_TAITOIO_H

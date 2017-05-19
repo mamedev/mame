@@ -27,13 +27,13 @@ class fruitpc_state : public pcat_base_state
 {
 public:
 	fruitpc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
-			m_isabus(*this, "isa"),
-			m_inp1(*this, "INP1"),
-			m_inp2(*this, "INP2"),
-			m_inp3(*this, "INP3"),
-			m_inp4(*this, "INP4")
-			{ }
+		: pcat_base_state(mconfig, type, tag)
+		, m_isabus(*this, "isa")
+		, m_inp1(*this, "INP1")
+		, m_inp2(*this, "INP2")
+		, m_inp3(*this, "INP3")
+		, m_inp4(*this, "INP4")
+	{ }
 
 	required_device<isa8_device> m_isabus;
 	required_ioport m_inp1;
@@ -122,7 +122,7 @@ static MACHINE_CONFIG_FRAGMENT( fruitpc_sb_conf )
 	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fruitpc, fruitpc_state )
+static MACHINE_CONFIG_START( fruitpc )
 	MCFG_CPU_ADD("maincpu", I486, 66000000) // ST STPCD0166BTC3 66 MHz 486 CPU
 	MCFG_CPU_PROGRAM_MAP(fruitpc_map)
 	MCFG_CPU_IO_MAP(fruitpc_io)
@@ -164,7 +164,7 @@ ROM_START( fruitpc )
 	DISK_IMAGE( "fruit", 0,SHA1(df250ff06a97fa141a4144034f7035ac2947c53c) )
 ROM_END
 
-GAME( 2006, fruitpc,  0, fruitpc, fruitpc, driver_device,  0, ROT0, "<unknown>", "Fruit Land", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2006, fruitpc,  0, fruitpc, fruitpc, fruitpc_state,  0, ROT0, "<unknown>", "Fruit Land", MACHINE_IMPERFECT_GRAPHICS )
 
 // this doesn't really belong here, but is some kind of x86 pc-like hardware, exact CPU type etc. unknown
 // hardware ia by Paokai, motherboard has logos, large chip with logo too, http://www.paokai.com.tw/
@@ -176,4 +176,4 @@ ROM_START( gogostrk )
 	DISK_IMAGE( "ggs-5-2-07", 0,SHA1(f214fd39ec8ac02f008823f4b179ea6c6835e1b8) )
 ROM_END
 
-GAME( 2007, gogostrk, 0, fruitpc, fruitpc, driver_device,  0, ROT0, "American Alpha / Paokai", "Go Go Strike", MACHINE_NOT_WORKING ) // motherboard is dated 2006, if the CF card string is a date it's 2007
+GAME( 2007, gogostrk, 0, fruitpc, fruitpc, fruitpc_state, 0, ROT0, "American Alpha / Paokai", "Go Go Strike", MACHINE_NOT_WORKING ) // motherboard is dated 2006, if the CF card string is a date it's 2007

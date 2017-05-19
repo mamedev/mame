@@ -121,7 +121,7 @@ void policetr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 INTERRUPT_GEN_MEMBER(policetr_state::irq4_gen)
 {
 	device.execute().set_input_line(R3000_IRQ4, ASSERT_LINE);
-	timer_set(m_screen->time_until_pos(0), TIMER_IRQ5_GEN);
+	m_irq5_gen_timer->adjust(m_screen->time_until_pos(0));
 }
 
 
@@ -386,6 +386,10 @@ static INPUT_PORTS_START( sshoot11 )
 INPUT_PORTS_END
 
 
+void policetr_state::machine_start()
+{
+	m_irq5_gen_timer = timer_alloc(TIMER_IRQ5_GEN);
+}
 
 /*************************************
  *
@@ -393,7 +397,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( policetr, policetr_state )
+static MACHINE_CONFIG_START( policetr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R3041, MASTER_CLOCK/2)
@@ -715,14 +719,14 @@ DRIVER_INIT_MEMBER(policetr_state,sshoot12)
  *
  *************************************/
 
-GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)", 0 )
-GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)", 0 )
-GAME( 1996, policetr10,  policetr, policetr, polict10, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)", 0 )
+GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",        0 )
+GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",        0 )
+GAME( 1996, policetr10,  policetr, policetr, polict10, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",        0 )
 
 GAME( 1996, policetr13a, policetr, sshooter, policetr, policetr_state, plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
-GAME( 1996, policetr13b, policetr, sshooter, policetr, policetr_state, plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)", 0 )
+GAME( 1996, policetr13b, policetr, sshooter, policetr, policetr_state, plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)",       0 )
 
-GAME( 1998, sshooter,    0,        sshooter, policetr, policetr_state, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)", 0 )
-GAME( 1998, sshooter17,  sshooter, sshooter, policetr, policetr_state, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)", 0 )
-GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, policetr_state, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)", 0 )
-GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, policetr_state, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)", 0 )
+GAME( 1998, sshooter,    0,        sshooter, policetr, policetr_state, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",          0 )
+GAME( 1998, sshooter17,  sshooter, sshooter, policetr, policetr_state, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",          0 )
+GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, policetr_state, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",          0 )
+GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, policetr_state, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",          0 )

@@ -1356,7 +1356,7 @@ WRITE_LINE_MEMBER(segas18_state::ym3438_irq_handler)
 }
 
 
-static MACHINE_CONFIG_START( system18, segas18_state )
+static MACHINE_CONFIG_START( system18 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)

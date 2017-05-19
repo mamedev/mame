@@ -101,7 +101,7 @@ public:
 	DECLARE_MACHINE_START(pgm);
 	DECLARE_MACHINE_RESET(pgm);
 	uint32_t screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_pgm(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm);
 	TIMER_DEVICE_CALLBACK_MEMBER(pgm_interrupt);
 
 	inline void pgm_draw_pix( int xdrawpos, int pri, uint16_t* dest, uint8_t* destpri, uint16_t srcdat);

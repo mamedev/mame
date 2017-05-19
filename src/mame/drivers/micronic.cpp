@@ -348,7 +348,7 @@ WRITE_LINE_MEMBER( micronic_state::mc146818_irq )
 }
 
 
-static MACHINE_CONFIG_START( micronic, micronic_state )
+static MACHINE_CONFIG_START( micronic )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(micronic_mem)
@@ -397,5 +397,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 198?, micronic,  0,       0,  micronic,   micronic, driver_device,     0,  "Victor Micronic",   "Micronic 1000",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY            FULLNAME         FLAGS
+COMP( 198?, micronic, 0,      0,      micronic, micronic, micronic_state, 0,    "Victor Micronic", "Micronic 1000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

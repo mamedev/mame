@@ -95,6 +95,8 @@ public:
 	uint8_t m_yawdim_dma;
 	uint16_t m_dma_register[16];
 	dma_state_t m_dma_state;
+	emu_timer *m_dma_timer;
+	emu_timer *m_autoerase_line_timer;
 	DECLARE_WRITE16_MEMBER(midyunit_cmos_w);
 	DECLARE_READ16_MEMBER(midyunit_cmos_r);
 	DECLARE_WRITE16_MEMBER(midyunit_cmos_enable_w);

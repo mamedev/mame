@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MIDWAY_CHEAP_SQUEAK_DELUXE = device_creator<midway_cheap_squeak_deluxe_device>;
+DEFINE_DEVICE_TYPE(MIDWAY_CHEAP_SQUEAK_DELUXE, midway_cheap_squeak_deluxe_device, "midcsd", "Cheap Squeak Deluxe Sound Board")
 
 //-------------------------------------------------
 //  audio cpu map
@@ -74,7 +74,7 @@ const tiny_rom_entry *midway_cheap_squeak_deluxe_device::device_rom_region() con
 //-------------------------------------------------
 
 midway_cheap_squeak_deluxe_device::midway_cheap_squeak_deluxe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MIDWAY_CHEAP_SQUEAK_DELUXE, "Cheap Squeak Deluxe Sound Board", tag, owner, clock, "midcsd", __FILE__),
+	device_t(mconfig, MIDWAY_CHEAP_SQUEAK_DELUXE, tag, owner, clock),
 	device_mixer_interface(mconfig, *this),
 	m_cpu(*this, "cpu"),
 	m_pia(*this, "pia"),

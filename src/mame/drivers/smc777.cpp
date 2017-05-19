@@ -54,15 +54,15 @@ class smc777_state : public driver_device
 {
 public:
 	smc777_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_crtc(*this, "crtc"),
-	m_fdc(*this, "fdc"),
-	m_floppy0(*this, "fdc:0"),
-	m_floppy1(*this, "fdc:1"),
-	m_beeper(*this, "beeper"),
-	m_gfxdecode(*this, "gfxdecode"),
-	m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+		, m_beeper(*this, "beeper")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(mc6845_w);
@@ -107,7 +107,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
-	required_device<mb8876_t> m_fdc;
+	required_device<mb8876_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<beep_device> m_beeper;
@@ -963,7 +963,7 @@ static SLOT_INTERFACE_START( smc777_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( smc777, smc777_state )
+static MACHINE_CONFIG_START( smc777 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(smc777_mem)
@@ -1026,5 +1026,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1983, smc777,  0,       0,    smc777,     smc777, driver_device,   0,  "Sony",   "SMC-777",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+//    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY  FULLNAME   FLAGS
+COMP( 1983, smc777,  0,       0,      smc777,   smc777, smc777_state, 0,    "Sony",  "SMC-777", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

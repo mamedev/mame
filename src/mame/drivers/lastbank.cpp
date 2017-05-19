@@ -32,7 +32,7 @@ public:
 		m_vdp(*this, "tc0091lvc"),
 		m_oki(*this, "oki"),
 		m_essnd(*this, "essnd")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdp;
@@ -41,7 +41,7 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	uint8_t m_ram_bank[4];
 	uint8_t m_rom_bank;
@@ -100,7 +100,7 @@ uint32_t lastbank_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-void lastbank_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(lastbank_state::screen_vblank)
 {
 	if (state)
 	{
@@ -527,7 +527,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::lastbank_irq_scanline)
 	}
 }
 
-static MACHINE_CONFIG_START( lastbank, lastbank_state )
+static MACHINE_CONFIG_START( lastbank )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/4) //!!! TC0091LVC !!!
@@ -553,7 +553,7 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lastbank_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(lastbank_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(lastbank_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastbank )
@@ -567,7 +567,7 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_ES8712_ADD("essnd", 12000)
@@ -602,4 +602,4 @@ ROM_START( lastbank )
 	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
 ROM_END
 
-GAME( 1994, lastbank,  0,   lastbank, lastbank, driver_device,  0, ROT0, "Excellent System", "Last Bank (v1.16)", 0 )
+GAME( 1994, lastbank,  0,   lastbank, lastbank, lastbank_state,  0, ROT0, "Excellent System", "Last Bank (v1.16)", 0 )

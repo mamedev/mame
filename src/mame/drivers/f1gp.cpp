@@ -33,6 +33,8 @@
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
 
+#include "video/vsystem_gga.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -85,6 +87,7 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xfff002, 0xfff005) AM_WRITE(f1gp_fgscroll_w)
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfff008, 0xfff009) AM_READWRITE8(command_pending_r, sound_command_w, 0x00ff)
+	AM_RANGE(0xfff020, 0xfff023) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
 	AM_RANGE(0xfff040, 0xfff05f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
 	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
@@ -181,7 +184,7 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xfff00e, 0xfff00f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITE(f1gpb_misc_w)
 	AM_RANGE(0xfff010, 0xfff011) AM_WRITENOP
-	AM_RANGE(0xfff020, 0xfff023) AM_RAM //?
+	AM_RANGE(0xfff020, 0xfff023) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
 	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
 	AM_RANGE(0xfff800, 0xfff809) AM_RAM AM_SHARE("rozregs")
 ADDRESS_MAP_END
@@ -389,7 +392,7 @@ MACHINE_RESET_MEMBER(f1gp_state,f1gp)
 	m_scroll[1] = 0;
 }
 
-static MACHINE_CONFIG_START( f1gp, f1gp_state )
+static MACHINE_CONFIG_START( f1gp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
@@ -420,6 +423,8 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", f1gp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( f1gp_state, f1gp_old_tile_callback )
@@ -453,7 +458,7 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( f1gpb, f1gp_state )
+static MACHINE_CONFIG_START( f1gpb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,10000000) /* 10 MHz ??? */
@@ -482,12 +487,14 @@ static MACHINE_CONFIG_START( f1gpb, f1gp_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+
 	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gpb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -505,6 +512,7 @@ static MACHINE_CONFIG_DERIVED( f1gp2, f1gp )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp2)
 
+	MCFG_DEVICE_REMOVE("gga")
 	MCFG_DEVICE_REMOVE("vsystem_spr_old")
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( f1gp_state, f1gp2_tile_callback )
@@ -664,7 +672,7 @@ ROM_START( f1gp2 )
 ROM_END
 
 
-GAME( 1991, f1gp,  0,    f1gp,  f1gp, driver_device,  0, ROT90, "Video System Co.", "F-1 Grand Prix", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, f1gpb, f1gp, f1gpb, f1gp, driver_device,  0, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
+GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix",                    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state, 0, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
-GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, driver_device, 0, ROT90, "Video System Co.", "F-1 Grand Prix Part II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -46,9 +46,9 @@ WRITE8_MEMBER(munchmo_state::nmi_enable_w)
 }
 
 /* trusted thru schematics, NMI and IRQ triggers at vblank, at the same time (!) */
-void munchmo_state::vblank_irq(screen_device &screen, bool vblank_state)
+WRITE_LINE_MEMBER(munchmo_state::vblank_irq)
 {
-	if (vblank_state)
+	if (state)
 	{
 		if (m_nmi_enable)
 			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -324,7 +324,7 @@ void munchmo_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
+static MACHINE_CONFIG_START( mnchmobl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_15MHz/4) // from pin 13 of XTAL-driven 163
@@ -342,7 +342,7 @@ static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 	MCFG_SCREEN_SIZE(256+32+32, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255+32+32,0, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(munchmo_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(munchmo_state, vblank_irq)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(munchmo_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mnchmobl)
@@ -435,5 +435,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, driver_device, 0, ROT270, "SNK", "Joyful Road (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, driver_device, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, munchmo_state, 0, ROT270, "SNK",                   "Joyful Road (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, munchmo_state, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

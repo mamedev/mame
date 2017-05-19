@@ -710,7 +710,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( firefox, firefox_state )
+static MACHINE_CONFIG_START( firefox )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809E, MASTER_XTAL/2)
@@ -876,5 +876,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, firefox,  0,       firefox, firefox, driver_device, 0, ROT0, "Atari", "Fire Fox (set 1)", 0 )
-GAME( 1984, firefoxa, firefox, firefox, firefox, driver_device, 0, ROT0, "Atari", "Fire Fox (set 2)", 0 )
+GAME( 1984, firefox,  0,       firefox, firefox, firefox_state, 0, ROT0, "Atari", "Fire Fox (set 1)", 0 )
+GAME( 1984, firefoxa, firefox, firefox, firefox, firefox_state, 0, ROT0, "Atari", "Fire Fox (set 2)", 0 )

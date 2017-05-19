@@ -7,6 +7,11 @@
     Phill Harvey-Smith
     2009-11-29.
 */
+#ifndef MAME_INCLUDES_RMNIMBUS_H
+#define MAME_INCLUDES_RMNIMBUS_H
+
+#pragma once
+
 #include "cpu/i86/i186.h"
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
@@ -77,7 +82,7 @@ public:
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
-	required_device<SCSI_PORT_DEVICE> m_scsibus;
+	required_device<scsi_port_device> m_scsibus;
 	required_device<ram_device> m_ram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<via6522_device> m_via;
@@ -86,7 +91,7 @@ public:
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<output_latch_device> m_scsi_ctrl_out;
-	required_device<wd2793_t> m_fdc;
+	required_device<wd2793_device> m_fdc;
 	required_device<z80sio2_device> m_z80sio;
 	required_device<screen_device> m_screen;
 	required_ioport m_io_config;
@@ -223,3 +228,5 @@ private:
 	void debug_command(int ref, const std::vector<std::string> &params);
 	void video_debug(int ref, const std::vector<std::string> &params);
 };
+
+#endif // MAME_INCLUDES_RMNIMBUS_H

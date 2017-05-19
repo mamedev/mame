@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "dc-ctrl.h"
 
-const device_type DC_CONTROLLER = device_creator<dc_controller_device>;
+DEFINE_DEVICE_TYPE(DC_CONTROLLER, dc_controller_device, "dcctrl", "Dreamcast Controller")
 
 void dc_controller_device::static_set_port_tag(device_t &device, int port, const char *tag)
 {
@@ -30,7 +30,7 @@ void dc_controller_device::static_set_versions(device_t &device, const char *ver
 }
 
 dc_controller_device::dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	maple_device(mconfig, DC_CONTROLLER, "Dreamcast Controller", tag, owner, clock, "dcctrl", __FILE__)
+	maple_device(mconfig, DC_CONTROLLER, tag, owner, clock)
 {
 	memset(port_tag, 0, sizeof(port_tag));
 

@@ -1396,7 +1396,7 @@ INPUT_PORTS_END
 
 /**********************************************************************************************************/
 
-static MACHINE_CONFIG_START( nc100, nc_state )
+static MACHINE_CONFIG_START( nc100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
 	MCFG_CPU_PROGRAM_MAP(nc_map)
@@ -1549,7 +1549,7 @@ ROM_START(nc200)
 	ROM_LOAD("nc200.rom", 0x010000, 0x080000, CRC(bb8180e7) SHA1(fb5c93b0a3e199202c6a12548d2617f7a09bae47))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME    FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE      INIT     COMPANY         FULLNAME    FLAGS */
 COMP( 1992, nc100,  0,      0,      nc100,  nc100, nc_state,  nc,      "Amstrad plc",  "NC100",    0 )
 COMP( 1992, dw225,  nc100,  0,      nc100,  nc100, nc_state,  nc,      "NTS Computer Systems", "DreamWriter 225",    0 )
 COMP( 1992, nc150,  nc100,  0,      nc100,  nc100, nc_state,  nc,      "Amstrad plc",  "NC150",    0 )

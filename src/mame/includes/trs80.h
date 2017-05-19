@@ -162,7 +162,7 @@ private:
 	optional_device<output_latch_device> m_cent_data_out;
 	optional_device<input_buffer_device> m_cent_status_in;
 	optional_device<ay31015_device> m_ay31015;
-	optional_device<fd1793_t> m_fdc;
+	optional_device<fd1793_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	optional_device<floppy_connector> m_floppy2;

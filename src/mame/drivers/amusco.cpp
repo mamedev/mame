@@ -142,6 +142,7 @@ public:
 	required_device<ticket_dispenser_device> m_hopper;
 	uint8_t m_mc6845_address;
 	uint16_t m_video_update_address;
+	bool m_blink_state;
 };
 
 
@@ -160,8 +161,7 @@ TILE_GET_INFO_MEMBER(amusco_state::get_bg_tile_info)
 	int code = m_videoram[tile_index * 2] | (m_videoram[tile_index * 2 + 1] << 8);
 	int color = (code & 0x7000) >> 12;
 
-	// 6845 cursor is only used for its blink state
-	if (BIT(code, 15) && !m_crtc->cursor_state_r())
+	if (BIT(code, 15) && !m_blink_state)
 		code = 0;
 
 	SET_TILE_INFO_MEMBER(
@@ -175,6 +175,7 @@ TILE_GET_INFO_MEMBER(amusco_state::get_bg_tile_info)
 void amusco_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(amusco_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 10, 74, 24);
+	m_blink_state = false;
 }
 
 void amusco_state::machine_start()
@@ -453,8 +454,14 @@ MC6845_ON_UPDATE_ADDR_CHANGED(amusco_state::crtc_addr)
 
 MC6845_UPDATE_ROW(amusco_state::update_row)
 {
+	// Latch blink state at start of first line, where cursor is always positioned
+	if (y == 0 && ma == 0 && m_blink_state != (cursor_x == 0))
+	{
+		m_blink_state = (cursor_x == 0);
+		m_bg_tilemap->mark_all_dirty();
+	}
+
 	const rectangle rowrect(0, 8 * x_count - 1, y, y);
-	m_bg_tilemap->mark_all_dirty();
 	m_bg_tilemap->draw(*m_screen, bitmap, rowrect, 0, 0);
 }
 
@@ -462,7 +469,7 @@ MC6845_UPDATE_ROW(amusco_state::update_row)
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( amusco, amusco_state )
+static MACHINE_CONFIG_START( amusco )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, CPU_CLOCK)        // 5 MHz ?
@@ -579,6 +586,6 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME        PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY      FULLNAME                      FLAGS                                                    LAYOUT    */
-GAMEL( 1987, amusco,     0,      amusco,   amusco,   driver_device, 0,    ROT0, "Amusco",    "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER,     layout_amusco ) // palette totally wrong
-GAMEL( 1988, draw88pkr,  0,      draw88pkr,draw88pkr,driver_device, 0,    ROT0, "BTE, Inc.", "Draw 88 Poker (V2.0)",        MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
+/*     YEAR  NAME        PARENT  MACHINE   INPUT      STATE         INIT  ROT   COMPANY      FULLNAME                       FLAGS                                                LAYOUT    */
+GAMEL( 1987, amusco,     0,      amusco,   amusco,    amusco_state, 0,    ROT0, "Amusco",    "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
+GAMEL( 1988, draw88pkr,  0,      draw88pkr,draw88pkr, amusco_state, 0,    ROT0, "BTE, Inc.", "Draw 88 Poker (V2.0)",        MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong

@@ -137,12 +137,12 @@ static GFXDECODE_START( adder2 )
 	GFXDECODE_ENTRY( ":gfx1",  0, charlayout, 0, 16 )
 GFXDECODE_END
 
-const device_type BFM_ADDER2 = device_creator<bfm_adder2_device>;
+DEFINE_DEVICE_TYPE(BFM_ADDER2, bfm_adder2_device, "bfm_adder2", "BFM ADDER2")
 
 bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: device_t(mconfig, BFM_ADDER2, "BFM ADDER2", tag, owner, clock, "bfm_adder2", __FILE__),
-		device_gfx_interface(mconfig, *this, GFXDECODE_NAME(adder2), "palette"),
-		m_cpu(*this, "adder2")
+	: device_t(mconfig, BFM_ADDER2, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, GFXDECODE_NAME(adder2), "palette")
+	, m_cpu(*this, "adder2")
 {
 }
 
@@ -215,7 +215,7 @@ void bfm_adder2_device::device_reset()
 
 void bfm_adder2_device::device_start()
 {
-	if (!palette().started())
+	if (!palette().device().started())
 		throw device_missing_dependencies();
 
 	adder2_decode_char_roms();

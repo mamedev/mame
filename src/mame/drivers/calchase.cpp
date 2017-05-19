@@ -639,7 +639,7 @@ void calchase_state::machine_reset()
 	membank("bios_ext")->set_base(memregion("bios")->base() + 0);
 }
 
-static MACHINE_CONFIG_START( calchase, calchase_state )
+static MACHINE_CONFIG_START( calchase )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
 	MCFG_CPU_PROGRAM_MAP(calchase_map)
 	MCFG_CPU_IO_MAP(calchase_io)
@@ -671,7 +671,7 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hostinv, calchase_state )
+static MACHINE_CONFIG_START( hostinv )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
 	MCFG_CPU_PROGRAM_MAP(calchase_map)
 	MCFG_CPU_IO_MAP(calchase_io)
@@ -773,6 +773,6 @@ ROM_START( eggsplc )
 	DISK_IMAGE_READONLY( "eggsplc", 0, SHA1(fa38dd6b0d25cde644f68cf639768f137c607eb5) )
 ROM_END
 
-GAME( 1998, hostinv,   0,    hostinv,  calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Host Invaders", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, calchase,  0,    calchase, calchase, calchase_state,  calchase, ROT0, "The Game Room", "California Chase", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, hostinv,   0,    hostinv,  calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Host Invaders",        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, calchase,  0,    calchase, calchase, calchase_state,  calchase, ROT0, "The Game Room", "California Chase",     MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2002, eggsplc,   0,    calchase, calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Eggs Playing Chicken", 0 )

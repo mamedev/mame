@@ -471,7 +471,7 @@ static GFXDECODE_START( kikcubic )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( vigilant, vigilant_state )
+static MACHINE_CONFIG_START( vigilant )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3579645)          /* 3.579645 MHz */
@@ -502,7 +502,7 @@ static MACHINE_CONFIG_START( vigilant, vigilant_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("m72", M72, 0)
+	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
 
 	MCFG_YM2151_ADD("ymsnd", 3579645)
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
@@ -514,7 +514,7 @@ static MACHINE_CONFIG_START( vigilant, vigilant_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( buccanrs, vigilant_state )
+static MACHINE_CONFIG_START( buccanrs )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5688800)          /* 5.688800 MHz */
@@ -545,7 +545,7 @@ static MACHINE_CONFIG_START( buccanrs, vigilant_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("m72", M72, 0)
+	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
 
 	MCFG_SOUND_ADD("ym1", YM2203, 18432000/6)
 	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
@@ -573,7 +573,7 @@ static MACHINE_CONFIG_START( buccanrs, vigilant_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kikcubic, vigilant_state )
+static MACHINE_CONFIG_START( kikcubic )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3579645)          /* 3.579645 MHz */
@@ -604,7 +604,7 @@ static MACHINE_CONFIG_START( kikcubic, vigilant_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("m72", M72, 0)
+	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
 
 	MCFG_YM2151_ADD("ymsnd", 3579645)
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
@@ -1121,18 +1121,18 @@ ROM_START( buccanrsb )
 	ROM_LOAD( "prom2.u99",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )
 ROM_END
 
-GAME( 1988, vigilant,   0,          vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev E)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantg,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev G)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilanto,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilanta,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev A)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantb,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev B)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantc,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantd,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (Japan, Rev D)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantbl, vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "bootleg", "Vigilante (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilant,   0,          vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (World, Rev E)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantg,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev G)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilanto,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem (Data East license)", "Vigilante (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilanta,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (World, Rev A)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantb,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev B)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantc,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (World, Rev C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantd,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (Japan, Rev D)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantbl, vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "bootleg", "Vigilante (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, kikcubic,   0,          kikcubic, kikcubic, driver_device, 0, ROT0, "Irem", "Meikyu Jima (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) /* English title is Kickle Cubicle */
-GAME( 1988, kikcubicb,  kikcubic,   kikcubic, kikcubic, driver_device, 0, ROT0, "bootleg", "Kickle Cubele", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kikcubic,   0,          kikcubic, kikcubic, vigilant_state, 0, ROT0, "Irem", "Meikyu Jima (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) /* English title is Kickle Cubicle */
+GAME( 1988, kikcubicb,  kikcubic,   kikcubic, kikcubic, vigilant_state, 0, ROT0, "bootleg", "Kickle Cubele", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, buccanrs,   0,          buccanrs, buccanrs, driver_device, 0, ROT0, "Duintronic", "Buccaneers (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, buccanrsa,  buccanrs,   buccanrs, buccanra, driver_device, 0, ROT0, "Duintronic", "Buccaneers (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, buccanrsb,  buccanrs,   buccanrs, buccanrs, driver_device, 0, ROT0, "Duintronic", "Buccaneers (set 3, harder)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, buccanrs,   0,          buccanrs, buccanrs, vigilant_state, 0, ROT0, "Duintronic", "Buccaneers (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, buccanrsa,  buccanrs,   buccanrs, buccanra, vigilant_state, 0, ROT0, "Duintronic", "Buccaneers (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, buccanrsb,  buccanrs,   buccanrs, buccanrs, vigilant_state, 0, ROT0, "Duintronic", "Buccaneers (set 3, harder)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

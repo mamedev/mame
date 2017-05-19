@@ -90,7 +90,7 @@ CIRCUIT_LAYOUT( breakout )
 
 #if (SLOW_BUT_ACCURATE)
 	SOLVER(Solver, 48000)
-	PARAM(Solver.ACCURACY, 1e-8) // less accuracy and diode will not work
+	PARAM(Solver.ACCURACY, 1e-7) // less accuracy and diode will not work
 	PARAM(Solver.METHOD, "MAT_CR")
 #else
 	SOLVER(Solver, 48000)

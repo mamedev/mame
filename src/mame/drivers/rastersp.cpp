@@ -847,7 +847,7 @@ SLOT_INTERFACE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( rastersp, rastersp_state )
+static MACHINE_CONFIG_START( rastersp )
 	MCFG_CPU_ADD("maincpu", I486, 33330000)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -954,5 +954,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, rotr, 0, rastersp, rotr, driver_device, 0, ROT0, "BFM/Mirage", "Rise of the Robots (prototype)", 0 )
-GAME( 1997, fbcrazy, 0, rastersp, rotr, driver_device, 0, ROT0, "BFM", "Football Crazy (Video Quiz)", MACHINE_NOT_WORKING )
+GAME( 1994, rotr,    0, rastersp, rotr, rastersp_state, 0, ROT0, "BFM/Mirage", "Rise of the Robots (prototype)", 0 )
+GAME( 1997, fbcrazy, 0, rastersp, rotr, rastersp_state, 0, ROT0, "BFM",        "Football Crazy (Video Quiz)",    MACHINE_NOT_WORKING )

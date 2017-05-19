@@ -5,11 +5,11 @@
     Namco C139 - Serial I/F Controller
 
 ***************************************************************************/
+#ifndef MAME_MACHINE_NAMCO_C139_H
+#define MAME_MACHINE_NAMCO_C139_H
 
 #pragma once
 
-#ifndef __NAMCO_C139DEV_H__
-#define __NAMCO_C139DEV_H__
 
 
 
@@ -54,7 +54,7 @@ private:
 
 
 // device type definition
-extern const device_type NAMCO_C139;
+DECLARE_DEVICE_TYPE(NAMCO_C139, namco_c139_device)
 
 
 
@@ -64,4 +64,4 @@ extern const device_type NAMCO_C139;
 
 
 
-#endif
+#endif // MAME_MACHINE_NAMCO_C139_H

@@ -394,7 +394,7 @@ static INPUT_PORTS_START( galds )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( pastelg, pastelg_state )
+static MACHINE_CONFIG_START( pastelg )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)    /* unknown divider, galds definitely relies on this for correct voice pitch */
@@ -455,7 +455,7 @@ Note
 
 */
 
-static MACHINE_CONFIG_START( threeds, pastelg_state )
+static MACHINE_CONFIG_START( threeds )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)    /* unknown divider, galds definitely relies on this for correct voice pitch */
@@ -562,6 +562,6 @@ ROM_END
 
 
 
-GAME( 1985, pastelg, 0,       pastelg, pastelg, driver_device, 0, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, threeds, 0,       threeds, threeds, driver_device, 0, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, galds,   threeds, threeds, galds,   driver_device, 0, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pastelg, 0,       pastelg, pastelg, pastelg_state, 0, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, threeds, 0,       threeds, threeds, pastelg_state, 0, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, galds,   threeds, threeds, galds,   pastelg_state, 0, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", MACHINE_SUPPORTS_SAVE )

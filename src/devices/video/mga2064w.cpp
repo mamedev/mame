@@ -3,10 +3,10 @@
 #include "emu.h"
 #include "mga2064w.h"
 
-const device_type MGA2064W = device_creator<mga2064w_device>;
+DEFINE_DEVICE_TYPE(MGA2064W, mga2064w_device, "mga2064w", "Matrox Millennium")
 
 mga2064w_device::mga2064w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, MGA2064W, "Matrox Millennium", tag, owner, clock, "mga2064w", __FILE__)
+	: pci_device(mconfig, MGA2064W, tag, owner, clock)
 {
 }
 

@@ -30,6 +30,9 @@
 #include "eminline.h"
 #include "profiler.h"
 
+// http interface helpers
+#include "http.h"
+
 // commonly-referenced utilities imported from lib/util
 #include "palette.h"
 #include "unicode.h"
@@ -70,6 +73,7 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "dirom.h"
 #include "diexec.h"
 #include "opresolv.h"
+#include "dipalette.h"
 #include "digfx.h"
 #include "diimage.h"
 #include "dioutput.h"
@@ -114,5 +118,8 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 
 // member templates that don't like incomplete types
 #include "device.ipp"
+
+template <class DriverClass> void game_driver::driver_init_helper_impl<DriverClass>::invoke(driver_init_helper const &helper, running_machine &machine)
+{ (machine.driver_data<DriverClass>()->*static_cast<driver_init_helper_impl<DriverClass> const &>(helper).m_method)(); }
 
 #endif  /* __EMU_H__ */

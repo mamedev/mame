@@ -375,7 +375,7 @@ static GFXDECODE_START( bestleag )
 	GFXDECODE_ENTRY( "gfx2", 0, bestleag_char16layout,   0x300, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( bestleag, bestleag_state )
+static MACHINE_CONFIG_START( bestleag )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(bestleag_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bestleag_state,  irq6_line_hold)
@@ -394,7 +394,7 @@ static MACHINE_CONFIG_START( bestleag, bestleag_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) /* Hand-tuned */
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) /* Hand-tuned */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_CONFIG_END
@@ -474,5 +474,5 @@ ROM_END
 
 /* GAME drivers */
 
-GAME( 1993, bestleag, bigstrik, bestleag, bestleag, driver_device, 0, ROT0, "bootleg", "Best League (bootleg of Big Striker, Italian Serie A)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, bestleaw, bigstrik, bestleaw, bestleag, driver_device, 0, ROT0, "bootleg", "Best League (bootleg of Big Striker, World Cup)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, bestleag, bigstrik, bestleag, bestleag, bestleag_state, 0, ROT0, "bootleg", "Best League (bootleg of Big Striker, Italian Serie A)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, bestleaw, bigstrik, bestleaw, bestleag, bestleag_state, 0, ROT0, "bootleg", "Best League (bootleg of Big Striker, World Cup)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

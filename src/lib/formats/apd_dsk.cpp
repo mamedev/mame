@@ -6,6 +6,58 @@
 
     Archimedes Protected Disk Image format
 
+    APD file structure
+    ------------------
+
+    The APD file is a GZip compressed version of the original APD file.
+
+    Compressed file always starts:
+    1F 8B 08 00 00 00 00 00 00 0B EC BD
+    ^^ ^^ ^^ ^^ ^^ ^^ ^^ ^^ ^^ ^^
+    |  |  |  |  |  |  |  |  |  |
+    |  |  |  |  |  |  |  |  |  +- OS
+    |  |  |  |  |  |  |  |  +---- xfl
+    |  |  |  |  +--+--+--+------- time
+    |  |  |  +------------------- gzip flags
+    |  |  +---------------------- gzip compression*
+    |  |
+    +--+------------------------- gzip header
+
+    *  Compression method: 8 is the only supported format
+
+    Original APD file structure:
+              0 - 7    "APDX0001" identifier
+              8 - B    t0sd - Track 0 SD length in bits
+              C - F    t0dd - Track 0 DD length in bits
+             10 - 13   t0qd - Track 0 QD length in bits
+             14 - 1F   t1sd - Track 1 SD length in bits
+             20 - 23   t1dd - Track 1 DD length in bits
+             24 - 27   t1qd - Track 1 QD length in bits
+            ...   ...  repeated to Track 159
+            77C - 787  Track 160 (blank)
+            7C4 - 7CF  Track 166 (blank)
+
+                  7D0  Track 0 SD data
+    + (t0sd + 7) >> 3  Track 0 DD data
+    + (t0dd + 7) >> 3  Track 0 QD data
+
+    + (t0qd + 7) >> 3  Track 1 SD data
+    + (t1sd + 7) >> 3  Track 1 DD data
+    + (t1dd + 7) >> 3  Track 1 QD data
+
+    SD    data is big-endian raw FM words
+    DD/QD data is big-endian raw MFM words
+
+   As far as I can tell, the tracks are always sequential, so
+    physical tracks translate as:
+
+    Physical         APD
+    --------------   -------
+    Side 0 Track 0 > Track 0
+    Side 1 Track 0 > Track 1
+    Side 0 Track 1 > Track 2
+    etc.
+
 *********************************************************************/
 
 #include <zlib.h>
@@ -96,17 +148,17 @@ bool apd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 		err = inflateInit2(&d_stream, MAX_WBITS | 16);
 		if (err != Z_OK) {
-			LOG_FORMATS("inflateInit2 error: %d\n", err);
+			osd_printf_error("inflateInit2 error: %d\n", err);
 			return false;
 		}
 		err = inflate(&d_stream, Z_FINISH);
 		if (err != Z_STREAM_END && err != Z_OK) {
-			LOG_FORMATS("inflate error: %d\n", err);
+			osd_printf_error("inflate error: %d\n", err);
 			return false;
 		}
 		err = inflateEnd(&d_stream);
 		if (err != Z_OK) {
-			LOG_FORMATS("inflateEnd error: %d\n", err);
+			osd_printf_error("inflateEnd error: %d\n", err);
 			return false;
 		}
 		size = inflate_size;

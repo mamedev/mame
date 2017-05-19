@@ -6,10 +6,10 @@
  *
  *****************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_XXX_H
+#define MAME_CPU_XXX_H
 
-#ifndef __XXX_H__
-#define __XXX_H__
+#pragma once
 
 enum
 {
@@ -24,7 +24,7 @@ class xxx_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	xxx_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	xxx_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -39,7 +39,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : (spacenum == AS_DATA) ? &m_data_config : nullptr; }
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -63,9 +63,9 @@ private:
 };
 
 
-extern const device_type XXX;
+DECLARE_DEVICE_TYPE(XXX, xxx_cpu_device)
 
 
 CPU_DISASSEMBLE( xxx );
 
-#endif /* __XXX_H__ */
+#endif // MAME_CPU_XXX_H

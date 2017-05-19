@@ -1,10 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
+#ifndef MAME_MACHINE_MACKBD_H
+#define MAME_MACHINE_MACKBD_H
+
 #pragma once
-
-#ifndef __MACKBD_H__
-#define __MACKBD_H__
-
 
 
 
@@ -49,7 +48,6 @@ public:
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_WRITE8_MEMBER(p2_w);
-	DECLARE_READ8_MEMBER(t1_r);
 
 	DECLARE_WRITE_LINE_MEMBER(data_w);
 
@@ -73,6 +71,6 @@ private:
 };
 
 // device type definition
-extern const device_type MACKBD;
+DECLARE_DEVICE_TYPE(MACKBD, mackbd_device)
 
-#endif
+#endif // MAME_MACHINE_MACKBD_H

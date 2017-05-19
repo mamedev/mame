@@ -5,11 +5,11 @@
     Luxor ABC 1600 Mover emulation
 
 **********************************************************************/
+#ifndef MAME_VIDEO_ABC1600_H
+#define MAME_VIDEO_ABC1600_H
 
 #pragma once
 
-#ifndef __ABC1600_MOVER__
-#define __ABC1600_MOVER__
 
 #include "video/mc6845.h"
 
@@ -145,8 +145,8 @@ private:
 
 
 // device type definition
-extern const device_type ABC1600_MOVER;
+DECLARE_DEVICE_TYPE(ABC1600_MOVER, abc1600_mover_device)
 
 
 
-#endif
+#endif // MAME_VIDEO_ABC1600_H

@@ -245,7 +245,7 @@ WRITE8_MEMBER(junofrst_state::portB_w)
 			C += 220000;    /* 220000pF = 0.22uF */
 
 		data >>= 2;
-		filter[i]->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 200, CAP_P(C));
+		filter[i]->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 200, CAP_P(C));
 	}
 }
 
@@ -337,8 +337,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, junofrst_state )
 	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
 
@@ -412,7 +410,7 @@ INTERRUPT_GEN_MEMBER(junofrst_state::_30hz_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( junofrst, junofrst_state )
+static MACHINE_CONFIG_START( junofrst )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 1500000)         /* 1.5 MHz ??? */
@@ -425,6 +423,8 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_CPU_ADD("mcu", I8039,8000000)  /* 8MHz crystal */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(junofrst_state, i8039_irqen_and_status_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

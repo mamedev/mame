@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#ifndef MAME_MACHINE_ZNMCU_H
+#define MAME_MACHINE_ZNMCU_H
+
 #pragma once
 
-#ifndef __ZNMCU_H__
-#define __ZNMCU_H__
 
-
-extern const device_type ZNMCU;
+DECLARE_DEVICE_TYPE(ZNMCU, znmcu_device)
 
 #define MCFG_ZNMCU_DATAOUT_HANDLER(_devcb) \
 	devcb = &znmcu_device::set_dataout_handler(*device, DEVCB_##_devcb);
@@ -29,11 +29,11 @@ public:
 	znmcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_dsw_handler(device_t &device, _Object object) { return downcast<znmcu_device &>(device).m_dsw_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_analog1_handler(device_t &device, _Object object) { return downcast<znmcu_device &>(device).m_analog1_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_analog2_handler(device_t &device, _Object object) { return downcast<znmcu_device &>(device).m_analog2_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_dataout_handler(device_t &device, _Object object) { return downcast<znmcu_device &>(device).m_dataout_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_dsr_handler(device_t &device, _Object object) { return downcast<znmcu_device &>(device).m_dsr_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_dsw_handler(device_t &device, Object &&cb) { return downcast<znmcu_device &>(device).m_dsw_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_analog1_handler(device_t &device, Object &&cb) { return downcast<znmcu_device &>(device).m_analog1_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_analog2_handler(device_t &device, Object &&cb) { return downcast<znmcu_device &>(device).m_analog2_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dataout_handler(device_t &device, Object &&cb) { return downcast<znmcu_device &>(device).m_dataout_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dsr_handler(device_t &device, Object &&cb) { return downcast<znmcu_device &>(device).m_dsr_handler.set_callback(std::forward<Object>(cb)); }
 
 	WRITE_LINE_MEMBER(write_select);
 	WRITE_LINE_MEMBER(write_clock);
@@ -60,4 +60,4 @@ private:
 	emu_timer *m_mcu_timer;
 };
 
-#endif
+#endif // MAME_MACHINE_ZNMCU_H

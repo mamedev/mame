@@ -260,7 +260,7 @@ WRITE16_MEMBER( dcon_state::layer_scroll_w )
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( dcon, dcon_state )
+static MACHINE_CONFIG_START( dcon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( dcon, dcon_state )
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -304,7 +304,7 @@ static MACHINE_CONFIG_START( dcon, dcon_state )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sdgndmps, dcon_state )
+static MACHINE_CONFIG_START( sdgndmps )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -339,7 +339,7 @@ static MACHINE_CONFIG_START( sdgndmps, dcon_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -436,4 +436,4 @@ DRIVER_INIT_MEMBER(dcon_state,sdgndmps)
 
 
 GAME( 1991, sdgndmps, 0, sdgndmps, sdgndmps, dcon_state, sdgndmps, ROT0, "Banpresto / Bandai", "SD Gundam Psycho Salamander no Kyoui", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dcon,     0, dcon,     dcon, driver_device,     0,        ROT0, "Success",            "D-Con", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dcon,     0, dcon,     dcon,     dcon_state, 0,        ROT0, "Success",            "D-Con",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

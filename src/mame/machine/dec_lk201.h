@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, M. Burke
-#pragma once
+#ifndef MAME_MACHINE_DEC_LK201_H
+#define MAME_MACHINE_DEC_LK201_H
 
-#ifndef __LK201_H__
-#define __LK201_H__
+#pragma once
 
 #include "sound/beep.h"
 
@@ -139,6 +139,6 @@ private:
 };
 
 // device type definition
-extern const device_type LK201;
+DECLARE_DEVICE_TYPE(LK201, lk201_device)
 
-#endif
+#endif // MAME_MACHINE_DEC_LK201_H

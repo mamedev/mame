@@ -8,7 +8,9 @@
     and Bryan McPhail, Nicola Salmoria, Aaron Giles
 
 ***************************************************************************/
+
 #include "sound/msm5205.h"
+#include "video/vsystem_gga.h"
 #include "video/vsystem_spr2.h"
 #include "screen.h"
 
@@ -19,6 +21,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
+		m_gga(*this, "gga"),
 		m_spr_old(*this, "vsystem_spr_old"),
 		m_subcpu(*this, "sub"),
 		m_maincpu(*this, "maincpu"),
@@ -31,6 +34,7 @@ public:
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_spriteram;
 
+	required_device<vsystem_gga_device> m_gga;
 	optional_device<vsystem_spr2_device> m_spr_old; // only used by pipe dream, split this state up and clean things...
 
 	/* video-related */
@@ -48,8 +52,6 @@ public:
 	uint32_t   m_scrolly_ofs;
 	uint32_t   m_scrollx_ofs;
 
-	uint8_t    m_crtc_register;
-	uint8_t    m_crtc_data[0x10];
 	emu_timer *m_crtc_timer;
 
 	/* misc */
@@ -80,8 +82,7 @@ public:
 	DECLARE_READ8_MEMBER(fromance_videoram_r);
 	DECLARE_WRITE8_MEMBER(fromance_videoram_w);
 	DECLARE_WRITE8_MEMBER(fromance_scroll_w);
-	DECLARE_WRITE8_MEMBER(fromance_crtc_data_w);
-	DECLARE_WRITE8_MEMBER(fromance_crtc_register_w);
+	DECLARE_WRITE8_MEMBER(fromance_gga_data_w);
 	DECLARE_WRITE8_MEMBER(fromance_adpcm_reset_w);
 	TILE_GET_INFO_MEMBER(get_fromance_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fromance_fg_tile_info);

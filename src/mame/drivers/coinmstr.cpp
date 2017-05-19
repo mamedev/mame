@@ -1234,7 +1234,7 @@ uint32_t coinmstr_state::screen_update_coinmstr(screen_device &screen, bitmap_in
 }
 
 
-static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
+static MACHINE_CONFIG_START( coinmstr )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 7 MHz.
 	MCFG_CPU_PROGRAM_MAP(coinmstr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", coinmstr_state,  irq0_line_hold)
@@ -1550,10 +1550,10 @@ DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY                  FULLNAME                                   FLAGS   */
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT   COMPANY                  FULLNAME                                    FLAGS
 GAME( 1985, quizmstr, 0,        quizmstr, quizmstr, coinmstr_state, coinmstr, ROT0, "Loewen Spielautomaten", "Quizmaster (German)",                      MACHINE_UNEMULATED_PROTECTION )
 GAME( 1987, trailblz, 0,        trailblz, trailblz, coinmstr_state, coinmstr, ROT0, "Coinmaster",            "Trail Blazer",                             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // or Trail Blazer 2 ?
 GAME( 1989, supnudg2, 0,        supnudg2, supnudg2, coinmstr_state, coinmstr, ROT0, "Coinmaster",            "Super Nudger II - P173 (Version 5.21)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1990, pokeroul, 0,        pokeroul, pokeroul, driver_device,  0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",            MACHINE_NOT_WORKING )
-GAME( 1985, jpcoin,   0,        jpcoin,   jpcoin,   driver_device,  0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster set 1)", 0 )
-GAME( 1990, jpcoin2,  0,        jpcoin,   jpcoin,   driver_device,  0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster, Amusement Only)", 0 )
+GAME( 1990, pokeroul, 0,        pokeroul, pokeroul, coinmstr_state, 0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",            MACHINE_NOT_WORKING )
+GAME( 1985, jpcoin,   0,        jpcoin,   jpcoin,   coinmstr_state, 0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster set 1)",           0 )
+GAME( 1990, jpcoin2,  0,        jpcoin,   jpcoin,   coinmstr_state, 0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster, Amusement Only)", 0 )

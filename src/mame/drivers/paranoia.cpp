@@ -163,7 +163,7 @@ WRITE_LINE_MEMBER(paranoia_state::i8155_timer_out)
 	//logerror("Timer out %d\n", state);
 }
 
-static MACHINE_CONFIG_START( paranoia, paranoia_state )
+static MACHINE_CONFIG_START( paranoia )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)
@@ -186,7 +186,7 @@ static MACHINE_CONFIG_START( paranoia, paranoia_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_common_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
@@ -221,4 +221,4 @@ ROM_START(paranoia)
 	ROM_LOAD( "4.352", 0x18000, 0x8000, CRC(11297fed) SHA1(17a294e65ba1c4806307602dee4c7c627ad1fcfd) )
 ROM_END
 
-GAME( 1990, paranoia, 0, paranoia, paranoia, pce_common_state, pce_common, ROT0, "Naxat Soft", "Paranoia", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, paranoia, 0, paranoia, paranoia, paranoia_state, pce_common, ROT0, "Naxat Soft", "Paranoia", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

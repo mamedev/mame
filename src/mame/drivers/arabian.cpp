@@ -336,7 +336,7 @@ void arabian_state::machine_reset()
 	m_video_control = 0;
 }
 
-static MACHINE_CONFIG_START( arabian, arabian_state )
+static MACHINE_CONFIG_START( arabian )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_OSC/4)
@@ -422,5 +422,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, arabian,  0,       arabian, arabian, driver_device,  0, ROT270, "Sun Electronics",                 "Arabian",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, arabiana, arabian, arabian, arabiana, driver_device, 0, ROT270, "Sun Electronics (Atari license)", "Arabian (Atari)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, arabian,  0,       arabian, arabian,  arabian_state, 0, ROT270, "Sun Electronics",                 "Arabian",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, arabiana, arabian, arabian, arabiana, arabian_state, 0, ROT270, "Sun Electronics (Atari license)", "Arabian (Atari)", MACHINE_SUPPORTS_SAVE )

@@ -286,21 +286,21 @@ READ8_MEMBER(n8080_state::n8080_8035_p1_r)
 }
 
 
-READ8_MEMBER(n8080_state::n8080_8035_t0_r)
+READ_LINE_MEMBER(n8080_state::n8080_8035_t0_r)
 {
 	return (m_curr_sound_pins >> 0x7) & 1;
 }
-READ8_MEMBER(n8080_state::n8080_8035_t1_r)
+READ_LINE_MEMBER(n8080_state::n8080_8035_t1_r)
 {
 	return (m_curr_sound_pins >> 0xc) & 1;
 }
 
 
-READ8_MEMBER(n8080_state::helifire_8035_t0_r)
+READ_LINE_MEMBER(n8080_state::helifire_8035_t0_r)
 {
 	return (m_curr_sound_pins >> 0x3) & 1;
 }
-READ8_MEMBER(n8080_state::helifire_8035_t1_r)
+READ_LINE_MEMBER(n8080_state::helifire_8035_t1_r)
 {
 	return (m_curr_sound_pins >> 0x4) & 1;
 }
@@ -470,24 +470,8 @@ static ADDRESS_MAP_START( n8080_sound_cpu_map, AS_PROGRAM, 8, n8080_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( n8080_sound_io_map, AS_IO, 8, n8080_state )
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(n8080_8035_t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(n8080_8035_t1_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(n8080_8035_p1_r)
-
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(n8080_dac_w)
-ADDRESS_MAP_END
-
-
 static ADDRESS_MAP_START( helifire_sound_io_map, AS_IO, 8, n8080_state )
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(helifire_8035_t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(helifire_8035_t1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(helifire_8035_p2_r)
-
 	AM_RANGE(0x00, 0x7f) AM_READ(helifire_8035_external_ram_r)
-
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("helifire_dac", dac_byte_interface, write)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(helifire_sound_ctrl_w)
 ADDRESS_MAP_END
 
 
@@ -499,7 +483,10 @@ MACHINE_CONFIG_FRAGMENT( spacefev_sound )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
 	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
-	MCFG_CPU_IO_MAP(n8080_sound_io_map)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(n8080_state, n8080_8035_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(n8080_state, n8080_8035_t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(n8080_state, n8080_8035_p1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(n8080_state, n8080_dac_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("vco_timer", n8080_state, spacefev_vco_voltage_timer, attotime::from_hz(1000))
 
@@ -536,7 +523,10 @@ MACHINE_CONFIG_FRAGMENT( sheriff_sound )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
 	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
-	MCFG_CPU_IO_MAP(n8080_sound_io_map)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(n8080_state, n8080_8035_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(n8080_state, n8080_8035_t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(n8080_state, n8080_8035_p1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(n8080_state, n8080_dac_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -572,6 +562,11 @@ MACHINE_CONFIG_FRAGMENT( helifire_sound )
 	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
 	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
 	MCFG_CPU_IO_MAP(helifire_sound_io_map)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(n8080_state, helifire_8035_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(n8080_state, helifire_8035_t1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(n8080_state, helifire_8035_p2_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("helifire_dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(n8080_state, helifire_sound_ctrl_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("helifire_dac_volume_timer", n8080_state, helifire_dac_volume_timer, attotime::from_hz(1000))
 

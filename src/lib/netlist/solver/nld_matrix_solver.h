@@ -136,7 +136,7 @@ public:
 
 	virtual std::pair<pstring, pstring> create_solver_code()
 	{
-		return std::pair<pstring, pstring>("", plib::pfmt("/* {1} doesn't support static compile */"));
+		return std::pair<pstring, pstring>("", plib::pfmt("/* solver doesn't support static compile */\n\n"));
 	}
 
 protected:

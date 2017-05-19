@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, psx1_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( psj, psx1_state )
+static MACHINE_CONFIG_START( psj )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( psx_map )
@@ -129,8 +129,8 @@ static MACHINE_CONFIG_START( psj, psx1_state )
 
 	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
 	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate(&psx1_state::cd_dma_read, (psx1_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate(&psx1_state::cd_dma_write, (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, (psx1_state *) owner ) )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psu, psj )
@@ -138,7 +138,7 @@ static MACHINE_CONFIG_DERIVED( psu, psj )
 	MCFG_CPU_PROGRAM_MAP( subcpu_map )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pse, psx1_state )
+static MACHINE_CONFIG_START( pse )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( psx_map)
@@ -175,8 +175,8 @@ static MACHINE_CONFIG_START( pse, psx1_state )
 
 	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
 	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate(&psx1_state::cd_dma_read, (psx1_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate(&psx1_state::cd_dma_write, (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, (psx1_state *) owner ) )
 MACHINE_CONFIG_END
 
 ROM_START( psj )
@@ -306,8 +306,8 @@ Version 4.3 E
 
 */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                             FULLNAME                            FLAGS */
-CONS( 1994, psj,    0,      0,      psj,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, pse,    psj,    0,      pse,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Europe)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, psu,    psj,    0,      psu,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (USA)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, psa,    psj,    0,      psj,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Asia-Pacific)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE       INIT  COMPANY                            FULLNAME                            FLAGS
+CONS( 1994, psj,    0,      0,      psj,        0,     psx1_state, 0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 1995, pse,    psj,    0,      pse,        0,     psx1_state, 0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Europe)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 1995, psu,    psj,    0,      psu,        0,     psx1_state, 0,    "Sony Computer Entertainment Inc", "Sony PlayStation (USA)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 1995, psa,    psj,    0,      psj,        0,     psx1_state, 0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Asia-Pacific)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

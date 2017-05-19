@@ -150,6 +150,6 @@ private:
 };
 
 // device type definition
-extern const device_type INTERPRO_SGA;
+DECLARE_DEVICE_TYPE(INTERPRO_SGA, interpro_sga_device)
 
 #endif // MAME_MACHINE_INTERPRO_SGA_H

@@ -1004,7 +1004,7 @@ ADC12138_IPT_CONVERT_CB(hornet_state::adc12138_input_callback)
 	return (double)(value) / 2047.0;
 }
 
-static MACHINE_CONFIG_START( hornet, hornet_state )
+static MACHINE_CONFIG_START( hornet )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
@@ -1063,7 +1063,7 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(1)
-	MCFG_KONPPC_CGBOARD_TYPE(CGBOARD_TYPE_HORNET)
+	MCFG_KONPPC_CGBOARD_TYPE(HORNET)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
@@ -1120,7 +1120,7 @@ static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 	MCFG_DEVICE_REMOVE("konppc")
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(2)
-	MCFG_KONPPC_CGBOARD_TYPE(CGBOARD_TYPE_HORNET)
+	MCFG_KONPPC_CGBOARD_TYPE(HORNET)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( terabrst, hornet )

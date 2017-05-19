@@ -151,10 +151,10 @@ rom.
 
 #define T5182_CLOCK     XTAL_14_31818MHz/4
 
-const device_type T5182 = device_creator<t5182_device>;
+DEFINE_DEVICE_TYPE(T5182, t5182_device, "t5182", "T5182 MCU")
 
 t5182_device::t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, T5182, "T5182 MCU", tag, owner, clock, "t5182", __FILE__),
+	: device_t(mconfig, T5182, tag, owner, clock),
 	m_ourcpu(*this, "t5182_z80"),
 	m_sharedram(*this, "sharedram"),
 	m_irqstate(0),

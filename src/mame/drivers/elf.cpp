@@ -230,7 +230,7 @@ QUICKLOAD_LOAD_MEMBER( elf2_state, elf )
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( elf2, elf2_state )
+static MACHINE_CONFIG_START( elf2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(elf2_mem)
@@ -285,5 +285,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME    FLAGS */
-COMP( 1978, elf2,   0,      0,      elf2,   elf2, driver_device,    0,      "Netronics",    "Elf II",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE       INIT    COMPANY         FULLNAME    FLAGS
+COMP( 1978, elf2,   0,      0,      elf2,   elf2, elf2_state, 0,      "Netronics",    "Elf II",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)

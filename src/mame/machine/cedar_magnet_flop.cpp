@@ -8,10 +8,10 @@
 #include "emu.h"
 #include "cedar_magnet_flop.h"
 
-const device_type CEDAR_MAGNET_FLOP = device_creator<cedar_magnet_flop_device>;
+DEFINE_DEVICE_TYPE(CEDAR_MAGNET_FLOP, cedar_magnet_flop_device, "cedmag_flop", "Cedar Floppy Simulation")
 
 cedar_magnet_flop_device::cedar_magnet_flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CEDAR_MAGNET_FLOP, "Cedar Floppy Simulation", tag, owner, clock, "cedmag_flop", __FILE__)
+	: device_t(mconfig, CEDAR_MAGNET_FLOP, tag, owner, clock)
 {
 }
 
@@ -53,7 +53,7 @@ READ8_MEMBER(cedar_magnet_flop_device::port61_r)
 
 READ8_MEMBER(cedar_magnet_flop_device::port63_r)
 {
-	uint8_t ret = rand();
+	uint8_t ret = machine().rand();
 
 	// printf("%s: port63_r (DATA) (%02x)\n", machine().describe_context(), ret);
 

@@ -91,6 +91,8 @@ void lethalj_state::video_start()
 	/* predetermine blitter info */
 	m_blitter_base = (uint16_t *)memregion("gfx1")->base();
 	m_blitter_rows = memregion("gfx1")->bytes() / (2*BLITTER_SOURCE_WIDTH);
+
+	m_gen_ext1_int_timer = timer_alloc(TIMER_GEN_EXT1_INT);
 }
 
 
@@ -168,7 +170,7 @@ WRITE16_MEMBER(lethalj_state::lethalj_blitter_w)
 		else
 			do_blit();
 
-		timer_set(attotime::from_hz(XTAL_32MHz) * ((m_blitter_data[5] + 1) * (m_blitter_data[7] + 1)), TIMER_GEN_EXT1_INT);
+		m_gen_ext1_int_timer->adjust(attotime::from_hz(XTAL_32MHz) * ((m_blitter_data[5] + 1) * (m_blitter_data[7] + 1)));
 	}
 
 	/* clear the IRQ on offset 0 */

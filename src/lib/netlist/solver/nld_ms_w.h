@@ -97,7 +97,7 @@ protected:
 	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
 
 private:
-	static const std::size_t m_pitch  = (((  storage_N) + 7) / 8) * 8;
+	static constexpr std::size_t m_pitch  = (((  storage_N) + 7) / 8) * 8;
 	nl_ext_double m_A[storage_N][m_pitch];
 	nl_ext_double m_Ainv[storage_N][m_pitch];
 	nl_ext_double m_W[storage_N][m_pitch];

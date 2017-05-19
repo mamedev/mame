@@ -327,7 +327,7 @@ public:
 	DECLARE_VIDEO_START(cps);
 	DECLARE_MACHINE_START(sf2m1);
 	uint32_t screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_cps1(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_cps1);
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);

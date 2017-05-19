@@ -15,15 +15,17 @@
 
   FIP = fluorescent indicator panel
   g = number of grids
-  A = revision of the VFD
-  M = custom display
-  20 = unique display part number
+  r = revision of the VFD
+  c = custom display
+  s = unique display part number
 
 
   known chips:
 
   serial  device   etc.
 ----------------------------------------------------------------
+ *055     uPD546C  1979, Fidelity Checker Challenger (CR)
+
  @017     uPD552C  1979, Bambino UFO Master-Blaster Station (ET-02)
  @042     uPD552C  1980, Tomy Cosmic Combat (TN-??)
  @043     uPD552C  1979, Bambino Kick The Goal Soccer (ET-10)
@@ -50,6 +52,7 @@
 
  @511     uPD557LC 1980, Takatoku Toys Game Robot 9/Mego Fabulous Fred
  @512     uPD557LC 1980, Castle Toy Tactix
+ *513     uPD557LC 1980, Castle Toy Name That Tune
 
  @060     uPD650C  1979, Mattel Computer Gin
  *085     uPD650C  1980, Roland TR-808
@@ -345,7 +348,7 @@ INPUT_PORTS_END
 
 static const s16 ufombs_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( ufombs, ufombs_state )
+static MACHINE_CONFIG_START( ufombs )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -491,7 +494,7 @@ INPUT_PORTS_END
 
 static const s16 ssfball_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( ssfball, ssfball_state )
+static MACHINE_CONFIG_START( ssfball )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, 400000) // approximation
@@ -619,7 +622,7 @@ static INPUT_PORTS_START( bmsoccer )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shoot")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bmsoccer, bmsoccer_state )
+static MACHINE_CONFIG_START( bmsoccer )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -727,7 +730,7 @@ static INPUT_PORTS_START( bmsafari )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bmsafari, bmsafari_state )
+static MACHINE_CONFIG_START( bmsafari )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -877,7 +880,7 @@ INPUT_PORTS_END
 
 static const s16 splasfgt_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( splasfgt, splasfgt_state )
+static MACHINE_CONFIG_START( splasfgt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, 400000) // approximation
@@ -981,7 +984,7 @@ static INPUT_PORTS_START( bcclimbr )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bcclimbr, bcclimbr_state )
+static MACHINE_CONFIG_START( bcclimbr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -1104,7 +1107,7 @@ static INPUT_PORTS_START( tactix )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tactix, tactix_state )
+static MACHINE_CONFIG_START( tactix )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D557L, 400000) // approximation
@@ -1198,7 +1201,7 @@ static INPUT_PORTS_START( invspace )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( invspace, invspace_state )
+static MACHINE_CONFIG_START( invspace )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, XTAL_400kHz)
@@ -1316,7 +1319,7 @@ static INPUT_PORTS_START( efball )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( efball, efball_state )
+static MACHINE_CONFIG_START( efball )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -1415,7 +1418,7 @@ static INPUT_PORTS_START( galaxy2 )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( galaxy2, galaxy2_state )
+static MACHINE_CONFIG_START( galaxy2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -1533,7 +1536,7 @@ static INPUT_PORTS_START( astrocmd )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( astrocmd, astrocmd_state )
+static MACHINE_CONFIG_START( astrocmd )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -1629,7 +1632,7 @@ static INPUT_PORTS_START( edracula )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( edracula, edracula_state )
+static MACHINE_CONFIG_START( edracula )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -1711,7 +1714,7 @@ static INPUT_PORTS_START( mcompgin )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mcompgin, mcompgin_state )
+static MACHINE_CONFIG_START( mcompgin )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D650, 400000) // approximation
@@ -1818,7 +1821,7 @@ static INPUT_PORTS_START( mvbfree )
 	PORT_CONFSETTING(    0x08, "3" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mvbfree, mvbfree_state )
+static MACHINE_CONFIG_START( mvbfree )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, 400000) // approximation
@@ -1937,7 +1940,7 @@ static INPUT_PORTS_START( grobot9 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, single_interrupt_line, nullptr) PORT_NAME("Start-Pitch")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( grobot9, grobot9_state )
+static MACHINE_CONFIG_START( grobot9 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D557L, 160000) // approximation
@@ -2027,7 +2030,7 @@ static INPUT_PORTS_START( tccombat )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tccombat, tccombat_state )
+static MACHINE_CONFIG_START( tccombat )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -2184,7 +2187,7 @@ void tmtennis_state::machine_reset()
 	set_clock();
 }
 
-static MACHINE_CONFIG_START( tmtennis, tmtennis_state )
+static MACHINE_CONFIG_START( tmtennis )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 360000) // see set_clock
@@ -2293,7 +2296,7 @@ static INPUT_PORTS_START( tmpacman )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tmpacman, tmpacman_state )
+static MACHINE_CONFIG_START( tmpacman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_430kHz)
@@ -2396,7 +2399,7 @@ static INPUT_PORTS_START( tmscramb )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tmscramb, tmscramb_state )
+static MACHINE_CONFIG_START( tmscramb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -2496,7 +2499,7 @@ static INPUT_PORTS_START( tcaveman )
 	PORT_CONFSETTING(    0x08, "Professional" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tcaveman, tcaveman_state )
+static MACHINE_CONFIG_START( tcaveman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -2628,7 +2631,7 @@ static INPUT_PORTS_START( alnchase )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( alnchase, alnchase_state )
+static MACHINE_CONFIG_START( alnchase )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -2849,36 +2852,36 @@ ROM_END
 
 
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   driver_device, 0, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, driver_device, 0, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, driver_device, 0, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   CMP MACHINE   INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   ufombs_state,   0, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  0, "Bambino", "Superstar Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, bmsoccer_state, 0, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, bmsafari_state, 0, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, splasfgt_state, 0, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, driver_device, 0, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, bcclimbr_state, 0, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, tactix,   0,        0, tactix,   tactix,   driver_device, 0, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, tactix,   0,        0, tactix,   tactix,   tactix_state,   0, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, invspace, 0,        0, invspace, invspace, driver_device, 0, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, efball,   0,        0, efball,   efball,   driver_device, 0, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  driver_device, 0, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  driver_device, 0, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, edracula, 0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, invspace, 0,        0, invspace, invspace, invspace_state, 0, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, efball,   0,        0, efball,   efball,   efball_state,   0, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  galaxy2_state,  0, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  galaxy2_state,  0, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, astrocmd_state, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, driver_device, 0, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, 0, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  driver_device, 0, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  0, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, grobot9,  0,        0, grobot9,  grobot9,  driver_device, 0, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+CONS( 1980, grobot9,  0,        0, grobot9,  grobot9,  grobot9_state,  0, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 
-CONS( 1980, tccombat, 0,        0, tccombat, tccombat, driver_device, 0, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, driver_device, 0, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, driver_device, 0, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, driver_device, 0, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, alnchase, 0,        0, alnchase, alnchase, driver_device, 0, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tccombat, 0,        0, tccombat, tccombat, tccombat_state, 0, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, tmtennis_state, 0, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, tmpacman_state, 0, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, tmscramb_state, 0, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, tcaveman_state, 0, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, alnchase, 0,        0, alnchase, alnchase, alnchase_state, 0, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

@@ -396,7 +396,7 @@ DEVICE_INPUT_DEFAULTS_END
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 
-static MACHINE_CONFIG_START( pccga, pc_state )
+static MACHINE_CONFIG_START( pccga )
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc8, pc8, I8088, 4772720)   /* 4,77 MHz */
 
@@ -464,7 +464,7 @@ static DEVICE_INPUT_DEFAULTS_START( iskr3104 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x00)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( iskr3104, pc_state )
+static MACHINE_CONFIG_START( iskr3104 )
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, pc16, I8086, 4772720)
 
@@ -488,7 +488,7 @@ MACHINE_CONFIG_END
 
 
 //Poisk-2
-static MACHINE_CONFIG_START( poisk2, pc_state )
+static MACHINE_CONFIG_START( poisk2 )
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, pc16, I8086, 4772720)
 
@@ -517,7 +517,7 @@ MACHINE_CONFIG_END
 
 
 // Zenith SuperSport
-static MACHINE_CONFIG_START( zenith, pc_state )
+static MACHINE_CONFIG_START( zenith )
 	/* basic machine hardware */
 	MCFG_CPU_PC(zenith, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
 
@@ -559,7 +559,7 @@ static DEVICE_INPUT_DEFAULTS_START( siemens )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x30)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( siemens, pc_state )
+static MACHINE_CONFIG_START( siemens )
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
 
@@ -584,7 +584,7 @@ MACHINE_CONFIG_END
 
 
 // IBM 5550
-static MACHINE_CONFIG_START( ibm5550, pc_state )
+static MACHINE_CONFIG_START( ibm5550 )
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc16, ibm5550, I8086, 8000000)
 
@@ -639,7 +639,7 @@ MACHINE_CONFIG_END
 
 
 //Laser XT/3
-static MACHINE_CONFIG_START( laser_xt3, pc_state )
+static MACHINE_CONFIG_START( laser_xt3 )
 	MCFG_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
@@ -668,7 +668,7 @@ MACHINE_CONFIG_END
 
 
 //Laser Turbo XT
-static MACHINE_CONFIG_START( laser_turbo_xt, pc_state )
+static MACHINE_CONFIG_START( laser_turbo_xt )
 	MCFG_CPU_PC(pc8, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
@@ -888,26 +888,26 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR    NAME              PARENT      COMPAT      MACHINE         INPUT     INIT                     COMPANY                            FULLNAME */
-COMP( 1984,   dgone,            ibm5150,    0,          dgone,          pccga,    driver_device, 0,        "Data General",                    "Data General/One" , MACHINE_NOT_WORKING)/* CGA, 2x 3.5" disk drives */
-COMP( 1985,   bw230,            ibm5150,    0,          bondwell,       bondwell, pc_state,      bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)", 0 )
-COMP( 1984,   compc1,           ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Commodore Business Machines",     "Commodore PC-1" , MACHINE_NOT_WORKING)
-COMP( 1987,   pc10iii,          ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Commodore Business Machines",     "Commodore PC-10 III" , MACHINE_NOT_WORKING)
-COMP( 1992,   iskr3104,         ibm5150,    0,          iskr3104,       pccga,    driver_device, 0,        "Schetmash",                       "Iskra 3104", MACHINE_NOT_WORKING)
-COMP( 1989,   mk88,             ibm5150,    0,          mk88,           pccga,    driver_device, 0,        "<unknown>",                       "MK-88", MACHINE_NOT_WORKING)
-COMP( 1991,   poisk2,           ibm5150,    0,          poisk2,         pccga,    driver_device, 0,        "<unknown>",                       "Poisk-2", MACHINE_NOT_WORKING)
-COMP( 1990,   mc1702,           ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "<unknown>",                       "Elektronika MC-1702", MACHINE_NOT_WORKING)
-COMP( 1987,   zdsupers,         ibm5150,    0,          zenith,         pccga,    driver_device, 0,        "Zenith Data Systems",             "SuperSport", 0)
-COMP( 1985,   sicpc1605,        ibm5150,    0,          siemens,        pccga,    driver_device, 0,        "Siemens",                         "Sicomp PC16-05", MACHINE_NOT_WORKING)
-COMP( 1985,   ncrpc4i,          ibm5150,    0,          ncrpc4i,        pccga,    driver_device, 0,        "NCR",                             "PC4i", MACHINE_NOT_WORKING)
-COMP( 198?,   olivm15,          ibm5150,    0,          m15,            pccga,    driver_device, 0,        "Olivetti",                        "M15", 0)
-COMP( 1983,   ibm5550,          ibm5150,    0,          ibm5550,        pccga,    driver_device, 0,        "International Business Machines", "IBM 5550", MACHINE_NOT_WORKING)
-COMP( 1985,   pc7000,           ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Sharp",                           "PC-7000", MACHINE_NOT_WORKING)
-COMP( 1988,   sx16,             ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Sanyo",                           "SX-16", MACHINE_NOT_WORKING)
-COMP( 198?,   mbc16,            ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Sanyo",                           "MBC-16" , MACHINE_NOT_WORKING)
-COMP( 1987,   ataripc1,         ibm5150,    0,          ataripc1,       pccga,    driver_device, 0,        "Atari",                           "PC1" , 0)
-COMP( 1988,   ataripc3,         ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Atari",                           "PC3" , 0)
-COMP( 1989,   ssam88s,          ibm5150,    0,          pccga,          pccga,    driver_device, 0,        "Samsung",                         "Samtron 88S" , MACHINE_NOT_WORKING)
-COMP( 1983,   eagle1600,        ibm5150,    0,          eagle1600,      pccga,    driver_device, 0,        "Eagle",                           "1600" , MACHINE_NOT_WORKING)
-COMP( 1988,   laser_turbo_xt,   ibm5150,    0,          laser_turbo_xt, 0,        driver_device, 0,        "VTech",                           "Laser Turbo XT" , 0)
-COMP( 1989,   laser_xt3,        ibm5150,    0,          laser_xt3,      0,        driver_device, 0,        "VTech",                           "Laser XT/3" , 0)
+//    YEAR    NAME              PARENT      COMPAT      MACHINE         INPUT     STATE     INIT      COMPANY                            FULLNAME                FLAGS
+COMP( 1984,   dgone,            ibm5150,    0,          dgone,          pccga,    pc_state, 0,        "Data General",                    "Data General/One" ,    MACHINE_NOT_WORKING ) // CGA, 2x 3.5" disk drives
+COMP( 1985,   bw230,            ibm5150,    0,          bondwell,       bondwell, pc_state, bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)", 0 )
+COMP( 1984,   compc1,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Commodore Business Machines",     "Commodore PC-1" ,      MACHINE_NOT_WORKING )
+COMP( 1987,   pc10iii,          ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Commodore Business Machines",     "Commodore PC-10 III",  MACHINE_NOT_WORKING )
+COMP( 1992,   iskr3104,         ibm5150,    0,          iskr3104,       pccga,    pc_state, 0,        "Schetmash",                       "Iskra 3104",           MACHINE_NOT_WORKING )
+COMP( 1989,   mk88,             ibm5150,    0,          mk88,           pccga,    pc_state, 0,        "<unknown>",                       "MK-88",                MACHINE_NOT_WORKING )
+COMP( 1991,   poisk2,           ibm5150,    0,          poisk2,         pccga,    pc_state, 0,        "<unknown>",                       "Poisk-2",              MACHINE_NOT_WORKING )
+COMP( 1990,   mc1702,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "<unknown>",                       "Elektronika MC-1702",  MACHINE_NOT_WORKING )
+COMP( 1987,   zdsupers,         ibm5150,    0,          zenith,         pccga,    pc_state, 0,        "Zenith Data Systems",             "SuperSport",           0 )
+COMP( 1985,   sicpc1605,        ibm5150,    0,          siemens,        pccga,    pc_state, 0,        "Siemens",                         "Sicomp PC16-05",       MACHINE_NOT_WORKING )
+COMP( 1985,   ncrpc4i,          ibm5150,    0,          ncrpc4i,        pccga,    pc_state, 0,        "NCR",                             "PC4i",                 MACHINE_NOT_WORKING )
+COMP( 198?,   olivm15,          ibm5150,    0,          m15,            pccga,    pc_state, 0,        "Olivetti",                        "M15",                  0 )
+COMP( 1983,   ibm5550,          ibm5150,    0,          ibm5550,        pccga,    pc_state, 0,        "International Business Machines", "IBM 5550",             MACHINE_NOT_WORKING )
+COMP( 1985,   pc7000,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Sharp",                           "PC-7000",              MACHINE_NOT_WORKING )
+COMP( 1988,   sx16,             ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Sanyo",                           "SX-16",                MACHINE_NOT_WORKING )
+COMP( 198?,   mbc16,            ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Sanyo",                           "MBC-16",               MACHINE_NOT_WORKING )
+COMP( 1987,   ataripc1,         ibm5150,    0,          ataripc1,       pccga,    pc_state, 0,        "Atari",                           "PC1" ,                 0 )
+COMP( 1988,   ataripc3,         ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Atari",                           "PC3" ,                 0 )
+COMP( 1989,   ssam88s,          ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Samsung",                         "Samtron 88S" ,         MACHINE_NOT_WORKING )
+COMP( 1983,   eagle1600,        ibm5150,    0,          eagle1600,      pccga,    pc_state, 0,        "Eagle",                           "1600" ,                MACHINE_NOT_WORKING )
+COMP( 1988,   laser_turbo_xt,   ibm5150,    0,          laser_turbo_xt, 0,        pc_state, 0,        "VTech",                           "Laser Turbo XT",       0 )
+COMP( 1989,   laser_xt3,        ibm5150,    0,          laser_xt3,      0,        pc_state, 0,        "VTech",                           "Laser XT/3",           0 )

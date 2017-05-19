@@ -224,7 +224,7 @@ static INPUT_PORTS_START( hyhoo2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( hyhoo, hyhoo_state )
+static MACHINE_CONFIG_START( hyhoo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)   /* 5.00 MHz ?? */
@@ -309,5 +309,5 @@ ROM_START( hyhoo2 )
 ROM_END
 
 
-GAME( 1987, hyhoo,  0, hyhoo,  hyhoo,  driver_device, 0, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hyhoo2, 0, hyhoo2, hyhoo2, driver_device, 0, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hyhoo,  0, hyhoo,  hyhoo,  hyhoo_state, 0, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hyhoo2, 0, hyhoo2, hyhoo2, hyhoo_state, 0, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo 2 (Japan)", MACHINE_SUPPORTS_SAVE )

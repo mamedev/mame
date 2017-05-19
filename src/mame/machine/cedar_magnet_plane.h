@@ -1,15 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_MACHINE_CEDAR_MAGNET_PLANE_H
+#define MAME_MACHINE_CEDAR_MAGNET_PLANE_H
 
 #pragma once
 
-#ifndef CEDAR_MAGNET_PLANE_DEF
-#define CEDAR_MAGNET_PLANE_DEF
 
 #include "machine/cedar_magnet_board.h"
 #include "machine/z80pio.h"
 
 extern const device_type CEDAR_MAGNET_PLANE;
+DECLARE_DEVICE_TYPE(CEDAR_MAGNET_PLANE, cedar_magnet_plane_device)
 
 #define MCFG_CEDAR_MAGNET_PLANE_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, CEDAR_MAGNET_PLANE, 0)
@@ -38,6 +39,13 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
+	uint32_t draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+
+private:
 	uint8_t m_framebuffer[0x10000];
 	int m_curline;
 	int m_lineoffset;
@@ -50,13 +58,6 @@ public:
 
 	uint8_t m_cd_data;
 	uint8_t m_cf_data;
-	uint32_t draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase);
-protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void device_start() override;
-//  virtual void device_reset() override;
-
-private:
 };
 
-#endif
+#endif // MAME_MACHINE_CEDAR_MAGNET_PLANE_H

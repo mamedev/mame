@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
+#ifndef MAME_INCLUDES_CIDELSA_H
+#define MAME_INCLUDES_CIDELSA_H
 
-#ifndef __CIDELSA__
-#define __CIDELSA__
+#pragma once
 
 
 #include "cpu/cosmac/cosmac.h"
@@ -12,6 +12,7 @@
 #include "sound/ay8910.h"
 #include "machine/cdp1852.h"
 #include "machine/nvram.h"
+
 
 #define SCREEN_TAG  "screen"
 #define CDP1802_TAG "cdp1802"
@@ -22,9 +23,9 @@
 #define DESTRYER_CHR1   3579000.0 // unverified
 #define DESTRYER_CHR2   XTAL_5_7143MHz
 #define ALTAIR_CHR1     3579000.0 // unverified
-#define ALTAIR_CHR2     CDP1869_DOT_CLK_PAL // unverified
+#define ALTAIR_CHR2     cdp1869_device::DOT_CLK_PAL // unverified
 #define DRACO_CHR1      XTAL_4_43361MHz
-#define DRACO_CHR2      CDP1869_DOT_CLK_PAL // unverified
+#define DRACO_CHR2      cdp1869_device::DOT_CLK_PAL // unverified
 #define DRACO_SND_CHR1  XTAL_2_01216MHz
 
 #define CIDELSA_PAGERAM_SIZE    0x400
@@ -35,6 +36,7 @@
 #define DRACO_PAGERAM_MASK      0x7ff
 #define CIDELSA_CHARRAM_MASK    0x7ff
 
+
 class cidelsa_state : public driver_device
 {
 public:
@@ -44,9 +46,9 @@ public:
 	};
 
 	cidelsa_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, CDP1802_TAG),
-			m_vis(*this, CDP1869_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, CDP1802_TAG)
+		, m_vis(*this, CDP1869_TAG)
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
@@ -121,4 +123,4 @@ MACHINE_CONFIG_EXTERN( destryer_video );
 MACHINE_CONFIG_EXTERN( altair_video );
 MACHINE_CONFIG_EXTERN( draco_video );
 
-#endif
+#endif // MAME_INCLUDES_CIDELSA_H

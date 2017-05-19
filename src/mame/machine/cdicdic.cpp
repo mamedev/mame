@@ -22,15 +22,17 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cdrom.h"
 #include "machine/cdicdic.h"
 #include "includes/cdi.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cdrom.h"
 #include "sound/cdda.h"
 #include "imagedev/chd_cd.h"
 
+
 // device type definition
-const device_type MACHINE_CDICDIC = device_creator<cdicdic_device>;
+DEFINE_DEVICE_TYPE(MACHINE_CDICDIC, cdicdic_device, "cdicdic", "CDICDIC")
 
 #if ENABLE_VERBOSE_LOG
 static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
@@ -1162,7 +1164,7 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 //-------------------------------------------------
 
 cdicdic_device::cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MACHINE_CDICDIC, "CDICDIC", tag, owner, clock, "cdicdic", __FILE__)
+	: device_t(mconfig, MACHINE_CDICDIC, tag, owner, clock)
 {
 }
 

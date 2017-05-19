@@ -1013,7 +1013,7 @@ MACHINE_RESET_MEMBER(flstory_state,flstory)
 	m_from_mcu = 0;
 }
 
-static MACHINE_CONFIG_START( flstory, flstory_state )
+static MACHINE_CONFIG_START( flstory )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_733MHz/2) /* verified on pcb */
@@ -1075,7 +1075,7 @@ static MACHINE_CONFIG_START( flstory, flstory_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( onna34ro, flstory_state )
+static MACHINE_CONFIG_START( onna34ro )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 10733000/2)     /* ??? */
@@ -1138,7 +1138,7 @@ static MACHINE_CONFIG_START( onna34ro, flstory_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( victnine, flstory_state )
+static MACHINE_CONFIG_START( victnine )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000/2)      /* 4 MHz */
@@ -1207,7 +1207,7 @@ MACHINE_RESET_MEMBER(flstory_state,rumba)
 	m_mcu_cmd = 0;
 }
 
-static MACHINE_CONFIG_START( rumba, flstory_state )
+static MACHINE_CONFIG_START( rumba )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2) /* verified on pcb */
@@ -1559,9 +1559,9 @@ ROM_START( rumba )
 ROM_END
 
 
-GAME( 1985, flstory,   0,        flstory,  flstory, driver_device,  0, ROT180, "Taito", "The FairyLand Story", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, flstoryj,  flstory,  flstory,  flstory, driver_device,  0, ROT180, "Taito", "The FairyLand Story (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, onna34ro,  0,        onna34ro, onna34ro, driver_device, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, onna34roa, onna34ro, onna34ro, onna34ro, driver_device, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, victnine,  0,        victnine, victnine, driver_device, 0, ROT0,   "Taito", "Victorious Nine", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, rumba,     0,        rumba,    rumba, driver_device,    0, ROT270, "Taito", "Rumba Lumber", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, flstory,   0,        flstory,  flstory,  flstory_state, 0, ROT180, "Taito", "The FairyLand Story",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, flstoryj,  flstory,  flstory,  flstory,  flstory_state, 0, ROT180, "Taito", "The FairyLand Story (Japan)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, onna34ro,  0,        onna34ro, onna34ro, flstory_state, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, onna34roa, onna34ro, onna34ro, onna34ro, flstory_state, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, victnine,  0,        victnine, victnine, flstory_state, 0, ROT0,   "Taito", "Victorious Nine",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, rumba,     0,        rumba,    rumba,    flstory_state, 0, ROT270, "Taito", "Rumba Lumber",                        MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )

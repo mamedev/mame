@@ -118,7 +118,7 @@ INTERRUPT_GEN_MEMBER(ondra_state::ondra_interrupt)
 }
 
 /* Machine driver */
-static MACHINE_CONFIG_START( ondra, ondra_state )
+static MACHINE_CONFIG_START( ondra )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)
 	MCFG_CPU_PROGRAM_MAP(ondra_mem)
@@ -183,6 +183,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY          FULLNAME       FLAGS */
-COMP( 1989, ondrat, 0,      0,      ondra,      ondra, driver_device,       0,       "Tesla",        "Ondra",       0)
-COMP( 1989, ondrav, ondrat, 0,      ondra,      ondra, driver_device,       0,       "ViLi",         "Ondra ViLi",  0)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE        INIT  COMPANY   FULLNAME       FLAGS
+COMP( 1989, ondrat, 0,      0,      ondra,      ondra, ondra_state, 0,    "Tesla",  "Ondra",       0 )
+COMP( 1989, ondrav, ondrat, 0,      ondra,      ondra, ondra_state, 0,    "ViLi",   "Ondra ViLi",  0 )

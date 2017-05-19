@@ -320,7 +320,7 @@ void dbz_state::machine_reset()
 	m_control = 0;
 }
 
-static MACHINE_CONFIG_START( dbz, dbz_state )
+static MACHINE_CONFIG_START( dbz )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
@@ -379,7 +379,7 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -586,6 +586,6 @@ DRIVER_INIT_MEMBER(dbz_state,dbz2)
 	ROM[0xae8/2] = 0x4e71;    /* 0x005e */
 }
 
-GAME( 1993, dbz,  0,   dbz, dbz, dbz_state,  dbz,  ROT0, "Banpresto", "Dragonball Z (rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
-GAME( 1993, dbza, dbz, dbz, dbza, dbz_state, dbza, ROT0, "Banpresto", "Dragonball Z (rev A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, dbz,  0,   dbz, dbz,  dbz_state, dbz,  ROT0, "Banpresto", "Dragonball Z (rev B)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
+GAME( 1993, dbza, dbz, dbz, dbza, dbz_state, dbza, ROT0, "Banpresto", "Dragonball Z (rev A)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dbz2, 0,   dbz, dbz2, dbz_state, dbz2, ROT0, "Banpresto", "Dragonball Z 2 - Super Battle", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test

@@ -159,6 +159,7 @@ public:
 	// static helpers
 	static software_list_device *find_by_name(const machine_config &mconfig, const std::string &name);
 	static void display_matches(const machine_config &config, const char *interface, const std::string &name);
+	static device_image_interface *find_mountable_image(const machine_config &mconfig, const software_part &part, std::function<bool (const device_image_interface &)> filter);
 	static device_image_interface *find_mountable_image(const machine_config &mconfig, const software_part &part);
 
 protected:
@@ -186,7 +187,7 @@ private:
 
 
 // device type definition
-extern const device_type SOFTWARE_LIST;
+DECLARE_DEVICE_TYPE(SOFTWARE_LIST, software_list_device)
 
 // device type iterator
 typedef device_type_iterator<software_list_device> software_list_device_iterator;

@@ -3083,7 +3083,7 @@ MACHINE_CONFIG_FRAGMENT( mpu4_common2 )
 MACHINE_CONFIG_END
 
 /* machine driver for MOD 2 board */
-MACHINE_CONFIG_START( mpu4base, mpu4_state )
+MACHINE_CONFIG_START( mpu4base )
 
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mod2    )
 	MCFG_MACHINE_RESET_OVERRIDE(mpu4_state,mpu4)

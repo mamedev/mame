@@ -608,7 +608,7 @@ void allied_state::machine_reset()
 	output().set_value("led0", 1);  //1=off
 }
 
-static MACHINE_CONFIG_START( allied, allied_state )
+static MACHINE_CONFIG_START( allied )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6504, 3572549/4)
 	MCFG_CPU_PROGRAM_MAP(allied_map)
@@ -709,15 +709,15 @@ ROM_END
 #define rom_starshot    rom_allied
 
 
-GAME(1977,  allied,     0,          allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Allied System", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
-GAME(1977,  suprpick,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Super Picker", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1977,  royclark,   allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Roy Clark - The Entertainer", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1977,  thndbolt,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Thunderbolt", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  hoedown,    allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Hoe Down", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  takefive,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Take Five", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  heartspd,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Hearts & Spades", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  foathens,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Flame of Athens", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979,  disco79,    allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Disco '79", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979,  erosone,    allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Eros One", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979,  circa33,    allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Circa 1933", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979,  starshot,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Star Shooter", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1977,  allied,     0,          allied, allied, allied_state, 0, ROT0, "Allied Leisure",   "Allied System",               MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+GAME(1977,  suprpick,   allied,     allied, allied, allied_state, 0, ROT0, "Allied Leisure",   "Super Picker",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1977,  royclark,   allied,     allied, allied, allied_state, 0, ROT0, "Fascination Int.", "Roy Clark - The Entertainer", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1977,  thndbolt,   allied,     allied, allied, allied_state, 0, ROT0, "Allied Leisure",   "Thunderbolt",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  hoedown,    allied,     allied, allied, allied_state, 0, ROT0, "Allied Leisure",   "Hoe Down",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  takefive,   allied,     allied, allied, allied_state, 0, ROT0, "Allied Leisure",   "Take Five",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  heartspd,   allied,     allied, allied, allied_state, 0, ROT0, "Allied Leisure",   "Hearts & Spades",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  foathens,   allied,     allied, allied, allied_state, 0, ROT0, "Allied Leisure",   "Flame of Athens",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  disco79,    allied,     allied, allied, allied_state, 0, ROT0, "Allied Leisure",   "Disco '79",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  erosone,    allied,     allied, allied, allied_state, 0, ROT0, "Fascination Int.", "Eros One",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  circa33,    allied,     allied, allied, allied_state, 0, ROT0, "Fascination Int.", "Circa 1933",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  starshot,   allied,     allied, allied, allied_state, 0, ROT0, "Allied Leisure",   "Star Shooter",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

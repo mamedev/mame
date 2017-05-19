@@ -1325,7 +1325,7 @@ CUSTOM_INPUT_MEMBER(galaxian_state::kingball_noise_r)
 {
 	/* bit 5 is the NOISE line from the sound circuit.  The code just verifies
 	   that it's working, doesn't actually use return value, so we can just use
-	   rand() */
+	   machine().rand() */
 	return machine().rand() & 1;
 }
 
@@ -5586,7 +5586,7 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
+static MACHINE_CONFIG_START( galaxian_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, GALAXIAN_PIXEL_CLOCK/3/2)
@@ -8774,7 +8774,6 @@ ROM_START( atlantisb ) /* Artic Multi-System */
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "sn74s288n.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
-
 
 ROM_START( tenspot )
 	/* Game A - Survivor */

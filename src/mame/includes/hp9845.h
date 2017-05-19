@@ -46,6 +46,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(pa_w);
 
+	DECLARE_WRITE_LINE_MEMBER(t14_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(t14_flg_w);
+	DECLARE_WRITE_LINE_MEMBER(t14_sts_w);
 	DECLARE_WRITE_LINE_MEMBER(t15_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(t15_flg_w);
 	DECLARE_WRITE_LINE_MEMBER(t15_sts_w);
@@ -60,6 +63,7 @@ protected:
 	required_ioport m_io_key1;
 	required_ioport m_io_key2;
 	required_ioport m_io_key3;
+	required_device<hp_taco_device> m_t14;
 	required_device<hp_taco_device> m_t15;
 	required_device<beep_device> m_beeper;
 	required_device<timer_device> m_beep_timer;
@@ -75,9 +79,6 @@ protected:
 
 	// Character generator
 	required_region_ptr<uint8_t> m_chargen;
-
-	// Optional character generator
-	required_region_ptr<uint8_t> m_optional_chargen;
 
 	// Text mode video I/F
 	typedef struct {

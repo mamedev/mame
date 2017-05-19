@@ -735,6 +735,19 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ddungeon )
 	PORT_INCLUDE(ddragon)
 
+	// Dangerous Dungeons installation guide recommends 4-way joystick "for maximum profits"
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
@@ -819,7 +832,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( toffy )
-	PORT_INCLUDE(ddragon)
+	PORT_INCLUDE(ddungeon)
 
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
@@ -923,7 +936,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( ddragon, ddragon_state )
+static MACHINE_CONFIG_START( ddragon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)     /* 12 MHz / 4 internally */
@@ -966,12 +979,12 @@ static MACHINE_CONFIG_START( ddragon, ddragon_state )
 
 	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK / 32)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_1))   /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK / 32)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_2))   /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -993,7 +1006,7 @@ static MACHINE_CONFIG_DERIVED( ddragonba, ddragon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
+static MACHINE_CONFIG_START( ddragon6809 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)  /* 1.5 MHz */
@@ -1036,17 +1049,17 @@ static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 
 	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_1))   /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_2))   /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ddragon2, ddragon_state )
+static MACHINE_CONFIG_START( ddragon2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)     /* 12 MHz / 4 internally */
@@ -1087,12 +1100,12 @@ static MACHINE_CONFIG_START( ddragon2, ddragon_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( darktowr, ddragon, darktowr_state )
+static MACHINE_CONFIG_DERIVED( darktowr, ddragon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("mcu", M68705P3, XTAL_4MHz)
@@ -1102,7 +1115,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( darktowr, ddragon, darktowr_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( toffy, ddragon, toffy_state )
+static MACHINE_CONFIG_DERIVED( toffy, ddragon )
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("sub")

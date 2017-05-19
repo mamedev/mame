@@ -84,7 +84,6 @@
 #include "network.h"
 #include "ui/uimain.h"
 #include <time.h>
-#include "server_http.hpp"
 #include "rapidjson/include/rapidjson/writer.h"
 #include "rapidjson/include/rapidjson/stringbuffer.h"
 
@@ -126,7 +125,7 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		m_ui_active(_config.options().ui_active()),
 		m_basename(_config.gamedrv().name),
 		m_sample_rate(_config.options().sample_rate()),
-		m_saveload_schedule(SLS_NONE),
+		m_saveload_schedule(saveload_schedule::NONE),
 		m_saveload_schedule_time(attotime::zero),
 		m_saveload_searchpath(nullptr),
 
@@ -291,6 +290,8 @@ int running_machine::run(bool quiet)
 	// use try/catch for deep error recovery
 	try
 	{
+		m_manager.http()->clear();
+
 		// move to the init phase
 		m_current_phase = MACHINE_PHASE_INIT;
 
@@ -334,14 +335,16 @@ int running_machine::run(bool quiet)
 		soft_reset();
 
 		// handle initial load
-		if (m_saveload_schedule != SLS_NONE)
+		if (m_saveload_schedule != saveload_schedule::NONE)
 			handle_saveload();
 
 		export_http_api();
 
+		m_manager.http()->update();
+
 		// run the CPUs until a reset or exit
 		m_hard_reset_pending = false;
-		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != SLS_NONE)
+		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
 		{
 			g_profiler.start(PROFILER_EXTRA);
 
@@ -358,11 +361,12 @@ int running_machine::run(bool quiet)
 				m_video->frame_update();
 
 			// handle save/load
-			if (m_saveload_schedule != SLS_NONE)
+			if (m_saveload_schedule != saveload_schedule::NONE)
 				handle_saveload();
 
 			g_profiler.stop();
 		}
+		m_manager.http()->clear();
 
 		// and out via the exit phase
 		m_current_phase = MACHINE_PHASE_EXIT;
@@ -567,7 +571,7 @@ std::string running_machine::get_statename(const char *option) const
 //  for state loading/saving
 //-------------------------------------------------
 
-std::string running_machine::compose_saveload_filename(const char *filename, const char **searchpath)
+std::string running_machine::compose_saveload_filename(std::string &&filename, const char **searchpath)
 {
 	std::string result;
 
@@ -577,7 +581,7 @@ std::string running_machine::compose_saveload_filename(const char *filename, con
 		// if so, this is easy
 		if (searchpath != nullptr)
 			*searchpath = nullptr;
-		result = filename;
+		result = std::move(filename);
 	}
 	else
 	{
@@ -599,10 +603,10 @@ std::string running_machine::compose_saveload_filename(const char *filename, con
 //  for state loading/saving
 //-------------------------------------------------
 
-void running_machine::set_saveload_filename(const char *filename)
+void running_machine::set_saveload_filename(std::string &&filename)
 {
 	// compose the save/load filename and persist it
-	m_saveload_pending_file = compose_saveload_filename(filename, &m_saveload_searchpath);
+	m_saveload_pending_file = compose_saveload_filename(std::move(filename), &m_saveload_searchpath);
 }
 
 
@@ -611,13 +615,13 @@ void running_machine::set_saveload_filename(const char *filename)
 //  soon as possible
 //-------------------------------------------------
 
-void running_machine::schedule_save(const char *filename)
+void running_machine::schedule_save(std::string &&filename)
 {
 	// specify the filename to save or load
-	set_saveload_filename(filename);
+	set_saveload_filename(std::move(filename));
 
 	// note the start time and set a timer for the next timeslice to actually schedule it
-	m_saveload_schedule = SLS_SAVE;
+	m_saveload_schedule = saveload_schedule::SAVE;
 	m_saveload_schedule_time = this->time();
 
 	// we can't be paused since we need to clear out anonymous timers
@@ -635,7 +639,7 @@ void running_machine::immediate_save(const char *filename)
 	set_saveload_filename(filename);
 
 	// set up some parameters for handle_saveload()
-	m_saveload_schedule = SLS_SAVE;
+	m_saveload_schedule = saveload_schedule::SAVE;
 	m_saveload_schedule_time = this->time();
 
 	// jump right into the save, anonymous timers can't hurt us!
@@ -648,13 +652,13 @@ void running_machine::immediate_save(const char *filename)
 //  soon as possible
 //-------------------------------------------------
 
-void running_machine::schedule_load(const char *filename)
+void running_machine::schedule_load(std::string &&filename)
 {
 	// specify the filename to save or load
-	set_saveload_filename(filename);
+	set_saveload_filename(std::move(filename));
 
 	// note the start time and set a timer for the next timeslice to actually schedule it
-	m_saveload_schedule = SLS_LOAD;
+	m_saveload_schedule = saveload_schedule::LOAD;
 	m_saveload_schedule_time = this->time();
 
 	// we can't be paused since we need to clear out anonymous timers
@@ -672,7 +676,7 @@ void running_machine::immediate_load(const char *filename)
 	set_saveload_filename(filename);
 
 	// set up some parameters for handle_saveload()
-	m_saveload_schedule = SLS_LOAD;
+	m_saveload_schedule = saveload_schedule::LOAD;
 	m_saveload_schedule_time = this->time();
 
 	// jump right into the load, anonymous timers can't hurt us
@@ -856,7 +860,7 @@ void running_machine::handle_saveload()
 	// if no name, bail
 	if (!m_saveload_pending_file.empty())
 	{
-		const char *const opname = (m_saveload_schedule == SLS_LOAD) ? "load" : "save";
+		const char *const opname = (m_saveload_schedule == saveload_schedule::LOAD) ? "load" : "save";
 
 		// if there are anonymous timers, we can't save just yet, and we can't load yet either
 		// because the timers might overwrite data we have loaded
@@ -870,17 +874,17 @@ void running_machine::handle_saveload()
 		}
 		else
 		{
-			u32 const openflags = (m_saveload_schedule == SLS_LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			u32 const openflags = (m_saveload_schedule == saveload_schedule::LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 			// open the file
 			emu_file file(m_saveload_searchpath, openflags);
 			auto const filerr = file.open(m_saveload_pending_file.c_str());
 			if (filerr == osd_file::error::NONE)
 			{
-				const char *const opnamed = (m_saveload_schedule == SLS_LOAD) ? "loaded" : "saved";
+				const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
 
 				// read/write the save state
-				save_error saverr = (m_saveload_schedule == SLS_LOAD) ? m_save.read_file(file) : m_save.write_file(file);
+				save_error saverr = (m_saveload_schedule == saveload_schedule::LOAD) ? m_save.read_file(file) : m_save.write_file(file);
 
 				// handle the result
 				switch (saverr)
@@ -914,7 +918,7 @@ void running_machine::handle_saveload()
 				}
 
 				// close and perhaps delete the file
-				if (saverr != STATERR_NONE && m_saveload_schedule == SLS_SAVE)
+				if (saverr != STATERR_NONE && m_saveload_schedule == saveload_schedule::SAVE)
 					file.remove_on_close();
 			}
 			else
@@ -925,7 +929,7 @@ void running_machine::handle_saveload()
 	// unschedule the operation
 	m_saveload_pending_file.clear();
 	m_saveload_searchpath = nullptr;
-	m_saveload_schedule = SLS_NONE;
+	m_saveload_schedule = saveload_schedule::NONE;
 }
 
 
@@ -1185,9 +1189,7 @@ running_machine::logerror_callback_item::logerror_callback_item(logerror_callbac
 
 void running_machine::export_http_api()
 {
-	if (!options().http()) return;
-
-	m_manager.http_server()->on_get("/api/machine", [this](auto response, auto request)
+	m_manager.http()->add("/api/machine", [this](std::string)
 	{
 		rapidjson::StringBuffer s;
 		rapidjson::Writer<rapidjson::StringBuffer> writer(s);
@@ -1205,8 +1207,7 @@ void running_machine::export_http_api()
 		writer.EndArray();
 		writer.EndObject();
 
-		response->type("application/json");
-		response->status(200).send(s.GetString());
+		return std::make_tuple(std::string(s.GetString()), 200, "application/json");
 	});
 }
 
@@ -1279,10 +1280,10 @@ static ADDRESS_MAP_START(dummy, AS_0, 8, dummy_space_device)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
-const device_type DUMMY_SPACE = device_creator<dummy_space_device>;
+DEFINE_DEVICE_TYPE(DUMMY_SPACE, dummy_space_device, "dummy_space", "Dummy Space")
 
 dummy_space_device::dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, DUMMY_SPACE, "Dummy Space", tag, owner, clock, "dummy_space", __FILE__),
+	device_t(mconfig, DUMMY_SPACE, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, nullptr, *ADDRESS_MAP_NAME(dummy))
 {
@@ -1313,6 +1314,11 @@ static running_machine * jsmess_machine;
 
 void js_main_loop()
 {
+	if (jsmess_machine->paused()) {
+		jsmess_machine->video().frame_update();
+		return;
+	}
+
 	device_scheduler * scheduler;
 	scheduler = &(jsmess_machine->scheduler());
 	attotime stoptime(scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60)));

@@ -534,7 +534,7 @@ void sf_state::machine_reset()
 	m_fgscroll = 0;
 }
 
-static MACHINE_CONFIG_START( sfan, sf_state )
+static MACHINE_CONFIG_START( sfan )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
@@ -574,12 +574,12 @@ static MACHINE_CONFIG_START( sfan, sf_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* 8KHz playback ?    */
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* 8KHz playback ?    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* 8KHz playback ?    */
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* 8KHz playback ?    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1023,9 +1023,9 @@ ROM_END
 
 
 
-GAME( 1987, sf,   0,  sfus, sfus, driver_device, 0, ROT0, "Capcom", "Street Fighter (US, set 1)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom copyright
-GAME( 1987, sfua, sf, sfjp, sfjp, driver_device, 0, ROT0, "Capcom", "Street Fighter (US, set 2) (protected)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom USA copyright
-GAME( 1987, sfj,  sf, sfjp, sfjp, driver_device, 0, ROT0, "Capcom", "Street Fighter (Japan) (protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfjan,sf, sfan, sfan, driver_device, 0, ROT0, "Capcom", "Street Fighter (Japan, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfan, sf, sfan, sfan, driver_device, 0, ROT0, "Capcom", "Street Fighter (World, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfp,  sf, sfp,  sfan, driver_device, 0, ROT0, "Capcom", "Street Fighter (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sf,   0,  sfus, sfus, sf_state, 0, ROT0, "Capcom", "Street Fighter (US, set 1)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom copyright
+GAME( 1987, sfua, sf, sfjp, sfjp, sf_state, 0, ROT0, "Capcom", "Street Fighter (US, set 2) (protected)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom USA copyright
+GAME( 1987, sfj,  sf, sfjp, sfjp, sf_state, 0, ROT0, "Capcom", "Street Fighter (Japan) (protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfjan,sf, sfan, sfan, sf_state, 0, ROT0, "Capcom", "Street Fighter (Japan, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfan, sf, sfan, sfan, sf_state, 0, ROT0, "Capcom", "Street Fighter (World, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfp,  sf, sfp,  sfan, sf_state, 0, ROT0, "Capcom", "Street Fighter (prototype)", MACHINE_SUPPORTS_SAVE )

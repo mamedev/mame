@@ -657,7 +657,7 @@ void umipoker_state::machine_reset()
 }
 
 // TODO: clocks
-static MACHINE_CONFIG_START( umipoker, umipoker_state )
+static MACHINE_CONFIG_START( umipoker )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,16000000) // TMP68HC000-16
@@ -693,7 +693,7 @@ static MACHINE_CONFIG_START( umipoker, umipoker_state )
 	MCFG_SOUND_ADD("ym", YM3812, 4000000 / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 4000000 / 2, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 4000000 / 2, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -763,6 +763,6 @@ DRIVER_INIT_MEMBER(umipoker_state,saiyukip)
 *              Game Drivers               *
 ******************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE    INPUT      INIT      ROT    COMPANY                  FULLNAME                                 FLAGS   LAYOUT      */
+//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE            INIT      ROT   COMPANY                  FULLNAME                                  FLAGS   LAYOUT
 GAME(  1997, umipoker,  0,        umipoker,  umipoker, umipoker_state,  umipoker, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", 0 )                      // title screen is toggleable thru a dsw
 GAMEL( 1998, saiyukip,  0,        umipoker,  saiyukip, umipoker_state,  saiyukip, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",             0,      layout_saiyukip )

@@ -806,7 +806,7 @@ void bnstars_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( bnstars, bnstars_state )
+static MACHINE_CONFIG_START( bnstars )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V70, 20000000) // 20MHz

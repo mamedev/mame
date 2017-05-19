@@ -384,18 +384,18 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( pushman )
 	PORT_START("P1_P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
@@ -451,18 +451,18 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bballs )
 	PORT_START("P1_P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Open/Close Gate")   // Open/Close gate
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Zap")   // Use Zap
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )  // BUTTON3 in "test mode"
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Open/Close Gate")   // Open/Close gate
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Zap")   // Use Zap
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -574,7 +574,7 @@ static GFXDECODE_START( tigeroad )
 	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
+static MACHINE_CONFIG_START( tigeroad )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
@@ -596,7 +596,7 @@ static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tigeroad_state, screen_update_tigeroad)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tigeroad)
@@ -633,12 +633,12 @@ static MACHINE_CONFIG_DERIVED( toramich, tigeroad )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* 4KHz playback ?  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* 4KHz playback ?  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( f1dream_comad, tigeroad_state )
+static MACHINE_CONFIG_START( f1dream_comad )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
@@ -660,7 +660,7 @@ static MACHINE_CONFIG_START( f1dream_comad, tigeroad_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tigeroad_state, screen_update_tigeroad)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -695,7 +695,7 @@ void pushman_state::machine_start()
 	save_item(NAME(m_mcu_latch_ctl));
 }
 
-static MACHINE_CONFIG_DERIVED_CLASS(pushman, f1dream_comad, pushman_state)
+static MACHINE_CONFIG_DERIVED(pushman, f1dream_comad)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pushman_map)
 
@@ -1178,21 +1178,21 @@ DRIVER_INIT_MEMBER(tigeroad_state, f1dream)
 /***************************************************************************/
 
 
-GAME( 1987, tigeroad, 0,        tigeroad, tigeroad, driver_device,  0,       ROT0, "Capcom", "Tiger Road (US)", 0 )
-GAME( 1987, tigeroadu,tigeroad, tigeroad, tigeroad, driver_device,  0,       ROT0, "Capcom (Romstar license)", "Tiger Road (US, Romstar license)", 0 )
-GAME( 1987, toramich, tigeroad, toramich, toramich, driver_device,  0,       ROT0, "Capcom", "Tora e no Michi (Japan)", 0 )
-GAME( 1987, tigeroadb,tigeroad, tigeroad, tigeroad, driver_device,  0,       ROT0, "bootleg", "Tiger Road (US bootleg)", 0 )
+GAME( 1987, tigeroad, 0,        tigeroad, tigeroad, tigeroad_state, 0,       ROT0, "Capcom", "Tiger Road (US)", 0 )
+GAME( 1987, tigeroadu,tigeroad, tigeroad, tigeroad, tigeroad_state, 0,       ROT0, "Capcom (Romstar license)", "Tiger Road (US, Romstar license)", 0 )
+GAME( 1987, toramich, tigeroad, toramich, toramich, tigeroad_state, 0,       ROT0, "Capcom", "Tora e no Michi (Japan)", 0 )
+GAME( 1987, tigeroadb,tigeroad, tigeroad, tigeroad, tigeroad_state, 0,       ROT0, "bootleg", "Tiger Road (US bootleg)", 0 )
 
 /* F1 Dream has an Intel 8751 microcontroller for protection */
 GAME( 1988, f1dream,  0,        tigeroad, f1dream,  tigeroad_state, f1dream, ROT0, "Capcom (Romstar license)", "F-1 Dream", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // collisions are wrong
-GAME( 1988, f1dreamb, f1dream,  tigeroad, f1dream,  driver_device,  0,       ROT0, "bootleg", "F-1 Dream (bootleg, set 1)", 0 )
-GAME( 1988, f1dreamba,f1dream,  tigeroad, f1dream,  driver_device,  0,       ROT0, "bootleg", "F-1 Dream (bootleg, set 2)", 0 )
+GAME( 1988, f1dreamb, f1dream,  tigeroad, f1dream,  tigeroad_state, 0,       ROT0, "bootleg", "F-1 Dream (bootleg, set 1)", 0 )
+GAME( 1988, f1dreamba,f1dream,  tigeroad, f1dream,  tigeroad_state, 0,       ROT0, "bootleg", "F-1 Dream (bootleg, set 2)", 0 )
 
 /* This Comad hardware is based around the F1 Dream design */
-GAME( 1990, pushman,  0,        pushman, pushman,   driver_device,  0,       ROT0, "Comad", "Pushman (Korea, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pushmana, pushman,  pushman, pushman,   driver_device,  0,       ROT0, "Comad", "Pushman (Korea, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pushmans, pushman,  pushman, pushman,   driver_device,  0,       ROT0, "Comad (American Sammy license)", "Pushman (American Sammy license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pushmant, pushman,  pushman, pushman,   driver_device,  0,       ROT0, "Comad (Top Tronic license)", "Pushman (Top Tronic license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushman,  0,        pushman, pushman,   pushman_state,  0,       ROT0, "Comad", "Pushman (Korea, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmana, pushman,  pushman, pushman,   pushman_state,  0,       ROT0, "Comad", "Pushman (Korea, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmans, pushman,  pushman, pushman,   pushman_state,  0,       ROT0, "Comad (American Sammy license)", "Pushman (American Sammy license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmant, pushman,  pushman, pushman,   pushman_state,  0,       ROT0, "Comad (Top Tronic license)", "Pushman (Top Tronic license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, bballs,   0,        bballs,  bballs,    driver_device,  0,       ROT0, "Comad", "Bouncing Balls", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bballsa,  bballs,   bballs,  bballs,    driver_device,  0,       ROT0, "Comad", "Bouncing Balls (Adult)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bballs,   0,        bballs,  bballs,    pushman_state,  0,       ROT0, "Comad", "Bouncing Balls", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bballsa,  bballs,   bballs,  bballs,    pushman_state,  0,       ROT0, "Comad", "Bouncing Balls (Adult)", MACHINE_SUPPORTS_SAVE )

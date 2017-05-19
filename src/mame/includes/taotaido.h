@@ -42,7 +42,8 @@ public:
 	std::unique_ptr<uint16_t[]> m_spriteram2_older;
 
 	DECLARE_READ16_MEMBER(pending_command_r);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(unknown_output_w);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sprite_character_bank_select_w);
@@ -56,7 +57,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	uint32_t tile_callback( uint32_t code );
 };
 

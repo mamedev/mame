@@ -90,7 +90,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type UV201 = device_creator<uv201_device>;
+DEFINE_DEVICE_TYPE(UV201, uv201_device, "uv201", "UV201")
 
 
 //-------------------------------------------------
@@ -98,7 +98,7 @@ const device_type UV201 = device_creator<uv201_device>;
 //-------------------------------------------------
 
 uv201_device::uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, UV201, "UV201", tag, owner, clock, "uv201", __FILE__),
+	device_t(mconfig, UV201, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_write_ext_int(*this),
 	m_write_hblank(*this),

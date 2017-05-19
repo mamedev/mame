@@ -373,7 +373,7 @@ void drgnmst_state::machine_reset()
 	m_oki0_bank = 0;
 }
 
-static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
+static MACHINE_CONFIG_START( drgnmst )
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* Confirmed */
 	MCFG_CPU_PROGRAM_MAP(drgnmst_main_map)
@@ -403,11 +403,11 @@ static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", 32000000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 32000000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", 32000000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 32000000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

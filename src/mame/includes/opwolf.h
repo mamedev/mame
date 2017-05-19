@@ -45,6 +45,8 @@ public:
 	int          m_opwolf_gun_xoffs;
 	int          m_opwolf_gun_yoffs;
 
+	emu_timer   *m_opwolf_timer;
+
 	/* c-chip */
 	emu_timer   *m_cchip_timer;
 
