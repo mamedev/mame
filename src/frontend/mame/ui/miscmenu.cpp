@@ -566,91 +566,87 @@ void menu_export::handle()
 	const event *menu_event = process(PROCESS_NOIMAGE);
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		switch ((uintptr_t)menu_event->itemref)
+		switch (uintptr_t(menu_event->itemref))
 		{
-			case 1:
-			case 3:
+		case 1:
+		case 3:
+			if (menu_event->iptkey == IPT_UI_SELECT)
 			{
-				if (menu_event->iptkey == IPT_UI_SELECT)
-				{
-					std::string filename("exported");
-					emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
-					if (infile.open(filename.c_str(), ".xml") == osd_file::error::NONE)
-						for (int seq = 0; ; ++seq)
-						{
-							std::string seqtext = string_format("%s_%04d", filename, seq);
-							if (infile.open(seqtext.c_str(), ".xml") != osd_file::error::NONE)
-							{
-								filename = seqtext;
-								break;
-							}
-						}
-
-					// attempt to open the output file
-					emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-					if (file.open(filename.c_str(), ".xml") == osd_file::error::NONE)
+				std::string filename("exported");
+				emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
+				if (infile.open(filename.c_str(), ".xml") == osd_file::error::NONE)
+					for (int seq = 0; ; ++seq)
 					{
-						FILE *pfile;
-						std::string fullpath(file.fullpath());
-						file.close();
-						pfile = fopen(fullpath.c_str(), "w");
-
-						// create the XML and save to file
-						driver_enumerator drvlist(machine().options());
-						drvlist.exclude_all();
-						for (auto & elem : m_list)
-							drvlist.include(driver_list::find(*elem));
-
-						info_xml_creator creator(drvlist, true);
-						creator.output(pfile, ((uintptr_t)menu_event->itemref == 1) ? false : true);
-						fclose(pfile);
-						machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());
+						std::string seqtext = string_format("%s_%04d", filename, seq);
+						if (infile.open(seqtext.c_str(), ".xml") != osd_file::error::NONE)
+						{
+							filename = seqtext;
+							break;
+						}
 					}
+
+				// attempt to open the output file
+				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+				if (file.open(filename.c_str(), ".xml") == osd_file::error::NONE)
+				{
+					FILE *pfile;
+					std::string fullpath(file.fullpath());
+					file.close();
+					pfile = fopen(fullpath.c_str(), "w");
+
+					// create the XML and save to file
+					driver_enumerator drvlist(machine().options());
+					drvlist.exclude_all();
+					for (auto & elem : m_list)
+						drvlist.include(driver_list::find(*elem));
+
+					info_xml_creator creator(machine().options());
+					creator.output(pfile, drvlist, (uintptr_t(menu_event->itemref) == 1) ? false : true);
+					fclose(pfile);
+					machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());
 				}
-				break;
 			}
-			case 2:
+			break;
+		case 2:
+			if (menu_event->iptkey == IPT_UI_SELECT)
 			{
-				if (menu_event->iptkey == IPT_UI_SELECT)
-				{
-					std::string filename("exported");
-					emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
-					if (infile.open(filename.c_str(), ".txt") == osd_file::error::NONE)
-						for (int seq = 0; ; ++seq)
-						{
-							std::string seqtext = string_format("%s_%04d", filename, seq);
-							if (infile.open(seqtext.c_str(), ".txt") != osd_file::error::NONE)
-							{
-								filename = seqtext;
-								break;
-							}
-						}
-
-					// attempt to open the output file
-					emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-					if (file.open(filename.c_str(), ".txt") == osd_file::error::NONE)
+				std::string filename("exported");
+				emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
+				if (infile.open(filename.c_str(), ".txt") == osd_file::error::NONE)
+					for (int seq = 0; ; ++seq)
 					{
-						// print the header
-						std::ostringstream buffer;
-						buffer << _("Name:             Description:\n");
-						driver_enumerator drvlist(machine().options());
-						drvlist.exclude_all();
-						for (auto & elem : m_list)
-							drvlist.include(driver_list::find(*elem));
-
-						// iterate through drivers and output the info
-						while (drvlist.next())
-							if ((drvlist.driver().flags & MACHINE_NO_STANDALONE) == 0)
-								util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().type.fullname());
-						file.puts(buffer.str().c_str());
-						file.close();
-						machine().popmessage(_("%s.txt saved under ui folder."), filename.c_str());
+						std::string seqtext = string_format("%s_%04d", filename, seq);
+						if (infile.open(seqtext.c_str(), ".txt") != osd_file::error::NONE)
+						{
+							filename = seqtext;
+							break;
+						}
 					}
+
+				// attempt to open the output file
+				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+				if (file.open(filename.c_str(), ".txt") == osd_file::error::NONE)
+				{
+					// print the header
+					std::ostringstream buffer;
+					buffer << _("Name:             Description:\n");
+					driver_enumerator drvlist(machine().options());
+					drvlist.exclude_all();
+					for (auto & elem : m_list)
+						drvlist.include(driver_list::find(*elem));
+
+					// iterate through drivers and output the info
+					while (drvlist.next())
+						if ((drvlist.driver().flags & MACHINE_NO_STANDALONE) == 0)
+							util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().type.fullname());
+					file.puts(buffer.str().c_str());
+					file.close();
+					machine().popmessage(_("%s.txt saved under ui folder."), filename.c_str());
 				}
-				break;
 			}
-			default:
-				break;
+			break;
+		default:
+			break;
 		}
 	}
 }

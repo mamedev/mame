@@ -319,16 +319,9 @@ int cli_frontend::execute(std::vector<std::string> &args)
 
 void cli_frontend::listxml(const std::vector<std::string> &args)
 {
-	const char *gamename = args.empty() ? nullptr : args[0].c_str();
-
-	// determine which drivers to output; return an error if none found
-	driver_enumerator drivlist(m_options, gamename);
-	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename ? gamename : "");
-
 	// create the XML and print it to stdout
-	info_xml_creator creator(drivlist, gamename && *gamename);
-	creator.output(stdout);
+	info_xml_creator creator(m_options);
+	creator.output(stdout, args);
 }
 
 
@@ -512,23 +505,20 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 	auto const included = [&args, &matched] (char const *name) -> bool
 	{
 		if (args.empty())
-		{
 			return true;
-		}
 
+		bool result = false;
 		auto it = matched.begin();
 		for (std::string const &pat : args)
 		{
 			if (!core_strwildcmp(pat.c_str(), name))
 			{
+				result = true;
 				*it = true;
-				return true;
 			}
-
 			++it;
 		}
-
-		return false;
+		return result;
 	};
 
 	bool first = true;
@@ -878,20 +868,19 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 			return true;
 		}
 
+		bool result = false;
 		auto it = matched.begin();
 		for (std::string const &pat : args)
 		{
 			if (!core_strwildcmp(pat.c_str(), name))
 			{
 				++matchcount;
+				result = true;
 				*it = true;
-				return true;
 			}
-
 			++it;
 		}
-
-		return false;
+		return result;
 	};
 
 	unsigned correct = 0;
@@ -1549,7 +1538,7 @@ void cli_frontend::execute_commands(const char *exename)
 		const char *usage;
 	} info_commands[] =
 	{
-		{ CLICOMMAND_LISTXML,           0,  1, &cli_frontend::listxml,          "[system name]" },
+		{ CLICOMMAND_LISTXML,           0, -1, &cli_frontend::listxml,          "[pattern] ..." },
 		{ CLICOMMAND_LISTFULL,          0,  1, &cli_frontend::listfull,         "[system name]" },
 		{ CLICOMMAND_LISTSOURCE,        0,  1, &cli_frontend::listsource,       "[system name]" },
 		{ CLICOMMAND_LISTCLONES,        0,  1, &cli_frontend::listclones,       "[system name]" },
@@ -1557,9 +1546,9 @@ void cli_frontend::execute_commands(const char *exename)
 		{ CLICOMMAND_LISTCRC,           0,  1, &cli_frontend::listcrc,          "[system name]" },
 		{ CLICOMMAND_LISTDEVICES,       0,  1, &cli_frontend::listdevices,      "[system name]" },
 		{ CLICOMMAND_LISTSLOTS,         0,  1, &cli_frontend::listslots,        "[system name]" },
-		{ CLICOMMAND_LISTROMS,          0, -1, &cli_frontend::listroms,         "[system name]" },
+		{ CLICOMMAND_LISTROMS,          0, -1, &cli_frontend::listroms,         "[pattern] ..." },
 		{ CLICOMMAND_LISTSAMPLES,       0,  1, &cli_frontend::listsamples,      "[system name]" },
-		{ CLICOMMAND_VERIFYROMS,        0, -1, &cli_frontend::verifyroms,       "[system name]" },
+		{ CLICOMMAND_VERIFYROMS,        0, -1, &cli_frontend::verifyroms,       "[pattern] ..." },
 		{ CLICOMMAND_VERIFYSAMPLES,     0,  1, &cli_frontend::verifysamples,    "[system name|*]" },
 		{ CLICOMMAND_LISTMEDIA,         0,  1, &cli_frontend::listmedia,        "[system name]" },
 		{ CLICOMMAND_LISTSOFTWARE,      0,  1, &cli_frontend::listsoftware,     "[system name]" },

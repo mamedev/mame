@@ -17,6 +17,7 @@
 
 #include <type_traits>
 #include <unordered_set>
+#include <vector>
 
 
 class driver_enumerator;
@@ -31,20 +32,24 @@ class info_xml_creator
 {
 public:
 	// construction/destruction
-	info_xml_creator(driver_enumerator &drivlist, bool filter_devices);
+	info_xml_creator(emu_options const &options);
 
 	// output
-	void output(FILE *out, bool nodevices = false);
+	void output(FILE *out, std::vector<std::string> const &patterns);
+	void output(FILE *out, driver_enumerator &drivlist, bool nodevices);
 
 private:
 	typedef std::unordered_set<std::add_pointer_t<device_type> > device_type_set;
 
 	// internal helper
-	void output_one(device_type_set *devtypes);
+	void output_header();
+	void output_footer();
+
+	void output_one(driver_enumerator &drivlist, device_type_set *devtypes);
 	void output_sampleof(device_t &device);
-	void output_bios();
-	void output_rom(device_t &device);
-	void output_device_roms();
+	void output_bios(game_driver const &driver);
+	void output_rom(driver_enumerator *drivlist, device_t &device);
+	void output_device_roms(device_t &root);
 	void output_sample(device_t &device);
 	void output_chips(device_t &device, const char *root_tag);
 	void output_display(device_t &device, u32 const *flags, const char *root_tag);
@@ -53,22 +58,20 @@ private:
 	void output_switches(const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *innertag);
 	void output_ports(const ioport_list &portlist);
 	void output_adjusters(const ioport_list &portlist);
-	void output_driver();
+	void output_driver(game_driver const &driver);
 	void output_images(device_t &device, const char *root_tag);
 	void output_slots(machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes);
-	void output_software_list();
-	void output_ramoptions();
+	void output_software_list(device_t &root);
+	void output_ramoptions(device_t &root);
 
 	void output_one_device(machine_config &config, device_t &device, const char *devtag);
 	void output_devices(device_type_set const *filter);
 
-	const char *get_merge_name(const util::hash_collection &romhashes);
+	const char *get_merge_name(driver_enumerator &drivlist, util::hash_collection const &romhashes);
 
 	// internal state
-	FILE *                  m_output;
-	driver_enumerator &     m_drivlist;
-	bool                    m_filter_devices;
-	emu_options             m_lookup_options;
+	FILE *          m_output; // FIXME: this is not reentrancy-safe
+	emu_options     m_lookup_options;
 
 	static const char s_dtd_string[];
 };
