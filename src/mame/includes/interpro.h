@@ -6,8 +6,6 @@
 
 #pragma once
 
-#define NEW_SCSI 1
-
 #include "cpu/clipper/clipper.h"
 #include "machine/cammu.h"
 

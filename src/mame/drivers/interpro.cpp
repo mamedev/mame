@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
+#define NEW_SCSI 0
+
 #include "emu.h"
 #include "includes/interpro.h"
 #include "debugger.h"
