@@ -124,16 +124,15 @@
  *          PIT and DUSCCs are hooked up to the BIM to get further.
  *
  ****************************************************************************/
-#define TODO "VME side hookup of 68153 BIM device needed\n"
-
 #include "emu.h"
+#include "vme_fcisio.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/scnxx562.h"
 #include "machine/68230pit.h"
 #include "machine/68153bim.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
-#include "vme_fcisio.h"
 
 //#define LOG_GENERAL (1U <<  0)
 #define LOG_SETUP   (1U <<  1)
@@ -151,11 +150,13 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+#define TODO "VME side hookup of 68153 BIM device needed\n"
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_FCISIO1 = device_creator<vme_fcisio1_card_device>;
+DEFINE_DEVICE_TYPE(VME_FCISIO1, vme_fcisio1_card_device, "fcisio1", "Force Computer SYS68K/ISIO-1/2 Intelligent Serial I/O Board")
 
 #define CPU_CLOCK XTAL_20MHz /* HCJ */
 #define DUSCC_CLOCK XTAL_14_7456MHz /* HCJ */
@@ -384,32 +385,23 @@ const tiny_rom_entry *vme_fcisio1_card_device::device_rom_region() const
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
-vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-	,device_vme_card_interface(mconfig, *this)
-	,m_maincpu (*this, "maincpu")
-	,m_duscc0(*this, "duscc0")
-	,m_duscc1(*this, "duscc1")
-	,m_duscc2(*this, "duscc2")
-	,m_duscc3(*this, "duscc3")
-	,m_pit (*this, "pit")
-	,m_bim (*this, "bim")
+vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_vme_card_interface(mconfig, *this)
+	, m_maincpu (*this, "maincpu")
+	, m_duscc0(*this, "duscc0")
+	, m_duscc1(*this, "duscc1")
+	, m_duscc2(*this, "duscc2")
+	, m_duscc3(*this, "duscc3")
+	, m_pit (*this, "pit")
+	, m_bim (*this, "bim")
 {
 	LOG("%s\n", FUNCNAME);
 }
 
-vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VME_FCISIO1, "Force Computer SYS68K/ISIO-1/2 Intelligent Serial I/O Board", tag, owner, clock, "fcisio1", __FILE__)
-	,device_vme_card_interface(mconfig, *this)
-	,m_maincpu(*this, "maincpu")
-	,m_duscc0(*this, "duscc0")
-	,m_duscc1(*this, "duscc1")
-	,m_duscc2(*this, "duscc2")
-	,m_duscc3(*this, "duscc3")
-	,m_pit (*this, "pit")
-	,m_bim (*this, "bim")
+vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vme_fcisio1_card_device(mconfig, VME_FCISIO1, tag, owner, clock)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 /* Start it up */

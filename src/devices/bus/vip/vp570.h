@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VIP_VP570_H
+#define MAME_BUS_VIP_VP570_H
 
-#ifndef __VP570__
-#define __VP570__
+#pragma once
 
 #include "exp.h"
 
@@ -47,7 +47,7 @@ private:
 
 
 // device type definition
-extern const device_type VP570;
+DECLARE_DEVICE_TYPE(VP570, vp570_device)
 
 
-#endif
+#endif // MAME_BUS_VIP_VP570_H

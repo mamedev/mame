@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_WANGPC_MCC_H
+#define MAME_BUS_WANGPC_MCC_H
 
-#ifndef __WANGPC_MCC__
-#define __WANGPC_MCC__
+#pragma once
 
 #include "wangpc.h"
 #include "machine/z80dart.h"
@@ -53,7 +53,6 @@ private:
 
 
 // device type definition
-extern const device_type WANGPC_MCC;
+DECLARE_DEVICE_TYPE(WANGPC_MCC, wangpc_mcc_device)
 
-
-#endif
+#endif // MAME_BUS_WANGPC_MCC_H

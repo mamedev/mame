@@ -29,7 +29,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type IMI5000H = device_creator<imi5000h_device>;
+DEFINE_DEVICE_TYPE(IMI5000H, imi5000h_device, "imi5000h", "IMI 5000H")
 
 
 //-------------------------------------------------
@@ -447,7 +447,7 @@ ioport_constructor imi5000h_device::device_input_ports() const
 //-------------------------------------------------
 
 imi5000h_device::imi5000h_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, IMI5000H, "IMI 5000H", tag, owner, clock, "imi5000h", __FILE__),
+	device_t(mconfig, IMI5000H, tag, owner, clock),
 	device_imi7000_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
 	m_ctc(*this, Z80CTC_TAG),

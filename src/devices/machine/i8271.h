@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl,Olivier Galibert
-#ifndef I8271N_H_
-#define I8271N_H_
+#ifndef MAME_MACHINE_I8271_H
+#define MAME_MACHINE_I8271_H
+
+#pragma once
 
 #include "imagedev/floppy.h"
 #include "fdc_pll.h"
@@ -26,12 +28,11 @@ class i8271_device : public device_t
 {
 public:
 	i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~i8271_device() {}
 
-	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).intrq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).drq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_hdl_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).hdl_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_opt_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).opt_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_intrq_wr_callback(device_t &device, Object &&cb) { return downcast<i8271_device &>(device).intrq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<i8271_device &>(device).drq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_hdl_wr_callback(device_t &device, Object &&cb) { return downcast<i8271_device &>(device).hdl_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_opt_wr_callback(device_t &device, Object &&cb) { return downcast<i8271_device &>(device).opt_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER (sr_r);
 	DECLARE_READ8_MEMBER (rr_r);
@@ -289,6 +290,6 @@ private:
 	bool get_input(uint8_t *data);
 };
 
-extern const device_type I8271;
+DECLARE_DEVICE_TYPE(I8271, i8271_device)
 
-#endif
+#endif // MAME_MACHINE_I8271_H

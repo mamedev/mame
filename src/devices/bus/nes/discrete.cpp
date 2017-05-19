@@ -35,29 +35,29 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_74X161X161X32 = device_creator<nes_74x161x161x32_device>;
-const device_type NES_74X139X74 = device_creator<nes_74x139x74_device>;
-const device_type NES_74X377 = device_creator<nes_74x377_device>;
-const device_type NES_74X161X138 = device_creator<nes_74x161x138_device>;
+DEFINE_DEVICE_TYPE(NES_74X161X161X32, nes_74x161x161x32_device, "nes_74x161",      "NES Cart Discrete Logic (74*161/161/32) PCB")
+DEFINE_DEVICE_TYPE(NES_74X139X74,     nes_74x139x74_device,     "nes_74x139",      "NES Cart Discrete Logic (74*139/74) PCB")
+DEFINE_DEVICE_TYPE(NES_74X377,        nes_74x377_device,        "nes_74x377",      "NES Cart Discrete Logic (74*377) PCB")
+DEFINE_DEVICE_TYPE(NES_74X161X138,    nes_74x161x138_device,    "nes_bitcorp_dis", "NES Cart Discrete Logic (74*161/138) PCB")
 
 
 nes_74x161x161x32_device::nes_74x161x161x32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_74X161X161X32, "NES Cart Discrete Logic (74*161/161/32) PCB", tag, owner, clock, "nes_74x161", __FILE__)
+	: nes_nrom_device(mconfig, NES_74X161X161X32, tag, owner, clock)
 {
 }
 
 nes_74x139x74_device::nes_74x139x74_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_74X139X74, "NES Cart Discrete Logic (74*139/74) PCB", tag, owner, clock, "nes_74x139", __FILE__)
+	: nes_nrom_device(mconfig, NES_74X139X74, tag, owner, clock)
 {
 }
 
 nes_74x377_device::nes_74x377_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_74X377, "NES Cart Discrete Logic (74*377) PCB", tag, owner, clock, "nes_74x377", __FILE__)
+	: nes_nrom_device(mconfig, NES_74X377, tag, owner, clock)
 {
 }
 
 nes_74x161x138_device::nes_74x161x138_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_74X161X138, "NES Cart Discrete Logic (74*161/138) PCB", tag, owner, clock, "nes_bitcorp_dis", __FILE__)
+	: nes_nrom_device(mconfig, NES_74X161X138, tag, owner, clock)
 {
 }
 

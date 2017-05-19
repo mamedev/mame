@@ -6,11 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_SNES_CTRL_CTRL_H
+#define MAME_BUS_SNES_CTRL_CTRL_H
 
 #pragma once
-
-#ifndef __SNES_CONTROL_PORT__
-#define __SNES_CONTROL_PORT__
 
 
 //**************************************************************************
@@ -28,11 +27,11 @@ public:
 	device_snes_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_snes_control_port_interface();
 
-	virtual uint8_t read_pin4() { return 0; };
-	virtual uint8_t read_pin5() { return 0; };
-	virtual void write_pin6(uint8_t data) { };
-	virtual void write_strobe(uint8_t data) { };
-	virtual void port_poll() { };
+	virtual uint8_t read_pin4() { return 0; }
+	virtual uint8_t read_pin5() { return 0; }
+	virtual void write_pin6(uint8_t data) { }
+	virtual void write_strobe(uint8_t data) { }
+	virtual void port_poll() { }
 
 protected:
 	snes_control_port_device *m_port;
@@ -46,8 +45,7 @@ typedef device_delegate<void (int16_t x, int16_t y)> snesctrl_gunlatch_delegate;
 
 // ======================> snes_control_port_device
 
-class snes_control_port_device : public device_t,
-								public device_slot_interface
+class snes_control_port_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -63,19 +61,22 @@ public:
 	void write_strobe(uint8_t data);
 	void port_poll();
 
-	snesctrl_onscreen_delegate m_onscreen_cb;
-	snesctrl_gunlatch_delegate m_gunlatch_cb;
+	bool onscreen_cb(int16_t x, int16_t y) { return m_onscreen_cb.isnull() ? true : m_onscreen_cb(x, y); }
+	void gunlatch_cb(int16_t x, int16_t y) { if (!m_gunlatch_cb.isnull()) m_gunlatch_cb(x, y); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	snesctrl_onscreen_delegate m_onscreen_cb;
+	snesctrl_gunlatch_delegate m_gunlatch_cb;
 
 	device_snes_control_port_interface *m_device;
 };
 
 
 // device type definition
-extern const device_type SNES_CONTROL_PORT;
+DECLARE_DEVICE_TYPE(SNES_CONTROL_PORT, snes_control_port_device)
 
 
 //**************************************************************************
@@ -96,4 +97,4 @@ extern const device_type SNES_CONTROL_PORT;
 SLOT_INTERFACE_EXTERN( snes_control_port_devices );
 
 
-#endif
+#endif // MAME_BUS_SNES_CTRL_CTRL_H

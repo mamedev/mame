@@ -8,8 +8,11 @@
 
 ***************************************************************************/
 
-#ifndef __UPD4701_H__
-#define __UPD4701_H__
+#ifndef MAME_MACHINE_UPD4701_H
+#define MAME_MACHINE_UPD4701_H
+
+#pragma once
+
 
 /***************************************************************************
     MACROS / CONSTANTS
@@ -57,10 +60,10 @@ private:
 	int m_cf;
 };
 
-extern const device_type UPD4701;
+DECLARE_DEVICE_TYPE(UPD4701, upd4701_device)
 
 
-#define MCFG_UPD4701_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, UPD4701, 0)
+#define MCFG_UPD4701_ADD(tag) \
+		MCFG_DEVICE_ADD((tag), UPD4701, 0)
 
-#endif  /* __UPD4701_H__ */
+#endif // MAME_MACHINE_UPD4701_H

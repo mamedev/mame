@@ -21,127 +21,122 @@
 //  gba_rom_device - constructor
 //-------------------------------------------------
 
-const device_type GBA_ROM_STD = device_creator<gba_rom_device>;
-const device_type GBA_ROM_SRAM = device_creator<gba_rom_sram_device>;
-const device_type GBA_ROM_DRILLDOZ = device_creator<gba_rom_drilldoz_device>;
-const device_type GBA_ROM_WARIOTWS = device_creator<gba_rom_wariotws_device>;
-const device_type GBA_ROM_EEPROM = device_creator<gba_rom_eeprom_device>;
-const device_type GBA_ROM_YOSHIUG = device_creator<gba_rom_yoshiug_device>;
-const device_type GBA_ROM_EEPROM64 = device_creator<gba_rom_eeprom64_device>;
-const device_type GBA_ROM_BOKTAI = device_creator<gba_rom_boktai_device>;
-const device_type GBA_ROM_FLASH = device_creator<gba_rom_flash_device>;
-const device_type GBA_ROM_FLASH_RTC = device_creator<gba_rom_flash_rtc_device>;
-const device_type GBA_ROM_FLASH1M = device_creator<gba_rom_flash1m_device>;
-const device_type GBA_ROM_FLASH1M_RTC = device_creator<gba_rom_flash1m_rtc_device>;
-const device_type GBA_ROM_3DMATRIX = device_creator<gba_rom_3dmatrix_device>;
+DEFINE_DEVICE_TYPE(GBA_ROM_STD,         gba_rom_device,             "gba_rom",             "GBA Carts")
+DEFINE_DEVICE_TYPE(GBA_ROM_SRAM,        gba_rom_sram_device,        "gba_rom_sram",        "GBA Carts + SRAM")
+DEFINE_DEVICE_TYPE(GBA_ROM_DRILLDOZ,    gba_rom_drilldoz_device,    "gba_rom_drilldoz",    "GBA Carts + SRAM + Rumble")
+DEFINE_DEVICE_TYPE(GBA_ROM_WARIOTWS,    gba_rom_wariotws_device,    "gba_rom_wariotws",    "GBA Carts + SRAM + Rumble + Gyroscope")
+DEFINE_DEVICE_TYPE(GBA_ROM_EEPROM,      gba_rom_eeprom_device,      "gba_rom_eeprom",      "GBA Carts + EEPROM")
+DEFINE_DEVICE_TYPE(GBA_ROM_YOSHIUG,     gba_rom_yoshiug_device,     "gba_rom_yoshiug",     "GBA Carts + EEPROM + Tilt Sensor")
+DEFINE_DEVICE_TYPE(GBA_ROM_EEPROM64,    gba_rom_eeprom64_device,    "gba_rom_eeprom64",    "GBA Carts + EEPROM 64K")
+DEFINE_DEVICE_TYPE(GBA_ROM_BOKTAI,      gba_rom_boktai_device,      "gba_rom_boktai",      "GBA Carts + EEPROM 64K + RTC + Light Sensor")
+DEFINE_DEVICE_TYPE(GBA_ROM_FLASH,       gba_rom_flash_device,       "gba_rom_flash",       "GBA Carts + Panasonic Flash")
+DEFINE_DEVICE_TYPE(GBA_ROM_FLASH_RTC,   gba_rom_flash_rtc_device,   "gba_rom_flash_rtc",   "GBA Carts + Panasonic Flash + RTC")
+DEFINE_DEVICE_TYPE(GBA_ROM_FLASH1M,     gba_rom_flash1m_device,     "gba_rom_flash1m",     "GBA Carts + Sanyo Flash")
+DEFINE_DEVICE_TYPE(GBA_ROM_FLASH1M_RTC, gba_rom_flash1m_rtc_device, "gba_rom_flash1m_rtc", "GBA Carts + Sanyo Flash + RTC")
+DEFINE_DEVICE_TYPE(GBA_ROM_3DMATRIX,    gba_rom_3dmatrix_device,    "gba_rom_3dmatrix",    "3D Matrix Memory Mapper")
 
 
-gba_rom_device::gba_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_gba_cart_interface( mconfig, *this )
+gba_rom_device::gba_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_gba_cart_interface(mconfig, *this)
 {
 }
 
 gba_rom_device::gba_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, GBA_ROM_STD, "GBA Carts", tag, owner, clock, "gba_rom", __FILE__),
-						device_gba_cart_interface( mconfig, *this )
+	: gba_rom_device(mconfig, GBA_ROM_STD, tag, owner, clock)
 {
 }
 
-gba_rom_sram_device::gba_rom_sram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: gba_rom_device(mconfig, type, name, tag, owner, clock, shortname, source)
+gba_rom_sram_device::gba_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: gba_rom_device(mconfig, type, tag, owner, clock)
 {
 }
 
 gba_rom_sram_device::gba_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gba_rom_device(mconfig, GBA_ROM_SRAM, "GBA Carts + SRAM", tag, owner, clock, "gba_sram", __FILE__)
+	: gba_rom_sram_device(mconfig, GBA_ROM_SRAM, tag, owner, clock)
 {
 }
 
 gba_rom_drilldoz_device::gba_rom_drilldoz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gba_rom_sram_device(mconfig, GBA_ROM_DRILLDOZ, "GBA Carts + SRAM + Rumble", tag, owner, clock, "gba_drilldoz", __FILE__)
+	: gba_rom_sram_device(mconfig, GBA_ROM_DRILLDOZ, tag, owner, clock)
 {
 }
 
 gba_rom_wariotws_device::gba_rom_wariotws_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gba_rom_sram_device(mconfig, GBA_ROM_WARIOTWS, "GBA Carts + SRAM + Rumble + Gyroscope", tag, owner, clock, "gba_wariotws", __FILE__),
-						m_gyro_z(*this, "GYROZ")
+	: gba_rom_sram_device(mconfig, GBA_ROM_WARIOTWS, tag, owner, clock)
+	, m_gyro_z(*this, "GYROZ")
 {
 }
 
-gba_rom_eeprom_device::gba_rom_eeprom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: gba_rom_device(mconfig, type, name, tag, owner, clock, shortname, source)
+gba_rom_eeprom_device::gba_rom_eeprom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: gba_rom_device(mconfig, type, tag, owner, clock)
 {
 }
 
 gba_rom_eeprom_device::gba_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gba_rom_device(mconfig, GBA_ROM_EEPROM, "GBA Carts + EEPROM", tag, owner, clock, "gba_eeprom", __FILE__)
+	: gba_rom_eeprom_device(mconfig, GBA_ROM_EEPROM, tag, owner, clock)
 {
 }
 
 gba_rom_yoshiug_device::gba_rom_yoshiug_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gba_rom_eeprom_device(mconfig, GBA_ROM_YOSHIUG, "GBA Carts + EEPROM + Tilt Sensor", tag, owner, clock, "gba_yoshiug", __FILE__),
-						m_tilt_x(*this, "TILTX"),
-						m_tilt_y(*this, "TILTY")
+	: gba_rom_eeprom_device(mconfig, GBA_ROM_YOSHIUG, tag, owner, clock)
+	, m_tilt_x(*this, "TILTX")
+	, m_tilt_y(*this, "TILTY")
 {
 }
 
-gba_rom_eeprom64_device::gba_rom_eeprom64_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: gba_rom_device(mconfig, type, name, tag, owner, clock, shortname, source)
+gba_rom_eeprom64_device::gba_rom_eeprom64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: gba_rom_device(mconfig, type, tag, owner, clock)
 {
 }
 
 gba_rom_eeprom64_device::gba_rom_eeprom64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gba_rom_device(mconfig, GBA_ROM_EEPROM64, "GBA Carts + EEPROM 64K", tag, owner, clock, "gba_eeprom64", __FILE__)
+	: gba_rom_eeprom64_device(mconfig, GBA_ROM_EEPROM64, tag, owner, clock)
 {
 }
 
 gba_rom_boktai_device::gba_rom_boktai_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gba_rom_eeprom64_device(mconfig, GBA_ROM_BOKTAI, "GBA Carts + EEPROM 64K + RTC", tag, owner, clock, "gba_boktai", __FILE__),
-						m_sensor(*this, "LIGHTSENSE")
+	: gba_rom_eeprom64_device(mconfig, GBA_ROM_BOKTAI, tag, owner, clock)
+	, m_sensor(*this, "LIGHTSENSE")
 {
 }
 
-gba_rom_flash_device::gba_rom_flash_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: gba_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
-						m_flash_mask(0),
-						m_flash(*this, "flash")
+gba_rom_flash_device::gba_rom_flash_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: gba_rom_device(mconfig, type, tag, owner, clock)
+	, m_flash_mask(0)
+	, m_flash(*this, "flash")
 {
 }
 
 gba_rom_flash_device::gba_rom_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gba_rom_device(mconfig, GBA_ROM_FLASH, "GBA Carts + Panasonic Flash", tag, owner, clock, "gba_flash", __FILE__),
-						m_flash_mask(0),
-						m_flash(*this, "flash")
+	: gba_rom_flash_device(mconfig, GBA_ROM_FLASH, tag, owner, clock)
 {
 }
 
 gba_rom_flash_rtc_device::gba_rom_flash_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gba_rom_flash_device(mconfig, GBA_ROM_FLASH_RTC, "GBA Carts + Panasonic Flash + RTC", tag, owner, clock, "gba_flash_rtc", __FILE__)
+	: gba_rom_flash_device(mconfig, GBA_ROM_FLASH_RTC, tag, owner, clock)
 {
 }
 
-gba_rom_flash1m_device::gba_rom_flash1m_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: gba_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
-						m_flash_mask(0),
-						m_flash(*this, "flash")
+gba_rom_flash1m_device::gba_rom_flash1m_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: gba_rom_device(mconfig, type, tag, owner, clock)
+	, m_flash_mask(0)
+	, m_flash(*this, "flash")
 {
 }
 
 gba_rom_flash1m_device::gba_rom_flash1m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gba_rom_device(mconfig, GBA_ROM_FLASH1M, "GBA Carts + Sanyo Flash", tag, owner, clock, "gba_flash1m", __FILE__),
-						m_flash_mask(0),
-						m_flash(*this, "flash")
+	: gba_rom_flash1m_device(mconfig, GBA_ROM_FLASH1M, tag, owner, clock)
 {
 }
 
 gba_rom_flash1m_rtc_device::gba_rom_flash1m_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gba_rom_flash1m_device(mconfig, GBA_ROM_FLASH1M_RTC, "GBA Carts + Sanyo Flash + RTC", tag, owner, clock, "gba_flash1m_rtc", __FILE__)
+	: gba_rom_flash1m_device(mconfig, GBA_ROM_FLASH1M_RTC, tag, owner, clock)
 {
 }
 
 gba_rom_3dmatrix_device::gba_rom_3dmatrix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gba_rom_device(mconfig, GBA_ROM_3DMATRIX, "GBA Carts + 3D Matrix Memory Mapper", tag, owner, clock, "gba_3dmatrix", __FILE__)
+	: gba_rom_device(mconfig, GBA_ROM_3DMATRIX, tag, owner, clock)
 {
 }
 

@@ -55,10 +55,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_7404_H
+#define MAME_MACHINE_7404_H
 
-#ifndef TTL7404_H
-#define TTL7404_H
+#pragma once
 
 
 #define MCFG_7404_Y1_CB(_devcb) \
@@ -89,12 +89,12 @@ public:
 	ttl7404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_y1_cb(device_t &device, _Object object) { return downcast<ttl7404_device &>(device).m_y1_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_y2_cb(device_t &device, _Object object) { return downcast<ttl7404_device &>(device).m_y2_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_y3_cb(device_t &device, _Object object) { return downcast<ttl7404_device &>(device).m_y3_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_y4_cb(device_t &device, _Object object) { return downcast<ttl7404_device &>(device).m_y4_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_y5_cb(device_t &device, _Object object) { return downcast<ttl7404_device &>(device).m_y5_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_y6_cb(device_t &device, _Object object) { return downcast<ttl7404_device &>(device).m_y6_func.set_callback(object); }
+	template <class Object> static devcb_base &set_y1_cb(device_t &device, Object &&cb) { return downcast<ttl7404_device &>(device).m_y1_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_y2_cb(device_t &device, Object &&cb) { return downcast<ttl7404_device &>(device).m_y2_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_y3_cb(device_t &device, Object &&cb) { return downcast<ttl7404_device &>(device).m_y3_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_y4_cb(device_t &device, Object &&cb) { return downcast<ttl7404_device &>(device).m_y4_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_y5_cb(device_t &device, Object &&cb) { return downcast<ttl7404_device &>(device).m_y5_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_y6_cb(device_t &device, Object &&cb) { return downcast<ttl7404_device &>(device).m_y6_func.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	DECLARE_WRITE_LINE_MEMBER( a1_w );
@@ -139,7 +139,6 @@ private:
 };
 
 // device type definition
-extern const device_type TTL7404;
+DECLARE_DEVICE_TYPE(TTL7404, ttl7404_device)
 
-
-#endif /* TTL7404_H */
+#endif // MAME_MACHINE_7404_H

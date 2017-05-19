@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_LIC = device_creator<wangpc_lic_device>;
+DEFINE_DEVICE_TYPE(WANGPC_LIC, wangpc_lic_device, "wangpc_lic", "Wang PC-PM070 Local Interconnect")
 
 
 //-------------------------------------------------
@@ -75,7 +75,7 @@ machine_config_constructor wangpc_lic_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 wangpc_lic_device::wangpc_lic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WANGPC_LIC, "Wang PC-PM070", tag, owner, clock, "wangpc_lic", __FILE__),
+	device_t(mconfig, WANGPC_LIC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this)
 {
 }

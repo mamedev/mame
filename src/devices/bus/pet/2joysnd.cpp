@@ -57,7 +57,7 @@ Connections
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PET_USERPORT_JOYSTICK_AND_SOUND_DEVICE = device_creator<pet_userport_joystick_and_sound_device>;
+DEFINE_DEVICE_TYPE(PET_USERPORT_JOYSTICK_AND_SOUND_DEVICE, pet_userport_joystick_and_sound_device, "2joysnd", "PET Dual Joysticks and Sound")
 
 MACHINE_CONFIG_FRAGMENT( 2joysnd )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -114,7 +114,7 @@ machine_config_constructor pet_userport_joystick_and_sound_device::device_mconfi
 //-------------------------------------------------
 
 pet_userport_joystick_and_sound_device::pet_userport_joystick_and_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PET_USERPORT_JOYSTICK_AND_SOUND_DEVICE, "Dual Joysticks and Sound", tag, owner, clock, "2joysnd", __FILE__),
+	device_t(mconfig, PET_USERPORT_JOYSTICK_AND_SOUND_DEVICE, tag, owner, clock),
 	device_pet_user_port_interface(mconfig, *this),
 	m_dac(*this, "dac"),
 	m_up1(1),

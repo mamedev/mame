@@ -10,7 +10,7 @@
 #define OMTI_READ_DATA_BUFFER 0xec
 #define OMTI_ASSIGN_DISK_PARAM 0xc2
 
-const device_type OMTI5100 = device_creator<omti5100_device>;
+DEFINE_DEVICE_TYPE(OMTI5100, omti5100_device, "omti5100", "OMTI 5100")
 
 #if 0
 ROM_START( omti5100 )
@@ -25,9 +25,9 @@ const tiny_rom_entry *omti5100_device::device_rom_region() const
 #endif
 
 omti5100_device::omti5100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: scsihd_device(mconfig, OMTI5100, "OMTI 5100", tag, owner, clock, "omti5100", __FILE__),
-		m_image0(*this, "image0"),
-		m_image1(*this, "image1")
+	: scsihd_device(mconfig, OMTI5100, tag, owner, clock)
+	, m_image0(*this, "image0")
+	, m_image1(*this, "image1")
 {
 }
 

@@ -31,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_PL80 = device_creator<comx_pl80_device>;
+DEFINE_DEVICE_TYPE(COMX_PL80, comx_pl80_device, "comx_pl80", "COMX PL-80")
 
 
 //-------------------------------------------------
@@ -160,7 +160,7 @@ ioport_constructor comx_pl80_device::device_input_ports() const
 //-------------------------------------------------
 
 comx_pl80_device::comx_pl80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, COMX_PL80, "COMX PL-80", tag, owner, clock, "comx_pl80", __FILE__),
+	: device_t(mconfig, COMX_PL80, tag, owner, clock),
 		device_centronics_peripheral_interface(mconfig, *this),
 		m_plotter(*this, "gfx1"),
 		m_font(*this, "FONT"),

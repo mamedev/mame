@@ -128,9 +128,10 @@
  ****************************************************************************/
 
 #include "emu.h"
+#include "vme_mvme350.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/68230pit.h"
-#include "vme_mvme350.h"
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
@@ -158,7 +159,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_MVME350 = device_creator<vme_mvme350_card_device>;
+DEFINE_DEVICE_TYPE(VME_MVME350, vme_mvme350_card_device, "mvme350", "Motorola MVME-350 Intelligent Tape Controller")
 
 #define MVME350_CPU_TAG "mvme350_cpu"
 #define MVME350_ROM "mvme350_rom"
@@ -212,16 +213,15 @@ const tiny_rom_entry *vme_mvme350_card_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_vme_card_interface(mconfig, *this)
+vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_vme_card_interface(mconfig, *this)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VME_MVME350, "Motorola MVME-350 Intelligent Tape Controller", tag, owner, clock, "mvme350", __FILE__),
-	device_vme_card_interface(mconfig, *this)
+	vme_mvme350_card_device(mconfig, VME_MVME350, tag, owner, clock)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }

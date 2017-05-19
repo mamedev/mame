@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef __TLCS900_H__
-#define __TLCS900_H__
+#ifndef MAME_CPU_TLCS900_TLCS900_H
+#define MAME_CPU_TLCS900_TLCS900_H
 
+#pragma once
 
 
 enum tlcs900_inputs
@@ -39,8 +40,8 @@ enum
 };
 
 
-extern const device_type TMP95C061;
-extern const device_type TMP95C063;
+DECLARE_DEVICE_TYPE(TMP95C061, tmp95c061_device)
+DECLARE_DEVICE_TYPE(TMP95C063, tmp95c063_device)
 
 
 #define MCFG_TLCS900H_AM8_16( am8_16 ) tlcs900h_device::set_am8_16( *device, am8_16 );
@@ -48,13 +49,13 @@ extern const device_type TMP95C063;
 class tlcs900h_device : public cpu_device
 {
 public:
-	// construction/destruction
-	tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
-
 	// static configuration helpers
 	static void set_am8_16(device_t &device, int am8_16) { downcast<tlcs900h_device &>(device).m_am8_16 = am8_16; }
 
 protected:
+	// construction/destruction
+	tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -655,21 +656,21 @@ public:
 	tmp95c061_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_port1_read(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_port1_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_port1_write(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_port1_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_port2_write(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_port2_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_port5_read(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_port5_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_port5_write(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_port5_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_port6_write(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_port6_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_port7_read(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_port7_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_port7_write(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_port7_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_port8_read(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_port8_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_port8_write(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_port8_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_port9_read(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_port9_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_porta_read(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_porta_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_porta_write(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_porta_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_portb_read(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_portb_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_portb_write(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_portb_write.set_callback(object); }
+	template <class Object> static devcb_base &set_port1_read(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port1_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port1_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port1_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port2_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port2_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port5_read(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port5_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port5_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port5_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port6_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port6_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port7_read(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port7_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port7_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port7_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port8_read(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port8_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port8_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port8_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port9_read(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_port9_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_porta_read(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_porta_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_porta_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_porta_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_portb_read(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_portb_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_portb_write(device_t &device, Object &&cb) { return downcast<tmp95c061_device &>(device).m_portb_write.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( internal_r );
 	DECLARE_WRITE8_MEMBER( internal_w );
@@ -778,36 +779,36 @@ public:
 	DECLARE_WRITE8_MEMBER( internal_w );
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_port1_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_port1_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_port1_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_port1_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_port2_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_port2_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_port5_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_port5_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_port5_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_port5_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_port6_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_port6_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_port6_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_port6_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_port7_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_port7_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_port7_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_port7_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_port8_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_port8_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_port8_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_port8_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_port9_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_port9_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_port9_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_port9_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_porta_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_porta_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_porta_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_porta_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_portb_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_portb_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_portb_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_portb_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_portc_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_portc_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_portd_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_portd_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_portd_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_portd_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_porte_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_porte_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_porte_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_porte_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_an0_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an0_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_an1_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an1_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_an2_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an2_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_an3_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an3_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_an4_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an4_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_an5_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an5_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_an6_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an6_read.set_callback(object); }
-	template<class _Object> static devcb_base &set_an7_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an7_read.set_callback(object); }
+	template <class Object> static devcb_base &set_port1_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port1_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port1_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port1_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port2_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port2_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port5_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port5_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port5_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port5_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port6_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port6_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port6_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port6_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port7_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port7_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port7_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port7_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port8_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port8_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port8_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port8_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port9_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port9_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port9_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_port9_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_porta_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_porta_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_porta_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_porta_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_portb_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_portb_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_portb_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_portb_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_portc_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_portc_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_portd_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_portd_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_portd_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_portd_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_porte_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_porte_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_porte_write(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_porte_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an0_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an0_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an1_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an1_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an2_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an2_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an3_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an3_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an4_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an4_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an5_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an5_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an6_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an6_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_an7_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an7_read.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	virtual void device_config_complete() override;
@@ -878,4 +879,4 @@ private:
 	devcb_read16       m_an7_read;
 };
 
-#endif
+#endif // MAME_CPU_TLCS900_TLCS900_H

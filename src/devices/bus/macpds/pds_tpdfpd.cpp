@@ -59,7 +59,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PDS_SEDISPLAY = device_creator<macpds_sedisplay_device>;
+DEFINE_DEVICE_TYPE(PDS_SEDISPLAY, macpds_sedisplay_device, "pds_sefp", "Radius SE Full Page Display")
 
 
 //-------------------------------------------------
@@ -90,20 +90,17 @@ const tiny_rom_entry *macpds_sedisplay_device::device_rom_region() const
 //-------------------------------------------------
 
 macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, PDS_SEDISPLAY, "Radius SE Full Page Display", tag, owner, clock, "pds_sefp", __FILE__),
-		device_video_interface(mconfig, *this),
-		device_macpds_card_interface(mconfig, *this), m_vram(nullptr), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+	macpds_sedisplay_device(mconfig, PDS_SEDISPLAY, tag, owner, clock)
 {
-	m_assembled_tag = std::string(tag).append(":").append(SEDISPLAY_SCREEN_NAME);
-	m_screen_tag = m_assembled_tag.c_str();
 }
 
-macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this),
-		device_macpds_card_interface(mconfig, *this), m_vram(nullptr), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	device_macpds_card_interface(mconfig, *this),
+	m_vram(nullptr), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
+	m_assembled_tag(util::string_format("%s:%s", tag, SEDISPLAY_SCREEN_NAME))
 {
-	m_assembled_tag = std::string(tag).append(":").append(SEDISPLAY_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 

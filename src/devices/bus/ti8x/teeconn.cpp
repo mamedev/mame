@@ -5,7 +5,7 @@
 #include "teeconn.h"
 
 
-device_type const TI8X_TEE_CONNECTOR = device_creator<bus::ti8x::tee_connector_device>;
+DEFINE_DEVICE_TYPE_NS(TI8X_TEE_CONNECTOR, bus::ti8x, tee_connector_device, "it8x_tconn", "TI-8x T-connector")
 
 
 namespace bus { namespace ti8x {
@@ -30,7 +30,7 @@ tee_connector_device::tee_connector_device(
 		char const *tag,
 		device_t *owner,
 		uint32_t clock)
-	: device_t(mconfig, TI8X_TEE_CONNECTOR, "T-connector", tag, owner, clock, "ti8xtconn", __FILE__)
+	: device_t(mconfig, TI8X_TEE_CONNECTOR, tag, owner, clock)
 	, device_ti8x_link_port_interface(mconfig, *this)
 	, m_port_a(*this, "a")
 	, m_port_b(*this, "b")

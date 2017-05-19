@@ -31,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type AKIKO = device_creator<akiko_device>;
+DEFINE_DEVICE_TYPE(AKIKO, akiko_device, "akiko", "CBM AKIKO")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -56,7 +56,7 @@ machine_config_constructor akiko_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 akiko_device::akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AKIKO, "CBM AKIKO", tag, owner, clock, "akiko", __FILE__),
+	: device_t(mconfig, AKIKO, tag, owner, clock),
 	m_c2p_input_index(0),
 	m_c2p_output_index(0),
 	m_i2c_scl_out(0),

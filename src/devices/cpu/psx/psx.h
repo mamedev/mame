@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef MAME_DEVICES_CPU_PSX_PSX_H
-#define MAME_DEVICES_CPU_PSX_PSX_H
+#ifndef MAME_CPU_PSX_PSX_H
+#define MAME_CPU_PSX_PSX_H
 
 #pragma once
 
@@ -21,11 +21,6 @@
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
-
-// cache
-
-#define ICACHE_ENTRIES ( 0x400 )
-#define DCACHE_ENTRIES ( 0x100 )
 
 // interrupts
 
@@ -151,12 +146,12 @@ class psxcpu_device : public cpu_device, psxcpu_state
 {
 public:
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_gpu_read_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_gpu_read_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_gpu_write_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_gpu_write_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_spu_read_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_spu_read_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_spu_write_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_spu_write_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_cd_read_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_cd_read_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_cd_write_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_cd_write_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_gpu_read_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_gpu_read_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_gpu_write_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_gpu_write_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_spu_read_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_spu_read_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_spu_write_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_spu_write_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_cd_read_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_cd_read_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_cd_write_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_cd_write_handler.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	DECLARE_WRITE32_MEMBER( berr_w );
@@ -195,7 +190,10 @@ public:
 	void set_disable_rom_berr(bool mode);
 
 protected:
-	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	static constexpr unsigned ICACHE_ENTRIES = 0x400;
+	static constexpr unsigned DCACHE_ENTRIES = 0x100;
+
+	psxcpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -391,132 +389,14 @@ public:
 };
 
 // device type definition
-extern const device_type CXD8530AQ;
-extern const device_type CXD8530BQ;
-extern const device_type CXD8530CQ;
-extern const device_type CXD8661R;
-extern const device_type CXD8606BQ;
-extern const device_type CXD8606CQ;
+DECLARE_DEVICE_TYPE(CXD8530AQ, cxd8530aq_device)
+DECLARE_DEVICE_TYPE(CXD8530BQ, cxd8530bq_device)
+DECLARE_DEVICE_TYPE(CXD8530CQ, cxd8530cq_device)
+DECLARE_DEVICE_TYPE(CXD8661R,  cxd8661r_device)
+DECLARE_DEVICE_TYPE(CXD8606BQ, cxd8606bq_device)
+DECLARE_DEVICE_TYPE(CXD8606CQ, cxd8606cq_device)
 
-
-
-#define PSXCPU_DELAYR_PC ( 32 )
-#define PSXCPU_DELAYR_NOTPC ( 33 )
-
-#define PSXCPU_BYTE_EXTEND( a ) ( (int32_t)(int8_t)a )
-#define PSXCPU_WORD_EXTEND( a ) ( (int32_t)(int16_t)a )
-
-#define INS_OP( op ) ( ( op >> 26 ) & 63 )
-#define INS_RS( op ) ( ( op >> 21 ) & 31 )
-#define INS_RT( op ) ( ( op >> 16 ) & 31 )
-#define INS_IMMEDIATE( op ) ( op & 0xffff )
-#define INS_TARGET( op ) ( op & 0x3ffffff )
-#define INS_RD( op ) ( ( op >> 11 ) & 31 )
-#define INS_SHAMT( op ) ( ( op >> 6 ) & 31 )
-#define INS_FUNCT( op ) ( op & 63 )
-#define INS_CODE( op ) ( ( op >> 6 ) & 0xfffff )
-#define INS_CO( op ) ( ( op >> 25 ) & 1 )
-#define INS_COFUN( op ) ( op & 0x1ffffff )
-#define INS_CF( op ) ( op & 31 )
-#define INS_BC( op ) ( ( op >> 16 ) & 1 )
-#define INS_RT_REGIMM( op ) ( ( op >> 16 ) & 1 )
-
-#define OP_SPECIAL ( 0 )
-#define OP_REGIMM ( 1 )
-#define OP_J ( 2 )
-#define OP_JAL ( 3 )
-#define OP_BEQ ( 4 )
-#define OP_BNE ( 5 )
-#define OP_BLEZ ( 6 )
-#define OP_BGTZ ( 7 )
-#define OP_ADDI ( 8 )
-#define OP_ADDIU ( 9 )
-#define OP_SLTI ( 10 )
-#define OP_SLTIU ( 11 )
-#define OP_ANDI ( 12 )
-#define OP_ORI ( 13 )
-#define OP_XORI ( 14 )
-#define OP_LUI ( 15 )
-#define OP_COP0 ( 16 )
-#define OP_COP1 ( 17 )
-#define OP_COP2 ( 18 )
-#define OP_COP3 ( 19 )
-#define OP_LB ( 32 )
-#define OP_LH ( 33 )
-#define OP_LWL ( 34 )
-#define OP_LW ( 35 )
-#define OP_LBU ( 36 )
-#define OP_LHU ( 37 )
-#define OP_LWR ( 38 )
-#define OP_SB ( 40 )
-#define OP_SH ( 41 )
-#define OP_SWL ( 42 )
-#define OP_SW ( 43 )
-#define OP_SWR ( 46 )
-#define OP_LWC0 ( 48 )
-#define OP_LWC1 ( 49 )
-#define OP_LWC2 ( 50 )
-#define OP_LWC3 ( 51 )
-#define OP_SWC0 ( 56 )
-#define OP_SWC1 ( 57 )
-#define OP_SWC2 ( 58 )
-#define OP_SWC3 ( 59 )
-
-/* OP_SPECIAL */
-#define FUNCT_SLL ( 0 )
-#define FUNCT_SRL ( 2 )
-#define FUNCT_SRA ( 3 )
-#define FUNCT_SLLV ( 4 )
-#define FUNCT_SRLV ( 6 )
-#define FUNCT_SRAV ( 7 )
-#define FUNCT_JR ( 8 )
-#define FUNCT_JALR ( 9 )
-#define FUNCT_SYSCALL ( 12 )
-#define FUNCT_BREAK ( 13 )
-#define FUNCT_MFHI ( 16 )
-#define FUNCT_MTHI ( 17 )
-#define FUNCT_MFLO ( 18 )
-#define FUNCT_MTLO ( 19 )
-#define FUNCT_MULT ( 24 )
-#define FUNCT_MULTU ( 25 )
-#define FUNCT_DIV ( 26 )
-#define FUNCT_DIVU ( 27 )
-#define FUNCT_ADD ( 32 )
-#define FUNCT_ADDU ( 33 )
-#define FUNCT_SUB ( 34 )
-#define FUNCT_SUBU ( 35 )
-#define FUNCT_AND ( 36 )
-#define FUNCT_OR ( 37 )
-#define FUNCT_XOR ( 38 )
-#define FUNCT_NOR ( 39 )
-#define FUNCT_SLT ( 42 )
-#define FUNCT_SLTU ( 43 )
-
-/* OP_REGIMM */
-#define RT_BLTZ ( 0 )
-#define RT_BGEZ ( 1 )
-#define RT_BLTZAL ( 16 )
-#define RT_BGEZAL ( 17 )
-
-/* OP_COP0/OP_COP1/OP_COP2 */
-#define RS_MFC ( 0 )
-#define RS_CFC ( 2 )
-#define RS_MTC ( 4 )
-#define RS_CTC ( 6 )
-#define RS_BC ( 8 )
-#define RS_BC_ALT ( 12 )
-
-/* BC_BC */
-#define BC_BCF ( 0 )
-#define BC_BCT ( 1 )
-
-/* OP_COP0 */
-#define CF_TLBR ( 1 )
-#define CF_TLBWI ( 2 )
-#define CF_TLBWR ( 6 )
-#define CF_TLBP ( 8 )
-#define CF_RFE ( 16 )
 
 extern unsigned DasmPSXCPU(psxcpu_state *state, std::ostream &stream, uint32_t pc, const uint8_t *opram);
 
-#endif // MAME_DEVICES_CPU_PSX_PSX_H
+#endif // MAME_CPU_PSX_PSX_H

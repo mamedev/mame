@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#pragma once
+#ifndef MAME_DEVICES_MACHINE_BANKDEV_H
+#define MAME_DEVICES_MACHINE_BANKDEV_H
 
-#ifndef __BANKDEV_H__
-#define __BANKDEV_H__
+#pragma once
 
 
 #define MCFG_ADDRESS_MAP_BANK_ENDIANNESS(_endianness) \
@@ -24,7 +24,7 @@ class address_map_bank_device :
 {
 public:
 	// construction/destruction
-	address_map_bank_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
+	address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	static void set_endianness(device_t &device, endianness_t endianness) { downcast<address_map_bank_device &>(device).m_endianness = endianness; }
@@ -69,6 +69,6 @@ private:
 
 
 // device type definition
-extern const device_type ADDRESS_MAP_BANK;
+DECLARE_DEVICE_TYPE(ADDRESS_MAP_BANK, address_map_bank_device)
 
-#endif
+#endif // MAME_DEVICES_MACHINE_BANKDEV_H

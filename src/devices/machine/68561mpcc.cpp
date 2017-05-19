@@ -86,18 +86,18 @@ FEATURES
 //  DEVICE DEFINITIONS
 //**************************************************************************
 // device type definition
-const device_type MPCC       = device_creator<mpcc_device>;
-const device_type MPCC68560  = device_creator<mpcc68560_device>;
-const device_type MPCC68560A = device_creator<mpcc68560A_device>;
-const device_type MPCC68561  = device_creator<mpcc68561_device>;
-const device_type MPCC68561A = device_creator<mpcc68561A_device>;
+DEFINE_DEVICE_TYPE(MPCC,       mpcc_device,       "mpcc",       "Rockwell MPCC")
+DEFINE_DEVICE_TYPE(MPCC68560,  mpcc68560_device,  "mpcc68560",  "MPCC 68560")
+DEFINE_DEVICE_TYPE(MPCC68560A, mpcc68560a_device, "mpcc68560a", "MPCC 68560A")
+DEFINE_DEVICE_TYPE(MPCC68561,  mpcc68561_device,  "mpcc68561",  "MPCC 68561")
+DEFINE_DEVICE_TYPE(MPCC68561A, mpcc68561a_device, "mpcc68561a", "MPCC 68561A")
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-mpcc_device::mpcc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+mpcc_device::mpcc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: device_t(mconfig, type, tag, owner, clock),
 	  device_serial_interface(mconfig, *this),
 	  m_irq(CLEAR_LINE),
 	  m_variant(variant),
@@ -141,27 +141,27 @@ mpcc_device::mpcc_device(const machine_config &mconfig, device_type type, const 
 }
 
 mpcc_device::mpcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mpcc_device(mconfig, MPCC, "Rockwell MPCC", tag, owner, clock, TYPE_MPCC, "mpcc", __FILE__)
+	: mpcc_device(mconfig, MPCC, tag, owner, clock, TYPE_MPCC)
 {
 }
 
 mpcc68560_device::mpcc68560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mpcc_device(mconfig, MPCC68560, "MPCC 68560", tag, owner, clock, TYPE_MPCC68560, "mpcc68560", __FILE__)
+	: mpcc_device(mconfig, MPCC68560, tag, owner, clock, TYPE_MPCC68560)
 {
 }
 
-mpcc68560A_device::mpcc68560A_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mpcc_device(mconfig, MPCC68560A, "MPCC 68560A", tag, owner, clock, TYPE_MPCC68560A, "mpcc68560a", __FILE__)
+mpcc68560a_device::mpcc68560a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mpcc_device(mconfig, MPCC68560A, tag, owner, clock, TYPE_MPCC68560A)
 {
 }
 
 mpcc68561_device::mpcc68561_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mpcc_device(mconfig, MPCC68561, "MPCC 68561", tag, owner, clock, TYPE_MPCC68561, "mpcc68561", __FILE__)
+	: mpcc_device(mconfig, MPCC68561, tag, owner, clock, TYPE_MPCC68561)
 {
 }
 
-mpcc68561A_device::mpcc68561A_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mpcc_device(mconfig, MPCC68561A, "MPCC 68561A", tag, owner, clock, TYPE_MPCC68561A, "mpcc68561a", __FILE__)
+mpcc68561a_device::mpcc68561a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mpcc_device(mconfig, MPCC68561A, tag, owner, clock, TYPE_MPCC68561A)
 {
 }
 

@@ -8,8 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef __R3000_H__
-#define __R3000_H__
+#ifndef MAME_CPU_MIPS_R3000_H
+#define MAME_CPU_MIPS_R3000_H
+
+#pragma once
 
 
 /***************************************************************************
@@ -66,6 +68,36 @@ enum
 
 class r3000_device : public cpu_device
 {
+public:
+	// construction/destruction
+	virtual ~r3000_device();
+
+	// inline configuration helpers
+	static void static_set_endianness(device_t &device, endianness_t endianness)
+	{
+		downcast<r3000_device &>(device).m_endianness = endianness;
+	}
+
+	template <class Object> static devcb_base &static_set_brcond0_input(device_t &device, Object &&cb)
+	{
+		return downcast<r3000_device &>(device).m_in_brcond0.set_callback(std::forward<Object>(cb));
+	}
+
+	template <class Object> static devcb_base &static_set_brcond1_input(device_t &device, Object &&cb)
+	{
+		return downcast<r3000_device &>(device).m_in_brcond1.set_callback(std::forward<Object>(cb));
+	}
+
+	template <class Object> static devcb_base &static_set_brcond2_input(device_t &device, Object &&cb)
+	{
+		return downcast<r3000_device &>(device).m_in_brcond2.set_callback(std::forward<Object>(cb));
+	}
+
+	template <class Object> static devcb_base &static_set_brcond3_input(device_t &device, Object &&cb)
+	{
+		return downcast<r3000_device &>(device).m_in_brcond3.set_callback(std::forward<Object>(cb));
+	}
+
 protected:
 	enum chip_type
 	{
@@ -76,38 +108,8 @@ protected:
 		CHIP_TYPE_R3081
 	};
 
-	// construction/destruction
-	r3000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, chip_type chiptype, const char *shortname, const char *source);
-	virtual ~r3000_device();
+	r3000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, chip_type chiptype);
 
-public:
-	// inline configuration helpers
-	static void static_set_endianness(device_t &device, endianness_t endianness)
-	{
-		downcast<r3000_device &>(device).m_endianness = endianness;
-	}
-
-	template<class _Object> static devcb_base &static_set_brcond0_input(device_t &device, _Object object)
-	{
-		return downcast<r3000_device &>(device).m_in_brcond0.set_callback(object);
-	}
-
-	template<class _Object> static devcb_base &static_set_brcond1_input(device_t &device, _Object object)
-	{
-		return downcast<r3000_device &>(device).m_in_brcond1.set_callback(object);
-	}
-
-	template<class _Object> static devcb_base &static_set_brcond2_input(device_t &device, _Object object)
-	{
-		return downcast<r3000_device &>(device).m_in_brcond2.set_callback(object);
-	}
-
-	template<class _Object> static devcb_base &static_set_brcond3_input(device_t &device, _Object object)
-	{
-		return downcast<r3000_device &>(device).m_in_brcond3.set_callback(object);
-	}
-
-protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -121,7 +123,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -310,10 +312,10 @@ public:
 
 // device type definition
 
-extern const device_type R3041;
-extern const device_type R3051;
-extern const device_type R3052;
-extern const device_type R3071;
-extern const device_type R3081;
+DECLARE_DEVICE_TYPE(R3041, r3041_device)
+DECLARE_DEVICE_TYPE(R3051, r3051_device)
+DECLARE_DEVICE_TYPE(R3052, r3052_device)
+DECLARE_DEVICE_TYPE(R3071, r3071_device)
+DECLARE_DEVICE_TYPE(R3081, r3081_device)
 
-#endif /* __R3000_H__ */
+#endif // MAME_CPU_MIPS_R3000_H

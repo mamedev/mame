@@ -122,8 +122,17 @@
 #define TRACE_GROM 0
 #define TRACE_PUNMAP 0
 
+enum
+{
+	SGMSEL = 1,
+	TSGSEL = 2,
+	P8GSEL = 4,
+	P3GSEL = 8,
+	VIDSEL = 16
+};
+
 mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MAINBOARD8, "TI-99/8 Mainboard", tag, owner, clock, "ti998_mainboard", __FILE__),
+	: device_t(mconfig, TI99_MAINBOARD8, tag, owner, clock),
 	m_A14_set(false),
 	m_pending_write(false),
 	m_speech_ready(true),
@@ -148,6 +157,160 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_p8grom_idle(true),
 	m_p3grom_idle(true)
 {
+}
+
+// Debugger support
+// The memory accesses by the debugger are routed around the custom chip logic
+
+READ8_MEMBER( mainboard8_device::debugger_read )
+{
+	int logical_address = offset;
+	bool compat_mode = (m_crus_debug==ASSERT_LINE);
+
+	// Check whether the mapper itself is accessed
+	int mapaddr = compat_mode? 0x8810 : 0xf870;
+	bool mapper_accessed = ((offset & 0xfff1)==mapaddr);
+
+	if (mapper_accessed) return 0; // do not allow the debugger to mess with the mapper
+
+	// or SRAM
+	int sramaddr = compat_mode? 0x8000 : 0xf000;
+
+	if ((offset & 0xf800)==sramaddr)
+	{
+		// SRAM access
+		return m_sram->pointer()[logical_address & 0x07ff];
+	}
+	if ((offset & 0xe000)==0x0000 && compat_mode)
+	{
+		// ROM0 access
+		return m_rom0[logical_address & 0x1fff];
+	}
+
+	// Physical space
+	u8 value = 0;
+	int physical_address = m_amigo->get_physical_address_debug(offset);
+
+	if ((physical_address & 0x00ff0000)==0x00000000)
+	{
+		// DRAM
+		return m_dram->pointer()[physical_address & 0xffff];
+	}
+	if ((physical_address & 0x00ffc000)==0x00f00000)
+	{
+		// Pascal ROM 16K
+		return m_pascalrom[physical_address & 0x3fff];
+	}
+	if ((physical_address & 0x00ffe000)==0x00ff4000)
+	{
+		// Internal DSR, Hexbus DSR, or PEB
+		if (m_mofetta->hexbus_access_debug()) return m_rom1[(physical_address & 0x1fff) | 0x6000];
+		if (m_mofetta->intdsr_access_debug()) return m_rom1[(physical_address & 0x1fff) | 0x4000];
+		m_peb->memen_in(ASSERT_LINE);
+		m_peb->readz(space, physical_address & 0xffff, &value);
+		m_peb->memen_in(CLEAR_LINE);
+		return value;
+	}
+	if ((physical_address & 0x00ffe000)==0x00ff6000)
+	{
+		// Cartridge space lower 8
+		m_gromport->romgq_line(ASSERT_LINE);
+		m_gromport->readz(space, physical_address & 0x1fff, &value);
+		m_gromport->romgq_line(CLEAR_LINE);
+		return value;
+	}
+	if ((physical_address & 0x00ffe000)==0x00ff8000)
+	{
+		// Cartridge space upper 8
+		m_gromport->romgq_line(ASSERT_LINE);
+		m_gromport->readz(space, (physical_address & 0x1fff) | 0x2000, &value);
+		m_gromport->romgq_line(CLEAR_LINE);
+		return value;
+	}
+	if ((physical_address & 0x00ffe000)==0x00ffa000)
+	{
+		// ROM1 lower 8
+		return m_rom1[(physical_address & 0x1fff) | 0x0000];
+	}
+	if ((physical_address & 0x00ffe000)==0x00ffc000)
+	{
+		// ROM1 upper 8
+		return m_rom1[(physical_address & 0x1fff) | 0x2000];
+	}
+	return 0;
+}
+
+WRITE8_MEMBER( mainboard8_device::debugger_write )
+{
+	int logical_address = offset;
+	bool compat_mode = (m_crus_debug==ASSERT_LINE);
+
+	// Check whether the mapper itself is accessed
+	int mapaddr = compat_mode? 0x8810 : 0xf870;
+	bool mapper_accessed = ((offset & 0xfff1)==mapaddr);
+
+	if (mapper_accessed)
+	{
+		// Allow for loading/saving mapper registers
+		m_amigo->mapper_access_debug(data);
+		return;
+	}
+
+	// SRAM
+	int sramaddr = compat_mode? 0x8000 : 0xf000;
+
+	if ((offset & 0xf800)==sramaddr)
+	{
+		// SRAM access
+		m_sram->pointer()[logical_address & 0x07ff] = data & 0xff;
+		return;
+	}
+
+	// ROM0 (no write access)
+	if ((offset & 0xe000)==0x0000 && compat_mode) return;
+
+	// Physical space
+	int physical_address = m_amigo->get_physical_address_debug(offset);
+
+	if ((physical_address & 0x00ff0000)==0x00000000)
+	{
+		// DRAM
+		m_dram->pointer()[physical_address & 0xffff] = data & 0xff;
+		return;
+	}
+
+	// Pascal ROM (no write)
+	if ((physical_address & 0x00ffc000)==0x00f00000) return;
+
+	// Internal DSR, Hexbus DSR, or PEB
+	if ((physical_address & 0x00ffe000)==0x00ff4000)
+	{
+		if (m_mofetta->hexbus_access_debug()) return;
+		if (m_mofetta->intdsr_access_debug()) return;
+		m_peb->memen_in(ASSERT_LINE);
+		m_peb->write(space, physical_address & 0xffff, data & 0xff);
+		m_peb->memen_in(CLEAR_LINE);
+		return;
+	}
+	if ((physical_address & 0x00ffe000)==0x00ff6000)
+	{
+		// Cartridge space lower 8
+		m_gromport->romgq_line(ASSERT_LINE);
+		m_gromport->write(space, physical_address & 0x1fff, data & 0xff);
+		m_gromport->romgq_line(CLEAR_LINE);
+		return;
+	}
+	if ((physical_address & 0x00ffe000)==0x00ff8000)
+	{
+		// Cartridge space upper 8
+		m_gromport->romgq_line(ASSERT_LINE);
+		m_gromport->write(space, (physical_address & 0x1fff) | 0x2000, data & 0xff);
+		m_gromport->romgq_line(CLEAR_LINE);
+		return;
+	}
+
+	// ROM1 not writable
+	if ((physical_address & 0x00ffe000)==0x00ffa000 || (physical_address & 0x00ffe000)==0x00ffc000) return;
 }
 
 // =============== CRU bus access ==================
@@ -461,6 +624,11 @@ READ8_MEMBER( mainboard8_device::read )
 	uint8_t value = 0;
 	const char* what;
 
+	if (machine().side_effect_disabled())
+	{
+		return debugger_read(space, offset);
+	}
+
 	// =================================================
 	//   Logical space
 	// =================================================
@@ -654,6 +822,11 @@ WRITE8_MEMBER( mainboard8_device::write )
 	m_latched_data = data;
 	m_pending_write = true;
 
+	if (machine().side_effect_disabled())
+	{
+		return debugger_write(space, offset, data);
+	}
+
 	// Some logical space devices can be written immediately
 	// GROMs and video must wait to be selected
 	if (m_amigo->mapper_accessed())
@@ -704,6 +877,7 @@ WRITE_LINE_MEMBER( mainboard8_device::crus_in )
 	if (TRACE_CRU) logerror("%s CRUS\n", (state==1)? "Assert" : "Clear");
 	m_vaquerro->crus_in(state);
 	m_amigo->crus_in(state);
+	m_crus_debug = (line_state)state;
 }
 
 /*
@@ -829,17 +1003,18 @@ void mainboard8_device::device_reset()
 }
 
 MACHINE_CONFIG_FRAGMENT( ti998_mainboard )
-	MCFG_DEVICE_ADD(VAQUERRO_TAG, VAQUERRO, 0)
-	MCFG_DEVICE_ADD(MOFETTA_TAG, MOFETTA, 0)
-	MCFG_DEVICE_ADD(AMIGO_TAG, AMIGO, 0)
-	MCFG_DEVICE_ADD(OSO_TAG, OSO, 0)
+	MCFG_DEVICE_ADD(VAQUERRO_TAG, TI99_VAQUERRO, 0)
+	MCFG_DEVICE_ADD(MOFETTA_TAG, TI99_MOFETTA, 0)
+	MCFG_DEVICE_ADD(AMIGO_TAG, TI99_AMIGO, 0)
+	MCFG_DEVICE_ADD(OSO_TAG, TI99_OSO, 0)
 MACHINE_CONFIG_END
 
 machine_config_constructor mainboard8_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( ti998_mainboard );
 }
-const device_type MAINBOARD8 = device_creator<mainboard8_device>;
+
+DEFINE_DEVICE_TYPE(TI99_MAINBOARD8, mainboard8_device, "ti998_mainboard", "TI-99/8 Mainboard")
 
 
 /***************************************************************************
@@ -919,7 +1094,7 @@ const device_type MAINBOARD8 = device_creator<mainboard8_device>;
 ***************************************************************************/
 
 vaquerro_device::vaquerro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, VAQUERRO, "Logical Address Space Decoder", tag, owner, clock, "ti998_vaquerro", __FILE__),
+	: device_t(mconfig, TI99_VAQUERRO, tag, owner, clock),
 	m_crus(ASSERT_LINE),
 	m_crugl(ASSERT_LINE),
 	m_ggrdy(ASSERT_LINE)
@@ -1243,12 +1418,12 @@ void vaquerro_device::device_reset()
        asserted, while the READY line remains Low.
     7. Continue at 3.
 */
-void waitstate_generator::select_in(bool addressed)
+void vaquerro_device::waitstate_generator::select_in(bool addressed)
 {
 	m_addressed = addressed;
 }
 
-int waitstate_generator::select_out()
+int vaquerro_device::waitstate_generator::select_out()
 {
 	return (!m_counting && m_addressed)? m_selvalue : 0;
 }
@@ -1256,22 +1431,22 @@ int waitstate_generator::select_out()
 /*
     Should be low by default.
 */
-line_state waitstate_generator::ready_out()
+line_state vaquerro_device::waitstate_generator::ready_out()
 {
 	return (m_ready && !m_counting && m_generate)? ASSERT_LINE : CLEAR_LINE;
 }
 
-bool waitstate_generator::is_counting()
+bool vaquerro_device::waitstate_generator::is_counting()
 {
 	return m_counting;
 }
 
-bool waitstate_generator::is_generating()
+bool vaquerro_device::waitstate_generator::is_generating()
 {
 	return m_generate;
 }
 
-bool waitstate_generator::is_ready()
+bool vaquerro_device::waitstate_generator::is_ready()
 {
 	return m_ready;
 }
@@ -1279,12 +1454,12 @@ bool waitstate_generator::is_ready()
 /*
     READY in. This may only show an effect with the next trailing edge of CLKOUT.
 */
-void grom_waitstate_generator::ready_in(line_state ready)
+void vaquerro_device::grom_waitstate_generator::ready_in(line_state ready)
 {
 	m_ready = (ready==ASSERT_LINE);
 }
 
-void grom_waitstate_generator::clock_in(line_state clkout)
+void vaquerro_device::grom_waitstate_generator::clock_in(line_state clkout)
 {
 	if (clkout == ASSERT_LINE)
 	{
@@ -1305,7 +1480,7 @@ void grom_waitstate_generator::clock_in(line_state clkout)
 	}
 }
 
-void waitstate_generator::treset_in(line_state reset)
+void vaquerro_device::waitstate_generator::treset_in(line_state reset)
 {
 	if (reset==ASSERT_LINE)
 	{
@@ -1314,7 +1489,7 @@ void waitstate_generator::treset_in(line_state reset)
 	}
 }
 
-void video_waitstate_generator::clock_in(line_state clkout)
+void vaquerro_device::video_waitstate_generator::clock_in(line_state clkout)
 {
 	if (clkout == ASSERT_LINE)
 	{
@@ -1335,7 +1510,7 @@ void video_waitstate_generator::clock_in(line_state clkout)
 	}
 }
 
-const device_type VAQUERRO = device_creator<vaquerro_device>;
+DEFINE_DEVICE_TYPE(TI99_VAQUERRO, vaquerro_device, "ti998_vaquerro", "TI-99/8 Logical Address Space Decoder")
 
 /***************************************************************************
   ===== MOFETTA: Physical Address Space decoder =====
@@ -1373,7 +1548,7 @@ enum
 };
 
 mofetta_device::mofetta_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MOFETTA, "Physical Address Space Decoder", tag, owner, clock, "ti998_mofetta", __FILE__),
+	: device_t(mconfig, TI99_MOFETTA, tag, owner, clock),
 	m_gotfirstword(false)
 {
 }
@@ -1489,6 +1664,19 @@ READ_LINE_MEMBER( mofetta_device::dbc_out )
 	return (m_lasreq || m_cmas || m_rom1cs || m_skdrcs || !m_pmemen)? CLEAR_LINE : ASSERT_LINE;
 }
 
+/*
+    Debugger support
+*/
+bool mofetta_device::hexbus_access_debug()
+{
+	return m_alcpg;
+}
+
+bool mofetta_device::intdsr_access_debug()
+{
+	return m_txspg;
+}
+
 WRITE8_MEMBER(mofetta_device::cruwrite)
 {
 	if ((offset & 0xff00)==0x2700)
@@ -1583,7 +1771,7 @@ void mofetta_device::device_reset()
 }
 
 
-const device_type MOFETTA = device_creator<mofetta_device>;
+DEFINE_DEVICE_TYPE(TI99_MOFETTA, mofetta_device, "ti998_mofetta", "TI-99/8 Physical Address Space Decoder")
 
 /***************************************************************************
 
@@ -1659,7 +1847,7 @@ const device_type MOFETTA = device_creator<mofetta_device>;
 ***************************************************************************/
 
 amigo_device::amigo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, AMIGO, "Address space mapper", tag, owner, clock, "ti998_amigo", __FILE__),
+	: device_t(mconfig, TI99_AMIGO, tag, owner, clock),
 	m_logical_space(true),
 	m_crus(ASSERT_LINE)
 {
@@ -1674,6 +1862,14 @@ enum
 	SRAMLOAD,
 	SRAMSAVE
 };
+
+/*
+    Debugger support
+*/
+int amigo_device::get_physical_address_debug(offs_t offset)
+{
+	return  ((offset & 0x0fff) + m_base_register[(offset >> 12) & 0x000f]) & 0x00ffffff;
+}
 
 /*
     Incoming READY line (SRDY)
@@ -1905,6 +2101,37 @@ void amigo_device::mapper_save()
 	m_mapvalue = m_mapvalue << 8;
 }
 
+/*
+    Debugger support
+*/
+void amigo_device::mapper_access_debug(int data)
+{
+	if ((data & 0xf0)==0x00)
+	{
+		int address = (data & 0x0e) << 5;
+
+		if ((data & 1)==1)
+		{
+			for (int i=0; i < 64; i++)
+			{
+				// Load from SRAM
+				m_base_register[i/4] = (m_base_register[i/4] << 8) | (m_sram[address++] & 0xff);
+			}
+		}
+		else
+		{
+			for (int i=0; i < 16; i++)
+			{
+				// Save to SRAM
+				m_sram[address++] = (m_base_register[i] >> 24) & 0xff;
+				m_sram[address++] = (m_base_register[i] >> 16) & 0xff;
+				m_sram[address++] = (m_base_register[i] >> 8) & 0xff;
+				m_sram[address++] = m_base_register[i] & 0xff;
+			}
+		}
+	}
+}
+
 WRITE_LINE_MEMBER( amigo_device::holda_in )
 {
 	if (TRACE_MAP) logerror("HOLD acknowledged = %d\n", state);
@@ -1939,7 +2166,7 @@ void amigo_device::device_reset()
 	m_logical_space = true;
 }
 
-const device_type AMIGO = device_creator<amigo_device>;
+DEFINE_DEVICE_TYPE(TI99_AMIGO, amigo_device, "ti998_amigo", "TI-99/8 Address space mapper")
 
 /***************************************************************************
 
@@ -2009,7 +2236,7 @@ enum
 };
 
 oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, OSO, "Hexbus interface", tag, owner, clock, "oso", __FILE__), m_data(0), m_status(0), m_control(0), m_xmit(0)
+	: device_t(mconfig, TI99_OSO, tag, owner, clock), m_data(0), m_status(0), m_control(0), m_xmit(0)
 {
 }
 
@@ -2078,4 +2305,4 @@ void oso_device::device_start()
 	save_item(NAME(m_xmit));
 }
 
-const device_type OSO = device_creator<oso_device>;
+DEFINE_DEVICE_TYPE(TI99_OSO, oso_device, "ti998_oso", "TI-99/8 Hexbus interface")

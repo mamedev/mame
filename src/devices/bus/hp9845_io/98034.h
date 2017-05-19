@@ -8,26 +8,24 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_HP9845_IO_98034_H
+#define MAME_BUS_HP9845_IO_98034_H
 
-#ifndef _98034_H_
-#define _98034_H_
+#pragma once
 
 #include "hp9845_io.h"
 #include "cpu/nanoprocessor/nanoprocessor.h"
 #include "bus/ieee488/ieee488.h"
 
-class hp98034_io_card : public hp9845_io_card_device
+class hp98034_io_card_device : public hp9845_io_card_device
 {
 public:
 	// construction/destruction
-	hp98034_io_card(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~hp98034_io_card();
+	hp98034_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~hp98034_io_card_device();
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
@@ -51,6 +49,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(ieee488_ctrl_w);
 
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 private:
 	required_device<hp_nanoprocessor_device> m_cpu;
 	required_ioport m_sw1;
@@ -70,16 +72,16 @@ private:
 	uint8_t m_ctrl_out;
 	uint8_t m_data_out;
 
-	void update_dc(void);
-	void update_flg(void);
-	void update_np_irq(void);
-	void update_data_out(void);
-	void update_ctrl_out(void);
-	void update_clr_hpib(void);
+	void update_dc();
+	void update_flg();
+	void update_np_irq();
+	void update_data_out();
+	void update_ctrl_out();
+	void update_clr_hpib();
 
 };
 
 // device type definition
-extern const device_type HP98034_IO_CARD;
+DECLARE_DEVICE_TYPE(HP98034_IO_CARD, hp98034_io_card_device)
 
-#endif /* _98034_H_ */
+#endif // MAME_BUS_HP9845_IO_98034_H

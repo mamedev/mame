@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef CASSETTE_H
-#define CASSETTE_H
+#ifndef MAME_DEVICES_IMAGEDEV_CASSETTE_H
+#define MAME_DEVICES_IMAGEDEV_CASSETTE_H
 
 #include "formats/cassimg.h"
 #include "softlist_dev.h"
@@ -117,7 +117,7 @@ private:
 };
 
 // device type definition
-extern const device_type CASSETTE;
+DECLARE_DEVICE_TYPE(CASSETTE, cassette_image_device)
 
 // device iterator
 typedef device_type_iterator<cassette_image_device> cassette_device_iterator;
@@ -143,4 +143,4 @@ typedef device_type_iterator<cassette_image_device> cassette_device_iterator;
 #define MCFG_CASSETTE_INTERFACE(_interface) \
 	cassette_image_device::static_set_interface(*device, _interface);
 
-#endif /* CASSETTE_H */
+#endif // MAME_DEVICES_IMAGEDEV_CASSETTE_H

@@ -21,7 +21,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_SSC = device_creator<a2bus_ssc_device>;
+DEFINE_DEVICE_TYPE(A2BUS_SSC, a2bus_ssc_device, "a2ssc", "Apple Super Serial Card")
 
 #define SSC_ROM_REGION  "ssc_rom"
 #define SSC_ACIA_TAG    "ssc_acia"
@@ -129,17 +129,12 @@ const tiny_rom_entry *a2bus_ssc_device::device_rom_region() const
 //**************************************************************************
 
 a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, A2BUS_SSC, "Apple Super Serial Card", tag, owner, clock, "a2ssc", __FILE__),
-		device_a2bus_card_interface(mconfig, *this),
-		m_dsw1(*this, "DSW1"),
-		m_dsw2(*this, "DSW2"),
-		m_acia(*this, SSC_ACIA_TAG), m_rom(nullptr),
-		m_started(false)
+		a2bus_ssc_device(mconfig, A2BUS_SSC, tag, owner, clock)
 {
 }
 
-a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, type, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
 		m_dsw2(*this, "DSW2"),

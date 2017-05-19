@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_POFO_HPC104_H
+#define MAME_BUS_POFO_HPC104_H
 
-#ifndef __HPC104__
-#define __HPC104__
+#pragma once
 
 #include "exp.h"
 #include "bus/pofo/ccm.h"
@@ -21,22 +21,23 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> hpc104_t
+// ======================> pofo_hpc104_device
 
-class hpc104_t :  public device_t,
+class pofo_hpc104_device :  public device_t,
 				  public device_portfolio_expansion_slot_interface,
 				  public device_nvram_interface
 {
 public:
 	// construction/destruction
-	hpc104_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	hpc104_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pofo_hpc104_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:
+	pofo_hpc104_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -55,8 +56,8 @@ protected:
 	virtual WRITE_LINE_MEMBER( iint_w ) override { m_exp->iint_w(state); }
 
 private:
-	required_device<portfolio_memory_card_slot_t> m_ccm;
-	required_device<portfolio_expansion_slot_t> m_exp;
+	required_device<portfolio_memory_card_slot_device> m_ccm;
+	required_device<portfolio_expansion_slot_device> m_exp;
 	optional_shared_ptr<uint8_t> m_nvram;
 	required_ioport m_io_sw1;
 
@@ -65,13 +66,13 @@ private:
 };
 
 
-// ======================> hpc104_2_t
+// ======================> pofo_hpc104_2_device
 
-class hpc104_2_t :  public hpc104_t
+class pofo_hpc104_2_device :  public pofo_hpc104_device
 {
 public:
 	// construction/destruction
-	hpc104_2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pofo_hpc104_2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -79,9 +80,7 @@ public:
 
 
 // device type definition
-extern const device_type HPC104;
-extern const device_type HPC104_2;
+DECLARE_DEVICE_TYPE(POFO_HPC104,   pofo_hpc104_device)
+DECLARE_DEVICE_TYPE(POFO_HPC104_2, pofo_hpc104_2_device)
 
-
-
-#endif
+#endif // MAME_BUS_POFO_HPC104_H

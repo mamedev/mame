@@ -5,9 +5,9 @@
 
 #include "test.h"
 #include <bx/commandline.h>
-#include <string.h>
+#include <bx/string.h>
 
-TEST(commandLine)
+TEST_CASE("commandLine", "")
 {
 	const char* args[] =
 	{
@@ -19,76 +19,52 @@ TEST(commandLine)
 
 	bx::CommandLine cmdLine(BX_COUNTOF(args), args);
 
-	CHECK(cmdLine.hasArg("long") );
-	CHECK(cmdLine.hasArg('s') );
+	REQUIRE(cmdLine.hasArg("long") );
+	REQUIRE(cmdLine.hasArg('s') );
 
 	// non-existing argument
-	CHECK(!cmdLine.hasArg('x') );
-	CHECK(!cmdLine.hasArg("preprocess") );
+	REQUIRE(!cmdLine.hasArg('x') );
+	REQUIRE(!cmdLine.hasArg("preprocess") );
 }
 
-TEST(tokenizeCommandLine)
+static bool test(const char* _input, int32_t _argc, ...)
 {
-#if 0
-	const char* input[] =
-	{
-		"       ",
-		"\\",
-//		"\"a b c\" d e",
-		"\"ab\\\"c\" \"\\\\\" d",
-		"a\\\\\\b d\"e f\"g h",
-		"a\\\\\\\"b c d",
-		"a\\\\\\\\\"b c\" d e",
-	};
+	char buffer[1024];
+	uint32_t len = sizeof(buffer);
+	char* argv[32];
+	int32_t argc;
+	bx::tokenizeCommandLine(_input, buffer, len, argc, argv, BX_COUNTOF(argv) );
 
-	const int expected_argc[] =
+	if (_argc != argc)
 	{
-		0,
-		0,
-//		3,
-		3,
-		3,
-		3,
-		3
-	};
+		return false;
+	}
 
-	const char* expected_results[] =
-	{
-		"a b c", "d", "e",
-		"ab\"c", "\\", "d",
-		"a\\\\\\b", "de fg", "h",
-		"a\\\"b", "c", "d",
-		"a\\\\b c", "d", "e",
-	};
+	va_list argList;
+	va_start(argList, _argc);
 
-	const char** expected_argv[] =
+	for (int32_t ii = 0; ii < _argc; ++ii)
 	{
-		NULL,
-		NULL,
-//		&expected_results[0],
-		&expected_results[3],
-		&expected_results[6],
-		&expected_results[9],
-		&expected_results[12],
-	};
-
-	for (uint32_t ii = 0; ii < BX_COUNTOF(exptected_argv); ++ii)
-	{
-		printf("x\n");
-		char commandLine[1024];
-		uint32_t size = BX_COUNTOF(commandLine);
-		char* argv[50];
-		int32_t argc;
-		bx::tokenizeCommandLine(input[ii], commandLine, size, argc, argv, BX_COUNTOF(argv) );
-		printf("\n%d (%d): %s %s\n", ii, argc, input[ii], expected_argc[ii] == argc ? "" : "FAILED!");
-		for (uint32_t jj = 0; jj < argc; ++jj)
+		const char* arg = va_arg(argList, const char*);
+		if (0 != bx::strncmp(argv[ii], arg) )
 		{
-			printf("\t%d: {%s} %s\n"
-					, jj
-					, argv[jj]
-					, jj < argc ? (0==strcmp(argv[jj], expected_argv[ii][jj]) ? "" : "FAILED!") : "FAILED!"
-					);
+			return false;
 		}
 	}
-#endif // 0
+
+	va_end(argList);
+
+	return true;
+}
+
+TEST_CASE("tokenizeCommandLine", "")
+{
+	REQUIRE(test("      ", 0, NULL) );
+	REQUIRE(test("\\",     0, NULL) );
+
+	REQUIRE(test("a b v g d", 5, "a", "b", "v", "g", "d") );
+
+	REQUIRE(test("\"ab\\\"v\" \"\\\\\" g", 3, "ab\"v",    "\\",   "g") );
+	REQUIRE(test("a\\\\\\\"b v g",         3, "a\\\"b",   "v",  "g") );
+	REQUIRE(test("a\\\\\\\\\"b v\" g d",   3, "a\\\\b v", "g",  "d") );
 }

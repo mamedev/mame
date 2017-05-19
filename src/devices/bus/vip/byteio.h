@@ -31,11 +31,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VIP_BYTEIO_H
+#define MAME_BUS_VIP_BYTEIO_H
+
 #pragma once
-
-#ifndef __VIP_BYTEIO_PORT__
-#define __VIP_BYTEIO_PORT__
-
 
 
 
@@ -102,24 +101,24 @@ protected:
 class device_vip_byteio_port_interface : public device_slot_card_interface
 {
 public:
-	// construction/destruction
-	device_vip_byteio_port_interface(const machine_config &mconfig, device_t &device);
-
-	virtual uint8_t vip_in_r() { return 0xff; };
-	virtual void vip_out_w(uint8_t data) { };
+	virtual uint8_t vip_in_r() { return 0xff; }
+	virtual void vip_out_w(uint8_t data) { }
 
 	virtual int vip_ef3_r() { return CLEAR_LINE; }
 	virtual int vip_ef4_r() { return CLEAR_LINE; }
 
-	virtual void vip_q_w(int state) { };
+	virtual void vip_q_w(int state) { }
 
 protected:
+	// construction/destruction
+	device_vip_byteio_port_interface(const machine_config &mconfig, device_t &device);
+
 	vip_byteio_port_device *m_slot;
 };
 
 
 // device type definition
-extern const device_type VIP_BYTEIO_PORT;
+DECLARE_DEVICE_TYPE(VIP_BYTEIO_PORT, vip_byteio_port_device)
 
 
 // slot devices
@@ -127,6 +126,4 @@ extern const device_type VIP_BYTEIO_PORT;
 
 SLOT_INTERFACE_EXTERN( vip_byteio_cards );
 
-
-
-#endif
+#endif // MAME_BUS_VIP_BYTEIO_H

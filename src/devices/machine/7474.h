@@ -39,10 +39,10 @@
 
 *****************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_TTL7474_H
+#define MAME_MACHINE_TTL7474_H
 
-#ifndef __TTL7474_H__
-#define __TTL7474_H__
+#pragma once
 
 
 
@@ -71,8 +71,8 @@ public:
 	ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_output_cb(device_t &device, _Object object) { return downcast<ttl7474_device &>(device).m_output_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_comp_output_cb(device_t &device, _Object object) { return downcast<ttl7474_device &>(device).m_comp_output_func.set_callback(object); }
+	template <class Object> static devcb_base &set_output_cb(device_t &device, Object &&cb) { return downcast<ttl7474_device &>(device).m_output_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_comp_output_cb(device_t &device, Object &&cb) { return downcast<ttl7474_device &>(device).m_comp_output_func.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	DECLARE_WRITE_LINE_MEMBER( clear_w );
@@ -88,6 +88,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override { }
 	virtual void device_clock_changed() override { }
+
 private:
 	// callbacks
 	devcb_write_line m_output_func;
@@ -114,7 +115,6 @@ private:
 
 
 // device type definition
-extern const device_type TTL7474;
+DECLARE_DEVICE_TYPE(TTL7474, ttl7474_device)
 
-
-#endif /* __TTL7474_H__ */
+#endif // MAME_MACHINE_TTL7474_H

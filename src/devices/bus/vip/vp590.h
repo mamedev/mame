@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VIP_VP590_H
+#define MAME_BUS_VIP_VP590_H
 
-#ifndef __VP590__
-#define __VP590__
+#pragma once
 
 #include "machine/rescap.h"
 #include "exp.h"
@@ -64,7 +64,6 @@ private:
 
 
 // device type definition
-extern const device_type VP590;
+DECLARE_DEVICE_TYPE(VP590, vp590_device)
 
-
-#endif
+#endif // MAME_BUS_VIP_VP590_H

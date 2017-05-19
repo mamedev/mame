@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type APRICOT_KEYBOARD_INTERFACE = device_creator<apricot_keyboard_bus_device>;
+DEFINE_DEVICE_TYPE(APRICOT_KEYBOARD_INTERFACE, apricot_keyboard_bus_device, "apricot_kbd", "Apricot Keyboard Interface")
 
 
 //**************************************************************************
@@ -27,7 +27,7 @@ const device_type APRICOT_KEYBOARD_INTERFACE = device_creator<apricot_keyboard_b
 //-------------------------------------------------
 
 apricot_keyboard_bus_device::apricot_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, APRICOT_KEYBOARD_INTERFACE, "Apricot Keyboard Interface", tag, owner, clock, "apricot_kbd", __FILE__),
+	device_t(mconfig, APRICOT_KEYBOARD_INTERFACE, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_kbd(nullptr),
 	m_in_handler(*this)

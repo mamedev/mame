@@ -20,7 +20,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_SOFTCARD = device_creator<a2bus_softcard_device>;
+DEFINE_DEVICE_TYPE(A2BUS_SOFTCARD, a2bus_softcard_device, "a2softcard", "Microsoft SoftCard")
 
 #define Z80_TAG         "z80"
 
@@ -51,17 +51,15 @@ machine_config_constructor a2bus_softcard_device::device_mconfig_additions() con
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_softcard_device::a2bus_softcard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_softcard_device::a2bus_softcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_z80(*this, Z80_TAG), m_bEnabled(false), m_FirstZ80Boot(false)
 {
 }
 
 a2bus_softcard_device::a2bus_softcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_SOFTCARD, "Microsoft SoftCard", tag, owner, clock, "a2softcard", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_z80(*this, Z80_TAG), m_bEnabled(false), m_FirstZ80Boot(false)
+	a2bus_softcard_device(mconfig, A2BUS_SOFTCARD, tag, owner, clock)
 {
 }
 

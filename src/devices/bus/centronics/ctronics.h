@@ -5,11 +5,10 @@
     Centronics printer interface
 
 ***************************************************************************/
+#ifndef MAME_BUS_CENTRONICS_CTRONICS_H
+#define MAME_BUS_CENTRONICS_CTRONICS_H
 
 #pragma once
-
-#ifndef __CTRONICS_H__
-#define __CTRONICS_H__
 
 #include "machine/buffer.h"
 #include "machine/latch.h"
@@ -91,7 +90,7 @@
 	MCFG_CENTRONICS_DATA6_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit6)) \
 	MCFG_CENTRONICS_DATA7_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit7))
 
-extern const device_type CENTRONICS;
+DECLARE_DEVICE_TYPE(CENTRONICS, centronics_device)
 
 class device_centronics_peripheral_interface;
 
@@ -103,23 +102,23 @@ class centronics_device : public device_t,
 public:
 	centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_strobe_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_strobe_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_data0_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_data0_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_data1_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_data1_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_data2_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_data2_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_data3_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_data3_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_data4_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_data4_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_data5_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_data5_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_data6_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_data6_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_data7_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_data7_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_ack_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_ack_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_busy_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_busy_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_perror_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_perror_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_select_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_select_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_autofd_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_autofd_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_fault_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_fault_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_init_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_init_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_select_in_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_select_in_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_strobe_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_strobe_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data0_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_data0_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data1_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_data1_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data2_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_data2_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data3_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_data3_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data4_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_data4_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data5_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_data5_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data6_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_data6_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data7_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_data7_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ack_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_ack_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_busy_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_busy_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_perror_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_perror_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_select_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_select_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_autofd_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_autofd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_fault_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_fault_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_init_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_init_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_select_in_handler(device_t &device, Object &&cb) { return downcast<centronics_device &>(device).m_select_in_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_strobe );
 	DECLARE_WRITE_LINE_MEMBER( write_data0 );
@@ -172,7 +171,6 @@ class device_centronics_peripheral_interface : public device_slot_card_interface
 	friend class centronics_device;
 
 public:
-	device_centronics_peripheral_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_centronics_peripheral_interface();
 
 	DECLARE_WRITE_LINE_MEMBER( output_strobe ) { m_slot->m_strobe_handler(state); }
@@ -194,23 +192,25 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( output_select_in ) { m_slot->m_select_in_handler(state); }
 
 protected:
-	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_ack ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_busy ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_perror ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_select ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_autofd ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_fault ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_init ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_select_in ) {}
+	device_centronics_peripheral_interface(const machine_config &mconfig, device_t &device);
+
+	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_ack ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_busy )  { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_perror ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_select ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_autofd ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_fault ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_init ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_select_in ) { }
 
 	centronics_device *m_slot;
 };
@@ -218,4 +218,4 @@ protected:
 
 SLOT_INTERFACE_EXTERN( centronics_devices );
 
-#endif
+#endif // MAME_BUS_CENTRONICS_CTRONICS_H

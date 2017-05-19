@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#pragma once
+#ifndef MAME_CPU_SM8500_SM8500_H
+#define MAME_CPU_SM8500_SM8500_H
 
-#ifndef __SM8500_H__
-#define __SM8500_H__
+#pragma once
 
 #define MCFG_SM8500_DMA_CB(_devcb) \
 	devcb = &sm8500_cpu_device::set_dma_cb(*device, DEVCB_##_devcb);
@@ -29,32 +29,32 @@ public:
 	sm8500_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_dma_cb(device_t &device, _Object object) { return downcast<sm8500_cpu_device &>(device).m_dma_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_timer_cb(device_t &device, _Object object) { return downcast<sm8500_cpu_device &>(device).m_timer_func.set_callback(object); }
+	template <class Object> static devcb_base &set_dma_cb(device_t &device, Object &&cb) { return downcast<sm8500_cpu_device &>(device).m_dma_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_timer_cb(device_t &device, Object &&cb) { return downcast<sm8500_cpu_device &>(device).m_timer_func.set_callback(std::forward<Object>(cb)); }
 
 	/* interrupts */
-	static const int ILL_INT  = 0;
-	static const int DMA_INT  = 1;
-	static const int TIM0_INT = 2;
-	static const int EXT_INT  = 3;
-	static const int UART_INT = 4;
-	static const int LCDC_INT = 5;
-	static const int TIM1_INT = 6;
-	static const int CK_INT   = 7;
-	static const int PIO_INT  = 8;
-	static const int WDT_INT  = 9;
-	static const int NMI_INT  = 10;
+	static constexpr int ILL_INT  = 0;
+	static constexpr int DMA_INT  = 1;
+	static constexpr int TIM0_INT = 2;
+	static constexpr int EXT_INT  = 3;
+	static constexpr int UART_INT = 4;
+	static constexpr int LCDC_INT = 5;
+	static constexpr int TIM1_INT = 6;
+	static constexpr int CK_INT   = 7;
+	static constexpr int PIO_INT  = 8;
+	static constexpr int WDT_INT  = 9;
+	static constexpr int NMI_INT  = 10;
 
 protected:
 	// Flags
-	static const uint8_t FLAG_C = 0x80;
-	static const uint8_t FLAG_Z = 0x40;
-	static const uint8_t FLAG_S = 0x20;
-	static const uint8_t FLAG_V = 0x10;
-	static const uint8_t FLAG_D = 0x08;
-	static const uint8_t FLAG_H = 0x04;
-	static const uint8_t FLAG_B = 0x02;
-	static const uint8_t FLAG_I = 0x01;
+	static constexpr uint8_t FLAG_C = 0x80;
+	static constexpr uint8_t FLAG_Z = 0x40;
+	static constexpr uint8_t FLAG_S = 0x20;
+	static constexpr uint8_t FLAG_V = 0x10;
+	static constexpr uint8_t FLAG_D = 0x08;
+	static constexpr uint8_t FLAG_H = 0x04;
+	static constexpr uint8_t FLAG_B = 0x02;
+	static constexpr uint8_t FLAG_I = 0x01;
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -112,7 +112,6 @@ protected:
 };
 
 
-extern const device_type SM8500;
+DECLARE_DEVICE_TYPE(SM8500, sm8500_cpu_device)
 
-
-#endif /* __SM8500_H__ */
+#endif // MAME_CPU_SM8500_SM8500_H

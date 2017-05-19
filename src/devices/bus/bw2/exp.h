@@ -34,10 +34,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_BW2_EXP_H
+#define MAME_BUS_BW2_EXP_H
 
-#ifndef __BW2_EXPANSION_SLOT__
-#define __BW2_EXPANSION_SLOT__
+#pragma once
 
 
 
@@ -102,7 +102,6 @@ class device_bw2_expansion_slot_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_bw2_expansion_slot_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_bw2_expansion_slot_interface();
 
 	virtual uint8_t bw2_cd_r(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) { return data; };
@@ -115,16 +114,17 @@ public:
 	virtual void bw2_modsel_w(address_space &space, offs_t offset, uint8_t data) { }
 
 protected:
+	device_bw2_expansion_slot_interface(const machine_config &mconfig, device_t &device);
+
 	bw2_expansion_slot_device *m_slot;
 };
 
 
 // device type definition
-extern const device_type BW2_EXPANSION_SLOT;
+DECLARE_DEVICE_TYPE(BW2_EXPANSION_SLOT, bw2_expansion_slot_device)
 
 
 SLOT_INTERFACE_EXTERN( bw2_expansion_cards );
 
 
-
-#endif
+#endif // MAME_BUS_BW2_EXP_H

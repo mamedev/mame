@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef OMTI5100_H_
-#define OMTI5100_H_
+#ifndef MAME_BUS_SCSI_OMTI5100_H
+#define MAME_BUS_SCSI_OMTI5100_H
 
 #include "scsi.h"
 #include "scsihd.h"
@@ -18,6 +18,8 @@ public:
 	virtual void ExecCommand() override;
 	virtual void ReadData( uint8_t *data, int dataLength ) override;
 	virtual void WriteData( uint8_t *data, int dataLength ) override;
+
+protected:
 	void device_start() override;
 
 private:
@@ -26,6 +28,6 @@ private:
 	hard_disk_info m_param[2];
 };
 
-extern const device_type OMTI5100;
+DECLARE_DEVICE_TYPE(OMTI5100, omti5100_device)
 
-#endif /* OMTI5100_H_ */
+#endif // MAME_BUS_SCSI_OMTI5100_H

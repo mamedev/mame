@@ -19,11 +19,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_MOS6702_H
+#define MAME_MACHINE_MOS6702_H
+
 #pragma once
-
-#ifndef __MOS6702__
-#define __MOS6702__
-
 
 
 
@@ -31,8 +30,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MOS6702_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, MOS6702, _clock)
+#define MCFG_MOS6702_ADD(tag, clock) \
+	MCFG_DEVICE_ADD(tag, MOS6702, clock)
 
 
 
@@ -58,8 +57,6 @@ protected:
 
 
 // device type definition
-extern const device_type MOS6702;
+DECLARE_DEVICE_TYPE(MOS6702, mos6702_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_MOS6702_H

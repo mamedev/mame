@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "brunword4.h"
 
-const device_type CPC_BRUNWORD_MK4 = device_creator<cpc_brunword4_device>;
+DEFINE_DEVICE_TYPE(CPC_BRUNWORD_MK4, cpc_brunword4_device, "cpc_brunword4", "Brunword Elite MK4")
 
 
 ROM_START( cpc_brunword4 )
@@ -64,8 +64,9 @@ const tiny_rom_entry *cpc_brunword4_device::device_rom_region() const
 }
 
 cpc_brunword4_device::cpc_brunword4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CPC_BRUNWORD_MK4, "Brunword Elite MK4", tag, owner, clock, "cpc_brunword4", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr), m_rombank_active(false), m_bank_sel(0)
+	device_t(mconfig, CPC_BRUNWORD_MK4, tag, owner, clock),
+	device_cpc_expansion_card_interface(mconfig, *this),
+	m_slot(nullptr), m_rombank_active(false), m_bank_sel(0)
 {
 }
 

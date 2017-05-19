@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef _PHI_H_
-#define _PHI_H_
+#ifndef MAME_MACHINE_PHI_H
+#define MAME_MACHINE_PHI_H
 
 // Set read and write callbacks to access DIO bus on IEEE-488
 #define MCFG_PHI_DIO_READWRITE_CB(_read , _write)   \
@@ -49,18 +49,14 @@
 #define MCFG_PHI_DMARQ_WRITE_CB(_write)         \
 	phi_device::set_dmarq_write_cb(*device , DEVCB_##_write);
 
-// Depth of inbound/outbound FIFOs
-#define PHI_FIFO_SIZE   8
-
 class phi_device : public device_t
 {
 public:
 	// construction/destruction
-	phi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
 	phi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// See ieee488.h
-	typedef enum {
+	enum phi_488_signal_t {
 		PHI_488_EOI,
 		PHI_488_DAV,
 		PHI_488_NRFD,
@@ -70,7 +66,7 @@ public:
 		PHI_488_ATN,
 		PHI_488_REN,
 		PHI_488_SIGNAL_COUNT
-	} phi_488_signal_t;
+	};
 
 	template<class _Object> static devcb_base& set_dio_read_cb(device_t &device , _Object object)
 	{ return downcast<phi_device&>(device).m_dio_read_func.set_callback(object); }
@@ -124,12 +120,17 @@ public:
 	DECLARE_READ8_MEMBER(reg8_r);
 
 protected:
+	phi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	// Depth of inbound/outbound FIFOs
+	static constexpr unsigned FIFO_SIZE = 8;
+
 	devcb_read8 m_dio_read_func;
 	devcb_write8 m_dio_write_func;
 	devcb_write_line m_signal_wr_fns[ PHI_488_SIGNAL_COUNT ];
@@ -244,8 +245,8 @@ private:
 	uint16_t m_reg_2nd_id;
 	uint16_t m_reg_control;
 	uint16_t m_reg_address;
-	util::fifo<uint16_t , PHI_FIFO_SIZE> m_fifo_in;
-	util::fifo<uint16_t , PHI_FIFO_SIZE> m_fifo_out;
+	util::fifo<uint16_t , FIFO_SIZE> m_fifo_in;
+	util::fifo<uint16_t , FIFO_SIZE> m_fifo_out;
 
 	typedef enum {
 		NBA_NONE,
@@ -287,6 +288,6 @@ private:
 };
 
 // device type definition
-extern const device_type PHI;
+DECLARE_DEVICE_TYPE(PHI, phi_device)
 
-#endif /* _PHI_H_ */
+#endif // MAME_MACHINE_PHI_H

@@ -3,12 +3,11 @@
 /***************************************************************************
     Geneve 9640 mapper and more components
 
-    This file contains 3 classes:
+    This file contains 2 classes:
     - mapper: main function of the Gate Array on the Geneve board. Maps logical
         memory accesses to a wider address space using map registers.
     - keyboard: an implementation of a XT-style keyboard. This should be dropped
         and replaced by a proper XT keyboard implementation.
-    - mouse: an implementation of an Atari-style mouse connected to the v9938.
 
     Onboard SRAM configuration:
     There is an adjustable SRAM configuration on board, representing the
@@ -211,7 +210,7 @@
 #define DRAM_PAR_TAG  ":dram"
 
 geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock, "geneve_mapper", __FILE__), m_gromwaddr_LSB(false),
+	: device_t(mconfig, GENEVE_MAPPER, tag, owner, clock), m_gromwaddr_LSB(false),
 	m_gromraddr_LSB(false),
 	m_grom_address(0),
 	m_video_waitstates(false),
@@ -1508,13 +1507,11 @@ void geneve_mapper_device::device_reset()
 	}
 }
 
-const device_type GENEVE_MAPPER = device_creator<geneve_mapper_device>;
+DEFINE_DEVICE_TYPE(GENEVE_MAPPER, geneve_mapper_device, "geneve_mapper", "Geneve Gate Array")
 
 /****************************************************************************
     Keyboard support
 ****************************************************************************/
-
-static const char *const KEYNAMES[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 
 static const uint8_t MF1_CODE[0xe] =
 {
@@ -1545,8 +1542,10 @@ static const uint8_t MF1_CODE[0xe] =
 };
 
 geneve_keyboard_device::geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, GENEVE_KEYBOARD, "Geneve XT-style keyboard", tag, owner, clock, "geneve_keyboard", __FILE__),
-	m_interrupt(*this), m_key_reset(false), m_key_queue_length(0), m_key_queue_head(0), m_key_in_buffer(false), m_key_numlock_state(false), m_key_ctrl_state(0), m_key_alt_state(0),
+	: device_t(mconfig, GENEVE_KEYBOARD, tag, owner, clock),
+	m_interrupt(*this),
+	m_keys(*this, "KEY%u", 0),
+	m_key_reset(false), m_key_queue_length(0), m_key_queue_head(0), m_key_in_buffer(false), m_key_numlock_state(false), m_key_ctrl_state(0), m_key_alt_state(0),
 	m_key_real_shift_state(0), m_key_fake_shift_state(false), m_key_fake_unshift_state(false), m_key_autorepeat_key(0), m_key_autorepeat_timer(0), m_keep_keybuf(false),
 	m_keyboard_clock(false), m_timer(nullptr)
 {
@@ -1578,7 +1577,7 @@ void geneve_keyboard_device::poll()
 	/* Poll keyboard */
 	for (i = 0; (i < 4) && (m_key_queue_length <= (KEYQUEUESIZE-MAXKEYMSGLENGTH)); i++)
 	{
-		keystate = ioport(KEYNAMES[2*i])->read() | (ioport(KEYNAMES[2*i + 1])->read() << 16);
+		keystate = m_keys[2*i]->read() | (m_keys[2*i + 1]->read() << 16);
 		key_transitions = keystate ^ m_key_state_save[i];
 		if (key_transitions)
 		{
@@ -2009,84 +2008,4 @@ ioport_constructor geneve_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME( genkeys );
 }
 
-const device_type GENEVE_KEYBOARD = device_creator<geneve_keyboard_device>;
-
-/****************************************************************************
-    Mouse support
-****************************************************************************/
-
-geneve_mouse_device::geneve_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: device_t(mconfig, GENEVE_MOUSE, "Geneve mouse", tag, owner, clock, "geneve_mouse", __FILE__), m_v9938(nullptr), m_last_mx(0), m_last_my(0)
-{
-}
-
-line_state geneve_mouse_device::left_button()
-{
-	return ((ioport("MOUSE0")->read() & 0x04)!=0)? ASSERT_LINE : CLEAR_LINE;
-}
-
-void geneve_mouse_device::poll()
-{
-	int new_mx, new_my;
-	int delta_x, delta_y, buttons;
-
-	buttons = ioport("MOUSE0")->read();
-	new_mx = ioport("MOUSEX")->read();
-	new_my = ioport("MOUSEY")->read();
-
-	/* compute x delta */
-	delta_x = new_mx - m_last_mx;
-
-	/* check for wrap */
-	if (delta_x > 0x80)
-		delta_x = 0x100-delta_x;
-	if  (delta_x < -0x80)
-		delta_x = -0x100-delta_x;
-
-	m_last_mx = new_mx;
-
-	/* compute y delta */
-	delta_y = new_my - m_last_my;
-
-	/* check for wrap */
-	if (delta_y > 0x80)
-		delta_y = 0x100-delta_y;
-	if  (delta_y < -0x80)
-		delta_y = -0x100-delta_y;
-
-	m_last_my = new_my;
-
-	// only middle and right button go to V9938
-	m_v9938->update_mouse_state(delta_x, delta_y, buttons & 0x03);
-}
-
-INPUT_PORTS_START( genmouse )
-	PORT_START("MOUSEX") /* Mouse - X AXIS */
-		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("MOUSEY") /* Mouse - Y AXIS */
-		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("MOUSE0") /* mouse buttons */
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left mouse button")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right mouse button")
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Middle mouse button")
-INPUT_PORTS_END
-
-void geneve_mouse_device::device_start()
-{
-	m_v9938 = machine().device<v9938_device>(VDP_TAG);
-}
-
-void geneve_mouse_device::device_reset()
-{
-	m_last_mx = 0;
-	m_last_my = 0;
-}
-
-ioport_constructor geneve_mouse_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME( genmouse );
-}
-
-const device_type GENEVE_MOUSE = device_creator<geneve_mouse_device>;
+DEFINE_DEVICE_TYPE(GENEVE_KEYBOARD, geneve_keyboard_device, "geneve_keyboard", "Geneve XT-style keyboard")

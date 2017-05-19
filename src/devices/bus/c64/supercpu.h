@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_SUPERCPU_H
+#define MAME_BUS_C64_SUPERCPU_H
 
-#ifndef __SUPERCPU__
-#define __SUPERCPU__
+#pragma once
 
 #include "exp.h"
 #include "cpu/g65816/g65816.h"
@@ -55,8 +55,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_SUPERCPU;
+DECLARE_DEVICE_TYPE(C64_SUPERCPU, c64_supercpu_device)
 
 
-
-#endif
+#endif // MAME_BUS_C64_SUPERCPU_H

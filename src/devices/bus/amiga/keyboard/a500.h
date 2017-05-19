@@ -27,26 +27,13 @@
 
 ***************************************************************************/
 
-#ifndef DEVICES_BUS_AMIGA_KEYBOARD_A500_H
-#define DEVICES_BUS_AMIGA_KEYBOARD_A500_H
+#ifndef MAME_BUS_AMIGA_KEYBOARD_A500_H
+#define MAME_BUS_AMIGA_KEYBOARD_A500_H
 
 #pragma once
 
 #include "keyboard.h"
 #include "cpu/m6502/m6502.h"
-
-
-// device type definition
-extern const device_type A500_KBD_US;
-extern const device_type A500_KBD_DE;
-extern const device_type A500_KBD_FR;
-extern const device_type A500_KBD_IT;
-extern const device_type A500_KBD_SE;
-extern const device_type A500_KBD_ES;
-extern const device_type A500_KBD_DK;
-extern const device_type A500_KBD_CH;
-extern const device_type A500_KBD_NO;
-extern const device_type A500_KBD_GB;
 
 
 namespace bus { namespace amiga { namespace keyboard {
@@ -85,10 +72,7 @@ protected:
 			const char *tag,
 			device_t *owner,
 			uint32_t clock,
-			device_type type,
-			const char *name,
-			const char *shortname,
-			const char *file);
+			device_type type);
 
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -250,4 +234,17 @@ protected:
 
 } } } // namespace bus::amiga::keyboard
 
-#endif // DEVICES_BUS_AMIGA_KEYBOARD_A500_H
+
+// device type definition
+DECLARE_DEVICE_TYPE_NS(A500_KBD_US, bus::amiga::keyboard, a500_kbd_us_device)
+DECLARE_DEVICE_TYPE_NS(A500_KBD_DE, bus::amiga::keyboard, a500_kbd_de_device)
+DECLARE_DEVICE_TYPE_NS(A500_KBD_FR, bus::amiga::keyboard, a500_kbd_fr_device)
+DECLARE_DEVICE_TYPE_NS(A500_KBD_IT, bus::amiga::keyboard, a500_kbd_it_device)
+DECLARE_DEVICE_TYPE_NS(A500_KBD_SE, bus::amiga::keyboard, a500_kbd_se_device)
+DECLARE_DEVICE_TYPE_NS(A500_KBD_ES, bus::amiga::keyboard, a500_kbd_es_device)
+DECLARE_DEVICE_TYPE_NS(A500_KBD_DK, bus::amiga::keyboard, a500_kbd_dk_device)
+DECLARE_DEVICE_TYPE_NS(A500_KBD_CH, bus::amiga::keyboard, a500_kbd_ch_device)
+DECLARE_DEVICE_TYPE_NS(A500_KBD_NO, bus::amiga::keyboard, a500_kbd_no_device)
+DECLARE_DEVICE_TYPE_NS(A500_KBD_GB, bus::amiga::keyboard, a500_kbd_gb_device)
+
+#endif // MAME_BUS_AMIGA_KEYBOARD_A500_H

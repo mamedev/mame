@@ -36,13 +36,13 @@
 #include "es5503.h"
 
 // device type definition
-const device_type ES5503 = device_creator<es5503_device>;
+DEFINE_DEVICE_TYPE(ES5503, es5503_device, "es5503", "Ensoniq ES5503")
 
 // useful constants
-static const uint16_t wavesizes[8] = { 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
-static const uint32_t wavemasks[8] = { 0x1ff00, 0x1fe00, 0x1fc00, 0x1f800, 0x1f000, 0x1e000, 0x1c000, 0x18000 };
-static const uint32_t accmasks[8]  = { 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff, 0x3fff, 0x7fff };
-static const int    resshifts[8] = { 9, 10, 11, 12, 13, 14, 15, 16 };
+static constexpr uint16_t wavesizes[8] = { 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
+static constexpr uint32_t wavemasks[8] = { 0x1ff00, 0x1fe00, 0x1fc00, 0x1f800, 0x1f000, 0x1e000, 0x1c000, 0x18000 };
+static constexpr uint32_t accmasks[8]  = { 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff, 0x3fff, 0x7fff };
+static constexpr int    resshifts[8] = { 9, 10, 11, 12, 13, 14, 15, 16 };
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -53,7 +53,7 @@ static const int    resshifts[8] = { 9, 10, 11, 12, 13, 14, 15, 16 };
 //-------------------------------------------------
 
 es5503_device::es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ES5503, "Ensoniq ES5503", tag, owner, clock, "es5503", __FILE__),
+	: device_t(mconfig, ES5503, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 17),
 		m_irq_func(*this),

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __APF_ROM_H
-#define __APF_ROM_H
+#ifndef MAME_BUS_APF_ROM_H
+#define MAME_BUS_APF_ROM_H
 
 #include "slot.h"
 
@@ -13,15 +13,17 @@ class apf_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	apf_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	apf_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// device-level overrides
-	virtual void device_start() override {}
-	virtual void device_reset() override {}
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom) override;
+
+protected:
+	apf_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override { }
+	virtual void device_reset() override { }
 };
 
 // ======================> apf_basic_device
@@ -51,12 +53,9 @@ public:
 
 
 
-
-
 // device type definition
-extern const device_type APF_ROM_STD;
-extern const device_type APF_ROM_BASIC;
-extern const device_type APF_ROM_SPACEDST;
+DECLARE_DEVICE_TYPE(APF_ROM_STD,      apf_rom_device)
+DECLARE_DEVICE_TYPE(APF_ROM_BASIC,    apf_basic_device)
+DECLARE_DEVICE_TYPE(APF_ROM_SPACEDST, apf_spacedst_device)
 
-
-#endif
+#endif // MAME_BUS_APF_ROM_H

@@ -14,9 +14,10 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "harddriv.h"
+
 #include "emuopts.h"
 #include "harddisk.h"
-#include "harddriv.h"
 
 
 OPTION_GUIDE_START(hd_option_guide)
@@ -32,28 +33,22 @@ static const char *hd_option_spec =
 
 
 // device type definition
-const device_type HARDDISK = device_creator<harddisk_image_device>;
+DEFINE_DEVICE_TYPE(HARDDISK, harddisk_image_device, "harddisk_image", "Harddisk")
 
 //-------------------------------------------------
 //  harddisk_image_device - constructor
 //-------------------------------------------------
 
 harddisk_image_device::harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HARDDISK, "Harddisk", tag, owner, clock, "harddisk_image", __FILE__),
-		device_image_interface(mconfig, *this),
-		m_chd(nullptr),
-		m_hard_disk_handle(nullptr),
-		m_device_image_load(device_image_load_delegate()),
-		m_device_image_unload(device_image_func_delegate()),
-		m_interface(nullptr)
+	: harddisk_image_device(mconfig, HARDDISK, tag, owner, clock)
 {
 }
 
 //-------------------------------------------------
 //  harddisk_image_device - constructor for subclasses
 //-------------------------------------------------
-harddisk_image_device::harddisk_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+harddisk_image_device::harddisk_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		m_chd(nullptr),
 		m_hard_disk_handle(nullptr),

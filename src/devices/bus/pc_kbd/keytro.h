@@ -9,6 +9,8 @@
 #ifndef MAME_BUS_PC_KBD_KEYTRO_H
 #define MAME_BUS_PC_KBD_KEYTRO_H
 
+#pragma once
+
 #include "pc_kbdc.h"
 
 //**************************************************************************
@@ -47,12 +49,9 @@ protected:
 	pc_kbd_keytronic_pc3270_device(
 			machine_config const &mconfig,
 			device_type type,
-			char const *name,
 			char const *tag,
 			device_t *owner,
-			uint32_t clock,
-			char const *shortname,
-			char const *source);
+			uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -77,7 +76,7 @@ public:
 
 
 // device type definition
-extern const device_type PC_KBD_KEYTRONIC_PC3270;
-extern const device_type PC_KBD_KEYTRONIC_PC3270_AT;
+DECLARE_DEVICE_TYPE(PC_KBD_KEYTRONIC_PC3270,    pc_kbd_keytronic_pc3270_device)
+DECLARE_DEVICE_TYPE(PC_KBD_KEYTRONIC_PC3270_AT, pc_kbd_keytronic_pc3270_at_device)
 
 #endif // MAME_BUS_PC_KBD_KEYTRO_H

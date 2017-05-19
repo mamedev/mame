@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CDP1871 = device_creator<cdp1871_device>;
+DEFINE_DEVICE_TYPE(CDP1871, cdp1871_device, "cdp1871", "RCA CDP1871 Keyboard Encoder")
 
 
 
@@ -97,7 +97,7 @@ const uint8_t cdp1871_device::key_codes[4][11][8] =
 //-------------------------------------------------
 
 cdp1871_device::cdp1871_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CDP1871, "RCA CDP1871", tag, owner, clock, "cdp1871", __FILE__),
+	device_t(mconfig, CDP1871, tag, owner, clock),
 	m_read_d1(*this),
 	m_read_d2(*this),
 	m_read_d3(*this),

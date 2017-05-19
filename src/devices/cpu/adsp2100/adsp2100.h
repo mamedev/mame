@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_ADSP2100_ADSP2100_H
+#define MAME_CPU_ADSP2100_ADSP2100_H
 
-#ifndef __ADSP2100_H__
-#define __ADSP2100_H__
+#pragma once
 
 
 //**************************************************************************
@@ -200,6 +200,18 @@ enum
 
 class adsp21xx_device : public cpu_device
 {
+public:
+	virtual ~adsp21xx_device();
+
+	// inline configuration helpers
+	template <class Object> static devcb_base &set_sport_rx_callback(device_t &device, Object &&cb) { return downcast<adsp21xx_device &>(device).m_sport_rx_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sport_tx_callback(device_t &device, Object &&cb) { return downcast<adsp21xx_device &>(device).m_sport_tx_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_timer_fired_callback(device_t &device, Object &&cb) { return downcast<adsp21xx_device &>(device).m_timer_fired_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dmovlay_callback(device_t &device, Object &&cb) { return downcast<adsp21xx_device &>(device).m_dmovlay_cb.set_callback(std::forward<Object>(cb)); }
+
+	// public interfaces
+	void load_boot_data(uint8_t *srcdata, uint32_t *dstdata);
+
 protected:
 	enum
 	{
@@ -212,20 +224,8 @@ protected:
 	};
 
 	// construction/destruction
-	adsp21xx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, const char *shortname, const char *source);
-	virtual ~adsp21xx_device();
+	adsp21xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype);
 
-public:
-	// inline configuration helpers
-	template<class _Object> static devcb_base &set_sport_rx_callback(device_t &device, _Object object) { return downcast<adsp21xx_device &>(device).m_sport_rx_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_sport_tx_callback(device_t &device, _Object object) { return downcast<adsp21xx_device &>(device).m_sport_tx_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_timer_fired_callback(device_t &device, _Object object) { return downcast<adsp21xx_device &>(device).m_timer_fired_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_dmovlay_callback(device_t &device, _Object object) { return downcast<adsp21xx_device &>(device).m_dmovlay_cb.set_callback(object); }
-
-	// public interfaces
-	void load_boot_data(uint8_t *srcdata, uint32_t *dstdata);
-
-protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -509,7 +509,7 @@ public:
 	adsp2101_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	adsp2101_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, const char *shortname, const char *source);
+	adsp2101_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype);
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_input_lines() const override;
@@ -577,12 +577,12 @@ public:
 
 
 // device type definition
-extern const device_type ADSP2100;
-extern const device_type ADSP2101;
-extern const device_type ADSP2104;
-extern const device_type ADSP2105;
-extern const device_type ADSP2115;
-extern const device_type ADSP2181;
+DECLARE_DEVICE_TYPE(ADSP2100, adsp2100_device)
+DECLARE_DEVICE_TYPE(ADSP2101, adsp2101_device)
+DECLARE_DEVICE_TYPE(ADSP2104, adsp2104_device)
+DECLARE_DEVICE_TYPE(ADSP2105, adsp2105_device)
+DECLARE_DEVICE_TYPE(ADSP2115, adsp2115_device)
+DECLARE_DEVICE_TYPE(ADSP2181, adsp2181_device)
 
 
-#endif /* __ADSP2100_H__ */
+#endif // MAME_CPU_ADSP2100_ADSP2100_H

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_COMPIS_HRG_H
+#define MAME_BUS_COMPIS_HRG_H
 
-#ifndef __COMPIS_HRG__
-#define __COMPIS_HRG__
+#pragma once
 
 #include "graphics.h"
 #include "video/upd7220.h"
@@ -20,15 +20,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> compis_hrg_t
+// ======================> compis_hrg_device
 
-class compis_hrg_t : public device_t,
+class compis_hrg_device : public device_t,
 					 public device_compis_graphics_card_interface
 {
 public:
 	// construction/destruction
-	compis_hrg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	compis_hrg_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	compis_hrg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -36,6 +35,8 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels );
 
 protected:
+	compis_hrg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -52,13 +53,13 @@ protected:
 };
 
 
-// ======================> compis_uhrg_t
+// ======================> compis_uhrg_device
 
-class compis_uhrg_t : public compis_hrg_t
+class compis_uhrg_device : public compis_hrg_device
 {
 public:
 	// construction/destruction
-	compis_uhrg_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	compis_uhrg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -68,9 +69,8 @@ public:
 
 
 // device type definition
-extern const device_type COMPIS_HRG;
-extern const device_type COMPIS_UHRG;
+DECLARE_DEVICE_TYPE(COMPIS_HRG,  compis_hrg_device)
+DECLARE_DEVICE_TYPE(COMPIS_UHRG, compis_uhrg_device)
 
 
-
-#endif
+#endif // MAME_BUS_COMPIS_HRG_H

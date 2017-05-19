@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ABCBUS_LUX21056_H
+#define MAME_BUS_ABCBUS_LUX21056_H
 
-#ifndef __LUXOR_55_21056__
-#define __LUXOR_55_21056__
+#pragma once
 
 #include "abcbus.h"
 #include "bus/scsi/scsi.h"
@@ -79,7 +79,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
-	required_device<SCSI_PORT_DEVICE> m_sasibus;
+	required_device<scsi_port_device> m_sasibus;
 	required_device<output_latch_device> m_sasi_data_out;
 	required_device<input_buffer_device> m_sasi_data_in;
 	required_ioport m_s1;
@@ -100,8 +100,6 @@ private:
 
 
 // device type definition
-extern const device_type LUXOR_55_21056;
+DECLARE_DEVICE_TYPE(LUXOR_55_21056, luxor_55_21056_device)
 
-
-
-#endif
+#endif // MAME_BUS_ABCBUS_LUX21056_H

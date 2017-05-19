@@ -14,18 +14,23 @@
 #include "emu.h"
 #include "microtch.h"
 
-#define LOG 0
+//#define VERBOSE 1
+#include "logmacro.h"
 
-const device_type MICROTOUCH = device_creator<microtouch_device>;
+
+DEFINE_DEVICE_TYPE(MICROTOUCH, microtouch_device, "microtouch", "Microtouch Touchscreen")
 
 microtouch_device::microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MICROTOUCH, "Microtouch Touchscreen", tag, owner, clock, "microtouch", __FILE__),
-	device_serial_interface(mconfig, *this), m_rx_buffer_ptr(0), m_tx_buffer_num(0), m_tx_buffer_ptr(0), m_reset_done(0), m_format(0), m_mode(0), m_last_touch_state(0),
+	device_t(mconfig, MICROTOUCH, tag, owner, clock),
+	device_serial_interface(mconfig, *this),
+	m_rx_buffer_ptr(0), m_tx_buffer_num(0), m_tx_buffer_ptr(0), m_reset_done(0), m_format(0), m_mode(0), m_last_touch_state(0),
 	m_last_x(0), m_last_y(0),
 	m_out_stx_func(*this),
 	m_touch(*this, "TOUCH"),
 	m_touchx(*this, "TOUCH_X"),
-	m_touchy(*this, "TOUCH_Y"), m_timer(nullptr), m_output_valid(false), m_output(0)
+	m_touchy(*this, "TOUCH_Y"),
+	m_timer(nullptr),
+	m_output_valid(false), m_output(0)
 {
 }
 
@@ -219,12 +224,12 @@ void microtouch_device::rcv_complete()
 
 	if (m_rx_buffer_ptr > 0 && (m_rx_buffer[m_rx_buffer_ptr-1] == 0x0d))
 	{
-		if (LOG)
+		if (VERBOSE)
 		{
 			char command[16];
 			memset(command, 0, sizeof(command));
 			strncpy( command, (const char*)m_rx_buffer + 1, m_rx_buffer_ptr - 2 );
-			logerror("Microtouch: received command %s\n", command);
+			LOG("Microtouch: received command %s\n", command);
 		}
 		// check command
 		if ( check_command( "MS", m_rx_buffer_ptr, m_rx_buffer ) )

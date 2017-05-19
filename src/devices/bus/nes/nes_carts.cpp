@@ -9,6 +9,61 @@
 #include "emu.h"
 #include "nes_carts.h"
 
+// official PCBs
+#include "nxrom.h"
+#include "mmc1.h"
+#include "mmc2.h"
+#include "mmc3.h"
+#include "mmc5.h"
+#include "bandai.h"
+#include "datach.h"
+#include "discrete.h"
+#include "disksys.h"
+#include "event.h"
+#include "irem.h"
+#include "jaleco.h"
+#include "karastudio.h"
+#include "konami.h"
+#include "namcot.h"
+#include "pt554.h"
+#include "sunsoft.h"
+#include "sunsoft_dcs.h"
+#include "taito.h"
+// unlicensed/bootleg/pirate PCBs
+#include "2a03pur.h"
+#include "act53.h"
+#include "aladdin.h"
+#include "ave.h"
+#include "benshieng.h"
+#include "camerica.h"
+#include "cne.h"
+#include "cony.h"
+#include "ggenie.h"
+#include "hes.h"
+#include "henggedianzi.h"
+#include "hosenkan.h"
+#include "jy.h"
+#include "kaiser.h"
+#include "legacy.h"
+#include "nanjing.h"
+#include "ntdec.h"
+#include "racermate.h"
+#include "rcm.h"
+#include "rexsoft.h"
+#include "sachen.h"
+#include "somari.h"
+#include "subor.h"
+#include "tengen.h"
+#include "txc.h"
+#include "waixing.h"
+#include "zemina.h"
+// misc unlicensed/bootleg/pirate PCBs
+#include "bootleg.h"
+#include "multigame.h"
+#include "pirate.h"
+#include "mmc3_clones.h"
+
+
 SLOT_INTERFACE_START(nes_cart)
 // HROM, NROM, RROM, SROM & STROM
 	SLOT_INTERFACE_INTERNAL("nrom",             NES_NROM)
@@ -216,6 +271,7 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("daou_306",         NES_DAOU306)
 	SLOT_INTERFACE_INTERNAL("subor0",           NES_SUBOR0)
 	SLOT_INTERFACE_INTERNAL("subor1",           NES_SUBOR1)
+	SLOT_INTERFACE_INTERNAL("subor2",           NES_SUBOR2)
 	SLOT_INTERFACE_INTERNAL("cc21",             NES_CC21)
 	SLOT_INTERFACE_INTERNAL("xiaozy",           NES_XIAOZY)
 	SLOT_INTERFACE_INTERNAL("edu2k",            NES_EDU2K)
@@ -346,7 +402,6 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("ninjaryu",         NES_NROM)    // mapper 111 - UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("unl_dance",        NES_NROM)    // UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("onebus",           NES_NROM)    // UNSUPPORTED
-	SLOT_INTERFACE_INTERNAL("dance2k",          NES_NROM)    // UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("pec586",           NES_NROM)    // UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("coolboy",          NES_NROM)    // UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("bmc_f15",          NES_NROM)    // UNSUPPORTED

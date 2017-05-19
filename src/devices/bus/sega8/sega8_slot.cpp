@@ -30,15 +30,15 @@
 #include "sega8_slot.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SEGA8_CART_SLOT = device_creator<sega8_cart_slot_device>;
-const device_type SEGA8_CARD_SLOT = device_creator<sega8_card_slot_device>;
+DEFINE_DEVICE_TYPE(SEGA8_CART_SLOT, sega8_cart_slot_device, "sega8_cart_slot", "Sega Master System / Game Gear / SG-1000 Cartridge Slot")
+DEFINE_DEVICE_TYPE(SEGA8_CARD_SLOT, sega8_card_slot_device, "sega8_card_slot", "Sega Master System / Game Gear / SG-1000 Card Slot")
 
 
 //**************************************************************************
@@ -50,14 +50,14 @@ const device_type SEGA8_CARD_SLOT = device_creator<sega8_card_slot_device>;
 //-------------------------------------------------
 
 device_sega8_cart_interface::device_sega8_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0),
-		m_rom_page_count(0),
-		has_battery(false),
-		m_late_battery_enable(false),
-		m_lphaser_xoffs(-1),
-		m_sms_mode(0)
+	: device_slot_card_interface(mconfig, device)
+	, m_rom(nullptr)
+	, m_rom_size(0)
+	, m_rom_page_count(0)
+	, has_battery(false)
+	, m_late_battery_enable(false)
+	, m_lphaser_xoffs(-1)
+	, m_sms_mode(0)
 {
 }
 
@@ -107,32 +107,26 @@ void device_sega8_cart_interface::ram_alloc(uint32_t size)
 //  sega8_cart_slot_device - constructor
 //-------------------------------------------------
 
-sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, bool is_card, const char *shortname, const char *source) :
-						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(SEGA8_BASE_ROM),
-						m_must_be_loaded(false),
-						m_interface("sms_cart"),
-						m_extensions("bin"), m_cart(nullptr)
-{
-	m_is_card = is_card;
-}
-
-sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, SEGA8_CART_SLOT, "Sega Master System / Game Gear / SG1000 Cartridge Slot", tag, owner, clock, "sega8_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(SEGA8_BASE_ROM),
-						m_must_be_loaded(false),
-						m_is_card(false),
-						m_interface("sms_cart"),
-						m_extensions("bin"), m_cart(nullptr)
+sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_card)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_slot_interface(mconfig, *this)
+	, m_type(SEGA8_BASE_ROM)
+	, m_must_be_loaded(false)
+	, m_is_card(is_card)
+	, m_interface("sms_cart")
+	, m_extensions("bin")
+	, m_cart(nullptr)
 {
 }
 
-sega8_card_slot_device::sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						sega8_cart_slot_device(mconfig, SEGA8_CARD_SLOT, "Sega Master System / Game Gear / SG1000 Card Slot", tag, owner, clock, true, "sega8_card_slot", __FILE__)
+sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_cart_slot_device(mconfig, SEGA8_CART_SLOT, tag, owner, clock, false)
+{
+}
+
+sega8_card_slot_device::sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sega8_cart_slot_device(mconfig, SEGA8_CARD_SLOT, tag, owner, clock, true)
 {
 }
 
@@ -473,7 +467,7 @@ int sms_state::detect_korean_mapper( uint8_t *rom )
 }
 #endif
 
-int sega8_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
+int sega8_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len) const
 {
 	int type = SEGA8_BASE_ROM;
 
@@ -503,7 +497,7 @@ int sega8_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
 			}
 		}
 
-		LOG(("Mapper test: _0002 = %d, _8000 = %d, _a000 = %d, _ffff = %d\n", _0002, _8000, _a000, _ffff));
+		LOG("Mapper test: _0002 = %d, _8000 = %d, _a000 = %d, _ffff = %d\n", _0002, _8000, _a000, _ffff);
 
 		// 2 is a security measure, although tests on existing ROM showed it was not needed
 		if (len > 0x10000 && (_0002 > _ffff + 2 || (_0002 > 0 && _ffff == 0)))
@@ -593,16 +587,16 @@ int sega8_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
  get default card software
  -------------------------------------------------*/
 
-std::string sega8_cart_slot_device::get_default_card_software()
+std::string sega8_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t len = m_file->size(), offset = 0;
+		uint32_t len = hook.image_file()->size(), offset = 0;
 		std::vector<uint8_t> rom(len);
 		int type;
 
-		m_file->read(&rom[0], len);
+		hook.image_file()->read(&rom[0], len);
 
 		if ((len % 0x4000) == 512)
 			offset = 512;
@@ -611,7 +605,6 @@ std::string sega8_cart_slot_device::get_default_card_software()
 		slot_string = sega8_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		return std::string(slot_string);
 	}

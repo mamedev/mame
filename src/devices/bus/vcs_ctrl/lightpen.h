@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VCS_CTRL_LIGHTPEN_H
+#define MAME_BUS_VCS_CTRL_LIGHTPEN_H
 
-#ifndef __VCS_LIGHTPEN__
-#define __VCS_LIGHTPEN__
+#pragma once
 
 #include "ctrl.h"
 
@@ -48,7 +48,6 @@ private:
 
 
 // device type definition
-extern const device_type VCS_LIGHTPEN;
+DECLARE_DEVICE_TYPE(VCS_LIGHTPEN, vcs_lightpen_device)
 
-
-#endif
+#endif // MAME_BUS_VCS_CTRL_LIGHTPEN_H

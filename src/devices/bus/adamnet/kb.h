@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ADAMNET_KB_H
+#define MAME_BUS_ADAMNET_KB_H
 
-#ifndef __ADAM_KB__
-#define __ADAM_KB__
+#pragma once
 
 #include "adamnet.h"
 #include "cpu/m6800/m6800.h"
@@ -58,8 +58,8 @@ protected:
 
 
 // device type definition
-extern const device_type ADAM_KB;
+DECLARE_DEVICE_TYPE(ADAM_KB, adam_keyboard_device)
 
 
 
-#endif
+#endif // MAME_BUS_ADAMNET_KB_H

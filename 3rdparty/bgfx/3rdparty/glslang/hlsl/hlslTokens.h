@@ -65,6 +65,8 @@ enum EHlslTokenClass {
     EHTokOut,
     EHTokInOut,
     EHTokLayout,
+    EHTokGloballyCoherent,
+    EHTokInline,
 
     // primitive types
     EHTokPoint,
@@ -77,6 +79,10 @@ enum EHlslTokenClass {
     EHTokPointStream,
     EHTokLineStream,
     EHTokTriangleStream,
+
+    // Tessellation patches
+    EHTokInputPatch,
+    EHTokOutputPatch,
 
     // template types
     EHTokBuffer,
@@ -252,13 +258,22 @@ enum EHlslTokenClass {
     EHTokRWTexture3d,
     EHTokRWBuffer,
 
+    // Structure buffer variants
+    EHTokAppendStructuredBuffer,
+    EHTokByteAddressBuffer,
+    EHTokConsumeStructuredBuffer,
+    EHTokRWByteAddressBuffer,
+    EHTokRWStructuredBuffer,
+    EHTokStructuredBuffer,
+
     // variable, user type, ...
     EHTokIdentifier,
-    EHTokTypeName,
+    EHTokClass,
     EHTokStruct,
     EHTokCBuffer,
     EHTokTBuffer,
     EHTokTypedef,
+    EHTokThis,
 
     // constant
     EHTokFloatConstant,
@@ -314,6 +329,7 @@ enum EHlslTokenClass {
     EHTokDot,
     EHTokComma,
     EHTokColon,
+    EHTokColonColon,
     EHTokSemicolon,
     EHTokBang,
     EHTokDash,

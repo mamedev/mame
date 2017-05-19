@@ -2689,7 +2689,7 @@ void tms3203x_device::rorc(uint32_t op)
 
 /*-----------------------------------------------------*/
 
-void tms3203x_device::rtps_reg(uint32_t op)
+void tms3203x_device::rpts_reg(uint32_t op)
 {
 	IREG(TMR_RC) = IREG(op & 31);
 	IREG(TMR_RS) = m_pc;
@@ -2699,7 +2699,7 @@ void tms3203x_device::rtps_reg(uint32_t op)
 	m_delayed = true;
 }
 
-void tms3203x_device::rtps_dir(uint32_t op)
+void tms3203x_device::rpts_dir(uint32_t op)
 {
 	IREG(TMR_RC) = RMEM(DIRECT(op));
 	IREG(TMR_RS) = m_pc;
@@ -2709,7 +2709,7 @@ void tms3203x_device::rtps_dir(uint32_t op)
 	m_delayed = true;
 }
 
-void tms3203x_device::rtps_ind(uint32_t op)
+void tms3203x_device::rpts_ind(uint32_t op)
 {
 	IREG(TMR_RC) = RMEM(INDIRECT_D(op, op >> 8));
 	IREG(TMR_RS) = m_pc;
@@ -2719,7 +2719,7 @@ void tms3203x_device::rtps_ind(uint32_t op)
 	m_delayed = true;
 }
 
-void tms3203x_device::rtps_imm(uint32_t op)
+void tms3203x_device::rpts_imm(uint32_t op)
 {
 	IREG(TMR_RC) = (uint16_t)op;
 	IREG(TMR_RS) = m_pc;
@@ -6407,7 +6407,7 @@ void (tms3203x_device::*const tms3203x_device::s_tms32031ops[])(uint32_t op) =
 	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::rolc,
 	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::ror,
 	&tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::illegal,      &tms3203x_device::rorc,
-	&tms3203x_device::rtps_reg,     &tms3203x_device::rtps_dir,     &tms3203x_device::rtps_ind,     &tms3203x_device::rtps_imm,
+	&tms3203x_device::rpts_reg,     &tms3203x_device::rpts_dir,     &tms3203x_device::rpts_ind,     &tms3203x_device::rpts_imm,
 	&tms3203x_device::illegal,      &tms3203x_device::stf_dir,      &tms3203x_device::stf_ind,      &tms3203x_device::illegal,      // 0x28
 	&tms3203x_device::illegal,      &tms3203x_device::stfi_dir,     &tms3203x_device::stfi_ind,     &tms3203x_device::illegal,
 	&tms3203x_device::illegal,      &tms3203x_device::sti_dir,      &tms3203x_device::sti_ind,      &tms3203x_device::illegal,

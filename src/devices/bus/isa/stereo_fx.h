@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef __STEREO_FX__
-#define __STEREO_FX__
+#ifndef MAME_BUS_ISA_STEREO_FX_H
+#define MAME_BUS_ISA_STEREO_FX_H
+
+#pragma once
 
 #include "isa.h"
 #include "bus/pc_joy/pc_joy.h"
@@ -24,9 +26,6 @@ public:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	required_device<pc_joy_device> m_joy;
-	required_device<cpu_device> m_cpu;
 
 	// mcu ports
 	DECLARE_READ8_MEMBER( dev_dsp_data_r );
@@ -56,6 +55,10 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t dack_r(int line) override;
 	void dack_w(int line, uint8_t data) override;
+
+	required_device<pc_joy_device> m_joy;
+	required_device<cpu_device> m_cpu;
+
 private:
 	// internal state
 	bool m_data_in;
@@ -72,6 +75,6 @@ private:
 
 // device type definition
 
-extern const device_type ISA8_STEREO_FX;
+DECLARE_DEVICE_TYPE(ISA8_STEREO_FX, stereo_fx_device)
 
-#endif
+#endif // MAME_BUS_ISA_STEREO_FX_H

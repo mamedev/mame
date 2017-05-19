@@ -25,10 +25,10 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 	}
 }
 
-const device_type PSX_DMA = device_creator<psxdma_device>;
+DEFINE_DEVICE_TYPE(PSX_DMA, psxdma_device, "psxdma", "Sony PSX DMA")
 
 psxdma_device::psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PSX_DMA, "Sony PSX DMA", tag, owner, clock, "psxdma", __FILE__), m_ram( ), m_ramsize(0), m_dpcp(0), m_dicr(0),
+	device_t(mconfig, PSX_DMA, tag, owner, clock), m_ram(), m_ramsize(0), m_dpcp(0), m_dicr(0),
 	m_irq_handler(*this)
 {
 }
@@ -201,12 +201,12 @@ void psxdma_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	dma_finished(id);
 }
 
-void psxdma_device::install_read_handler( int index, psx_dma_read_delegate p_fn_dma_read )
+void psxdma_device::install_read_handler( int index, read_delegate p_fn_dma_read )
 {
 	m_channel[ index ].fn_read = p_fn_dma_read;
 }
 
-void psxdma_device::install_write_handler( int index, psx_dma_read_delegate p_fn_dma_write )
+void psxdma_device::install_write_handler( int index, write_delegate p_fn_dma_write )
 {
 	m_channel[ index ].fn_write = p_fn_dma_write;
 }

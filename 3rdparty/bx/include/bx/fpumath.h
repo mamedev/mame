@@ -9,8 +9,6 @@
 #define BX_FPU_MATH_H_HEADER_GUARD
 
 #include "bx.h"
-#include <math.h>
-#include <string.h>
 
 namespace bx
 {
@@ -125,6 +123,9 @@ namespace bx
 	float fcos(float _a);
 
 	///
+	float ftan(float _a);
+
+	///
 	float facos(float _a);
 
 	///
@@ -158,7 +159,7 @@ namespace bx
 	bool fequal(float _a, float _b, float _epsilon);
 
 	///
-	bool fequal(const float* __restrict _a, const float* __restrict _b, uint32_t _num, float _epsilon);
+	bool fequal(const float* _a, const float* _b, uint32_t _num, float _epsilon);
 
 	///
 	float fwrap(float _a, float _wrap);
@@ -183,93 +184,93 @@ namespace bx
 	float fgain(float _time, float _gain);
 
 	///
-	void vec3Move(float* __restrict _result, const float* __restrict _a);
+	void vec3Move(float* _result, const float* _a);
 
 	///
-	void vec3Abs(float* __restrict _result, const float* __restrict _a);
+	void vec3Abs(float* _result, const float* _a);
 
 	///
-	void vec3Neg(float* __restrict _result, const float* __restrict _a);
+	void vec3Neg(float* _result, const float* _a);
 
 	///
-	void vec3Add(float* __restrict _result, const float* __restrict _a, const float* __restrict _b);
+	void vec3Add(float* _result, const float* _a, const float* _b);
 
 	///
-	void vec3Add(float* __restrict _result, const float* __restrict _a, float _b);
+	void vec3Add(float* _result, const float* _a, float _b);
 
 	///
-	void vec3Sub(float* __restrict _result, const float* __restrict _a, const float* __restrict _b);
+	void vec3Sub(float* _result, const float* _a, const float* _b);
 
 	///
-	void vec3Sub(float* __restrict _result, const float* __restrict _a, float _b);
+	void vec3Sub(float* _result, const float* _a, float _b);
 
 	///
-	void vec3Mul(float* __restrict _result, const float* __restrict _a, const float* __restrict _b);
+	void vec3Mul(float* _result, const float* _a, const float* _b);
 
 	///
-	void vec3Mul(float* __restrict _result, const float* __restrict _a, float _b);
+	void vec3Mul(float* _result, const float* _a, float _b);
 
 	///
-	float vec3Dot(const float* __restrict _a, const float* __restrict _b);
+	float vec3Dot(const float* _a, const float* _b);
 
 	///
-	void vec3Cross(float* __restrict _result, const float* __restrict _a, const float* __restrict _b);
+	void vec3Cross(float* _result, const float* _a, const float* _b);
 
 	///
 	float vec3Length(const float* _a);
 
 	///
-	void vec3Lerp(float* __restrict _result, const float* __restrict _a, const float* __restrict _b, float _t);
+	void vec3Lerp(float* _result, const float* _a, const float* _b, float _t);
 
 	///
-	void vec3Lerp(float* __restrict _result, const float* __restrict _a, const float* __restrict _b, const float* __restrict _c);
+	void vec3Lerp(float* _result, const float* _a, const float* _b, const float* _c);
 
 	///
-	float vec3Norm(float* __restrict _result, const float* __restrict _a);
+	float vec3Norm(float* _result, const float* _a);
 
 	///
-	void vec3Min(float* __restrict _result, const float* __restrict _a, const float* __restrict _b);
+	void vec3Min(float* _result, const float* _a, const float* _b);
 
 	///
-	void vec3Max(float* __restrict _result, const float* __restrict _a, const float* __restrict _b);
+	void vec3Max(float* _result, const float* _a, const float* _b);
 
 	///
-	void vec3Rcp(float* __restrict _result, const float* __restrict _a);
+	void vec3Rcp(float* _result, const float* _a);
 
 	/// Calculate tangent frame from normal.
 	///
-	void vec3TangentFrame(const float* __restrict _n, float* __restrict _t, float* __restrict _b);
+	void vec3TangentFrame(const float* _n, float* _t, float* _b);
 
 	/// Calculate tangent frame from normal and angle.
 	///
-	void vec3TangentFrame(const float* __restrict _n, float* __restrict _t, float* __restrict _b, float _angle);
+	void vec3TangentFrame(const float* _n, float* _t, float* _b, float _angle);
 
 	///
 	void quatIdentity(float* _result);
 
 	///
-	void quatMove(float* __restrict _result, const float* __restrict _a);
+	void quatMove(float* _result, const float* _a);
 
 	///
-	void quatMulXYZ(float* __restrict _result, const float* __restrict _qa, const float* __restrict _qb);
+	void quatMulXYZ(float* _result, const float* _qa, const float* _qb);
 
 	///
-	void quatMul(float* __restrict _result, const float* __restrict _qa, const float* __restrict _qb);
+	void quatMul(float* _result, const float* _qa, const float* _qb);
 
 	///
-	void quatInvert(float* __restrict _result, const float* __restrict _quat);
+	void quatInvert(float* _result, const float* _quat);
 
 	///
-	float quatDot(const float* __restrict _a, const float* __restrict _b);
+	float quatDot(const float* _a, const float* _b);
 
 	///
-	void quatNorm(float* __restrict _result, const float* __restrict _quat);
+	void quatNorm(float* _result, const float* _quat);
 
 	///
-	void quatToEuler(float* __restrict _result, const float* __restrict _quat);
+	void quatToEuler(float* _result, const float* _quat);
 
 	///
-	void quatRotateAxis(float* __restrict _result, const float* _axis, float _angle);
+	void quatRotateAxis(float* _result, const float* _axis, float _angle);
 
 	///
 	void quatRotateX(float* _result, float _ax);
@@ -281,7 +282,7 @@ namespace bx
 	void quatRotateZ(float* _result, float _az);
 
 	///
-	void vec3MulQuat(float* __restrict _result, const float* __restrict _vec, const float* __restrict _quat);
+	void vec3MulQuat(float* _result, const float* _vec, const float* _quat);
 
 	///
 	void mtxIdentity(float* _result);
@@ -296,28 +297,28 @@ namespace bx
 	void mtxScale(float* _result, float _scale);
 
 	///
-	void mtxFromNormal(float* __restrict _result, const float* __restrict _normal, float _scale, const float* __restrict _pos);
+	void mtxFromNormal(float* _result, const float* _normal, float _scale, const float* _pos);
 
 	///
-	void mtxFromNormal(float* __restrict _result, const float* __restrict _normal, float _scale, const float* __restrict _pos, float _angle);
+	void mtxFromNormal(float* _result, const float* _normal, float _scale, const float* _pos, float _angle);
 
 	///
-	void mtxQuat(float* __restrict _result, const float* __restrict _quat);
+	void mtxQuat(float* _result, const float* _quat);
 
 	///
-	void mtxQuatTranslation(float* __restrict _result, const float* __restrict _quat, const float* __restrict _translation);
+	void mtxQuatTranslation(float* _result, const float* _quat, const float* _translation);
 
 	///
-	void mtxQuatTranslationHMD(float* __restrict _result, const float* __restrict _quat, const float* __restrict _translation);
+	void mtxQuatTranslationHMD(float* _result, const float* _quat, const float* _translation);
 
 	///
-	void mtxLookAtLh(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL);;
+	void mtxLookAtLh(float* _result, const float* _eye, const float* _at, const float* _up = NULL);;
 
 	///
-	void mtxLookAtRh(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL);
+	void mtxLookAtRh(float* _result, const float* _eye, const float* _at, const float* _up = NULL);
 
 	///
-	void mtxLookAt(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL);
+	void mtxLookAt(float* _result, const float* _eye, const float* _at, const float* _up = NULL);
 
 	///
 	void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false);
@@ -422,33 +423,33 @@ namespace bx
 	void mtxSRT(float* _result, float _sx, float _sy, float _sz, float _ax, float _ay, float _az, float _tx, float _ty, float _tz);
 
 	///
-	void vec3MulMtx(float* __restrict _result, const float* __restrict _vec, const float* __restrict _mat);
+	void vec3MulMtx(float* _result, const float* _vec, const float* _mat);
 
 	///
-	void vec3MulMtxH(float* __restrict _result, const float* __restrict _vec, const float* __restrict _mat);
+	void vec3MulMtxH(float* _result, const float* _vec, const float* _mat);
 
 	///
-	void vec4MulMtx(float* __restrict _result, const float* __restrict _vec, const float* __restrict _mat);
+	void vec4MulMtx(float* _result, const float* _vec, const float* _mat);
 
 	///
-	void mtxMul(float* __restrict _result, const float* __restrict _a, const float* __restrict _b);
+	void mtxMul(float* _result, const float* _a, const float* _b);
 
 	///
-	void mtxTranspose(float* __restrict _result, const float* __restrict _a);
+	void mtxTranspose(float* _result, const float* _a);
 
 	///
-	void mtx3Inverse(float* __restrict _result, const float* __restrict _a);
+	void mtx3Inverse(float* _result, const float* _a);
 
 	///
-	void mtxInverse(float* __restrict _result, const float* __restrict _a);
+	void mtxInverse(float* _result, const float* _a);
 
 	/// Convert LH to RH projection matrix and vice versa.
 	///
-	void mtxProjFlipHandedness(float* __restrict _dst, const float* __restrict _src);
+	void mtxProjFlipHandedness(float* _dst, const float* _src);
 
 	/// Convert LH to RH view matrix and vice versa.
 	///
-	void mtxViewFlipHandedness(float* __restrict _dst, const float* __restrict _src);
+	void mtxViewFlipHandedness(float* _dst, const float* _src);
 
 	///
 	void calcNormal(float _result[3], float _va[3], float _vb[3], float _vc[3]);
@@ -470,6 +471,6 @@ namespace bx
 
 } // namespace bx
 
-#include "fpumath.inl"
+#include "inline/fpumath.inl"
 
 #endif // BX_FPU_MATH_H_HEADER_GUARD

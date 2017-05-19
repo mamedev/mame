@@ -10,10 +10,10 @@
 #include "pc_lpt.h"
 
 
-const device_type PC_LPT = device_creator<pc_lpt_device>;
+DEFINE_DEVICE_TYPE(PC_LPT, pc_lpt_device, "pc_lpt", "PC LPT")
 
 pc_lpt_device::pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC_LPT, "PC-LPT", tag, owner, clock, "pc_lpt", __FILE__),
+	: device_t(mconfig, PC_LPT, tag, owner, clock),
 	m_irq(1),
 	m_data(0xff), m_control(0),
 	m_irq_enabled(1),

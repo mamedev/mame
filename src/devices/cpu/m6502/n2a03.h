@@ -7,9 +7,10 @@
     6502, NES variant
 
 ***************************************************************************/
+#ifndef MAME_CPU_M6502_N2A03_H
+#define MAME_CPU_M6502_N2A03_H
 
-#ifndef __N2A03_H__
-#define __N2A03_H__
+#pragma once
 
 #include "m6502.h"
 #include "sound/nes_apu.h"
@@ -72,7 +73,15 @@ private:
 
 };
 
-#define N2A03_DEFAULTCLOCK (21477272.724 / 12)
+/* These are the official XTAL values and clock rates used by Nintendo for
+   manufacturing throughout the production of the 2A03. PALC_APU_CLOCK is
+   the clock rate devised by UMC(?) for PAL Famicom clone hardware.        */
+
+#define N2A03_NTSC_XTAL           XTAL_21_4772MHz
+#define N2A03_PAL_XTAL            XTAL_26_601712MHz
+#define NTSC_APU_CLOCK      (N2A03_NTSC_XTAL/12) /* 1.7897726666... MHz */
+#define PAL_APU_CLOCK       (N2A03_PAL_XTAL/16) /* 1.662607 MHz */
+#define PALC_APU_CLOCK      (N2A03_PAL_XTAL/15) /* 1.77344746666... MHz */
 
 enum {
 	N2A03_IRQ_LINE = m6502_device::IRQ_LINE,
@@ -81,6 +90,6 @@ enum {
 	N2A03_SET_OVERFLOW = m6502_device::V_LINE
 };
 
-extern const device_type N2A03;
+DECLARE_DEVICE_TYPE(N2A03, n2a03_device)
 
-#endif
+#endif // MAME_CPU_M6502_N2A03_H

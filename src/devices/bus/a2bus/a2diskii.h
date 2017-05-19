@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_DISKII__
-#define __A2BUS_DISKII__
+#ifndef MAME_BUS_A2BUS_A2DISKII_H
+#define MAME_BUS_A2BUS_A2DISKII_H
+
+#pragma once
 
 #include "a2bus.h"
 #include "machine/applefdc.h"
@@ -23,14 +25,14 @@ class a2bus_floppy_device:
 	public device_a2bus_card_interface
 {
 public:
-	// construction/destruction
-	a2bus_floppy_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
+	// construction/destruction
+	a2bus_floppy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -59,8 +61,17 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
-// device type definition
-extern const device_type A2BUS_DISKII;
-extern const device_type A2BUS_IWM_FDC;
+class a2bus_agat7flop_device: public a2bus_floppy_device
+{
+public:
+	a2bus_agat7flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-#endif  /* __A2BUS_DISKII__ */
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+// device type definition
+DECLARE_DEVICE_TYPE(A2BUS_DISKII,    a2bus_diskii_device)
+DECLARE_DEVICE_TYPE(A2BUS_IWM_FDC,   a2bus_iwmflop_device)
+DECLARE_DEVICE_TYPE(A2BUS_AGAT7_FDC, a2bus_agat7flop_device)
+
+#endif  // MAME_BUS_A2BUS_A2DISKII_H

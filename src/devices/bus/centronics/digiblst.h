@@ -12,8 +12,8 @@
  *  Created on: 23/08/2014
  */
 
-#ifndef DIGIBLST_H_
-#define DIGIBLST_H_
+#ifndef MAME_BUS_CENTRONICS_DIGIBLST_H
+#define MAME_BUS_CENTRONICS_DIGIBLST_H
 
 #pragma once
 
@@ -54,7 +54,7 @@ private:
 };
 
 // device type definition
-extern const device_type CENTRONICS_DIGIBLASTER;
+DECLARE_DEVICE_TYPE(CENTRONICS_DIGIBLASTER, centronics_digiblaster_device)
 
 
-#endif /* DIGIBLST_H_ */
+#endif // MAME_BUS_CENTRONICS_DIGIBLST_H

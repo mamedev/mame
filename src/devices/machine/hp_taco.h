@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __HP_TACO_H__
-#define __HP_TACO_H__
+#ifndef MAME_MACHINE_HP_TACO_H
+#define MAME_MACHINE_HP_TACO_H
+
+#pragma once
 
 #include <map>
 
@@ -27,13 +29,12 @@ class hp_taco_device : public device_t ,
 {
 public:
 	// construction/destruction
-	hp_taco_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
 	hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<hp_taco_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_flg_handler(device_t &device, _Object object) { return downcast<hp_taco_device &>(device).m_flg_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_sts_handler(device_t &device, _Object object) { return downcast<hp_taco_device &>(device).m_sts_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<hp_taco_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_flg_handler(device_t &device, Object &&cb) { return downcast<hp_taco_device &>(device).m_flg_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sts_handler(device_t &device, Object &&cb) { return downcast<hp_taco_device &>(device).m_sts_handler.set_callback(std::forward<Object>(cb)); }
 
 	// Register read/write
 	DECLARE_WRITE16_MEMBER(reg_w);
@@ -56,14 +57,18 @@ public:
 	virtual bool is_reset_on_load() const override { return false; }
 	virtual const char *file_extensions() const override;
 
+protected:
 	// Tape position, 1 unit = 1 inch / (968 * 1024)
 	typedef int32_t tape_pos_t;
 
 	// Words stored on tape
 	typedef uint16_t tape_word_t;
 
-protected:
-		// device-level overrides
+	static const tape_pos_t tape_holes[];
+
+	hp_taco_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
@@ -71,7 +76,7 @@ protected:
 
 private:
 	// Storage of tracks: mapping from a tape position to word stored there
-	typedef std::map<tape_pos_t , tape_word_t> tape_track_t;
+	typedef std::map<tape_pos_t, tape_word_t> tape_track_t;
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_flg_handler;
@@ -96,13 +101,13 @@ private:
 
 	// Command FSM state
 	typedef enum {
-			CMD_IDLE,
-			CMD_INVERTING,
-			CMD_PH0,
-			CMD_PH1,
-			CMD_PH2,
-			CMD_END,
-			CMD_STOPPING
+		CMD_IDLE,
+		CMD_INVERTING,
+		CMD_PH0,
+		CMD_PH1,
+		CMD_PH2,
+		CMD_END,
+		CMD_STOPPING
 	} cmd_state_t;
 	cmd_state_t m_cmd_state;
 
@@ -132,9 +137,9 @@ private:
 	tape_pos_t m_gap_detect_start;
 
 	typedef enum {
-			ADV_NO_MORE_DATA,
-			ADV_CONT_DATA,
-			ADV_DISCONT_DATA
+		ADV_NO_MORE_DATA,
+		ADV_CONT_DATA,
+		ADV_DISCONT_DATA
 	} adv_res_t;
 
 	void clear_state(void);
@@ -185,6 +190,6 @@ private:
 };
 
 // device type definition
-extern const device_type HP_TACO;
+DECLARE_DEVICE_TYPE(HP_TACO, hp_taco_device)
 
-#endif /* __HP_TACO_H__ */
+#endif // MAME_MACHINE_HP_TACO_H

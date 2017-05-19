@@ -176,6 +176,8 @@ macro jsr32 %opc %spreg
 	prefetch_noirq();
 
 10003 dma
+	if(current_dma->count == 1)
+		dma_device->count_last(current_dma->id);
 	if(current_dma->mode_16) {
 		TMP1 = read16(current_dma->source);
 		write16(current_dma->dest, TMP1);
@@ -186,6 +188,8 @@ macro jsr32 %opc %spreg
 	current_dma->source += current_dma->incs;
 	current_dma->dest   += current_dma->incd;
 	current_dma->count--;
+	if(!current_dma->autoreq)
+		current_dma->suspended = true;
 	if(!current_dma->count) {
 		uint8_t id = current_dma->id;
 		current_dma = nullptr;
@@ -2441,22 +2445,22 @@ macro jsr32 %opc %spreg
 	prefetch();
 
 7b5c598f     ffffffff     0 eepmov.b -        -        o
-	while(r8_r(4)) {
+	while(r8_r(4+8)) {
 		TMP1 = read8(r16_r(5));
 		write8(r16_r(6), TMP1);
 		r16_w(5, r16_r(5)+1);
 		r16_w(6, r16_r(6)+1);
-		r8_w(4, r8_r(4)-1);
+		r8_w(4+8, r8_r(4+8)-1);
 	}
 	prefetch();
 
 7b5c598f     ffffffff     0 eepmov.b -        -        h
-	while(r8_r(4)) {
+	while(r8_r(4+8)) {
 		TMP1 = read8(r32_r(5));
 		write8(r32_r(6), TMP1);
 		r32_w(5, r32_r(5)+1);
 		r32_w(6, r32_r(6)+1);
-		r8_w(4, r8_r(4)-1);
+		r8_w(4+8, r8_r(4+8)-1);
 	}
 	prefetch();
 

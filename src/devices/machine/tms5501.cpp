@@ -27,7 +27,7 @@ const uint8_t tms5501_device::rst_vector[] = { 0xc7, 0xcf, 0xd7, 0xdf, 0xe7, 0xe
 //**************************************************************************
 
 // device type definition
-const device_type TMS5501 = device_creator<tms5501_device>;
+DEFINE_DEVICE_TYPE(TMS5501, tms5501_device, "tms5501", "TMS5501 Multifunction I/O")
 
 
 // I/O address map
@@ -55,7 +55,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 tms5501_device::tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, TMS5501, "TMS5501", tag, owner, clock, "tms5501", __FILE__),
+	device_t(mconfig, TMS5501, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_write_xmt(*this),

@@ -40,8 +40,8 @@
 /*************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "lr35902.h"
+#include "debugger.h"
 
 /* Flag bit definitions */
 enum lr35902_flag
@@ -60,11 +60,11 @@ enum lr35902_flag
 //  LR35902 DEVICE
 //**************************************************************************
 
-const device_type LR35902 = device_creator<lr35902_cpu_device>;
+DEFINE_DEVICE_TYPE(LR35902, lr35902_cpu_device, "lr35902", "LR35902")
 
 
 lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, LR35902, "LR35902", tag, owner, clock, "lr35902", __FILE__)
+	: cpu_device(mconfig, LR35902, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_A(0)
 	, m_F(0)

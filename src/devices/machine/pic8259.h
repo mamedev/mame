@@ -24,8 +24,8 @@
 
 ***************************************************************************/
 
-#ifndef __PIC8259_H__
-#define __PIC8259_H__
+#ifndef MAME_MACHINE_PIC8259_H
+#define MAME_MACHINE_PIC8259_H
 
 
 /***************************************************************************
@@ -44,9 +44,9 @@ class pic8259_device : public device_t
 public:
 	pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &static_set_out_int_callback(device_t &device, _Object object) { return downcast<pic8259_device &>(device).m_out_int_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_sp_en_callback(device_t &device, _Object object) { return downcast<pic8259_device &>(device).m_sp_en_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_read_slave_ack_callback(device_t &device, _Object object) { return downcast<pic8259_device &>(device).m_read_slave_ack_func.set_callback(object); }
+	template <class Object> static devcb_base &static_set_out_int_callback(device_t &device, Object &&cb) { return downcast<pic8259_device &>(device).m_out_int_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_sp_en_callback(device_t &device, Object &&cb) { return downcast<pic8259_device &>(device).m_sp_en_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_read_slave_ack_callback(device_t &device, Object &&cb) { return downcast<pic8259_device &>(device).m_read_slave_ack_func.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -64,7 +64,7 @@ public:
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
 	// used by m92.c until we can figure out how to hook it up in a way that doesn't break nbbatman (probably need correct IRQ timing / clears for the sprites IRQs
-	int HACK_get_base_vector() { return m_base;  }
+	int HACK_get_base_vector() { return m_base; }
 
 protected:
 	// device-level overrides
@@ -73,7 +73,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	static const device_timer_id TIMER_CHECK_IRQ = 0;
+	static constexpr device_timer_id TIMER_CHECK_IRQ = 0;
 
 	inline void set_timer() { timer_set(attotime::zero, TIMER_CHECK_IRQ); }
 	void set_irq_line(int irq, int state);
@@ -124,6 +124,6 @@ private:
 	uint8_t m_is_x86;
 };
 
-extern const device_type PIC8259;
+DECLARE_DEVICE_TYPE(PIC8259, pic8259_device)
 
-#endif /* __PIC8259_H__ */
+#endif // MAME_MACHINE_PIC8259_H

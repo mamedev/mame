@@ -25,9 +25,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_EZCGI = device_creator<a2bus_ezcgi_device>;
-const device_type A2BUS_EZCGI_9938 = device_creator<a2bus_ezcgi_9938_device>;
-const device_type A2BUS_EZCGI_9958 = device_creator<a2bus_ezcgi_9958_device>;
+DEFINE_DEVICE_TYPE(A2BUS_EZCGI,      a2bus_ezcgi_device,      "a2ezcgi",  "E-Z Color Graphics Interface")
+DEFINE_DEVICE_TYPE(A2BUS_EZCGI_9938, a2bus_ezcgi_9938_device, "a2ezcgi3", "E-Z Color Graphics Interface (TMS9938)")
+DEFINE_DEVICE_TYPE(A2BUS_EZCGI_9958, a2bus_ezcgi_9958_device, "a2ezcgi5", "E-Z Color Graphics Interface (TMS9958)")
 
 MACHINE_CONFIG_FRAGMENT( ezcgi )
 	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
@@ -55,7 +55,7 @@ MACHINE_CONFIG_FRAGMENT( ezcgi9938 )
 	MCFG_SCREEN_UPDATE_DEVICE(TMS_TAG, v9938_device, screen_update)
 	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, 262*2)
 	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
-	MCFG_SCREEN_PALETTE("ezcgi_tms:palette")
+	MCFG_SCREEN_PALETTE(TMS_TAG)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( ezcgi9958 )
@@ -69,7 +69,7 @@ MACHINE_CONFIG_FRAGMENT( ezcgi9958 )
 	MCFG_SCREEN_UPDATE_DEVICE(TMS_TAG, v9938_device, screen_update)
 	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, 262*2)
 	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
-	MCFG_SCREEN_PALETTE("ezcgi_tms:palette")
+	MCFG_SCREEN_PALETTE(TMS_TAG)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -97,42 +97,36 @@ machine_config_constructor a2bus_ezcgi_9958_device::device_mconfig_additions() c
 //**************************************************************************
 
 a2bus_ezcgi_device::a2bus_ezcgi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_EZCGI, "E-Z Color Graphics Interface", tag, owner, clock, "a2ezcgi", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_tms(*this, TMS_TAG)
+	a2bus_ezcgi_device(mconfig, A2BUS_EZCGI, tag, owner, clock)
 {
 }
 
-a2bus_ezcgi_device::a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_ezcgi_device::a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
 {
 }
 
 a2bus_ezcgi_9938_device::a2bus_ezcgi_9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_EZCGI_9938, "E-Z Color Graphics Interface (TMS9938)", tag, owner, clock, "a2ezcgi3", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_tms(*this, TMS_TAG)
+	a2bus_ezcgi_9938_device(mconfig, A2BUS_EZCGI_9938, tag, owner, clock)
 {
 }
 
-a2bus_ezcgi_9938_device::a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_ezcgi_9938_device::a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
 {
 }
 
 a2bus_ezcgi_9958_device::a2bus_ezcgi_9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_EZCGI_9958, "E-Z Color Graphics Interface (TMS9958)", tag, owner, clock, "a2ezcgi5", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_tms(*this, TMS_TAG)
+	a2bus_ezcgi_9958_device(mconfig, A2BUS_EZCGI_9958, tag, owner, clock)
 {
 }
 
-a2bus_ezcgi_9958_device::a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_ezcgi_9958_device::a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
 {

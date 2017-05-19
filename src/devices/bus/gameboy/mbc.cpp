@@ -18,133 +18,133 @@
 //  gb_rom_mbc*_device - constructor
 //-------------------------------------------------
 
-const device_type GB_ROM_MBC1 = device_creator<gb_rom_mbc1_device>;
-const device_type GB_ROM_MBC2 = device_creator<gb_rom_mbc2_device>;
-const device_type GB_ROM_MBC3 = device_creator<gb_rom_mbc3_device>;
-const device_type GB_ROM_MBC5 = device_creator<gb_rom_mbc5_device>;
-const device_type GB_ROM_MBC6 = device_creator<gb_rom_mbc6_device>;
-const device_type GB_ROM_MBC7 = device_creator<gb_rom_mbc7_device>;
-const device_type GB_ROM_M161 = device_creator<gb_rom_m161_device>;
-const device_type GB_ROM_MMM01 = device_creator<gb_rom_mmm01_device>;
-const device_type GB_ROM_SACHEN1 = device_creator<gb_rom_sachen_mmc1_device>;
-const device_type GB_ROM_SACHEN2 = device_creator<gb_rom_sachen_mmc2_device>;
-const device_type GB_ROM_188IN1 = device_creator<gb_rom_188in1_device>;
-const device_type GB_ROM_SINTAX = device_creator<gb_rom_sintax_device>;
-const device_type GB_ROM_CHONGWU = device_creator<gb_rom_chongwu_device>;
-const device_type GB_ROM_LICHENG = device_creator<gb_rom_licheng_device>;
-const device_type GB_ROM_DIGIMON = device_creator<gb_rom_digimon_device>;
-const device_type GB_ROM_ROCKMAN8 = device_creator<gb_rom_rockman8_device>;
-const device_type GB_ROM_SM3SP = device_creator<gb_rom_sm3sp_device>;
+DEFINE_DEVICE_TYPE(GB_ROM_MBC1,     gb_rom_mbc1_device,        "gb_rom_mbc1",     "GB MBC1 Carts")
+DEFINE_DEVICE_TYPE(GB_ROM_MBC2,     gb_rom_mbc2_device,        "gb_rom_mbc2",     "GB MBC2 Carts")
+DEFINE_DEVICE_TYPE(GB_ROM_MBC3,     gb_rom_mbc3_device,        "gb_rom_mbc3",     "GB MBC3 Carts")
+DEFINE_DEVICE_TYPE(GB_ROM_MBC5,     gb_rom_mbc5_device,        "gb_rom_mbc5",     "GB MBC5 Carts")
+DEFINE_DEVICE_TYPE(GB_ROM_MBC6,     gb_rom_mbc6_device,        "gb_rom_mbc6",     "GB MBC6 Carts")
+DEFINE_DEVICE_TYPE(GB_ROM_MBC7,     gb_rom_mbc7_device,        "gb_rom_mbc7",     "GB MBC7 Carts")
+DEFINE_DEVICE_TYPE(GB_ROM_M161,     gb_rom_m161_device,        "gb_rom_m161",     "GB M161 Carts")
+DEFINE_DEVICE_TYPE(GB_ROM_MMM01,    gb_rom_mmm01_device,       "gb_rom_mmm01",    "GB MMM01 Carts")
+DEFINE_DEVICE_TYPE(GB_ROM_SACHEN1,  gb_rom_sachen_mmc1_device, "gb_rom_sachen1",  "GB Sachen MMC1 Carts")
+DEFINE_DEVICE_TYPE(GB_ROM_SACHEN2,  gb_rom_sachen_mmc2_device, "gb_rom_sachen2",  "GB Sachen MMC2 Carts")
+DEFINE_DEVICE_TYPE(GB_ROM_188IN1,   gb_rom_188in1_device,      "gb_rom_188in1",   "GB 188in1")
+DEFINE_DEVICE_TYPE(GB_ROM_SINTAX,   gb_rom_sintax_device,      "gb_rom_sintax",   "GB MBC5 Sintax Carts")
+DEFINE_DEVICE_TYPE(GB_ROM_CHONGWU,  gb_rom_chongwu_device,     "gb_rom_chongwu",  "GB Chong Wu Xiao Jing Ling")
+DEFINE_DEVICE_TYPE(GB_ROM_LICHENG,  gb_rom_licheng_device,     "gb_rom_licheng",  "GB MBC5 Li Cheng Carts")
+DEFINE_DEVICE_TYPE(GB_ROM_DIGIMON,  gb_rom_digimon_device,     "gb_rom_digimon",  "GB Digimon")
+DEFINE_DEVICE_TYPE(GB_ROM_ROCKMAN8, gb_rom_rockman8_device,    "gb_rom_rockman8", "GB MBC1 Rockman 8")
+DEFINE_DEVICE_TYPE(GB_ROM_SM3SP,    gb_rom_sm3sp_device,       "gb_sm3sp",        "GB MBC1 Super Mario 3 Special")
 
 
-gb_rom_mbc_device::gb_rom_mbc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_gb_cart_interface( mconfig, *this ), m_ram_enable(0)
-				{
+gb_rom_mbc_device::gb_rom_mbc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_gb_cart_interface(mconfig, *this)
+	, m_ram_enable(0)
+{
 }
 
-gb_rom_mbc1_device::gb_rom_mbc1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: gb_rom_mbc_device(mconfig, type, name, tag, owner, clock, shortname, source), m_mode(MODE_16M_64k),
-						m_mask(0x1f),
-						m_shift(0)
+gb_rom_mbc1_device::gb_rom_mbc1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: gb_rom_mbc_device(mconfig, type, tag, owner, clock)
+	, m_mode(MODE_16M_64k)
+	, m_mask(0x1f)
+	, m_shift(0)
 {
 }
 
 gb_rom_mbc1_device::gb_rom_mbc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_MBC1, "GB MBC1 Carts", tag, owner, clock, "gb_rom_mbc1", __FILE__), m_mode(MODE_16M_64k),
-						m_mask(0x1f),
-						m_shift(0)
+	: gb_rom_mbc1_device(mconfig, GB_ROM_MBC1, tag, owner, clock)
 {
 }
 
 gb_rom_mbc2_device::gb_rom_mbc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_MBC2, "GB MBC2 Carts", tag, owner, clock, "gb_rom_mbc2", __FILE__)
+	: gb_rom_mbc_device(mconfig, GB_ROM_MBC2, tag, owner, clock)
 {
 }
 
 gb_rom_mbc3_device::gb_rom_mbc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_MBC3, "GB MBC3 Carts", tag, owner, clock, "gb_rom_mbc3", __FILE__)
+	: gb_rom_mbc_device(mconfig, GB_ROM_MBC3, tag, owner, clock)
 {
 }
 
-gb_rom_mbc5_device::gb_rom_mbc5_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: gb_rom_mbc_device(mconfig, type, name, tag, owner, clock, shortname, source)
+gb_rom_mbc5_device::gb_rom_mbc5_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: gb_rom_mbc_device(mconfig, type, tag, owner, clock)
 {
 }
 
 gb_rom_mbc5_device::gb_rom_mbc5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_MBC5, "GB MBC5 Carts", tag, owner, clock, "gb_rom_mbc5", __FILE__)
+	: gb_rom_mbc5_device(mconfig, GB_ROM_MBC5, tag, owner, clock)
 {
 }
 
 gb_rom_mbc6_device::gb_rom_mbc6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_MBC6, "GB MBC6 Carts", tag, owner, clock, "gb_rom_mbc6", __FILE__), m_latch1(0), m_latch2(0), m_bank_4000(0), m_bank_6000(0)
-				{
+	: gb_rom_mbc_device(mconfig, GB_ROM_MBC6, tag, owner, clock), m_latch1(0), m_latch2(0), m_bank_4000(0), m_bank_6000(0)
+{
 }
 
 gb_rom_mbc7_device::gb_rom_mbc7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_MBC7, "GB MBC7 Carts", tag, owner, clock, "gb_rom_mbc7", __FILE__)
+	: gb_rom_mbc_device(mconfig, GB_ROM_MBC7, tag, owner, clock)
 {
 }
 
 gb_rom_m161_device::gb_rom_m161_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_M161, "GB M161 Carts", tag, owner, clock, "gb_rom_m161", __FILE__), m_base_bank(0), m_load_disable(0)
-				{
+	: gb_rom_mbc_device(mconfig, GB_ROM_M161, tag, owner, clock), m_base_bank(0), m_load_disable(0)
+{
 }
 
 gb_rom_mmm01_device::gb_rom_mmm01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_MMM01, "GB MMM01 Carts", tag, owner, clock, "gb_rom_mmm01", __FILE__), m_romb(0), m_romb_nwe(0), m_ramb(0), m_ramb_nwe(0), m_mode(0), m_mode_nwe(0), m_map(0), m_mux(0)
-				{
+	: gb_rom_mbc_device(mconfig, GB_ROM_MMM01, tag, owner, clock), m_romb(0), m_romb_nwe(0), m_ramb(0), m_ramb_nwe(0), m_mode(0), m_mode_nwe(0), m_map(0), m_mux(0)
+{
 }
 
 gb_rom_sachen_mmc1_device::gb_rom_sachen_mmc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_SACHEN1, "GB Sachen MMC1 Carts", tag, owner, clock, "gb_rom_sachen1", __FILE__), m_base_bank(0), m_mask(0), m_mode(0), m_unlock_cnt(0)
-				{
+	: gb_rom_sachen_mmc1_device(mconfig, GB_ROM_SACHEN1, tag, owner, clock)
+{
 }
 
-gb_rom_sachen_mmc1_device::gb_rom_sachen_mmc1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: gb_rom_mbc_device(mconfig, type, name, tag, owner, clock, shortname, source), m_base_bank(0), m_mask(0), m_mode(0), m_unlock_cnt(0)
-				{
+gb_rom_sachen_mmc1_device::gb_rom_sachen_mmc1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: gb_rom_mbc_device(mconfig, type, tag, owner, clock), m_base_bank(0), m_mask(0), m_mode(0), m_unlock_cnt(0)
+{
 }
 
 gb_rom_sachen_mmc2_device::gb_rom_sachen_mmc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_sachen_mmc1_device(mconfig, GB_ROM_SACHEN2, "GB Sachen MMC2 Carts", tag, owner, clock, "gb_rom_sachen2", __FILE__)
+	: gb_rom_sachen_mmc1_device(mconfig, GB_ROM_SACHEN2, tag, owner, clock)
 {
 }
 
 gb_rom_188in1_device::gb_rom_188in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc1_device(mconfig, GB_ROM_188IN1, "GB 188in1", tag, owner, clock, "gb_rom_188in1", __FILE__), m_game_base(0)
-				{
+	: gb_rom_mbc1_device(mconfig, GB_ROM_188IN1, tag, owner, clock), m_game_base(0)
+{
 }
 
 gb_rom_sintax_device::gb_rom_sintax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_SINTAX, "GB MBC5 Sintax Carts", tag, owner, clock, "gb_rom_sintax", __FILE__), m_bank_mask(0), m_bank(0), m_reg(0), m_currentxor(0), m_xor2(0), m_xor3(0), m_xor4(0), m_xor5(0), m_sintax_mode(0)
-				{
+	: gb_rom_mbc_device(mconfig, GB_ROM_SINTAX, tag, owner, clock), m_bank_mask(0), m_bank(0), m_reg(0), m_currentxor(0), m_xor2(0), m_xor3(0), m_xor4(0), m_xor5(0), m_sintax_mode(0)
+{
 }
 
 gb_rom_chongwu_device::gb_rom_chongwu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc5_device(mconfig, GB_ROM_CHONGWU, "GB Chong Wu Xiao Jing Ling", tag, owner, clock, "gb_rom_chongwu", __FILE__), m_protection_checked(0)
-				{
+	: gb_rom_mbc5_device(mconfig, GB_ROM_CHONGWU, tag, owner, clock), m_protection_checked(0)
+{
 }
 
 gb_rom_licheng_device::gb_rom_licheng_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc5_device(mconfig, GB_ROM_LICHENG, "GB MBC5 Li Cheng Carts", tag, owner, clock, "gb_rom_licheng", __FILE__)
+	: gb_rom_mbc5_device(mconfig, GB_ROM_LICHENG, tag, owner, clock)
 {
 }
 
 gb_rom_digimon_device::gb_rom_digimon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc5_device(mconfig, GB_ROM_DIGIMON, "GB Digimon", tag, owner, clock, "gb_rom_digimon", __FILE__)
+	: gb_rom_mbc5_device(mconfig, GB_ROM_DIGIMON, tag, owner, clock)
 {
 }
 
 gb_rom_rockman8_device::gb_rom_rockman8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_ROCKMAN8, "GB MBC1 Rockman 8", tag, owner, clock, "gb_rom_rockman8", __FILE__), m_bank_mask(0), m_bank(0), m_reg(0)
-				{
+	: gb_rom_mbc_device(mconfig, GB_ROM_ROCKMAN8, tag, owner, clock), m_bank_mask(0), m_bank(0), m_reg(0)
+{
 }
 
 gb_rom_sm3sp_device::gb_rom_sm3sp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_SM3SP, "GB MBC1 Super Mario 3 Special", tag, owner, clock, "gb_rom_sm3sp", __FILE__), m_bank_mask(0), m_bank(0), m_reg(0), m_mode(0)
-				{
+	: gb_rom_mbc_device(mconfig, GB_ROM_SM3SP, tag, owner, clock), m_bank_mask(0), m_bank(0), m_reg(0), m_mode(0)
+{
 }
 
 

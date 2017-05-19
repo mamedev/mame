@@ -93,10 +93,10 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMV_K230 = device_creator<dmv_k230_device>;
-const device_type DMV_K231 = device_creator<dmv_k231_device>;
-const device_type DMV_K234 = device_creator<dmv_k234_device>;
-const device_type DMV_K235 = device_creator<dmv_k235_device>;
+DEFINE_DEVICE_TYPE(DMV_K230, dmv_k230_device, "dmv_k230", "K230 8088 without interrupt controller")
+DEFINE_DEVICE_TYPE(DMV_K231, dmv_k231_device, "dmv_k231", "K231 8088 without interrupt controller")
+DEFINE_DEVICE_TYPE(DMV_K234, dmv_k234_device, "dmv_k234", "K234 68008")
+DEFINE_DEVICE_TYPE(DMV_K235, dmv_k235_device, "dmv_k235", "K235 8088 with interrupt controller")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -107,19 +107,16 @@ const device_type DMV_K235 = device_creator<dmv_k235_device>;
 //-------------------------------------------------
 
 dmv_k230_device::dmv_k230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, DMV_K230, "K230 8088 without interrupt controller", tag, owner, clock, "dmv_k230", __FILE__),
-		device_dmvslot_interface( mconfig, *this ),
-		m_maincpu(*this, "maincpu"),
-		m_rom(*this, "rom"), m_bus(nullptr), m_io(nullptr), m_switch16(0), m_hold(0)
-	{
+	: dmv_k230_device(mconfig, DMV_K230, tag, owner, clock)
+{
 }
 
-dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_dmvslot_interface( mconfig, *this ),
-		m_maincpu(*this, "maincpu"),
-		m_rom(*this, "rom"), m_bus(nullptr), m_io(nullptr), m_switch16(0), m_hold(0)
-	{
+dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_dmvslot_interface(mconfig, *this)
+	, m_maincpu(*this, "maincpu")
+	, m_rom(*this, "rom"), m_bus(nullptr), m_io(nullptr), m_switch16(0), m_hold(0)
+{
 }
 
 //-------------------------------------------------
@@ -127,7 +124,7 @@ dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type
 //-------------------------------------------------
 
 dmv_k231_device::dmv_k231_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: dmv_k230_device(mconfig, DMV_K231, "K231 8088 without interrupt controller", tag, owner, clock, "dmv_k231", __FILE__)
+	: dmv_k230_device(mconfig, DMV_K231, tag, owner, clock)
 {
 }
 
@@ -136,8 +133,8 @@ dmv_k231_device::dmv_k231_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 dmv_k234_device::dmv_k234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: dmv_k230_device(mconfig, DMV_K234, "K234 68008", tag, owner, clock, "dmv_k234", __FILE__), m_snr(0)
-	{
+	: dmv_k230_device(mconfig, DMV_K234, tag, owner, clock), m_snr(0)
+{
 }
 
 //-------------------------------------------------
@@ -145,9 +142,7 @@ dmv_k234_device::dmv_k234_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 dmv_k235_device::dmv_k235_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: dmv_k230_device(mconfig, DMV_K235, "K235 8088 with interrupt controller", tag, owner, clock, "dmv_k235", __FILE__),
-		m_pic(*this, "pic8259"),
-		m_dsw(*this, "DSW")
+	: dmv_k230_device(mconfig, DMV_K235, tag, owner, clock), m_pic(*this, "pic8259"), m_dsw(*this, "DSW")
 {
 }
 

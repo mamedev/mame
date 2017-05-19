@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __NES_GGENIE_H
-#define __NES_GGENIE_H
+#ifndef MAME_BUS_NES_GGENIE_H
+#define MAME_BUS_NES_GGENIE_H
+
+#pragma once
 
 #include "nxrom.h"
 
@@ -14,8 +16,6 @@ public:
 	// construction/destruction
 	nes_ggenie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_l) override;
 	virtual DECLARE_READ8_MEMBER(read_m) override;
 	virtual DECLARE_READ8_MEMBER(read_h) override;
@@ -38,6 +38,9 @@ public:
 	virtual void pcb_start(running_machine &machine, uint8_t *ciram_ptr, bool cart_mounted) override;
 
 private:
+	// device-level overrides
+	virtual void device_start() override;
+
 	// emulate the Game Genie!
 	required_device<nes_cart_slot_device> m_ggslot;
 
@@ -51,8 +54,7 @@ private:
 };
 
 
-
 // device type definition
-extern const device_type NES_GGENIE;
+DECLARE_DEVICE_TYPE(NES_GGENIE, nes_ggenie_device)
 
-#endif
+#endif // MAME_BUS_NES_GGENIE_H

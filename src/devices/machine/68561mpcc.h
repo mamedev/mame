@@ -35,8 +35,8 @@
 
 ***************************************************************************/
 
-#ifndef MPCC68561_H
-#define MPCC68561_H
+#ifndef MAME_MACHINE_68561MPCC_H
+#define MAME_MACHINE_68561MPCC_H
 
 
 /* Variant ADD macros - use the right one to enable the right feature set! */
@@ -89,21 +89,19 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-class mpcc_device :  public device_t,
-		public device_serial_interface
+class mpcc_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	mpcc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
 	mpcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_txd_callback(device_t &device, _Object object) { return downcast<mpcc_device &>(device).m_out_txd_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dtr_callback(device_t &device, _Object object) { return downcast<mpcc_device &>(device).m_out_dtr_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_rts_callback(device_t &device, _Object object) { return downcast<mpcc_device &>(device).m_out_rts_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_rtxc_callback(device_t &device, _Object object) { return downcast<mpcc_device &>(device).m_out_rtxc_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_trxc_callback(device_t &device, _Object object) { return downcast<mpcc_device &>(device).m_out_trxc_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_txd_callback(device_t &device, Object &&cb) { return downcast<mpcc_device &>(device).m_out_txd_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_dtr_callback(device_t &device, Object &&cb) { return downcast<mpcc_device &>(device).m_out_dtr_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_rts_callback(device_t &device, Object &&cb) { return downcast<mpcc_device &>(device).m_out_rts_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_rtxc_callback(device_t &device, Object &&cb) { return downcast<mpcc_device &>(device).m_out_rtxc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_trxc_callback(device_t &device, Object &&cb) { return downcast<mpcc_device &>(device).m_out_trxc_cb.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<mpcc_device &>(device).m_out_int_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<mpcc_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
 
 	static void configure_clocks(device_t &device, int rxc, int txc)
 	{
@@ -127,6 +125,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( txc_w ) {} // { m_chanA->txc_w(state); }
 
 protected:
+	mpcc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -197,9 +197,8 @@ protected:
 		TYPE_MPCC68560A = 0x004,
 		TYPE_MPCC68561  = 0x008,
 		TYPE_MPCC68561A = 0x010,
+		SET_TYPE_A      = TYPE_MPCC68560A | TYPE_MPCC68561A
 	};
-
-#define SET_TYPE_A ( mpcc_device::TYPE_MPCC68560A | mpcc_device::TYPE_MPCC68561A )
 
 	// State variables
 	uint32_t m_irq;
@@ -454,16 +453,16 @@ protected:
 
 };
 
+class mpcc68560_device  : public mpcc_device { public: mpcc68560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); };
+class mpcc68560a_device : public mpcc_device { public: mpcc68560a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); };
+class mpcc68561_device  : public mpcc_device { public: mpcc68561_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); };
+class mpcc68561a_device : public mpcc_device { public: mpcc68561a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); };
+
 // device type definition
-extern const device_type MPCC;
-extern const device_type MPCC68560;
-extern const device_type MPCC68560A;
-extern const device_type MPCC68561;
-extern const device_type MPCC68561A;
+DECLARE_DEVICE_TYPE(MPCC,       mpcc_device)
+DECLARE_DEVICE_TYPE(MPCC68560,  mpcc68560_device)
+DECLARE_DEVICE_TYPE(MPCC68560A, mpcc68560a_device)
+DECLARE_DEVICE_TYPE(MPCC68561,  mpcc68561_device)
+DECLARE_DEVICE_TYPE(MPCC68561A, mpcc68561a_device)
 
-class mpcc68560_device  : public mpcc_device { public : mpcc68560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); };
-class mpcc68560A_device : public mpcc_device { public : mpcc68560A_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); };
-class mpcc68561_device  : public mpcc_device { public : mpcc68561_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); };
-class mpcc68561A_device : public mpcc_device { public : mpcc68561A_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock); };
-
-#endif // MPCC68561_H
+#endif // MAME_MACHINE_68561MPCC_H

@@ -336,8 +336,8 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PC_KBD_KEYTRONIC_PC3270       = device_creator<pc_kbd_keytronic_pc3270_device>;
-const device_type PC_KBD_KEYTRONIC_PC3270_AT    = device_creator<pc_kbd_keytronic_pc3270_at_device>;
+DEFINE_DEVICE_TYPE(PC_KBD_KEYTRONIC_PC3270,    pc_kbd_keytronic_pc3270_device,    "keytronic_pc3270",    "Keytronic PC3270")
+DEFINE_DEVICE_TYPE(PC_KBD_KEYTRONIC_PC3270_AT, pc_kbd_keytronic_pc3270_at_device, "keytronic_pc3270_at", "Keytronic PC3270 AT")
 
 
 /*****************************************************************************
@@ -378,7 +378,7 @@ ROM_END
 
 
 pc_kbd_keytronic_pc3270_device::pc_kbd_keytronic_pc3270_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	pc_kbd_keytronic_pc3270_device(mconfig, PC_KBD_KEYTRONIC_PC3270, "Keytronic PC3270", tag, owner, clock, "keytronic_pc3270", __FILE__)
+	pc_kbd_keytronic_pc3270_device(mconfig, PC_KBD_KEYTRONIC_PC3270, tag, owner, clock)
 {
 }
 
@@ -386,13 +386,10 @@ pc_kbd_keytronic_pc3270_device::pc_kbd_keytronic_pc3270_device(const machine_con
 pc_kbd_keytronic_pc3270_device::pc_kbd_keytronic_pc3270_device(
 		machine_config const &mconfig,
 		device_type type,
-		char const *name,
 		char const *tag,
 		device_t *owner,
-		uint32_t clock,
-		char const *shortname,
-		char const *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_pc_kbd_interface(mconfig, *this),
 	m_cpu(*this, "kb_keytr"), m_p1(0), m_p1_data(0), m_p2(0), m_p3(0), m_last_write_addr(0)
 {
@@ -400,7 +397,7 @@ pc_kbd_keytronic_pc3270_device::pc_kbd_keytronic_pc3270_device(
 
 
 pc_kbd_keytronic_pc3270_at_device::pc_kbd_keytronic_pc3270_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	pc_kbd_keytronic_pc3270_device(mconfig, PC_KBD_KEYTRONIC_PC3270_AT, "Keytronic PC3270 AT", tag, owner, clock, "keytronic_pc3270_at", __FILE__)
+	pc_kbd_keytronic_pc3270_device(mconfig, PC_KBD_KEYTRONIC_PC3270_AT, tag, owner, clock)
 {
 }
 

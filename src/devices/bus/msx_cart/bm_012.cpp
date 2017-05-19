@@ -19,11 +19,11 @@ TODO:
 #include "cpu/z80/z80.h"
 
 
-const device_type MSX_CART_BM_012 = device_creator<msx_cart_bm_012>;
+DEFINE_DEVICE_TYPE(MSX_CART_BM_012, msx_cart_bm_012_device, "msx_cart_bm_012", "MSX Cartridge - BM-012")
 
 
-msx_cart_bm_012::msx_cart_bm_012(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_BM_012, "MSX Cartridge - BM-012", tag, owner, clock, "msx_cart_bm_012", __FILE__)
+msx_cart_bm_012_device::msx_cart_bm_012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSX_CART_BM_012, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_tmpz84c015af(*this, "tmpz84c015af")
 	, m_bm012_pio(*this, "bm012_pio")
@@ -32,7 +32,7 @@ msx_cart_bm_012::msx_cart_bm_012(const machine_config &mconfig, const char *tag,
 }
 
 
-static ADDRESS_MAP_START( bm_012_memory_map, AS_PROGRAM, 8, msx_cart_bm_012 )
+static ADDRESS_MAP_START( bm_012_memory_map, AS_PROGRAM, 8, msx_cart_bm_012_device )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -69,7 +69,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_cart_bm_012 )
 
 	// MIDI ports
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(msx_cart_bm_012, midi_in))
+	MCFG_MIDI_RX_HANDLER(WRITELINE(msx_cart_bm_012_device, midi_in))
 
 	MCFG_MIDI_PORT_ADD("mdthru", midiout_slot, "midiout")
 
@@ -77,7 +77,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_cart_bm_012 )
 MACHINE_CONFIG_END
 
 
-machine_config_constructor msx_cart_bm_012::device_mconfig_additions() const
+machine_config_constructor msx_cart_bm_012_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( msx_cart_bm_012 );
 }
@@ -90,13 +90,13 @@ ROM_START( msx_cart_bm_012 )
 ROM_END
 
 
-const tiny_rom_entry *msx_cart_bm_012::device_rom_region() const
+const tiny_rom_entry *msx_cart_bm_012_device::device_rom_region() const
 {
 	return ROM_NAME( msx_cart_bm_012 );
 }
 
 
-void msx_cart_bm_012::device_start()
+void msx_cart_bm_012_device::device_start()
 {
 	// Install IO read/write handlers
 	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
@@ -105,7 +105,7 @@ void msx_cart_bm_012::device_start()
 }
 
 
-WRITE_LINE_MEMBER(msx_cart_bm_012::midi_in)
+WRITE_LINE_MEMBER(msx_cart_bm_012_device::midi_in)
 {
 	m_mdthru->write_txd(state);
 	m_tmpz84c015af->rxb_w(state);

@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 
+#ifndef MAME_BUS_NEOGEO_PROT_FATFURY2_H
+#define MAME_BUS_NEOGEO_PROT_FATFURY2_H
+
 #pragma once
 
-#ifndef __FATFURY2_PROT__
-#define __FATFURY2_PROT__
-
-extern const device_type FATFURY2_PROT;
+DECLARE_DEVICE_TYPE(NG_FATFURY2_PROT, fatfury2_prot_device)
 
 #define MCFG_FATFURY2_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, FATFURY2_PROT, 0)
+	MCFG_DEVICE_ADD(_tag, NG_FATFURY2_PROT, 0)
 
 
 class fatfury2_prot_device :  public device_t
@@ -21,11 +21,11 @@ public:
 	DECLARE_READ16_MEMBER( protection_r );
 	DECLARE_WRITE16_MEMBER( protection_w );
 
-	uint32_t     m_prot_data;
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	uint32_t     m_prot_data;
 };
 
-#endif
+#endif // MAME_BUS_NEOGEO_PROT_FATFURY2_H

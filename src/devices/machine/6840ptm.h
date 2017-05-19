@@ -8,11 +8,10 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_6840PTM_H
+#define MAME_MACHINE_6840PTM_H
+
 #pragma once
-
-#ifndef __6840PTM_H__
-#define __6840PTM_H__
-
 
 
 
@@ -48,8 +47,8 @@ public:
 	ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_external_clocks(device_t &device, double clock0, double clock1, double clock2) { downcast<ptm6840_device &>(device).m_external_clock[0] = clock0; downcast<ptm6840_device &>(device).m_external_clock[1] = clock1; downcast<ptm6840_device &>(device).m_external_clock[2] = clock2; }
-	template<class _Object> static devcb_base &set_out_callback(device_t &device, int index, _Object object) { return downcast<ptm6840_device &>(device).m_out_cb[index].set_callback(object); }
-	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<ptm6840_device &>(device).m_irq_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_callback(device_t &device, int index, Object &&cb) { return downcast<ptm6840_device &>(device).m_out_cb[index].set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<ptm6840_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	int status(int clock) const { return m_enabled[clock]; } // get whether timer is enabled
 	int irq_state() const { return m_irq; }                 // get IRQ state
@@ -151,7 +150,6 @@ private:
 
 
 // device type definition
-extern const device_type PTM6840;
+DECLARE_DEVICE_TYPE(PTM6840, ptm6840_device)
 
-
-#endif /* __6840PTM_H__ */
+#endif // MAME_MACHINE_6840PTM_H

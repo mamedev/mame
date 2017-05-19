@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_IEEE488_C2031_H
+#define MAME_BUS_IEEE488_C2031_H
 
-#ifndef __C2031__
-#define __C2031__
+#pragma once
 
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
@@ -79,8 +79,7 @@ protected:
 
 
 // device type definition
-extern const device_type C2031;
+DECLARE_DEVICE_TYPE(C2031, c2031_device)
 
 
-
-#endif
+#endif // MAME_BUS_IEEE488_C2031_H

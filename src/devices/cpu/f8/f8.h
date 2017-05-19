@@ -7,15 +7,24 @@
  *
  *****************************************************************************/
 
+#ifndef MAME_CPU_F8_F8_H
+#define MAME_CPU_F8_F8_H
+
 #pragma once
 
-#ifndef __F8_H__
-#define _F8_H
 
+#define F8_INPUT_LINE_INT_REQ   1
 
-enum
+class f8_cpu_device : public cpu_device
 {
-	F8_PC0=1, F8_PC1, F8_DC0, F8_DC1, F8_W, F8_A, F8_IS,
+public:
+	// construction/destruction
+	f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	enum
+	{
+		F8_PC0=1, F8_PC1, F8_DC0, F8_DC1, F8_W, F8_A, F8_IS,
 		F8_J, F8_HU, F8_HL, F8_KU, F8_KL, F8_QU, F8_QL,
 
 		F8_R0, F8_R1, F8_R2, F8_R3, F8_R4, F8_R5, F8_R6, F8_R7, F8_R8,
@@ -25,17 +34,8 @@ enum
 		F8_R40, F8_R41, F8_R42, F8_R43, F8_R44, F8_R45, F8_R46, F8_R47,
 		F8_R48, F8_R49, F8_R50, F8_R51, F8_R52, F8_R53, F8_R54, F8_R55,
 		F8_R56, F8_R57, F8_R58, F8_R59, F8_R60, F8_R61, F8_R62, F8_R63
-};
+	};
 
-#define F8_INPUT_LINE_INT_REQ   1
-
-class f8_cpu_device :  public cpu_device
-{
-public:
-	// construction/destruction
-	f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -211,7 +211,6 @@ private:
 };
 
 
-extern const device_type F8;
+DECLARE_DEVICE_TYPE(F8, f8_cpu_device)
 
-
-#endif /* __F8_H__ */
+#endif // MAME_CPU_F8_F8_H

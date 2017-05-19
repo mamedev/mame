@@ -5,10 +5,10 @@
  *
  */
 
-#pragma once
+#ifndef MAME_BUS_CENTRONICS_EPSON_LX810L_H
+#define MAME_BUS_CENTRONICS_EPSON_LX810L_H
 
-#ifndef __EPSON_LX810L__
-#define __EPSON_LX810L__
+#pragma once
 
 #include "ctronics.h"
 #include "cpu/upd7810/upd7810.h"
@@ -33,18 +33,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> epson_lx810l_t
+// ======================> epson_lx810l_device
 
-class epson_lx810l_t : public device_t,
-						public device_centronics_peripheral_interface
+class epson_lx810l_device : public device_t, public device_centronics_peripheral_interface
 {
 public:
 	// construction/destruction
-	epson_lx810l_t(const machine_config &mconfig, const char *tag,
-					device_t *owner, uint32_t clock);
-	epson_lx810l_t(const machine_config &mconfig, device_type type,
-					const char *name, const char *tag, device_t *owner,
-					uint32_t clock, const char *shortname, const char *source);
+	epson_lx810l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -106,6 +101,8 @@ public:
 	unsigned int bitmap_line(int i) { return ((uabs(m_pf_pos_abs) / 6) + i) % m_bitmap.height(); }
 
 protected:
+	epson_lx810l_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -137,11 +134,11 @@ private:
 
 // ======================> epson_ap2000_t
 
-class epson_ap2000_t : public epson_lx810l_t
+class epson_ap2000_device : public epson_lx810l_device
 {
 public:
 	// construction/destruction
-	epson_ap2000_t(const machine_config &mconfig, const char *tag,
+	epson_ap2000_device(const machine_config &mconfig, const char *tag,
 					device_t *owner, uint32_t clock);
 
 	// optional information overrides
@@ -150,7 +147,7 @@ public:
 
 
 // device type definition
-extern const device_type EPSON_LX810L;
-extern const device_type EPSON_AP2000;
+DECLARE_DEVICE_TYPE(EPSON_LX810L, epson_lx810l_device)
+DECLARE_DEVICE_TYPE(EPSON_AP2000, epson_ap2000_device)
 
-#endif
+#endif // MAME_BUS_CENTRONICS_EPSON_LX810L_H

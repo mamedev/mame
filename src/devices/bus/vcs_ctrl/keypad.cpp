@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VCS_KEYPAD = device_creator<vcs_keypad_device>;
+DEFINE_DEVICE_TYPE(VCS_KEYPAD, vcs_keypad_device, "vcs_keypad", "Atari / CBM Keypad")
 
 
 static INPUT_PORTS_START( vcs_keypad )
@@ -55,9 +55,10 @@ ioport_constructor vcs_keypad_device::device_input_ports() const
 //-------------------------------------------------
 
 vcs_keypad_device::vcs_keypad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VCS_KEYPAD, "Atari / CBM Keypad", tag, owner, clock, "vcs_keypad", __FILE__),
+	device_t(mconfig, VCS_KEYPAD, tag, owner, clock),
 	device_vcs_control_port_interface(mconfig, *this),
-	m_keypad(*this, "KEYPAD"), m_column(0)
+	m_keypad(*this, "KEYPAD"),
+	m_column(0)
 {
 }
 

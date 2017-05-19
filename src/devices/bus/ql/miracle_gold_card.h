@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_QL_MIRACLE_GOLD_CARD_H
+#define MAME_BUS_QL_MIRACLE_GOLD_CARD_H
 
-#ifndef __MIRACLE_GOLD_CARD__
-#define __MIRACLE_GOLD_CARD__
+#pragma once
 
 #include "exp.h"
 
@@ -19,14 +19,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> miracle_gold_card_t
+// ======================> miracle_gold_card_device
 
-class miracle_gold_card_t : public device_t,
-							public device_ql_expansion_card_interface
+class miracle_gold_card_device : public device_t, public device_ql_expansion_card_interface
 {
 public:
 	// construction/destruction
-	miracle_gold_card_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	miracle_gold_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -43,8 +42,6 @@ protected:
 
 
 // device type definition
-extern const device_type MIRACLE_GOLD_CARD;
+DECLARE_DEVICE_TYPE(MIRACLE_GOLD_CARD, miracle_gold_card_device)
 
-
-
-#endif
+#endif // MAME_BUS_QL_MIRACLE_GOLD_CARD_H

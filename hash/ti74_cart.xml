@@ -7,8 +7,6 @@
 
     Not dumped yet:
     - Chemical Engineering
-    - Finance
-    - Mathematics
     - Statistics
 
     Not included in list:
@@ -16,6 +14,30 @@
 
 -->
 
+
+	<software name="finance">
+		<description>Finance</description>
+		<year>1985</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="usage" value="Load with RUN &quot;DIR&quot;, then load program from list" />
+		<part name="cart" interface="ti74_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="finance.bin" size="0x8000" crc="36afa310" sha1="a051c393f35f11ef51dc8c4e785e6fec0eb4d774" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maths">
+		<description>Mathematics</description>
+		<year>1985</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="usage" value="Load with RUN &quot;DIR&quot;, then load program from list" />
+		<part name="cart" interface="ti74_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="mathematics.bin" size="0x8000" crc="afb0821f" sha1="9fc3b054df0fdc93eab3e7824f28d4f733f97547" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="pascal">
 		<description>Learn Pascal</description>

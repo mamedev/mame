@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __A78_SLOT_H
-#define __A78_SLOT_H
+#ifndef MAME_BUS_A7800_A78_SLOT_H
+#define MAME_BUS_A7800_A78_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -43,7 +45,6 @@ class device_a78_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_a78_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_a78_cart_interface();
 
 	// memory accessor
@@ -67,6 +68,8 @@ public:
 	uint32_t get_nvram_size() { return m_nvram.size(); }
 
 protected:
+	device_a78_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -114,7 +117,7 @@ public:
 	virtual device_image_partialhash_func get_partial_hash() const override { return &a78_partialhash; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_04xx);
@@ -131,13 +134,13 @@ private:
 	int m_type;
 
 	image_verify_result verify_header(char *header);
-	int validate_header(int head, bool log);
+	int validate_header(int head, bool log) const;
 	void internal_header_logging(uint8_t *header, uint32_t len);
 };
 
 
 // device type definition
-extern const device_type A78_CART_SLOT;
+DECLARE_DEVICE_TYPE(A78_CART_SLOT, a78_cart_slot_device)
 
 
 /***************************************************************************
@@ -151,4 +154,4 @@ extern const device_type A78_CART_SLOT;
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
-#endif
+#endif // MAME_BUS_A7800_A78_SLOT_H

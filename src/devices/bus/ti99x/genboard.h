@@ -10,51 +10,24 @@
     February 2012: Rewritten as class
 
 *****************************************************************************/
-#ifndef __GENBOARD__
-#define __GENBOARD__
+#ifndef MAME_BUS_TI99X_GENBOARD_H
+#define MAME_BUS_TI99X_GENBOARD_H
+
+#pragma once
 
 #include "ti99defs.h"
 #include "machine/mm58274c.h"
 #include "video/v9938.h"
 #include "cpu/tms9900/tms9995.h"
 #include "machine/at29x.h"
-#include "bus/ti99_peb/peribox.h"
+#include "bus/ti99/peb/peribox.h"
 #include "sound/sn76496.h"
 #include "machine/ram.h"
 
-extern const device_type GENEVE_MOUSE;
-extern const device_type GENEVE_KEYBOARD;
-extern const device_type GENEVE_MAPPER;
+DECLARE_DEVICE_TYPE(GENEVE_KEYBOARD, geneve_keyboard_device)
+DECLARE_DEVICE_TYPE(GENEVE_MAPPER,   geneve_mapper_device)
 
 /*****************************************************************************/
-
-class geneve_mouse_device : public device_t
-{
-public:
-	geneve_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void poll();
-	line_state  left_button();  // left button is not connected to the V9938 but to a TMS9901 pin
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
-
-private:
-	v9938_device*   m_v9938;
-	int             m_last_mx;
-	int             m_last_my;
-};
-
-#define MCFG_GENEVE_MOUSE_ADD(_tag )    \
-	MCFG_DEVICE_ADD(_tag, GENEVE_MOUSE, 0)
-
-/*****************************************************************************/
-
-#define KEYQUEUESIZE 256
-#define MAXKEYMSGLENGTH 10
-#define KEYAUTOREPEATDELAY 30
-#define KEYAUTOREPEATRATE 6
 
 class geneve_keyboard_device : public device_t
 {
@@ -65,16 +38,23 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( clock_control );
 	uint8_t get_recent_key();
 
-	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<geneve_keyboard_device &>(device).m_interrupt.set_callback(object); }
+	template <class Object> static devcb_base &static_set_int_callback(device_t &device, Object &&cb) { return downcast<geneve_keyboard_device &>(device).m_interrupt.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	void               device_start() override;
 	void               device_reset() override;
 	ioport_constructor device_input_ports() const override;
-	devcb_write_line  m_interrupt;    // Keyboard interrupt to console
 	void               device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	devcb_write_line  m_interrupt;    // Keyboard interrupt to console
+	required_ioport_array<8> m_keys;
+
 private:
+	static constexpr unsigned KEYQUEUESIZE = 256;
+	static constexpr unsigned MAXKEYMSGLENGTH = 10;
+	static constexpr unsigned KEYAUTOREPEATDELAY = 30;
+	static constexpr unsigned KEYAUTOREPEATRATE = 6;
+
 	void    post_in_key_queue(int keycode);
 	void    signal_when_key_available();
 	void    poll();
@@ -133,7 +113,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pfm_select_msb );
 	DECLARE_WRITE_LINE_MEMBER( pfm_output_enable );
 
-	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object) {  return downcast<geneve_mapper_device &>(device).m_ready.set_callback(object); }
+	template <class Object> static devcb_base &static_set_ready_callback(device_t &device, Object &&cb) { return downcast<geneve_mapper_device &>(device).m_ready.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	void    device_start() override;
@@ -219,4 +199,4 @@ private:
 #define MCFG_GENEVE_READY_HANDLER( _intcallb ) \
 	devcb = &geneve_mapper_device::static_set_ready_callback( *device, DEVCB_##_intcallb );
 
-#endif
+#endif // MAME_BUS_TI99X_GENBOARD_H

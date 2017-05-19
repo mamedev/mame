@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef __NSCSI_CD_H__
-#define __NSCSI_CD_H__
+#ifndef MAME_MACHINE_NSCSI_CD_H
+#define MAME_MACHINE_NSCSI_CD_H
+
+#pragma once
 
 #include "machine/nscsi_bus.h"
 #include "cdrom.h"
@@ -28,6 +30,6 @@ private:
 	void return_no_cd();
 };
 
-extern const device_type NSCSI_CDROM;
+DECLARE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device)
 
-#endif
+#endif // MAME_MACHINE_NSCSI_CD_H

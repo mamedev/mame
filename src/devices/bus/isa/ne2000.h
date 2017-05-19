@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef __NE2000_H__
-#define __NE2000_H__
+#ifndef MAME_BUS_ISA_NE2000_H
+#define MAME_BUS_ISA_NE2000_H
+
+#pragma once
 
 #include "isa.h"
 #include "machine/dp8390.h"
@@ -29,6 +31,6 @@ private:
 	uint8_t m_prom[16];
 };
 
-extern const device_type NE2000;
+DECLARE_DEVICE_TYPE(NE2000, ne2000_device)
 
-#endif
+#endif // MAME_BUS_ISA_NE2000_H

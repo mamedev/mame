@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ABCKB_ABC800KB_H
+#define MAME_BUS_ABCKB_ABC800KB_H
 
-#ifndef __ABC800_KEYBOARD__
-#define __ABC800_KEYBOARD__
+#pragma once
 
 
 #include "cpu/mcs48/mcs48.h"
@@ -43,7 +43,7 @@ public:
 	DECLARE_READ8_MEMBER( kb_p1_r );
 	DECLARE_WRITE8_MEMBER( kb_p1_w );
 	DECLARE_WRITE8_MEMBER( kb_p2_w );
-	DECLARE_READ8_MEMBER( kb_t1_r );
+	DECLARE_READ_LINE_MEMBER( kb_t1_r );
 
 protected:
 	// device-level overrides
@@ -71,8 +71,6 @@ private:
 
 
 // device type definition
-extern const device_type ABC800_KEYBOARD;
+DECLARE_DEVICE_TYPE(ABC800_KEYBOARD, abc800_keyboard_device)
 
-
-
-#endif
+#endif // MAME_BUS_ABCKB_ABC800KB_H

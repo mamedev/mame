@@ -17,18 +17,19 @@
 //  neogeo_rom_device - constructor
 //-------------------------------------------------
 
-const device_type NEOGEO_ROM = device_creator<neogeo_rom_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_ROM, neogeo_rom_device, "neocart_rom", "Neo Geo Standard Carts")
 
 
-neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint16_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_neogeo_cart_interface(mconfig, *this)
-{}
+neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint16_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_neogeo_cart_interface(mconfig, *this)
+{
+}
 
 neogeo_rom_device::neogeo_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
-		device_t(mconfig, NEOGEO_ROM, "Neo Geo Standard Carts", tag, owner, clock, "neocart_rom", __FILE__),
-		device_neogeo_cart_interface(mconfig, *this)
-{}
+	neogeo_rom_device(mconfig, NEOGEO_ROM, tag, owner, clock)
+{
+}
 
 
 //-------------------------------------------------
@@ -69,19 +70,20 @@ WRITE16_MEMBER(neogeo_rom_device::banksel_w)
  V-Liner : this is plain NeoGeo cart + RAM
  **************************************************/
 
-const device_type NEOGEO_VLINER_CART = device_creator<neogeo_vliner_cart>;
+DEFINE_DEVICE_TYPE(NEOGEO_VLINER_CART, neogeo_vliner_cart_device, "neocart_vliner", "Neo Geo V-Liner Cart")
 
-neogeo_vliner_cart::neogeo_vliner_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	neogeo_rom_device(mconfig, NEOGEO_VLINER_CART, "Neo Geo V-Liner Cart", tag, owner, clock, "neocart_vliner", __FILE__)
-{}
+neogeo_vliner_cart_device::neogeo_vliner_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	neogeo_rom_device(mconfig, NEOGEO_VLINER_CART, tag, owner, clock)
+{
+}
 
 
-void neogeo_vliner_cart::device_start()
+void neogeo_vliner_cart_device::device_start()
 {
 	save_item(NAME(m_cart_ram));
 }
 
-void neogeo_vliner_cart::device_reset()
+void neogeo_vliner_cart_device::device_reset()
 {
 	memset(m_cart_ram, 0, 0x2000);
 }

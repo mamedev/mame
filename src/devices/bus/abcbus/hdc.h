@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ABCBUS_HDC_H
+#define MAME_BUS_ABCBUS_HDC_H
 
-#ifndef __ABC_HDC__
-#define __ABC_HDC__
+#pragma once
 
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
@@ -49,8 +49,6 @@ private:
 
 
 // device type definition
-extern const device_type ABC_HDC;
+DECLARE_DEVICE_TYPE(ABC_HDC, abc_hdc_device)
 
-
-
-#endif
+#endif // MAME_BUS_ABCBUS_HDC_H

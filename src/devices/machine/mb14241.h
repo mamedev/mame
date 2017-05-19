@@ -6,8 +6,10 @@
 
  *****************************************************************************/
 
-#ifndef __MB14241_H__
-#define __MB14241_H__
+#ifndef MAME_MACHINE_MB14241_H
+#define MAME_MACHINE_MB14241_H
+
+#pragma once
 
 
 class mb14241_device : public device_t
@@ -15,8 +17,8 @@ class mb14241_device : public device_t
 public:
 	mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER ( shift_count_w );
-	DECLARE_WRITE8_MEMBER ( shift_data_w );
+	DECLARE_WRITE8_MEMBER( shift_count_w );
+	DECLARE_WRITE8_MEMBER( shift_data_w );
 	DECLARE_READ8_MEMBER( shift_result_r );
 
 protected:
@@ -31,7 +33,7 @@ private:
 	uint8_t m_shift_count;  /* 3 bits */
 };
 
-extern const device_type MB14241;
+DECLARE_DEVICE_TYPE(MB14241, mb14241_device)
 
 
 /***************************************************************************
@@ -41,4 +43,4 @@ extern const device_type MB14241;
 #define MCFG_MB14241_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, MB14241, 0)
 
-#endif /* __MB14241_H__ */
+#endif // MAME_MACHINE_MB14241_H

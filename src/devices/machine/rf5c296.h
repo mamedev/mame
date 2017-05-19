@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#pragma once
+#ifndef MAME_MACHINE_RF5C296_H
+#define MAME_MACHINE_RF5C296_H
 
-#ifndef __RF5C296_H__
-#define __RF5C296_H__
+#pragma once
 
 #include "pccard.h"
 
@@ -36,6 +36,6 @@ private:
 	const char *m_pccard_name;
 };
 
-extern const device_type RF5C296;
+DECLARE_DEVICE_TYPE(RF5C296, rf5c296_device)
 
-#endif
+#endif // MAME_MACHINE_RF5C296_H

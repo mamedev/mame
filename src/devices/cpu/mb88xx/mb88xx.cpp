@@ -16,17 +16,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "mb88xx.h"
+#include "debugger.h"
 
 
-const device_type MB88 = device_creator<mb88_cpu_device>;
-const device_type MB88201 = device_creator<mb88201_cpu_device>;
-const device_type MB88202 = device_creator<mb88202_cpu_device>;
-const device_type MB8841 = device_creator<mb8841_cpu_device>;
-const device_type MB8842 = device_creator<mb8842_cpu_device>;
-const device_type MB8843 = device_creator<mb8843_cpu_device>;
-const device_type MB8844 = device_creator<mb8844_cpu_device>;
+DEFINE_DEVICE_TYPE(MB88,    mb88_cpu_device,    "mb88xx",  "MB88xx");
+DEFINE_DEVICE_TYPE(MB88201, mb88201_cpu_device, "mb88201", "MB88201")
+DEFINE_DEVICE_TYPE(MB88202, mb88202_cpu_device, "mb88202", "MB88202")
+DEFINE_DEVICE_TYPE(MB8841,  mb8841_cpu_device,  "mb8841",  "MB8841")
+DEFINE_DEVICE_TYPE(MB8842,  mb8842_cpu_device,  "mb8842",  "MB8842")
+DEFINE_DEVICE_TYPE(MB8843,  mb8843_cpu_device,  "mb8843",  "MB8843")
+DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "MB8844")
 
 
 /***************************************************************************
@@ -110,7 +110,7 @@ ADDRESS_MAP_END
 
 
 mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, MB88, "MB88xx", tag, owner, clock, "mb88xx", __FILE__)
+	: cpu_device(mconfig, MB88, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 11, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 7, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 3, 0)
@@ -119,46 +119,46 @@ mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, const char *tag,
 }
 
 
-mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int program_width, int data_width)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_BIG, 8, program_width, 0, ( (program_width == 9) ? ADDRESS_MAP_NAME(program_9bit) : (program_width == 10) ? ADDRESS_MAP_NAME(program_10bit) : ADDRESS_MAP_NAME(program_11bit) ) )
-	, m_data_config("data", ENDIANNESS_BIG, 8, data_width, 0, ( (data_width == 4) ? ADDRESS_MAP_NAME(data_4bit) : (data_width == 5) ? ADDRESS_MAP_NAME(data_5bit) : (data_width == 6) ? ADDRESS_MAP_NAME(data_6bit) : ADDRESS_MAP_NAME(data_7bit) ) )
+mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 8, program_width, 0, (program_width == 9) ? ADDRESS_MAP_NAME(program_9bit) : (program_width == 10) ? ADDRESS_MAP_NAME(program_10bit) : ADDRESS_MAP_NAME(program_11bit))
+	, m_data_config("data", ENDIANNESS_BIG, 8, data_width, 0, (data_width == 4) ? ADDRESS_MAP_NAME(data_4bit) : (data_width == 5) ? ADDRESS_MAP_NAME(data_5bit) : (data_width == 6) ? ADDRESS_MAP_NAME(data_6bit) : ADDRESS_MAP_NAME(data_7bit))
 	, m_io_config("io", ENDIANNESS_BIG, 8, 3, 0)
 	, m_PLA(nullptr)
 {
 }
 
 mb88201_cpu_device::mb88201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mb88_cpu_device(mconfig, MB88201, "MB88201", tag, owner, clock, "mb88201", __FILE__, 9, 4)
+	: mb88_cpu_device(mconfig, MB88201, tag, owner, clock, 9, 4)
 {
 }
 
 mb88202_cpu_device::mb88202_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mb88_cpu_device(mconfig, MB88202, "MB88202", tag, owner, clock, "mb88202", __FILE__, 10, 5)
+	: mb88_cpu_device(mconfig, MB88202, tag, owner, clock, 10, 5)
 {
 }
 
 
 mb8841_cpu_device::mb8841_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mb88_cpu_device(mconfig, MB8841, "MB8841", tag, owner, clock, "mb8841", __FILE__, 11, 7)
+	: mb88_cpu_device(mconfig, MB8841, tag, owner, clock, 11, 7)
 {
 }
 
 
 mb8842_cpu_device::mb8842_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mb88_cpu_device(mconfig, MB8842, "MB8842", tag, owner, clock, "mb8842", __FILE__, 11, 7)
+	: mb88_cpu_device(mconfig, MB8842, tag, owner, clock, 11, 7)
 {
 }
 
 
 mb8843_cpu_device::mb8843_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mb88_cpu_device(mconfig, MB8843, "MB8843", tag, owner, clock, "mb8843", __FILE__, 10, 6)
+	: mb88_cpu_device(mconfig, MB8843, tag, owner, clock, 10, 6)
 {
 }
 
 
 mb8844_cpu_device::mb8844_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mb88_cpu_device(mconfig, MB8844, "MB8844", tag, owner, clock, "mb8844", __FILE__, 10, 6)
+	: mb88_cpu_device(mconfig, MB8844, tag, owner, clock, 10, 6)
 {
 }
 

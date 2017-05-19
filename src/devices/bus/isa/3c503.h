@@ -2,14 +2,15 @@
 // copyright-holders:Carl
 /* 3com Etherlink II 3c503 */
 
-#ifndef __3C503_H__
-#define __3C503_H__
+#ifndef MAME_BUS_ISA_3C503_H
+#define MAME_BUS_ISA_3C503_H
+
+#pragma once
 
 #include "isa.h"
 #include "machine/dp8390.h"
 
-class el2_3c503_device: public device_t,
-					public device_isa8_card_interface
+class el2_3c503_device : public device_t, public device_isa8_card_interface
 {
 public:
 	el2_3c503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -58,6 +59,6 @@ private:
 	} m_regs;
 };
 
-extern const device_type EL2_3C503;
+DECLARE_DEVICE_TYPE(EL2_3C503, el2_3c503_device)
 
-#endif
+#endif // MAME_BUS_ISA_3C503_H

@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef __DECO16_H__
-#define __DECO16_H__
+#ifndef MAME_CPU_M6502_DECO16_H
+#define MAME_CPU_M6502_DECO16_H
 
 #include "m6502.h"
 
@@ -57,6 +57,6 @@ enum {
 	DECO16_SET_OVERFLOW = m6502_device::V_LINE
 };
 
-extern const device_type DECO16;
+DECLARE_DEVICE_TYPE(DECO16, deco16_device)
 
-#endif
+#endif // MAME_CPU_M6502_DECO16_H

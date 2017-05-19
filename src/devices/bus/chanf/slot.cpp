@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type CHANF_CART_SLOT = device_creator<channelf_cart_slot_device>;
+DEFINE_DEVICE_TYPE(CHANF_CART_SLOT, channelf_cart_slot_device, "chanf_cart_slot", "Fairchild Channel F Cartridge Slot")
 
 //**************************************************************************
 //    Channel F cartridges Interface
@@ -73,10 +73,10 @@ void device_channelf_cart_interface::ram_alloc(uint32_t size)
 //  channelf_cart_slot_device - constructor
 //-------------------------------------------------
 channelf_cart_slot_device::channelf_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, CHANF_CART_SLOT, "Fairchild Channel F Cartridge Slot", tag, owner, clock, "cf_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(CF_CHESS), m_cart(nullptr)
+	device_t(mconfig, CHANF_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(CF_CHESS), m_cart(nullptr)
 {
 }
 
@@ -193,12 +193,12 @@ image_init_result channelf_cart_slot_device::call_load()
  get default card software
  -------------------------------------------------*/
 
-std::string channelf_cart_slot_device::get_default_card_software()
+std::string channelf_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t len = m_file->size();
+		uint32_t len = hook.image_file()->size();
 		int type;
 
 		if (len == 0x40000)
@@ -209,7 +209,6 @@ std::string channelf_cart_slot_device::get_default_card_software()
 		slot_string = chanf_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		return std::string(slot_string);
 	}

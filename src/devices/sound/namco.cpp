@@ -43,12 +43,12 @@
 /* a position of waveform sample */
 #define WAVEFORM_POSITION(n)    (((n) >> m_f_fracbits) & 0x1f)
 
-const device_type NAMCO = device_creator<namco_device>;
-const device_type NAMCO_15XX = device_creator<namco_15xx_device>;
-const device_type NAMCO_CUS30 = device_creator<namco_cus30_device>;
+DEFINE_DEVICE_TYPE(NAMCO,       namco_device,       "namco",       "Namco")
+DEFINE_DEVICE_TYPE(NAMCO_15XX,  namco_15xx_device,  "namco_15xx",  "Namco 15xx")
+DEFINE_DEVICE_TYPE(NAMCO_CUS30, namco_cus30_device, "namco_cus30", "Namco CUS30")
 
-namco_audio_device::namco_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+namco_audio_device::namco_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_wave_ptr(*this, DEVICE_SELF)
 	, m_last_channel(nullptr)
@@ -66,17 +66,17 @@ namco_audio_device::namco_audio_device(const machine_config &mconfig, device_typ
 }
 
 namco_device::namco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: namco_audio_device(mconfig, NAMCO, "Namco", tag, owner, clock, "namco", __FILE__)
+	: namco_audio_device(mconfig, NAMCO, tag, owner, clock)
 {
 }
 
 namco_15xx_device::namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:namco_audio_device(mconfig, NAMCO_15XX, "Namco 15XX", tag, owner, clock, "namco_15xx", __FILE__)
+	:namco_audio_device(mconfig, NAMCO_15XX, tag, owner, clock)
 {
 }
 
 namco_cus30_device::namco_cus30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: namco_audio_device(mconfig, NAMCO_CUS30, "Namco CUS30", tag, owner, clock, "namco_cus30", __FILE__)
+	: namco_audio_device(mconfig, NAMCO_CUS30, tag, owner, clock)
 {
 }
 

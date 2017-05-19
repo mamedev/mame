@@ -23,8 +23,10 @@
 
 ***************************************************************************/
 
-#ifndef __Z80CTC_H__
-#define __Z80CTC_H__
+#ifndef MAME_MACHINE_Z80CTC_H
+#define MAME_MACHINE_Z80CTC_H
+
+#pragma once
 
 #include "cpu/z80/z80daisy.h"
 
@@ -60,10 +62,10 @@ public:
 	// construction/destruction
 	z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_intr_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_intr_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_zc0_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_zc1_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_zc2_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc2_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_intr_callback(device_t &device, Object &&cb) { return downcast<z80ctc_device &>(device).m_intr_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_zc0_callback(device_t &device, Object &&cb) { return downcast<z80ctc_device &>(device).m_zc0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_zc1_callback(device_t &device, Object &&cb) { return downcast<z80ctc_device &>(device).m_zc1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_zc2_callback(device_t &device, Object &&cb) { return downcast<z80ctc_device &>(device).m_zc2_cb.set_callback(std::forward<Object>(cb)); }
 
 	// read/write handlers
 	DECLARE_READ8_MEMBER( read );
@@ -130,7 +132,7 @@ private:
 
 
 // device type definition
-extern const device_type Z80CTC;
+DECLARE_DEVICE_TYPE(Z80CTC, z80ctc_device)
 
 
-#endif
+#endif // MAME_MACHINE_Z80CTC_H

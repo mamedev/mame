@@ -33,7 +33,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A78_CART_SLOT = device_creator<a78_cart_slot_device>;
+DEFINE_DEVICE_TYPE(A78_CART_SLOT, a78_cart_slot_device, "a78_cart_slot", "Atari 7800 Cartridge Slot")
 
 
 //-------------------------------------------------
@@ -112,10 +112,12 @@ void device_a78_cart_interface::nvram_alloc(uint32_t size)
 //-------------------------------------------------
 //  a78_cart_slot_device - constructor
 //-------------------------------------------------
-a78_cart_slot_device::a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, A78_CART_SLOT, "Atari 7800 Cartridge Slot", tag, owner, clock, "a78_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)
+a78_cart_slot_device::a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, A78_CART_SLOT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_slot_interface(mconfig, *this)
+	, m_cart(nullptr)
+	, m_type(0)
 {
 }
 
@@ -143,7 +145,7 @@ void a78_cart_slot_device::device_start()
  call load
  -------------------------------------------------*/
 
-int a78_cart_slot_device::validate_header(int head, bool log)
+int a78_cart_slot_device::validate_header(int head, bool log) const
 {
 	switch (head & 0x3d)
 	{
@@ -511,16 +513,16 @@ image_verify_result a78_cart_slot_device::verify_header(char *header)
  get default card software
  -------------------------------------------------*/
 
-std::string a78_cart_slot_device::get_default_card_software()
+std::string a78_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
 		std::vector<uint8_t> head(128);
 		int type = A78_TYPE0, mapper;
 
 		// Load and check the header
-		m_file->read(&head[0], 128);
+		hook.image_file()->read(&head[0], 128);
 
 		// let's try to auto-fix some common errors in the header
 		mapper = validate_header((head[53] << 8) | head[54], false);
@@ -541,7 +543,7 @@ std::string a78_cart_slot_device::get_default_card_software()
 				break;
 			case 0x0022:
 			case 0x0026:
-				if (m_file->size() > 0x40000)
+				if (hook.image_file()->size() > 0x40000)
 					type = A78_MEGACART;
 				else
 					type = A78_VERSABOARD;
@@ -568,8 +570,6 @@ std::string a78_cart_slot_device::get_default_card_software()
 
 		logerror("Cart type: %x\n", type);
 		slot_string = a78_get_slot(type);
-
-		clear();
 
 		return std::string(slot_string);
 	}

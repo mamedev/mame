@@ -23,10 +23,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_ADC0808_H
+#define MAME_MACHINE_ADC0808_H
 
-#ifndef __ADC0808__
-#define __ADC0808__
+#pragma once
 
 
 
@@ -36,7 +36,6 @@
 
 // ======================> adc0808_analog_read
 
-typedef device_delegate<double ()> adc0808_analog_read_delegate;
 #define ADC0808_ANALOG_READ_CB(name)  double name()
 
 
@@ -44,54 +43,56 @@ typedef device_delegate<double ()> adc0808_analog_read_delegate;
 	devcb = &adc0808_device::set_out_eoc_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_ADC0808_IN_VREF_POS_CB(_class, _method) \
-	adc0808_device::set_in_vref_pos_callback(*device, adc0808_analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_vref_pos_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_ADC0808_IN_VREF_NEG_CB(_class, _method) \
-	adc0808_device::set_in_vref_neg_callback(*device, adc0808_analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_vref_neg_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_ADC0808_IN_IN_0_CB(_class, _method) \
-	adc0808_device::set_in_in_0_callback(*device, adc0808_analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_0_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_ADC0808_IN_IN_1_CB(_class, _method) \
-	adc0808_device::set_in_in_1_callback(*device, adc0808_analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_1_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_ADC0808_IN_IN_2_CB(_class, _method) \
-	adc0808_device::set_in_in_2_callback(*device, adc0808_analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_2_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_ADC0808_IN_IN_3_CB(_class, _method) \
-	adc0808_device::set_in_in_3_callback(*device, adc0808_analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_3_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_ADC0808_IN_IN_4_CB(_class, _method) \
-	adc0808_device::set_in_in_4_callback(*device, adc0808_analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_4_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_ADC0808_IN_IN_5_CB(_class, _method) \
-	adc0808_device::set_in_in_5_callback(*device, adc0808_analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_5_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_ADC0808_IN_IN_6_CB(_class, _method) \
-	adc0808_device::set_in_in_6_callback(*device, adc0808_analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_6_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_ADC0808_IN_IN_7_CB(_class, _method) \
-	adc0808_device::set_in_in_7_callback(*device, adc0808_analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc0808_device::set_in_in_7_callback(*device, adc0808_device::analog_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 // ======================> adc0808_device
 
 class adc0808_device :  public device_t
 {
 public:
+	typedef device_delegate<double ()> analog_read_delegate;
+
 	// construction/destruction
 	adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_eoc_callback(device_t &device, _Object object) { return downcast<adc0808_device &>(device).m_out_eoc_cb.set_callback(object); }
-	static void set_in_vref_pos_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_vref_pos_cb = callback; }
-	static void set_in_vref_neg_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_vref_neg_cb = callback; }
-	static void set_in_in_0_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_in_0_cb = callback; }
-	static void set_in_in_1_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_in_1_cb = callback; }
-	static void set_in_in_2_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_in_2_cb = callback; }
-	static void set_in_in_3_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_in_3_cb = callback; }
-	static void set_in_in_4_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_in_4_cb = callback; }
-	static void set_in_in_5_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_in_5_cb = callback; }
-	static void set_in_in_6_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_in_6_cb = callback; }
-	static void set_in_in_7_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_in_7_cb = callback; }
+	template <class Object> static devcb_base &set_out_eoc_callback(device_t &device, Object &&cb) { return downcast<adc0808_device &>(device).m_out_eoc_cb.set_callback(std::forward<Object>(cb)); }
+	static void set_in_vref_pos_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_vref_pos_cb = std::move(cb); }
+	static void set_in_vref_neg_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_vref_neg_cb = std::move(cb); }
+	static void set_in_in_0_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_0_cb = std::move(cb); }
+	static void set_in_in_1_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_1_cb = std::move(cb); }
+	static void set_in_in_2_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_2_cb = std::move(cb); }
+	static void set_in_in_3_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_3_cb = std::move(cb); }
+	static void set_in_in_4_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_4_cb = std::move(cb); }
+	static void set_in_in_5_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_5_cb = std::move(cb); }
+	static void set_in_in_6_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_6_cb = std::move(cb); }
+	static void set_in_in_7_callback(device_t &device, analog_read_delegate &&cb) { downcast<adc0808_device &>(device).m_in_in_7_cb = std::move(cb); }
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( ale_w );
@@ -104,17 +105,17 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	devcb_write_line           m_out_eoc_cb;
-	adc0808_analog_read_delegate     m_in_vref_pos_cb;
-	adc0808_analog_read_delegate     m_in_vref_neg_cb;
-	adc0808_analog_read_delegate     m_in_in_0_cb;
-	adc0808_analog_read_delegate     m_in_in_1_cb;
-	adc0808_analog_read_delegate     m_in_in_2_cb;
-	adc0808_analog_read_delegate     m_in_in_3_cb;
-	adc0808_analog_read_delegate     m_in_in_4_cb;
-	adc0808_analog_read_delegate     m_in_in_5_cb;
-	adc0808_analog_read_delegate     m_in_in_6_cb;
-	adc0808_analog_read_delegate     m_in_in_7_cb;
+	devcb_write_line        m_out_eoc_cb;
+	analog_read_delegate    m_in_vref_pos_cb;
+	analog_read_delegate    m_in_vref_neg_cb;
+	analog_read_delegate    m_in_in_0_cb;
+	analog_read_delegate    m_in_in_1_cb;
+	analog_read_delegate    m_in_in_2_cb;
+	analog_read_delegate    m_in_in_3_cb;
+	analog_read_delegate    m_in_in_4_cb;
+	analog_read_delegate    m_in_in_5_cb;
+	analog_read_delegate    m_in_in_6_cb;
+	analog_read_delegate    m_in_in_7_cb;
 
 	int m_address;                      // analog channel address
 	int m_start;                        // start conversion pin
@@ -132,8 +133,6 @@ private:
 
 
 // device type definition
-extern const device_type ADC0808;
+DECLARE_DEVICE_TYPE(ADC0808, adc0808_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_ADC0808_H

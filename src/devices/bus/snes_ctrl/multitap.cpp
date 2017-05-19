@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_MULTITAP = device_creator<snes_multitap_device>;
+DEFINE_DEVICE_TYPE(SNES_MULTITAP, snes_multitap_device, "snes_multitap", "Nintendo SNES / SFC Multitap Adapter")
 
 
 static INPUT_PORTS_START( snes_multitap )
@@ -69,7 +69,7 @@ machine_config_constructor snes_multitap_device::device_mconfig_additions() cons
 //-------------------------------------------------
 
 snes_multitap_device::snes_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SNES_MULTITAP, "Nintendo SNES / SFC Multitap Adapter", tag, owner, clock, "snes_multitap", __FILE__),
+	device_t(mconfig, SNES_MULTITAP, tag, owner, clock),
 	device_snes_control_port_interface(mconfig, *this),
 	m_port1(*this, "port1"),
 	m_port2(*this, "port2"),

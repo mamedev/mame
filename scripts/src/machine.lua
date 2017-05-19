@@ -393,6 +393,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/74166.h,MACHINES["TTL74166"] = true
+---------------------------------------------------
+
+if (MACHINES["TTL74166"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/74166.cpp",
+		MAME_DIR .. "src/devices/machine/74166.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/74175.h,MACHINES["TTL74175"] = true
 ---------------------------------------------------
 
@@ -744,6 +756,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/cxd1095.h,MACHINES["CXD1095"] = true
+---------------------------------------------------
+
+if (MACHINES["CXD1095"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/cxd1095.cpp",
+		MAME_DIR .. "src/devices/machine/cxd1095.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/dm9334.h,MACHINES["DM9334"] = true
 ---------------------------------------------------
 
@@ -763,6 +787,18 @@ if (MACHINES["DS1204"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ds1204.cpp",
 		MAME_DIR .. "src/devices/machine/ds1204.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ds1205.h,MACHINES["DS1205"] = true
+---------------------------------------------------
+
+if (MACHINES["DS1205"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ds1205.cpp",
+		MAME_DIR .. "src/devices/machine/ds1205.h",
 	}
 end
 
@@ -1134,6 +1170,28 @@ if (MACHINES["IDE"]~=null) then
 		MAME_DIR .. "src/devices/machine/idehd.h",
 		MAME_DIR .. "src/devices/machine/vt83c461.cpp",
 		MAME_DIR .. "src/devices/machine/vt83c461.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ie15.h,MACHINES["IE15"] = true
+---------------------------------------------------
+
+if (MACHINES["IE15"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ie15.cpp",
+		MAME_DIR .. "src/devices/machine/ie15.h",
+		MAME_DIR .. "src/devices/machine/ie15_kbd.cpp",
+		MAME_DIR .. "src/devices/machine/ie15_kbd.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/machine/ie15.cpp", GEN_DIR .. "emu/layout/ie15.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "ie15"),
 	}
 end
 
@@ -1823,6 +1881,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/msm6253.h,MACHINES["MSM6253"] = true
+---------------------------------------------------
+
+if (MACHINES["MSM6253"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/msm6253.cpp",
+		MAME_DIR .. "src/devices/machine/msm6253.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ncr539x.h,MACHINES["NCR539x"] = true
 ---------------------------------------------------
 
@@ -1925,7 +1995,6 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/i82439tx.h",
 		MAME_DIR .. "src/devices/machine/i82371sb.cpp",
 		MAME_DIR .. "src/devices/machine/i82371sb.h",
-		MAME_DIR .. "src/devices/machine/lpc.cpp",
 		MAME_DIR .. "src/devices/machine/lpc.h",
 		MAME_DIR .. "src/devices/machine/lpc-acpi.cpp",
 		MAME_DIR .. "src/devices/machine/lpc-acpi.h",
@@ -1935,6 +2004,8 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/lpc-pit.h",
 		MAME_DIR .. "src/devices/machine/vrc4373.cpp",
 		MAME_DIR .. "src/devices/machine/vrc4373.h",
+		MAME_DIR .. "src/devices/machine/vrc5074.cpp",
+		MAME_DIR .. "src/devices/machine/vrc5074.h",
 		MAME_DIR .. "src/devices/machine/gt64xxx.cpp",
 		MAME_DIR .. "src/devices/machine/gt64xxx.h",
 	}
@@ -2171,26 +2242,21 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/s3c2400.h,MACHINES["S3C2400"] = true
+--@src/devices/machine/s3c2400.h,MACHINES["S3C24XX"] = true
+--@src/devices/machine/s3c2410.h,MACHINES["S3C24XX"] = true
+--@src/devices/machine/s3c2440.h,MACHINES["S3C24XX"] = true
 ---------------------------------------------------
 
-if (MACHINES["S3C2400"]~=null) then
+if (MACHINES["S3C24XX"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/s3c2400.cpp",
 		MAME_DIR .. "src/devices/machine/s3c2400.h",
-		MAME_DIR .. "src/devices/machine/s3c24xx.hxx",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/s3c2410.h,MACHINES["S3C2410"] = true
----------------------------------------------------
-
-if (MACHINES["S3C2410"]~=null) then
-	files {
 		MAME_DIR .. "src/devices/machine/s3c2410.cpp",
 		MAME_DIR .. "src/devices/machine/s3c2410.h",
+		MAME_DIR .. "src/devices/machine/s3c2440.cpp",
+		MAME_DIR .. "src/devices/machine/s3c2440.h",
+		MAME_DIR .. "src/devices/machine/s3c24xx.cpp",
+		MAME_DIR .. "src/devices/machine/s3c24xx.h",
 		MAME_DIR .. "src/devices/machine/s3c24xx.hxx",
 	}
 end
@@ -2204,19 +2270,6 @@ if (MACHINES["S3C44B0"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/s3c44b0.cpp",
 		MAME_DIR .. "src/devices/machine/s3c44b0.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/s3c2440.h,MACHINES["S3C2440"] = true
----------------------------------------------------
-
-if (MACHINES["S3C2440"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/s3c2440.cpp",
-		MAME_DIR .. "src/devices/machine/s3c2440.h",
-		MAME_DIR .. "src/devices/machine/s3c24xx.hxx",
 	}
 end
 
@@ -3087,5 +3140,16 @@ if (MACHINES["INPUT_MERGER"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/input_merger.cpp",
 		MAME_DIR .. "src/devices/machine/input_merger.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/k054321.h,MACHINES["K054321"] = true
+---------------------------------------------------
+if (MACHINES["K054321"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/k054321.cpp",
+		MAME_DIR .. "src/devices/machine/k054321.h",
 	}
 end

@@ -124,7 +124,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_T4426 = device_creator<coco_t4426_device>;
+DEFINE_DEVICE_TYPE(COCO_T4426, coco_t4426_device, "coco_t4426", "Terco CNC Programming Station 4426 multi cart")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -134,27 +134,20 @@ const device_type COCO_T4426 = device_creator<coco_t4426_device>;
 //  coco_t4426_device - constructor
 //-------------------------------------------------
 
-coco_t4426_device::coco_t4426_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-	,device_cococart_interface( mconfig, *this )
-	,m_cart(nullptr)
-	,m_owner(nullptr)
-	,m_select(0)
-	,m_autostart(*this, CART_AUTOSTART_TAG)
-	,m_uart(*this, UART_TAG)
-	,m_pia(*this, PIA_TAG)
+coco_t4426_device::coco_t4426_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_cococart_interface(mconfig, *this)
+	, m_cart(nullptr)
+	, m_owner(nullptr)
+	, m_select(0)
+	, m_autostart(*this, CART_AUTOSTART_TAG)
+	, m_uart(*this, UART_TAG)
+	, m_pia(*this, PIA_TAG)
 {
 }
 
 coco_t4426_device::coco_t4426_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, COCO_T4426, "Terco CNC Programming Station 4426 multi cart", tag, owner, clock, "coco_t4426", __FILE__)
-	,device_cococart_interface( mconfig, *this )
-	,m_cart(nullptr)
-	,m_owner(nullptr)
-	,m_select(0)
-	,m_autostart(*this, CART_AUTOSTART_TAG)
-	,m_uart(*this, UART_TAG)
-	,m_pia(*this, PIA_TAG)
+	: coco_t4426_device(mconfig, COCO_T4426, tag, owner, clock)
 {
 }
 
@@ -208,7 +201,7 @@ void coco_t4426_device::device_reset()
 {
 	LOG("%s()\n", FUNCNAME );
 	auto cart_line = cococart_slot_device::line_value::Q;
-	m_owner->cart_set_line(cococart_slot_device::line::CART, cart_line);
+	m_owner->set_line_value(cococart_slot_device::line::CART, cart_line);
 }
 
 /*-------------------------------------------------

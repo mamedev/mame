@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __NES_NTDEC_H
-#define __NES_NTDEC_H
+#ifndef MAME_BUS_NES_NTDEC_H
+#define MAME_BUS_NES_NTDEC_H
+
+#pragma once
 
 #include "nxrom.h"
 
@@ -14,11 +16,13 @@ public:
 	// construction/destruction
 	nes_ntdec_asder_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 private:
 	uint8_t m_latch;
@@ -33,19 +37,18 @@ public:
 	// construction/destruction
 	nes_ntdec_fh_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 
-
-
-
 // device type definition
-extern const device_type NES_NTDEC_ASDER;
-extern const device_type NES_NTDEC_FH;
+DECLARE_DEVICE_TYPE(NES_NTDEC_ASDER, nes_ntdec_asder_device)
+DECLARE_DEVICE_TYPE(NES_NTDEC_FH,    nes_ntdec_fh_device)
 
-#endif
+#endif // MAME_BUS_NES_NTDEC_H

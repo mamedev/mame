@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#pragma once
+#ifndef MAME_CPU_MINX_MINX_H
+#define MAME_CPU_MINX_MINX_H
 
-#ifndef __MINX_H__
-#define __MINX_H__
+#pragma once
 
 
 enum
@@ -115,7 +115,6 @@ private:
 };
 
 
-extern const device_type MINX;
+DECLARE_DEVICE_TYPE(MINX, minx_cpu_device)
 
-
-#endif /* __MINX_H__ */
+#endif // MAME_CPU_MINX_MINX_H

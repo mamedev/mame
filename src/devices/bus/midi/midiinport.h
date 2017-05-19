@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef _MIDIINPORT_H_
-#define _MIDIINPORT_H_
+#ifndef MAME_BUS_MIDI_MIDIINPORT_H
+#define MAME_BUS_MIDI_MIDIINPORT_H
+
+#pragma once
 
 #include "midi.h"
 #include "imagedev/midiin.h"
@@ -31,6 +33,6 @@ private:
 	required_device<midiin_device> m_midiin;
 };
 
-extern const device_type MIDIIN_PORT;
+DECLARE_DEVICE_TYPE(MIDIIN_PORT, midiin_port_device)
 
-#endif
+#endif // MAME_BUS_MIDI_MIDIINPORT_H

@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
 
-#ifndef RS232_LOOPBACK_H_
-#define RS232_LOOPBACK_H_
+#ifndef MAME_BUS_RS232_LOOPBACK_H
+#define MAME_BUS_RS232_LOOPBACK_H
+
+#pragma once
 
 #include "rs232.h"
 
@@ -22,4 +24,4 @@ protected:
 
 extern const device_type RS232_LOOPBACK;
 
-#endif
+#endif // MAME_BUS_RS232_LOOPBACK_H

@@ -17,50 +17,18 @@
 #include "2610intf.h"
 #include "fm.h"
 
-const char* YM2610_TAG = "ymsnd";
-const char* YM2610_DELTAT_TAG = "ymsnd.deltat";
+char const *const ym2610_device::YM2610_TAG = "ymsnd";
+char const *const ym2610_device::YM2610_DELTAT_TAG = "ymsnd.deltat";
 
-static void psg_set_clock(void *param, int clock)
+const ssg_callbacks ym2610_device::psgintf =
 {
-	ym2610_device *ym2610 = (ym2610_device *) param;
-	ym2610->ay_set_clock(clock);
-}
-
-static void psg_write(void *param, int address, int data)
-{
-	ym2610_device *ym2610 = (ym2610_device *) param;
-	ym2610->ay8910_write_ym(address, data);
-}
-
-static int psg_read(void *param)
-{
-	ym2610_device *ym2610 = (ym2610_device *) param;
-	return ym2610->ay8910_read_ym();
-}
-
-static void psg_reset(void *param)
-{
-	ym2610_device *ym2610 = (ym2610_device *) param;
-	ym2610->ay8910_reset_ym();
-}
-
-static const ssg_callbacks psgintf =
-{
-	psg_set_clock,
-	psg_write,
-	psg_read,
-	psg_reset
+	&ym2610_device::psg_set_clock,
+	&ym2610_device::psg_write,
+	&ym2610_device::psg_read,
+	&ym2610_device::psg_reset
 };
 
-/*------------------------- TM2610 -------------------------------*/
-/* IRQ Handler */
-static void IRQHandler(void *param,int irq)
-{
-	ym2610_device *ym2610 = (ym2610_device *) param;
-	ym2610->_IRQHandler(irq);
-}
-
-void ym2610_device::_IRQHandler(int irq)
+void ym2610_device::irq_handler(int irq)
 {
 	if (!m_irq_handler.isnull())
 		m_irq_handler(irq);
@@ -81,13 +49,7 @@ void ym2610_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-static void timer_handler(void *param,int c,int count,int clock)
-{
-	ym2610_device *ym2610 = (ym2610_device *) param;
-	ym2610->_timer_handler(c, count, clock);
-}
-
-void ym2610_device::_timer_handler(int c,int count,int clock)
+void ym2610_device::timer_handler(int c,int count,int clock)
 {
 	if( count == 0 )
 	{   /* Reset FM Timer */
@@ -100,18 +62,6 @@ void ym2610_device::_timer_handler(int c,int count,int clock)
 		if (!m_timer[c]->enable(true))
 			m_timer[c]->adjust(period);
 	}
-}
-
-/* update request from fm.c */
-void ym2610_update_request(void *param)
-{
-	ym2610_device *ym2610 = (ym2610_device *) param;
-	ym2610->_ym2610_update_request();
-}
-
-void ym2610_device::_ym2610_update_request()
-{
-	m_stream->update();
 }
 
 //-------------------------------------------------
@@ -172,9 +122,9 @@ void ym2610_device::device_start()
 	}
 
 	/**** initialize YM2610 ****/
-	m_chip = ym2610_init(this,this,clock(),rate,
+	m_chip = ym2610_init(this,clock(),rate,
 					pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
-					timer_handler,IRQHandler,&psgintf);
+					&ym2610_device::static_timer_handler,&ym2610_device::static_irq_handler,&psgintf);
 	assert_always(m_chip != nullptr, "Error creating YM2610 chip");
 }
 
@@ -208,25 +158,25 @@ WRITE8_MEMBER( ym2610_device::write )
 }
 
 
-const device_type YM2610 = device_creator<ym2610_device>;
+DEFINE_DEVICE_TYPE(YM2610, ym2610_device, "ym2610", "YM2610 OPNB")
 
 ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ay8910_device(mconfig, YM2610, "YM2610", tag, owner, clock, PSG_TYPE_YM, 1, 0, "ym2610", __FILE__)
+	: ym2610_device(mconfig, YM2610, tag, owner, clock)
+{
+}
+
+ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ay8910_device(mconfig, type, tag, owner, clock, PSG_TYPE_YM, 1, 0)
+	, m_stream(nullptr)
+	, m_timer{ nullptr, nullptr }
 	, m_irq_handler(*this)
 	, m_region(*this, DEVICE_SELF)
 {
 }
 
-ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: ay8910_device(mconfig, type, name, tag, owner, clock, PSG_TYPE_YM, 1, 0, shortname, source)
-	, m_irq_handler(*this)
-	, m_region(*this, DEVICE_SELF)
-{
-}
-
-const device_type YM2610B = device_creator<ym2610b_device>;
+DEFINE_DEVICE_TYPE(YM2610B, ym2610b_device, "ym2610b", "YM2610B OPNB")
 
 ym2610b_device::ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ym2610_device(mconfig, YM2610B, "YM2610B", tag, owner, clock, "ym2610b", __FILE__)
+	: ym2610_device(mconfig, YM2610B, tag, owner, clock)
 {
 }

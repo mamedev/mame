@@ -12,41 +12,13 @@
 
 ******************************************************************************/
 
+#ifndef MAME_CPU_H6280_H6280_H
+#define MAME_CPU_H6280_H6280_H
+
 #pragma once
 
-#ifndef __H6280_H__
-#define __H6280_H__
 
-
-#define LAZY_FLAGS  0
-
-/***************************************************************************
-    REGISTER ENUMERATION
-***************************************************************************/
-
-enum
-{
-	H6280_PC = 1,
-	H6280_S,
-	H6280_P,
-	H6280_A,
-	H6280_X,
-	H6280_Y,
-	H6280_IRQ_MASK,
-	H6280_TIMER_STATE,
-	H6280_NMI_STATE,
-	H6280_IRQ1_STATE,
-	H6280_IRQ2_STATE,
-	H6280_IRQT_STATE,
-	H6280_M1,
-	H6280_M2,
-	H6280_M3,
-	H6280_M4,
-	H6280_M5,
-	H6280_M6,
-	H6280_M7,
-	H6280_M8
-};
+#define H6280_LAZY_FLAGS  0
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -75,6 +47,31 @@ public:
 	void io_set_buffer(uint8_t);
 
 protected:
+    // register enumeration
+	enum
+	{
+		H6280_PC = 1,
+		H6280_S,
+		H6280_P,
+		H6280_A,
+		H6280_X,
+		H6280_Y,
+		H6280_IRQ_MASK,
+		H6280_TIMER_STATE,
+		H6280_NMI_STATE,
+		H6280_IRQ1_STATE,
+		H6280_IRQ2_STATE,
+		H6280_IRQT_STATE,
+		H6280_M1,
+		H6280_M2,
+		H6280_M3,
+		H6280_M4,
+		H6280_M5,
+		H6280_M6,
+		H6280_M7,
+		H6280_M8
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -351,7 +348,7 @@ protected:
 	uint8_t m_nmi_state;
 	uint8_t m_irq_state[3];
 	uint8_t m_irq_pending;
-#if LAZY_FLAGS
+#if H6280_LAZY_FLAGS
 	int32_t m_nz;         /* last value (lazy N and Z flag) */
 #endif
 	uint8_t m_io_buffer;  /* last value written to the PSG, timer, and interrupt pages */
@@ -371,6 +368,6 @@ protected:
 	static const ophandler s_opcodetable[256];
 };
 
-extern const device_type H6280;
+DECLARE_DEVICE_TYPE(H6280, h6280_device)
 
-#endif /* __H6280_H__ */
+#endif // MAME_CPU_H6280_H6280_H

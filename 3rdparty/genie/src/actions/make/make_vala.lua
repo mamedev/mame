@@ -64,7 +64,7 @@
 		-- list sources
 		_p('SOURCES := \\')
 		for _, file in ipairs(prj.files) do
-			if path.isSourceFile(file) then
+			if path.issourcefile(file) then
 				-- check if file is excluded.
 				if not table.icontains(prj.excludes, file) then
 					-- if not excluded, add it.
@@ -124,8 +124,9 @@
 		_p('  TARGETDIR  = %s', _MAKE.esc(cfg.buildtarget.directory))
 		_p('  TARGET     = $(TARGETDIR)/%s', _MAKE.esc(cfg.buildtarget.name))
 		_p('  DEFINES    +=%s', make.list(valac.getdefines(cfg.defines)))
+		_p('  VAPIDIRS   +=%s', make.list(valac.getvapidirs(cfg.vapidirs)))
 		_p('  PKGS       +=%s', make.list(valac.getlinks(cfg.links)))
-		_p('  FLAGS      += $(DEFINES) $(PKGS)%s', make.list(table.join(valac.getvalaflags(cfg), valac.getbuildoptions(cfg.buildoptions), valac.getbuildoptions(cfg.buildoptions_c))))
+		_p('  FLAGS      += $(DEFINES) $(VAPIDIRS) $(PKGS)%s', make.list(table.join(valac.getvalaflags(cfg), valac.getbuildoptions(cfg.buildoptions), valac.getbuildoptions(cfg.buildoptions_c), cfg.buildoptions_vala)))
 
 		_p('  define PREBUILDCMDS')
 		if #cfg.prebuildcommands > 0 then

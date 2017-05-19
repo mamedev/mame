@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __COCOCART_H__
-#define __COCOCART_H__
+#ifndef MAME_BUS_COCO_COCOCART_H
+#define MAME_BUS_COCO_COCOCART_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -61,9 +63,9 @@ public:
 	// construction/destruction
 	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &static_set_cart_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_cart_callback.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_nmi_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_nmi_callback.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_halt_callback(device_t &device, _Object object)  { return downcast<cococart_slot_device &>(device).m_halt_callback.set_callback(object); }
+	template <class Object> static devcb_base &static_set_cart_callback(device_t &device, Object &&cb) { return downcast<cococart_slot_device &>(device).m_cart_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_nmi_callback(device_t &device, Object &&cb) { return downcast<cococart_slot_device &>(device).m_nmi_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_halt_callback(device_t &device, Object &&cb) { return downcast<cococart_slot_device &>(device).m_halt_callback.set_callback(std::forward<Object>(cb)); }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -84,14 +86,15 @@ public:
 	virtual const char *file_extensions() const override { return "ccc,rom"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing to $FF40-$FF7F
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	// sets a cartridge line
-	void cart_set_line(line line, line_value value);
+	// manipulation of cartridge lines
+	void set_line_value(line line, line_value value);
+	line_value get_line_value(line line) const;
 
 	// hack to support twiddling the Q line
 	void twiddle_q_lines();
@@ -143,6 +146,7 @@ private:
 
 // device type definition
 extern const device_type COCOCART_SLOT;
+DECLARE_DEVICE_TYPE(COCOCART_SLOT, cococart_slot_device)
 
 // ======================> device_cococart_interface
 
@@ -150,7 +154,6 @@ class device_cococart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_cococart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_cococart_interface();
 
 	virtual DECLARE_READ8_MEMBER(read);
@@ -161,6 +164,8 @@ public:
 	void set_cart_base_update(cococart_base_update_delegate update);
 
 protected:
+	device_cococart_interface(const machine_config &mconfig, device_t &device);
+
 	void cart_base_changed(void);
 
 private:
@@ -172,10 +177,10 @@ private:
 ***************************************************************************/
 
 #define MCFG_COCO_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, COCOCART_SLOT, 0) \
+	MCFG_DEVICE_ADD(_tag, COCOCART_SLOT, DERIVED_CLOCK(1, 1)) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_COCO_CARTRIDGE_REMOVE(_tag)        \
 	MCFG_DEVICE_REMOVE(_tag)
 
-#endif // __COCOCART_H__
+#endif // MAME_BUS_COCO_COCOCART_H

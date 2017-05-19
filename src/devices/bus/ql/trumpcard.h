@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_QL_TRUMPCARD_H
+#define MAME_BUS_QL_TRUMPCARD_H
 
-#ifndef __QL_TRUMP_CARD__
-#define __QL_TRUMP_CARD__
+#pragma once
 
 #include "exp.h"
 #include "machine/wd_fdc.h"
@@ -21,15 +21,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> ql_trump_card_t
+// ======================> ql_trump_card_device
 
-class ql_trump_card_t : public device_t,
-						public device_ql_expansion_card_interface
+class ql_trump_card_device : public device_t, public device_ql_expansion_card_interface
 {
 public:
 	// construction/destruction
-	ql_trump_card_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	ql_trump_card_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int ram_size);
+	ql_trump_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -38,6 +36,8 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
+	ql_trump_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int ram_size);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -47,7 +47,7 @@ protected:
 	virtual void write(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
-	required_device<wd1772_t> m_fdc;
+	required_device<wd1772_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_memory_region m_rom;
@@ -58,43 +58,40 @@ private:
 };
 
 
-// ======================> ql_trump_card_256k_t
+// ======================> ql_trump_card_256k_device
 
-class ql_trump_card_256k_t :  public ql_trump_card_t
+class ql_trump_card_256k_device :  public ql_trump_card_device
 {
 public:
 	// construction/destruction
-	ql_trump_card_256k_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ql_trump_card_256k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
-// ======================> ql_trump_card_512k_t
+// ======================> ql_trump_card_512k_device
 
-class ql_trump_card_512k_t :  public ql_trump_card_t
+class ql_trump_card_512k_device :  public ql_trump_card_device
 {
 public:
 	// construction/destruction
-	ql_trump_card_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ql_trump_card_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
-// ======================> ql_trump_card_768k_t
+// ======================> ql_trump_card_768k_device
 
-class ql_trump_card_768k_t :  public ql_trump_card_t
+class ql_trump_card_768k_device :  public ql_trump_card_device
 {
 public:
 	// construction/destruction
-	ql_trump_card_768k_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ql_trump_card_768k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
-
 
 
 // device type definition
-extern const device_type QL_TRUMP_CARD;
-extern const device_type QL_TRUMP_CARD_256K;
-extern const device_type QL_TRUMP_CARD_512K;
-extern const device_type QL_TRUMP_CARD_768K;
+DECLARE_DEVICE_TYPE(QL_TRUMP_CARD,       ql_trump_card_device)
+DECLARE_DEVICE_TYPE(QL_TRUMP_CARD_256K,  ql_trump_card_256k_device)
+DECLARE_DEVICE_TYPE(QL_TRUMP_CARD_512K,  ql_trump_card_512k_device)
+DECLARE_DEVICE_TYPE(QL_TRUMP_CARD_768K,  ql_trump_card_768k_device)
 
-
-
-#endif
+#endif // MAME_BUS_QL_TRUMPCARD_H

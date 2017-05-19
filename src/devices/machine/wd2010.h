@@ -6,11 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_WD2010_H
+#define MAME_MACHINE_WD2010_H
+
 #pragma once
-
-#ifndef __WD2010__
-#define __WD2010__
-
 
 
 
@@ -76,21 +75,21 @@ public:
 	// construction/destruction
 	wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_intrq_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_out_intrq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_bdrq_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_out_bdrq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_bcr_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_out_bcr_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_brdy_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_in_brdy_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_bcs_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_in_bcs_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_bcs_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_out_bcs_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dirin_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_out_dirin_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_step_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_out_step_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_rwc_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_out_rwc_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_wg_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_out_wg_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_drdy_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_in_drdy_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_index_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_in_index_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_wf_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_in_wf_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_tk000_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_in_tk000_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_sc_callback(device_t &device, _Object object) { return downcast<wd2010_device &>(device).m_in_sc_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_intrq_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_out_intrq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_bdrq_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_out_bdrq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_bcr_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_out_bcr_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_brdy_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_in_brdy_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_bcs_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_in_bcs_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_bcs_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_out_bcs_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_dirin_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_out_dirin_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_step_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_out_step_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_rwc_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_out_rwc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_wg_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_out_wg_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_drdy_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_in_drdy_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_index_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_in_index_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_wf_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_in_wf_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_tk000_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_in_tk000_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_sc_callback(device_t &device, Object &&cb) { return downcast<wd2010_device &>(device).m_in_sc_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -151,6 +150,6 @@ private:
 };
 
 // device type definition
-extern const device_type WD2010;
+DECLARE_DEVICE_TYPE(WD2010, wd2010_device)
 
-#endif
+#endif // MAME_MACHINE_WD2010_H

@@ -6,15 +6,15 @@
 // Need PCI to be able to have a target delay (pci bus stall) a dma transfer
 // Configurable byte swapping on cpu and pci busses.
 
-#ifndef GT64XXX_H
-#define GT64XXX_H
+#ifndef MAME_MACHINE_GT64XXX_H
+#define MAME_MACHINE_GT64XXX_H
 
 #include "pci.h"
 #include "cpu/mips/mips3.h"
 
 // Supports R4600/4650/4700/R5000 CPUs
 #define MCFG_GT64010_ADD(_tag,  _cpu_tag, _clock, _irq_num) \
-	MCFG_PCI_HOST_ADD(_tag, GT64XXX, 0x014611ab, 0x03, 0x00000000) \
+	MCFG_PCI_HOST_ADD(_tag, GT64XXX, 0x11ab0146, 0x03, 0x00000000) \
 	downcast<gt64xxx_device *>(device)->set_cpu_tag(_cpu_tag); \
 	downcast<gt64xxx_device *>(device)->set_clock(_clock); \
 	downcast<gt64xxx_device *>(device)->set_irq_num(_irq_num);
@@ -36,164 +36,20 @@
 	downcast<gt64xxx_device *>(device)->set_irq_info(_irq_num);
 
 #define MCFG_GT64XXX_SET_CS(_cs_num, _map) \
-	downcast<gt64xxx_device *>(device)->set_cs_map(_cs_num, ADDRESS_MAP_NAME(_map), #_map, owner);
+	downcast<gt64xxx_device *>(device)->set_map(_cs_num, address_map_delegate(ADDRESS_MAP_NAME(_map), #_map), owner);
 
-/*************************************
- *
- *  Galileo constants
- *
- *************************************/
+#define MCFG_GT64XX_SET_SIMM(_index, _size) \
+	downcast<gt64xxx_device *>(device)->set_simm_size(_index, _size);
 
-#define TIMER_PERIOD            attotime::from_hz(m_clock)
-#define PCI_BUS_CLOCK        33000000
-// Number of dma words to transfer at a time, real hardware configurable between 8-32
-#define DMA_BURST_SIZE       32
-#define DMA_TIMER_PERIOD     attotime::from_hz(PCI_BUS_CLOCK / 48)
+#define MCFG_GT64XX_SET_SIMM0(_size) \
+	downcast<gt64xxx_device *>(device)->set_simm0_size(_size);
 
-/* Galileo registers - 0x000-0x3ff */
-#define GREG_CPU_CONFIG     (0x000/4)
-#define GREG_RAS_1_0_LO     (0x008/4)
-#define GREG_RAS_1_0_HI     (0x010/4)
-#define GREG_RAS_3_2_LO     (0x018/4)
-#define GREG_RAS_3_2_HI     (0x020/4)
-#define GREG_CS_2_0_LO      (0x028/4)
-#define GREG_CS_2_0_HI      (0x030/4)
-#define GREG_CS_3_BOOT_LO   (0x038/4)
-#define GREG_CS_3_BOOT_HI   (0x040/4)
-#define GREG_PCI_IO_LO      (0x048/4)
-#define GREG_PCI_IO_HI      (0x050/4)
-#define GREG_PCI_MEM0_LO    (0x058/4)
-#define GREG_PCI_MEM0_HI    (0x060/4)
-#define GREG_INTERNAL_SPACE (0x068/4)
-#define GREG_BUSERR_LO      (0x070/4)
-#define GREG_BUSERR_HI      (0x078/4)
-// GT-64111 only
-#define GREG_PCI_MEM1_LO    (0x080/4)
-#define GREG_PCI_MEM1_HI    (0x088/4)
-
-/* Galileo registers - 0x400-0x7ff */
-#define GREG_RAS0_LO        (0x400/4)
-#define GREG_RAS0_HI        (0x404/4)
-#define GREG_RAS1_LO        (0x408/4)
-#define GREG_RAS1_HI        (0x40c/4)
-#define GREG_RAS2_LO        (0x410/4)
-#define GREG_RAS2_HI        (0x414/4)
-#define GREG_RAS3_LO        (0x418/4)
-#define GREG_RAS3_HI        (0x41c/4)
-#define GREG_CS0_LO         (0x420/4)
-#define GREG_CS0_HI         (0x424/4)
-#define GREG_CS1_LO         (0x428/4)
-#define GREG_CS1_HI         (0x42c/4)
-#define GREG_CS2_LO         (0x430/4)
-#define GREG_CS2_HI         (0x434/4)
-#define GREG_CS3_LO         (0x438/4)
-#define GREG_CS3_HI         (0x43c/4)
-#define GREG_CSBOOT_LO      (0x440/4)
-#define GREG_CSBOOT_HI      (0x444/4)
-#define GREG_DRAM_CONFIG    (0x448/4)
-#define GREG_DRAM_BANK0     (0x44c/4)
-#define GREG_DRAM_BANK1     (0x450/4)
-#define GREG_DRAM_BANK2     (0x454/4)
-#define GREG_DRAM_BANK3     (0x458/4)
-#define GREG_DEVICE_BANK0   (0x45c/4)
-#define GREG_DEVICE_BANK1   (0x460/4)
-#define GREG_DEVICE_BANK2   (0x464/4)
-#define GREG_DEVICE_BANK3   (0x468/4)
-#define GREG_DEVICE_BOOT    (0x46c/4)
-#define GREG_ADDRESS_ERROR  (0x470/4)
-
-/* Galileo registers - 0x800-0xbff */
-#define GREG_DMA0_COUNT     (0x800/4)
-#define GREG_DMA1_COUNT     (0x804/4)
-#define GREG_DMA2_COUNT     (0x808/4)
-#define GREG_DMA3_COUNT     (0x80c/4)
-#define GREG_DMA0_SOURCE    (0x810/4)
-#define GREG_DMA1_SOURCE    (0x814/4)
-#define GREG_DMA2_SOURCE    (0x818/4)
-#define GREG_DMA3_SOURCE    (0x81c/4)
-#define GREG_DMA0_DEST      (0x820/4)
-#define GREG_DMA1_DEST      (0x824/4)
-#define GREG_DMA2_DEST      (0x828/4)
-#define GREG_DMA3_DEST      (0x82c/4)
-#define GREG_DMA0_NEXT      (0x830/4)
-#define GREG_DMA1_NEXT      (0x834/4)
-#define GREG_DMA2_NEXT      (0x838/4)
-#define GREG_DMA3_NEXT      (0x83c/4)
-#define GREG_DMA0_CONTROL   (0x840/4)
-#define GREG_DMA1_CONTROL   (0x844/4)
-#define GREG_DMA2_CONTROL   (0x848/4)
-#define GREG_DMA3_CONTROL   (0x84c/4)
-#define GREG_TIMER0_COUNT   (0x850/4)
-#define GREG_TIMER1_COUNT   (0x854/4)
-#define GREG_TIMER2_COUNT   (0x858/4)
-#define GREG_TIMER3_COUNT   (0x85c/4)
-#define GREG_DMA_ARBITER    (0x860/4)
-#define GREG_TIMER_CONTROL  (0x864/4)
-
-/* Galileo registers - 0xc00-0xfff */
-#define GREG_PCI_COMMAND    (0xc00/4)
-#define GREG_PCI_TIMEOUT    (0xc04/4)
-#define GREG_PCI_RAS_1_0    (0xc08/4)
-#define GREG_PCI_RAS_3_2    (0xc0c/4)
-#define GREG_PCI_CS_2_0     (0xc10/4)
-#define GREG_PCI_CS_3_BOOT  (0xc14/4)
-#define GREG_INT_STATE      (0xc18/4)
-#define GREG_INT_MASK       (0xc1c/4)
-#define GREG_PCI_INT_MASK   (0xc24/4)
-#define GREG_CONFIG_ADDRESS (0xcf8/4)
-#define GREG_CONFIG_DATA    (0xcfc/4)
-
-/* Galileo interrupts */
-#define GINT_SUMMARY_SHIFT  (0)
-#define GINT_MEMOUT_SHIFT   (1)
-#define GINT_DMAOUT_SHIFT   (2)
-#define GINT_CPUOUT_SHIFT   (3)
-#define GINT_DMA0COMP_SHIFT (4)
-#define GINT_DMA1COMP_SHIFT (5)
-#define GINT_DMA2COMP_SHIFT (6)
-#define GINT_DMA3COMP_SHIFT (7)
-#define GINT_T0EXP_SHIFT    (8)
-#define GINT_T1EXP_SHIFT    (9)
-#define GINT_T2EXP_SHIFT    (10)
-#define GINT_T3EXP_SHIFT    (11)
-#define GINT_MASRDERR_SHIFT (12)
-#define GINT_SLVWRERR_SHIFT (13)
-#define GINT_MASWRERR_SHIFT (14)
-#define GINT_SLVRDERR_SHIFT (15)
-#define GINT_ADDRERR_SHIFT  (16)
-#define GINT_MEMERR_SHIFT   (17)
-#define GINT_MASABORT_SHIFT (18)
-#define GINT_TARABORT_SHIFT (19)
-#define GINT_RETRYCTR_SHIFT (20)
-
+#define MCFG_GT64XX_SET_SIMM1(_size) \
+	downcast<gt64xxx_device *>(device)->set_simm1_size(_size);
 
 /*************************************
  *  Structures
  *************************************/
-struct galileo_timer
-{
-	emu_timer *     timer;
-	uint32_t          count;
-	uint8_t           active;
-};
-
-struct galileo_addr_map
-{
-	uint32_t low_addr;
-	uint32_t high_addr;
-	address_space* space;
-	galileo_addr_map() : low_addr(0xffffffff), high_addr(0x0) {}
-};
-
-struct galileo_device_map
-{
-	bool enable;
-	const char *name;
-	device_t *device;
-	address_map_constructor map;
-	galileo_device_map() : enable(false), device(nullptr) {}
-};
-
 class gt64xxx_device : public pci_host_device {
 public:
 	gt64xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -208,6 +64,9 @@ public:
 	void set_autoconfig(const int autoconfig) {m_autoconfig = autoconfig;}
 	void set_irq_num(const int irq_num) {m_irq_num = irq_num;}
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+	void set_simm_size(const int index, const int size) { m_simm_size[index] = size; };
+	void set_simm0_size(const int size) { m_simm_size[0] = size; };
+	void set_simm1_size(const int size) { m_simm_size[1] = size; };
 
 	DECLARE_WRITE_LINE_MEMBER(pci_stall);
 
@@ -243,7 +102,8 @@ public:
 	// Enums
 	enum proc_addr_bank {ADDR_RAS1_0, ADDR_RAS3_2, ADDR_CS2_0, ADDR_CS3_BCS, ADDR_PCI_IO, ADDR_PCI_MEM0, ADDR_PCI_MEM1, ADDR_NUM};
 
-	void set_cs_map(int id, address_map_constructor map, const char *name, device_t *device);
+	void set_map(int id, const address_map_delegate &map, device_t *device);
+	void postload();
 
 protected:
 	address_space *m_cpu_space;
@@ -253,11 +113,27 @@ protected:
 
 
 private:
+	struct galileo_timer
+	{
+		emu_timer *     timer;
+		uint32_t          count;
+		uint8_t           active;
+	};
+
+	struct galileo_addr_map
+	{
+		uint32_t low_addr;
+		uint32_t high_addr;
+		address_space* space;
+		galileo_addr_map() : low_addr(0xffffffff), high_addr(0x0) {}
+	};
+
 	mips3_device *m_cpu;
 	const char *cpu_tag;
 	uint32_t m_clock;
 	int m_be, m_autoconfig;
 	int m_irq_num;
+	int m_simm_size[4];
 
 	int m_pci_stall_state;
 	int m_retry_count;
@@ -272,6 +148,7 @@ private:
 	optional_memory_region m_updateRegion;
 
 	DECLARE_ADDRESS_MAP(cpu_map, 32);
+	DECLARE_ADDRESS_MAP(empty, 32);
 
 	void map_cpu_space();
 
@@ -290,16 +167,8 @@ private:
 	std::vector<uint32_t> m_ram[4];
 
 	// Chip Select
-	galileo_device_map m_cs_map[4];
-
-	template<int id> void map_trampoline(::address_map &map) {
-		m_cs_map[id].map(map);
-	}
-	template <typename T> void install_cs_map(offs_t addrstart, offs_t addrend, void (T::*map)(::address_map &map), const char *name) {
-		//address_map_delegate delegate(map, name, static_cast<T *>(this));
-		address_map_delegate delegate(map, name, static_cast<T *>(this));
-		m_cpu_space->install_device_delegate(addrstart, addrend, *this, delegate);
-	}
+	device_t *m_cs_devices[4];
+	address_map_delegate m_cs_maps[4];
 
 	void update_irqs();
 
@@ -309,9 +178,8 @@ private:
 	int dma_fetch_next(address_space &space, int which);
 	TIMER_CALLBACK_MEMBER(perform_dma);
 	address_space* dma_decode_address(uint32_t &addr);
-
 };
 
-extern const device_type GT64XXX;
+DECLARE_DEVICE_TYPE(GT64XXX, gt64xxx_device)
 
-#endif
+#endif // MAME_MACHINE_GT64XXX_H

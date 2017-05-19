@@ -58,25 +58,25 @@
 //  DEVICE TYPE DEFINITIONS
 //**************************************************************************
 
-const device_type PIT68230 = device_creator<pit68230_device>;
+DEFINE_DEVICE_TYPE(PIT68230, pit68230_device, "pit68230", "MC68230 PI/T")
 
 //-------------------------------------------------
 //  pit68230_device - constructors
 //-------------------------------------------------
-pit68230_device::pit68230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
-	: device_t (mconfig, type, name, tag, owner, clock, shortname, source)
+pit68230_device::pit68230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_pa_out_cb(*this)
 	, m_pa_in_cb(*this)
 	, m_pb_out_cb(*this)
 	, m_pb_in_cb(*this)
 	, m_pc_out_cb(*this)
 	, m_pc_in_cb(*this)
-	, m_h1_out_cb (*this)
-	, m_h2_out_cb (*this)
-	, m_h3_out_cb (*this)
-	, m_h4_out_cb (*this)
-	, m_tirq_out_cb (*this)
-	, m_pirq_out_cb (*this)
+	, m_h1_out_cb(*this)
+	, m_h2_out_cb(*this)
+	, m_h3_out_cb(*this)
+	, m_h4_out_cb(*this)
+	, m_tirq_out_cb(*this)
+	, m_pirq_out_cb(*this)
 	, m_pgcr(0)
 	, m_psrr(0)
 	, m_paddr(0)
@@ -98,43 +98,12 @@ pit68230_device::pit68230_device(const machine_config &mconfig, device_type type
 	, m_cntr(0)
 	, m_tsr(0)
 {
+	// FIXME: is the unused variant parameter supposed to be useful for something?
 }
 
 
 pit68230_device::pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t (mconfig, PIT68230, "PIT68230", tag, owner, clock, "pit68230", __FILE__)
-	, m_pa_out_cb (*this)
-	, m_pa_in_cb(*this)
-	, m_pb_out_cb(*this)
-	, m_pb_in_cb(*this)
-	, m_pc_out_cb(*this)
-	, m_pc_in_cb(*this)
-	, m_h1_out_cb(*this)
-	, m_h2_out_cb(*this)
-	, m_h3_out_cb(*this)
-	, m_h4_out_cb(*this)
-	, m_tirq_out_cb (*this)
-	, m_pirq_out_cb (*this)
-	, m_pgcr(0)
-	, m_psrr(0)
-	, m_paddr(0)
-	, m_pbddr(0)
-	, m_pcddr(0)
-	, m_pivr(0)
-	, m_pacr(0)
-	, m_pbcr(0)
-	, m_padr(0)
-	, m_pbdr(0)
-	, m_pcdr(0)
-	, m_psr(0)
-	, m_tcr(0)
-	, m_tivr(0)
-	, m_cpr(0)
-	//  , m_cprh(0) // Collectivelly handled by m_cpr
-	//  , m_cprm(0) // Collectivelly handled by m_cpr
-	//  , m_cprl(0) // Collectivelly handled by m_cpr
-	, m_cntr(0)
-	, m_tsr(0)
+	: pit68230_device (mconfig, PIT68230, tag, owner, clock, 0)
 {
 }
 
