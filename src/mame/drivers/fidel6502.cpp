@@ -1560,7 +1560,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( sc9 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1400000) // from ceramic resonator "681 JSA", measured
+	MCFG_CPU_ADD("maincpu", M6502, 1400000) // from ceramic resonator "681 JSA", measured. Also released as 1.5MHz, 1.6MHz, 1.9MHz
 	MCFG_CPU_PROGRAM_MAP(sc9_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(610)) // from 555 timer (22nF, 102K, 2.7K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(610) - attotime::from_usec(41)) // active for 41us
