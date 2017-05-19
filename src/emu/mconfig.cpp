@@ -235,7 +235,6 @@ device_t *machine_config::device_find(device_t *owner, const char *tag)
 	// find the original device by relative tag (must exist)
 	assert(owner != nullptr);
 	device_t *device = owner->subdevice(tag);
-	assert(device != nullptr);
 	if (device == nullptr)
 		throw emu_fatalerror("Unable to find device '%s'\n", tag);
 
