@@ -50,7 +50,7 @@
 #define INTERPRO_SCSI_HA_TAG    "adapter"
 
 #define INTERPRO_IOGA_TAG       "ioga"
-#define INTERPRO_MCGA_TAG       "fmcc"
+#define INTERPRO_MCGA_TAG       "mcga"
 #define INTERPRO_SGA_TAG        "sga"
 #define INTERPRO_SRARB_TAG      "srarb"
 

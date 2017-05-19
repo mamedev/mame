@@ -21,7 +21,7 @@
 #define FMCC_CTRL_MASK       0x8fff
 
 // mcga error register
-#define MCGA_ERROR_VALID	0x00008000
+#define MCGA_ERROR_VALID	 0x00008000
 
 class interpro_mcga_device : public device_t
 {

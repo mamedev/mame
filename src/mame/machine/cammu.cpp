@@ -103,7 +103,7 @@ DEFINE_DEVICE_TYPE(CAMMU_C4I, cammu_c4i_device, "c4i", "C4I CAMMU")
 DEFINE_DEVICE_TYPE(CAMMU_C3,  cammu_c3_device,  "c3",  "C1/C3 CAMMU")
 
 cammu_c4t_device::cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cammu_c4_device(mconfig, CAMMU_C4T, tag, owner, clock) 
+	: cammu_c4_device(mconfig, CAMMU_C4T, tag, owner, clock)
 {
 }
 
@@ -132,7 +132,7 @@ cammu_device::cammu_device(const machine_config &mconfig, device_type type, cons
 	m_io_space(nullptr),
 	m_boot_space(nullptr),
 	m_ssw_func(*this)
-{ 
+{
 }
 
 void cammu_device::device_start()

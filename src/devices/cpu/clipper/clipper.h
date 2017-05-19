@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_DEVICES_CPU_CLIPPER_H
-#define MAME_DEVICES_CPU_CLIPPER_H
+#ifndef MAME_CPU_CLIPPER_CLIPPER_H
+#define MAME_CPU_CLIPPER_CLIPPER_H
 
 #pragma once
 
@@ -267,4 +267,4 @@ DECLARE_DEVICE_TYPE(CLIPPER_C400, clipper_c400_device)
 
 extern CPU_DISASSEMBLE(clipper);
 
-#endif // MAME_DEVICES_CPU_CLIPPER_H
+#endif // MAME_CPU_CLIPPER_CLIPPER_H

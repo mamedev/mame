@@ -44,13 +44,6 @@ public:
 	DECLARE_WRITE8_MEMBER(conf_w);
 	DECLARE_WRITE8_MEMBER(clock_w);
 
-	DECLARE_WRITE8_MEMBER(test_w);
-	DECLARE_READ8_MEMBER(conf2_r) { return config2; };
-	DECLARE_WRITE8_MEMBER(conf2_w) { config2 = data; };
-	DECLARE_READ8_MEMBER(conf3_r) { return config3; };
-	DECLARE_WRITE8_MEMBER(conf3_w) { config3 = data; };
-	DECLARE_WRITE8_MEMBER(fifo_align_w) { m_fifo_align = data; };
-
 	virtual void scsi_ctrl_changed() override;
 
 	uint8_t dma_r();
@@ -234,11 +227,6 @@ private:
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
-
-	bool test_mode;
-	u8 config2;
-	u8 config3;
-	u8 m_fifo_align;
 };
 
 DECLARE_DEVICE_TYPE(NCR5390, ncr5390_device)

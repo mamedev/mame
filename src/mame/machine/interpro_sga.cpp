@@ -22,10 +22,10 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_sga_device)
 	AM_RANGE(0x08, 0x0b) AM_READWRITE(imask_r, imask_w)
 	AM_RANGE(0x0c, 0x0f) AM_READWRITE(range_base_r, range_base_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(range_end_r, range_end_w)
-	AM_RANGE(0x14, 0x17) AM_READWRITE(cttag_r, cttag_w)     // aka diag1
-	AM_RANGE(0x18, 0x1b) AM_READWRITE(address_r, address_w) // aka diag0
+	AM_RANGE(0x14, 0x17) AM_READWRITE(cttag_r, cttag_w)           // aka diag1
+	AM_RANGE(0x18, 0x1b) AM_READWRITE(address_r, address_w)       // aka diag0
 	AM_RANGE(0x1c, 0x1f) AM_READWRITE(dmacsr_r, dmacsr_w)
-	AM_RANGE(0x20, 0x23) AM_READWRITE(edmacsr_r, edmacsr_w)               // esga
+	AM_RANGE(0x20, 0x23) AM_READWRITE(edmacsr_r, edmacsr_w)       // esga
 	AM_RANGE(0x24, 0x27) AM_READWRITE(reg6_range_r, reg6_range_w) // esga
 
 	AM_RANGE(0x80, 0x83) AM_READWRITE(ddpta0_r, ddpta0_w) // dma 0 device page table address (esga)

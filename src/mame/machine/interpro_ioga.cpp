@@ -804,4 +804,3 @@ void interpro_ioga_device::dma_w(address_space &space, offs_t offset, u32 data, 
 		break;
 	}
 }
-
