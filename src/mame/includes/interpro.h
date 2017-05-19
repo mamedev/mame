@@ -6,7 +6,7 @@
 
 #pragma once
 
-#define NEW_SCSI 0
+#define NEW_SCSI 1
 
 #include "cpu/clipper/clipper.h"
 #include "machine/cammu.h"
@@ -47,7 +47,7 @@
 #define INTERPRO_TERMINAL_TAG   "terminal"
 #define INTERPRO_FDC_TAG        "fdc"
 #define INTERPRO_SCSI_TAG       "scsi"
-#define INTERPRO_SCSI_HA_TAG    "adapter"
+#define INTERPRO_SCSI_ADAPTER_TAG    "adapter"
 
 #define INTERPRO_IOGA_TAG       "ioga"
 #define INTERPRO_MCGA_TAG       "mcga"
@@ -97,9 +97,9 @@ public:
 		m_fdc(*this, INTERPRO_FDC_TAG),
 #if NEW_SCSI
 		m_scsibus(*this, INTERPRO_SCSI_TAG),
-		m_scsi(*this, INTERPRO_SCSI_TAG ":7:" INTERPRO_SCSI_HA_TAG),
+		m_scsi(*this, INTERPRO_SCSI_TAG ":7:" INTERPRO_SCSI_ADAPTER_TAG),
 #else
-		m_scsi(*this, INTERPRO_SCSI_HA_TAG),
+		m_scsi(*this, INTERPRO_SCSI_ADAPTER_TAG),
 #endif
 		m_ioga(*this, INTERPRO_IOGA_TAG),
 		m_mcga(*this, INTERPRO_MCGA_TAG),
@@ -117,7 +117,7 @@ public:
 	required_device<n82077aa_device> m_fdc;
 #if NEW_SCSI
 	required_device<nscsi_bus_device> m_scsibus;
-	required_device<ncr5390_device> m_scsi;
+	required_device<ncr53c94_device> m_scsi;
 #else
 	required_device<ncr539x_device> m_scsi;
 #endif
@@ -140,6 +140,8 @@ public:
 
 	DECLARE_READ8_MEMBER(scsi_r);
 	DECLARE_WRITE8_MEMBER(scsi_w);
+	DECLARE_READ8_MEMBER(scsi_dma_r);
+	DECLARE_WRITE8_MEMBER(scsi_dma_w);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
