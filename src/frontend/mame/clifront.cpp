@@ -528,18 +528,23 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 		if (!first)
 			osd_printf_info("\n");
 		first = false;
-		osd_printf_info(
-				"ROMs required for %s \"%s\".\n"
-				"%-32s %10s %s\n",
-				type, root.shortname(), "Name", "Size", "Checksum");
 
 		// iterate through roms
+		bool hasroms = false;
 		for (device_t &device : device_iterator(root))
 		{
 			for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
 			{
 				for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
+					// print a header
+					if (!hasroms)
+						osd_printf_info(
+							"ROMs required for %s \"%s\".\n"
+							"%-32s %10s %s\n",
+							type, root.shortname(), "Name", "Size", "Checksum");
+					hasroms = true;
+
 					// accumulate the total length of all chunks
 					int64_t length = -1;
 					if (ROMREGION_ISROMDATA(region))
@@ -571,6 +576,8 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 				}
 			}
 		}
+		if (!hasroms)
+			osd_printf_info("No ROMs required for %s \"%s\".\n", type, root.shortname());
 	};
 
 	// determine which drivers to output
