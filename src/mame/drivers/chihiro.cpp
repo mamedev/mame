@@ -734,7 +734,7 @@ static const struct
 		uint32_t address;
 		uint8_t write_byte;
 	} modify[16];
-} hacks[HACK_ITEMS] = { { "chihiro",  { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0xeb }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
+} hacks[HACK_ITEMS] = { { "chihiro",  { { 0, 0 } } },
 						{ "outr2",    { { 0, 0 } } },
 						{ "crtaxihr", { { 0x14ada5/*11fda5*/, 0x90 }, { 0x14ada6/*11fda6*/, 0x90 }, { 0, 0 } } },
 						{ "ghostsqu", { { 0x78833/*4d833*/, 0x90 }, { 0x78834/*4d834*/, 0x90 }, { 0, 0 } } },
@@ -745,9 +745,7 @@ void chihiro_state::hack_usb()
 {
 	int p;
 
-	if (hack_counter == 0)
-		p = 0; // need to patch the kernel
-	else if (hack_counter == 1)
+	if (hack_counter == 1)
 		p = hack_index; // need to patch the game
 	else
 		p = -1;
