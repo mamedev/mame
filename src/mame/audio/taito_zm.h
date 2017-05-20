@@ -48,7 +48,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_snd_shared_ram;
 };
 
-DECLARE_DEVICE_TYPE(TAITO_ZOOM, taito_zoom_sound)
+DECLARE_DEVICE_TYPE(TAITO_ZOOM, taito_zoom_device)
 
 MACHINE_CONFIG_EXTERN( taito_zoom_sound );
 

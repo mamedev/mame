@@ -55,6 +55,8 @@ protected:
 	uint8_t m_cal_mask,m_cal_com,m_cal_cnt,m_cal_val;
 
 	rtc_regs_t m_rtc;
+
+	emu_timer *m_timer;
 };
 
 

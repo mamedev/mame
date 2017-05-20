@@ -7,7 +7,7 @@
     CXD1095Q: 64-pin quad flat package
 
        1-2              NC
-       3-9              PB1-PB7
+       3-9              PB1-PB7
         10              GND
      11-18              PC0-PC7
         19              NC

@@ -37,6 +37,9 @@ private:
 	// internal state
 	devcb_write_line m_irq_handler;
 
+	// link unconnected
+	bool m_link_unconnected;
+
 	/* raw register data and masks */
 	uint16_t          m_reg[64];
 	uint16_t          m_regmask[64];
@@ -58,8 +61,10 @@ private:
 
 	void update_ethernet_irq();
 	void update_stats();
-	void finish_enqueue(int param);
+	TIMER_CALLBACK_MEMBER(finish_enqueue);
 	void process_command(uint16_t data);
+	emu_timer* m_tx_timer;
+
 };
 
 

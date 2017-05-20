@@ -281,7 +281,7 @@ void pengadvb_state::machine_reset()
 void pengadvb_state::pengadvb_decrypt(const char* region)
 {
 	uint8_t *mem = memregion(region)->base();
-	int memsize = memregion(region)->bytes();
+	uint32_t memsize = memregion(region)->bytes();
 
 	// data lines swap
 	for (int i = 0; i < memsize; i++)

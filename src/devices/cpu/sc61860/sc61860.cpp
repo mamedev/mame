@@ -101,7 +101,8 @@ void sc61860_device::device_reset()
 
 void sc61860_device::device_start()
 {
-	machine().scheduler().timer_pulse(attotime::from_hz(500), timer_expired_delegate( FUNC(sc61860_device::sc61860_2ms_tick), this));
+	m_2ms_tick_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sc61860_device::sc61860_2ms_tick), this));
+	m_2ms_tick_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
 
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();

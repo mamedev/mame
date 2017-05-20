@@ -1816,15 +1816,7 @@ void validity_checker::validate_devices()
 
 		// look for duplicates
 		if (!device_map.insert(device.tag()).second)
-			osd_printf_error("Multiple devices with the same tag '%s' defined\n", device.tag());
-
-		// all devices must have a shortname
-		if (strcmp(device.shortname(), "") == 0)
-			osd_printf_error("Device does not have short name defined\n");
-
-		// all devices must have a source file defined
-		if (strcmp(device.source(), "") == 0)
-			osd_printf_error("Device does not have source file location defined\n");
+			osd_printf_error("Multiple devices with the same tag defined\n");
 
 		// check for device-specific validity check
 		device.validity_check(*this);
@@ -1832,31 +1824,6 @@ void validity_checker::validate_devices()
 		// done with this device
 		m_current_device = nullptr;
 	}
-
-	// if device is slot cart device, we must have a shortname
-	std::unordered_set<std::string> slot_device_map;
-	for (const device_slot_interface &slot : slot_interface_iterator(m_current_config->root_device()))
-	{
-		for (auto &option : slot.option_list())
-		{
-			std::string temptag("_");
-			temptag.append(option.second->name());
-			device_t *dev = const_cast<machine_config &>(*m_current_config).device_add(&m_current_config->root_device(), temptag.c_str(), option.second->devtype(), 0);
-
-			// notify this device and all its subdevices that they are now configured
-			for (device_t &device : device_iterator(*dev))
-				if (!device.configured())
-					device.config_complete();
-
-			if (strcmp(dev->shortname(), "") == 0) {
-				if (slot_device_map.insert(dev->name()).second)
-					osd_printf_error("Device '%s' is slot cart device but does not have short name defined\n", dev->name());
-			}
-
-			const_cast<machine_config &>(*m_current_config).device_remove(&m_current_config->root_device(), temptag.c_str());
-		}
-	}
-
 }
 
 
@@ -1897,6 +1864,10 @@ void validity_checker::validate_device_types()
 			}
 			else
 			{
+				// make sure the device name is not too long
+				if (strlen(dev->shortname()) > 32)
+					osd_printf_error("Device short name must be 32 characters or less\n");
+
 				// check for invalid characters in shortname
 				for (char const *s = dev->shortname(); *s; ++s)
 				{

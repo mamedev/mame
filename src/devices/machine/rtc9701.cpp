@@ -92,7 +92,8 @@ void rtc9701_device::device_validity_check(validity_checker &valid) const
 void rtc9701_device::device_start()
 {
 	/* let's call the timer callback every second */
-	machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), timer_expired_delegate(FUNC(rtc9701_device::timer_callback), this));
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rtc9701_device::timer_callback), this));
+	m_timer->adjust(attotime::from_hz(clock() / XTAL_32_768kHz), 0, attotime::from_hz(clock() / XTAL_32_768kHz));
 
 	system_time systime;
 	machine().base_datetime(systime);

@@ -146,8 +146,12 @@ DEFINE_DEVICE_TYPE(COCO_PAK_BANKED, coco_pak_banked_device, "cocopak_banked", "C
 //  coco_pak_device - constructor
 //-------------------------------------------------
 
+coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: coco_pak_device(mconfig, type, tag, owner, clock)
+{
+}
 coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: coco_pak_device(mconfig, COCO_PAK_BANKED, tag, owner, clock)
+	: coco_pak_banked_device(mconfig, COCO_PAK_BANKED, tag, owner, clock)
 {
 }
 

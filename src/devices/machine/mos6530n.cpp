@@ -176,11 +176,11 @@ void mos6530_device_base::device_start()
 	for (auto &cb : m_in_pa_cb)
 		cb.resolve();
 	for (auto &cb : m_out_pa_cb)
+		cb.resolve_safe();
+	for (auto &cb : m_in_pb_cb)
 		cb.resolve();
-	for (auto &cb : m_in_pa_cb)
-		cb.resolve();
-	for (auto &cb : m_out_pa_cb)
-		cb.resolve();
+	for (auto &cb : m_out_pb_cb)
+		cb.resolve_safe();
 
 	// allocate timer
 	t_gen = timer_alloc(0);

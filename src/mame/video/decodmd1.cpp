@@ -252,7 +252,7 @@ void decodmd_type1_device::device_reset()
 	m_rom = memregion(m_gfxtag);
 
 	memset(RAM,0,0x2000);
-	memset(m_pixels,0,0x200);
+	memset(m_pixels,0,0x200*sizeof(uint32_t));
 
 	ROM = m_rom->base();
 	m_rombank1->configure_entries(0, 8, &ROM[0x0000], 0x4000);

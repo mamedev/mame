@@ -126,5 +126,5 @@ ROM_END
 
 
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      STATE        INIT  COMPANY        FULLNAME, FLAGS */
+//    YEAR  NAME       PARENT   CMP MACHINE    INPUT      STATE        INIT  COMPANY, FULLNAME, FLAGS
 CONS( 1984, nupogodi,  0,        0, nupogodi,  nupogodi,  nupogodi_state, 0, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

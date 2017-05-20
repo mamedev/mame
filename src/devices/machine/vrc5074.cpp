@@ -388,7 +388,7 @@ void vrc5074_device::setup_pci_space()
 		m_pci_mask[index] = (1 << (36 - mask)) - 1;
 		m_pci_laddr[index] = m_cpu_regs[NREG_PCIINIT0 + index * 2] & (~m_pci_mask[index]);
 		m_pci_type[index] = m_cpu_regs[NREG_PCIINIT0 + index * 2] & 0xe;
-		if (0 && LOG_NILE)
+		if (1 && LOG_NILE)
 			logerror("setup_pci_space: mask_sel=%x pci_type=%x pci_mask[%d]=%08X pci_laddr[%d]=%08X\n",
 				mask, m_pci_type[index], index, m_pci_mask[index], index, m_pci_laddr[index]);
 	}
@@ -873,7 +873,7 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 		break;
 	case NREG_PCIW0:
 	case NREG_PCIW1:
-		setup_pci_space();
+		map_cpu_space();
 		break;
 	case NREG_CPUSTAT + 0:    /* CPU status */
 	case NREG_CPUSTAT + 1:    /* CPU status */

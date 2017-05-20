@@ -419,7 +419,7 @@ void snes_ppu_device::device_reset()
 	{
 		elem.enable = 0;
 		elem.clip = 0;
-		memset(elem.buffer, 0, SNES_SCR_WIDTH);
+		memset(elem.buffer, 0, SNES_SCR_WIDTH * sizeof(uint16_t));
 		memset(elem.priority, 0, SNES_SCR_WIDTH);
 		memset(elem.layer, 0, SNES_SCR_WIDTH);
 		memset(elem.blend_exception, 0, SNES_SCR_WIDTH);

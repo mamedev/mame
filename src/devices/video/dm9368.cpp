@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(DM9368, dm9368_device, "dm9368", "Fairchild DM9368 7-Segment 
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-constexpr uint8_t dm9368_device::m_segment_data[16] =
+const uint8_t dm9368_device::s_segment_data[16] =
 {
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71
 };
@@ -83,9 +83,9 @@ void dm9368_device::a_w(uint8_t data)
 	}
 	else
 	{
-		LOG("DM9368 Output Data: %u = %02x\n", a, m_segment_data[a]);
+		LOG("DM9368 Output Data: %u = %02x\n", a, s_segment_data[a]);
 
-		value = m_segment_data[a];
+		value = s_segment_data[a];
 
 		m_rbo = 1;
 	}

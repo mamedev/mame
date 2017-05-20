@@ -53,7 +53,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void send_key(uint8_t code) { m_keyboard_cb(code); }
+	virtual void send_key(uint8_t code) { if (!m_keyboard_cb.isnull()) m_keyboard_cb(code); }
 
 	optional_device<palette_device> m_palette;
 	required_ioport m_io_term_conf;

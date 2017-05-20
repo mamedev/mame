@@ -81,6 +81,8 @@ public:
 	{
 	}
 
+	void kbd_put(u8 data);
+
 	DECLARE_READ32_MEMBER(r9751_mmio_5ff_r);
 	DECLARE_WRITE32_MEMBER(r9751_mmio_5ff_w);
 	DECLARE_READ32_MEMBER(r9751_mmio_ff01_r);
@@ -113,6 +115,7 @@ private:
 	uint32_t smioc_dma_bank;
 	uint32_t fdd_dma_bank;
 	attotime timer_32khz_last;
+	uint8_t m_term_data;
 	// End registers
 
 	address_space *m_mem;
@@ -126,6 +129,10 @@ private:
 	virtual void machine_reset() override;
 };
 
+void r9751_state::kbd_put(u8 data)
+{
+	m_term_data = data;
+}
 
 uint32_t r9751_state::swap_uint32( uint32_t val )
 {
@@ -500,6 +507,7 @@ static MACHINE_CONFIG_START( r9751 )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(r9751_state, kbd_put))
 
 	/* disk hardware */
 	MCFG_DEVICE_ADD("pdc", PDC, 0)

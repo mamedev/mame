@@ -82,7 +82,7 @@ READ8_MEMBER(argo_state::argo_io_r)
 	{
 	case 0xA1: // keyboard
 		char kbdrow[6];
-		sprintf(kbdrow,"X%X",offset>>8);
+		sprintf(kbdrow,"X%X",uint8_t(offset>>8));
 		return ioport(kbdrow)->read();
 
 	case 0xE8: // wants bit 4 low then high

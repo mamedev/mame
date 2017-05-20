@@ -2460,7 +2460,7 @@ static void do_extract_cd(parameters_t &params)
 
 			if (mode == MODE_GDI)
 			{
-				char temp[8];
+				char temp[11];
 				sprintf(temp, "%02d", tracknum+1);
 				trackbin_name.append(temp);
 				if (toc->tracks[tracknum].trktype == CD_TRACK_AUDIO)

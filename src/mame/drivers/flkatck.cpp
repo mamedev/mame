@@ -106,10 +106,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( flkatck_sound_map, AS_PROGRAM, 8, flkatck_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                                             /* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                                             /* RAM */
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(multiply_r, multiply_w)               /* ??? */
-//  AM_RANGE(0x9001, 0x9001) AM_RAM                                             /* ??? */
-	AM_RANGE(0x9004, 0x9004) AM_READNOP                                         /* ??? */
-	AM_RANGE(0x9006, 0x9006) AM_WRITENOP                                        /* ??? */
+	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)                                // 007452: Protection (see wecleman, but unused here?)
+	AM_RANGE(0x9001, 0x9001) AM_READNOP                                         // 007452: ?
+	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)                               // 007452: Protection (see wecleman, but unused here?)
+	AM_RANGE(0x9004, 0x9004) AM_READNOP                                         // 007452: ?
+	AM_RANGE(0x9006, 0x9006) AM_WRITENOP                                        // 007452: ?
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write) /* 007232 registers */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)           /* YM2151 */

@@ -13,11 +13,15 @@
     - Super Glob seems like a later revision of The Glob, the most obvious
       difference being an updated service mode.
     - These games don't have cocktail mode.
-    - The divisor 4 was derived using the timing loop used to split the screen
-      in the middle.  This loop takes roughly 24200 cycles, giving
+    - The CPU clock divisor 4 was derived using the timing loop used to split
+      the screen in the middle.  This loop takes roughly 24200 cycles, giving
       2500 + (24200 - 2500) * 2 * 60 = 2754000 = 2.75MHz for the CPU speed,
       assuming 60 fps and a 2500 cycle VBLANK period.
-      This should be easy to check since the schematics are available, .
+      This also matches the IGMO schematic, as it is the /CLK signal, which is
+      derived from the 11MHz xtal by dividing it down by two 74LS193 chips, one
+      (U92) dividing the clock by 2, and another (U91) having 3 taps, further
+      dividing the already divided clock by 2 (/CLK), 4 (/PLOAD) and 8 (CLOCK).
+      The CLOCK signal drives the AY.
     - I think theglob2 is earlier than theglob.  They only differ in one routine,
       but it appears to be a bug fix.  Also, theglob3 appears to be even older.
 
@@ -25,9 +29,9 @@
 
     - Super Blob uses a busy loop during the color test to split the screen
       between the two palettes.  This effect is not emulated, but since both
-      halfs of the palette are identical, this is not an issue.  See $039c.
+      halves of the palette are identical, this is not an issue.  See $039c.
       The other games have a different color test, not using the busy loop.
-	
+
 	- dealer/beastf/revngr84: "PSG registers not OK" in service mode thru 
 	  sound menu, internal ay8910 not right?
 
@@ -72,7 +76,6 @@ static ADDRESS_MAP_START( epos_map, AS_PROGRAM, 8, epos_state )
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( dealer_map, AS_PROGRAM, 8, epos_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank2")
@@ -86,7 +89,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, epos_state )
+static ADDRESS_MAP_START( epos_io_map, AS_IO, 8, epos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(port_1_w)
@@ -106,7 +109,7 @@ static ADDRESS_MAP_START( dealer_io_map, AS_IO, 8, epos_state )
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(epos_state::read_prta)
+READ8_MEMBER(epos_state::i8255_porta_r)
 {
 	uint8_t data = 0xff;
 
@@ -124,10 +127,22 @@ READ8_MEMBER(epos_state::read_prta)
    There's a separate ROM check for banked U04 at 30F3.
    It looks like dealer/revenger uses ppi8255 to control bankswitching.
 */
-WRITE8_MEMBER(epos_state::write_prtc)
+WRITE8_MEMBER(epos_state::i8255_portc_w)
 {
 	membank("bank2")->set_entry(data & 0x01);
 	m_input_multiplex = (data >> 5) & 3;
+}
+
+READ8_MEMBER(epos_state::ay_porta_mpx_r)
+{
+	return (m_ay_porta_multiplex ? 0xFF : ioport("DSW")->read());
+}
+
+WRITE8_MEMBER(epos_state::flip_screen_w)
+{
+	flip_screen_set(BIT(data, 7));
+	// bit 6: ay8910 port A/B multiplexer read
+	m_ay_porta_multiplex = BIT(data, 6);
 }
 
 /*************************************
@@ -414,6 +429,7 @@ MACHINE_START_MEMBER(epos_state,epos)
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_input_multiplex));
+	save_item(NAME(m_ay_porta_multiplex));
 }
 
 void epos_state::machine_reset()
@@ -421,6 +437,7 @@ void epos_state::machine_reset()
 	m_palette_bank = 0;
 	m_counter = 0;
 	m_input_multiplex = 3;
+	m_ay_porta_multiplex = 0;
 }
 
 
@@ -441,7 +458,7 @@ static MACHINE_CONFIG_START( epos ) /* EPOS TRISTAR 8000 PCB */
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_11MHz/4)    /* 2.75 MHz schematics confirm 11MHz XTAL (see notes) */
 	MCFG_CPU_PROGRAM_MAP(epos_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_CPU_IO_MAP(epos_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -459,7 +476,7 @@ static MACHINE_CONFIG_START( epos ) /* EPOS TRISTAR 8000 PCB */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_11MHz/4) /* should be a divisor of 16? - clock not confirmed - schematics show 8912 */
+	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_11MHz/16) /*  0.6875 MHz, confirmed from schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -473,8 +490,8 @@ static MACHINE_CONFIG_START( dealer ) /* EPOS TRISTAR 9000 PCB */
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(epos_state, read_prta))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(epos_state, write_prtc))
+	MCFG_I8255_IN_PORTA_CB(READ8(epos_state, i8255_porta_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(epos_state, i8255_portc_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	
@@ -498,9 +515,9 @@ static MACHINE_CONFIG_START( dealer ) /* EPOS TRISTAR 9000 PCB */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_22_1184MHz/32)    /* 0.6912 MHz (measured) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(epos_state, ay_porta_mpx_r))
 	// port a writes?
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(epos_state, flip_screen_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(epos_state, flip_screen_w)) // flipscreen and ay port a multiplex control
 MACHINE_CONFIG_END
 
 
@@ -509,7 +526,8 @@ MACHINE_CONFIG_END
  *  ROM definitions
  *
  *************************************/
-
+ 
+// Tristar 8000 boards:
 ROM_START( megadon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2732u10b.bin",   0x0000, 0x1000, CRC(af8fbe80) SHA1(2d7857616462112fe17343a9357ee51d8f965a0f) )
@@ -622,6 +640,7 @@ ROM_START( igmo )
 ROM_END
 
 
+// Tristar 9000 boards:
 ROM_START( dealer )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "u1.bin",         0x0000, 0x2000, CRC(e06f3563) SHA1(0d58cd1f2e1ca89adb9c64d7dd520bb1f2d50f1a) )
@@ -702,8 +721,6 @@ ROM_START( revenger )
 	ROM_REGION( 0x1000, "nvram", 0)
 	ROM_LOAD( "revngr84.nv", 0, 0x1000, CRC(a4417770) SHA1(92eded82db0810e7818d2f52a0497032f390fcc1) )
 ROM_END
-
-
 
 ROM_START( beastf )
 	ROM_REGION( 0x40000, "maincpu", 0 )

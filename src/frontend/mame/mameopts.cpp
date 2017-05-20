@@ -16,6 +16,7 @@
 #include "softlist_dev.h"
 #include "zippath.h"
 #include "hashfile.h"
+#include "clifront.h"
 
 #include <ctype.h>
 #include <stack>

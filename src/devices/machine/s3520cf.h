@@ -71,6 +71,7 @@ protected:
 	state_t m_rtc_state;
 	rtc_regs_t m_rtc;
 
+	emu_timer *m_timer;
 };
 
 

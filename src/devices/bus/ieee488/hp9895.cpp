@@ -56,6 +56,7 @@
 
 #include "emu.h"
 #include "hp9895.h"
+#include "formats/hpi_dsk.h"
 
 // Debugging
 #define VERBOSE 1
@@ -866,6 +867,12 @@ static SLOT_INTERFACE_START(hp9895_floppies)
 	SLOT_INTERFACE("8dsdd" , FLOPPY_8_DSDD)
 SLOT_INTERFACE_END
 
+static const floppy_format_type hp9895_floppy_formats[] = {
+	FLOPPY_MFI_FORMAT,
+	FLOPPY_HPI_FORMAT,
+	nullptr
+};
+
 static MACHINE_CONFIG_FRAGMENT(hp9895)
 	MCFG_CPU_ADD("cpu" , Z80 , 4000000)
 	MCFG_CPU_PROGRAM_MAP(z80_program_map)
@@ -884,9 +891,9 @@ static MACHINE_CONFIG_FRAGMENT(hp9895)
 	MCFG_PHI_DIO_READWRITE_CB(READ8(hp9895_device , phi_dio_r) , WRITE8(hp9895_device , phi_dio_w))
 	MCFG_PHI_INT_WRITE_CB(WRITELINE(hp9895_device , phi_int_w))
 
-	MCFG_FLOPPY_DRIVE_ADD("floppy0" , hp9895_floppies , "8dsdd" , floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("floppy0" , hp9895_floppies , "8dsdd" , hp9895_floppy_formats)
 	MCFG_SLOT_FIXED(true)
-	MCFG_FLOPPY_DRIVE_ADD("floppy1" , hp9895_floppies , "8dsdd" , floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("floppy1" , hp9895_floppies , "8dsdd" , hp9895_floppy_formats)
 	MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
 

@@ -943,23 +943,23 @@ WRITE8_MEMBER( cd32_state::akiko_cia_0_port_a_write )
 #if 0
 static ADDRESS_MAP_START( a1000_overlay_map, AS_PROGRAM, 16, a1000_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x1c0000) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x200000, 0x201fff) AM_MIRROR(0x03e000) AM_ROM AM_REGION("bootrom", 0)
+	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x030000) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0x280000, 0x2bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x300000, 0x33ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x380000, 0x381fff) AM_MIRROR(0x03e000) AM_ROM AM_REGION("bootrom", 0)
+	AM_RANGE(0x380000, 0x38ffff) AM_MIRROR(0x030000) AM_ROM AM_REGION("bootrom", 0)
 ADDRESS_MAP_END
 #endif
 
 static ADDRESS_MAP_START( a1000_overlay_map, AS_PROGRAM, 16, a1000_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x200000, 0x201fff) AM_MIRROR(0x03e000) AM_ROM AM_REGION("bootrom", 0)
+	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x030000) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x300000, 0x37ffff) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x380000, 0x381fff) AM_MIRROR(0x03e000) AM_ROM AM_REGION("bootrom", 0)
+	AM_RANGE(0x380000, 0x38ffff) AM_MIRROR(0x030000) AM_ROM AM_REGION("bootrom", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( a1000_bootrom_map, AS_PROGRAM, 16, a1000_state )
-	AM_RANGE(0x000000, 0x001fff) AM_MIRROR(0x3e000) AM_ROM AM_REGION("bootrom", 0) AM_WRITE(write_protect_w)
+	AM_RANGE(0x000000, 0x00ffff) AM_MIRROR(0x30000) AM_ROM AM_REGION("bootrom", 0) AM_WRITE(write_protect_w)
 	AM_RANGE(0x040000, 0x07ffff) AM_ROMBANK("wom")
 ADDRESS_MAP_END
 
@@ -1924,12 +1924,13 @@ MACHINE_CONFIG_END
 // Amiga 1000
 //
 // Shipped with a small bootrom to load kickstart from disk because the
-// Kickstart wasn't finished in time.
+// Kickstart wasn't finished in time. ROM type is 23256, but only the
+// first 4kb of it are used.
 
 ROM_START( a1000 )
-	ROM_REGION16_BE(0x2000, "bootrom", 0)
-	ROM_LOAD16_BYTE("252179-01.u5n", 0x0000, 0x1000, CRC(42553bc4) SHA1(8855a97f7a44e3f62d1c88d938fee1f4c606af5b))
-	ROM_LOAD16_BYTE("252180-01.u5p", 0x0001, 0x1000, CRC(8e5b9a37) SHA1(d10f1564b99f5ffe108fa042362e877f569de2c3))
+	ROM_REGION16_BE(0x10000, "bootrom", 0)
+	ROM_LOAD16_BYTE("252179-01.u5n", 0x0000, 0x8000, CRC(76bd46ec) SHA1(2155b4887f064c5e01e0a2ebb4a0cc2a3e88d9e8))
+	ROM_LOAD16_BYTE("252180-01.u5p", 0x0001, 0x8000, CRC(dd516b6d) SHA1(2c307d02f10ad332a479b50767fd0463efc2844b))
 
 	// PALs, all of type PAL16L8
 	ROM_REGION(0x104, "dpalen", 0)

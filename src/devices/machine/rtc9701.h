@@ -91,6 +91,8 @@ protected:
 	uint16_t rtc9701_data[0x100];
 
 	regs_t m_rtc;
+
+	emu_timer *m_timer;
 };
 
 

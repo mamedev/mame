@@ -482,6 +482,9 @@ configuration { "Debug", "vs*" }
 		"Symbols",
 		"NoIncrementalLink",
 	}
+	buildoptions {
+		"/bigobj",
+	}
 
 configuration { "Release", "vs*" }
 	flags {
