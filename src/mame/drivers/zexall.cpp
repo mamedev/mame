@@ -53,6 +53,7 @@ private:
 	uint8_t m_out_req_last; // old value at 0xFFFE before the most recent write
 	uint8_t m_out_ack; // byte written to 0xFFFC
 	virtual void machine_reset() override;
+	std::string m_outstring;
 };
 
 DRIVER_INIT_MEMBER(zexall_state,zexall)
@@ -70,6 +71,7 @@ void zexall_state::machine_reset()
 	uint8_t *ram = m_main_ram;
 	/* fill main ram with zexall code */
 	memcpy(ram, rom, 0x228a);
+	m_outstring.clear();
 }
 
 READ8_MEMBER( zexall_state::zexall_output_ack_r )
@@ -78,6 +80,15 @@ READ8_MEMBER( zexall_state::zexall_output_ack_r )
 	if (m_out_req != m_out_req_last)
 	{
 		m_terminal->write(space,0,m_out_data);
+		// turn text into a string for logerror
+		char temp[2];
+		sprintf(temp,"%c",m_out_data);
+		m_outstring.append(temp);
+		if (m_out_data == 0x0a)
+		{
+			logerror(m_outstring.c_str());
+			m_outstring.clear();
+		}
 		m_out_req_last = m_out_req;
 		m_out_ack++;
 	}
