@@ -434,7 +434,7 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream, stream_sample
 	m_rms[m_index] = sqrt(m_rms[m_index]);
 
 	m_index++;
-	m_index &= 0x07;
+	m_index &= 0x0f;
 }
 
 
@@ -444,9 +444,11 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream, stream_sample
 
 bool cocossc_sac_device::sound_activity_circuit_output()
 {
-	double average = m_rms[0] + m_rms[2] + m_rms[3] + m_rms[4] + m_rms[5] + m_rms[6] + m_rms[7];
+	double average = m_rms[0] + m_rms[2] + m_rms[3] + m_rms[4] + m_rms[5] +
+		m_rms[6] + m_rms[7] + m_rms[8] + m_rms[9] + m_rms[10] + m_rms[11] +
+		m_rms[12] + m_rms[13] + m_rms[14] + m_rms[15];
 
-	average /= 8.0;
+	average /= 16.0;
 
 	if( average > 10400.0 )
 		return true;

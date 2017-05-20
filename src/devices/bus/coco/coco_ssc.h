@@ -98,7 +98,7 @@ protected:
 
 private:
 	sound_stream*  m_stream;
-	double m_rms[8];
+	double m_rms[16];
 	int m_index;
 };
 
