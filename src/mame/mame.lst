@@ -11369,6 +11369,7 @@ dorachan                        // (c) 1980 Craul Denshi
 @source:dotrikun.cpp
 dotrikun                        // cabinet test board
 dotrikun2                       // cabinet test board
+dotriman
 
 @source:dps1.cpp
 dps1                            //
