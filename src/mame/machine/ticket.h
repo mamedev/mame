@@ -30,8 +30,12 @@ DECLARE_DEVICE_TYPE(TICKET_DISPENSER, ticket_dispenser_device)
 #define MCFG_TICKET_DISPENSER_ADD(_tag, _period_in_msec, _motor_sense, _status_sense) \
 	MCFG_DEVICE_ADD(_tag, TICKET_DISPENSER, 0) \
 	ticket_dispenser_device::static_set_period(*device, _period_in_msec); \
-	ticket_dispenser_device::static_set_senses(*device, _motor_sense, _status_sense);
+	ticket_dispenser_device::static_set_senses(*device, _motor_sense, _status_sense, false);
 
+#define MCFG_HOPPER_ADD(_tag, _period_in_msec, _motor_sense, _status_sense) \
+	MCFG_DEVICE_ADD(_tag, TICKET_DISPENSER, 0) \
+	ticket_dispenser_device::static_set_period(*device, _period_in_msec); \
+	ticket_dispenser_device::static_set_senses(*device, _motor_sense, _status_sense, true);
 
 //**************************************************************************
 //  CONSTANTS
@@ -60,7 +64,7 @@ public:
 
 	// inline configuration helpers
 	static void static_set_period(device_t &device, const attotime &period);
-	static void static_set_senses(device_t &device, uint8_t motor_sense, uint8_t status_sense);
+	static void static_set_senses(device_t &device, uint8_t motor_sense, uint8_t status_sense, bool hopper_type);
 
 	// read/write handlers
 	DECLARE_READ8_MEMBER( read );
@@ -78,6 +82,7 @@ protected:
 	uint8_t m_motor_sense;
 	uint8_t m_status_sense;
 	attotime m_period;
+	bool m_hopper_type;
 
 	// active state
 	uint8_t m_active_bit;

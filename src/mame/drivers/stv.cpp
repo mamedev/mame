@@ -256,14 +256,8 @@ WRITE8_MEMBER(stv_state::stvmp_ioga_w)
 
 WRITE8_MEMBER(stv_state::hop_ioga_w)
 {
-	if (offset == 7) {
-		if ((data & 0x80) == 0) {
-			m_hopper->motor_w(0);		//
-			m_hopper->motor_w(0x80); 	// ugly hack to reset status of ticket dispenser device
-			m_hopper->motor_w(0);
-		} else 
-			m_hopper->motor_w(0x80);
-	}
+	if (offset == 7)
+		m_hopper->motor_w(data & 0x80);
 	stv_ioga_w(space, offset, data);
 }
 
@@ -1141,7 +1135,7 @@ static MACHINE_CONFIG_DERIVED( stv_slot, stv )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hopper, stv )
-		MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+		MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
 
 MACHINE_RESET_MEMBER(stv_state,stv)
