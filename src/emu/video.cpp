@@ -892,16 +892,17 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 
 	// loop until we reach our target
 	g_profiler.start(PROFILER_IDLE);
-	osd_ticks_t minimum_sleep = osd_ticks_per_second() / 1000;
 	osd_ticks_t current_ticks = osd_ticks();
 	while (current_ticks < target_ticks)
 	{
 		// compute how much time to sleep for, taking into account the average oversleep
 		osd_ticks_t delta = (target_ticks - current_ticks) * 1000 / (1000 + m_average_oversleep);
+		if (!delta)
+			delta = 1;
 
 		// see if we can sleep
 		bool slept = false;
-		if (allowed_to_sleep && delta >= minimum_sleep)
+		if (allowed_to_sleep)
 		{
 			osd_sleep(delta);
 			slept = true;
@@ -914,13 +915,8 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 		if (slept)
 		{
 			// if we overslept, keep an average of the amount
-			// however, if we overslept too much, which is very likely resulted by a system time
-			// change, instead of inaccuracy of sleep, we should not update this average amount, as
-			// it's both a wrong reflection of the average and will potentially cause delta to be
-			// calculated as a very small value, even less than minimum_sleep, which will make this
-			// loop to be a busy one wasting cpu resource
 			osd_ticks_t actual_ticks = new_ticks - current_ticks;
-			if (actual_ticks > delta && actual_ticks < delta * 10)
+			if (actual_ticks > delta)
 			{
 				// take 90% of the previous average plus 10% of the new value
 				osd_ticks_t oversleep_milliticks = 1000 * (actual_ticks - delta) / delta;
