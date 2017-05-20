@@ -359,7 +359,8 @@ bool mame_options::parse_command_line(emu_options &options, std::vector<std::str
 	// out if this is necessary for this particular auxillary verb, and if so, set the system name
 	if (!options.command().empty()
 		&& cli_frontend::parse_slot_options_for_auxverb(options.command())
-		&& !options.command_arguments().empty())
+		&& !options.command_arguments().empty()
+		&& !core_iswildstr(options.command_arguments()[0].c_str()))
 	{
 		std::string error_string;
 		options.set_value(OPTION_SYSTEMNAME, options.command_arguments()[0].c_str(), OPTION_PRIORITY_CMDLINE, error_string);

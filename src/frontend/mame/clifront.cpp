@@ -1458,7 +1458,7 @@ const cli_frontend::info_command_struct *cli_frontend::find_command(const std::s
 		{ CLICOMMAND_LISTCLONES,        0,  1, false,	&cli_frontend::listclones,       "[system name]" },
 		{ CLICOMMAND_LISTBROTHERS,      0,  1, false,	&cli_frontend::listbrothers,     "[system name]" },
 		{ CLICOMMAND_LISTCRC,           0,  1, false,	&cli_frontend::listcrc,          "[system name]" },
-		{ CLICOMMAND_LISTDEVICES,       0,  1, false,	&cli_frontend::listdevices,      "[system name]" },
+		{ CLICOMMAND_LISTDEVICES,       0,  1, true,	&cli_frontend::listdevices,      "[system name]" },
 		{ CLICOMMAND_LISTSLOTS,         0,  1, true,	&cli_frontend::listslots,        "[system name]" },
 		{ CLICOMMAND_LISTROMS,          0, -1, false,	&cli_frontend::listroms,         "[pattern] ..." },
 		{ CLICOMMAND_LISTSAMPLES,       0,  1, false,	&cli_frontend::listsamples,      "[system name]" },
