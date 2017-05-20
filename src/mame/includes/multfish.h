@@ -7,6 +7,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/timekpr.h"
 #include "machine/watchdog.h"
+#include "machine/ticket.h"
 #include "screen.h"
 
 #define igrosoft_gamble_ROM_SIZE 0x80000
@@ -21,7 +22,8 @@ public:
 		m_m48t35(*this, "m48t35" ),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_hopper(*this, "hopper")
 	{
 	}
 
@@ -38,9 +40,6 @@ public:
 
 	uint8_t m_rambk;
 
-	uint8_t m_hopper_motor;
-	uint8_t m_hopper;
-
 	uint8_t m_vid[igrosoft_gamble_VIDRAM_SIZE];
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_vid_w);
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_bank_w);
@@ -56,7 +55,6 @@ public:
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_counters_w);
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_f3_w);
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_dispenable_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(igrosoft_gamble_hopper_r);
 	DECLARE_READ8_MEMBER(igrosoft_gamble_timekeeper_r);
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_timekeeper_w);
 	DECLARE_DRIVER_INIT(customl);
@@ -92,6 +90,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<ticket_dispenser_device> m_hopper;
 };
 
 
