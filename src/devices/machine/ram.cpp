@@ -2,7 +2,7 @@
 // copyright-holders: Dirk Best
 /*************************************************************************
 
-    ram.cpp
+    RAM device
 
     Provides a configurable amount of RAM to drivers
 
