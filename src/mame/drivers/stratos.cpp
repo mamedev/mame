@@ -15,24 +15,13 @@ class stratos_state : public driver_device
 {
 public:
 	stratos_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			maincpu(*this, "maincpu"),
-			nvram(*this, "nvram"),
-			bank_8000(*this, "bank_8000"),
-			bank_4000(*this, "bank_4000"),
-			nvram_bank(*this, "nvram_bank")
+		: driver_device(mconfig, type, tag)
+		, maincpu(*this, "maincpu")
+		, nvram(*this, "nvram")
+		, bank_8000(*this, "bank_8000")
+		, bank_4000(*this, "bank_4000")
+		, nvram_bank(*this, "nvram_bank")
 	{ }
-
-	required_device<m65c02_device> maincpu;
-	required_device<nvram_device> nvram;
-	required_memory_bank bank_8000;
-	required_memory_bank bank_4000;
-	required_memory_bank nvram_bank;
-
-	std::unique_ptr<uint8_t[]> nvram_data;
-	uint8_t control, led_latch_control;
-	uint32_t individual_leds;
-	uint8_t latch_AH_red, latch_AH_green, latch_18_red, latch_18_green;
 
 	DECLARE_DRIVER_INIT(stratos);
 	DECLARE_WRITE8_MEMBER(p2000_w);
@@ -45,10 +34,21 @@ public:
 	DECLARE_WRITE8_MEMBER(lcd_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
-
-	void show_leds();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+private:
+	std::unique_ptr<uint8_t[]> nvram_data;
+	uint8_t control, led_latch_control;
+	uint32_t individual_leds;
+	uint8_t latch_AH_red, latch_AH_green, latch_18_red, latch_18_green;
+	void show_leds();
 	virtual void machine_reset() override;
+
+	required_device<m65c02_device> maincpu;
+	required_device<nvram_device> nvram;
+	required_memory_bank bank_8000;
+	required_memory_bank bank_4000;
+	required_memory_bank nvram_bank;
 };
 
 DRIVER_INIT_MEMBER( stratos_state, stratos )
@@ -368,4 +368,4 @@ ROM_START( stratos )
 ROM_END
 
 /*     YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS          INIT     COMPANY    FULLNAME                           FLAGS */
-CONS(  1986, stratos,  0,       0,      stratos,   stratos,  stratos_state, stratos, "Saitek",  "Kasparov Stratos Chess Computer", MACHINE_NO_SOUND)
+CONS(  1986, stratos,  0,       0,      stratos,   stratos,  stratos_state, stratos, "Saitek",  "Kasparov Stratos Chess Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
