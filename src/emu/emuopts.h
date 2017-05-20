@@ -286,6 +286,7 @@ public:
 	~emu_options();
 
 	// mutation
+	void set_system_name(const std::string &new_system_name);
 	void set_system_name(std::string &&new_system_name);
 	void set_software(std::string &&new_software);
 
@@ -477,6 +478,9 @@ public:
 	bool has_slot_option(const std::string &device_name) const { return find_slot_option(device_name) ? true : false; }
 	const ::image_option &image_option(const std::string &device_name) const;
 	::image_option &image_option(const std::string &device_name);
+
+protected:
+	virtual void command_argument_processed() override;
 
 private:
 	struct software_options

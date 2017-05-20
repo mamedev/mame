@@ -623,6 +623,7 @@ void core_options::parse_command_line(const std::vector<std::string> &args, int 
 		if (is_unadorned && !m_command.empty())
 		{
 			m_command_arguments.push_back(std::move(args[arg]));
+			command_argument_processed();
 			continue;
 		}
 

@@ -197,6 +197,9 @@ public:
 	// misc
 	static const char *unadorned(int x = 0) { return s_option_unadorned[std::min(x, MAX_UNADORNED_OPTIONS - 1)]; }
 
+protected:
+	virtual void command_argument_processed() { }
+
 private:
 	class simple_entry : public entry
 	{

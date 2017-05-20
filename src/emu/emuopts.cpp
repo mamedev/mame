@@ -488,6 +488,17 @@ void emu_options::set_system_name(std::string &&new_system_name)
 
 
 //-------------------------------------------------
+//  set_system_name - called to set the system
+//  name; will adjust slot/image options as appropriate
+//-------------------------------------------------
+
+void emu_options::set_system_name(const std::string &new_system_name)
+{
+	set_system_name(std::string(new_system_name));
+}
+
+
+//-------------------------------------------------
 //  update_slot_and_image_options
 //-------------------------------------------------
 
@@ -1006,6 +1017,21 @@ image_option &emu_options::image_option(const std::string &device_name)
 	auto iter = m_image_options.find(device_name);
 	assert(iter != m_image_options.end() && "Attempt to access non-existent image option");
 	return *iter->second;
+}
+
+
+//-------------------------------------------------
+//  command_argument_processed
+//-------------------------------------------------
+
+void emu_options::command_argument_processed()
+{
+	// some command line arguments require that the system name be set, so we can get slot options
+	if (command_arguments().size() == 1 &&
+		(command() == "listdevices" || (command() == "listslots") || (command() == "listmedia")))
+	{
+		set_system_name(command_arguments()[0]);
+	}
 }
 
 
