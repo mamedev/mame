@@ -127,10 +127,10 @@ void coco_state::analog_port_start(analog_input_t *analog, const char *rx_tag, c
 
 void coco_state::device_start()
 {
-	/* call base device_start */
+	// call base device_start
 	driver_device::device_start();
 
-	/* look up analog ports */
+	// look up analog ports
 	analog_port_start(&m_joystick, JOYSTICK_RX_TAG, JOYSTICK_RY_TAG,
 		JOYSTICK_LX_TAG, JOYSTICK_LY_TAG, JOYSTICK_BUTTONS_TAG);
 	analog_port_start(&m_rat_mouse, RAT_MOUSE_RX_TAG, RAT_MOUSE_RY_TAG,
@@ -138,15 +138,17 @@ void coco_state::device_start()
 	analog_port_start(&m_diecom_lightgun, DIECOM_LIGHTGUN_RX_TAG, DIECOM_LIGHTGUN_RY_TAG,
 		DIECOM_LIGHTGUN_LX_TAG, DIECOM_LIGHTGUN_LY_TAG, DIECOM_LIGHTGUN_BUTTONS_TAG);
 
-	/* timers */
+	// timers
 	m_hiresjoy_transition_timer[0] = timer_alloc(TIMER_HIRES_JOYSTICK_X);
 	m_hiresjoy_transition_timer[1] = timer_alloc(TIMER_HIRES_JOYSTICK_Y);
 	m_diecom_lightgun_timer = timer_alloc(TIMER_DIECOM_LIGHTGUN);
 
-	/* cart base update */
+	// cart slot
 	m_cococart->set_cart_base_update(cococart_base_update_delegate(&coco_state::update_cart_base, this));
+	m_cococart->set_line_delay(cococart_slot_device::line::NMI, 12);	// 12 allowed one more instruction to finished after the line is pulled
+	m_cococart->set_line_delay(cococart_slot_device::line::HALT, 6);	// 6 allowed one more instruction to finished after the line is pulled
 
-	/* save state support */
+	// save state support
 	save_item(NAME(m_dac_output));
 	save_item(NAME(m_hiresjoy_ca));
 	save_item(NAME(m_dclg_previous_bit));

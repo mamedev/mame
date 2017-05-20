@@ -96,8 +96,7 @@ void cococart_slot_device::device_start()
 	m_cart_line.callback = &m_cart_callback;
 
 	m_nmi_line.timer_index      = 0;
-	/* 12 allowed one more instruction to finished after the line is pulled */
-	m_nmi_line.delay            = 12;
+	m_nmi_line.delay            = 0;
 	m_nmi_line.value            = line_value::CLEAR;
 	m_nmi_line.line             = 0;
 	m_nmi_line.q_count          = 0;
@@ -105,8 +104,7 @@ void cococart_slot_device::device_start()
 	m_nmi_line.callback = &m_nmi_callback;
 
 	m_halt_line.timer_index     = 0;
-	/* 6 allowed one more instruction to finished after the line is pulled */
-	m_halt_line.delay           = 6;
+	m_halt_line.delay           = 0;
 	m_halt_line.value           = line_value::CLEAR;
 	m_halt_line.line            = 0;
 	m_halt_line.q_count         = 0;
@@ -232,7 +230,7 @@ void cococart_slot_device::set_line(const char *line_name, coco_cartridge_line &
 
 
 //-------------------------------------------------
-//  set_line_timer()
+//  set_line_timer
 //-------------------------------------------------
 
 void cococart_slot_device::set_line_timer(coco_cartridge_line &line, cococart_slot_device::line_value value)
@@ -298,6 +296,32 @@ void cococart_slot_device::set_line_value(cococart_slot_device::line which, coco
 		if (m_cart)
 			m_cart->set_sound_enable(value != cococart_slot_device::line_value::CLEAR);
 		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  set_line_delay
+//-------------------------------------------------
+
+void cococart_slot_device::set_line_delay(cococart_slot_device::line which, int cycles)
+{
+	switch (which)
+	{
+	case cococart_slot_device::line::CART:
+		m_cart_line.delay = cycles;
+		break;
+
+	case cococart_slot_device::line::NMI:
+		m_nmi_line.delay = cycles;
+		break;
+
+	case cococart_slot_device::line::HALT:
+		m_halt_line.delay = cycles;
+		break;
+
+	default:
+		throw false;
 	}
 }
 

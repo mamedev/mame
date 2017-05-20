@@ -94,6 +94,7 @@ public:
 
 	// manipulation of cartridge lines
 	void set_line_value(line line, line_value value);
+	void set_line_delay(line line, int cycles);
 	line_value get_line_value(line line) const;
 
 	// hack to support twiddling the Q line
