@@ -286,7 +286,7 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 	{
 		floppy_image_device *floppy = m_floppies[i]->get_device();
 		if (floppy)
-			floppy->mon_w(i == drive ? CLEAR_LINE : ASSERT_LINE);
+			floppy->mon_w(((i == drive) && (data & 0x08)) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	head = ((data & 0x40) && (drive != 3)) ? 1 : 0;
