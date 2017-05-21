@@ -309,6 +309,7 @@ void generic_keyboard_device::key_repeat(u8 row, u8 column)
 
 void generic_keyboard_device::send_key(u8 code)
 {
+	assert(!m_keyboard_cb.isnull());
 	m_keyboard_cb(code);
 }
 

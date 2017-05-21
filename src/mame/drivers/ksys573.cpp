@@ -392,8 +392,6 @@ public:
 		m_out2(*this, "OUT2" ),
 		m_cd(*this, "CD" ),
 		m_upd4701(*this, "upd4701" ),
-		m_upd4701_y(*this, "uPD4701_y" ),
-		m_upd4701_switches(*this, "uPD4701_switches" ),
 		m_stage(*this, "STAGE" ),
 		m_gunx(*this, "GUNX" ),
 		m_sensor(*this, "SENSOR" ),
@@ -534,8 +532,6 @@ private:
 	required_ioport m_out2;
 	required_ioport m_cd;
 	optional_device<upd4701_device> m_upd4701;
-	optional_ioport m_upd4701_y;
-	optional_ioport m_upd4701_switches;
 	optional_ioport m_stage;
 	optional_ioport m_gunx;
 	optional_ioport m_sensor;
@@ -842,38 +838,19 @@ todo:
 
 READ16_MEMBER( ksys573_state::ge765pwbba_r )
 {
-	uint32_t data = 0;
-
 	switch( offset )
 	{
 	case 0x4c:
 	case 0x4d:
-		m_upd4701->y_add( m_upd4701_y->read() );
-		m_upd4701->switches_set( m_upd4701_switches->read() );
-
-		m_upd4701->cs_w( 0 );
-		m_upd4701->xy_w( 1 );
-
-		if( offset == 0x4c )
-		{
-			m_upd4701->ul_w( 0 );
-		}
-		else
-		{
-			m_upd4701->ul_w( 1 );
-		}
-
-		data = m_upd4701->d_r( space, 0, 0xffff );
-		m_upd4701->cs_w( 1 );
-		break;
+		return m_upd4701->read_y(space, offset & 1);
 
 	default:
 		verboselog( 0, "ge765pwbba_r: unhandled offset %08x %08x\n", offset, mem_mask );
 		break;
 	}
 
-	verboselog( 2, "ge765pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
-	return data;
+	verboselog( 2, "ge765pwbba_r( %08x, %08x )\n", offset, mem_mask );
+	return 0;
 }
 
 WRITE16_MEMBER( ksys573_state::ge765pwbba_w )
@@ -2330,7 +2307,9 @@ static MACHINE_CONFIG_DERIVED( fbaitbc, konami573 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( fbaitbc_map )
 
-	MCFG_UPD4701_ADD( "upd4701" )
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_UPD4701_PORTY("uPD4701_y")
+
 	MCFG_FRAGMENT_ADD( cassx )
 MACHINE_CONFIG_END
 
@@ -2528,9 +2507,9 @@ static INPUT_PORTS_START( fbaitbc )
 	PORT_BIT( 0x0fff, 0, IPT_MOUSE_Y ) PORT_MINMAX( 0, 0xfff ) PORT_SENSITIVITY( 15 ) PORT_KEYDELTA( 8 ) PORT_RESET
 
 	PORT_START( "uPD4701_switches" )
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER( 1 )
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, middle_w)
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, right_w)
+	PORT_BIT( 0x4, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, left_w)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fbaitmc )

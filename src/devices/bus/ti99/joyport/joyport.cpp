@@ -95,7 +95,7 @@ void ti99_joyport_device::device_config_complete()
 
 void device_ti99_joyport_interface::interface_config_complete()
 {
-	m_joyport = downcast<ti99_joyport_device*>(device().owner());
+	m_joyport = dynamic_cast<ti99_joyport_device*>(device().owner());
 }
 
 SLOT_INTERFACE_START( ti99_joystick_port )
