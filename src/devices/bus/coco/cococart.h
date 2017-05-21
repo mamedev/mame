@@ -15,11 +15,21 @@
 
 #include "softlist_dev.h"
 
-// it isn't clear why these need to be included; they don't seem
-// to be picked up by the build system despite being in use by
-// the various CoCo cartridge implementations
-#include "cpu/tms7000/tms7000.h"
+// The following are modules included by the various CoCo cartridge
+// devices.  For some reason, the build system will not necessarily
+// identify them as dependencies.  Adding these #include's here seems
+// to rectify the problem
+#include "machine/mos6551.h"
+#include "machine/6850acia.h"
+#include "machine/msm6242.h"
 #include "machine/ds1315.h"
+#include "machine/wd_fdc.h"
+#include "sound/ay8910.h"
+#include "sound/sp0256.h"
+#include "sound/sn76496.h"
+#include "formats/dmk_dsk.h"
+#include "formats/jvc_dsk.h"
+#include "formats/vdk_dsk.h"
 
 
 /***************************************************************************
