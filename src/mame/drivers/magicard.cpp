@@ -751,7 +751,7 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8, magicard_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( magicard, magicard_state )
+static MACHINE_CONFIG_START( magicard )
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A / 2)    /* SCC-68070 CCA84 datasheet */
 	MCFG_CPU_PROGRAM_MAP(magicard_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicard_state, magicard_irq) /* no interrupts? (it erases the vectors..) */
@@ -902,7 +902,7 @@ DRIVER_INIT_MEMBER(magicard_state, magicard)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY   FULLNAME                    FLAGS... */
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT   COMPANY   FULLNAME                     FLAGS
 
 GAME( 199?, magicard,  0,        magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Card (set 1)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 199?, magicarda, magicard, magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Card (set 2)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

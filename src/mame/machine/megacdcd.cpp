@@ -10,10 +10,131 @@
 #include "emu.h"
 #include "machine/megacdcd.h"
 
-const device_type LC89510_TEMP = device_creator<lc89510_temp_device>;
+#define READ_MAIN (0x0200)
+#define READ_SUB  (0x0300)
+
+#define REG_W_SBOUT  (0x0)
+#define REG_W_IFCTRL (0x1)
+#define REG_W_DBCL   (0x2)
+#define REG_W_DBCH   (0x3)
+#define REG_W_DACL   (0x4)
+#define REG_W_DACH   (0x5)
+#define REG_W_DTTRG  (0x6)
+#define REG_W_DTACK  (0x7)
+#define REG_W_WAL    (0x8)
+#define REG_W_WAH    (0x9)
+#define REG_W_CTRL0  (0xA)
+#define REG_W_CTRL1  (0xB)
+#define REG_W_PTL    (0xC)
+#define REG_W_PTH    (0xD)
+#define REG_W_CTRL2  (0xE)
+#define REG_W_RESET  (0xF)
+
+#define REG_R_COMIN  (0x0)
+#define REG_R_IFSTAT (0x1)
+#define REG_R_DBCL   (0x2)
+#define REG_R_DBCH   (0x3)
+#define REG_R_HEAD0  (0x4)
+#define REG_R_HEAD1  (0x5)
+#define REG_R_HEAD2  (0x6)
+#define REG_R_HEAD3  (0x7)
+#define REG_R_PTL    (0x8)
+#define REG_R_PTH    (0x9)
+#define REG_R_WAL    (0xa)
+#define REG_R_WAH    (0xb)
+#define REG_R_STAT0  (0xc)
+#define REG_R_STAT1  (0xd)
+#define REG_R_STAT2  (0xe)
+#define REG_R_STAT3  (0xf)
+
+#define CMD_STATUS   (0x0)
+#define CMD_STOPALL  (0x1)
+#define CMD_GETTOC   (0x2)
+#define CMD_READ     (0x3)
+#define CMD_SEEK     (0x4)
+//                   (0x5)
+#define CMD_STOP     (0x6)
+#define CMD_RESUME   (0x7)
+#define CMD_FF       (0x8)
+#define CMD_RW       (0x9)
+#define CMD_INIT     (0xa)
+//                   (0xb)
+#define CMD_CLOSE    (0xc)
+#define CMD_OPEN     (0xd)
+//                   (0xe)
+//                   (0xf)
+
+
+#define TOCCMD_CURPOS    (0x0)
+#define TOCCMD_TRKPOS    (0x1)
+#define TOCCMD_CURTRK    (0x2)
+#define TOCCMD_LENGTH    (0x3)
+#define TOCCMD_FIRSTLAST (0x4)
+#define TOCCMD_TRACKADDR (0x5)
+
+
+
+
+#define SET_CDD_DATA_MODE \
+	CDD_CONTROL |= 0x0100;
+#define SET_CDD_AUDIO_MODE \
+	CDD_CONTROL &= ~0x0100;
+#define STOP_CDC_READ \
+	SCD_STATUS_CDC &= ~0x01;
+#define SET_CDC_READ \
+	SCD_STATUS_CDC |= 0x01;
+#define SET_CDC_DMA \
+	SCD_STATUS_CDC |= 0x08;
+#define STOP_CDC_DMA \
+	SCD_STATUS_CDC &= ~0x08;
+#define SCD_READ_ENABLED \
+	(SCD_STATUS_CDC & 1)
+
+#define SCD_DMA_ENABLED \
+	(SCD_STATUS_CDC & 0x08)
+
+#define CLEAR_CDD_RESULT \
+	CDD_MIN = CDD_SEC = CDD_FRAME = CDD_EXT = 0;
+#define CHECK_SCD_LV5_INTERRUPT \
+	if (segacd_irq_mask & 0x20) \
+	{ \
+		machine.device(":segacd:segacd_68k")->execute().set_input_line(5, HOLD_LINE); \
+	}
+#define CHECK_SCD_LV4_INTERRUPT \
+	if (segacd_irq_mask & 0x10) \
+	{ \
+		machine.device(":segacd:segacd_68k")->execute().set_input_line(4, HOLD_LINE); \
+	}
+#define CHECK_SCD_LV4_INTERRUPT_A \
+	if (segacd_irq_mask & 0x10) \
+	{ \
+		machine().device(":segacd:segacd_68k")->execute().set_input_line(4, HOLD_LINE); \
+	}
+
+
+#define CURRENT_TRACK_IS_DATA \
+	(segacd.toc->tracks[SCD_CURTRK - 1].trktype != CD_TRACK_AUDIO)
+
+#define CDD_PLAYINGCDDA 0x0100
+#define CDD_READY       0x0400
+#define CDD_STOPPED     0x0900
+
+
+/* neocd */
+
+#define CD_FRAMES_MINUTE (60 * 75)
+#define CD_FRAMES_SECOND (     75)
+#define CD_FRAMES_PREGAP ( 2 * 75)
+
+#define SEK_IRQSTATUS_NONE (0x0000)
+#define SEK_IRQSTATUS_AUTO (0x2000)
+#define SEK_IRQSTATUS_ACK  (0x1000)
+
+
+DEFINE_DEVICE_TYPE(LC89510_TEMP, lc89510_temp_device, "lc89510_temp", "lc89510_temp_device")
 
 lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, LC89510_TEMP, "lc89510_temp_device", tag, owner, clock, "lc89510_temp", __FILE__)
+	: device_t(mconfig, LC89510_TEMP, tag, owner, clock)
 {
 	segacd_dma_callback =  segacd_dma_delegate(FUNC(lc89510_temp_device::Fake_CDC_Do_DMA), this);
 	type1_interrupt_callback =  interrupt_delegate(FUNC(lc89510_temp_device::dummy_interrupt_callback), this);
@@ -1163,7 +1284,7 @@ char* lc89510_temp_device::LC8915InitTransfer(int NeoCDDMACount)
 		//bprintf(PRINT_ERROR, _T("    LC8951 DOUTEN status invalid\n"));
 		return nullptr;
 	}
-	if (((LC8951RegistersW[REG_W_DACH] << 8) | LC8951RegistersW[REG_W_DACL]) + (NeoCDDMACount << 1) > LC89510_EXTERNAL_BUFFER_SIZE) {
+	if (((LC8951RegistersW[REG_W_DACH] << 8) | LC8951RegistersW[REG_W_DACL]) + (NeoCDDMACount << 1) > EXTERNAL_BUFFER_SIZE) {
 		//bprintf(PRINT_ERROR, _T("    DMA transfer exceeds current sector in LC8951 external buffer\n"));
 
 		return nullptr;

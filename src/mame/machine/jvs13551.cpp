@@ -5,15 +5,15 @@
 
 #include "cpu/tlcs90/tlcs90.h"
 
-const device_type SEGA_837_13551 = device_creator<sega_837_13551>;
+DEFINE_DEVICE_TYPE(SEGA_837_13551, sega_837_13551_device, "jvs13551", "Sega 837-13551 I/O Board")
 
-WRITE_LINE_MEMBER(sega_837_13551::jvs13551_coin_1_w)
+WRITE_LINE_MEMBER(sega_837_13551_device::jvs13551_coin_1_w)
 {
 	if(state)
 		inc_coin(0);
 }
 
-WRITE_LINE_MEMBER(sega_837_13551::jvs13551_coin_2_w)
+WRITE_LINE_MEMBER(sega_837_13551_device::jvs13551_coin_2_w)
 {
 	if(state)
 		inc_coin(1);
@@ -21,8 +21,8 @@ WRITE_LINE_MEMBER(sega_837_13551::jvs13551_coin_2_w)
 
 static INPUT_PORTS_START(sega_837_13551_coins)
 	PORT_START("COINS")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, sega_837_13551, jvs13551_coin_1_w)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, sega_837_13551, jvs13551_coin_2_w)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, sega_837_13551_device, jvs13551_coin_1_w)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, sega_837_13551_device, jvs13551_coin_2_w)
 INPUT_PORTS_END
 
 MACHINE_CONFIG_FRAGMENT(sega_837_13551)
@@ -42,53 +42,53 @@ ROM_START( jvs13551 )
 	ROM_LOAD( "315-6215.bin", 0x0000, 0x4000, CRC(98202738) SHA1(8c4dc85438298e31e25f69542804a78ff0e20962))
 ROM_END
 
-const tiny_rom_entry *sega_837_13551::device_rom_region() const
+const tiny_rom_entry *sega_837_13551_device::device_rom_region() const
 {
 	return ROM_NAME(jvs13551);
 }
 
-void sega_837_13551::static_set_port_tag(device_t &device, int port, const char *tag)
+void sega_837_13551_device::static_set_port_tag(device_t &device, int port, const char *tag)
 {
-	sega_837_13551 &ctrl = downcast<sega_837_13551 &>(device);
+	sega_837_13551_device &ctrl = downcast<sega_837_13551_device &>(device);
 	ctrl.port_tag[port] = tag;
 }
 
-machine_config_constructor sega_837_13551::device_mconfig_additions() const
+machine_config_constructor sega_837_13551_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME(sega_837_13551);
 }
 
-ioport_constructor sega_837_13551::device_input_ports() const
+ioport_constructor sega_837_13551_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(sega_837_13551_coins);
 }
 
-sega_837_13551::sega_837_13551(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : jvs_device(mconfig, SEGA_837_13551, "Sega 837-13551 I/O Board", tag, owner, clock, "jvs13551", __FILE__)
+sega_837_13551_device::sega_837_13551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : jvs_device(mconfig, SEGA_837_13551, tag, owner, clock)
 {
 	memset(port_tag, 0, sizeof(port_tag));
 }
 
-const char *sega_837_13551::device_id()
+const char *sega_837_13551_device::device_id()
 {
 	return "SEGA ENTERPRISES,LTD.;I/O BD JVS;837-13551";
 }
 
-uint8_t sega_837_13551::command_format_version()
+uint8_t sega_837_13551_device::command_format_version()
 {
 	return 0x11;
 }
 
-uint8_t sega_837_13551::jvs_standard_version()
+uint8_t sega_837_13551_device::jvs_standard_version()
 {
 	return 0x20;
 }
 
-uint8_t sega_837_13551::comm_method_version()
+uint8_t sega_837_13551_device::comm_method_version()
 {
 	return 0x10;
 }
 
-void sega_837_13551::device_start()
+void sega_837_13551_device::device_start()
 {
 	jvs_device::device_start();
 	for (int i = 0; i < ARRAY_LENGTH(port_tag); i++)
@@ -98,14 +98,14 @@ void sega_837_13551::device_start()
 	save_item(NAME(coin_counter));
 }
 
-void sega_837_13551::device_reset()
+void sega_837_13551_device::device_reset()
 {
 	jvs_device::device_reset();
 	coin_counter[0] = 0;
 	coin_counter[1] = 0;
 }
 
-void sega_837_13551::inc_coin(int coin)
+void sega_837_13551_device::inc_coin(int coin)
 {
 	coin_counter[coin]++;
 	if(coin_counter[coin] == 16384)
@@ -113,7 +113,7 @@ void sega_837_13551::inc_coin(int coin)
 }
 
 
-void sega_837_13551::function_list(uint8_t *&buf)
+void sega_837_13551_device::function_list(uint8_t *&buf)
 {
 	// SW input - 2 players, 13 bits
 	*buf++ = 0x01; *buf++ = 2; *buf++ = 13; *buf++ = 0;
@@ -128,7 +128,7 @@ void sega_837_13551::function_list(uint8_t *&buf)
 	*buf++ = 0x12; *buf++ = 6; *buf++ = 0; *buf++ = 0;
 }
 
-bool sega_837_13551::coin_counters(uint8_t *&buf, uint8_t count)
+bool sega_837_13551_device::coin_counters(uint8_t *&buf, uint8_t count)
 {
 	if(count > 2)
 		return false;
@@ -142,7 +142,7 @@ bool sega_837_13551::coin_counters(uint8_t *&buf, uint8_t count)
 	return true;
 }
 
-bool sega_837_13551::coin_add(uint8_t slot, int32_t count)
+bool sega_837_13551_device::coin_add(uint8_t slot, int32_t count)
 {
 	if(slot < 1 || slot > 2)
 		return false;
@@ -152,7 +152,7 @@ bool sega_837_13551::coin_add(uint8_t slot, int32_t count)
 	return true;
 }
 
-bool sega_837_13551::switches(uint8_t *&buf, uint8_t count_players, uint8_t bytes_per_switch)
+bool sega_837_13551_device::switches(uint8_t *&buf, uint8_t count_players, uint8_t bytes_per_switch)
 {
 	if(count_players > 2 || bytes_per_switch > 2)
 		return false;
@@ -167,7 +167,7 @@ bool sega_837_13551::switches(uint8_t *&buf, uint8_t count_players, uint8_t byte
 
 }
 
-bool sega_837_13551::analogs(uint8_t *&buf, uint8_t count)
+bool sega_837_13551_device::analogs(uint8_t *&buf, uint8_t count)
 {
 	if(count > 8)
 		return false;
@@ -179,7 +179,7 @@ bool sega_837_13551::analogs(uint8_t *&buf, uint8_t count)
 	return true;
 }
 
-bool sega_837_13551::swoutputs(uint8_t count, const uint8_t *vals)
+bool sega_837_13551_device::swoutputs(uint8_t count, const uint8_t *vals)
 {
 	// WARNING! JVS standard have reversed bits count order
 	// so "board have 6 output bits" means 6 MSB bits is used, the same rules for input too
@@ -194,7 +194,7 @@ bool sega_837_13551::swoutputs(uint8_t count, const uint8_t *vals)
 	return true;
 }
 
-bool sega_837_13551::swoutputs(uint8_t id, uint8_t val)
+bool sega_837_13551_device::swoutputs(uint8_t id, uint8_t val)
 {
 	if(id > 6)
 		return false;

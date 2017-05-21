@@ -15,14 +15,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VP620 = device_creator<vp620_device>;
+DEFINE_DEVICE_TYPE(VP620, vp620_device, "vp620", "VP-620 ASCII Keyboard")
 
 
 //-------------------------------------------------
 //  ASCII_KEYBOARD_INTERFACE( kb_intf )
 //-------------------------------------------------
 
-WRITE8_MEMBER( vp620_device::kb_w )
+void vp620_device::kb_w(uint8_t data)
 {
 	m_keydata = data;
 
@@ -38,7 +38,7 @@ WRITE8_MEMBER( vp620_device::kb_w )
 
 static MACHINE_CONFIG_FRAGMENT( vp620 )
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(vp620_device, kb_w))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(vp620_device, kb_w))
 MACHINE_CONFIG_END
 
 
@@ -63,7 +63,7 @@ machine_config_constructor vp620_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 vp620_device::vp620_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VP620, "VP620", tag, owner, clock, "vp620", __FILE__),
+	device_t(mconfig, VP620, tag, owner, clock),
 	device_vip_byteio_port_interface(mconfig, *this),
 	m_keydata(0),
 	m_keystb(CLEAR_LINE)

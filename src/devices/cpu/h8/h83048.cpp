@@ -3,13 +3,13 @@
 #include "emu.h"
 #include "h83048.h"
 
-const device_type H83044 = device_creator<h83044_device>;
-const device_type H83045 = device_creator<h83045_device>;
-const device_type H83047 = device_creator<h83047_device>;
-const device_type H83048 = device_creator<h83048_device>;
+DEFINE_DEVICE_TYPE(H83044, h83044_device, "h83044", "H8/3044")
+DEFINE_DEVICE_TYPE(H83045, h83045_device, "h83045", "H8/3045")
+DEFINE_DEVICE_TYPE(H83047, h83047_device, "h83047", "H8/3047")
+DEFINE_DEVICE_TYPE(H83048, h83048_device, "h83048", "H8/3048")
 
-h83048_device::h83048_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	h8h_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h83048_device::map), this)),
+h83048_device::h83048_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
+	h8h_device(mconfig, type, tag, owner, clock, address_map_delegate(FUNC(h83048_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	port1(*this, "port1"),
@@ -31,57 +31,30 @@ h83048_device::h83048_device(const machine_config &mconfig, device_type type, co
 	timer16_4(*this, "timer16:4"),
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
-	watchdog(*this, "watchdog")
+	watchdog(*this, "watchdog"),
+	ram_start(start),
+	syscr(0)
 {
-	ram_start = 0;
-	syscr = 0;
 }
 
 h83048_device::h83048_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8h_device(mconfig, H83048, "H8/3048", tag, owner, clock, "h83048", __FILE__, address_map_delegate(FUNC(h83048_device::map), this)),
-	intc(*this, "intc"),
-	adc(*this, "adc"),
-	port1(*this, "port1"),
-	port2(*this, "port2"),
-	port3(*this, "port3"),
-	port4(*this, "port4"),
-	port5(*this, "port5"),
-	port6(*this, "port6"),
-	port7(*this, "port7"),
-	port8(*this, "port8"),
-	port9(*this, "port9"),
-	porta(*this, "porta"),
-	portb(*this, "portb"),
-	timer16(*this, "timer16"),
-	timer16_0(*this, "timer16:0"),
-	timer16_1(*this, "timer16:1"),
-	timer16_2(*this, "timer16:2"),
-	timer16_3(*this, "timer16:3"),
-	timer16_4(*this, "timer16:4"),
-	sci0(*this, "sci0"),
-	sci1(*this, "sci1"),
-	watchdog(*this, "watchdog")
+	h83048_device(mconfig, H83048, tag, owner, clock, 0xffef10)
 {
-	syscr = 0;
-	ram_start = 0xffef10;
 }
 
 h83044_device::h83044_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h83048_device(mconfig, H83044, "H8/3044", tag, owner, clock, "h83044", __FILE__)
+	h83048_device(mconfig, H83044, tag, owner, clock, 0xfff710)
 {
-	ram_start = 0xfff710;
 }
 
 h83045_device::h83045_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h83048_device(mconfig, H83045, "H8/3045", tag, owner, clock, "h83045", __FILE__)
+	h83048_device(mconfig, H83045, tag, owner, clock, 0xfff710)
 {
-	ram_start = 0xfff710;
 }
 
 h83047_device::h83047_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h83048_device(mconfig, H83047, "H8/3047", tag, owner, clock, "h83047", __FILE__)
+	h83048_device(mconfig, H83047, tag, owner, clock, 0xffef10)
 {
-	ram_start = 0xffef10;
 }
 
 static MACHINE_CONFIG_FRAGMENT(h83048)

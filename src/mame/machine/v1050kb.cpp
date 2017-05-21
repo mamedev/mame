@@ -26,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type V1050_KEYBOARD = device_creator<v1050_keyboard_device>;
+DEFINE_DEVICE_TYPE(V1050_KEYBOARD, v1050_keyboard_device, "v1050kb", "Visual 1050 Keyboard")
 
 
 //-------------------------------------------------
@@ -297,7 +297,7 @@ ioport_constructor v1050_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 v1050_keyboard_device::v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, V1050_KEYBOARD, "Visual 1050 Keyboard", tag, owner, clock, "v1050kb", __FILE__),
+	device_t(mconfig, V1050_KEYBOARD, tag, owner, clock),
 	m_maincpu(*this, I8049_TAG),
 	m_discrete(*this, DISCRETE_TAG),
 	m_y(*this, "Y%u", 0),

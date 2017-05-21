@@ -579,7 +579,7 @@ READ_LINE_MEMBER( fp200_state::sid_r )
 	return (ioport("KEYMOD")->read() >> m_keyb_mux) & 1;
 }
 
-static MACHINE_CONFIG_START( fp200, fp200_state )
+static MACHINE_CONFIG_START( fp200 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A,MAIN_CLOCK)
@@ -625,4 +625,4 @@ ROM_START( fp200 )
 	ROM_REGION( 0x800, "chargen", ROMREGION_ERASE00 )
 ROM_END
 
-COMP( 1982, fp200,  0,   0,   fp200,  fp200, driver_device,  0,  "Casio",      "FP-200 (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1982, fp200,  0,   0,   fp200,  fp200, fp200_state,  0,  "Casio",      "FP-200 (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

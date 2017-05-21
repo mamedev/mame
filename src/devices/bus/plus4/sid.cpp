@@ -37,7 +37,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PLUS4_SID = device_creator<plus4_sid_cartridge_device>;
+DEFINE_DEVICE_TYPE(PLUS4_SID, plus4_sid_cartridge_device, "plus4_sid", "Plus/4 SID cartridge")
 
 
 //-------------------------------------------------
@@ -94,7 +94,7 @@ machine_config_constructor plus4_sid_cartridge_device::device_mconfig_additions(
 //-------------------------------------------------
 
 plus4_sid_cartridge_device::plus4_sid_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PLUS4_SID, "Plus/4 SID cartridge", tag, owner, clock, "plus4_sid", __FILE__),
+	device_t(mconfig, PLUS4_SID, tag, owner, clock),
 	device_plus4_expansion_card_interface(mconfig, *this),
 	m_sid(*this, MOS8580_TAG),
 	m_joy(*this, CONTROL1_TAG)

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_C128_COMAL80_H
+#define MAME_BUS_C64_C128_COMAL80_H
 
-#ifndef __C128_COMAL80__
-#define __C128_COMAL80__
+#pragma once
 
 
 #include "exp.h"
@@ -44,7 +44,7 @@ private:
 
 
 // device type definition
-extern const device_type C128_COMAL80;
+DECLARE_DEVICE_TYPE(C128_COMAL80, c128_comal80_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_C128_COMAL80_H

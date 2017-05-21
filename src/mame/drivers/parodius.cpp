@@ -224,7 +224,7 @@ WRITE8_MEMBER( parodius_state::banking_callback )
 	membank("bank1")->set_entry((data & 0x0f) ^ 0x0f);
 }
 
-static MACHINE_CONFIG_START( parodius, parodius_state )
+static MACHINE_CONFIG_START( parodius )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* 053248 */
@@ -379,7 +379,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1990, parodius,  0,        parodius, parodius, driver_device, 0, ROT0, "Konami", "Parodius DA! (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, parodiuse, parodius, parodius, parodius, driver_device, 0, ROT0, "Konami", "Parodius DA! (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, parodiusj, parodius, parodius, parodius, driver_device, 0, ROT0, "Konami", "Parodius DA! (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, parodiusa, parodius, parodius, parodius, driver_device, 0, ROT0, "Konami", "Parodius DA! (Asia)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, parodius,  0,        parodius, parodius, parodius_state, 0, ROT0, "Konami", "Parodius DA! (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, parodiuse, parodius, parodius, parodius, parodius_state, 0, ROT0, "Konami", "Parodius DA! (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, parodiusj, parodius, parodius, parodius, parodius_state, 0, ROT0, "Konami", "Parodius DA! (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, parodiusa, parodius, parodius, parodius, parodius_state, 0, ROT0, "Konami", "Parodius DA! (Asia)",         MACHINE_SUPPORTS_SAVE )

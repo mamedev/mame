@@ -35,7 +35,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_IDE = device_creator<powermate_ide_device>;
+DEFINE_DEVICE_TYPE(ADAM_IDE, powermate_ide_device, "adam_ide", "Powermate HP IDE")
 
 
 //-------------------------------------------------
@@ -90,7 +90,7 @@ machine_config_constructor powermate_ide_device::device_mconfig_additions() cons
 //-------------------------------------------------
 
 powermate_ide_device::powermate_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ADAM_IDE, "Powermate HP IDE", tag, owner, clock, "adam_ide", __FILE__),
+	: device_t(mconfig, ADAM_IDE, tag, owner, clock),
 		device_adam_expansion_slot_card_interface(mconfig, *this),
 		m_ata(*this, ATA_TAG),
 		m_cent_data_out(*this, "cent_data_out"), m_ata_data(0)

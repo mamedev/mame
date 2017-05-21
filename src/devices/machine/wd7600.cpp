@@ -15,9 +15,11 @@
 #include "emu.h"
 #include "machine/wd7600.h"
 
-const device_type WD7600 = device_creator<wd7600_device>;
+#define VERBOSE 1
+#include "logmacro.h"
 
-#define LOG (1)
+
+DEFINE_DEVICE_TYPE(WD7600, wd7600_device, "wd7600", "Western Digital WD7600 chipset")
 
 static MACHINE_CONFIG_FRAGMENT( wd7600 )
 	MCFG_DEVICE_ADD("dma1", AM9517A, 0)
@@ -97,7 +99,7 @@ void wd7600_device::static_set_keybctag(device_t &device, const char *tag)
 }
 
 wd7600_device::wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WD7600, "WD 7600 chipset", tag, owner, clock, "wd7600", __FILE__),
+	device_t(mconfig, WD7600, tag, owner, clock),
 	m_read_ior(*this),
 	m_write_iow(*this),
 	m_write_tc(*this),
@@ -316,20 +318,20 @@ WRITE_LINE_MEMBER( wd7600_device::ctc_out2_w )
 // Keyboard
 WRITE8_MEMBER( wd7600_device::keyb_data_w )
 {
-//  if(LOG) logerror("WD7600 '%s': keyboard data write %02x\n", tag(), data);
+//  LOG("WD7600: keyboard data write %02x\n", data);
 	m_keybc->data_w(space,0,data);
 }
 
 READ8_MEMBER( wd7600_device::keyb_data_r )
 {
 	uint8_t ret = m_keybc->data_r(space,0);
-//  if(LOG) logerror("WD7600 '%s': keyboard data read %02x\n", tag(), ret);
+//  LOG("WD7600: keyboard data read %02x\n", ret);
 		return ret;
 }
 
 WRITE8_MEMBER( wd7600_device::keyb_cmd_w )
 {
-//  if(LOG) logerror("WD7600 '%s': keyboard command %02x\n", tag(), data);
+//  LOG("WD7600: keyboard command %02x\n", data);
 	m_keybc->command_w(space,0,data);
 }
 
@@ -473,7 +475,7 @@ WRITE8_MEMBER( wd7600_device::a20_reset_w )
 	{
 		m_write_cpureset(1);
 		m_write_cpureset(0);
-		if(LOG) logerror("WD7600 '%s': System reset\n",tag());
+		LOG("WD7600: System reset\n");
 	}
 }
 
@@ -495,7 +497,7 @@ WRITE16_MEMBER(wd7600_device::refresh_w)
 {
 	// TODO: select serial/parallel I/O port location
 	m_refresh_ctrl = data;
-	if(LOG) logerror("WD7600 '%s': Refresh Control write %04x\n",tag(),data);
+	LOG("WD7600: Refresh Control write %04x\n", data);
 }
 
 // port 0x2872 - chip select
@@ -507,7 +509,7 @@ READ16_MEMBER(wd7600_device::chipsel_r)
 WRITE16_MEMBER(wd7600_device::chipsel_w)
 {
 	m_chip_sel = data;
-	if(LOG) logerror("WD7600 '%s': Chip Select write %04x\n",tag(),data);
+	LOG("WD7600: Chip Select write %04x\n", data);
 }
 
 // port 0x3872 - Memory Control
@@ -519,7 +521,7 @@ READ16_MEMBER(wd7600_device::mem_ctrl_r)
 WRITE16_MEMBER(wd7600_device::mem_ctrl_w)
 {
 	m_memory_ctrl = data;
-	if(LOG) logerror("WD7600 '%s': Memory Control write %04x\n",tag(),data);
+	LOG("WD7600: Memory Control write %04x\n", data);
 }
 
 // port 0x4872 - Bank 0 and 1 start address
@@ -533,12 +535,12 @@ WRITE16_MEMBER(wd7600_device::bank_01_start_w)
 	if(ACCESSING_BITS_0_7)
 	{
 		m_bank_start[0] = data & 0xff;
-		if(LOG) logerror("WD7600 '%s': Bank 0 start address %08x\n",tag(),m_bank_start[0] << 16);
+		LOG("WD7600: Bank 0 start address %08x\n", m_bank_start[0] << 16);
 	}
 	if(ACCESSING_BITS_8_15)
 	{
 		m_bank_start[1] = (data & 0xff00) >> 8;
-		if(LOG) logerror("WD7600 '%s': Bank 1 start address %08x\n",tag(),m_bank_start[1] << 16);
+		LOG("WD7600: Bank 1 start address %08x\n", m_bank_start[1] << 16);
 	}
 }
 
@@ -553,12 +555,12 @@ WRITE16_MEMBER(wd7600_device::bank_23_start_w)
 	if(ACCESSING_BITS_0_7)
 	{
 		m_bank_start[2] = data & 0xff;
-		if(LOG) logerror("WD7600 '%s': Bank 2 start address %08x\n",tag(),m_bank_start[2] << 16);
+		LOG("WD7600: Bank 2 start address %08x\n", m_bank_start[2] << 16);
 	}
 	if(ACCESSING_BITS_8_15)
 	{
 		m_bank_start[3] = (data & 0xff00) >> 8;
-		if(LOG) logerror("WD7600 '%s': Bank 3 start address %08x\n",tag(),m_bank_start[3] << 16);
+		LOG("WD7600: Bank 3 start address %08x\n", m_bank_start[3] << 16);
 	}
 }
 
@@ -571,7 +573,7 @@ READ16_MEMBER(wd7600_device::split_addr_r)
 WRITE16_MEMBER(wd7600_device::split_addr_w)
 {
 	m_split_start = data;
-	if(LOG) logerror("WD7600 '%s': Split start address write %04x\n",tag(),data);
+	LOG("WD7600: Split start address write %04x\n", data);
 }
 
 // port 0x9872 - Diagnostic
@@ -583,5 +585,5 @@ READ16_MEMBER(wd7600_device::diag_r)
 WRITE16_MEMBER(wd7600_device::diag_w)
 {
 	m_diagnostic = data;
-	if(LOG) logerror("WD7600 '%s': Diagnostic write %04x\n",tag(),data);
+	LOG("WD7600: Diagnostic write %04x\n", data);
 }

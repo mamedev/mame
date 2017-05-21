@@ -110,7 +110,7 @@ static GFXDECODE_START( m79152pc )
 	GFXDECODE_ENTRY( "chargen", 0x0000, m79152pc_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( m79152pc, m79152pc_state )
+static MACHINE_CONFIG_START( m79152pc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(m79152pc_mem)
@@ -141,5 +141,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     INIT    COMPANY     FULLNAME       FLAGS */
-COMP( ????, m79152pc,  0,       0,       m79152pc,  m79152pc, driver_device, 0,   "Mera-Elzab", "MERA 79152 PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY       FULLNAME         FLAGS
+COMP( ????, m79152pc,  0,       0,       m79152pc,  m79152pc, m79152pc_state, 0,    "Mera-Elzab", "MERA 79152 PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

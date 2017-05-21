@@ -19,13 +19,12 @@
 //  constructors
 //-------------------------------------------------
 
-const device_type SEGA8_ROM_CARDCATCH = device_creator<sega8_cardcatch_device>;
+DEFINE_DEVICE_TYPE(SEGA8_ROM_CARDCATCH, sega8_cardcatch_device, "sega8_ccatch", "SG-1000 Card Catcher Cart")
 
 
 
 sega8_cardcatch_device::sega8_cardcatch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: sega8_rom_device(mconfig, SEGA8_ROM_CARDCATCH, "SG-1000 Card Catcher Cart", tag, owner, clock, "sega8_ccatch", __FILE__),
-						m_card(*this, "cardslot")
+	: sega8_rom_device(mconfig, SEGA8_ROM_CARDCATCH, tag, owner, clock), m_card(*this, "cardslot")
 {
 }
 

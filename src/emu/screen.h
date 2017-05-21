@@ -363,13 +363,10 @@ private:
 };
 
 // device type definition
-extern const device_type SCREEN;
+DECLARE_DEVICE_TYPE(SCREEN, screen_device)
 
 // iterator helper
 typedef device_type_iterator<screen_device> screen_device_iterator;
-
-extern template class device_finder<screen_device, false>;
-extern template class device_finder<screen_device, true>;
 
 /*!
  @defgroup Screen device configuration macros

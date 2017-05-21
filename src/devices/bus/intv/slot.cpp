@@ -86,7 +86,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type INTV_CART_SLOT = device_creator<intv_cart_slot_device>;
+DEFINE_DEVICE_TYPE(INTV_CART_SLOT, intv_cart_slot_device, "intv_cart_slot", "Intellivision Cartridge Slot")
 
 //**************************************************************************
 //    Intellivision Cartridges Interface
@@ -145,10 +145,11 @@ void device_intv_cart_interface::ram_alloc(uint32_t size)
 //  intv_cart_slot_device - constructor
 //-------------------------------------------------
 intv_cart_slot_device::intv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, INTV_CART_SLOT, "Intellivision Cartridge Slot", tag, owner, clock, "intv_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(INTV_STD), m_cart(nullptr)
+	device_t(mconfig, INTV_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(INTV_STD),
+	m_cart(nullptr)
 {
 }
 

@@ -308,7 +308,7 @@ DRIVER_INIT_MEMBER(wallc_state,wallca)
 
 
 
-static MACHINE_CONFIG_START( wallc, wallc_state )
+static MACHINE_CONFIG_START( wallc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12288000 / 4)  /* 3.072 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(wallc_map)
@@ -492,8 +492,8 @@ DRIVER_INIT_MEMBER(wallc_state,sidam)
 
 }
 
-GAME( 1984, wallc,  0,      wallc,  wallc, wallc_state, wallc,  ROT0, "Midcoin", "Wall Crash (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wallca, wallc,  wallc,  wallc, wallc_state, wallca, ROT0, "Midcoin", "Wall Crash (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, brkblast,wallc, wallc,  wallc, wallc_state, wallca, ROT0, "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
+GAME( 1984, wallc,    0,     wallc,  wallc, wallc_state, wallc,  ROT0, "Midcoin",          "Wall Crash (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wallca,   wallc, wallc,  wallc, wallc_state, wallca, ROT0, "Midcoin",          "Wall Crash (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, brkblast, wallc, wallc,  wallc, wallc_state, wallca, ROT0, "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
-GAME( 1984, sidampkr,0,     wallc,  wallc, wallc_state, sidam,  ROT270, "Sidam", "unknown Sidam Poker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sidampkr, 0,     wallc,  wallc, wallc_state, sidam,  ROT270, "Sidam",          "unknown Sidam Poker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

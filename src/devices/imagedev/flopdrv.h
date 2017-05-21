@@ -3,8 +3,10 @@
 /* flopdrv provides simple emulation of a disc drive */
 /* the 8271, upd765 and wd179x use this */
 
-#ifndef __FLOPDRV_H__
-#define __FLOPDRV_H__
+#ifndef MAME_DEVICES_IMAGEDV_FLOPDRV_H
+#define MAME_DEVICES_IMAGEDV_FLOPDRV_H
+
+#pragma once
 
 #include "formats/flopimg.h"
 #include "softlist_dev.h"
@@ -94,7 +96,6 @@ class legacy_floppy_image_device :  public device_t,
 public:
 	// construction/destruction
 	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~legacy_floppy_image_device();
 
 	static void static_set_floppy_config(device_t &device, const floppy_interface *config) { downcast<legacy_floppy_image_device &>(device).m_config = config; }
@@ -167,6 +168,8 @@ private:
 	TIMER_CALLBACK_MEMBER( set_wpt );
 
 protected:
+	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
@@ -224,7 +227,7 @@ protected:
 };
 
 // device type definition
-extern const device_type LEGACY_FLOPPY;
+DECLARE_DEVICE_TYPE(LEGACY_FLOPPY, legacy_floppy_image_device)
 
 
 
@@ -267,4 +270,4 @@ int floppy_get_count(running_machine &machine);
 	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)     \
 	MCFG_LEGACY_FLOPPY_CONFIG(_config)
 
-#endif /* __FLOPDRV_H__ */
+#endif // MAME_DEVICES_IMAGEDV_FLOPDRV_H

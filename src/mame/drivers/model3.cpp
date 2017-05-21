@@ -1073,28 +1073,28 @@ READ64_MEMBER(model3_state::scsi_r)
 	int reg = offset*8;
 	uint64_t r = 0;
 	if (ACCESSING_BITS_56_63) {
-		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+0) << 56;
+		r |= (uint64_t)m_lsi53c810->reg_r(reg+0) << 56;
 	}
 	if (ACCESSING_BITS_48_55) {
-		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+1) << 48;
+		r |= (uint64_t)m_lsi53c810->reg_r(reg+1) << 48;
 	}
 	if (ACCESSING_BITS_40_47) {
-		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+2) << 40;
+		r |= (uint64_t)m_lsi53c810->reg_r(reg+2) << 40;
 	}
 	if (ACCESSING_BITS_32_39) {
-		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+3) << 32;
+		r |= (uint64_t)m_lsi53c810->reg_r(reg+3) << 32;
 	}
 	if (ACCESSING_BITS_24_31) {
-		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+4) << 24;
+		r |= (uint64_t)m_lsi53c810->reg_r(reg+4) << 24;
 	}
 	if (ACCESSING_BITS_16_23) {
-		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+5) << 16;
+		r |= (uint64_t)m_lsi53c810->reg_r(reg+5) << 16;
 	}
 	if (ACCESSING_BITS_8_15) {
-		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+6) << 8;
+		r |= (uint64_t)m_lsi53c810->reg_r(reg+6) << 8;
 	}
 	if (ACCESSING_BITS_0_7) {
-		r |= (uint64_t)m_lsi53c810->lsi53c810_reg_r(reg+7) << 0;
+		r |= (uint64_t)m_lsi53c810->reg_r(reg+7) << 0;
 	}
 
 	return r;
@@ -1104,28 +1104,28 @@ WRITE64_MEMBER(model3_state::scsi_w)
 {
 	int reg = offset*8;
 	if (ACCESSING_BITS_56_63) {
-		m_lsi53c810->lsi53c810_reg_w(reg+0, data >> 56);
+		m_lsi53c810->reg_w(reg+0, data >> 56);
 	}
 	if (ACCESSING_BITS_48_55) {
-		m_lsi53c810->lsi53c810_reg_w(reg+1, data >> 48);
+		m_lsi53c810->reg_w(reg+1, data >> 48);
 	}
 	if (ACCESSING_BITS_40_47) {
-		m_lsi53c810->lsi53c810_reg_w(reg+2, data >> 40);
+		m_lsi53c810->reg_w(reg+2, data >> 40);
 	}
 	if (ACCESSING_BITS_32_39) {
-		m_lsi53c810->lsi53c810_reg_w(reg+3, data >> 32);
+		m_lsi53c810->reg_w(reg+3, data >> 32);
 	}
 	if (ACCESSING_BITS_24_31) {
-		m_lsi53c810->lsi53c810_reg_w(reg+4, data >> 24);
+		m_lsi53c810->reg_w(reg+4, data >> 24);
 	}
 	if (ACCESSING_BITS_16_23) {
-		m_lsi53c810->lsi53c810_reg_w(reg+5, data >> 16);
+		m_lsi53c810->reg_w(reg+5, data >> 16);
 	}
 	if (ACCESSING_BITS_8_15) {
-		m_lsi53c810->lsi53c810_reg_w(reg+6, data >> 8);
+		m_lsi53c810->reg_w(reg+6, data >> 8);
 	}
 	if (ACCESSING_BITS_0_7) {
-		m_lsi53c810->lsi53c810_reg_w(reg+7, data >> 0);
+		m_lsi53c810->reg_w(reg+7, data >> 0);
 	}
 }
 
@@ -3341,7 +3341,7 @@ ROM_START( vs215 )  /* Step 1.5 */
 	ROM_FILL( 0x000000, 0x80000, 0x0000 )
 ROM_END
 
-ROM_START( vs215o ) /* Step 1.5, original release.. might even be for Step 1.0??? */
+ROM_START( vs215o ) /* Step 1.5, original release.. might even be for Step 1.0???, Sega ID# 833-13089, ROM board ID# 834-13090 V.STRIKER 2 */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-19806.17",  0x600006, 0x080000, CRC(95e1b970) SHA1(bcc914088cd08cb0032349b71904757760d947f3) )
@@ -5055,7 +5055,7 @@ ROM_START( fvipers2 )   /* Step 2.0 - Japan version */
 	ROM_PARAMETER( ":315_5881:key", "29260e96" )
 ROM_END
 
-ROM_START( spikeout )   /* Step 2.1 */
+ROM_START( spikeout )   /* Step 2.1, Sega game ID# is 833-13592, ROM board ID# 834-13593 SPK */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21214c.17", 0x000006, 0x200000, CRC(8dc0a85c) SHA1(c75088fd0594964a4ed78b80a2585d3d89c85464) )
@@ -5701,7 +5701,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model3_state::model3_interrupt)
 	}
 }
 
-static MACHINE_CONFIG_START( model3_10, model3_state )
+static MACHINE_CONFIG_START( model3_10 )
 	MCFG_CPU_ADD("maincpu", PPC603E, 66000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)   /* Multiplier 1, Bus = 66MHz, Core = 66MHz */
 	MCFG_CPU_PROGRAM_MAP(model3_10_mem)
@@ -5749,7 +5749,7 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_LEGACY_SCSI_PORT("scsi")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( model3_15, model3_state )
+static MACHINE_CONFIG_START( model3_15 )
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)       /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	MCFG_CPU_PROGRAM_MAP(model3_mem)
@@ -5810,7 +5810,7 @@ static MACHINE_CONFIG_DERIVED(scud, model3_15)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(model3_20, model3_state)
+static MACHINE_CONFIG_START(model3_20)
 	MCFG_CPU_ADD("maincpu", PPC603R, 166000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)    /* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
 	MCFG_CPU_PROGRAM_MAP(model3_mem)
@@ -5855,7 +5855,7 @@ static MACHINE_CONFIG_DERIVED(model3_20_5881, model3_20)
 	MCFG_SET_READ_CALLBACK(model3_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(model3_21, model3_state)
+static MACHINE_CONFIG_START(model3_21)
 	MCFG_CPU_ADD("maincpu", PPC603R, 166000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)    /* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
 	MCFG_CPU_PROGRAM_MAP(model3_mem)

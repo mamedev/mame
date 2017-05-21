@@ -181,7 +181,7 @@ static GFXDECODE_START( ti630 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, ti630_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ti630, ti630_state )
+static MACHINE_CONFIG_START( ti630 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
@@ -210,5 +210,5 @@ ROM_START( ti630 )
 	ROM_LOAD( "ti630.ci11",  0x00000, 0x10000, CRC(2602cbdc) SHA1(98266bea52a5893e0af0b5872eca0a0a1e0c5f9c) )
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS         INIT    COMPANY  FULLNAME                       FLAGS */
-COMP( 1999, ti630,   0,      0,      ti630,     0,   ti630_state, ti630, "Intelbras", "TI630 telephone",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT   COMPANY      FULLNAME           FLAGS
+COMP( 1999, ti630,   0,      0,      ti630,    0,     ti630_state, ti630, "Intelbras", "TI630 telephone", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

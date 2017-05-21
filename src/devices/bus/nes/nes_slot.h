@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __NES_SLOT_H__
-#define __NES_SLOT_H__
+#ifndef MAME_BUS_NES_NES_SLOT_H
+#define MAME_BUS_NES_NES_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -161,7 +163,6 @@ class device_nes_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_nes_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_nes_cart_interface();
 
 	// reading and writing
@@ -230,6 +231,7 @@ public:
 	uint8_t account_bus_conflict(uint32_t offset, uint8_t data);
 
 protected:
+	device_nes_cart_interface(const machine_config &mconfig, device_t &device);
 
 	// internal state
 	uint8_t *m_prg;
@@ -396,15 +398,14 @@ public:
 
 	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
 
-	//private:
-
+//private:
 	device_nes_cart_interface*      m_cart;
 	int m_pcb_id;
 	bool                            m_must_be_loaded;
 };
 
 // device type definition
-extern const device_type NES_CART_SLOT;
+DECLARE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device)
 
 
 /***************************************************************************
@@ -429,4 +430,4 @@ extern const device_type NES_CART_SLOT;
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, true) \
 	MCFG_NES_CARTRIDGE_NOT_MANDATORY
 
-#endif
+#endif // MAME_BUS_NES_NES_SLOT_H

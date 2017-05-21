@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf,Carl
-#ifndef NULL_MODEM_H_
-#define NULL_MODEM_H_
+#ifndef MAME_BUS_RS232_NULL_MODEM_H
+#define MAME_BUS_RS232_NULL_MODEM_H
 
 #include "rs232.h"
 #include "imagedev/bitbngr.h"
@@ -30,9 +30,9 @@ protected:
 	virtual void rcv_complete() override;
 
 private:
-	void queue();
+	static constexpr int TIMER_POLL = 1;
 
-	static const int TIMER_POLL = 1;
+	void queue();
 
 	required_device<bitbanger_device> m_stream;
 
@@ -51,6 +51,6 @@ private:
 	int m_rts;
 };
 
-extern const device_type NULL_MODEM;
+DECLARE_DEVICE_TYPE(NULL_MODEM, null_modem_device)
 
-#endif
+#endif // MAME_BUS_RS232_NULL_MODEM_H

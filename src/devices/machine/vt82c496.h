@@ -6,8 +6,10 @@
 
 */
 
-#ifndef __VT82C496_H__
-#define __VT82C496_H__
+#ifndef MAME_MACHINE_VT82C496_H
+#define MAME_MACHINE_VT82C496_H
+
+#pragma once
 
 #include "ram.h"
 
@@ -53,7 +55,6 @@ private:
 };
 
 // device type definition
-extern const device_type VT82C496;
+DECLARE_DEVICE_TYPE(VT82C496, vt82c496_device)
 
-
-#endif /* __VT82C496_H__ */
+#endif // MAME_MACHINE_VT82C496_H

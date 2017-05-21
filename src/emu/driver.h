@@ -121,13 +121,6 @@ public:
 	static void static_set_game(device_t &device, const game_driver &game);
 	static void static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback);
 
-	// generic helpers
-	template<class _DriverClass, void (_DriverClass::*_Function)()>
-	static void driver_init_wrapper(running_machine &machine)
-	{
-		(machine.driver_data<_DriverClass>()->*_Function)();
-	}
-
 	// dummy driver_init callbacks
 	void init_0() { }
 

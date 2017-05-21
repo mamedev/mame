@@ -16,7 +16,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type MACPDS_SLOT = device_creator<macpds_slot_device>;
+DEFINE_DEVICE_TYPE(MACPDS_SLOT, macpds_slot_device, "macpds_slot", "Mac 68000 Processor-Direct Slot")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -26,16 +26,15 @@ const device_type MACPDS_SLOT = device_creator<macpds_slot_device>;
 //  macpds_slot_device - constructor
 //-------------------------------------------------
 macpds_slot_device::macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, MACPDS_SLOT, "Mac 68000 Processor-Direct Slot", tag, owner, clock, "macpds_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-	m_macpds_tag(nullptr),
-	m_macpds_slottag(nullptr)
+	macpds_slot_device(mconfig, MACPDS_SLOT, tag, owner, clock)
 {
 }
 
-macpds_slot_device::macpds_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this), m_macpds_tag(nullptr), m_macpds_slottag(nullptr)
+macpds_slot_device::macpds_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_macpds_tag(nullptr),
+	m_macpds_slottag(nullptr)
 {
 }
 
@@ -61,7 +60,7 @@ void macpds_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type MACPDS = device_creator<macpds_device>;
+DEFINE_DEVICE_TYPE(MACPDS, macpds_device, "macpds", "Mac 68000 Processor-Direct Bus")
 
 void macpds_device::static_set_cputag(device_t &device, const char *tag)
 {
@@ -78,12 +77,14 @@ void macpds_device::static_set_cputag(device_t &device, const char *tag)
 //-------------------------------------------------
 
 macpds_device::macpds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, MACPDS, "MACPDS", tag, owner, clock, "macpds", __FILE__), m_maincpu(nullptr), m_cputag(nullptr)
+	macpds_device(mconfig, MACPDS, tag, owner, clock)
 {
 }
 
-macpds_device::macpds_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr), m_cputag(nullptr)
+macpds_device::macpds_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_maincpu(nullptr),
+	m_cputag(nullptr)
 {
 }
 //-------------------------------------------------

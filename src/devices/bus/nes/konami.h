@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __NES_KONAMI_H
-#define __NES_KONAMI_H
+#ifndef MAME_BUS_NES_KONAMI_H
+#define MAME_BUS_NES_KONAMI_H
+
+#pragma once
 
 #include "nxrom.h"
 #include "sound/vrc6.h"
@@ -16,11 +18,13 @@ public:
 	// construction/destruction
 	nes_konami_vrc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 private:
 	uint8_t m_mmc_vrom_bank[2];
@@ -35,13 +39,15 @@ public:
 	// construction/destruction
 	nes_konami_vrc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_m) override;
 	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 private:
 	uint8_t m_mmc_vrom_bank[8];
@@ -57,19 +63,22 @@ public:
 	// construction/destruction
 	nes_konami_vrc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
+	static constexpr device_timer_id TIMER_IRQ = 0;
+
 	uint16_t m_irq_count, m_irq_count_latch;
 	int m_irq_enable, m_irq_enable_latch;
 	int m_irq_mode;
 
-	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };
 
@@ -80,17 +89,21 @@ class nes_konami_vrc4_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_konami_vrc4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	nes_konami_vrc4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 
 protected:
+	static constexpr device_timer_id TIMER_IRQ = 0;
+
+	nes_konami_vrc4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void set_prg();
 	uint8_t m_mmc_vrom_bank[8];
 	uint8_t m_latch, m_mmc_prg_bank;
@@ -101,7 +114,6 @@ protected:
 	int m_irq_mode;
 	int m_irq_prescale;
 
-	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };
 
@@ -114,10 +126,12 @@ public:
 	// construction/destruction
 	nes_konami_vrc6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 	required_device<vrc6snd_device> m_vrc6snd;
 };
@@ -131,25 +145,26 @@ public:
 	// construction/destruction
 	nes_konami_vrc7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 private:
 	required_device<ym2413_device> m_ym2413;
 };
 
 
-
 // device type definition
-extern const device_type NES_VRC1;
-extern const device_type NES_VRC2;
-extern const device_type NES_VRC3;
-extern const device_type NES_VRC4;
-extern const device_type NES_VRC6;
-extern const device_type NES_VRC7;
+DECLARE_DEVICE_TYPE(NES_VRC1, nes_konami_vrc1_device)
+DECLARE_DEVICE_TYPE(NES_VRC2, nes_konami_vrc2_device)
+DECLARE_DEVICE_TYPE(NES_VRC3, nes_konami_vrc3_device)
+DECLARE_DEVICE_TYPE(NES_VRC4, nes_konami_vrc4_device)
+DECLARE_DEVICE_TYPE(NES_VRC6, nes_konami_vrc6_device)
+DECLARE_DEVICE_TYPE(NES_VRC7, nes_konami_vrc7_device)
 
-#endif
+#endif // MAME_BUS_NES_KONAMI_H

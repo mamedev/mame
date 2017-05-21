@@ -49,7 +49,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DSBZ80 = device_creator<dsbz80_device>;
+DEFINE_DEVICE_TYPE(DSBZ80, dsbz80_device, "dsbz80_device", "Sega Z80-based Digital Sound Board")
 
 
 //-------------------------------------------------
@@ -71,7 +71,7 @@ machine_config_constructor dsbz80_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 dsbz80_device::dsbz80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, DSBZ80, "Sega Z80-based Digital Sound Board", tag, owner, clock, "dsbz80", __FILE__),
+	device_t(mconfig, DSBZ80, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_ourcpu(*this, Z80_TAG),
 	m_uart(*this, "uart"),

@@ -5,10 +5,10 @@
 
 const uint8_t manufacturer_id = 0x08;
 
-const device_type MSX_MATSUSHITA = device_creator<msx_matsushita_device>;
+DEFINE_DEVICE_TYPE(MSX_MATSUSHITA, msx_matsushita_device, "msx_matsushita", "Matsushita switched device")
 
 msx_matsushita_device::msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_MATSUSHITA, "Matsushita switched device", tag, owner, clock, "msx_matsushita", __FILE__)
+	: device_t(mconfig, MSX_MATSUSHITA, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_io_config(*this, "CONFIG")
 	, m_turbo_out_cb(*this)

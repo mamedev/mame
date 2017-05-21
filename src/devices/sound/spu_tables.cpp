@@ -2,18 +2,9 @@
 // copyright-holders:pSXAuthor, R. Belmont
 #include "emu.h"
 #include "spu.h"
+#include "spureverb.h"
 
-static inline float ms_to_rate(const float ms)
-{
-	return 1.0f/(ms*((float)spu_base_frequency_hz/1000.0f));
-}
-
-static inline float s_to_rate(const float s)
-{
-	return ms_to_rate(s*1000.0f);
-}
-
-static float linear_rate[]=
+const float spu_device::linear_rate[]=
 {
 	ms_to_rate(0.05f),
 	ms_to_rate(0.06f),
@@ -125,9 +116,8 @@ static float linear_rate[]=
 	s_to_rate(6080.0f)
 };
 
-static const int num_linear_rates=ARRAY_LENGTH(linear_rate);
 
-static const float pos_exp_rate[]=
+const float spu_device::pos_exp_rate[]=
 {
 	ms_to_rate(0.09f),
 	ms_to_rate(0.11f),
@@ -231,9 +221,8 @@ static const float pos_exp_rate[]=
 	s_to_rate(2664.0f)
 };
 
-static const int num_pos_exp_rates=ARRAY_LENGTH(pos_exp_rate);
 
-static const float neg_exp_rate[]=
+const float spu_device::neg_exp_rate[]=
 {
 	ms_to_rate(0.07f),
 	ms_to_rate(0.09f),
@@ -345,9 +334,8 @@ static const float neg_exp_rate[]=
 	s_to_rate(11200.0f)
 };
 
-static const int num_neg_exp_rates=ARRAY_LENGTH(neg_exp_rate);
 
-static const float decay_rate[16]=
+const float spu_device::decay_rate[16]=
 {
 	ms_to_rate(0.07f),
 	ms_to_rate(0.18f),
@@ -367,7 +355,7 @@ static const float decay_rate[16]=
 	s_to_rate(3.4f),
 };
 
-static const float linear_release_rate[]=
+const float spu_device::linear_release_rate[]=
 {
 	ms_to_rate(0.04f),
 	ms_to_rate(0.09f),
@@ -398,9 +386,8 @@ static const float linear_release_rate[]=
 	s_to_rate(3040.0f)
 };
 
-static const int num_linear_release_rates=ARRAY_LENGTH(linear_release_rate);
 
-static const float exp_release_rate[]=
+const float spu_device::exp_release_rate[]=
 {
 	ms_to_rate(0.07f),
 	ms_to_rate(0.18f),
@@ -431,7 +418,6 @@ static const float exp_release_rate[]=
 	s_to_rate(7008.0f)
 };
 
-static const int num_exp_release_rates=ARRAY_LENGTH(exp_release_rate);
 
 //
 //
@@ -631,6 +617,7 @@ spu_device::reverb_preset spu_device::reverb_presets[]=
 
 float spu_device::get_linear_rate(const int n)
 {
+	static constexpr int num_linear_rates=ARRAY_LENGTH(linear_rate);
 	if (n>=num_linear_rates) return 0.0f;
 	return linear_rate[n]*freq_multiplier;
 }
@@ -643,6 +630,7 @@ float spu_device::get_linear_rate_neg_phase(const int n)
 
 float spu_device::get_pos_exp_rate(const int n)
 {
+	static constexpr int num_pos_exp_rates=ARRAY_LENGTH(pos_exp_rate);
 	if (n>=num_pos_exp_rates) return 0.0f;
 	return pos_exp_rate[n]*freq_multiplier;
 }
@@ -655,6 +643,7 @@ float spu_device::get_pos_exp_rate_neg_phase(const int n)
 
 float spu_device::get_neg_exp_rate(const int n)
 {
+	static constexpr int num_neg_exp_rates=ARRAY_LENGTH(neg_exp_rate);
 	if (n>=num_neg_exp_rates) return 0.0f;
 	return -neg_exp_rate[n]*freq_multiplier;
 }
@@ -677,12 +666,14 @@ float spu_device::get_sustain_level(const int n)
 
 float spu_device::get_linear_release_rate(const int n)
 {
+	static constexpr int num_linear_release_rates=ARRAY_LENGTH(linear_release_rate);
 	if (n>=num_linear_release_rates) return 0.0f;
 	return linear_release_rate[n]*freq_multiplier;
 }
 
 float spu_device::get_exp_release_rate(const int n)
 {
+	static constexpr int num_exp_release_rates=ARRAY_LENGTH(exp_release_rate);
 	if (n>=num_exp_release_rates) return 0.0f;
 	return exp_release_rate[n]*freq_multiplier;
 }

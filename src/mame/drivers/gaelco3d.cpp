@@ -279,7 +279,7 @@ READ16_MEMBER(gaelco3d_state::eeprom_data_r)
 	{
 		/* bit 0 is clock */
 		/* bit 1 active */
-		result &= ~GAELCOSER_EXT_STATUS_MASK;
+		result &= ~uint32_t(gaelco_serial_device::EXT_STATUS_MASK);
 		result |= m_serial->status_r(space, 0);
 	}
 
@@ -950,7 +950,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
+static MACHINE_CONFIG_START( gaelco3d )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 15000000)

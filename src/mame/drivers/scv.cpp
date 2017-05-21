@@ -651,7 +651,7 @@ static SLOT_INTERFACE_START(scv_cart)
 	SLOT_INTERFACE_INTERNAL("rom128k_ram", SCV_ROM128K_RAM4K)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( scv, scv_state )
+static MACHINE_CONFIG_START( scv )
 
 	MCFG_CPU_ADD( "maincpu", UPD7801, XTAL_4MHz )
 	MCFG_CPU_PROGRAM_MAP( scv_mem )
@@ -712,6 +712,6 @@ ROM_START( scv_pal )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT    COMPANY  FULLNAME                 FLAGS */
-CONS( 1984, scv,     0,      0,      scv,     scv, driver_device,   0,      "Epoch", "Super Cassette Vision", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 198?, scv_pal, scv,    0,      scv_pal, scv, driver_device,   0,      "Yeno",  "Super Cassette Vision (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE      INIT    COMPANY  FULLNAME                       FLAGS */
+CONS( 1984, scv,     0,      0,      scv,     scv,   scv_state, 0,      "Epoch", "Super Cassette Vision",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 198?, scv_pal, scv,    0,      scv_pal, scv,   scv_state, 0,      "Yeno",  "Super Cassette Vision (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

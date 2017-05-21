@@ -28,7 +28,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type PC9801_86 = device_creator<pc9801_86_device>;
+DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "pc9801_86")
 
 
 READ8_MEMBER(pc9801_86_device::opn_porta_r)
@@ -129,7 +129,7 @@ ioport_constructor pc9801_86_device::device_input_ports() const
 //-------------------------------------------------
 
 pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC9801_86, "pc9801_86", tag, owner, clock, "pc9801_86", __FILE__),
+	: device_t(mconfig, PC9801_86, tag, owner, clock),
 		m_opna(*this, "opna"),
 		m_ldac(*this, "ldac"),
 		m_rdac(*this, "rdac"),

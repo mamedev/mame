@@ -497,7 +497,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( spaceg, spaceg_state )
+static MACHINE_CONFIG_START( spaceg )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,2500000)         /* 2.5 MHz */
@@ -577,4 +577,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, spaceg, 0, spaceg, spaceg, driver_device, 0, ROT270, "Omori Electric Co., Ltd.", "Space Guerrilla", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spaceg, 0, spaceg, spaceg, spaceg_state, 0, ROT270, "Omori Electric Co., Ltd.", "Space Guerrilla", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -50,10 +50,10 @@ enum
 };
 
 
-const device_type NILE = device_creator<nile_device>;
+DEFINE_DEVICE_TYPE(NILE, nile_device, "nile", "Seta ST-0026 NiLe")
 
 nile_device::nile_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NILE, "NiLe", tag, owner, clock, "nile", __FILE__),
+	: device_t(mconfig, NILE, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_sound_ram(*this, DEVICE_SELF),

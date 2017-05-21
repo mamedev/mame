@@ -23,49 +23,49 @@
 //  chanf_rom_device - constructor
 //-------------------------------------------------
 
-const device_type CHANF_ROM_STD = device_creator<chanf_rom_device>;
-const device_type CHANF_ROM_MAZE = device_creator<chanf_maze_device>;
-const device_type CHANF_ROM_HANGMAN = device_creator<chanf_hangman_device>;
-const device_type CHANF_ROM_CHESS = device_creator<chanf_chess_device>;
-const device_type CHANF_ROM_MULTI_OLD = device_creator<chanf_multi_old_device>;
-const device_type CHANF_ROM_MULTI_FINAL = device_creator<chanf_multi_final_device>;
+DEFINE_DEVICE_TYPE(CHANF_ROM_STD,         chanf_rom_device,         "chanf_rom",       "Channel F Standard Carts")
+DEFINE_DEVICE_TYPE(CHANF_ROM_MAZE,        chanf_maze_device,        "chanf_maze",      "Channel F Maze Cart")
+DEFINE_DEVICE_TYPE(CHANF_ROM_HANGMAN,     chanf_hangman_device,     "chanf_hang",      "Channel F Hangman Cart")
+DEFINE_DEVICE_TYPE(CHANF_ROM_CHESS,       chanf_chess_device,       "chanf_chess",     "Channel F Chess Cart")
+DEFINE_DEVICE_TYPE(CHANF_ROM_MULTI_OLD,   chanf_multi_old_device,   "chanf_multi_old", "Channel F Multigame (Earlier Version) Cart")
+DEFINE_DEVICE_TYPE(CHANF_ROM_MULTI_FINAL, chanf_multi_final_device, "chanf_multi_fin", "Channel F Multigame (Final Version) Cart")
 
 
-chanf_rom_device::chanf_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_channelf_cart_interface( mconfig, *this ), m_addr_latch(0), m_addr(0), m_read_write(0), m_data0(0)
-				{
+chanf_rom_device::chanf_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_channelf_cart_interface(mconfig, *this)
+	, m_addr_latch(0), m_addr(0), m_read_write(0), m_data0(0)
+{
 }
 
 chanf_rom_device::chanf_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, CHANF_ROM_STD, "Channel F Standard Carts", tag, owner, clock, "chanf_rom", __FILE__),
-						device_channelf_cart_interface( mconfig, *this ), m_addr_latch(0), m_addr(0), m_read_write(0), m_data0(0)
-				{
+	: chanf_rom_device(mconfig, CHANF_ROM_STD, tag, owner, clock)
+{
 }
 
 chanf_maze_device::chanf_maze_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: chanf_rom_device(mconfig, CHANF_ROM_MAZE, "Channel F Maze Cart", tag, owner, clock, "chanf_maze", __FILE__)
+	: chanf_rom_device(mconfig, CHANF_ROM_MAZE, tag, owner, clock)
 {
 }
 
 chanf_hangman_device::chanf_hangman_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: chanf_rom_device(mconfig, CHANF_ROM_HANGMAN, "Channel F Hangman Cart", tag, owner, clock, "chanf_hang", __FILE__)
+	: chanf_rom_device(mconfig, CHANF_ROM_HANGMAN, tag, owner, clock)
 {
 }
 
 chanf_chess_device::chanf_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: chanf_rom_device(mconfig, CHANF_ROM_CHESS, "Channel F Chess Cart", tag, owner, clock, "chanf_chess", __FILE__)
+	: chanf_rom_device(mconfig, CHANF_ROM_CHESS, tag, owner, clock)
 {
 }
 
 chanf_multi_old_device::chanf_multi_old_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: chanf_rom_device(mconfig, CHANF_ROM_MULTI_OLD, "Channel F Multigame (Earlier Version) Cart", tag, owner, clock, "chanf_multi_old", __FILE__), m_base_bank(0)
-				{
+	: chanf_rom_device(mconfig, CHANF_ROM_MULTI_OLD, tag, owner, clock), m_base_bank(0)
+{
 }
 
 chanf_multi_final_device::chanf_multi_final_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: chanf_rom_device(mconfig, CHANF_ROM_MULTI_FINAL, "Channel F Multigame (Final Version) Cart", tag, owner, clock, "chanf_multi_fin", __FILE__), m_base_bank(0), m_half_bank(0)
-				{
+	: chanf_rom_device(mconfig, CHANF_ROM_MULTI_FINAL, tag, owner, clock), m_base_bank(0), m_half_bank(0)
+{
 }
 
 

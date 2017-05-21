@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_TUBE_SLOT = device_creator<bbc_tube_slot_device>;
+DEFINE_DEVICE_TYPE(BBC_TUBE_SLOT, bbc_tube_slot_device, "bbc_tube_slot", "BBC Micro Tube port")
 
 
 
@@ -53,8 +53,8 @@ device_bbc_tube_interface::~device_bbc_tube_interface()
 //-------------------------------------------------
 
 bbc_tube_slot_device::bbc_tube_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, BBC_TUBE_SLOT, "BBC Micro Tube port", tag, owner, clock, "bbc_tube_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+	device_t(mconfig, BBC_TUBE_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this)
 {
 }
 

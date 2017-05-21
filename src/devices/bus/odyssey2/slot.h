@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __O2_SLOT_H
-#define __O2_SLOT_H
+#ifndef MAME_BUS_ODYSSEY2_SLOT_H
+#define MAME_BUS_ODYSSEY2_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -28,15 +30,14 @@ class device_o2_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_o2_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_o2_cart_interface();
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom04) { return 0xff; }
 	virtual DECLARE_READ8_MEMBER(read_rom0c) { return 0xff; }
-	virtual void write_bank(int bank) {}
+	virtual void write_bank(int bank) { }
 
-	virtual DECLARE_WRITE8_MEMBER(io_write) {}
+	virtual DECLARE_WRITE8_MEMBER(io_write) { }
 	virtual DECLARE_READ_LINE_MEMBER(t0_read) { return 0; }
 
 	void rom_alloc(uint32_t size, const char *tag);
@@ -47,6 +48,8 @@ public:
 	uint32_t get_ram_size() { return m_ram.size(); }
 
 protected:
+	device_o2_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -70,7 +73,7 @@ public:
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual void call_unload() override {}
+	virtual void call_unload() override { }
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_type() { return m_type; }
@@ -98,13 +101,11 @@ public:
 protected:
 
 	int m_type;
-	device_o2_cart_interface*       m_cart;
+	device_o2_cart_interface* m_cart;
 };
 
-
-
 // device type definition
-extern const device_type O2_CART_SLOT;
+DECLARE_DEVICE_TYPE(O2_CART_SLOT, o2_cart_slot_device)
 
 
 /***************************************************************************
@@ -119,4 +120,4 @@ extern const device_type O2_CART_SLOT;
 
 SLOT_INTERFACE_EXTERN(o2_cart);
 
-#endif
+#endif // MAME_BUS_ODYSSEY2_SLOT_H

@@ -98,10 +98,10 @@
 //**************************************************************************
 
 // device type definition
-const device_type Z80SIO = device_creator<z80sio_device>;
-const device_type Z80SIO_CHANNEL = device_creator<z80sio_channel>;
-const device_type UPD7201N = device_creator<upd7201N_device>; // Remove trailing N when z80dart.cpp's 7201 implementation is fully replaced
-const device_type I8274N = device_creator<i8274N_device>; // Remove trailing N when z80dart.cpp's 8274 implementation is fully replaced
+DEFINE_DEVICE_TYPE(Z80SIO,         z80sio_device,      "z80sio",         "Z80 SIO")
+DEFINE_DEVICE_TYPE(Z80SIO_CHANNEL, z80sio_channel,     "z80sio_channel", "Z80 SIO channel")
+DEFINE_DEVICE_TYPE(UPD7201_NEW,    upd7201_new_device, "upd7201_new",    "NEC uPD7201 MPSC (new)") // Remove trailing N when z80dart.cpp's 7201 implementation is fully replaced
+DEFINE_DEVICE_TYPE(I8274_NEW,      i8274_new_device,   "i8274_new",      "Intel 8274 MPSC (new)") // Remove trailing N when z80dart.cpp's 8274 implementation is fully replaced
 
 //-------------------------------------------------
 //  device_mconfig_additions -
@@ -123,8 +123,8 @@ machine_config_constructor z80sio_device::device_mconfig_additions() const
 //-------------------------------------------------
 //  z80sio_device - constructor
 //-------------------------------------------------
-z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: device_t(mconfig, type, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this),
 	m_chanA(*this, CHANA_TAG),
 	m_chanB(*this, CHANB_TAG),
@@ -155,41 +155,19 @@ z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, co
 }
 
 z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, Z80SIO, "Z80 SIO", tag, owner, clock, "z80sio", __FILE__),
-	device_z80daisy_interface(mconfig, *this),
-	m_chanA(*this, CHANA_TAG),
-	m_chanB(*this, CHANB_TAG),
-	m_rxca(0),
-	m_txca(0),
-	m_rxcb(0),
-	m_txcb(0),
-	m_out_txda_cb(*this),
-	m_out_dtra_cb(*this),
-	m_out_rtsa_cb(*this),
-	m_out_wrdya_cb(*this),
-	m_out_synca_cb(*this),
-	m_out_txdb_cb(*this),
-	m_out_dtrb_cb(*this),
-	m_out_rtsb_cb(*this),
-	m_out_wrdyb_cb(*this),
-	m_out_syncb_cb(*this),
-	m_out_int_cb(*this),
-	m_out_rxdrqa_cb(*this),
-	m_out_txdrqa_cb(*this),
-	m_out_rxdrqb_cb(*this),
-	m_out_txdrqb_cb(*this),
-	m_variant(TYPE_Z80SIO),
-	m_cputag("maincpu")
+	: z80sio_device(mconfig, Z80SIO, tag, owner, clock, TYPE_Z80SIO)
 {
-	for (auto & elem : m_int_state)
-		elem = 0;
 }
 
-upd7201N_device::upd7201N_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80sio_device(mconfig, UPD7201N, "UPD 7201", tag, owner, clock, TYPE_UPD7201, "upd7201n", __FILE__){ }
+upd7201_new_device::upd7201_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z80sio_device(mconfig, UPD7201_NEW, tag, owner, clock, TYPE_UPD7201)
+{
+}
 
-i8274N_device::i8274N_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80sio_device(mconfig, I8274N, "i8274", tag, owner, clock, TYPE_I8274, "i8274n", __FILE__){ }
+i8274_new_device::i8274_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z80sio_device(mconfig, I8274_NEW, tag, owner, clock, TYPE_I8274)
+{
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -535,22 +513,22 @@ WRITE8_MEMBER( z80sio_device::ba_cd_w )
 //  z80sio_channel - constructor
 //-------------------------------------------------
 z80sio_channel::z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, Z80SIO_CHANNEL, "Z80 SIO channel", tag, owner, clock, "z80sio_channel", __FILE__),
-		device_serial_interface(mconfig, *this),
-		m_rx_error(0),
-		m_rx_clock(0),
-		m_rx_first(0),
-		m_rx_break(0),
-		m_rx_rr0_latch(0),
-		m_rxd(0),
-		m_sh(0),
-		m_cts(0),
-		m_dcd(0),
-		m_tx_data(0),
-		m_tx_clock(0),
-		m_dtr(0),
-		m_rts(0),
-		m_sync(0)
+	: device_t(mconfig, Z80SIO_CHANNEL, tag, owner, clock)
+	, device_serial_interface(mconfig, *this)
+	, m_rx_error(0)
+	, m_rx_clock(0)
+	, m_rx_first(0)
+	, m_rx_break(0)
+	, m_rx_rr0_latch(0)
+	, m_rxd(0)
+	, m_sh(0)
+	, m_cts(0)
+	, m_dcd(0)
+	, m_tx_data(0)
+	, m_tx_clock(0)
+	, m_dtr(0)
+	, m_rts(0)
+	, m_sync(0)
 {
 	LOG("%s\n",FUNCNAME);
 		// Reset all registers

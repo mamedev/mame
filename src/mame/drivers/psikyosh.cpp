@@ -775,7 +775,7 @@ void psikyosh_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
+static MACHINE_CONFIG_START( psikyo3v1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
@@ -1218,23 +1218,23 @@ DRIVER_INIT_MEMBER(psikyosh_state,mjgtaste)
 }
 
 
-/*     YEAR  NAME      PARENT    MACHINE    INPUT     INIT      MONITOR COMPANY   FULLNAME FLAGS */
+//    YEAR  NAME       PARENT    MACHINE      INPUT     STATE           INIT      MONITOR COMPANY   FULLNAME FLAGS */
 
 /* ps3-v1 */
-GAME( 1997, soldivid,  0,        psikyo3v1,   soldivid, psikyosh_state, ps3, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, soldividk, soldivid, psikyo3v1,   soldividk,psikyosh_state, ps3, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, s1945ii,   0,        psikyo3v1,   s1945ii,  psikyosh_state, ps3, ROT270, "Psikyo", "Strikers 1945 II", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, daraku,    0,        psikyo3v1,   daraku,   psikyosh_state, ps3, ROT0,   "Psikyo", "Daraku Tenshi - The Fallen Angels", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbomber,   0,        psikyo3v1,   sbomberb, psikyosh_state, ps3, ROT270, "Psikyo", "Space Bomber (ver. B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbombera,  sbomber,  psikyo3v1,   sbomberb, psikyosh_state, ps3, ROT270, "Psikyo", "Space Bomber", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, soldivid,  0,        psikyo3v1,   soldivid, psikyosh_state, ps3,      ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, soldividk, soldivid, psikyo3v1,   soldividk,psikyosh_state, ps3,      ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, s1945ii,   0,        psikyo3v1,   s1945ii,  psikyosh_state, ps3,      ROT270, "Psikyo", "Strikers 1945 II", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, daraku,    0,        psikyo3v1,   daraku,   psikyosh_state, ps3,      ROT0,   "Psikyo", "Daraku Tenshi - The Fallen Angels", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbomber,   0,        psikyo3v1,   sbomberb, psikyosh_state, ps3,      ROT270, "Psikyo", "Space Bomber (ver. B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbombera,  sbomber,  psikyo3v1,   sbomberb, psikyosh_state, ps3,      ROT270, "Psikyo", "Space Bomber", MACHINE_SUPPORTS_SAVE )
 
 /* ps5 */
-GAME( 1998, gunbird2,  0,        psikyo5,     gunbird2, psikyosh_state, ps5, ROT270, "Psikyo", "Gunbird 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, s1945iii,  0,        psikyo5,     s1945iii, psikyosh_state, ps5, ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, gunbird2,  0,        psikyo5,     gunbird2, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbird 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, s1945iii,  0,        psikyo5,     s1945iii, psikyosh_state, ps5,      ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 /* ps5v2 */
-GAME( 2000, dragnblz, 0,        psikyo5,     dragnblz, psikyosh_state, ps5,      ROT270, "Psikyo", "Dragon Blaze", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, tgm2,     0,        psikyo5_240, tgm2,     psikyosh_state, ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, tgm2p,    tgm2,     psikyo5_240, tgm2,     psikyosh_state, ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2 Plus", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, gnbarich, 0,        psikyo5,     gnbarich, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbarich", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, mjgtaste, 0,        psikyo5,     mjgtaste, psikyosh_state, mjgtaste, ROT0,   "Psikyo", "Mahjong G-Taste", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dragnblz,  0,        psikyo5,     dragnblz, psikyosh_state, ps5,      ROT270, "Psikyo", "Dragon Blaze", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tgm2,      0,        psikyo5_240, tgm2,     psikyosh_state, ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tgm2p,     tgm2,     psikyo5_240, tgm2,     psikyosh_state, ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2 Plus", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, gnbarich,  0,        psikyo5,     gnbarich, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbarich", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, mjgtaste,  0,        psikyo5,     mjgtaste, psikyosh_state, mjgtaste, ROT0,   "Psikyo", "Mahjong G-Taste", MACHINE_SUPPORTS_SAVE )

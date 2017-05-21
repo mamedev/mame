@@ -45,7 +45,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<wd2797_t> m_wd2797;
+	required_device<wd2797_device> m_wd2797;
 	required_device<floppy_image_device> m_floppy;
 	required_device<address_map_bank_device> m_ramrombank;
 
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( unixpc_mem, AS_PROGRAM, 16, unixpc_state )
 	AM_RANGE(0x4d0000, 0x4d7fff) AM_WRITE(diskdma_ptr_w)
 	AM_RANGE(0x4e0000, 0x4e0001) AM_WRITE(disk_control_w)
 	AM_RANGE(0x800000, 0x803fff) AM_MIRROR(0x7fc000) AM_ROM AM_REGION("bootrom", 0)
-	AM_RANGE(0xe10000, 0xe10007) AM_DEVREADWRITE8("wd2797", wd_fdc_t, read, write, 0x00ff)
+	AM_RANGE(0xe10000, 0xe10007) AM_DEVREADWRITE8("wd2797", wd_fdc_device_base, read, write, 0x00ff)
 	AM_RANGE(0xe30000, 0xe30001) AM_READ(rtc_r)
 	AM_RANGE(0xe40000, 0xe40001) AM_WRITE(error_enable_w)
 	AM_RANGE(0xe41000, 0xe41001) AM_WRITE(parity_enable_w)
@@ -313,7 +313,7 @@ static SLOT_INTERFACE_START( unixpc_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( unixpc, unixpc_state )
+static MACHINE_CONFIG_START( unixpc )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68010, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(unixpc_mem)
@@ -365,5 +365,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   INIT  COMPANY  FULLNAME  FLAGS
-COMP( 1985, 3b1,  0,      0,      unixpc,  unixpc, driver_device, 0,    "AT&T",  "3B1",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY  FULLNAME  FLAGS
+COMP( 1985, 3b1,  0,      0,      unixpc,  unixpc, unixpc_state, 0,    "AT&T",  "3B1",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

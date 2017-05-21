@@ -15,8 +15,9 @@ BUGS:
 
 */
 #include "emu.h"
-#include "formats/trd_dsk.h"
 #include "machine/beta.h"
+
+#include "formats/trd_dsk.h"
 
 
 /***************************************************************************
@@ -24,10 +25,10 @@ BUGS:
 ***************************************************************************/
 
 
-const device_type BETA_DISK = device_creator<beta_disk_device>;
+DEFINE_DEVICE_TYPE(BETA_DISK, beta_disk_device, "betadisk", "Beta Disk Interface")
 
 beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BETA_DISK, "Beta Disk Interface", tag, owner, clock, "betadisk", __FILE__)
+	: device_t(mconfig, BETA_DISK, tag, owner, clock)
 	, m_betadisk_active(0)
 	, m_wd179x(*this, "wd179x")
 	, m_floppy0(*this, "wd179x:0")

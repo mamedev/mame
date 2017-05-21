@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C4_STARDOS_H
+#define MAME_BUS_C4_STARDOS_H
 
-#ifndef __STARDOS__
-#define __STARDOS__
+#pragma once
 
 
 #include "exp.h"
@@ -53,7 +53,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_STARDOS;
+DECLARE_DEVICE_TYPE(C64_STARDOS, c64_stardos_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C4_STARDOS_H

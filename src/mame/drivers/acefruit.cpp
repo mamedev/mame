@@ -604,7 +604,7 @@ static GFXDECODE_START( acefruit )
 	GFXDECODE_ENTRY( "gfx1", 0x1800, charlayout, 8, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( acefruit, acefruit_state )
+static MACHINE_CONFIG_START( acefruit )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2500000) /* 2.5MHz */
@@ -773,7 +773,7 @@ ROM_END
 
 
 GAMEL( 1981?, sidewndr, 0,        acefruit, sidewndr, acefruit_state, sidewndr, ROT270, "ACE", "Sidewinder", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
-GAMEL( 1981?, spellbnd, 0,        acefruit, spellbnd, driver_device, 0,        ROT270, "ACE", "Spellbound", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
-GAME ( 1982?, starspnr, 0,        acefruit, starspnr, driver_device, 0,        ROT270, "ACE", "Starspinner (Dutch/Nederlands)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME ( 1982?, acefruit, 0,        acefruit, spellbnd, driver_device, 0,        ROT270, "ACE", "Silhouette", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs and video in bonus game need fixing on this one
+GAMEL( 1981?, spellbnd, 0,        acefruit, spellbnd, acefruit_state, 0,        ROT270, "ACE", "Spellbound", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
+GAME ( 1982?, starspnr, 0,        acefruit, starspnr, acefruit_state, 0,        ROT270, "ACE", "Starspinner (Dutch/Nederlands)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME ( 1982?, acefruit, 0,        acefruit, spellbnd, acefruit_state, 0,        ROT270, "ACE", "Silhouette", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs and video in bonus game need fixing on this one
 // not dumped: Magnum?

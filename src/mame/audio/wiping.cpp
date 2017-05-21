@@ -11,14 +11,14 @@
 #include "emu.h"
 #include "audio/wiping.h"
 
-static const int samplerate = 48000;
-static const int defgain = 48;
+static constexpr int samplerate = 48000;
+static constexpr int defgain = 48;
 
-const device_type WIPING = device_creator<wiping_sound_device>;
+DEFINE_DEVICE_TYPE(WIPING, wiping_sound_device, "wiping_sound", "Wiping Audio Custom")
 
 wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, WIPING, "Wiping Audio Custom", tag, owner, clock, "wiping_sound", __FILE__),
-		device_sound_interface(mconfig, *this),
+	: device_t(mconfig, WIPING, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
 	m_last_channel(nullptr),
 	m_sound_prom(nullptr),
 	m_sound_rom(nullptr),

@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SVI3X8_SLOT_SV805_H
+#define MAME_BUS_SVI3X8_SLOT_SV805_H
 
-#ifndef __SVI3X8_SLOT_SV805_H__
-#define __SVI3X8_SLOT_SV805_H__
+#pragma once
 
 #include "slot.h"
 #include "machine/ins8250.h"
@@ -43,6 +43,6 @@ private:
 };
 
 // device type definition
-extern const device_type SV805;
+DECLARE_DEVICE_TYPE(SV805, sv805_device)
 
-#endif // __SVI3X8_SLOT_SV805_H__
+#endif // MAME_BUS_SVI3X8_SLOT_SV805_H

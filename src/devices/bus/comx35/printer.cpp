@@ -24,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_PRN = device_creator<comx_prn_device>;
+DEFINE_DEVICE_TYPE(COMX_PRN, comx_prn_device, "comx_prn", "COMX-35 Printer Card")
 
 
 //-------------------------------------------------
@@ -88,7 +88,7 @@ machine_config_constructor comx_prn_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 comx_prn_device::comx_prn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COMX_PRN, "COMX-35 Printer Card", tag, owner, clock, "comx_prn", __FILE__),
+	device_t(mconfig, COMX_PRN, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_centronics(*this, CENTRONICS_TAG),
 	m_cent_data_out(*this, "cent_data_out"),

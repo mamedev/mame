@@ -742,7 +742,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tickee, tickee_state )
+static MACHINE_CONFIG_START( tickee )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
@@ -790,7 +790,7 @@ static MACHINE_CONFIG_DERIVED( ghoshunt, tickee )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rapidfir, tickee_state )
+static MACHINE_CONFIG_START( rapidfir )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_50MHz)
@@ -819,12 +819,12 @@ static MACHINE_CONFIG_START( rapidfir, tickee_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mouseatk, tickee_state )
+static MACHINE_CONFIG_START( mouseatk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
@@ -855,7 +855,7 @@ static MACHINE_CONFIG_START( mouseatk, tickee_state )
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -1151,11 +1151,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, tickee,    0,        tickee,   tickee, driver_device,   0, ROT0, "Raster Elite",  "Tickee Tickats", 0 )
-GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, driver_device, 0, ROT0, "Hanaho Games",  "Ghost Hunter", 0 )
-GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, driver_device, 0, ROT0, "Island Design", "Tut's Tomb", 0 )
-GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, driver_device, 0, ROT0, "ICE",           "Mouse Attack", 0 )
-GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 239)", 0 )
-GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 238)", 0 )
-GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.0 (Build 236)", 0 )
-GAME( 1999, maletmad,  0,        rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Mallet Madness v2.1", 0 )
+GAME( 1994, tickee,    0,        tickee,   tickee,   tickee_state, 0, ROT0, "Raster Elite",  "Tickee Tickats",              0 )
+GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, tickee_state, 0, ROT0, "Hanaho Games",  "Ghost Hunter",                0 )
+GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, tickee_state, 0, ROT0, "Island Design", "Tut's Tomb",                  0 )
+GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, tickee_state, 0, ROT0, "ICE",           "Mouse Attack",                0 )
+GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 239)", 0 )
+GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 238)", 0 )
+GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.0 (Build 236)", 0 )
+GAME( 1999, maletmad,  0,        rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Mallet Madness v2.1",         0 )

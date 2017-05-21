@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller
-#ifndef __PPS4_H__
-#define __PPS4_H__
+#ifndef MAME_CPU_PPS4_PPS4_H
+#define MAME_CPU_PPS4_PPS4_H
+
+#pragma once
 
 
 /***************************************************************************
@@ -39,8 +41,8 @@ enum
 //  DEVICE TYPE DEFINITIONS
 //**************************************************************************
 
-extern const device_type PPS4;
-extern const device_type PPS4_2;
+DECLARE_DEVICE_TYPE(PPS4,   pps4_device)
+DECLARE_DEVICE_TYPE(PPS4_2, pps4_2_device)
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -51,18 +53,17 @@ class pps4_device : public cpu_device
 public:
 	// construction/destruction
 	pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-protected:
-	pps4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *file);
 
-public:
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_dia_cb(device_t &device, _Object object) { return downcast<pps4_device &>(device).m_dia_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_dib_cb(device_t &device, _Object object) { return downcast<pps4_device &>(device).m_dib_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_do_cb(device_t &device, _Object object) { return downcast<pps4_device &>(device).m_do_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_dia_cb(device_t &device, Object &&cb) { return downcast<pps4_device &>(device).m_dia_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dib_cb(device_t &device, Object &&cb) { return downcast<pps4_device &>(device).m_dib_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_do_cb(device_t &device, Object &&cb) { return downcast<pps4_device &>(device).m_do_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ16_MEMBER(address_bus_r);
 
 protected:
+	pps4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -75,7 +76,7 @@ protected:
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
 	{
 		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ) );
 	}
@@ -88,7 +89,6 @@ protected:
 	virtual u32 disasm_max_opcode_bytes() const override { return 2; }
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 
-protected:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
@@ -206,4 +206,4 @@ private:
 	u8        m_DIO;      //!< DIO clamp
 };
 
-#endif  // __PPS4_H__
+#endif // MAME_CPU_PPS4_PPS4_H

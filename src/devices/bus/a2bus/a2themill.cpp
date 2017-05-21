@@ -36,7 +36,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_THEMILL = device_creator<a2bus_themill_device>;
+DEFINE_DEVICE_TYPE(A2BUS_THEMILL, a2bus_themill_device, "a2themill", "Stellation Two The Mill")
 
 #define M6809_TAG         "m6809"
 
@@ -67,17 +67,15 @@ machine_config_constructor a2bus_themill_device::device_mconfig_additions() cons
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_6809(*this, M6809_TAG), m_bEnabled(false), m_flipAddrSpace(false), m_6809Mode(false), m_status(0)
 {
 }
 
 a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_THEMILL, "Stellation Two The Mill", tag, owner, clock, "a2themill", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_6809(*this, M6809_TAG), m_bEnabled(false), m_flipAddrSpace(false), m_6809Mode(false), m_status(0)
+	a2bus_themill_device(mconfig, A2BUS_THEMILL, tag, owner, clock)
 {
 }
 

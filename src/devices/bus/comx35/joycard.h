@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_COMX35_JOYCARD_H
+#define MAME_BUS_COMX35_JOYCARD_H
 
-#ifndef __COMX_JOY__
-#define __COMX_JOY__
+#pragma once
 
 #include "exp.h"
 
@@ -46,7 +46,7 @@ private:
 
 
 // device type definition
-extern const device_type COMX_JOY;
+DECLARE_DEVICE_TYPE(COMX_JOY, comx_joy_device)
 
 
-#endif
+#endif // MAME_BUS_COMX35_JOYCARD_H

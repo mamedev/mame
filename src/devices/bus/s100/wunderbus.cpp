@@ -31,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_WUNDERBUS = device_creator<s100_wunderbus_device>;
+DEFINE_DEVICE_TYPE(S100_WUNDERBUS, s100_wunderbus_device, "s100_wunderbus", "Morrow Winderbus I/O")
 
 
 //-------------------------------------------------
@@ -238,7 +238,7 @@ ioport_constructor s100_wunderbus_device::device_input_ports() const
 //-------------------------------------------------
 
 s100_wunderbus_device::s100_wunderbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, S100_WUNDERBUS, "Wunderbus I/O", tag, owner, clock, "s100_wunderbus", __FILE__),
+	device_t(mconfig, S100_WUNDERBUS, tag, owner, clock),
 	device_s100_card_interface(mconfig, *this),
 	m_pic(*this, I8259A_TAG),
 	m_ace1(*this, INS8250_1_TAG),

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#pragma once
+#ifndef MAME_BUS_NUBUS_NUBUS_ASNTMC3B_H
+#define MAME_BUS_NUBUS_NUBUS_ASNTMC3B_H
 
-#ifndef __NUBUS_ASNTMC3B_H__
-#define __NUBUS_ASNTMC3B_H__
+#pragma once
 
 #include "nubus.h"
 #include "machine/dp8390.h"
@@ -19,32 +19,32 @@ class nubus_mac8390_device :
 		public device_nubus_card_interface
 {
 public:
-		// construction/destruction
-		nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override;
-		virtual const tiny_rom_entry *device_rom_region() const override;
-
-		void dp_irq_w(int state);
-		DECLARE_READ8_MEMBER(dp_mem_read);
-		DECLARE_WRITE8_MEMBER(dp_mem_write);
+	void dp_irq_w(int state);
+	DECLARE_READ8_MEMBER(dp_mem_read);
+	DECLARE_WRITE8_MEMBER(dp_mem_write);
 
 protected:
-		// device-level overrides
-		virtual void device_start() override;
-		virtual void device_reset() override;
+	// construction/destruction
+	nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-		DECLARE_READ8_MEMBER(asntm3b_ram_r);
-		DECLARE_WRITE8_MEMBER(asntm3b_ram_w);
-		DECLARE_READ32_MEMBER(en_r);
-		DECLARE_WRITE32_MEMBER(en_w);
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-		required_device<dp8390_device> m_dp83902;
+	DECLARE_READ8_MEMBER(asntm3b_ram_r);
+	DECLARE_WRITE8_MEMBER(asntm3b_ram_w);
+	DECLARE_READ32_MEMBER(en_r);
+	DECLARE_WRITE32_MEMBER(en_w);
+
+	required_device<dp8390_device> m_dp83902;
 
 private:
-		uint8_t m_ram[0x20000];
-		uint8_t m_prom[16];
+	uint8_t m_ram[0x20000];
+	uint8_t m_prom[16];
 };
 
 class nubus_asntmc3nb_device : public nubus_mac8390_device
@@ -61,7 +61,7 @@ public:
 };
 
 // device type definition
-extern const device_type NUBUS_ASNTMC3NB;
-extern const device_type NUBUS_APPLEENET;
+DECLARE_DEVICE_TYPE(NUBUS_ASNTMC3NB, nubus_asntmc3nb_device)
+DECLARE_DEVICE_TYPE(NUBUS_APPLEENET, nubus_appleenet_device)
 
-#endif  /* __NUBUS_ASNTMC3B_H__ */
+#endif // MAME_BUS_NUBUS_NUBUS_ASNTMC3B_H

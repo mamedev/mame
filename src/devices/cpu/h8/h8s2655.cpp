@@ -3,11 +3,11 @@
 #include "emu.h"
 #include "h8s2655.h"
 
-const device_type H8S2655 = device_creator<h8s2655_device>;
-const device_type H8S2653 = device_creator<h8s2653_device>;
+DEFINE_DEVICE_TYPE(H8S2655, h8s2655_device, "h8s2655", "H8S/2655")
+DEFINE_DEVICE_TYPE(H8S2653, h8s2653_device, "h8s2653", "H8S/2653")
 
-h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	h8s2600_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h8s2655_device::map), this)),
+h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	h8s2600_device(mconfig, type, tag, owner, clock, address_map_delegate(FUNC(h8s2655_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	port1(*this, "port1"),
@@ -35,50 +35,20 @@ h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, 
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
 	sci2(*this, "sci2"),
-	watchdog(*this, "watchdog")
+	watchdog(*this, "watchdog"),
+	syscr(0)
 {
 	has_trace = true;
-	syscr = 0;
 }
 
 h8s2655_device::h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8s2600_device(mconfig, H8S2655, "H8S/2655", tag, owner, clock, "h8s2655", __FILE__, address_map_delegate(FUNC(h8s2655_device::map), this)),
-	intc(*this, "intc"),
-	adc(*this, "adc"),
-	port1(*this, "port1"),
-	port2(*this, "port2"),
-	port3(*this, "port3"),
-	port4(*this, "port4"),
-	port5(*this, "port5"),
-	port6(*this, "port6"),
-	porta(*this, "porta"),
-	portb(*this, "portb"),
-	portc(*this, "portc"),
-	portd(*this, "portd"),
-	porte(*this, "porte"),
-	portf(*this, "portf"),
-	portg(*this, "portg"),
-	timer8_0(*this, "timer8_0"),
-	timer8_1(*this, "timer8_1"),
-	timer16(*this, "timer16"),
-	timer16_0(*this, "timer16:0"),
-	timer16_1(*this, "timer16:1"),
-	timer16_2(*this, "timer16:2"),
-	timer16_3(*this, "timer16:3"),
-	timer16_4(*this, "timer16:4"),
-	timer16_5(*this, "timer16:5"),
-	sci0(*this, "sci0"),
-	sci1(*this, "sci1"),
-	sci2(*this, "sci2"),
-	watchdog(*this, "watchdog")
+	h8s2655_device(mconfig, H8S2655, tag, owner, clock)
 
 {
-	has_trace = true;
-	syscr = 0;
 }
 
 h8s2653_device::h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8s2655_device(mconfig, H8S2653, "H8S/2653", tag, owner, clock, "h8s2653", __FILE__)
+	h8s2655_device(mconfig, H8S2653, tag, owner, clock)
 {
 }
 

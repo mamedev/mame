@@ -107,7 +107,7 @@ private:
 
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
-	required_device<fd1793_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	//required_device<z80sti_device> m_sti;
@@ -151,7 +151,7 @@ static ADDRESS_MAP_START(ts803_io, AS_IO, 8, ts803_state)
 	//AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("sti", z80sti_device, read, write)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("dart", z80dart_device, cd_ba_r, cd_ba_w)
 
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	AM_RANGE(0x90, 0x90) AM_READWRITE(disk_0_control_r,disk_0_control_w)
 
 	//AM_RANGE(0x91, 0xff) AM_READWRITE(ts803_porthi_r, ts803_porthi_w)
@@ -491,7 +491,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( ts803, ts803_state )
+static MACHINE_CONFIG_START( ts803 )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(ts803_mem)
 	MCFG_CPU_IO_MAP(ts803_io)
@@ -553,5 +553,5 @@ ROM_END
 
 
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT    COMPANY     FULLNAME       FLAGS */
+//   YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT    COMPANY     FULLNAME  FLAGS
 COMP(1983, ts803h,  0,      0,      ts803,     ts803, ts803_state, ts803, "Televideo", "TS803H", MACHINE_NOT_WORKING )

@@ -30,7 +30,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_ARCADEBOARD = device_creator<a2bus_arcboard_device>;
+DEFINE_DEVICE_TYPE(A2BUS_ARCADEBOARD, a2bus_arcboard_device, "a2arcbd", "Third Millenium Engineering Arcade Board")
 
 MACHINE_CONFIG_FRAGMENT( arcadeboard )
 	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
@@ -59,15 +59,12 @@ machine_config_constructor a2bus_arcboard_device::device_mconfig_additions() con
 //**************************************************************************
 
 a2bus_arcboard_device::a2bus_arcboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_ARCADEBOARD, "Third Millenium Engineering Arcade Board", tag, owner, clock, "a2arcbd", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_tms(*this, TMS_TAG),
-	m_ay(*this, AY_TAG)
+	a2bus_arcboard_device(mconfig, A2BUS_ARCADEBOARD, tag, owner, clock)
 {
 }
 
-a2bus_arcboard_device::a2bus_arcboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_arcboard_device::a2bus_arcboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG),
 	m_ay(*this, AY_TAG)

@@ -144,7 +144,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( sc6, fidelmcs48_state )
+static MACHINE_CONFIG_START( sc6 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8040, XTAL_11MHz)
@@ -182,5 +182,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1982, fscc6,    0,       0,      sc6,       sc6,       driver_device, 0, "Fidelity", "Sensory Chess Challenger 6", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  CMP MACHINE    INPUT   STATE          INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1982, fscc6,    0,       0, sc6,       sc6,    fidelmcs48_state, 0, "Fidelity", "Sensory Chess Challenger 6", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -18,6 +18,8 @@
     - speed up emulation
     - update SW401 baud rate options for Watz ROM
     - update SW401 & SW402 definitions for Super-19 ROM
+    - update SW401 & SW402 definitions for ULTRA ROM
+    - add option for ULTRA ROMs second page of screen RAM
 
 ****************************************************************************/
 /***************************************************************************
@@ -510,7 +512,7 @@ static GFXDECODE_START( h19 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, h19_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( h19, h19_state )
+static MACHINE_CONFIG_START( h19 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, H19_CLOCK) // From schematics
 	MCFG_CPU_PROGRAM_MAP(h19_mem)
@@ -599,11 +601,26 @@ ROM_START( watz19 )
 	ROM_LOAD( "keybd.bin", 0x0000, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
 ROM_END
 
+ROM_START( ultra19 )
+	// ULTRA ROM
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "2532_h19_ultra_firmware.bin", 0x0000, 0x1000, CRC(8ad4cdb4) SHA1(d6e1fc37a1f52abfce5e9adb1819e0030bed1df3))
 
-/*    YEAR  NAME    PARENT  COMPAT    MACHINE    INPUT          INIT    COMPANY      FULLNAME          FLAGS */
-COMP( 1979, h19,     0,       0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19", 0 )
+	ROM_REGION( 0x0800, "chargen", 0 )
+	// Original font dump
+	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+	// Watzman keyboard
+	ROM_REGION( 0x1000, "keyboard", 0 )
+	ROM_LOAD( "2716_h19_ultra_keyboard.bin", 0x0000, 0x0800, CRC(76130c92) SHA1(ca39c602af48505139d2750a084b5f8f0e662ff7))
+ROM_END
+
+
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE       INIT   COMPANY      FULLNAME                         FLAGS
+COMP( 1979, h19,     0,      0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19",                 0 )
 //Super-19 ROM - ATG Systems, Inc - Adv in Sextant Issue 4, Winter 1983. With the magazine lead-time, likely released late 1982.
-COMP( 1982, super19, h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", 0 )
+COMP( 1982, super19, h19,    0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", 0 )
 // Watzman ROM - HUG p/n 885-1121, announced in REMark Issue 33, Oct. 1982
-COMP( 1982, watz19,  h19,     0,    h19,    h19, driver_device,  0,     "Heath Inc", "Heathkit H-19 w/ Watzman ROM", 0 )
+COMP( 1982, watz19,  h19,    0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19 w/ Watzman ROM",  0 )
+// ULTRA ROM - Software Wizardry, Inc., (c) 1983 William G. Parrott, III
+COMP( 1983, ultra19, h19,    0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19 w/ ULTRA ROM",    0 )
 

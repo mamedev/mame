@@ -65,10 +65,10 @@ void vector_options::init(emu_options& options)
 }
 
 // device type definition
-const device_type VECTOR = device_creator<vector_device>;
+DEFINE_DEVICE_TYPE(VECTOR, vector_device, "vector_device", "VECTOR")
 
 vector_device::vector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VECTOR, "VECTOR", tag, owner, clock, "vector_device", __FILE__),
+	: device_t(mconfig, VECTOR, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		m_vector_list(nullptr),
 		m_min_intensity(255),

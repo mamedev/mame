@@ -490,7 +490,7 @@ SLOT_INTERFACE_END
 
 #define MASTER_CLOCK 6988800
 
-static MACHINE_CONFIG_START( pc100, pc100_state )
+static MACHINE_CONFIG_START( pc100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pc100_map)
@@ -564,5 +564,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY  FULLNAME       FLAGS */
-COMP( 198?, pc100,  0,      0,       pc100,     pc100, driver_device,   0,      "NEC",   "PC-100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE          INIT    COMPANY  FULLNAME  FLAGS
+COMP( 198?, pc100,  0,      0,       pc100,     pc100, pc100_state,   0,      "NEC",   "PC-100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

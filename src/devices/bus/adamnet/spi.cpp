@@ -26,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_SPI = device_creator<adam_spi_device>;
+DEFINE_DEVICE_TYPE(ADAM_SPI, adam_spi_device, "adam_spi", "Adam SPI")
 
 
 //-------------------------------------------------
@@ -111,7 +111,7 @@ machine_config_constructor adam_spi_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 adam_spi_device::adam_spi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ADAM_SPI, "Adam SPI", tag, owner, clock, "adam_spi", __FILE__),
+	: device_t(mconfig, ADAM_SPI, tag, owner, clock),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG)
 {

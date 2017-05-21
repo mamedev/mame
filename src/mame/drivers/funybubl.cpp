@@ -216,7 +216,7 @@ void funybubl_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( funybubl, funybubl_state )
+static MACHINE_CONFIG_START( funybubl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)      /* 6 MHz?? */
@@ -247,7 +247,7 @@ static MACHINE_CONFIG_START( funybubl, funybubl_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -314,5 +314,5 @@ ROM_START( funybublc )
 ROM_END
 
 
-GAME( 1999, funybubl, 0,        funybubl, funybubl, driver_device, 0, ROT0, "In Chang Electronic Co", "Funny Bubble", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, funybublc,funybubl, funybubl, funybubl, driver_device, 0, ROT0, "Comad", "Funny Bubble (Comad version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, funybubl, 0,        funybubl, funybubl, funybubl_state, 0, ROT0, "In Chang Electronic Co", "Funny Bubble", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, funybublc,funybubl, funybubl, funybubl, funybubl_state, 0, ROT0, "Comad", "Funny Bubble (Comad version)", MACHINE_SUPPORTS_SAVE )

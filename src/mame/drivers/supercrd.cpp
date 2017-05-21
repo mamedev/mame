@@ -412,7 +412,7 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( supercrd, supercrd_state )
+static MACHINE_CONFIG_START( supercrd )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 2MHz, guess */
 	MCFG_CPU_PROGRAM_MAP(supercrd_map)
@@ -510,6 +510,6 @@ ROM_START( fruitstr )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT    ROT    COMPANY      FULLNAME                 FLAGS   */
-GAME( 1992, supercrd, 0,      supercrd, supercrd, driver_device, 0,      ROT0, "Fun World", "Super Card (encrypted)", MACHINE_NOT_WORKING )
-GAME( 1992, fruitstr, 0,      supercrd, supercrd, driver_device, 0,      ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT    ROT   COMPANY      FULLNAME                  FLAGS
+GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, 0,      ROT0, "Fun World", "Super Card (encrypted)", MACHINE_NOT_WORKING )
+GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, 0,      ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_NOT_WORKING )

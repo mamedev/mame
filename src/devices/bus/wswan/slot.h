@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef __WS_SLOT_H
-#define __WS_SLOT_H
+#ifndef MAME_BUS_WSWAN_SLOT_H
+#define MAME_BUS_WSWAN_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -26,7 +28,6 @@ class device_ws_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_ws_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_ws_cart_interface();
 
 	// reading and writing
@@ -36,7 +37,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
 	virtual DECLARE_READ8_MEMBER(read_io) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_io) {}
+	virtual DECLARE_WRITE8_MEMBER(write_io) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void nvram_alloc(uint32_t size);
@@ -45,12 +46,14 @@ public:
 	uint32_t get_rom_size() { return m_rom_size; }
 	uint32_t get_nvram_size() { return m_nvram.size(); }
 
-	void save_nvram()   { device().save_item(NAME(m_nvram)); }
+	void save_nvram() { device().save_item(NAME(m_nvram)); }
 	void set_has_rtc(bool val) { m_has_rtc = val; }
 	void set_is_rotated(bool val) { m_is_rotated = val; }
 	int get_is_rotated() { return m_is_rotated ? 1 : 0; }
 
 protected:
+	device_ws_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -71,9 +74,6 @@ public:
 	// construction/destruction
 	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~ws_cart_slot_device();
-
-	// device-level overrides
-	virtual void device_start() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -109,15 +109,17 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_io);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 	int m_type;
-	device_ws_cart_interface*       m_cart;
+	device_ws_cart_interface* m_cart;
 };
 
 
 
 // device type definition
-extern const device_type WS_CART_SLOT;
+DECLARE_DEVICE_TYPE(WS_CART_SLOT, ws_cart_slot_device)
 
 
 /***************************************************************************
@@ -129,4 +131,5 @@ extern const device_type WS_CART_SLOT;
 #define MCFG_WSWAN_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, WS_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-#endif
+
+#endif // MAME_BUS_WSWAN_SLOT_H

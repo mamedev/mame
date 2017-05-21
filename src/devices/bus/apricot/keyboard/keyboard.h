@@ -27,10 +27,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_APRICOT_KEYBOARD_KEYBOARD_H
+#define MAME_BUS_APRICOT_KEYBOARD_KEYBOARD_H
 
-#ifndef __APRICOT_KEYBOARD_H__
-#define __APRICOT_KEYBOARD_H__
+#pragma once
 
 
 
@@ -62,8 +62,8 @@ public:
 	virtual ~apricot_keyboard_bus_device();
 
 	// callbacks
-	template<class _Object> static devcb_base &set_in_handler(device_t &device, _Object object)
-		{ return downcast<apricot_keyboard_bus_device &>(device).m_in_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_in_handler(device_t &device, Object &&cb)
+	{ return downcast<apricot_keyboard_bus_device &>(device).m_in_handler.set_callback(std::forward<Object>(cb)); }
 
 	// called from keyboard
 	DECLARE_WRITE_LINE_MEMBER( in_w ) { m_in_handler(state); }
@@ -88,21 +88,22 @@ class device_apricot_keyboard_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_apricot_keyboard_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_apricot_keyboard_interface();
 
-	virtual void out_w(int state) {};
+	virtual void out_w(int state) = 0;
 
 protected:
+	device_apricot_keyboard_interface(const machine_config &mconfig, device_t &device);
+
 	apricot_keyboard_bus_device *m_host;
 };
 
 
 // device type definition
-extern const device_type APRICOT_KEYBOARD_INTERFACE;
+DECLARE_DEVICE_TYPE(APRICOT_KEYBOARD_INTERFACE, apricot_keyboard_bus_device)
 
 // supported devices
 SLOT_INTERFACE_EXTERN( apricot_keyboard_devices );
 
 
-#endif // __APRICOT_KEYBOARD_H__
+#endif // MAME_BUS_APRICOT_KEYBOARD_KEYBOARD_H

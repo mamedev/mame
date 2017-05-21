@@ -355,7 +355,7 @@ void cgc7900_state::machine_reset()
     MACHINE_DRIVER( cgc7900 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( cgc7900, cgc7900_state )
+static MACHINE_CONFIG_START( cgc7900 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_28_48MHz/4)
 	MCFG_CPU_PROGRAM_MAP(cgc7900_mem)
@@ -441,5 +441,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME    FLAGS */
-COMP( 1980, cgc7900,    0,      0,      cgc7900,    cgc7900, driver_device, 0,      "Chromatics",   "CGC 7900", MACHINE_NOT_WORKING)
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT    COMPANY         FULLNAME    FLAGS */
+COMP( 1980, cgc7900,    0,      0,      cgc7900,    cgc7900, cgc7900_state, 0,      "Chromatics",   "CGC 7900", MACHINE_NOT_WORKING)

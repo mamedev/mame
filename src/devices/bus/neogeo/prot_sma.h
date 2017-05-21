@@ -1,19 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 
+#ifndef MAME_BUS_NEOGEO_PROT_SMA_H
+#define MAME_BUS_NEOGEO_PROT_SMA_H
 
 #pragma once
 
-#ifndef __SMA_PROT__
-#define __SMA_PROT__
 
-extern const device_type SMA_PROT;
+DECLARE_DEVICE_TYPE(NG_SMA_PROT, sma_prot_device)
 
 #define MCFG_SMA_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SMA_PROT, 0)
+	MCFG_DEVICE_ADD(_tag, NG_SMA_PROT, 0)
 
 
-class sma_prot_device :  public device_t
+class sma_prot_device : public device_t
 {
 public:
 	// construction/destruction
@@ -45,4 +45,4 @@ private:
 	uint16_t     m_sma_rng;
 };
 
-#endif
+#endif // MAME_BUS_NEOGEO_PROT_SMA_H

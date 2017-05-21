@@ -1353,7 +1353,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 #define CAN09T_BAUDGEN_CLOCK XTAL_1_8432MHz
 #define CAN09T_ACIA_CLOCK (CAN09T_BAUDGEN_CLOCK / 12)
 
-static MACHINE_CONFIG_START( can09t, can09t_state )
+static MACHINE_CONFIG_START( can09t )
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_4_9152MHz) // IPL crystal
 	MCFG_CPU_PROGRAM_MAP(can09t_map)
 
@@ -1397,7 +1397,7 @@ MACHINE_CONFIG_END
 
 #define CAN09_X1_CLOCK XTAL_22_1184MHz        /* UKI 22118.40 Khz */
 #define CAN09_CPU_CLOCK (CAN09_X1_CLOCK / 16) /* ~1.38MHz Divider needs to be check but is the most likelly */
-static MACHINE_CONFIG_START( can09, can09_state )
+static MACHINE_CONFIG_START( can09 )
 	MCFG_CPU_ADD("maincpu", M6809E, CAN09_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(can09_map)
 
@@ -1471,7 +1471,7 @@ static MACHINE_CONFIG_START( can09, can09_state )
 #endif
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( e100, e100_state )
+static MACHINE_CONFIG_START( e100 )
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(e100_map)
 
@@ -1532,7 +1532,7 @@ static MACHINE_CONFIG_START( e100, e100_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("video50hz", e100_state, rtc_w, attotime::from_hz(100)) /* Will be divided by two through toggle in the handler */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( md6802, md6802_state )
+static MACHINE_CONFIG_START( md6802 )
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(md6802_map)
 	MCFG_DEFAULT_LAYOUT(layout_md6802)
@@ -1565,7 +1565,7 @@ static MACHINE_CONFIG_START( md6802, md6802_state )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mp68a, mp68a_state )
+static MACHINE_CONFIG_START( mp68a )
 	// Clock source is based on a N9602N Dual Retriggerable Resettable Monostable Multivibrator oscillator at aprox 505KHz.
 	// Trimpot seems broken/stuck at 5K Ohm thu. ROM code 1Ms delay loops suggest 1MHz+
 	MCFG_CPU_ADD("maincpu", M6800, 505000)
@@ -1676,9 +1676,9 @@ ROM_START( mp68a ) // ROM image from http://elektronikforumet.com/forum/viewtopi
 	ROM_LOAD( "didactB.bin", 0x0a00, 0x0200, CRC(592898dc) SHA1(2962f4817712cae97f3ab37b088fc73e66535ff8) )
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS            INIT        COMPANY             FULLNAME                     FLAGS
-COMP( 1979, mp68a,      0,          0,      mp68a,      mp68a,  driver_device,   0,          "Didact AB",        "mp68a",                     MACHINE_NO_SOUND_HW )
-COMP( 1982, e100,       0,          0,      e100,       e100,   driver_device,   0,          "Didact AB",        "Esselte 100",               MACHINE_NO_SOUND_HW )
-COMP( 1983, md6802,     0,          0,      md6802,     md6802, driver_device,   0,          "Didact AB",        "Mikrodator 6802",           MACHINE_NO_SOUND_HW )
-COMP( 1984, can09,      0,          0,      can09,      can09,  driver_device,   0,          "Candela Data AB",  "Candela CAN09 main unit",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1984, can09t,     0,          0,      can09t,     can09t, driver_device,   0,          "Candela Data AB",  "Candela CAN09 terminal",    MACHINE_NO_SOUND_HW )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS         INIT        COMPANY             FULLNAME                     FLAGS
+COMP( 1979, mp68a,      0,          0,      mp68a,      mp68a,  mp68a_state,  0,          "Didact AB",        "mp68a",                     MACHINE_NO_SOUND_HW )
+COMP( 1982, e100,       0,          0,      e100,       e100,   e100_state,   0,          "Didact AB",        "Esselte 100",               MACHINE_NO_SOUND_HW )
+COMP( 1983, md6802,     0,          0,      md6802,     md6802, md6802_state, 0,          "Didact AB",        "Mikrodator 6802",           MACHINE_NO_SOUND_HW )
+COMP( 1984, can09,      0,          0,      can09,      can09,  can09_state,  0,          "Candela Data AB",  "Candela CAN09 main unit",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1984, can09t,     0,          0,      can09t,     can09t, can09t_state, 0,          "Candela Data AB",  "Candela CAN09 terminal",    MACHINE_NO_SOUND_HW )

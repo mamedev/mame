@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Karl Stenerud, hap
-#ifndef __M37710_H__
-#define __M37710_H__
+#ifndef MAME_CPU_M37710_M37710_H
+#define MAME_CPU_M37710_M37710_H
 
 /* ======================================================================== */
 /* =============================== COPYRIGHT ============================== */
@@ -93,13 +93,13 @@ enum
 class m37710_cpu_device : public cpu_device
 {
 public:
-	// construction/destruction
-	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_delegate map_delegate);
-
 	DECLARE_READ16_MEMBER( m37710_internal_word_r );
 	DECLARE_WRITE16_MEMBER( m37710_internal_word_w );
 
 protected:
+	// construction/destruction
+	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_delegate map_delegate);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -2024,8 +2024,8 @@ class m37702m2_device : public m37710_cpu_device
 public:
 	// construction/destruction
 	m37702m2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	m37702m2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 protected:
+	m37702m2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_ADDRESS_MAP(map, 16);
 };
 
@@ -2039,13 +2039,13 @@ protected:
 };
 
 
-extern const device_type M37702M2;
-extern const device_type M37702S1;
-extern const device_type M37710S4;
+DECLARE_DEVICE_TYPE(M37702M2, m37702m2_device)
+DECLARE_DEVICE_TYPE(M37702S1, m37702s1_device)
+DECLARE_DEVICE_TYPE(M37710S4, m37710s4_device)
 
 
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */
 /* ======================================================================== */
 
-#endif /* __M37710_H__ */
+#endif // MAME_CPU_M37710_M37710_H

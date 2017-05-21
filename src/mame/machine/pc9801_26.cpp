@@ -26,7 +26,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type PC9801_26 = device_creator<pc9801_26_device>;
+DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "pc9801_26")
 
 
 
@@ -113,7 +113,7 @@ ioport_constructor pc9801_26_device::device_input_ports() const
 //-------------------------------------------------
 
 pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC9801_26, "pc9801_26", tag, owner, clock, "pc9801_26", __FILE__),
+	: device_t(mconfig, PC9801_26, tag, owner, clock),
 //      m_maincpu(*this, "^maincpu"),
 		m_opn(*this, "opn")
 {

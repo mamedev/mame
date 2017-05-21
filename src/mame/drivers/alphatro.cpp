@@ -440,7 +440,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::timer_p)
 	}
 }
 
-static MACHINE_CONFIG_START( alphatro, alphatro_state )
+static MACHINE_CONFIG_START( alphatro )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK)
@@ -510,4 +510,4 @@ ROM_START( alphatro )
 	ROM_LOAD( "2732.ic-1067",   0x0000, 0x1000, CRC(61f38814) SHA1(35ba31c58a10d5bd1bdb202717792ca021dbe1a8) )
 ROM_END
 
-COMP( 1983, alphatro,   0,       0,    alphatro,   alphatro, driver_device,  0,  "Triumph-Adler", "Alphatronic PC", MACHINE_NOT_WORKING )
+COMP( 1983, alphatro,   0,       0,    alphatro,   alphatro, alphatro_state,  0,  "Triumph-Adler", "Alphatronic PC", MACHINE_NOT_WORKING )

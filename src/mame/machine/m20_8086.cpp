@@ -4,10 +4,10 @@
 #include "m20_8086.h"
 #include "machine/ram.h"
 
-const device_type M20_8086 = device_creator<m20_8086_device>;
+DEFINE_DEVICE_TYPE(M20_8086, m20_8086_device, "m20_8086", "Olivetti M20 8086 Adapter")
 
 m20_8086_device::m20_8086_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, M20_8086, "Olivetti M20 8086 Adapter", tag, owner, clock, "m20_8086", __FILE__),
+	device_t(mconfig, M20_8086, tag, owner, clock),
 	m_8086(*this, "8086"),
 	m_maincpu(*this, ":maincpu"),
 	m_pic(*this, ":i8259"),

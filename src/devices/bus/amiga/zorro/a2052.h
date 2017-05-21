@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_AMIGA_ZORRO_A2052_H
+#define MAME_BUS_AMIGA_ZORRO_A2052_H
 
-#ifndef __A2052_H__
-#define __A2052_H__
+#pragma once
 
 #include "zorro.h"
 #include "machine/autoconfig.h"
@@ -45,6 +45,6 @@ private:
 };
 
 // device type definition
-extern const device_type A2052;
+DECLARE_DEVICE_TYPE(A2052, a2052_device)
 
-#endif
+#endif // MAME_BUS_AMIGA_ZORRO_A2052_H

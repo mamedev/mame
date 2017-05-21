@@ -632,7 +632,7 @@ void tecmo_state::machine_reset()
 	m_adpcm_data = -1;
 }
 
-static MACHINE_CONFIG_START( rygar, tecmo_state )
+static MACHINE_CONFIG_START( rygar )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* verified on pcb */
@@ -668,7 +668,7 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb, even if schematics shows a 384khz resonator */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(tecmo_state, adpcm_int))    /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1173,12 +1173,12 @@ DRIVER_INIT_MEMBER(tecmo_state,backfirt)
 
 
 
-GAME( 1986, rygar,     0,        rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rygar2,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rygar3,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 3 Old Version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rygarj,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Argus no Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gemini,    0,        gemini,   gemini, tecmo_state,   gemini,   ROT90, "Tecmo", "Gemini Wing (Japan)", MACHINE_SUPPORTS_SAVE ) /* Japan regional warning screen */
-GAME( 1987, geminib,   gemini,   geminib,  gemini, tecmo_state,   gemini,   ROT90, "bootleg", "Gemini Wing (bootleg)", MACHINE_SUPPORTS_SAVE ) /* Japan regional warning screen */
-GAME( 1988, silkworm,  0,        silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo", "Silk Worm (World)", MACHINE_SUPPORTS_SAVE )   /* No regional "Warning, if you are playing ..." screen */
-GAME( 1988, silkwormj, silkworm, silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo", "Silk Worm (Japan)", MACHINE_SUPPORTS_SAVE )   /* Japan regional warning screen */
-GAME( 1988, backfirt,  0,        backfirt, backfirt, tecmo_state, backfirt, ROT0,  "Tecmo", "Back Fire (Tecmo, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygar,     0,        rygar,    rygar,    tecmo_state, rygar,    ROT0,  "Tecmo",   "Rygar (US set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygar2,    rygar,    rygar,    rygar,    tecmo_state, rygar,    ROT0,  "Tecmo",   "Rygar (US set 2)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygar3,    rygar,    rygar,    rygar,    tecmo_state, rygar,    ROT0,  "Tecmo",   "Rygar (US set 3 Old Version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygarj,    rygar,    rygar,    rygar,    tecmo_state, rygar,    ROT0,  "Tecmo",   "Argus no Senshi (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gemini,    0,        gemini,   gemini,   tecmo_state, gemini,   ROT90, "Tecmo",   "Gemini Wing (Japan)",          MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
+GAME( 1987, geminib,   gemini,   geminib,  gemini,   tecmo_state, gemini,   ROT90, "bootleg", "Gemini Wing (bootleg)",        MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
+GAME( 1988, silkworm,  0,        silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo",   "Silk Worm (World)",            MACHINE_SUPPORTS_SAVE ) // No regional "Warning, if you are playing ..." screen
+GAME( 1988, silkwormj, silkworm, silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo",   "Silk Worm (Japan)",            MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
+GAME( 1988, backfirt,  0,        backfirt, backfirt, tecmo_state, backfirt, ROT0,  "Tecmo",   "Back Fire (Tecmo, bootleg)",   MACHINE_SUPPORTS_SAVE )

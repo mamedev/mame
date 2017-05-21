@@ -417,7 +417,7 @@ GFXDECODE_END
  Machine Driver(s)
 *******************************************************************************/
 
-static MACHINE_CONFIG_START( wwfsstar, wwfsstar_state )
+static MACHINE_CONFIG_START( wwfsstar )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
@@ -447,7 +447,7 @@ static MACHINE_CONFIG_START( wwfsstar, wwfsstar_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -635,8 +635,8 @@ ROM_END
 
 
 
-GAME( 1989, wwfsstar,   0,        wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstaru,  wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (US, Newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstarua, wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstarj,  wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstarb,  wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "bootleg",       "WWF Superstars (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstar,   0,        wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (Europe)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstaru,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (US, Newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarua, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (US)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarj,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarb,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "bootleg",       "WWF Superstars (bootleg)",   MACHINE_SUPPORTS_SAVE )

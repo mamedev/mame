@@ -14,11 +14,11 @@
 
 // DPC device
 
-const device_type ATARI_DPC = device_creator<dpc_device>;
+DEFINE_DEVICE_TYPE(ATARI_DPC, dpc_device, "atari_dpc", "Atari DPC")
 
 
 dpc_device::dpc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
-	device_t(mconfig, ATARI_DPC, "Atari DCP", tag, owner, clock, "atari_dcp", __FILE__),
+	device_t(mconfig, ATARI_DPC, tag, owner, clock),
 	m_movamt(0),
 	m_latch_62(0),
 	m_latch_64(0),
@@ -238,12 +238,11 @@ WRITE8_MEMBER(dpc_device::write)
 
 // cart device
 
-const device_type A26_ROM_DPC = device_creator<a26_rom_dpc_device>;
+DEFINE_DEVICE_TYPE(A26_ROM_DPC, a26_rom_dpc_device, "a2600_dpc", "Atari 2600 ROM Cart Pitfall II")
 
 
 a26_rom_dpc_device::a26_rom_dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-						: a26_rom_f8_device(mconfig, A26_ROM_DPC, "Atari 2600 ROM Cart Pitfall II", tag, owner, clock, "a2600_dcp", __FILE__),
-						m_dpc(*this, "dpc")
+	: a26_rom_f8_device(mconfig, A26_ROM_DPC, tag, owner, clock), m_dpc(*this, "dpc")
 {
 }
 

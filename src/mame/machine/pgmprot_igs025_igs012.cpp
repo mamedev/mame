@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( drgw2_mem, AS_PROGRAM, 16, pgm_012_025_state )
 	AM_RANGE(0xd00000, 0xd00fff) AM_NOP // Written, but never read back? Related to the protection device? - IGS012?
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START( pgm_012_025_drgw2, pgm_012_025_state )
+MACHINE_CONFIG_START( pgm_012_025_drgw2 )
 	MCFG_FRAGMENT_ADD(pgmbase)
 
 	MCFG_CPU_MODIFY("maincpu")

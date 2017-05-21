@@ -317,7 +317,7 @@ static SLOT_INTERFACE_START( dgnbeta_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_35_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
+static MACHINE_CONFIG_START( dgnbeta )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(dgnbeta_map)
@@ -418,5 +418,5 @@ ROM_START(dgnbeta)
 	ROM_LOAD("betachar.rom" ,0x0000 ,0x2000 ,CRC(ca79d66c) SHA1(8e2090d471dd97a53785a7f44a49d3c8c85b41f2))
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    CLASS             INIT    COMPANY             FULLNAME                  FLAGS */
-COMP( 1984, dgnbeta,    0,      0,      dgnbeta,    dgnbeta, driver_device,    0,      "Dragon Data Ltd",  "Dragon 128 (Beta)",      MACHINE_NO_SOUND )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    CLASS           INIT    COMPANY             FULLNAME                  FLAGS
+COMP( 1984, dgnbeta,    0,      0,      dgnbeta,    dgnbeta, dgn_beta_state, 0,      "Dragon Data Ltd",  "Dragon 128 (Beta)",      MACHINE_NO_SOUND )

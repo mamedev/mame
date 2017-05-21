@@ -283,8 +283,8 @@ static ADDRESS_MAP_START( a7800_mem, AS_PROGRAM, 8, a7800_state )
 	AM_RANGE(0x0020, 0x003f) AM_MIRROR(0x300) AM_DEVREADWRITE("maria", atari_maria_device, read, write)
 	AM_RANGE(0x0040, 0x00ff) AM_RAMBANK("zpmirror") // mirror of 0x2040-0x20ff, for zero page
 	AM_RANGE(0x0140, 0x01ff) AM_RAMBANK("spmirror") // mirror of 0x2140-0x21ff, for stack page
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x160) AM_DEVICE("riot", mos6532_t, io_map)
-	AM_RANGE(0x0480, 0x04ff) AM_MIRROR(0x100) AM_DEVICE("riot", mos6532_t, ram_map)
+	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x160) AM_DEVICE("riot", mos6532_new_device, io_map)
+	AM_RANGE(0x0480, 0x04ff) AM_MIRROR(0x100) AM_DEVICE("riot", mos6532_new_device, ram_map)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("6116_1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("6116_2")
 								// According to the official Software Guide, the RAM at 0x2000 is
@@ -1351,7 +1351,7 @@ void a7800_state::machine_reset()
 	m_bios_enabled = 0;
 }
 
-static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
+static MACHINE_CONFIG_START( a7800_ntsc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, A7800_NTSC_Y1/8) /* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
 	MCFG_CPU_PROGRAM_MAP(a7800_mem)
@@ -1375,7 +1375,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_DEVICE_ADD("riot", MOS6532n, A7800_NTSC_Y1/8)
+	MCFG_DEVICE_ADD("riot", MOS6532_NEW, A7800_NTSC_Y1/8)
 	MCFG_MOS6530n_IN_PA_CB(READ8(a7800_state, riot_joystick_r))
 	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
 	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
@@ -1402,7 +1402,7 @@ static MACHINE_CONFIG_DERIVED( a7800_pal, a7800_ntsc )
 
 	/* devices */
 	MCFG_DEVICE_REMOVE("riot")
-	MCFG_DEVICE_ADD("riot", MOS6532n, CLK_PAL)
+	MCFG_DEVICE_ADD("riot", MOS6532_NEW, CLK_PAL)
 	MCFG_MOS6530n_IN_PA_CB(READ8(a7800_state, riot_joystick_r))
 	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
 	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
@@ -1458,6 +1458,6 @@ DRIVER_INIT_MEMBER(a7800_state,a7800_pal)
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     INIT          COMPANY   FULLNAME */
-CONS( 1986, a7800,    0,        0,      a7800_ntsc, a7800, a7800_state,    a7800_ntsc,  "Atari",  "Atari 7800 (NTSC)" , 0)
-CONS( 1986, a7800p,   a7800,    0,      a7800_pal,  a7800, a7800_state,    a7800_pal,   "Atari",  "Atari 7800 (PAL)" , 0)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT  STATE         INIT         COMPANY   FULLNAME */
+CONS( 1986, a7800,    0,        0,      a7800_ntsc, a7800, a7800_state,  a7800_ntsc,  "Atari",  "Atari 7800 (NTSC)" , 0)
+CONS( 1986, a7800p,   a7800,    0,      a7800_pal,  a7800, a7800_state,  a7800_pal,   "Atari",  "Atari 7800 (PAL)" , 0)

@@ -6,9 +6,10 @@
 
 */
 
-#ifndef _UCOM4_H_
-#define _UCOM4_H_
+#ifndef MAME_CPU_UCOM4_UCOM4_H
+#define MAME_CPU_UCOM4_UCOM4_H
 
+#pragma once
 
 
 // I/O ports setup
@@ -98,43 +99,24 @@ enum
 class ucom4_cpu_device : public cpu_device
 {
 public:
-	// construction/destruction
-	ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-		, m_program_config("program", ENDIANNESS_BIG, 8, prgwidth, 0, program)
-		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
-		, m_prgwidth(prgwidth)
-		, m_datawidth(datawidth)
-		, m_family(family)
-		, m_stack_levels(stack_levels)
-		, m_read_a(*this)
-		, m_read_b(*this)
-		, m_read_c(*this)
-		, m_read_d(*this)
-		, m_write_c(*this)
-		, m_write_d(*this)
-		, m_write_e(*this)
-		, m_write_f(*this)
-		, m_write_g(*this)
-		, m_write_h(*this)
-		, m_write_i(*this)
-	{ }
-
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_a_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_read_a.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_b_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_read_b.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_c_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_read_c.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_d_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_read_d.set_callback(object); }
+	template <class Object> static devcb_base &set_read_a_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_read_a.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_b_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_read_b.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_c_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_read_c.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_d_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_read_d.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_write_c_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_write_c.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_write_d.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_e_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_write_e.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_f_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_write_f.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_g_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_write_g.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_h_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_write_h.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_i_callback(device_t &device, _Object object) { return downcast<ucom4_cpu_device &>(device).m_write_i.set_callback(object); }
+	template <class Object> static devcb_base &set_write_c_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_c.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_d_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_e_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_e.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_f_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_f.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_g_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_g.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_h_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_h.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_i_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_i.set_callback(std::forward<Object>(cb)); }
 
 protected:
+	// construction/destruction
+	ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -352,11 +334,10 @@ public:
 
 
 
-extern const device_type NEC_D546;
-extern const device_type NEC_D553;
-extern const device_type NEC_D557L;
-extern const device_type NEC_D650;
-extern const device_type NEC_D552;
+DECLARE_DEVICE_TYPE(NEC_D546,  upd546_cpu_device)
+DECLARE_DEVICE_TYPE(NEC_D553,  upd553_cpu_device)
+DECLARE_DEVICE_TYPE(NEC_D557L, upd557l_cpu_device)
+DECLARE_DEVICE_TYPE(NEC_D650,  upd650_cpu_device)
+DECLARE_DEVICE_TYPE(NEC_D552,  upd552_cpu_device)
 
-
-#endif /* _UCOM4_H_ */
+#endif // MAME_CPU_UCOM4_UCOM4_H

@@ -26,10 +26,10 @@
  * - full emulation of 8xCx2 processors
  *****************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_MCS51_MCS51_H
+#define MAME_CPU_MCS51_MCS51_H
 
-#ifndef __MCS51_H__
-#define __MCS51_H__
+#pragma once
 
 
 #define MCFG_MCS51_SERIAL_RX_CB(_devcb) \
@@ -83,15 +83,15 @@ enum
 class mcs51_cpu_device : public cpu_device
 {
 public:
-	// construction/destruction
-	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features = 0);
-
 	// configuration helpers
 	static void set_port_forced_input(device_t &device, uint8_t port, uint8_t forced_input) { downcast<mcs51_cpu_device &>(device).m_forced_inputs[port] = forced_input; }
 	template<class _Object> static devcb_base & set_serial_rx_cb(device_t &device, _Object object) { return downcast<mcs51_cpu_device &>(device).m_serial_rx_cb.set_callback(object); }
 	template<class _Object> static devcb_base & set_serial_tx_cb(device_t &device, _Object object) { return downcast<mcs51_cpu_device &>(device).m_serial_tx_cb.set_callback(object); }
 
 protected:
+	// construction/destruction
+	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -341,26 +341,26 @@ protected:
 
 
 /* variants with no internal rom and 128 byte internal memory */
-extern const device_type I8031;
+DECLARE_DEVICE_TYPE(I8031, i8031_device)
 /* variants with no internal rom and 256 byte internal memory */
-extern const device_type I8032;
+DECLARE_DEVICE_TYPE(I8032, i8032_device)
 /* variants 4k internal rom and 128 byte internal memory */
-extern const device_type I8051;
-extern const device_type I8751;
+DECLARE_DEVICE_TYPE(I8051, i8051_device)
+DECLARE_DEVICE_TYPE(I8751, i8751_device)
 /* variants 8k internal rom and 256 byte internal memory and more registers */
-extern const device_type I8052;
-extern const device_type I8752;
+DECLARE_DEVICE_TYPE(I8052, i8052_device)
+DECLARE_DEVICE_TYPE(I8752, i8751_device)
 /* cmos variants */
-extern const device_type I80C31;
-extern const device_type I80C51;
-extern const device_type I87C51;
-extern const device_type I80C32;
-extern const device_type I80C52;
-extern const device_type I87C52;
+DECLARE_DEVICE_TYPE(I80C31, i80c31_device)
+DECLARE_DEVICE_TYPE(I80C51, i80c51_device)
+DECLARE_DEVICE_TYPE(I87C51, i87c51_device)
+DECLARE_DEVICE_TYPE(I80C32, i80c32_device)
+DECLARE_DEVICE_TYPE(I80C52, i80c52_device)
+DECLARE_DEVICE_TYPE(I87C52, i87c52_device)
 /* 4k internal perom and 128 internal ram and 2 analog comparators */
-extern const device_type AT89C4051;
+DECLARE_DEVICE_TYPE(AT89C4051, at89c4051_device)
 
-extern const device_type DS5002FP;
+DECLARE_DEVICE_TYPE(DS5002FP, ds5002fp_device)
 
 
 class i8031_device : public mcs51_cpu_device
@@ -390,9 +390,10 @@ class i8052_device : public mcs51_cpu_device
 public:
 	// construction/destruction
 	i8052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	i8052_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features = 0);
 
 protected:
+	i8052_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
+
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	/* SFR Callbacks */
@@ -430,9 +431,10 @@ class i80c51_device : public mcs51_cpu_device
 public:
 	// construction/destruction
 	i80c51_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	i80c51_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features = 0);
 
 protected:
+	i80c51_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
+
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 };
 
@@ -449,9 +451,10 @@ class i80c52_device : public i8052_device
 public:
 	// construction/destruction
 	i80c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	i80c52_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features = 0);
 
 protected:
+	i80c52_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
+
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	/* SFR Callbacks */
@@ -520,4 +523,4 @@ protected:
 };
 
 
-#endif /* __MCS51_H__ */
+#endif // MAME_CPU_MCS51_MCS51_H

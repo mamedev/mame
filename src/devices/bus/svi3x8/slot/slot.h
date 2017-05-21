@@ -34,10 +34,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SVI3X8_SLOT_SLOT_H
+#define MAME_BUS_SVI3X8_SLOT_SLOT_H
 
-#ifndef __SVI3X8_SLOT_H__
-#define __SVI3X8_SLOT_H__
+#pragma once
 
 
 
@@ -79,18 +79,14 @@ public:
 	virtual ~svi_slot_bus_device();
 
 	// callbacks
-	template<class _Object> static devcb_base &set_int_handler(device_t &device, _Object object)
-		{ return downcast<svi_slot_bus_device &>(device).m_int_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_int_handler(device_t &device, Object &&cb)
+	{ return downcast<svi_slot_bus_device &>(device).m_int_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_romdis_handler(device_t &device, _Object object)
-		{ return downcast<svi_slot_bus_device &>(device).m_romdis_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_romdis_handler(device_t &device, Object &&cb)
+	{ return downcast<svi_slot_bus_device &>(device).m_romdis_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_ramdis_handler(device_t &device, _Object object)
-		{ return downcast<svi_slot_bus_device &>(device).m_ramdis_handler.set_callback(object); }
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	template <class Object> static devcb_base &set_ramdis_handler(device_t &device, Object &&cb)
+	{ return downcast<svi_slot_bus_device &>(device).m_ramdis_handler.set_callback(std::forward<Object>(cb)); }
 
 	void add_card(device_svi_slot_interface *card);
 
@@ -111,6 +107,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( bk32_w );
 
 private:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 	simple_list<device_svi_slot_interface> m_dev;
 
 	devcb_write_line m_int_handler;
@@ -119,7 +119,7 @@ private:
 };
 
 // device type definition
-extern const device_type SVI_SLOT_BUS;
+DECLARE_DEVICE_TYPE(SVI_SLOT_BUS, svi_slot_bus_device)
 
 // ======================> svi_slot_device
 
@@ -142,37 +142,41 @@ protected:
 };
 
 // device type definition
-extern const device_type SVI_SLOT;
+DECLARE_DEVICE_TYPE(SVI_SLOT, svi_slot_device)
 
 // ======================> svi_slot_device
 
 class device_svi_slot_interface : public device_slot_card_interface
 {
+	template <class ElementType> friend class simple_list;
 public:
 	// construction/destruction
-	device_svi_slot_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_svi_slot_interface();
 
 	void set_bus_device(svi_slot_bus_device *bus);
 
 	device_svi_slot_interface *next() const { return m_next; }
-	device_svi_slot_interface *m_next;
 
-	virtual DECLARE_READ8_MEMBER( mreq_r ) { return 0xff; };
-	virtual DECLARE_WRITE8_MEMBER( mreq_w ) {};
-	virtual DECLARE_READ8_MEMBER( iorq_r ) { return 0xff; };
-	virtual DECLARE_WRITE8_MEMBER( iorq_w ) {};
+	virtual DECLARE_READ8_MEMBER( mreq_r ) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER( mreq_w ) { }
+	virtual DECLARE_READ8_MEMBER( iorq_r ) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER( iorq_w ) { }
 
-	virtual DECLARE_WRITE_LINE_MEMBER( bk21_w ) {};
-	virtual DECLARE_WRITE_LINE_MEMBER( bk22_w ) {};
-	virtual DECLARE_WRITE_LINE_MEMBER( bk31_w ) {};
-	virtual DECLARE_WRITE_LINE_MEMBER( bk32_w ) {};
+	virtual DECLARE_WRITE_LINE_MEMBER( bk21_w ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( bk22_w ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( bk31_w ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( bk32_w ) { }
 
 protected:
+	device_svi_slot_interface(const machine_config &mconfig, device_t &device);
+
 	svi_slot_bus_device *m_bus;
+
+private:
+	device_svi_slot_interface *m_next;
 };
 
 // include here so drivers don't need to
 #include "cards.h"
 
-#endif // __SVI3X8_SLOT_H__
+#endif // MAME_BUS_SVI3X8_SLOT_SLOT_H

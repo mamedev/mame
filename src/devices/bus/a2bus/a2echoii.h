@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_ECHOII__
-#define __A2BUS_ECHOII__
+#ifndef MAME_BUS_A2BUS_A2ECHOII_H
+#define MAME_BUS_A2BUS_A2ECHOII_H
+
+#pragma once
 
 #include "a2bus.h"
 #include "sound/tms5220.h"
@@ -24,7 +26,6 @@ class a2bus_echoii_device:
 {
 public:
 	// construction/destruction
-	a2bus_echoii_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a2bus_echoii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
@@ -33,6 +34,8 @@ public:
 	required_device<tms5220_device> m_tms;
 
 protected:
+	a2bus_echoii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -44,5 +47,6 @@ protected:
 
 // device type definition
 extern const device_type A2BUS_ECHOII;
+DECLARE_DEVICE_TYPE(A2BUS_ECHOII, a2bus_echoii_device)
 
-#endif /* __A2BUS_ECHOII__ */
+#endif // MAME_BUS_A2BUS_A2ECHOII_H

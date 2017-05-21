@@ -486,7 +486,7 @@ static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 	AM_RANGE(0x8c, 0x8c) AM_DEVREADWRITE(I8251A_SIO_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0x8d, 0x8d) AM_DEVREADWRITE(I8251A_SIO_TAG, i8251_device, status_r, control_w)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE(I8255A_MISC_TAG, i8255_device, read, write)
-	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE(MB8877_TAG, mb8877_t, read, write)
+	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE(MB8877_TAG, mb8877_device, read, write)
 	AM_RANGE(0x9c, 0x9f) AM_DEVREADWRITE(I8255A_RTC_TAG, i8255_device, read, write)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(vint_clr_r, vint_clr_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
@@ -1020,7 +1020,7 @@ void v1050_state::machine_reset()
 
 // Machine Driver
 
-static MACHINE_CONFIG_START( v1050, v1050_state )
+static MACHINE_CONFIG_START( v1050 )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(v1050_mem)
@@ -1149,5 +1149,5 @@ ROM_END
 
 // System Drivers
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                     FULLNAME        FLAGS
-COMP( 1983, v1050,  0,      0,      v1050,  v1050, driver_device,   0,      "Visual Technology Inc",    "Visual 1050", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_KEYBOARD )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE         INIT    COMPANY                  FULLNAME       FLAGS
+COMP( 1983, v1050,  0,      0,      v1050,  v1050, v1050_state,  0,      "Visual Technology Inc", "Visual 1050", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_KEYBOARD )

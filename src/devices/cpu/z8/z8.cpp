@@ -21,8 +21,8 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "z8.h"
+#include "debugger.h"
 
 /***************************************************************************
     CONSTANTS
@@ -152,9 +152,9 @@ enum
 #define PRE1        m_r[Z8_REGISTER_PRE1]
 
 
-const device_type Z8601 = device_creator<z8601_device>;
-const device_type UB8830D = device_creator<ub8830d_device>;
-const device_type Z8611 = device_creator<z8611_device>;
+DEFINE_DEVICE_TYPE(Z8601,   z8601_device,   "z8601",   "Z8601")
+DEFINE_DEVICE_TYPE(UB8830D, ub8830d_device, "ub8830d", "UB8830D")
+DEFINE_DEVICE_TYPE(Z8611,   z8611_device,   "z8611",   "Z8611")
 
 
 /***************************************************************************
@@ -170,29 +170,29 @@ static ADDRESS_MAP_START( program_4kb, AS_PROGRAM, 8, z8_device )
 ADDRESS_MAP_END
 
 
-z8_device::z8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int size)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, ( size == 4 ) ? ADDRESS_MAP_NAME(program_4kb) : ADDRESS_MAP_NAME(program_2kb))
+z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, (size == 4) ? ADDRESS_MAP_NAME(program_4kb) : ADDRESS_MAP_NAME(program_2kb))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 2, 0)
 {
 }
 
 
-z8601_device::z8601_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock)
-	: z8_device(mconfig, Z8601, "Z8601", _tag, _owner, _clock, "z8601", __FILE__, 2)
+z8601_device::z8601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z8_device(mconfig, Z8601, tag, owner, clock, 2)
 {
 }
 
 
-ub8830d_device::ub8830d_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock)
-	: z8_device(mconfig, UB8830D, "UB8830D", _tag, _owner, _clock, "ub8830d", __FILE__, 2)
+ub8830d_device::ub8830d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z8_device(mconfig, UB8830D, tag, owner, clock, 2)
 {
 }
 
 
-z8611_device::z8611_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock)
-	: z8_device(mconfig, Z8611, "Z8611", _tag, _owner, _clock, "z8611", __FILE__, 4)
+z8611_device::z8611_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z8_device(mconfig, Z8611, tag, owner, clock, 4)
 {
 }
 

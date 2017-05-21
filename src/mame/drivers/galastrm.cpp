@@ -285,7 +285,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static MACHINE_CONFIG_START( galastrm, galastrm_state )
+static MACHINE_CONFIG_START( galastrm )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000) /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(galastrm_map)
@@ -364,4 +364,4 @@ ROM_START( galastrm )
 ROM_END
 
 
-GAME( 1992, galastrm, 0, galastrm, galastrm, driver_device, 0, ROT0, "Taito Corporation", "Galactic Storm (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, galastrm, 0, galastrm, galastrm, galastrm_state, 0, ROT0, "Taito Corporation", "Galactic Storm (Japan)", MACHINE_IMPERFECT_GRAPHICS )

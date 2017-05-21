@@ -627,7 +627,7 @@ void rbisland_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( rbisland, rbisland_state )
+static MACHINE_CONFIG_START( rbisland )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
@@ -677,7 +677,7 @@ MACHINE_CONFIG_END
 
 
 /* Jumping: The PCB has 2 Xtals, 18.432MHz and 24MHz */
-static MACHINE_CONFIG_START( jumping, rbisland_state )
+static MACHINE_CONFIG_START( jumping )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)  /* verified on pcb */
@@ -971,7 +971,7 @@ DRIVER_INIT_MEMBER(rbisland_state,jumping)
 
 GAME( 1987, rbisland,  0,        rbisland, rbisland, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (new version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rbislando, rbisland, rbisland, rbisland, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (old version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rbislande, rbisland, rbisland, rbisland, rbisland_state, rbislande, ROT0, "Taito Corporation", "Rainbow Islands (Extra)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, jumping,   rbisland, jumping,  jumping, rbisland_state,  jumping,   ROT0, "bootleg",          "Jumping (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, jumpinga,  rbisland, jumping,  jumping, rbisland_state,  jumping,   ROT0, "bootleg (Seyutu)", "Jumping (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, jumpingi,  rbisland, jumpingi,  jumping, rbisland_state,  jumping,   ROT0, "bootleg (Seyutu)", "Jumping (set 3, Imnoe PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rbislande, rbisland, rbisland, rbisland, rbisland_state, rbislande, ROT0, "Taito Corporation", "Rainbow Islands (Extra)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, jumping,   rbisland, jumping,  jumping,  rbisland_state, jumping,   ROT0, "bootleg",           "Jumping (set 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jumpinga,  rbisland, jumping,  jumping,  rbisland_state, jumping,   ROT0, "bootleg (Seyutu)",  "Jumping (set 2)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jumpingi,  rbisland, jumpingi, jumping,  rbisland_state, jumping,   ROT0, "bootleg (Seyutu)",  "Jumping (set 3, Imnoe PCB)",    MACHINE_SUPPORTS_SAVE )

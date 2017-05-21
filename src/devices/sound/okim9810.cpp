@@ -17,7 +17,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type OKIM9810 = device_creator<okim9810_device>;
+DEFINE_DEVICE_TYPE(OKIM9810, okim9810_device, "okim9810", "OKI MSM9810 ADPCM")
 
 // volume lookup table. The manual lists a full 16 steps, 2dB per step.
 // Given the dB values, that seems to map to a 7-bit volume control.
@@ -73,14 +73,14 @@ const uint32_t okim9810_device::s_sampling_freq_table[16] =
 //-------------------------------------------------
 
 okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, OKIM9810, "OKI9810", tag, owner, clock, "okim9810", __FILE__),
+	: device_t(mconfig, OKIM9810, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 24),
 		m_stream(nullptr),
 		m_TMP_register(0x00),
 		m_global_volume(0x00),
-		m_filter_type(OKIM9810_SECONDARY_FILTER),
-		m_output_level(OKIM9810_OUTPUT_TO_DIRECT_DAC)
+		m_filter_type(SECONDARY_FILTER),
+		m_output_level(OUTPUT_TO_DIRECT_DAC)
 {
 }
 
@@ -340,8 +340,8 @@ void okim9810_device::write_command(uint8_t data)
 
 			m_voice[channel].m_playbackAlgo = (startFlags & 0x30) >> 4;
 			m_voice[channel].m_samplingFreq = s_sampling_freq_table[startFlags & 0x0f];
-			if (m_voice[channel].m_playbackAlgo == OKIM9810_ADPCM_PLAYBACK ||
-				m_voice[channel].m_playbackAlgo == OKIM9810_ADPCM2_PLAYBACK)
+			if (m_voice[channel].m_playbackAlgo == ADPCM_PLAYBACK ||
+				m_voice[channel].m_playbackAlgo == ADPCM2_PLAYBACK)
 				m_voice[channel].m_count *= 2;
 			else
 				osd_printf_warning("MSM9810: UNIMPLEMENTED PLAYBACK METHOD %d\n", m_voice[channel].m_playbackAlgo);
@@ -394,14 +394,14 @@ WRITE8_MEMBER( okim9810_device::write )
 //-----------------------------------------------------------
 
 // TMP is written when the CMD pin is high
-void okim9810_device::write_TMP_register(uint8_t data)
+void okim9810_device::write_tmp_register(uint8_t data)
 {
 	m_TMP_register = data;
 }
 
-WRITE8_MEMBER( okim9810_device::write_TMP_register )
+WRITE8_MEMBER( okim9810_device::write_tmp_register )
 {
-	write_TMP_register(data);
+	write_tmp_register(data);
 }
 
 
@@ -414,7 +414,7 @@ WRITE8_MEMBER( okim9810_device::write_TMP_register )
 //-------------------------------------------------
 
 okim9810_device::okim_voice::okim_voice()
-	: m_playbackAlgo(OKIM9810_ADPCM2_PLAYBACK),
+	: m_playbackAlgo(ADPCM2_PLAYBACK),
 		m_looping(false),
 		m_startFlags(0),
 		m_endFlags(0),
@@ -472,13 +472,13 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 				int nibble0 = rom.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
 				switch (m_playbackAlgo)
 				{
-					case OKIM9810_ADPCM_PLAYBACK:
+					case ADPCM_PLAYBACK:
 					{
 						m_adpcm.reset();
 						m_startSample = (int32_t)m_adpcm.clock(nibble0);
 						break;
 					}
-					case OKIM9810_ADPCM2_PLAYBACK:
+					case ADPCM2_PLAYBACK:
 					{
 						m_adpcm2.reset();
 						m_startSample = (int32_t)m_adpcm2.clock(nibble0);
@@ -498,12 +498,12 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 			int nibble1 = rom.read_byte(m_base_offset + (m_sample+1) / 2) >> ((((m_sample+1) & 1) << 2) ^ 4);
 			switch (m_playbackAlgo)
 			{
-				case OKIM9810_ADPCM_PLAYBACK:
+				case ADPCM_PLAYBACK:
 				{
 					m_endSample = (int32_t)m_adpcm.clock(nibble1);
 					break;
 				}
-				case OKIM9810_ADPCM2_PLAYBACK:
+				case ADPCM2_PLAYBACK:
 				{
 					m_endSample = (int32_t)m_adpcm2.clock(nibble1);
 					break;
@@ -518,7 +518,7 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 		int32_t interpValue = (int32_t)((float)m_startSample + (((float)m_endSample-(float)m_startSample) * progress));
 
 		// if filtering is unwanted
-		if (filter_type != OKIM9810_SECONDARY_FILTER && filter_type != OKIM9810_PRIMARY_FILTER)
+		if (filter_type != SECONDARY_FILTER && filter_type != PRIMARY_FILTER)
 			interpValue = m_startSample;
 
 		// output to the stereo buffers, scaling by the volume

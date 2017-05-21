@@ -13,7 +13,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NEOGEO_CART_SLOT = device_creator<neogeo_cart_slot_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_CART_SLOT, neogeo_cart_slot_device, "neogeo_cart_slot", "Neo Geo Cartridge Slot")
 
 
 //-------------------------------------------------
@@ -98,10 +98,10 @@ void device_neogeo_cart_interface::optimize_sprites(uint8_t* region_sprites, uin
 //  neogeo_cart_slot_device - constructor
 //-------------------------------------------------
 neogeo_cart_slot_device::neogeo_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
-						device_t(mconfig, NEOGEO_CART_SLOT, "Neo Geo Cartridge Slot", tag, owner, clock, "neogeo_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_cart(nullptr)
+	device_t(mconfig, NEOGEO_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_cart(nullptr)
 {
 }
 

@@ -441,7 +441,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( r2dtank, r2dtank_state )
+static MACHINE_CONFIG_START( r2dtank )
 	MCFG_CPU_ADD("maincpu", M6809,3000000)       /* ?? too fast ? */
 	MCFG_CPU_PROGRAM_MAP(r2dtank_main_map)
 
@@ -532,4 +532,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, r2dtank, 0, r2dtank, r2dtank, driver_device, 0, ROT270, "Sigma Enterprises Inc.", "R2D Tank", MACHINE_SUPPORTS_SAVE)
+GAME( 1980, r2dtank, 0, r2dtank, r2dtank, r2dtank_state, 0, ROT270, "Sigma Enterprises Inc.", "R2D Tank", MACHINE_SUPPORTS_SAVE)

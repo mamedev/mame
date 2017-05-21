@@ -46,7 +46,7 @@ static ADDRESS_MAP_START( qs7_prog_map, AS_PROGRAM, 16, qs_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( qs7, qs_state )
+static MACHINE_CONFIG_START( qs7 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83048, XTAL_10MHz) /* FIX-ME! Actual CPU is H8/510 and XTAL value is a guess */
 	MCFG_CPU_PROGRAM_MAP(qs7_prog_map)
@@ -88,5 +88,5 @@ ROM_START( alesqs7 )
 //  ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
 ROM_END
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT               COMPANY   FULLNAME                       FLAGS  */
-COMP( 1996, alesqs7, 0,      0,      qs7,     qs7,   driver_device, 0,  "Alesis", "Alesis QS7 musical keyboard", MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT          COMPANY   FULLNAME                       FLAGS
+COMP( 1996, alesqs7, 0,      0,      qs7,     qs7,   qs_state, 0,  "Alesis", "Alesis QS7 musical keyboard", MACHINE_IS_SKELETON )

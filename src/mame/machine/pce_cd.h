@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef __PCE_CD_H
-#define __PCE_CD_H
+#ifndef MAME_MACHINE_PCE_CD_H
+#define MAME_MACHINE_PCE_CD_H
+
+#pragma once
 
 /***************************************************************************
  TYPE DEFINITIONS
@@ -43,7 +45,6 @@ class pce_cd_device : public device_t
 public:
 	// construction/destruction
 	pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~pce_cd_device() {}
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -174,7 +175,7 @@ private:
 
 
 // device type definition
-extern const device_type PCE_CD;
+DECLARE_DEVICE_TYPE(PCE_CD, pce_cd_device)
 
 
 /***************************************************************************
@@ -185,4 +186,4 @@ extern const device_type PCE_CD;
 	MCFG_DEVICE_ADD(_tag, PCE_CD, 0)
 
 
-#endif
+#endif // MAME_MACHINE_PCE_CD_H

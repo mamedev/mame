@@ -2,11 +2,11 @@
 // copyright-holders:David Haywood
 
 // device interface to hold some common functions of the EFO / Cedar Magnet System PCBs
+#ifndef MAME_MACHINE_CEDAR_MAGNET_BOARD_H
+#define MAME_MACHINE_CEDAR_MAGNET_BOARD_H
 
 #pragma once
 
-#ifndef CEDAR_MAGNET_BOARD_DEF
-#define CEDAR_MAGNET_BOARD_DEF
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -46,4 +46,4 @@ private:
 	bool m_is_running;
 };
 
-#endif
+#endif // MAME_MACHINE_CEDAR_MAGNET_BOARD_H

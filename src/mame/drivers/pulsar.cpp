@@ -77,7 +77,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dart_device> m_dart;
 	required_device<com8116_device> m_brg;
-	required_device<fd1797_t> m_fdc;
+	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<msm5832_device> m_rtc;
@@ -94,7 +94,7 @@ static ADDRESS_MAP_START(pulsar_io, AS_IO, 8, pulsar_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x0c) AM_DEVREADWRITE("z80dart", z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_DEVREADWRITE("fdc", fd1797_t, read, write)
+	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_DEVREADWRITE("fdc", fd1797_device, read, write)
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xf0, 0xff) AM_WRITE(baud_w)
 ADDRESS_MAP_END
@@ -224,7 +224,7 @@ DRIVER_INIT_MEMBER( pulsar_state, pulsar )
 	membank("bankw1")->configure_entry(0, &main[0xf800]);
 }
 
-static MACHINE_CONFIG_START( pulsar, pulsar_state )
+static MACHINE_CONFIG_START( pulsar )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pulsar_mem)
@@ -274,5 +274,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY       FULLNAME       FLAGS */
-COMP( 1981, pulsarlb, 0,      0,       pulsar,    pulsar,  pulsar_state,  pulsar,  "Pulsar", "Little Big Board", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT     COMPANY   FULLNAME            FLAGS
+COMP( 1981, pulsarlb, 0,      0,      pulsar,  pulsar,  pulsar_state,  pulsar,  "Pulsar", "Little Big Board", MACHINE_NO_SOUND_HW )

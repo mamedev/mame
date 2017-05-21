@@ -59,7 +59,7 @@ WRITE8_MEMBER(megazone_state::megazone_port_b_w)
 			C += 220000;    /* 220000pF = 0.22uF */
 
 		data >>= 2;
-		dynamic_cast<filter_rc_device*>(machine().device(fltname[i]))->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 200, CAP_P(C));
+		downcast<filter_rc_device*>(machine().device(fltname[i]))->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 200, CAP_P(C));
 	}
 }
 
@@ -235,7 +235,7 @@ INTERRUPT_GEN_MEMBER(megazone_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( megazone, megazone_state )
+static MACHINE_CONFIG_START( megazone )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 18432000/9)        /* 2 MHz */
@@ -515,8 +515,8 @@ ROM_START( megazonec )
 ROM_END
 
 
-GAME( 1983, megazone, 0,         megazone, megazone, driver_device, 0, ROT90, "Konami", "Mega Zone (Konami set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonea, megazone, megazone, megazona, driver_device, 0, ROT90, "Konami", "Mega Zone (Konami set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazoneb, megazone, megazone, megazone, driver_device, 0, ROT90, "Konami (Kosuka license)", "Mega Zone (Kosuka set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonec, megazone, megazone, megazone, driver_device, 0, ROT90, "Konami (Kosuka license)", "Mega Zone (Kosuka set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonei, megazone, megazone, megazone, driver_device, 0, ROT90, "Konami (Interlogic license)", "Mega Zone (Interlogic)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazone, 0,         megazone, megazone, megazone_state, 0, ROT90, "Konami",                      "Mega Zone (Konami set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonea, megazone, megazone, megazona, megazone_state, 0, ROT90, "Konami",                      "Mega Zone (Konami set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazoneb, megazone, megazone, megazone, megazone_state, 0, ROT90, "Konami (Kosuka license)",     "Mega Zone (Kosuka set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonec, megazone, megazone, megazone, megazone_state, 0, ROT90, "Konami (Kosuka license)",     "Mega Zone (Kosuka set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonei, megazone, megazone, megazone, megazone_state, 0, ROT90, "Konami (Interlogic license)", "Mega Zone (Interlogic)",   MACHINE_SUPPORTS_SAVE )

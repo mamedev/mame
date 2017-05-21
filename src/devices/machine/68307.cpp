@@ -4,8 +4,11 @@
 
 #include "emu.h"
 #include "68307.h"
+#include "68307bus.h"
+#include "68307sim.h"
+#include "68307tmu.h"
 
-const device_type M68307 = device_creator<m68307cpu_device>;
+DEFINE_DEVICE_TYPE(M68307, m68307_cpu_device, "mc68307", "MC68307")
 
 
 /* 68307 SERIAL Module */
@@ -18,24 +21,24 @@ const device_type M68307 = device_creator<m68307cpu_device>;
   a custom verson here, that may change later if subtle differences exist.
 
 */
-READ8_MEMBER( m68307cpu_device::m68307_internal_serial_r )
+READ8_MEMBER( m68307_cpu_device::m68307_internal_serial_r )
 {
-	m68307cpu_device *m68k = this;
+	m68307_cpu_device *m68k = this;
 
 	if (offset&1) return m_duart->read(*m68k->program, offset>>1);
 	return 0x0000;
 }
 
-WRITE8_MEMBER(m68307cpu_device::m68307_internal_serial_w)
+WRITE8_MEMBER(m68307_cpu_device::m68307_internal_serial_w)
 {
-	m68307cpu_device *m68k = this;
+	m68307_cpu_device *m68k = this;
 
 	if (offset & 1) m_duart->write(*m68k->program, offset >> 1, data);
 }
 
 
 
-static ADDRESS_MAP_START( m68307_internal_map, AS_PROGRAM, 16, m68307cpu_device )
+static ADDRESS_MAP_START( m68307_internal_map, AS_PROGRAM, 16, m68307_cpu_device )
 	AM_RANGE(0x000000f0, 0x000000ff) AM_READWRITE(m68307_internal_base_r, m68307_internal_base_w)
 ADDRESS_MAP_END
 
@@ -43,21 +46,21 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( 68307fragment )
 	MCFG_MC68681_ADD("internal68681", 16000000/4) // ?? Mhz - should be specified in inline config
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(m68307cpu_device, m68307_duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(m68307cpu_device, m68307_duart_txa))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(m68307cpu_device, m68307_duart_txb))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(m68307cpu_device, m68307_duart_input_r))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(m68307cpu_device, m68307_duart_output_w))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(m68307_cpu_device, m68307_duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(m68307_cpu_device, m68307_duart_txa))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(m68307_cpu_device, m68307_duart_txb))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(m68307_cpu_device, m68307_duart_input_r))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(m68307_cpu_device, m68307_duart_output_w))
 MACHINE_CONFIG_END
 
-machine_config_constructor m68307cpu_device::device_mconfig_additions() const
+machine_config_constructor m68307_cpu_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( 68307fragment );
 }
 
 
-m68307cpu_device::m68307cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_device(mconfig, "MC68307", tag, owner, clock, M68307, 16,24, ADDRESS_MAP_NAME(m68307_internal_map), "mc68307", __FILE__),
+m68307_cpu_device::m68307_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m68000_device(mconfig, tag, owner, clock, M68307, 16, 24, ADDRESS_MAP_NAME(m68307_internal_map)),
 	write_irq(*this),
 	write_a_tx(*this),
 	write_b_tx(*this),
@@ -79,7 +82,7 @@ m68307cpu_device::m68307cpu_device(const machine_config &mconfig, const char *ta
 
 
 
-void m68307cpu_device::device_reset()
+void m68307_cpu_device::device_reset()
 {
 	m68000_device::device_reset();
 
@@ -98,100 +101,102 @@ void m68307cpu_device::device_reset()
    and install handlers?  Going through this logic for every memory access is
    very slow */
 
-int m68307_calc_cs(m68307cpu_device *m68k, offs_t address)
+inline int m68307_cpu_device::calc_cs(offs_t address) const
 {
-	m68307_sim* sim = m68k->m68307SIM;
-
-	for (int i=0;i<4;i++)
+	m68307_sim const &sim = *m68307SIM;
+	for (int i=0; i < 4; i++)
 	{
-		int br,amask,bra;
-		br = sim->m_br[i] & 1;
-		amask = ((sim->m_or[i]&0x1ffc)<<11);
-		bra = ((sim->m_br[i] & 0x1ffc)<<11);
-		if ((br) && ((address & amask) == bra)) return i+1;
+		int const br = sim.m_br[i] & 1;
+		int const amask = (sim.m_or[i] & 0x1ffc) << 11;
+		int const bra = (sim.m_br[i] & 0x1ffc) << 11;
+		if (br && ((address & amask) == bra)) return i + 1;
 	}
 	return 0;
 }
 
 
 
-uint16_t m68307cpu_device::simple_read_immediate_16_m68307(offs_t address)
+uint16_t m68307_cpu_device::simple_read_immediate_16_m68307(offs_t address)
 {
-//  m68307_currentcs = m68307_calc_cs(this, address);
+//  m68307_currentcs = calc_cs(address);
 	return m_direct->read_word(address);
 }
 
-uint8_t m68307cpu_device::read_byte_m68307(offs_t address)
+uint8_t m68307_cpu_device::read_byte_m68307(offs_t address)
 {
-//  m68307_currentcs = m68307_calc_cs(this, address);
+//  m68307_currentcs = calc_cs(address);
 	return m_space->read_byte(address);
 }
 
-uint16_t m68307cpu_device::read_word_m68307(offs_t address)
+uint16_t m68307_cpu_device::read_word_m68307(offs_t address)
 {
-//  m68307_currentcs = m68307_calc_cs(this, address);
+//  m68307_currentcs = calc_cs(address);
 	return m_space->read_word(address);
 }
 
-uint32_t m68307cpu_device::read_dword_m68307(offs_t address)
+uint32_t m68307_cpu_device::read_dword_m68307(offs_t address)
 {
-//  m68307_currentcs = m68307_calc_cs(this, address);
+//  m68307_currentcs = calc_cs(address);
 	return m_space->read_dword(address);
 }
 
-void m68307cpu_device::write_byte_m68307(offs_t address, uint8_t data)
+void m68307_cpu_device::write_byte_m68307(offs_t address, uint8_t data)
 {
-//  m68307_currentcs = m68307_calc_cs(this, address);
+//  m68307_currentcs = calc_cs(address);
 	m_space->write_byte(address, data);
 }
 
-void m68307cpu_device::write_word_m68307(offs_t address, uint16_t data)
+void m68307_cpu_device::write_word_m68307(offs_t address, uint16_t data)
 {
-//  m68307_currentcs = m68307_calc_cs(this, address);
+//  m68307_currentcs = calc_cs(address);
 	m_space->write_word(address, data);
 }
 
-void m68307cpu_device::write_dword_m68307(offs_t address, uint32_t data)
+void m68307_cpu_device::write_dword_m68307(offs_t address, uint32_t data)
 {
-//  m68307_currentcs = m68307_calc_cs(this, address);
+//  m68307_currentcs = calc_cs(address);
 	m_space->write_dword(address, data);
 }
 
 
 
 
-void m68307cpu_device::init16_m68307(address_space &space)
+void m68307_cpu_device::init16_m68307(address_space &space)
 {
 	m_space = &space;
 	m_direct = &space.direct();
 	opcode_xor = 0;
 
-	readimm16 = m68k_readimm16_delegate(&m68307cpu_device::simple_read_immediate_16_m68307, this);
-	read8 = m68k_read8_delegate(&m68307cpu_device::read_byte_m68307, this);
-	read16 = m68k_read16_delegate(&m68307cpu_device::read_word_m68307, this);
-	read32 = m68k_read32_delegate(&m68307cpu_device::read_dword_m68307, this);
-	write8 = m68k_write8_delegate(&m68307cpu_device::write_byte_m68307, this);
-	write16 = m68k_write16_delegate(&m68307cpu_device::write_word_m68307, this);
-	write32 = m68k_write32_delegate(&m68307cpu_device::write_dword_m68307, this);
+	readimm16 = m68k_readimm16_delegate(&m68307_cpu_device::simple_read_immediate_16_m68307, this);
+	read8 = m68k_read8_delegate(&m68307_cpu_device::read_byte_m68307, this);
+	read16 = m68k_read16_delegate(&m68307_cpu_device::read_word_m68307, this);
+	read32 = m68k_read32_delegate(&m68307_cpu_device::read_dword_m68307, this);
+	write8 = m68k_write8_delegate(&m68307_cpu_device::write_byte_m68307, this);
+	write16 = m68k_write16_delegate(&m68307_cpu_device::write_word_m68307, this);
+	write32 = m68k_write32_delegate(&m68307_cpu_device::write_dword_m68307, this);
 }
 
 
 
-void m68307cpu_device::set_port_callbacks(m68307_porta_read_delegate porta_r, m68307_porta_write_delegate porta_w, m68307_portb_read_delegate portb_r, m68307_portb_write_delegate portb_w)
+void m68307_cpu_device::set_port_callbacks(
+		porta_read_delegate &&porta_r,
+		porta_write_delegate &&porta_w,
+		portb_read_delegate &&portb_r,
+		portb_write_delegate &&portb_w)
 {
-	m_m68307_porta_r = porta_r;
-	m_m68307_porta_w = porta_w;
-	m_m68307_portb_r = portb_r;
-	m_m68307_portb_w = portb_w;
+	m_porta_r = std::move(porta_r);
+	m_porta_w = std::move(porta_w);
+	m_portb_r = std::move(portb_r);
+	m_portb_w = std::move(portb_w);
 }
 
 
 
 
 
-uint16_t m68307cpu_device::get_cs(offs_t address)
+uint16_t m68307_cpu_device::get_cs(offs_t address)
 {
-	m68307_currentcs = m68307_calc_cs(this, address);
+	m68307_currentcs = calc_cs(address);
 
 	return m68307_currentcs;
 }
@@ -199,19 +204,19 @@ uint16_t m68307cpu_device::get_cs(offs_t address)
 
 /* 68307 specifics - MOVE */
 
-void m68307cpu_device::set_interrupt(int level, int vector)
+void m68307_cpu_device::set_interrupt(int level, int vector)
 {
 	set_input_line_and_vector(level, HOLD_LINE, vector);
 }
 
-void m68307cpu_device::timer0_interrupt()
+void m68307_cpu_device::timer0_interrupt()
 {
 	int prioritylevel = (m68307SIM->m_picr & 0x7000)>>12;
 	int vector        = (m68307SIM->m_pivr & 0x00f0) | 0xa;
 	set_interrupt(prioritylevel, vector);
 }
 
-void m68307cpu_device::timer1_interrupt()
+void m68307_cpu_device::timer1_interrupt()
 {
 	int prioritylevel = (m68307SIM->m_picr & 0x0700)>>8;
 	int vector        = (m68307SIM->m_pivr & 0x00f0) | 0xb;
@@ -219,13 +224,13 @@ void m68307cpu_device::timer1_interrupt()
 }
 
 
-void m68307cpu_device::serial_interrupt(int vector)
+void m68307_cpu_device::serial_interrupt(int vector)
 {
 	int prioritylevel = (m68307SIM->m_picr & 0x0070)>>4;
 	set_interrupt(prioritylevel, vector);
 }
 
-WRITE_LINE_MEMBER(m68307cpu_device::m68307_duart_irq_handler)
+WRITE_LINE_MEMBER(m68307_cpu_device::m68307_duart_irq_handler)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -233,14 +238,14 @@ WRITE_LINE_MEMBER(m68307cpu_device::m68307_duart_irq_handler)
 	}
 }
 
-void m68307cpu_device::mbus_interrupt()
+void m68307_cpu_device::mbus_interrupt()
 {
 	int prioritylevel = (m68307SIM->m_picr & 0x0007)>>0;
 	int vector        = (m68307SIM->m_pivr & 0x00f0) | 0xd;
 	set_interrupt(prioritylevel, vector);
 }
 
-void m68307cpu_device::licr2_interrupt()
+void m68307_cpu_device::licr2_interrupt()
 {
 	int prioritylevel = (m68307SIM->m_licr2 & 0x0007)>>0;
 	int vector        = (m68307SIM->m_pivr & 0x00f0) | 0x9;
@@ -250,7 +255,7 @@ void m68307cpu_device::licr2_interrupt()
 	set_interrupt(prioritylevel, vector);
 }
 
-void m68307cpu_device::device_start()
+void m68307_cpu_device::device_start()
 {
 	init_cpu_m68000();
 
@@ -281,14 +286,14 @@ void m68307cpu_device::device_start()
 	read_inport.resolve();
 	write_outport.resolve_safe();
 
-	set_port_callbacks(m68307_porta_read_delegate(),m68307_porta_write_delegate(),m68307_portb_read_delegate(),m68307_portb_write_delegate());
+	set_port_callbacks(porta_read_delegate(), porta_write_delegate(), portb_read_delegate(), portb_write_delegate());
 }
 
 
 
-READ16_MEMBER( m68307cpu_device::m68307_internal_base_r )
+READ16_MEMBER( m68307_cpu_device::m68307_internal_base_r )
 {
-	m68307cpu_device *m68k = this;
+	m68307_cpu_device *m68k = this;
 
 	int pc = space.device().safe_pc();
 	logerror("%08x m68307_internal_base_r %08x, (%04x)\n", pc, offset*2,mem_mask);
@@ -305,9 +310,9 @@ READ16_MEMBER( m68307cpu_device::m68307_internal_base_r )
 	return 0x0000;
 }
 
-WRITE16_MEMBER( m68307cpu_device::m68307_internal_base_w )
+WRITE16_MEMBER( m68307_cpu_device::m68307_internal_base_w )
 {
-	m68307cpu_device *m68k = this;
+	m68307_cpu_device *m68k = this;
 
 	int pc = space.device().safe_pc();
 	logerror("%08x m68307_internal_base_w %08x, %04x (%04x)\n", pc, offset*2,data,mem_mask);
@@ -333,10 +338,10 @@ WRITE16_MEMBER( m68307cpu_device::m68307_internal_base_w )
 			base = (m68k->m68307_base & 0x0fff) << 12;
 			//mask = (m68k->m68307_base & 0xe000) >> 13;
 			//if ( m68k->m68307_base & 0x1000 ) mask |= 7;
-			m68k->internal->install_readwrite_handler(base + 0x000, base + 0x04f, read16_delegate(FUNC(m68307cpu_device::m68307_internal_sim_r),this),    write16_delegate(FUNC(m68307cpu_device::m68307_internal_sim_w),this));
-			m68k->internal->install_readwrite_handler(base + 0x100, base + 0x11f, read8_delegate(FUNC(m68307cpu_device::m68307_internal_serial_r),this), write8_delegate(FUNC(m68307cpu_device::m68307_internal_serial_w),this), 0xffff);
-			m68k->internal->install_readwrite_handler(base + 0x120, base + 0x13f, read16_delegate(FUNC(m68307cpu_device::m68307_internal_timer_r),this),  write16_delegate(FUNC(m68307cpu_device::m68307_internal_timer_w),this));
-			m68k->internal->install_readwrite_handler(base + 0x140, base + 0x149, read8_delegate(FUNC(m68307cpu_device::m68307_internal_mbus_r),this),   write8_delegate(FUNC(m68307cpu_device::m68307_internal_mbus_w),this), 0xffff);
+			m68k->internal->install_readwrite_handler(base + 0x000, base + 0x04f, read16_delegate(FUNC(m68307_cpu_device::m68307_internal_sim_r),this),    write16_delegate(FUNC(m68307_cpu_device::m68307_internal_sim_w),this));
+			m68k->internal->install_readwrite_handler(base + 0x100, base + 0x11f, read8_delegate(FUNC(m68307_cpu_device::m68307_internal_serial_r),this), write8_delegate(FUNC(m68307_cpu_device::m68307_internal_serial_w),this), 0xffff);
+			m68k->internal->install_readwrite_handler(base + 0x120, base + 0x13f, read16_delegate(FUNC(m68307_cpu_device::m68307_internal_timer_r),this),  write16_delegate(FUNC(m68307_cpu_device::m68307_internal_timer_w),this));
+			m68k->internal->install_readwrite_handler(base + 0x140, base + 0x149, read8_delegate(FUNC(m68307_cpu_device::m68307_internal_mbus_r),this),   write8_delegate(FUNC(m68307_cpu_device::m68307_internal_mbus_w),this), 0xffff);
 
 
 			break;

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_TIKI100_HDC_H
+#define MAME_BUS_TIKI100_HDC_H
 
-#ifndef __TIKI100_HDC__
-#define __TIKI100_HDC__
+#pragma once
 
 #include "bus/tiki100/exp.h"
 #include "imagedev/harddriv.h"
@@ -21,14 +21,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> tiki100_hdc_t
+// ======================> tiki100_hdc_device
 
-class tiki100_hdc_t : public device_t,
-						public device_tiki100bus_card_interface
+class tiki100_hdc_device : public device_t, public device_tiki100bus_card_interface
 {
 public:
 	// construction/destruction
-	tiki100_hdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tiki100_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -48,7 +47,6 @@ private:
 
 
 // device type definition
-extern const device_type TIKI100_HDC;
+DECLARE_DEVICE_TYPE(TIKI100_HDC, tiki100_hdc_device)
 
-
-#endif
+#endif // MAME_BUS_TIKI100_HDC_H

@@ -15,10 +15,10 @@
 #include "screen.h"
 
 
-const device_type ATIMACH32 = device_creator<mach32_device>;
-const device_type ATIMACH32_8514A = device_creator<mach32_8514a_device>;
-const device_type ATIMACH64 = device_creator<mach64_device>;
-const device_type ATIMACH64_8514A = device_creator<mach64_8514a_device>;
+DEFINE_DEVICE_TYPE(ATIMACH32,       mach32_device,       "mach32",       "ATi mach32")
+DEFINE_DEVICE_TYPE(ATIMACH32_8514A, mach32_8514a_device, "mach32_8514a", "ATi mach32 (2D acceleration module)")
+DEFINE_DEVICE_TYPE(ATIMACH64,       mach64_device,       "mach64",       "ATi mach64")
+DEFINE_DEVICE_TYPE(ATIMACH64_8514A, mach64_8514a_device, "mach64_8514a", "ATi mach64 (2D acceleration module)")
 
 
 /*
@@ -27,30 +27,24 @@ const device_type ATIMACH64_8514A = device_creator<mach64_8514a_device>;
 
 // 8514/A device
 mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mach8_device(mconfig, ATIMACH32_8514A, "ATi mach32 (2D acceleration module)", tag, owner, clock, "mach32_8514a", __FILE__),
-	m_chip_ID(0),
-	m_membounds(0)
+	: mach32_8514a_device(mconfig, ATIMACH32_8514A, tag, owner, clock)
 {
 }
 
-mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: mach8_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_chip_ID(0),
-	m_membounds(0)
+mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: mach8_device(mconfig, type, tag, owner, clock), m_chip_ID(0), m_membounds(0)
 {
 }
 
 
 // SVGA device
 mach32_device::mach32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ati_vga_device(mconfig, ATIMACH32, "ATi mach32", tag, owner, clock, "mach32", __FILE__),
-		m_8514a(*this,"8514a")
+	: mach32_device(mconfig, ATIMACH32, tag, owner, clock)
 {
 }
 
-mach32_device::mach32_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: ati_vga_device(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_8514a(*this,"8514a")
+mach32_device::mach32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ati_vga_device(mconfig, type, tag, owner, clock), m_8514a(*this,"8514a")
 {
 }
 
@@ -100,26 +94,24 @@ void mach32_device::device_reset()
 
 // 8514/A device
 mach64_8514a_device::mach64_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mach32_8514a_device(mconfig, ATIMACH64_8514A, "ATi mach64 (2D acceleration module)", tag, owner, clock, "mach64_8514a", __FILE__)
+	: mach64_8514a_device(mconfig, ATIMACH64_8514A, tag, owner, clock)
 {
 }
 
-mach64_8514a_device::mach64_8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: mach32_8514a_device(mconfig, type, name, tag, owner, clock, shortname, source)
+mach64_8514a_device::mach64_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: mach32_8514a_device(mconfig, type, tag, owner, clock)
 {
 }
 
 
 // SVGA device
 mach64_device::mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mach32_device(mconfig, ATIMACH64, "ATi mach64", tag, owner, clock, "mach64", __FILE__),
-		m_8514a(*this,"8514a")
+	: mach64_device(mconfig, ATIMACH64, tag, owner, clock)
 {
 }
 
-mach64_device::mach64_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: mach32_device(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_8514a(*this,"8514a")
+mach64_device::mach64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: mach32_device(mconfig, type, tag, owner, clock), m_8514a(*this, "8514a")
 {
 }
 

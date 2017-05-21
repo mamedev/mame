@@ -442,7 +442,7 @@ INTERRUPT_GEN_MEMBER(sub_state::sound_irq)
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( sub, sub_state )
+static MACHINE_CONFIG_START( sub )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* ? MHz */
@@ -516,4 +516,4 @@ ROM_START( sub )
 	ROM_LOAD( "prom pos c8 n82s129",      0x0600, 0x100, CRC(351e1ef8) SHA1(530c9012ff5abda1c4ba9787ca999ca1ae1a893d) )
 ROM_END
 
-GAME( 1985, sub,  0,    sub, sub, driver_device,  0, ROT270, "Sigma Enterprises Inc.", "Submarine (Sigma)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sub,  0,    sub, sub, sub_state,  0, ROT270, "Sigma Enterprises Inc.", "Submarine (Sigma)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

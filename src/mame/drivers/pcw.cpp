@@ -1242,7 +1242,7 @@ static SLOT_INTERFACE_START( pcw_floppies )
 SLOT_INTERFACE_END
 
 /* PCW8256, PCW8512, PCW9256 */
-static MACHINE_CONFIG_START( pcw, pcw_state )
+static MACHINE_CONFIG_START( pcw )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
 	MCFG_CPU_PROGRAM_MAP(pcw_map)
@@ -1393,9 +1393,9 @@ ROM_END
 
 /* these are all variants on the pcw design */
 /* major difference is memory configuration and drive type */
-/*     YEAR NAME        PARENT  COMPAT  MACHINE   INPUT INIT    COMPANY        FULLNAME */
-COMP( 1985, pcw8256,   0,       0,      pcw8256,  pcw, pcw_state,   pcw,    "Amstrad plc", "PCW8256",       MACHINE_NOT_WORKING)
-COMP( 1985, pcw8512,   pcw8256, 0,      pcw8512,  pcw, pcw_state,   pcw,    "Amstrad plc", "PCW8512",       MACHINE_NOT_WORKING)
-COMP( 1987, pcw9256,   pcw8256, 0,      pcw8256,  pcw, pcw_state,   pcw,        "Amstrad plc", "PCW9256",       MACHINE_NOT_WORKING)
-COMP( 1987, pcw9512,   pcw8256, 0,      pcw9512,  pcw, pcw_state,   pcw,        "Amstrad plc", "PCW9512 (+)",   MACHINE_NOT_WORKING)
-COMP( 1993, pcw10,     pcw8256, 0,      pcw8512,  pcw, pcw_state,   pcw,        "Amstrad plc", "PCW10",         MACHINE_NOT_WORKING)
+/*     YEAR NAME       PARENT   COMPAT  MACHINE   INPUT STATE        INIT  COMPANY        FULLNAME */
+COMP( 1985, pcw8256,   0,       0,      pcw8256,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW8256",       MACHINE_NOT_WORKING)
+COMP( 1985, pcw8512,   pcw8256, 0,      pcw8512,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW8512",       MACHINE_NOT_WORKING)
+COMP( 1987, pcw9256,   pcw8256, 0,      pcw8256,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW9256",       MACHINE_NOT_WORKING)
+COMP( 1987, pcw9512,   pcw8256, 0,      pcw9512,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW9512 (+)",   MACHINE_NOT_WORKING)
+COMP( 1993, pcw10,     pcw8256, 0,      pcw8512,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW10",         MACHINE_NOT_WORKING)

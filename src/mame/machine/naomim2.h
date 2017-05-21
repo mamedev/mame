@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef _NAOMIM2_H_
-#define _NAOMIM2_H_
+#ifndef MAME_MACHINE_NAOMIM2_H
+#define MAME_MACHINE_NAOMIM2_H
+
+#pragma once
 
 #include "naomibd.h"
 #include "315-5881_crypt.h"
@@ -35,6 +37,6 @@ private:
 	required_memory_region m_region;
 };
 
-extern const device_type NAOMI_M2_BOARD;
+DECLARE_DEVICE_TYPE(NAOMI_M2_BOARD, naomi_m2_board)
 
-#endif
+#endif // MAME_MACHINE_NAOMIM2_H

@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC1512_KEYBOARD = device_creator<pc1512_keyboard_t>;
+DEFINE_DEVICE_TYPE(PC1512_KEYBOARD, pc1512_keyboard_device, "pc1512kb", "Amstrad PC1512 Keyboard")
 
 
 //-------------------------------------------------
@@ -40,7 +40,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *pc1512_keyboard_t::device_rom_region() const
+const tiny_rom_entry *pc1512_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( pc1512_keyboard );
 }
@@ -52,12 +52,12 @@ const tiny_rom_entry *pc1512_keyboard_t::device_rom_region() const
 
 static MACHINE_CONFIG_FRAGMENT( pc1512_keyboard )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_6MHz)
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pc1512_keyboard_t, kb_bus_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pc1512_keyboard_t, kb_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(pc1512_keyboard_t, kb_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pc1512_keyboard_t, kb_p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(pc1512_keyboard_t, kb_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pc1512_keyboard_t, kb_t1_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pc1512_keyboard_device, kb_bus_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pc1512_keyboard_device, kb_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(pc1512_keyboard_device, kb_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pc1512_keyboard_device, kb_p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(pc1512_keyboard_device, kb_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pc1512_keyboard_device, kb_t1_r))
 
 	MCFG_VCS_CONTROL_PORT_ADD("joy", vcs_control_port_devices, nullptr)
 MACHINE_CONFIG_END
@@ -68,7 +68,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor pc1512_keyboard_t::device_mconfig_additions() const
+machine_config_constructor pc1512_keyboard_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( pc1512_keyboard );
 }
@@ -195,7 +195,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor pc1512_keyboard_t::device_input_ports() const
+ioport_constructor pc1512_keyboard_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( pc1512_keyboard );
 }
@@ -207,11 +207,11 @@ ioport_constructor pc1512_keyboard_t::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  pc1512_keyboard_t - constructor
+//  pc1512_keyboard_device - constructor
 //-------------------------------------------------
 
-pc1512_keyboard_t::pc1512_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PC1512_KEYBOARD, "Amstrad PC1512 Keyboard", tag, owner, clock, "pc1512kb", __FILE__),
+pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, PC1512_KEYBOARD, tag, owner, clock),
 	m_maincpu(*this, I8048_TAG),
 	m_joy(*this, "joy"),
 	m_y(*this, "Y%u", 1),
@@ -231,7 +231,7 @@ pc1512_keyboard_t::pc1512_keyboard_t(const machine_config &mconfig, const char *
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pc1512_keyboard_t::device_start()
+void pc1512_keyboard_device::device_start()
 {
 	// allocate timers
 	m_reset_timer = timer_alloc();
@@ -254,7 +254,7 @@ void pc1512_keyboard_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void pc1512_keyboard_t::device_reset()
+void pc1512_keyboard_device::device_reset()
 {
 	m_maincpu->set_input_line(MCS48_INPUT_EA, CLEAR_LINE);
 }
@@ -264,7 +264,7 @@ void pc1512_keyboard_t::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void pc1512_keyboard_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pc1512_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (!m_clock_in)
 	{
@@ -277,7 +277,7 @@ void pc1512_keyboard_t::device_timer(emu_timer &timer, device_timer_id id, int p
 //  data_w - keyboard data input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pc1512_keyboard_t::data_w )
+WRITE_LINE_MEMBER( pc1512_keyboard_device::data_w )
 {
 	m_data_in = state;
 }
@@ -287,7 +287,7 @@ WRITE_LINE_MEMBER( pc1512_keyboard_t::data_w )
 //  clock_w - keyboard clock input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pc1512_keyboard_t::clock_w )
+WRITE_LINE_MEMBER( pc1512_keyboard_device::clock_w )
 {
 	if (m_clock_in != state)
 	{
@@ -309,7 +309,7 @@ WRITE_LINE_MEMBER( pc1512_keyboard_t::clock_w )
 //  m1_w - mouse button 1
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pc1512_keyboard_t::m1_w )
+WRITE_LINE_MEMBER( pc1512_keyboard_device::m1_w )
 {
 	m_m1 = state;
 }
@@ -319,7 +319,7 @@ WRITE_LINE_MEMBER( pc1512_keyboard_t::m1_w )
 //  m2_w - mouse button 2
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pc1512_keyboard_t::m2_w )
+WRITE_LINE_MEMBER( pc1512_keyboard_device::m2_w )
 {
 	m_m2 = state;
 }
@@ -329,7 +329,7 @@ WRITE_LINE_MEMBER( pc1512_keyboard_t::m2_w )
 //  kb_bus_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_keyboard_t::kb_bus_r )
+READ8_MEMBER( pc1512_keyboard_device::kb_bus_r )
 {
 	/*
 
@@ -372,7 +372,7 @@ READ8_MEMBER( pc1512_keyboard_t::kb_bus_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_keyboard_t::kb_p1_w )
+WRITE8_MEMBER( pc1512_keyboard_device::kb_p1_w )
 {
 	/*
 
@@ -397,7 +397,7 @@ WRITE8_MEMBER( pc1512_keyboard_t::kb_p1_w )
 //  kb_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_keyboard_t::kb_p2_r )
+READ8_MEMBER( pc1512_keyboard_device::kb_p2_r )
 {
 	/*
 
@@ -427,7 +427,7 @@ READ8_MEMBER( pc1512_keyboard_t::kb_p2_r )
 //  kb_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_keyboard_t::kb_p2_w )
+WRITE8_MEMBER( pc1512_keyboard_device::kb_p2_w )
 {
 	/*
 
@@ -468,7 +468,7 @@ WRITE8_MEMBER( pc1512_keyboard_t::kb_p2_w )
 //  kb_t0_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( pc1512_keyboard_t::kb_t0_r )
+READ_LINE_MEMBER( pc1512_keyboard_device::kb_t0_r )
 {
 	return m_m1;
 }
@@ -478,7 +478,7 @@ READ_LINE_MEMBER( pc1512_keyboard_t::kb_t0_r )
 //  kb_t1_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( pc1512_keyboard_t::kb_t1_r )
+READ_LINE_MEMBER( pc1512_keyboard_device::kb_t1_r )
 {
 	return m_m2;
 }

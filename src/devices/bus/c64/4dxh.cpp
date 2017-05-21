@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_4DXH = device_creator<c64_4dxh_device>;
+DEFINE_DEVICE_TYPE(C64_4DXH, c64_4dxh_device, "c64_4dxh", "C64 DXH 4-Player Adapter")
 
 
 //-------------------------------------------------
@@ -63,7 +63,7 @@ ioport_constructor c64_4dxh_device::device_input_ports() const
 //-------------------------------------------------
 
 c64_4dxh_device::c64_4dxh_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_4DXH, "C64 DXH 4-Player Adapter", tag, owner, clock, "c64_4dxh", __FILE__),
+	device_t(mconfig, C64_4DXH, tag, owner, clock),
 	device_pet_user_port_interface(mconfig, *this)
 {
 }

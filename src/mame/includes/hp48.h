@@ -7,8 +7,13 @@
    Hewlett Packard HP48 S/SX & G/GX and HP49 G
 
 **********************************************************************/
+#ifndef MAME_INCLUDES_HP84_H
+#define MAME_INCLUDES_HP84_H
+
+#pragma once
 
 #include "sound/dac.h"
+
 /* model */
 typedef enum {
 	HP48_S,
@@ -214,8 +219,10 @@ private:
 };
 
 // device type definition
-extern const device_type HP48_PORT;
+DECLARE_DEVICE_TYPE(HP48_PORT, hp48_port_image_device)
 
 #define MCFG_HP48_PORT_ADD(_tag, _port, _module, _max_size) \
 	MCFG_DEVICE_ADD(_tag, HP48_PORT, 0) \
 	hp48_port_image_device::set_port_config(*device, _port, _module, _max_size);
+
+#endif // MAME_INCLUDES_HP84_H

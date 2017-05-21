@@ -1357,7 +1357,7 @@ MACHINE_START_MEMBER(merit_state,casino5)
 	membank("bank2")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( pitboss, merit_state )
+static MACHINE_CONFIG_START( pitboss )
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pitboss_map)
 	MCFG_CPU_IO_MAP(trvwhiz_io_map)
@@ -2451,34 +2451,34 @@ DRIVER_INIT_MEMBER(merit_state,dtrvwz5)
 
 /* Gambling type games */
 
-GAME( 1983, pitboss,    0,       pitboss,  pitbossa, driver_device,  0,   ROT0,  "Merit", "The Pit Boss (2214-07, U5-0A)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* "7" hand written over a 5 */
-GAME( 1983, pitboss04,  pitboss, casino5,  pitboss,  driver_device,  0,   ROT0,  "Merit", "The Pit Boss (2214-04)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, pitboss03,  pitboss, pitboss,  pitbossa, driver_device,  0,   ROT0,  "Merit", "The Pit Boss (2214-03, U5-0C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, pitboss03a, pitboss, pitboss,  pitbossa1,driver_device,  0,   ROT0,  "Merit", "The Pit Boss (2214-03, U5-1C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, pitbossm4,  pitboss, pitboss,  pitbossb, driver_device,  0,   ROT0,  "Merit", "The Pit Boss (M4A1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, pitbossps,  pitboss, pitboss,  pitbossa, driver_device,  0,   ROT0,  "Merit", "The Pit Boss (PSB1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, mdchoice,   pitboss, pitboss,  mdchoice, driver_device,  0,   ROT0,  "Merit", "Dealer's Choice (E4A1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* Copyright year based on other Pit Boss sets */
-GAME( 1983, mpchoice,   pitboss, pitboss,  mpchoice, driver_device,  0,   ROT0,  "Merit", "Player's Choice (M4C1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pitboss,    0,       pitboss,  pitbossa, merit_state,  0,   ROT0,  "Merit", "The Pit Boss (2214-07, U5-0A)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* "7" hand written over a 5 */
+GAME( 1983, pitboss04,  pitboss, casino5,  pitboss,  merit_state,  0,   ROT0,  "Merit", "The Pit Boss (2214-04)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pitboss03,  pitboss, pitboss,  pitbossa, merit_state,  0,   ROT0,  "Merit", "The Pit Boss (2214-03, U5-0C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pitboss03a, pitboss, pitboss,  pitbossa1,merit_state,  0,   ROT0,  "Merit", "The Pit Boss (2214-03, U5-1C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossm4,  pitboss, pitboss,  pitbossb, merit_state,  0,   ROT0,  "Merit", "The Pit Boss (M4A1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossps,  pitboss, pitboss,  pitbossa, merit_state,  0,   ROT0,  "Merit", "The Pit Boss (PSB1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, mdchoice,   pitboss, pitboss,  mdchoice, merit_state,  0,   ROT0,  "Merit", "Dealer's Choice (E4A1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* Copyright year based on other Pit Boss sets */
+GAME( 1983, mpchoice,   pitboss, pitboss,  mpchoice, merit_state,  0,   ROT0,  "Merit", "Player's Choice (M4C1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1989, casino5,  0,       casino5,  casino5,   driver_device, 0,   ROT0,  "Merit", "Casino Five (3315-02, U5-2B)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1984, casino5a, casino5, casino5,  casino5,   driver_device, 0,   ROT0,  "Merit", "Casino Five (3315-02, U5-0)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, casino5,  0,       casino5,  casino5,   merit_state, 0,   ROT0,  "Merit", "Casino Five (3315-02, U5-2B)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, casino5a, casino5, casino5,  casino5,   merit_state, 0,   ROT0,  "Merit", "Casino Five (3315-02, U5-0)",       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, mroundup, 0,         pitboss, mroundup, driver_device, 0,   ROT0,  "Merit", "The Round Up",                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1984, mroundup, 0,         pitboss, mroundup, merit_state, 0,   ROT0,  "Merit", "The Round Up",                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
-GAME( 1984, chkndraw,  0,        pitboss, chkndraw, driver_device, 0,   ROT0,  "Merit", "Chicken Draw (2131-04, U5-1)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, chkndrawa, chkndraw, pitboss, chkndraw, driver_device, 0,   ROT0,  "Merit", "Chicken Draw (2131-04, U5-0)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, chkndraw,  0,        pitboss, chkndraw, merit_state, 0,   ROT0,  "Merit", "Chicken Draw (2131-04, U5-1)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, chkndrawa, chkndraw, pitboss, chkndraw, merit_state, 0,   ROT0,  "Merit", "Chicken Draw (2131-04, U5-0)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1987, riviera,  0,       dodge,    riviera,   driver_device, 0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rivieraa, riviera, dodge,    riviera,   driver_device, 0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rivierab, riviera, dodge,    rivierab,  driver_device, 0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, riviera,  0,       dodge,    riviera,   merit_state, 0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivieraa, riviera, dodge,    riviera,   merit_state, 0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivierab, riviera, dodge,    rivierab,  merit_state, 0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1986, bigappg,  0,       bigappg,  bigappg,   driver_device, 0,   ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, misdraw,  0,       misdraw,  bigappg,   driver_device, 0,   ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1990, iowapp,   0,       dodge,    iowapp,    driver_device, 0,   ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) /* Copyright year based on rom label */
+GAME( 1986, bigappg,  0,       bigappg,  bigappg,   merit_state, 0,   ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, misdraw,  0,       misdraw,  bigappg,   merit_state, 0,   ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, iowapp,   0,       dodge,    iowapp,    merit_state, 0,   ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) /* Copyright year based on rom label */
 
-GAME( 1986, dodgectya,dodgecty,dodge,    dodge,     driver_device, 0,   ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1986, dodgectyb,dodgecty,dodge,    dodge,     driver_device, 0,   ROT0,  "Merit", "Dodge City (2131-82, U5-50)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1986, dodgectyc,dodgecty,dodge,    dodge,     driver_device, 0,   ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1986, dodgectya,dodgecty,dodge,    dodge,     merit_state, 0,   ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1986, dodgectyb,dodgecty,dodge,    dodge,     merit_state, 0,   ROT0,  "Merit", "Dodge City (2131-82, U5-50)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1986, dodgectyc,dodgecty,dodge,    dodge,     merit_state, 0,   ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 /* Trivia and Word games */
 
@@ -2508,6 +2508,6 @@ GAME( 1986, phrcrazev,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT90, "
 
 GAME( 1987, dtrvwz5,  0,       dtrvwz5,  dtrvwh5,  merit_state, dtrvwz5,ROT0,  "Merit", "Deluxe Trivia ? Whiz (6221-70, U5-0A Edition 5)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, couple,   0,       couple,   couple,  merit_state,  couple, ROT0,  "Merit", "The Couples (set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, couplep,  couple,  couple,   couplep, merit_state,  couple, ROT0,  "Merit", "The Couples (set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, couplei,  couple,  couple,   couple,  merit_state,  couple, ROT0,  "Merit", "The Couples (set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, couple,   0,       couple,   couple,   merit_state, couple, ROT0,  "Merit", "The Couples (set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, couplep,  couple,  couple,   couplep,  merit_state, couple, ROT0,  "Merit", "The Couples (set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, couplei,  couple,  couple,   couple,   merit_state, couple, ROT0,  "Merit", "The Couples (set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )

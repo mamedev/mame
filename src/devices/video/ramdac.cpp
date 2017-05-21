@@ -29,7 +29,7 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // device type definition
-const device_type RAMDAC = device_creator<ramdac_device>;
+DEFINE_DEVICE_TYPE(RAMDAC, ramdac_device, "ramdac", "RAMDAC")
 
 
 //**************************************************************************
@@ -41,7 +41,7 @@ const device_type RAMDAC = device_creator<ramdac_device>;
 //-------------------------------------------------
 
 ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RAMDAC, "RAMDAC", tag, owner, clock, "ramdac", __FILE__),
+	: device_t(mconfig, RAMDAC, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(ramdac_palram)),
 		m_palette(*this, finder_base::DUMMY_TAG),

@@ -394,7 +394,7 @@ void xtom3d_state::machine_reset()
 	membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
 }
 
-static MACHINE_CONFIG_START( xtom3d, xtom3d_state )
+static MACHINE_CONFIG_START( xtom3d )
 	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000/16)  // actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(xtom3d_map)
 	MCFG_CPU_IO_MAP(xtom3d_io)
@@ -431,4 +431,4 @@ ROM_START( xtom3d )
 ROM_END
 
 
-GAME(1999, xtom3d, 0, xtom3d, at_keyboard, driver_device, 0, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_IS_SKELETON)
+GAME(1999, xtom3d, 0, xtom3d, at_keyboard, xtom3d_state, 0, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_IS_SKELETON)

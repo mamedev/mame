@@ -9,11 +9,11 @@
 #include "screen.h"
 
 
-const device_type STFIGHT_VIDEO = device_creator<stfight_video_device>;
+DEFINE_DEVICE_TYPE(STFIGHT_VIDEO, stfight_video_device, "stfight_vid", "Seibu Street Fight Video")
 
 
 stfight_video_device::stfight_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, STFIGHT_VIDEO, "Seibu Street Fight Video", tag, owner, clock, "stfight_vid", __FILE__),
+	: device_t(mconfig, STFIGHT_VIDEO, tag, owner, clock),
 	m_gfxdecode(*this, "gfxdecode"),
 	m_palette(*this,"^palette"),
 	m_screen(*this, "screen"),

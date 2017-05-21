@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
-#include "sound/ay8910.h"
 #include "audio/cclimber.h"
+
+#include "sound/ay8910.h"
 
 
 /* macro to convert 4-bit unsigned samples to 16-bit signed samples */
@@ -34,7 +35,7 @@ MACHINE_CONFIG_END
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CCLIMBER_AUDIO = device_creator<cclimber_audio_device>;
+DEFINE_DEVICE_TYPE(CCLIMBER_AUDIO, cclimber_audio_device, "cclimber_audio", "Crazy Climber Sound Board")
 
 
 //**************************************************************************
@@ -46,7 +47,7 @@ const device_type CCLIMBER_AUDIO = device_creator<cclimber_audio_device>;
 //-------------------------------------------------
 
 cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CCLIMBER_AUDIO, "Crazy Climber Sound Board", tag, owner, clock, "cclimber_audio", __FILE__),
+	: device_t(mconfig, CCLIMBER_AUDIO, tag, owner, clock),
 	m_sample_buf(nullptr),
 	m_sample_num(0),
 	m_sample_freq(0),

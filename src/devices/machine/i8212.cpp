@@ -9,13 +9,8 @@
 #include "emu.h"
 #include "i8212.h"
 
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LOG 0
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 
@@ -24,18 +19,18 @@
 //**************************************************************************
 
 // device type definition
-const device_type I8212 = device_creator<i8212_device>;
+DEFINE_DEVICE_TYPE(I8212, i8212_device, "i8212", "Intel 8212 I/O")
 
 //-------------------------------------------------
 //  i8212_device - constructor
 //-------------------------------------------------
 
 i8212_device::i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, I8212, "I8212", tag, owner, clock, "i8212", __FILE__),
+	device_t(mconfig, I8212, tag, owner, clock),
 	m_write_irq(*this),
 	m_read_di(*this),
 	m_write_do(*this),
-	m_md(I8212_MODE_INPUT),
+	m_md(MODE_INPUT),
 	m_stb(0), m_data(0)
 {
 }
@@ -67,7 +62,7 @@ void i8212_device::device_reset()
 {
 	m_data = 0;
 
-	if (m_md == I8212_MODE_OUTPUT)
+	if (m_md == MODE_OUTPUT)
 	{
 		// output data
 		m_write_do((offs_t)0, m_data);
@@ -84,7 +79,7 @@ READ8_MEMBER( i8212_device::read )
 	// clear interrupt line
 	m_write_irq(CLEAR_LINE);
 
-	if (LOG) logerror("I8212 '%s' INT: %u\n", tag(), CLEAR_LINE);
+	LOG("I8212 INT: %u\n", CLEAR_LINE);
 
 	return m_data;
 }
@@ -110,7 +105,7 @@ WRITE8_MEMBER( i8212_device::write )
 
 WRITE_LINE_MEMBER( i8212_device::md_w )
 {
-	if (LOG) logerror("I8212 '%s' Mode: %s\n", tag(), state ? "output" : "input");
+	LOG("I8212 Mode: %s\n", state ? "output" : "input");
 
 	m_md = state;
 }
@@ -122,9 +117,9 @@ WRITE_LINE_MEMBER( i8212_device::md_w )
 
 WRITE_LINE_MEMBER( i8212_device::stb_w )
 {
-	if (LOG) logerror("I8212 '%s' STB: %u\n", tag(), state);
+	LOG("I8212 STB: %u\n", state);
 
-	if (m_md == I8212_MODE_INPUT)
+	if (m_md == MODE_INPUT)
 	{
 		if (m_stb && !state)
 		{
@@ -134,7 +129,7 @@ WRITE_LINE_MEMBER( i8212_device::stb_w )
 			// assert interrupt line
 			m_write_irq(ASSERT_LINE);
 
-			if (LOG) logerror("I8212 '%s' INT: %u\n", tag(), ASSERT_LINE);
+			LOG("I8212 INT: %u\n", ASSERT_LINE);
 		}
 	}
 

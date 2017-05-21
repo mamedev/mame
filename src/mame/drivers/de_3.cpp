@@ -391,7 +391,7 @@ DRIVER_INIT_MEMBER(de_3_state,de_3)
 {
 }
 
-static MACHINE_CONFIG_START( de_3, de_3_state )
+static MACHINE_CONFIG_START( de_3 )
 	/* basic machine hardware */
 	MCFG_DECOCPU_TYPE3_ADD("decocpu",XTAL_8MHz / 2, ":maincpu")
 	MCFG_DECOCPU_DISPLAY(READ8(de_3_state,display_r),WRITE8(de_3_state,display_w))

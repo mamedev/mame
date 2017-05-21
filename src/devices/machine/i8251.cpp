@@ -17,26 +17,16 @@
 #include "emu.h"
 #include "i8251.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-#define VERBOSE 0
-
-#define LOG(...)  do { if (VERBOSE) logerror(__VA_ARGS__); } while (0)
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type I8251 = device_creator<i8251_device>;
-const device_type V53_SCU = device_creator<v53_scu_device>;
-
-template class device_finder<i8251_device, false>;
-template class device_finder<i8251_device, true>;
-template class device_finder<v53_scu_device, false>;
-template class device_finder<v53_scu_device, true>;
+DEFINE_DEVICE_TYPE(I8251,   i8251_device,  "i8251",    "Intel 8251 USART")
+DEFINE_DEVICE_TYPE(V53_SCU, v53_scu_device, "v63_scu", "NEC V53 SCU")
 
 
 //-------------------------------------------------
@@ -46,13 +36,10 @@ template class device_finder<v53_scu_device, true>;
 i8251_device::i8251_device(
 		const machine_config &mconfig,
 		device_type type,
-		const char *name,
 		const char *tag,
 		device_t *owner,
-		uint32_t clock,
-		const char *shortname,
-		const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_txd_handler(*this),
 	m_dtr_handler(*this),
@@ -70,12 +57,12 @@ i8251_device::i8251_device(
 }
 
 i8251_device::i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8251_device(mconfig, I8251, "8251 USART", tag, owner, clock, "i8251", __FILE__)
+	: i8251_device(mconfig, I8251, tag, owner, clock)
 {
 }
 
 v53_scu_device::v53_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8251_device(mconfig, V53_SCU, "V53 SCU", tag, owner, clock, "v53_scu", __FILE__)
+	: i8251_device(mconfig, V53_SCU, tag, owner, clock)
 {
 }
 

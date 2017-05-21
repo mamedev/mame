@@ -634,7 +634,7 @@ DRIVER_INIT_MEMBER( fp1100_state, fp1100 )
 	membank("bankw0")->configure_entry(0, &wram[0x0000]);
 }
 
-static MACHINE_CONFIG_START( fp1100, fp1100_state )
+static MACHINE_CONFIG_START( fp1100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(fp1100_map)
@@ -699,5 +699,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS            INIT    COMPANY    FULLNAME       FLAGS */
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS          INIT      COMPANY    FULLNAME   FLAGS */
 COMP( 1983, fp1100,  0,      0,       fp1100,     fp1100, fp1100_state,  fp1100,   "Casio",   "FP-1100", MACHINE_NOT_WORKING)

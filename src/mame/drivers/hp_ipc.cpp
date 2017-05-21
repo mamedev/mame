@@ -418,7 +418,7 @@ public:
 private:
 	required_device<m68000_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
-	required_device<wd2797_t> m_fdc;
+	required_device<wd2797_device> m_fdc;
 	required_device<ram_device> m_ram;
 	required_device<screen_device> m_screen;
 
@@ -478,7 +478,7 @@ static ADDRESS_MAP_START(hp_ipc_mem_inner, AS_PROGRAM, 16, hp_ipc_state)
 	AM_RANGE(0x0100000, 0x04FFFFF) AM_UNMAP     // External ROM modules
 	AM_RANGE(0x0600000, 0x060FFFF) AM_READWRITE(mmu_r, mmu_w)
 	AM_RANGE(0x0610000, 0x0610007) AM_READWRITE8(floppy_id_r, floppy_id_w, 0x00ff)
-	AM_RANGE(0x0610008, 0x061000F) AM_DEVREADWRITE8("fdc", wd2797_t, read, write, 0x00ff)
+	AM_RANGE(0x0610008, 0x061000F) AM_DEVREADWRITE8("fdc", wd2797_device, read, write, 0x00ff)
 	AM_RANGE(0x0620000, 0x062000F) AM_DEVREADWRITE8("gpu", hp1ll3_device, read, write, 0x00ff)
 	AM_RANGE(0x0630000, 0x063FFFF) AM_NOP       // AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
 	AM_RANGE(0x0640000, 0x064002F) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0x00ff)
@@ -709,7 +709,7 @@ SLOT_INTERFACE_END
  *  2   HP-HIL devices (keyboard, mouse)
  *  1   Real-time clock
  */
-static MACHINE_CONFIG_START(hp_ipc, hp_ipc_state)
+static MACHINE_CONFIG_START(hp_ipc)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_15_92MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(hp_ipc_mem_outer)
 
@@ -767,4 +767,4 @@ ROM_START(hp_ipc)
 ROM_END
 
 
-COMP(1985, hp_ipc, 0, 0, hp_ipc, hp_ipc, driver_device, 0, "HP", "Integral Personal Computer", MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_KEYBOARD)
+COMP(1985, hp_ipc, 0, 0, hp_ipc, hp_ipc, hp_ipc_state, 0, "HP", "Integral Personal Computer", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_KEYBOARD)

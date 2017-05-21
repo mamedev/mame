@@ -89,9 +89,9 @@ constexpr u16 M68HC05_INT_MASK          = M68HC05_INT_IRQ | M68HC05_INT_TIMER;
  * Global variables
  ****************************************************************************/
 
-device_type const M68HC05C4     = device_creator<m68hc05c4_device>;
-device_type const M68HC05C8     = device_creator<m68hc05c8_device>;
-device_type const M68HC705C8A   = device_creator<m68hc705c8a_device>;
+DEFINE_DEVICE_TYPE(M68HC05C4,   m68hc05c4_device,   "m68hc05c4",   "MC68HC05C4")
+DEFINE_DEVICE_TYPE(M68HC05C8,   m68hc05c8_device,   "m68hc05c8",   "MC68HC05C8")
+DEFINE_DEVICE_TYPE(M68HC705C8A, m68hc705c8a_device, "m68hc705c8a", "MC68HC705C8A")
 
 
 
@@ -105,21 +105,15 @@ m68hc05_device::m68hc05_device(
 		device_t *owner,
 		u32 clock,
 		device_type type,
-		char const *name,
-		address_map_delegate internal_map,
-		char const *shortname,
-		char const *source)
+		address_map_delegate internal_map)
 	: m6805_base_device(
 			mconfig,
 			tag,
 			owner,
 			clock,
 			type,
-			name,
 			{ s_hc_ops, s_hc_cycles, 13, 0x00ff, 0x00c0, M68HC05_VECTOR_SWI },
-			internal_map,
-			shortname,
-			source)
+			internal_map)
 	, m_port_cb_r{ *this, *this, *this, *this }
 	, m_port_cb_w{ *this, *this, *this, *this }
 	, m_port_bits{ 0xff, 0xff, 0xff, 0xff }
@@ -718,11 +712,8 @@ m68hc705_device::m68hc705_device(
 		device_t *owner,
 		u32 clock,
 		device_type type,
-		char const *name,
-		address_map_delegate internal_map,
-		char const *shortname,
-		char const *source)
-	: m68hc05_device(mconfig, tag, owner, clock, type, name, internal_map, shortname, source)
+		address_map_delegate internal_map)
+	: m68hc05_device(mconfig, tag, owner, clock, type, internal_map)
 {
 }
 
@@ -770,10 +761,7 @@ m68hc05c4_device::m68hc05c4_device(machine_config const &mconfig, char const *ta
 			owner,
 			clock,
 			M68HC05C4,
-			"MC68HC05C4",
-			address_map_delegate(FUNC(m68hc05c4_device::c4_map), this),
-			"m68hc05c4",
-			__FILE__)
+			address_map_delegate(FUNC(m68hc05c4_device::c4_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
@@ -842,10 +830,7 @@ m68hc05c8_device::m68hc05c8_device(machine_config const &mconfig, char const *ta
 			owner,
 			clock,
 			M68HC05C8,
-			"MC68HC05C8",
-			address_map_delegate(FUNC(m68hc05c8_device::c8_map), this),
-			"m68hc05c8",
-			__FILE__)
+			address_map_delegate(FUNC(m68hc05c8_device::c8_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
@@ -920,10 +905,7 @@ m68hc705c8a_device::m68hc705c8a_device(machine_config const &mconfig, char const
 			owner,
 			clock,
 			M68HC705C8A,
-			"MC68HC705C8A",
-			address_map_delegate(FUNC(m68hc705c8a_device::c8a_map), this),
-			"m68hc705c8a",
-			__FILE__)
+			address_map_delegate(FUNC(m68hc705c8a_device::c8a_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }

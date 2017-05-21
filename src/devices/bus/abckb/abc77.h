@@ -26,12 +26,10 @@
 
 // ======================> abc77_device
 
-class abc77_device :  public device_t,
-						public abc_keyboard_interface
+class abc77_device :  public device_t, public abc_keyboard_interface
 {
 public:
 	// construction/destruction
-	abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
@@ -51,6 +49,8 @@ public:
 	DECLARE_WRITE8_MEMBER( j3_w );
 
 protected:
+	abc77_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -99,8 +99,8 @@ public:
 
 
 // device type definition
-extern const device_type ABC77;
-extern const device_type ABC55;
+DECLARE_DEVICE_TYPE(ABC77, abc77_device)
+DECLARE_DEVICE_TYPE(ABC55, abc55_device)
 
 
 #endif // MAME_BUS_ABCKB_ABC77_H

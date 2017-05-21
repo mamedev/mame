@@ -21,7 +21,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type BML3BUS_MP1805 = device_creator<bml3bus_mp1805_device>;
+DEFINE_DEVICE_TYPE(BML3BUS_MP1805, bml3bus_mp1805_device, "bml3mp1805", "Hitachi MP-1805 Floppy Controller Card")
 
 static const floppy_interface bml3_mp1805_floppy_interface =
 {
@@ -138,7 +138,7 @@ WRITE8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_w)
 //**************************************************************************
 
 bml3bus_mp1805_device::bml3bus_mp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, BML3BUS_MP1805, "Hitachi MP-1805 Floppy Controller Card", tag, owner, clock, "bml3mp1805", __FILE__),
+	device_t(mconfig, BML3BUS_MP1805, tag, owner, clock),
 	device_bml3bus_card_interface(mconfig, *this),
 	m_mc6843(*this, "mc6843"), m_rom(nullptr)
 {

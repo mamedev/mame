@@ -97,6 +97,8 @@ offsets:
 
 READ8_MEMBER(stv_state::stv_ioga_r)
 {
+	const char *const portg[] = { "PORTG.0", "PORTG.1", "PORTG.2", "PORTG.3" };
+
 	uint8_t res;
 
 	res = 0xff;
@@ -113,8 +115,14 @@ READ8_MEMBER(stv_state::stv_ioga_r)
 		case 0x07: res = m_system_output; break; // port D, read-backs value written
 		case 0x09: res = ioport("PORTE")->read(); break; // P3
 		case 0x0b: res = ioport("PORTF")->read(); break; // P4
-		case 0x0d: res = 0; break; // PORT-G
+		case 0x0d:
+			if (m_ioga_mode & 0x80)
+				res = (ioport(portg[(m_ioga_portg >> 1) & 3])->read()) >> (((m_ioga_portg & 1) ^ 1) * 8);	 // PORT-G counter mode
+			else
+				res = ioport("PORTG")->read();
+			break;
 		case 0x1b: res = 0; break; // Serial COM READ status
+		case 0x1d: res = m_ioga_mode; break;
 	}
 
 	return res;
@@ -131,13 +139,19 @@ WRITE8_MEMBER(stv_state::stv_ioga_w)
 	{
 		case 0x07:
 //			if (data != m_system_output)
-//				printf("OUT %02x\n", data);
+//				logerror("OUT %02x\n", data);
 			m_system_output = data;
 			/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
 			machine().bookkeeping().coin_counter_w(0,~data & 0x01);
 			machine().bookkeeping().coin_counter_w(1,~data & 0x02);
 			machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
 			machine().bookkeeping().coin_lockout_w(1,~data & 0x08);
+			break;
+		case 0x0d:
+			m_ioga_portg = data;
+			break;
+		case 0x1d:
+			m_ioga_mode = data;
 			break;
 	}
 }
@@ -238,6 +252,13 @@ WRITE8_MEMBER(stv_state::stvmp_ioga_w)
 		case 0x11: m_port_sel = data; break;
 		default:   stv_ioga_w(space,offset,data); break;
 	}
+}
+
+WRITE8_MEMBER(stv_state::hop_ioga_w)
+{
+	if (offset == 7)
+		m_hopper->motor_w(data & 0x80);
+	stv_ioga_w(space, offset, data);
 }
 
 /* remaps with a 8-bit handler because MAME can't install r/w handlers with a different bus parallelism than the CPU native one, shrug ... */
@@ -343,6 +364,19 @@ WRITE32_MEMBER(stv_state::magzun_ioga_w32)
 		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
 			if(!machine().side_effect_disabled())
 				printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
+}
+
+WRITE32_MEMBER(stv_state::hop_ioga_w32)
+{
+	if(ACCESSING_BITS_16_23)
+		hop_ioga_w(space,offset*4+1,data >> 16);
+	if(ACCESSING_BITS_0_7)
+		hop_ioga_w(space,offset*4+3,data);
+	if(ACCESSING_BITS_8_15 || ACCESSING_BITS_24_31)
+		if(!(ACCESSING_BITS_16_23 || ACCESSING_BITS_0_7))
+			printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
+
+	return;
 }
 
 /*
@@ -935,6 +969,13 @@ DRIVER_INIT_MEMBER(stv_state,nameclv3)
 	DRIVER_INIT_CALL(stv);
 }
 
+DRIVER_INIT_MEMBER(stv_state, hopper)
+{
+	DRIVER_INIT_CALL(stv);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::hop_ioga_w32),this));
+	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::hop_ioga_w32),this));
+}
+
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(stv_SMPC_r, stv_SMPC_w,0xffffffff)
@@ -976,7 +1017,7 @@ static ADDRESS_MAP_START( scudsp_data, AS_DATA, 32, stv_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( stv, stv_state )
+static MACHINE_CONFIG_START( stv )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
@@ -1093,6 +1134,9 @@ static MACHINE_CONFIG_DERIVED( stv_slot, stv )
 	MCFG_FRAGMENT_ADD( stv_cartslot )
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( hopper, stv )
+		MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+MACHINE_CONFIG_END
 
 MACHINE_RESET_MEMBER(stv_state,stv)
 {
@@ -1292,6 +1336,18 @@ static INPUT_PORTS_START( stv )
 
 	PORT_START("PORTF")
 	STV_PLAYER_INPUTS(4, BUTTON1, BUTTON2, BUTTON3, START)
+
+	PORT_START("PORTG")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PORTG.0")
+	PORT_BIT( 0x0000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("PORTG.1")
+	PORT_BIT( 0x0000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("PORTG.2")
+	PORT_BIT( 0x0000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("PORTG.3")
+	PORT_BIT( 0x0000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( stv6b )
@@ -1638,18 +1694,26 @@ static INPUT_PORTS_START( patocar )
 	PORT_INCLUDE( stv )
 
 	PORT_MODIFY("PORTA")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )	// hopper ?
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )	// hopper ?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )	// hopper ?
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_MODIFY("PORTB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 )	// ??
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 )	// Door switch ?
-	PORT_BIT( 0x0c, IP_ACTIVE_LOW,  IPT_BUTTON5 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN3 )		// Medal
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW,  IPT_BUTTON5 )	// ??
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN3 )	PORT_NAME("Medal")
 	PORT_BIT( 0xd0, IP_ACTIVE_LOW,  IPT_UNUSED )
 
+	// TODO: sense/delta values seems wrong
+	PORT_MODIFY("PORTG.0")
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(1)
+	PORT_MODIFY("PORTG.1")
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_RESET PORT_REVERSE PORT_PLAYER(1)
+
 	PORT_MODIFY("PORTC")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )  PORT_NAME("Select Button")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Power Button")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -3469,125 +3533,125 @@ ROM_END
 
 
 
-GAME( 1996, stvbios,   0,       stv_slot, stv, stv_state,      stv,         ROT0,   "Sega",                         "ST-V Bios", MACHINE_IS_BIOS_ROOT )
+GAME( 1996, stvbios,   0,       stv_slot, stv,      stv_state,   stv,        ROT0,   "Sega",                         "ST-V Bios", MACHINE_IS_BIOS_ROOT )
 
-//GAME YEAR, NAME,     PARENT,  MACH, INP, INIT,      MONITOR
+//GAME YEAR, NAME,     PARENT,  MACH,     INP,      STATE,       INIT,       MONITOR
 /* Playable */
-GAME( 1998, astrass,   stvbios, stv_5881, stv6b, stv_state,      astrass,    ROT0,   "Sunsoft",                      "Astra SuperStars (J 980514 V1.002)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, bakubaku,  stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Baku Baku Animal (J 950407 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, batmanfr,  stvbios, batmanfr, stv, stv_state,        batmanfr,   ROT0,   "Acclaim",                      "Batman Forever (JUE 960507 V1.000)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, colmns97,  stvbios, stv,      stv, stv_state,        colmns97,   ROT0,   "Sega",                         "Columns '97 (JET 961209 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, cotton2,   stvbios, stv,      stv, stv_state,        cotton2,    ROT0,   "Success",                      "Cotton 2 (JUET 970902 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, cottonbm,  stvbios, stv,      stv, stv_state,        cottonbm,   ROT0,   "Success",                      "Cotton Boomerang (JUET 980709 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, astrass,   stvbios, stv_5881, stv6b,    stv_state,   astrass,    ROT0,   "Sunsoft",                      "Astra SuperStars (J 980514 V1.002)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, bakubaku,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Baku Baku Animal (J 950407 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, batmanfr,  stvbios, batmanfr, stv,      stv_state,   batmanfr,   ROT0,   "Acclaim",                      "Batman Forever (JUE 960507 V1.000)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, colmns97,  stvbios, stv,      stv,      stv_state,   colmns97,   ROT0,   "Sega",                         "Columns '97 (JET 961209 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, cotton2,   stvbios, stv,      stv,      stv_state,   cotton2,    ROT0,   "Success",                      "Cotton 2 (JUET 970902 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, cottonbm,  stvbios, stv,      stv,      stv_state,   cottonbm,   ROT0,   "Success",                      "Cotton Boomerang (JUET 980709 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, critcrsh,  stvbios, stv,      critcrsh, stv_state,   critcrsh,   ROT0,   "Sega",                         "Critter Crusher (EA 951204 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, tatacot,   critcrsh,stv,      critcrsh, stv_state,   critcrsh,   ROT0,   "Sega",                         "Tatacot (JA 951128 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, danchih,   stvbios, stv,      stvmp, stv_state,      danchih,    ROT0,   "Altron (Tecmo license)",       "Danchi de Hanafuda (J 990607 V1.400)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, danchiq,   stvbios, stv,      stv, stv_state,        danchiq,    ROT0,   "Altron",                       "Danchi de Quiz: Okusan Yontaku Desuyo! (J 001128 V1.200)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, diehard,   stvbios, stv,      stv, stv_state,        diehard,    ROT0,   "Sega",                         "Die Hard Arcade (UET 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
-GAME( 1996, dnmtdeka,  diehard, stv,      stv, stv_state,        dnmtdeka,   ROT0,   "Sega",                         "Dynamite Deka (J 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
-GAME( 1995, ejihon,    stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Ejihon Tantei Jimusyo (J 950613 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, elandore,  stvbios, stv_5881, stv6b, stv_state,      elandore,   ROT0,   "Sai-Mate",                     "Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, ffrevng10, ffreveng,stv_5881, stv6b, stv_state,      ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990714 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, ffreveng,  stvbios, stv_5881, stv6b, stv_state,      ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990930 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, fhboxers,  stvbios, stv,      stv, stv_state,        fhboxers,   ROT0,   "Sega",                         "Funky Head Boxers (JUETBKAL 951218 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, findlove,  stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Daiki / FCF",                  "Zenkoku Seifuku Bishoujo Grand Prix Find Love (J 971212 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, gaxeduel,  stvbios, stv,      stv6b, stv_state,      gaxeduel,   ROT0,   "Sega",                         "Golden Axe - The Duel (JUETL 950117 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1998, grdforce,  stvbios, stv,      stv, stv_state,        grdforce,   ROT0,   "Success",                      "Guardian Force (JUET 980318 V0.105)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, groovef,   stvbios, stv,      stv6b, stv_state,      groovef,    ROT0,   "Atlus",                        "Groove on Fight - Gouketsuji Ichizoku 3 (J 970416 V1.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, hanagumi,  stvbios, stv,      stv, stv_state,        hanagumi,   ROT0,   "Sega",                         "Sakura Taisen - Hanagumi Taisen Columns (J 971007 V1.010)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, introdon,  stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sunsoft / Success",            "Karaoke Quiz Intro Don Don! (J 960213 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, kiwames,   stvbios, stv,      stvmp, stv_state,      stvmp,      ROT0,   "Athena",                       "Pro Mahjong Kiwame S (J 951020 V1.208)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, maruchan,  stvbios, stv,      stv, stv_state,        maruchan,   ROT0,   "Sega / Toyosuisan",            "Maru-Chan de Goo! (J 971216 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, mausuke,   stvbios, stv,      stv, stv_state,        mausuke,    ROT0,   "Data East",                    "Mausuke no Ojama the World (J 960314 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, danchih,   stvbios, stv,      stvmp,    stv_state,   danchih,    ROT0,   "Altron (Tecmo license)",       "Danchi de Hanafuda (J 990607 V1.400)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, danchiq,   stvbios, stv,      stv,      stv_state,   danchiq,    ROT0,   "Altron",                       "Danchi de Quiz: Okusan Yontaku Desuyo! (J 001128 V1.200)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, diehard,   stvbios, stv,      stv,      stv_state,   diehard,    ROT0,   "Sega",                         "Die Hard Arcade (UET 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
+GAME( 1996, dnmtdeka,  diehard, stv,      stv,      stv_state,   dnmtdeka,   ROT0,   "Sega",                         "Dynamite Deka (J 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
+GAME( 1995, ejihon,    stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Ejihon Tantei Jimusyo (J 950613 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, elandore,  stvbios, stv_5881, stv6b,    stv_state,   elandore,   ROT0,   "Sai-Mate",                     "Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ffrevng10, ffreveng,stv_5881, stv6b,    stv_state,   ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990714 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ffreveng,  stvbios, stv_5881, stv6b,    stv_state,   ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990930 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, fhboxers,  stvbios, stv,      stv,      stv_state,   fhboxers,   ROT0,   "Sega",                         "Funky Head Boxers (JUETBKAL 951218 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, findlove,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Daiki / FCF",                  "Zenkoku Seifuku Bishoujo Grand Prix Find Love (J 971212 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, gaxeduel,  stvbios, stv,      stv6b,    stv_state,   gaxeduel,   ROT0,   "Sega",                         "Golden Axe - The Duel (JUETL 950117 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1998, grdforce,  stvbios, stv,      stv,      stv_state,   grdforce,   ROT0,   "Success",                      "Guardian Force (JUET 980318 V0.105)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, groovef,   stvbios, stv,      stv6b,    stv_state,   groovef,    ROT0,   "Atlus",                        "Groove on Fight - Gouketsuji Ichizoku 3 (J 970416 V1.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, hanagumi,  stvbios, stv,      stv,      stv_state,   hanagumi,   ROT0,   "Sega",                         "Sakura Taisen - Hanagumi Taisen Columns (J 971007 V1.010)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, introdon,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sunsoft / Success",            "Karaoke Quiz Intro Don Don! (J 960213 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, kiwames,   stvbios, stv,      stvmp,    stv_state,   stvmp,      ROT0,   "Athena",                       "Pro Mahjong Kiwame S (J 951020 V1.208)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, maruchan,  stvbios, stv,      stv,      stv_state,   maruchan,   ROT0,   "Sega / Toyosuisan",            "Maru-Chan de Goo! (J 971216 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, mausuke,   stvbios, stv,      stv,      stv_state,   mausuke,    ROT0,   "Data East",                    "Mausuke no Ojama the World (J 960314 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, myfairld,  stvbios, stv,      myfairld, stv_state,   stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, othellos,  stvbios, stv,      stv, stv_state,        othellos,   ROT0,   "Success",                      "Othello Shiyouyo (J 980423 V1.002)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, patocar,   stvbios, stv,      patocar, stv_state,    stv,        ROT0,   "Sega",                         "Hashire Patrol Car (J 990326 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1995, pblbeach,  stvbios, stv,      stv, stv_state,        pblbeach,   ROT0,   "T&E Soft",                     "Pebble Beach - The Great Shot (JUE 950913 V0.990)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, prikura,   stvbios, stv,      stv, stv_state,        prikura,    ROT0,   "Atlus",                        "Princess Clara Daisakusen (J 960910 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, puyosun,   stvbios, stv,      stv, stv_state,        puyosun,    ROT0,   "Compile",                      "Puyo Puyo Sun (J 961115 V0.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, rsgun,     stvbios, stv_5881, stv, stv_state,        rsgun,      ROT0,   "Treasure",                     "Radiant Silvergun (JUET 980523 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, sasissu,   stvbios, stv,      stv, stv_state,        sasissu,    ROT0,   "Sega",                         "Taisen Tanto-R Sashissu!! (J 980216 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, sanjeon,   sasissu, stv,      stv, stv_state,        sanjeon,    ROT0,   "Sega / Deniam",                "DaeJeon! SanJeon SuJeon (AJTUE 990412 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, seabass,   stvbios, stv,      stv, stv_state,        seabass,    ROT0,   "A wave inc. (Able license)",   "Sea Bass Fishing (JUET 971110 V0.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, shanhigw,  stvbios, stv,      stv, stv_state,        shanhigw,   ROT0,   "Sunsoft / Activision",         "Shanghai - The Great Wall / Shanghai Triple Threat (JUE 950623 V1.005)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, shienryu,  stvbios, stv,      stv, stv_state,        shienryu,   ROT270, "Warashi",                      "Shienryu (JUET 961226 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, sss,       stvbios, stv_5881, stv, stv_state,        sss,        ROT0,   "Capcom / Cave / Victor",       "Steep Slope Sliders (JUET 981110 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, sandor,    stvbios, stv,      stv, stv_state,        sandor,     ROT0,   "Sega",                         "Puzzle & Action: Sando-R (J 951114 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, thunt,     sandor,  stv,      stv, stv_state,        thunt,      ROT0,   "Sega",                         "Puzzle & Action: Treasure Hunt (JUET 970901 V2.00E)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, thuntk,    sandor,  stv,      stv, stv_state,        sandor,     ROT0,   "Sega / Deniam",                "Puzzle & Action: BoMulEul Chajara (JUET 970125 V2.00K)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, smleague,  stvbios, stv,      stv, stv_state,        smleague,   ROT0,   "Sega",                         "Super Major League (U 960108 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, finlarch,  smleague,stv,      stv, stv_state,        finlarch,   ROT0,   "Sega",                         "Final Arch (J 950714 V1.001)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, sokyugrt,  stvbios, stv,      stv, stv_state,        sokyugrt,   ROT0,   "Raizing / Eighting",           "Soukyugurentai / Terra Diver (JUET 960821 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, suikoenb,  stvbios, stv,      stv6b, stv_state,      suikoenb,   ROT0,   "Data East",                    "Suiko Enbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, vfkids,    stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Virtua Fighter Kids (JUET 960319 V0.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, othellos,  stvbios, stv,      stv,      stv_state,   othellos,   ROT0,   "Success",                      "Othello Shiyouyo (J 980423 V1.002)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, patocar,   stvbios, hopper,   patocar,  stv_state,   hopper,     ROT0,   "Sega",                         "Hashire Patrol Car (J 990326 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, pblbeach,  stvbios, stv,      stv,      stv_state,   pblbeach,   ROT0,   "T&E Soft",                     "Pebble Beach - The Great Shot (JUE 950913 V0.990)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, prikura,   stvbios, stv,      stv,      stv_state,   prikura,    ROT0,   "Atlus",                        "Princess Clara Daisakusen (J 960910 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, puyosun,   stvbios, stv,      stv,      stv_state,   puyosun,    ROT0,   "Compile",                      "Puyo Puyo Sun (J 961115 V0.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, rsgun,     stvbios, stv_5881, stv,      stv_state,   rsgun,      ROT0,   "Treasure",                     "Radiant Silvergun (JUET 980523 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, sasissu,   stvbios, stv,      stv,      stv_state,   sasissu,    ROT0,   "Sega",                         "Taisen Tanto-R Sashissu!! (J 980216 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, sanjeon,   sasissu, stv,      stv,      stv_state,   sanjeon,    ROT0,   "Sega / Deniam",                "DaeJeon! SanJeon SuJeon (AJTUE 990412 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, seabass,   stvbios, stv,      stv,      stv_state,   seabass,    ROT0,   "A wave inc. (Able license)",   "Sea Bass Fishing (JUET 971110 V0.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, shanhigw,  stvbios, stv,      stv,      stv_state,   shanhigw,   ROT0,   "Sunsoft / Activision",         "Shanghai - The Great Wall / Shanghai Triple Threat (JUE 950623 V1.005)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, shienryu,  stvbios, stv,      stv,      stv_state,   shienryu,   ROT270, "Warashi",                      "Shienryu (JUET 961226 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, sss,       stvbios, stv_5881, stv,      stv_state,   sss,        ROT0,   "Capcom / Cave / Victor",       "Steep Slope Sliders (JUET 981110 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, sandor,    stvbios, stv,      stv,      stv_state,   sandor,     ROT0,   "Sega",                         "Puzzle & Action: Sando-R (J 951114 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, thunt,     sandor,  stv,      stv,      stv_state,   thunt,      ROT0,   "Sega",                         "Puzzle & Action: Treasure Hunt (JUET 970901 V2.00E)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, thuntk,    sandor,  stv,      stv,      stv_state,   sandor,     ROT0,   "Sega / Deniam",                "Puzzle & Action: BoMulEul Chajara (JUET 970125 V2.00K)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, smleague,  stvbios, stv,      stv,      stv_state,   smleague,   ROT0,   "Sega",                         "Super Major League (U 960108 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, finlarch,  smleague,stv,      stv,      stv_state,   finlarch,   ROT0,   "Sega",                         "Final Arch (J 950714 V1.001)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, sokyugrt,  stvbios, stv,      stv,      stv_state,   sokyugrt,   ROT0,   "Raizing / Eighting",           "Soukyugurentai / Terra Diver (JUET 960821 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, suikoenb,  stvbios, stv,      stv6b,    stv_state,   suikoenb,   ROT0,   "Data East",                    "Suiko Enbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, vfkids,    stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Virtua Fighter Kids (JUET 960319 V0.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, vmahjong,  stvbios, stv,      vmahjong, stv_state,   stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong (J 961214 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, winterht,  stvbios, stv,      stv, stv_state,        winterht,   ROT0,   "Sega",                         "Winter Heat (JUET 971012 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, znpwfv,    stvbios, stv,      stv, stv_state,        znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, znpwfvt,   znpwfv,  stv,      stv, stv_state,        znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (T 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, winterht,  stvbios, stv,      stv,      stv_state,   winterht,   ROT0,   "Sega",                         "Winter Heat (JUET 971012 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, znpwfv,    stvbios, stv,      stv,      stv_state,   znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, znpwfvt,   znpwfv,  stv,      stv,      stv_state,   znpwfv,     ROT0,   "Sega",                         "Zen Nippon Pro-Wrestling Featuring Virtua (T 971123 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* Unemulated printer / camera devices */
 // USA sets
-GAME( 1997, pclub2,    stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 (U 970921 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1999, pclub2v3,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 3 (U 990310 V1.000)", MACHINE_NOT_WORKING ) // Hello Kitty themed
-GAME( 1999, pclubpok,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Pokemon B (U 991126 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclub2,    stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 (U 970921 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, pclub2v3,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 3 (U 990310 V1.000)", MACHINE_NOT_WORKING ) // Hello Kitty themed
+GAME( 1999, pclubpok,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club Pokemon B (U 991126 V1.000)", MACHINE_NOT_WORKING )
 // Japan sets
-GAME( 1999, pclub2fc,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Felix The Cat (Rev. A) (J 970415 V1.100)", MACHINE_NOT_WORKING )
-GAME( 1998, pclub2pf,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Puffy (Japan)", MACHINE_NOT_WORKING ) // version info is blank
-GAME( 1997, pclub2pe,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Pepsiman (J 970618 V1.100)", MACHINE_NOT_WORKING )
-GAME( 1997, pclub2wb,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Warner Bros (J 970228 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, pclub2fc,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Felix The Cat (Rev. A) (J 970415 V1.100)", MACHINE_NOT_WORKING )
+GAME( 1998, pclub2pf,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Puffy (Japan)", MACHINE_NOT_WORKING ) // version info is blank
+GAME( 1997, pclub2pe,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Pepsiman (J 970618 V1.100)", MACHINE_NOT_WORKING )
+GAME( 1997, pclub2wb,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Warner Bros (J 970228 V1.000)", MACHINE_NOT_WORKING )
 
-GAME( 1997, pclb2elk,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Earth Limited Kobe (Print Club Custom) (J 970808 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1997, pckobe99,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Kobe Luminaire '99 (Print Club Custom 3) (J 991203 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclb2elk,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Earth Limited Kobe (Print Club Custom) (J 970808 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pckobe99,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Kobe Luminaire '99 (Print Club Custom 3) (J 991203 V1.000)", MACHINE_NOT_WORKING )
 
-GAME( 1997, pclub26w,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 961210 V1.000)", MACHINE_NOT_WORKING ) // internal string is 'PURIKURA2 97FUYU' (but in reality it seems to be an end of 96 Winter version)
-GAME( 1997, pclub26wa, pclub26w,stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 970121 V1.200)", MACHINE_NOT_WORKING ) // ^
-GAME( 1997, pclub27s,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 7 Spring (J 970313 V1.100)", MACHINE_NOT_WORKING )
-GAME( 1997, prc28su,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 8 Summer (J 970616 V1.100)", MACHINE_NOT_WORKING ) // internal string 97SUMMER
-GAME( 1997, prc29au,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 9 Autumn (J V1.100)", MACHINE_NOT_WORKING ) // internal string 97AUTUMN, no date code! (all 0)
-GAME( 1997, prc297wi,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 1)", MACHINE_NOT_WORKING ) // internal string is '97WINTER'
-GAME( 1997, prc297wia, prc297wi,stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 2)", MACHINE_NOT_WORKING ) // different program revision, same date code, clearly didn't get updated properly
-GAME( 1998, prc298sp,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING ) // again, date doesn't appear to have bene updated, this should be early 98
-GAME( 1998, prc298su,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Summer Ver (J 980603 V1.100)", MACHINE_NOT_WORKING ) //
-GAME( 1998, prc298au,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Autumn Ver (J 980827 V1.000)", MACHINE_NOT_WORKING )
-GAME( 2000, prc2ksu,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club 2 2000 Summer (J 000509 V1.000)", MACHINE_NOT_WORKING ) // internal string 2000_SUMMER
-
-
-GAME( 1999, pclubor,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Goukakenran (J 991104 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1999, pclubol,   stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Olive (J 980717 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1997, pclub2kc,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Kome Kome Club (J 970203 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1997, pclubyo2,  stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Atlus",                        "Print Club Yoshimoto V2 (J 970422 V1.100)", MACHINE_NOT_WORKING )
+GAME( 1997, pclub26w,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 961210 V1.000)", MACHINE_NOT_WORKING ) // internal string is 'PURIKURA2 97FUYU' (but in reality it seems to be an end of 96 Winter version)
+GAME( 1997, pclub26wa, pclub26w,stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 6 Winter (J 970121 V1.200)", MACHINE_NOT_WORKING ) // ^
+GAME( 1997, pclub27s,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 7 Spring (J 970313 V1.100)", MACHINE_NOT_WORKING )
+GAME( 1997, prc28su,   stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 8 Summer (J 970616 V1.100)", MACHINE_NOT_WORKING ) // internal string 97SUMMER
+GAME( 1997, prc29au,   stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 Vol. 9 Autumn (J V1.100)", MACHINE_NOT_WORKING ) // internal string 97AUTUMN, no date code! (all 0)
+GAME( 1997, prc297wi,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 1)", MACHINE_NOT_WORKING ) // internal string is '97WINTER'
+GAME( 1997, prc297wia, prc297wi,stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100, set 2)", MACHINE_NOT_WORKING ) // different program revision, same date code, clearly didn't get updated properly
+GAME( 1998, prc298sp,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", MACHINE_NOT_WORKING ) // again, date doesn't appear to have bene updated, this should be early 98
+GAME( 1998, prc298su,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Summer Ver (J 980603 V1.100)", MACHINE_NOT_WORKING ) //
+GAME( 1998, prc298au,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Autumn Ver (J 980827 V1.000)", MACHINE_NOT_WORKING )
+GAME( 2000, prc2ksu,   stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club 2 2000 Summer (J 000509 V1.000)", MACHINE_NOT_WORKING ) // internal string 2000_SUMMER
 
 
-GAME( 1997, pclove,    stvbios, stv_5838, stv, stv_state,       decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
-GAME( 1997, pclove2,   stvbios, stv_5838, stv, stv_state,       decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove Ver 2 (J 970825 V1.000)", MACHINE_NOT_WORKING ) // ^
-GAME( 1997, pcpooh2,   stvbios, stv_5838, stv, stv_state,       decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 2 (J 971218 V1.000)", MACHINE_NOT_WORKING ) // ^
-GAME( 1998, pcpooh3,   stvbios, stv_5838, stv, stv_state,       decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1999, pclubor,   stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club Goukakenran (J 991104 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, pclubol,   stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club Olive (J 980717 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclub2kc,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club Kome Kome Club (J 970203 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1997, pclubyo2,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Atlus",                        "Print Club Yoshimoto V2 (J 970422 V1.100)", MACHINE_NOT_WORKING )
 
-GAME( 1998, stress,    stvbios, stv,      stv, stv_state,       stv,        ROT0,   "Sega",                         "Stress Busters (J 981020 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1996, nameclub,  stvbios, stv_5838, stv, stv_state,       decathlt,   ROT0,   "Sega",                         "Name Club (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
-GAME( 1996, nclubv2,   stvbios, stv_5838, stv, stv_state,       decathlt,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released today)
-GAME( 1997, nclubv3,   stvbios, stv,      stv, stv_state,       nameclv3,   ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
+GAME( 1997, pclove,    stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
+GAME( 1997, pclove2,   stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove Ver 2 (J 970825 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1997, pcpooh2,   stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 2 (J 971218 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1998, pcpooh3,   stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
+
+GAME( 1998, stress,    stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Stress Busters (J 981020 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+GAME( 1996, nameclub,  stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Sega",                         "Name Club (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
+GAME( 1996, nclubv2,   stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released today)
+GAME( 1997, nclubv3,   stvbios, stv,      stv,      stv_state,   nameclv3,   ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
 
 
 
 
 
 /* Doing something.. but not enough yet */
-GAME( 1995, vfremix,   stvbios, stv,      stv, stv_state,        vfremix,    ROT0,   "Sega",                         "Virtua Fighter Remix (JUETBKAL 950428 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, decathlt,  stvbios, stv_5838, stv, stv_state,        decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960709 V1.001)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, decathlto, decathlt,stv_5838, stv, stv_state,        decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960424 V1.000)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998, twcup98,   stvbios, stv_5881, stv, stv_state,        twcup98,    ROT0,   "Tecmo",                        "Tecmo World Cup '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // some situations with the GK result in the game stalling, maybe CPU core bug??
-GAME( 1998, twsoc98,   twcup98, stv_5881, stv, stv_state,        twcup98,    ROT0,   "Tecmo",                        "Tecmo World Soccer '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^^ (check)
+GAME( 1995, vfremix,   stvbios, stv,      stv,      stv_state,   vfremix,    ROT0,   "Sega",                         "Virtua Fighter Remix (JUETBKAL 950428 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, decathlt,  stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960709 V1.001)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, decathlto, decathlt,stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960424 V1.000)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998, twcup98,   stvbios, stv_5881, stv,      stv_state,   twcup98,    ROT0,   "Tecmo",                        "Tecmo World Cup '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // some situations with the GK result in the game stalling, maybe CPU core bug??
+GAME( 1998, twsoc98,   twcup98, stv_5881, stv,      stv_state,   twcup98,    ROT0,   "Tecmo",                        "Tecmo World Soccer '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^^ (check)
 /* Gives I/O errors */
-GAME( 1996, magzun,    stvbios, stv,      stv, stv_state,        magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_MICROPHONE )
-GAME( 1997, techbowl,  stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Technical Bowling (J 971212 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1999, micrombc,  stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Microman Battle Charge (J 990326 V1.000)", MACHINE_NOT_WORKING )
-GAME( 1998, choroqhr,  stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1996, magzun,    stvbios, stv,      stv,      stv_state,   magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_MICROPHONE )
+GAME( 1997, techbowl,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Technical Bowling (J 971212 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, micrombc,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Microman Battle Charge (J 990326 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING )
 
 /* CD games */
-GAME( 1995, sfish2,    0,       stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1995, sfish2j,   sfish2,  stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Sport Fishing 2 (J 951201 V1.100)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1995, sfish2,    0,       stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1995, sfish2j,   sfish2,  stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (J 951201 V1.100)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 /*
 This is the known list of undumped ST-V games:

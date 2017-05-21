@@ -26,6 +26,6 @@ public:
 };
 
 // device type definition
-extern const device_type NES_ZEMINA;
+DECLARE_DEVICE_TYPE(NES_ZEMINA, nes_zemina_device)
 
-#endif /* MAME_BUS_NES_ZEMINA_H */
+#endif // MAME_BUS_NES_ZEMINA_H

@@ -452,7 +452,7 @@ MACHINE_RESET_MEMBER(sangho_state,sexyboom)
 }
 
 
-static MACHINE_CONFIG_START( pzlestar, sangho_state )
+static MACHINE_CONFIG_START( pzlestar )
 
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6) // ?
 	MCFG_CPU_PROGRAM_MAP(sangho_map)
@@ -471,7 +471,7 @@ static MACHINE_CONFIG_START( pzlestar, sangho_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sexyboom, sangho_state )
+static MACHINE_CONFIG_START( sexyboom )
 
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)
 	MCFG_CPU_PROGRAM_MAP(sangho_map)
@@ -539,4 +539,4 @@ DRIVER_INIT_MEMBER(sangho_state,pzlestar)
 }
 
 GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state,  pzlestar,   ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
-GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, driver_device, 0,          ROT270, "Sang Ho Soft", "Sexy Boom", 0 )
+GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, sangho_state,  0,          ROT270, "Sang Ho Soft", "Sexy Boom", 0 )

@@ -56,14 +56,17 @@ public:
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER(swtpc_status_r);
 	DECLARE_READ8_MEMBER(swtpc_terminal_r);
 	DECLARE_READ8_MEMBER(swtpc_tricky_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	uint8_t m_term_data;
+	void kbd_put(u8 data);
+
+protected:
 	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
+	uint8_t m_term_data;
 };
 
 // bit 0 - ready to receive a character; bit 1 - ready to send a character to the terminal
@@ -103,12 +106,12 @@ void swtpc_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER( swtpc_state::kbd_put )
+void swtpc_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( swtpc, swtpc_state )
+static MACHINE_CONFIG_START( swtpc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(swtpc_mem)
@@ -116,7 +119,7 @@ static MACHINE_CONFIG_START( swtpc, swtpc_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(swtpc_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(swtpc_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -130,5 +133,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1975, swtpc,  0,       0,      swtpc,     swtpc, driver_device,    0, "Southwest Technical Products Corporation", "SWTPC 6800", MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY                                     FULLNAME      FLAGS
+COMP( 1975, swtpc,  0,      0,      swtpc,   swtpc, swtpc_state, 0,    "Southwest Technical Products Corporation", "SWTPC 6800", MACHINE_NO_SOUND)

@@ -2675,7 +2675,7 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
  */
 
  // TODO: merge with Dreamcast base machine
- MACHINE_CONFIG_START( naomi_aw_base, dc_state )
+ MACHINE_CONFIG_START( naomi_aw_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
 	MCFG_SH4_MD0(1)
@@ -2716,7 +2716,7 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
 	MCFG_AICARTC_ADD("aicartc", XTAL_32_768kHz )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( naomi_base, naomi_state )
+static MACHINE_CONFIG_START( naomi_base )
 	MCFG_FRAGMENT_ADD( naomi_aw_base )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
@@ -2786,13 +2786,13 @@ MACHINE_CONFIG_END
  * Naomi 2 GD-Rom
  */
 
-static MACHINE_CONFIG_START( naomi2_base, naomi2_state )
+static MACHINE_CONFIG_START( naomi2_base )
 	MCFG_POWERVR2_ADD("powervr2_slave", WRITE8(dc_state, pvr_irq))
 
 	// TODO: ELAN device
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( naomi2gd, naomi2_state )
+static MACHINE_CONFIG_START( naomi2gd )
 	MCFG_FRAGMENT_ADD( naomigd )
 	MCFG_FRAGMENT_ADD( naomi2_base )
 
@@ -2804,7 +2804,7 @@ MACHINE_CONFIG_END
  * Naomi 2, M1 sub-board
  */
 
-static MACHINE_CONFIG_START( naomi2m1, naomi2_state )
+static MACHINE_CONFIG_START( naomi2m1 )
 	MCFG_FRAGMENT_ADD( naomim1 )
 	MCFG_FRAGMENT_ADD( naomi2_base )
 
@@ -2816,7 +2816,7 @@ MACHINE_CONFIG_END
  * Naomi 2, M2/3 sub-board
  */
 
-static MACHINE_CONFIG_START( naomi2m2, naomi2_state )
+static MACHINE_CONFIG_START( naomi2m2 )
 	MCFG_FRAGMENT_ADD( naomim2 )
 	MCFG_FRAGMENT_ADD( naomi2_base )
 
@@ -2828,7 +2828,7 @@ MACHINE_CONFIG_END
  * Atomiswave
  */
 
-static MACHINE_CONFIG_START( aw_base, atomiswave_state )
+static MACHINE_CONFIG_START( aw_base )
 	MCFG_FRAGMENT_ADD( naomi_aw_base )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -9877,21 +9877,21 @@ ROM_END
 
 /* Main board and game specific BIOS */
 /* Naomi */ GAME( 1998, naomi,    0, naomi, naomi, naomi_state,   naomi, ROT0, "Sega", "Naomi Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* game  */ GAME( 1998, hod2bios, 0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi House of the Dead 2 Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* game  */ GAME( 1999, f355dlx,  0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi Ferrari F355 Challenge (deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* game  */ GAME( 1999, f355bios, 0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi Ferrari F355 Challenge (twin/deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* game  */ GAME( 1999, airlbios, 0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi Airline Pilots (deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* Naomi2*/ GAME( 2001, naomi2,   0, naomi, naomi, driver_device, 0,     ROT0, "Sega", "Naomi 2 Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1998, hod2bios, 0, naomi, naomi, naomi_state,   0,     ROT0, "Sega", "Naomi House of the Dead 2 Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1999, f355dlx,  0, naomi, naomi, naomi_state,   0,     ROT0, "Sega", "Naomi Ferrari F355 Challenge (deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1999, f355bios, 0, naomi, naomi, naomi_state,   0,     ROT0, "Sega", "Naomi Ferrari F355 Challenge (twin/deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1999, airlbios, 0, naomi, naomi, naomi_state,   0,     ROT0, "Sega", "Naomi Airline Pilots (deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* Naomi2*/ GAME( 2001, naomi2,   0, naomi, naomi, naomi_state,   0,     ROT0, "Sega", "Naomi 2 Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 /* GDROM */ GAME( 2001, naomigd,  0, naomi, naomi, naomi_state,   naomi, ROT0, "Sega", "Naomi GD-ROM Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 
 /* 834-xxxxx (Sega Naomi cart with game specific BIOS sets) */
 /* 13636-01 */ GAME( 1998, hotd2,    hod2bios, naomim2, hotd2, naomi_state,   hotd2, ROT0, "Sega", "House of the Dead 2 (USA)", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
 /* 13636    */ GAME( 1998, hotd2o,   hotd2,    naomim2, hotd2, naomi_state,   hotd2, ROT0, "Sega", "House of the Dead 2", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
 /* none     */ GAME( 1998, hotd2p,   hotd2,    naomim2, hotd2, naomi_state,   hotd2, ROT0, "Sega", "House of the Dead 2 (prototype)", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
-/* 13842    */ GAME( 1999, f355,     f355dlx,  naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Ferrari F355 Challenge (deluxe, no link)", GAME_FLAGS ) /* specific BIOS "f355dlx" needed */
-/* 13950    */ GAME( 1999, f355twin, f355bios, naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Ferrari F355 Challenge (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
-/* none     */ GAME( 2001, f355twn2, f355bios, naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Ferrari F355 Challenge 2 - International Course Edition (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
-/* ?????    */ GAME( 1999, alpiltdx, airlbios, naomim2, naomi, driver_device, 0,     ROT0, "Sega", "Airline Pilots (deluxe) (Rev B)", GAME_FLAGS ) /* specific BIOS "airlbios" needed */
+/* 13842    */ GAME( 1999, f355,     f355dlx,  naomim2, naomi, naomi_state,   0,     ROT0, "Sega", "Ferrari F355 Challenge (deluxe, no link)", GAME_FLAGS ) /* specific BIOS "f355dlx" needed */
+/* 13950    */ GAME( 1999, f355twin, f355bios, naomim2, naomi, naomi_state,   0,     ROT0, "Sega", "Ferrari F355 Challenge (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
+/* none     */ GAME( 2001, f355twn2, f355bios, naomim2, naomi, naomi_state,   0,     ROT0, "Sega", "Ferrari F355 Challenge 2 - International Course Edition (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
+/* ?????    */ GAME( 1999, alpiltdx, airlbios, naomim2, naomi, naomi_state,   0,     ROT0, "Sega", "Airline Pilots (deluxe) (Rev B)", GAME_FLAGS ) /* specific BIOS "airlbios" needed */
 
 /* 840-xxxxx (Sega Naomi cart games)*/
 /* 0001    */ GAME( 1998, dybbnao,   naomi,    naomim2, dybbnao, naomi_state, naomi,   ROT0, "Sega", "Dynamite Baseball NAOMI (Japan)", GAME_FLAGS )
@@ -10036,10 +10036,10 @@ ROM_END
 /* Cart games on Namco custom ROM board
  for game descriptions below NAMCO region codes decoded as such (same as in older NAMCO hardware):
   1 - Japan
-  2 - Asia
+  2 - World
   3 - USA
-  4 - World
- real meaning of 2 and 4 is not clear and seems not correct, 2 more looks like "World", 4 like "some other part of World", possible Europe
+  4 - Asia
+ real meaning of 4 is not clear, it can be like "some other part of World", also possible Europe
 */
 /* 25209801 */ GAME( 2000, wldkicksj,  wldkicks, naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks (Japan, WK1 Ver.A)", GAME_FLAGS )
 /* 25209801 */ GAME( 2000, wldkicks,   naomi,    naomim2,naomi, naomi_state, naomi, ROT0, "Namco",          "World Kicks (World, WK2 Ver.A)", GAME_FLAGS )

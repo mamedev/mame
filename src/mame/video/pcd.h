@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
-#ifndef _PCD_H_
-#define _PCD_H_
+#ifndef MAME_VIDEO_PCD_H
+#define MAME_VIDEO_PCD_H
+
+#pragma once
 
 #include "machine/pic8259.h"
 #include "video/scn2674.h"
@@ -13,14 +15,14 @@
 class pcdx_video_device : public device_t, public device_gfx_interface
 {
 public:
-	pcdx_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	virtual DECLARE_ADDRESS_MAP(map, 16) = 0;
 	DECLARE_READ8_MEMBER(detect_r);
 	DECLARE_WRITE8_MEMBER(detect_w);
 	DECLARE_PALETTE_INIT(pcdx);
 
 protected:
+	pcdx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<scn2674_device> m_crtc;
@@ -76,7 +78,7 @@ class pcx_video_device : public pcdx_video_device,
 {
 public:
 	pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<pcx_video_device &>(device).m_txd_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<pcx_video_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
 
 	virtual DECLARE_ADDRESS_MAP(map, 16) override;
 	DECLARE_READ8_MEMBER(term_r);
@@ -108,7 +110,7 @@ private:
 	uint8_t m_term_key, m_term_char, m_term_stat, m_vram_latch_r[2], m_vram_latch_w[2], m_p1;
 };
 
-extern const device_type PCD_VIDEO;
-extern const device_type PCX_VIDEO;
+DECLARE_DEVICE_TYPE(PCD_VIDEO, pcd_video_device)
+DECLARE_DEVICE_TYPE(PCX_VIDEO, pcx_video_device)
 
-#endif
+#endif // MAME_VIDEO_PCD_H

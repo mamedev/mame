@@ -5586,7 +5586,7 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
+static MACHINE_CONFIG_START( galaxian_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, GALAXIAN_PIXEL_CLOCK/3/2)

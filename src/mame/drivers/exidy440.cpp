@@ -992,7 +992,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( exidy440, exidy440_state )
+static MACHINE_CONFIG_START( exidy440 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CPU_CLOCK)
@@ -2071,18 +2071,18 @@ DRIVER_INIT_MEMBER(exidy440_state,yukon)
  *
  *************************************/
 
-GAME( 1983, crossbow, 0,        exidy440, crossbow, exidy440_state, exidy440, ROT0, "Exidy", "Crossbow (version 2.0)", 0 )
-GAME( 1984, cheyenne, 0,        exidy440, cheyenne, exidy440_state, exidy440, ROT0, "Exidy", "Cheyenne (version 1.0)", 0 )
-GAME( 1985, combat,   0,        exidy440, combat, exidy440_state,   exidy440, ROT0, "Exidy", "Combat (version 3.0)", 0 )
-GAME( 1985, catch22,  combat,   exidy440, catch22, exidy440_state,  exidy440, ROT0, "Exidy", "Catch-22 (version 8.0)", 0 )
-GAME( 1985, cracksht, 0,        exidy440, cracksht, exidy440_state, exidy440, ROT0, "Exidy", "Crackshot (version 2.0)", 0 )
-GAME( 1986, claypign, 0,        exidy440, claypign, exidy440_state, claypign, ROT0, "Exidy", "Clay Pigeon (version 2.0)", 0 )
-GAME( 1986, chiller,  0,        exidy440, chiller, exidy440_state,  exidy440, ROT0, "Exidy", "Chiller (version 3.0)", 0 )
+GAME( 1983, crossbow, 0,        exidy440, crossbow, exidy440_state, exidy440, ROT0, "Exidy", "Crossbow (version 2.0)",           0 )
+GAME( 1984, cheyenne, 0,        exidy440, cheyenne, exidy440_state, exidy440, ROT0, "Exidy", "Cheyenne (version 1.0)",           0 )
+GAME( 1985, combat,   0,        exidy440, combat,   exidy440_state, exidy440, ROT0, "Exidy", "Combat (version 3.0)",             0 )
+GAME( 1985, catch22,  combat,   exidy440, catch22,  exidy440_state, exidy440, ROT0, "Exidy", "Catch-22 (version 8.0)",           0 )
+GAME( 1985, cracksht, 0,        exidy440, cracksht, exidy440_state, exidy440, ROT0, "Exidy", "Crackshot (version 2.0)",          0 )
+GAME( 1986, claypign, 0,        exidy440, claypign, exidy440_state, claypign, ROT0, "Exidy", "Clay Pigeon (version 2.0)",        0 )
+GAME( 1986, chiller,  0,        exidy440, chiller,  exidy440_state, exidy440, ROT0, "Exidy", "Chiller (version 3.0)",            0 )
 GAME( 1986, topsecex, 0,        topsecex, topsecex, exidy440_state, topsecex, ROT0, "Exidy", "Top Secret (Exidy) (version 1.0)", 0 )
-GAME( 1987, hitnmiss, 0,        exidy440, hitnmiss, exidy440_state, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 3.0)", 0 )
-GAME( 1987, hitnmiss2,hitnmiss, exidy440, hitnmiss, exidy440_state, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 2.0)", 0 )
-GAME( 1988, whodunit, 0,        exidy440, whodunit, exidy440_state, exidy440, ROT0, "Exidy", "Who Dunit (version 9.0)", 0 )
-GAME( 1988, whodunit8,whodunit, exidy440, whodunit, exidy440_state, exidy440, ROT0, "Exidy", "Who Dunit (version 8.0)", 0 )
-GAME( 1988, showdown, 0,        exidy440, showdown, exidy440_state, showdown, ROT0, "Exidy", "Showdown (version 5.0)", 0 )
-GAME( 1989, yukon,    0,        exidy440, showdown, exidy440_state, yukon,    ROT0, "Exidy", "Yukon (version 2.0)", 0 )
-GAME( 1989, yukon1,   yukon,    exidy440, showdown, exidy440_state, yukon,    ROT0, "Exidy", "Yukon (version 1.0)", 0 )
+GAME( 1987, hitnmiss, 0,        exidy440, hitnmiss, exidy440_state, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 3.0)",        0 )
+GAME( 1987, hitnmiss2,hitnmiss, exidy440, hitnmiss, exidy440_state, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 2.0)",        0 )
+GAME( 1988, whodunit, 0,        exidy440, whodunit, exidy440_state, exidy440, ROT0, "Exidy", "Who Dunit (version 9.0)",          0 )
+GAME( 1988, whodunit8,whodunit, exidy440, whodunit, exidy440_state, exidy440, ROT0, "Exidy", "Who Dunit (version 8.0)",          0 )
+GAME( 1988, showdown, 0,        exidy440, showdown, exidy440_state, showdown, ROT0, "Exidy", "Showdown (version 5.0)",           0 )
+GAME( 1989, yukon,    0,        exidy440, showdown, exidy440_state, yukon,    ROT0, "Exidy", "Yukon (version 2.0)",              0 )
+GAME( 1989, yukon1,   yukon,    exidy440, showdown, exidy440_state, yukon,    ROT0, "Exidy", "Yukon (version 1.0)",              0 )

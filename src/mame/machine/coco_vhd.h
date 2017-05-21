@@ -8,9 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef COCOVHD_H
-#define COCOVHD_H
+#ifndef MAME_MACHINE_COCO_VHD_H
+#define MAME_MACHINE_COCO_VHD_H
 
+#pragma once
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -59,7 +60,7 @@ private:
 };
 
 // device type definition
-extern const device_type COCO_VHD;
+DECLARE_DEVICE_TYPE(COCO_VHD, coco_vhd_image_device)
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -67,4 +68,5 @@ extern const device_type COCO_VHD;
 
 #define MCFG_COCO_VHD_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, COCO_VHD, 0)
-#endif /* COCOVHD_H */
+
+#endif // MAME_MACHINE_COCO_VHD_H

@@ -97,7 +97,7 @@ void pgm3_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( pgm3, pgm3_state )
+static MACHINE_CONFIG_START( pgm3 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM9, 800000000) // wrong, see notes at top of driver

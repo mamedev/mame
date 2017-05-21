@@ -15,14 +15,14 @@
 #include "machine/mb8421.h"
 
 
-const device_type MB8421 = device_creator<mb8421_device>;
+DEFINE_DEVICE_TYPE(MB8421, mb8421_device, "mb8421", "MB8421 DPSRAM")
 
 //-------------------------------------------------
 //  mb8421_device - constructor
 //-------------------------------------------------
 
 mb8421_device::mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MB8421, "MB8421 DPSRAM", tag, owner, clock, "mb8421", __FILE__),
+	: device_t(mconfig, MB8421, tag, owner, clock),
 		m_intl_handler(*this),
 		m_intr_handler(*this)
 {

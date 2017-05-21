@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_COCO_COCO_MULTI_H
+#define MAME_BUS_COCO_COCO_MULTI_H
 
-#ifndef __COCO_MULTI_H__
-#define __COCO_MULTI_H__
+#pragma once
 
 #include "cococart.h"
 
@@ -61,7 +61,7 @@ protected:
 
 private:
 	// device references
-	std::array<cococart_slot_device *, 4> m_slots;
+	required_device_array<cococart_slot_device, 4> m_slots;
 
 	// internal state
 	uint8_t m_select;
@@ -82,6 +82,6 @@ private:
 
 
 // device type definition
-extern const device_type COCO_MULTIPAK;
+DECLARE_DEVICE_TYPE(COCO_MULTIPAK, coco_multipak_device)
 
-#endif  /* __COCO_MULTI_H__ */
+#endif  // MAME_BUS_COCO_COCO_MULTI_H

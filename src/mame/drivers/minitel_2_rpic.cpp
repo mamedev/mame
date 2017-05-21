@@ -411,7 +411,7 @@ static INPUT_PORTS_START( minitel2 )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( minitel2, minitel_state )
+static MACHINE_CONFIG_START( minitel2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32, XTAL_14_31818MHz) //verified on pcb
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
@@ -446,4 +446,4 @@ ROM_START( minitel2 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
 ROM_END
 
-COMP( 1989, minitel2,      0,     0, minitel2,    minitel2,driver_device,   0, "Philips", "Minitel 2", MACHINE_TYPE_COMPUTER | MACHINE_NO_SOUND)
+COMP( 1989, minitel2,      0,     0, minitel2,    minitel2, minitel_state,   0, "Philips", "Minitel 2", MACHINE_NO_SOUND )

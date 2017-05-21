@@ -5,9 +5,11 @@
     Emulation of various Midway ICs
 
 ***************************************************************************/
+#ifndef MAME_MACHINE_MIDWAY_IC_H
+#define MAME_MACHINE_MIDWAY_IC_H
 
-#ifndef __MIDWAY_IC__
-#define __MIDWAY_IC__
+#pragma once
+
 
 #include "audio/cage.h"
 #include "audio/dcs.h"
@@ -20,7 +22,6 @@ class midway_serial_pic_device : public device_t
 public:
 	// construction/destruction
 	midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	static void static_set_upper(device_t &device, int upper) { downcast<midway_serial_pic_device &>(device).m_upper = upper; }
 
@@ -30,6 +31,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 
 protected:
+	midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -48,7 +51,7 @@ private:
 
 
 // device type definition
-extern const device_type MIDWAY_SERIAL_PIC;
+DECLARE_DEVICE_TYPE(MIDWAY_SERIAL_PIC, midway_serial_pic_device)
 
 #define MCFG_MIDWAY_SERIAL_PIC_UPPER(_upper) \
 	midway_serial_pic_device::static_set_upper(*device, _upper);
@@ -60,7 +63,6 @@ class midway_serial_pic_emu_device : public device_t
 public:
 	// construction/destruction
 	midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	midway_serial_pic_emu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_READ8_MEMBER(read_b);
@@ -70,17 +72,16 @@ public:
 	DECLARE_WRITE8_MEMBER(write_c);
 
 protected:
+	midway_serial_pic_emu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
-
-private:
-
 };
 
 
 // device type definition
-extern const device_type MIDWAY_SERIAL_PIC_EMU;
+DECLARE_DEVICE_TYPE(MIDWAY_SERIAL_PIC_EMU, midway_serial_pic_emu_device)
 
 
 
@@ -88,13 +89,11 @@ extern const device_type MIDWAY_SERIAL_PIC_EMU;
 
 // ======================> midway_serial_pic2_device
 
-class midway_serial_pic2_device : public midway_serial_pic_device,
-									public device_nvram_interface
+class midway_serial_pic2_device : public midway_serial_pic_device, public device_nvram_interface
 {
 public:
 	// construction/destruction
 	midway_serial_pic2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	static void static_set_yearoffs(device_t &device, int yearoffs) { downcast<midway_serial_pic2_device &>(device).m_yearoffs = yearoffs; }
 
@@ -105,6 +104,8 @@ public:
 	void set_default_nvram(const uint8_t *nvram);
 
 protected:
+	midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -136,7 +137,7 @@ private:
 
 
 // device type definition
-extern const device_type MIDWAY_SERIAL_PIC2;
+DECLARE_DEVICE_TYPE(MIDWAY_SERIAL_PIC2, midway_serial_pic2_device)
 
 #define MCFG_MIDWAY_SERIAL_PIC2_UPPER   MCFG_MIDWAY_SERIAL_PIC_UPPER
 
@@ -178,7 +179,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(cage_irq_handler);
 
-	DECLARE_WRITE8_MEMBER(serial_rx_w);
+	void serial_rx_w(u8 data);
 
 	void ioasic_reset();
 
@@ -218,7 +219,7 @@ private:
 
 
 // device type definition
-extern const device_type MIDWAY_IOASIC;
+DECLARE_DEVICE_TYPE(MIDWAY_IOASIC, midway_ioasic_device)
 
 #define MCFG_MIDWAY_IOASIC_UPPER    MCFG_MIDWAY_SERIAL_PIC_UPPER
 
@@ -253,4 +254,4 @@ enum
 	MIDWAY_IOASIC_HYPRDRIV
 };
 
-#endif
+#endif // MAME_MACHINE_MIDWAY_IC_H

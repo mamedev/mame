@@ -808,7 +808,7 @@ INTERRUPT_GEN_MEMBER(igs009_state::interrupt)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( jingbell, igs009_state )
+static MACHINE_CONFIG_START( jingbell )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)   /* HD64180RP8, 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(jingbell_map)
@@ -845,7 +845,7 @@ static MACHINE_CONFIG_START( jingbell, igs009_state )
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz / 12, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz / 12, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1166,4 +1166,4 @@ GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  jingbell,  
 GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  gp98,      0,        gp98,     jingbell, driver_device, 0,         ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  gp98,      0,        gp98,     jingbell, igs009_state,  0,         ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     MACHINE_SUPPORTS_SAVE )

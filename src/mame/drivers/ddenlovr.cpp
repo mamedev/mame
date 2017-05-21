@@ -4280,7 +4280,7 @@ static ADDRESS_MAP_START( htengoku_mem_map, AS_PROGRAM, 8, ddenlovr_state )
 	AM_RANGE( 0x8000, 0x81ff ) AM_WRITE(yarunara_palette_w) // Palette or RTC
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( htengoku, ddenlovr_state )
+static MACHINE_CONFIG_START( htengoku )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,20000000 / 4)
@@ -9614,7 +9614,7 @@ MACHINE_START_MEMBER(ddenlovr_state,sryudens)
                             Don Den Lover Vol.1
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( ddenlovr, ddenlovr_state )
+static MACHINE_CONFIG_START( ddenlovr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_24MHz / 2)
@@ -9647,7 +9647,7 @@ static MACHINE_CONFIG_START( ddenlovr, ddenlovr_state )
 	MCFG_SOUND_ADD("aysnd", YMZ284, XTAL_28_63636MHz / 16)  // or /8 ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -9736,7 +9736,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::quizchq_rtc_irq )
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc);
 }
 
-static MACHINE_CONFIG_START( quizchq, ddenlovr_state )
+static MACHINE_CONFIG_START( quizchq )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)  /* Verified */
@@ -9767,7 +9767,7 @@ static MACHINE_CONFIG_START( quizchq, ddenlovr_state )
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz/8) // 3.579545Mhz, verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz/28, OKIM6295_PIN7_HIGH) // clock frequency verified 1.022MHz, pin 7 verified high
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz/28, PIN7_HIGH) // clock frequency verified 1.022MHz, pin 7 verified high
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
@@ -9815,7 +9815,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_rtc_irq )
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf); // RST 18, clock
 }
 
-static MACHINE_CONFIG_START( mmpanic, ddenlovr_state )
+static MACHINE_CONFIG_START( mmpanic )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)
@@ -9856,7 +9856,7 @@ static MACHINE_CONFIG_START( mmpanic, ddenlovr_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", 1022720, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1022720, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -9899,7 +9899,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::hanakanz_rtc_irq)
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe2);
 }
 
-static MACHINE_CONFIG_START( hanakanz, ddenlovr_state )
+static MACHINE_CONFIG_START( hanakanz )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,8000000) // TMPZ84C015BF-8
@@ -9930,7 +9930,7 @@ static MACHINE_CONFIG_START( hanakanz, ddenlovr_state )
 	MCFG_SOUND_ADD("ym2413", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1022720, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1022720, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -9945,7 +9945,7 @@ static MACHINE_CONFIG_DERIVED( hkagerou, hanakanz )
 	MCFG_CPU_IO_MAP(hkagerou_portmap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kotbinyo, ddenlovr_state )
+static MACHINE_CONFIG_START( kotbinyo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2) // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
@@ -9976,7 +9976,7 @@ static MACHINE_CONFIG_START( kotbinyo, ddenlovr_state )
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_37516MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_37516MHz / 28, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_28_37516MHz / 28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -10068,7 +10068,7 @@ MACHINE_CONFIG_END
      Mahjong Super Dai Chuuka Ken
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mjschuka, ddenlovr_state )
+static MACHINE_CONFIG_START( mjschuka )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_16MHz/2)
@@ -10102,7 +10102,7 @@ static MACHINE_CONFIG_START( mjschuka, ddenlovr_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -10364,7 +10364,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( jongtei, ddenlovr_state )
+static MACHINE_CONFIG_START( jongtei )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2) // TMPZ84C015
@@ -10395,7 +10395,7 @@ static MACHINE_CONFIG_START( jongtei, ddenlovr_state )
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -10416,7 +10416,7 @@ MACHINE_CONFIG_END
                             Mahjong Seiryu Densetsu
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( sryudens, ddenlovr_state )
+static MACHINE_CONFIG_START( sryudens )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 2) // ?
@@ -10450,7 +10450,7 @@ static MACHINE_CONFIG_START( sryudens, ddenlovr_state )
 	MCFG_SOUND_ADD("aysnd", YMZ284, XTAL_28_63636MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH) // ?
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, PIN7_HIGH) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -10463,7 +10463,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 // PCB: NM7001004
-static MACHINE_CONFIG_START( janshinp, ddenlovr_state )
+static MACHINE_CONFIG_START( janshinp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 2)
@@ -10497,7 +10497,7 @@ static MACHINE_CONFIG_START( janshinp, ddenlovr_state )
 	MCFG_SOUND_ADD("aysnd", YMZ284, XTAL_28_63636MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH) // ?
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, PIN7_HIGH) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -10530,7 +10530,7 @@ MACHINE_START_MEMBER(ddenlovr_state,seljan2)
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-static MACHINE_CONFIG_START( seljan2, ddenlovr_state )
+static MACHINE_CONFIG_START( seljan2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 2)
@@ -10566,7 +10566,7 @@ static MACHINE_CONFIG_START( seljan2, ddenlovr_state )
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ddenlovr_state, ddenlovr_select_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH) // ?
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, PIN7_HIGH) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -10580,7 +10580,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( daimyojn, ddenlovr_state )
+static MACHINE_CONFIG_START( daimyojn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2)
@@ -10611,7 +10611,7 @@ static MACHINE_CONFIG_START( daimyojn, ddenlovr_state )
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -12919,51 +12919,51 @@ ROM_START( htengoku )
 	ROM_LOAD( "6510.11b", 0x80000, 0x20000, CRC(0fdd6edf) SHA1(c6870ab538987110337e6e154cba98391c68fb98) )
 ROM_END
 
-GAME( 1992, htengoku,  0,        htengoku,  htengoku, driver_device, 0,        ROT180, "Dynax",                                     "Hanafuda Hana Tengoku (Japan)",                                   0)
-GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic,  driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         MACHINE_NO_COCKTAIL  )
-GAME( 1993, mjmyorn2,  0,        mjmyornt,  mjmyorn2, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Orient Part 2 - Exotic Dream",             MACHINE_NO_COCKTAIL  )
-GAME( 1992, mjmyornt,  mjmyorn2, mjmyornt,  mjmyornt, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Orient",                                   MACHINE_NO_COCKTAIL  )
-GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (North America, set 1)",                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // scrolling, priority?
-GAME( 1993, funkyfiga, funkyfig, funkyfig,  funkyfig, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (North America, set 2)",                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, quizchq,   0,        quizchq,   quizchq,  driver_device, 0,        ROT0, "Nakanihon",                                   "Quiz Channel Question (Ver 1.00) (Japan)",                        MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1993, quizchql,  quizchq,  quizchq,   quizchq,  driver_device, 0,        ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Ver 1.23) (Taiwan?)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1993, animaljr,  0,        mmpanic,   animaljr, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Exciting Animal Land Jr. (USA)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
-GAME( 1993, animaljrs, animaljr, mmpanic,   animaljr, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Animalandia Jr. (Spanish)",                                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
-GAME( 1993, animaljrj, animaljr, mmpanic,   animaljr, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Waiwai Animal Land Jr. (Japan)",                                  MACHINE_NO_COCKTAIL  )
-GAME( 1994, mjmyster,  0,        mjmyster,  mjmyster, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 1)",                            MACHINE_NO_COCKTAIL  )
-GAME( 1994, mjmywrld,  mjmyster, mjmywrld,  mjmyster, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 2)",                            MACHINE_NO_COCKTAIL  )
-GAME( 1994, hginga,    0,        hginga,    hginga,   driver_device, 0,        ROT0, "Dynax",                                       "Hanafuda Hana Ginga",                                             MACHINE_NO_COCKTAIL  )
-GAME( 1994, mjmyuniv,  0,        mjmyuniv,  mjmyster, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Universe (Japan, D85)",                    MACHINE_NO_COCKTAIL  )
-GAME( 1994, quiz365,   0,        quiz365,   quiz365,  driver_device, 0,        ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                                MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, quiz365t,  quiz365,  quiz365,   quiz365,  driver_device, 0,        ROT0, "Nakanihon / Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, rongrong,  0,        rongrong,  rongrong, ddenlovr_state,rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Europe)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
-GAME( 1994, rongrongj, rongrong, rongrong,  rongrong, ddenlovr_state,rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Japan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
-GAME( 1994, rongrongg, rongrong, rongrong,  rongrong, ddenlovr_state,rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Germany)",                                 MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
-GAME( 1994, hparadis,  0,        hparadis,  hparadis, driver_device, 0,        ROT0, "Dynax",                                       "Super Hana Paradise (Japan)",                                     MACHINE_NO_COCKTAIL  )
-GAME( 1995, hgokou,    0,        hgokou,    hgokou,   driver_device, 0,        ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou (Japan)",                                     MACHINE_NO_COCKTAIL  )
-GAME( 1995, hgokbang,  hgokou,   hgokbang,  hgokou,   driver_device, 0,        ROT0, "Dynax",                                       "Hanafuda Hana Gokou Bangaihen (Japan)",                           MACHINE_NO_COCKTAIL  )
-GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken (China, D111)",                        MACHINE_NO_COCKTAIL  )
-GAME( 1995, mjschuka,  0,        mjschuka,  mjschuka, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong Super Dai Chuuka Ken (Japan, D115)",                      MACHINE_NO_COCKTAIL  )
-GAME( 1995, nettoqc,   0,        nettoqc,   nettoqc,  driver_device, 0,        ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
-GAME( 1995, ultrchmp,  nettoqc,  ultrchmp,  ultrchmp, driver_device, 0,        ROT0, "Nakanihon",                                   "Se Gye Hweng Dan Ultra Champion (Korea)",                         MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
-GAME( 1995, ultrchmph, nettoqc,  ultrchmp,  ultrchmp, driver_device, 0,        ROT0, "Nakanihon",                                   "Cheng Ba Shi Jie - Chao Shi Kong Guan Jun (Taiwan)",              MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
-GAME( 1995, ddenlovj,  0,        ddenlovj,  ddenlovj, driver_device, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Shiro Kuro Tsukeyo! (Japan)",              MACHINE_NO_COCKTAIL  )
-GAME( 1995, ddenlovrk, ddenlovj, ddenlovrk, ddenlovr, driver_device, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea)",          MACHINE_NO_COCKTAIL  )
-GAME( 1995, ddenlovrb, ddenlovj, ddenlovr,  ddenlovr, driver_device, 0,        ROT0, "bootleg",                                     "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea, bootleg)", MACHINE_NO_COCKTAIL  )
-GAME( 1996, ddenlovr,  ddenlovj, ddenlovr,  ddenlovr, driver_device, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                                MACHINE_NO_COCKTAIL  )
-GAME( 1996, hanakanz,  0,        hanakanz,  hanakanz, driver_device, 0,        ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                           MACHINE_NO_COCKTAIL  )
-GAME( 1997, kotbinyo,  hanakanz, kotbinyo,  kotbinyo, driver_device, 0,        ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo (Korea)",                                             MACHINE_NO_COCKTAIL  )
-GAME( 1997, kotbinsp,  0,        kotbinsp,  kotbinsp, driver_device, 0,        ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo Special (Korea)",                                     MACHINE_NO_COCKTAIL  )
-GAME( 1996, akamaru,   0,        akamaru,   akamaru,  driver_device, 0,        ROT0, "Dynax (Nakanihon license)",                   "Panel & Variety Akamaru Q Jousyou Dont-R",                        MACHINE_NO_COCKTAIL  )
-GAME( 1996, janshinp,  0,        janshinp,  janshinp, driver_device, 0,        ROT0, "Dynax / Sigma",                               "Mahjong Janshin Plus (Japan)",                                    MACHINE_NO_COCKTAIL  )
-GAME( 1996, dtoyoken,  0,        dtoyoken,  dtoyoken, driver_device, 0,        ROT0, "Dynax / Sigma",                               "Mahjong Dai Touyouken (Japan)",                                   MACHINE_NO_COCKTAIL  )
-GAME( 1996, sryudens,  0,        sryudens,  sryudens, driver_device, 0,        ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu (Japan, NM502)",                          MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, seljan2,   0,        seljan2,   seljan2,  driver_device, 0,        ROT0, "Dynax / Face",                                "Return Of Sel Jan II (Japan, NM557)",                             MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, mjflove,   0,        mjflove,   mjflove,  driver_device, 0,        ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, hkagerou,  0,        hkagerou,  hkagerou, driver_device, 0,        ROT0, "Nakanihon / Dynax",                           "Hana Kagerou [BET] (Japan)",                                      MACHINE_NO_COCKTAIL  )
-GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong Chuukanejyo (China)",                                     MACHINE_NO_COCKTAIL  )
-GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, driver_device, 0,        ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan)",                                   MACHINE_NO_COCKTAIL  )
-GAME( 1999, jongtei,   0,        jongtei,   jongtei,  driver_device, 0,        ROT0, "Dynax",                                       "Mahjong Jong-Tei (Japan, NM532-01)",                              MACHINE_NO_COCKTAIL  )
-GAME( 2000, mjgnight,  0,        mjgnight,  mjgnight, driver_device, 0,        ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night (Japan, TSM003-01)",                       MACHINE_NO_COCKTAIL  )
-GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, driver_device, 0,        ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin (Japan, T017-PB-00)",                           MACHINE_NO_COCKTAIL  )
-GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, ddenlovr_state,momotaro, ROT0, "Techno-Top",                                  "Mahjong Momotarou (Japan)",                                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1992, htengoku,  0,        htengoku,  htengoku, ddenlovr_state, 0,        ROT180, "Dynax",                                     "Hanafuda Hana Tengoku (Japan)",                                   0)
+GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic,  ddenlovr_state, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         MACHINE_NO_COCKTAIL  )
+GAME( 1993, mjmyorn2,  0,        mjmyornt,  mjmyorn2, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Orient Part 2 - Exotic Dream",             MACHINE_NO_COCKTAIL  )
+GAME( 1992, mjmyornt,  mjmyorn2, mjmyornt,  mjmyornt, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Orient",                                   MACHINE_NO_COCKTAIL  )
+GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, ddenlovr_state, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (North America, set 1)",                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // scrolling, priority?
+GAME( 1993, funkyfiga, funkyfig, funkyfig,  funkyfig, ddenlovr_state, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (North America, set 2)",                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, quizchq,   0,        quizchq,   quizchq,  ddenlovr_state, 0,        ROT0, "Nakanihon",                                   "Quiz Channel Question (Ver 1.00) (Japan)",                        MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, quizchql,  quizchq,  quizchq,   quizchq,  ddenlovr_state, 0,        ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Ver 1.23) (Taiwan?)",                      MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, animaljr,  0,        mmpanic,   animaljr, ddenlovr_state, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Exciting Animal Land Jr. (USA)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, animaljrs, animaljr, mmpanic,   animaljr, ddenlovr_state, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Animalandia Jr. (Spanish)",                                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, animaljrj, animaljr, mmpanic,   animaljr, ddenlovr_state, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Waiwai Animal Land Jr. (Japan)",                                  MACHINE_NO_COCKTAIL  )
+GAME( 1994, mjmyster,  0,        mjmyster,  mjmyster, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 1)",                            MACHINE_NO_COCKTAIL  )
+GAME( 1994, mjmywrld,  mjmyster, mjmywrld,  mjmyster, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 2)",                            MACHINE_NO_COCKTAIL  )
+GAME( 1994, hginga,    0,        hginga,    hginga,   ddenlovr_state, 0,        ROT0, "Dynax",                                       "Hanafuda Hana Ginga",                                             MACHINE_NO_COCKTAIL  )
+GAME( 1994, mjmyuniv,  0,        mjmyuniv,  mjmyster, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Universe (Japan, D85)",                    MACHINE_NO_COCKTAIL  )
+GAME( 1994, quiz365,   0,        quiz365,   quiz365,  ddenlovr_state, 0,        ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                                MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, quiz365t,  quiz365,  quiz365,   quiz365,  ddenlovr_state, 0,        ROT0, "Nakanihon / Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, rongrong,  0,        rongrong,  rongrong, ddenlovr_state, rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Europe)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
+GAME( 1994, rongrongj, rongrong, rongrong,  rongrong, ddenlovr_state, rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Japan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
+GAME( 1994, rongrongg, rongrong, rongrong,  rongrong, ddenlovr_state, rongrong, ROT0, "Nakanihon (Activision license)",              "Puzzle Game Rong Rong (Germany)",                                 MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
+GAME( 1994, hparadis,  0,        hparadis,  hparadis, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Super Hana Paradise (Japan)",                                     MACHINE_NO_COCKTAIL  )
+GAME( 1995, hgokou,    0,        hgokou,    hgokou,   ddenlovr_state, 0,        ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou (Japan)",                                     MACHINE_NO_COCKTAIL  )
+GAME( 1995, hgokbang,  hgokou,   hgokbang,  hgokou,   ddenlovr_state, 0,        ROT0, "Dynax",                                       "Hanafuda Hana Gokou Bangaihen (Japan)",                           MACHINE_NO_COCKTAIL  )
+GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken (China, D111)",                        MACHINE_NO_COCKTAIL  )
+GAME( 1995, mjschuka,  0,        mjschuka,  mjschuka, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Mahjong Super Dai Chuuka Ken (Japan, D115)",                      MACHINE_NO_COCKTAIL  )
+GAME( 1995, nettoqc,   0,        nettoqc,   nettoqc,  ddenlovr_state, 0,        ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
+GAME( 1995, ultrchmp,  nettoqc,  ultrchmp,  ultrchmp, ddenlovr_state, 0,        ROT0, "Nakanihon",                                   "Se Gye Hweng Dan Ultra Champion (Korea)",                         MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
+GAME( 1995, ultrchmph, nettoqc,  ultrchmp,  ultrchmp, ddenlovr_state, 0,        ROT0, "Nakanihon",                                   "Cheng Ba Shi Jie - Chao Shi Kong Guan Jun (Taiwan)",              MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
+GAME( 1995, ddenlovj,  0,        ddenlovj,  ddenlovj, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Shiro Kuro Tsukeyo! (Japan)",              MACHINE_NO_COCKTAIL  )
+GAME( 1995, ddenlovrk, ddenlovj, ddenlovrk, ddenlovr, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea)",          MACHINE_NO_COCKTAIL  )
+GAME( 1995, ddenlovrb, ddenlovj, ddenlovr,  ddenlovr, ddenlovr_state, 0,        ROT0, "bootleg",                                     "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea, bootleg)", MACHINE_NO_COCKTAIL  )
+GAME( 1996, ddenlovr,  ddenlovj, ddenlovr,  ddenlovr, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                                MACHINE_NO_COCKTAIL  )
+GAME( 1996, hanakanz,  0,        hanakanz,  hanakanz, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                           MACHINE_NO_COCKTAIL  )
+GAME( 1997, kotbinyo,  hanakanz, kotbinyo,  kotbinyo, ddenlovr_state, 0,        ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo (Korea)",                                             MACHINE_NO_COCKTAIL  )
+GAME( 1997, kotbinsp,  0,        kotbinsp,  kotbinsp, ddenlovr_state, 0,        ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo Special (Korea)",                                     MACHINE_NO_COCKTAIL  )
+GAME( 1996, akamaru,   0,        akamaru,   akamaru,  ddenlovr_state, 0,        ROT0, "Dynax (Nakanihon license)",                   "Panel & Variety Akamaru Q Jousyou Dont-R",                        MACHINE_NO_COCKTAIL  )
+GAME( 1996, janshinp,  0,        janshinp,  janshinp, ddenlovr_state, 0,        ROT0, "Dynax / Sigma",                               "Mahjong Janshin Plus (Japan)",                                    MACHINE_NO_COCKTAIL  )
+GAME( 1996, dtoyoken,  0,        dtoyoken,  dtoyoken, ddenlovr_state, 0,        ROT0, "Dynax / Sigma",                               "Mahjong Dai Touyouken (Japan)",                                   MACHINE_NO_COCKTAIL  )
+GAME( 1996, sryudens,  0,        sryudens,  sryudens, ddenlovr_state, 0,        ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu (Japan, NM502)",                          MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, seljan2,   0,        seljan2,   seljan2,  ddenlovr_state, 0,        ROT0, "Dynax / Face",                                "Return Of Sel Jan II (Japan, NM557)",                             MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, mjflove,   0,        mjflove,   mjflove,  ddenlovr_state, 0,        ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, hkagerou,  0,        hkagerou,  hkagerou, ddenlovr_state, 0,        ROT0, "Nakanihon / Dynax",                           "Hana Kagerou [BET] (Japan)",                                      MACHINE_NO_COCKTAIL  )
+GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, ddenlovr_state, 0,        ROT0, "Dynax",                                       "Mahjong Chuukanejyo (China)",                                     MACHINE_NO_COCKTAIL  )
+GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, ddenlovr_state, 0,        ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan)",                                   MACHINE_NO_COCKTAIL  )
+GAME( 1999, jongtei,   0,        jongtei,   jongtei,  ddenlovr_state, 0,        ROT0, "Dynax",                                       "Mahjong Jong-Tei (Japan, NM532-01)",                              MACHINE_NO_COCKTAIL  )
+GAME( 2000, mjgnight,  0,        mjgnight,  mjgnight, ddenlovr_state, 0,        ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night (Japan, TSM003-01)",                       MACHINE_NO_COCKTAIL  )
+GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, ddenlovr_state, 0,        ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin (Japan, T017-PB-00)",                           MACHINE_NO_COCKTAIL  )
+GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, ddenlovr_state, momotaro, ROT0, "Techno-Top",                                  "Mahjong Momotarou (Japan)",                                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

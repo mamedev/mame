@@ -5,10 +5,10 @@
     decocomn.h
 
 **************************************************************************/
+#ifndef MAME_VIDEO_DECOCOMN_H
+#define MAME_VIDEO_DECOCOMN_H
 
 #pragma once
-#ifndef __DECOCOMN_H__
-#define __DECOCOMN_H__
 
 
 /***************************************************************************
@@ -21,7 +21,6 @@ class decocomn_device : public device_t,
 {
 public:
 	decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~decocomn_device() {}
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
@@ -46,7 +45,7 @@ private:
 	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 };
 
-extern const device_type DECOCOMN;
+DECLARE_DEVICE_TYPE(DECOCOMN, decocomn_device)
 
 
 
@@ -60,4 +59,4 @@ extern const device_type DECOCOMN;
 #define MCFG_DECOCOMN_PALETTE(_palette_tag) \
 	decocomn_device::static_set_palette_tag(*device, "^" _palette_tag);
 
-#endif
+#endif // MAME_VIDEO_DECOCOMN_H

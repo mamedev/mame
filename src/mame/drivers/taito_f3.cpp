@@ -438,7 +438,7 @@ MACHINE_RESET_MEMBER(taito_f3_state,f3)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( f3, taito_f3_state )
+static MACHINE_CONFIG_START( f3 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
@@ -534,7 +534,7 @@ static GFXDECODE_START( bubsympb )
 	GFXDECODE_ENTRY( nullptr,           0x000000, pivotlayout,         0,  64 ) /* Dynamically modified */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( bubsympb, taito_f3_state )
+static MACHINE_CONFIG_START( bubsympb )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(f3_map)
@@ -561,7 +561,7 @@ static MACHINE_CONFIG_START( bubsympb, taito_f3_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000 , OKIM6295_PIN7_HIGH) // not verified
+	MCFG_OKIM6295_ADD("oki", 1000000 , PIN7_HIGH) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

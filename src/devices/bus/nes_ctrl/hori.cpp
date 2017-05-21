@@ -27,8 +27,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_HORITWIN = device_creator<nes_horitwin_device>;
-const device_type NES_HORI4P = device_creator<nes_hori4p_device>;
+DEFINE_DEVICE_TYPE(NES_HORITWIN, nes_horitwin_device, "nes_horitwin", "FC Hori Twin Adapter")
+DEFINE_DEVICE_TYPE(NES_HORI4P,   nes_hori4p_device,   "nes_hori4p",   "FC Hori 4P Adapter")
 
 
 static INPUT_PORTS_START( nes_hori4p )
@@ -91,21 +91,21 @@ machine_config_constructor nes_hori4p_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 nes_horitwin_device::nes_horitwin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, NES_HORITWIN, "Hori Twin Adapter", tag, owner, clock, "nes_horitwin", __FILE__),
-					device_nes_control_port_interface(mconfig, *this),
-					m_port1(*this, "port1"),
-					m_port2(*this, "port2")
+	device_t(mconfig, NES_HORITWIN, tag, owner, clock),
+	device_nes_control_port_interface(mconfig, *this),
+	m_port1(*this, "port1"),
+	m_port2(*this, "port2")
 {
 }
 
 nes_hori4p_device::nes_hori4p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, NES_HORI4P, "Hori 4P Adapter", tag, owner, clock, "nes_hori4p", __FILE__),
-					device_nes_control_port_interface(mconfig, *this),
-					m_port1(*this, "port1"),
-					m_port2(*this, "port2"),
-					m_port3(*this, "port3"),
-					m_port4(*this, "port4"),
-					m_cfg(*this, "CONFIG")
+	device_t(mconfig, NES_HORI4P, tag, owner, clock),
+	device_nes_control_port_interface(mconfig, *this),
+	m_port1(*this, "port1"),
+	m_port2(*this, "port2"),
+	m_port3(*this, "port3"),
+	m_port4(*this, "port4"),
+	m_cfg(*this, "CONFIG")
 {
 }
 

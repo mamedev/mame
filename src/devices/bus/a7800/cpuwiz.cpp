@@ -35,32 +35,32 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type A78_ROM_VERSABOARD = device_creator<a78_versaboard_device>;
-const device_type A78_ROM_MEGACART = device_creator<a78_megacart_device>;
+DEFINE_DEVICE_TYPE(A78_ROM_VERSABOARD, a78_versaboard_device, "a78_versaboard", "Atari 7800 VersaBoard Cart")
+DEFINE_DEVICE_TYPE(A78_ROM_MEGACART, a78_megacart_device, "a78_megacart", "Atari 7800 MegaCart+")
 
-const device_type A78_ROM_P450_VB = device_creator<a78_rom_p450_vb_device>;
+DEFINE_DEVICE_TYPE(A78_ROM_P450_VB, a78_rom_p450_vb_device, "a78_versapokey", "Atari 7800 VersaBoard + POKEY @ 0x450 Cart")
 
 
-a78_versaboard_device::a78_versaboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: a78_rom_sg_device(mconfig, type, name, tag, owner, clock, shortname, source), m_ram_bank(0)
-				{
+a78_versaboard_device::a78_versaboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: a78_rom_sg_device(mconfig, type, tag, owner, clock), m_ram_bank(0)
+{
 }
 
 a78_versaboard_device::a78_versaboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_rom_sg_device(mconfig, A78_ROM_VERSABOARD, "Atari 7800 VersaBoard Cart", tag, owner, clock, "a78_versaboard", __FILE__), m_ram_bank(0)
-				{
+	: a78_versaboard_device(mconfig, A78_ROM_VERSABOARD, tag, owner, clock)
+{
 }
 
 
 a78_megacart_device::a78_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_versaboard_device(mconfig, A78_ROM_MEGACART, "Atari 7800 MegaCart+", tag, owner, clock, "a78_megacart", __FILE__)
+	: a78_versaboard_device(mconfig, A78_ROM_MEGACART, tag, owner, clock)
 {
 }
 
 
 a78_rom_p450_vb_device::a78_rom_p450_vb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a78_versaboard_device(mconfig, A78_ROM_P450_VB, "Atari 7800 VersaBoard + POKEY @ 0x0450 Cart", tag, owner, clock, "a78_versapokey", __FILE__),
-						m_pokey450(*this, "pokey450")
+	: a78_versaboard_device(mconfig, A78_ROM_P450_VB, tag, owner, clock)
+	, m_pokey450(*this, "pokey450")
 {
 }
 

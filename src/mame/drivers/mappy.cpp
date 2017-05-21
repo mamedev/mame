@@ -1707,17 +1707,17 @@ static MACHINE_CONFIG_FRAGMENT( superpac_common )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( superpac, mappy_state )
+static MACHINE_CONFIG_START( superpac )
 
 	MCFG_FRAGMENT_ADD(superpac_common)
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_mux))
 	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
 	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
@@ -1725,21 +1725,21 @@ static MACHINE_CONFIG_START( superpac, mappy_state )
 	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pacnpal, mappy_state )
+static MACHINE_CONFIG_START( pacnpal )
 
 	MCFG_FRAGMENT_ADD(superpac_common)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  pacnpal_main_vblank_irq) // also update the custom I/O chips
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
 	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_lamps))
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO59XX, 0)
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO_59XX, 0)
 	MCFG_NAMCO59XX_IN_0_CB(READ8(mappy_state, dipB_mux))
 	MCFG_NAMCO59XX_IN_1_CB(READ8(mappy_state, dipA_l))
 	MCFG_NAMCO59XX_IN_2_CB(READ8(mappy_state, dipA_h))
@@ -1748,20 +1748,20 @@ static MACHINE_CONFIG_START( pacnpal, mappy_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( grobda, mappy_state )
+static MACHINE_CONFIG_START( grobda )
 
 	MCFG_FRAGMENT_ADD(superpac_common)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  grobda_main_vblank_irq)  // also update the custom I/O chips
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO58XX, 0)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_mux))
 	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
 	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
@@ -1775,7 +1775,7 @@ static MACHINE_CONFIG_START( grobda, mappy_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( phozon, mappy_state )
+static MACHINE_CONFIG_START( phozon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,  PIXEL_CLOCK/4)  /* MAIN CPU */
@@ -1797,13 +1797,13 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_MACHINE_START_OVERRIDE(mappy_state,mappy)
 	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,phozon)
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO58XX, 0)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_muxi))
 	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
 	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
@@ -1871,17 +1871,17 @@ static MACHINE_CONFIG_FRAGMENT( mappy_common )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mappy, mappy_state )
+static MACHINE_CONFIG_START( mappy )
 
 	MCFG_FRAGMENT_ADD(mappy_common)
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO58XX, 0)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO58XX, 0)
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(READ8(mappy_state, dipB_mux))
 	MCFG_NAMCO58XX_IN_1_CB(READ8(mappy_state, dipA_l))
 	MCFG_NAMCO58XX_IN_2_CB(READ8(mappy_state, dipA_h))
@@ -1889,7 +1889,7 @@ static MACHINE_CONFIG_START( mappy, mappy_state )
 	MCFG_NAMCO58XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( digdug2, mappy_state )
+static MACHINE_CONFIG_START( digdug2 )
 
 	MCFG_FRAGMENT_ADD(mappy_common)
 
@@ -1899,13 +1899,13 @@ static MACHINE_CONFIG_START( digdug2, mappy_state )
 	MCFG_WATCHDOG_MODIFY("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 0)
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO58XX, 0)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_mux))
 	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
 	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
@@ -1921,21 +1921,21 @@ static MACHINE_CONFIG_DERIVED( todruaga, digdug2 )
 	MCFG_PALETTE_ENTRIES(64*4+64*16)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( motos, mappy_state )
+static MACHINE_CONFIG_START( motos )
 
 	MCFG_FRAGMENT_ADD(mappy_common)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  motos_main_vblank_irq)    // also update the custom I/O chips
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
 	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_lamps))
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_mux))
 	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
 	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
@@ -2457,25 +2457,25 @@ DRIVER_INIT_MEMBER(mappy_state,motos)
 
 
 /* 2x6809, static tilemap, 2bpp sprites (Super Pacman type)  */
-GAME( 1982, superpac, 0,        superpac, superpac, mappy_state,   superpac,        ROT90, "Namco", "Super Pac-Man", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, superpacm,superpac, superpac, superpac, mappy_state,   superpac,        ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnpal,  0,        pacnpal,  pacnpal, mappy_state,   pacnpal,        ROT90, "Namco", "Pac & Pal", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnpal2, pacnpal,  pacnpal,  pacnpal, mappy_state,   pacnpal,        ROT90, "Namco", "Pac & Pal (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnchmp, pacnpal,  pacnpal,  pacnpal, mappy_state,   pacnpal,        ROT90, "Namco", "Pac-Man & Chomp Chomp", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda,   0,        grobda,   grobda, mappy_state,   grobda,   ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda2,  grobda,   grobda,   grobda, mappy_state,   grobda,   ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda3,  grobda,   grobda,   grobda, mappy_state,   grobda,   ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, superpac, 0,        superpac, superpac,  mappy_state, superpac, ROT90, "Namco", "Super Pac-Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, superpacm,superpac, superpac, superpac,  mappy_state, superpac, ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnpal,  0,        pacnpal,  pacnpal,   mappy_state, pacnpal,  ROT90, "Namco", "Pac & Pal", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnpal2, pacnpal,  pacnpal,  pacnpal,   mappy_state, pacnpal,  ROT90, "Namco", "Pac & Pal (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnchmp, pacnpal,  pacnpal,  pacnpal,   mappy_state, pacnpal,  ROT90, "Namco", "Pac-Man & Chomp Chomp", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda,   0,        grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda2,  grobda,   grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda3,  grobda,   grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* 3x6809, static tilemap, 2bpp sprites (Gaplus type) */
-GAME( 1983, phozon,   0,        phozon,   phozon, mappy_state,   phozon,        ROT90, "Namco", "Phozon (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, phozons,  phozon,   phozon,   phozon, mappy_state,   phozon,        ROT90, "Namco (Sidam license)", "Phozon (Sidam)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, phozon,   0,        phozon,    phozon,   mappy_state, phozon,   ROT90, "Namco", "Phozon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, phozons,  phozon,   phozon,    phozon,   mappy_state, phozon,   ROT90, "Namco (Sidam license)", "Phozon (Sidam)", MACHINE_SUPPORTS_SAVE )
 
 /* 2x6809, scroling tilemap, 4bpp sprites (Super Pacman type) */
-GAME( 1983, mappy,    0,        mappy,    mappy, mappy_state,   mappy,        ROT90, "Namco", "Mappy (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mappyj,   mappy,    mappy,    mappy, mappy_state,   mappy,        ROT90, "Namco", "Mappy (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruaga, 0,        todruaga,  todruaga, mappy_state,   druaga,        ROT90, "Namco", "The Tower of Druaga (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruagao,todruaga, todruaga,  todruaga, mappy_state,   druaga,        ROT90, "Namco", "The Tower of Druaga (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruagas,todruaga, todruaga,  todruaga, mappy_state,   druaga,        ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, digdug2,  0,        digdug2,  digdug2, mappy_state,  digdug2,  ROT90, "Namco", "Dig Dug II (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, digdug2o, digdug2,  digdug2,  digdug2, mappy_state,  digdug2,  ROT90, "Namco", "Dig Dug II (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, motos,    0,        motos,    motos, mappy_state,   motos,        ROT90, "Namco", "Motos", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mappy,    0,        mappy,     mappy,    mappy_state, mappy,    ROT90, "Namco", "Mappy (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mappyj,   mappy,    mappy,     mappy,    mappy_state, mappy,    ROT90, "Namco", "Mappy (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruaga, 0,        todruaga,  todruaga, mappy_state, druaga,   ROT90, "Namco", "The Tower of Druaga (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruagao,todruaga, todruaga,  todruaga, mappy_state, druaga,   ROT90, "Namco", "The Tower of Druaga (Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruagas,todruaga, todruaga,  todruaga, mappy_state, druaga,   ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, digdug2,  0,        digdug2,   digdug2,  mappy_state, digdug2,  ROT90, "Namco", "Dig Dug II (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, digdug2o, digdug2,  digdug2,   digdug2,  mappy_state, digdug2,  ROT90, "Namco", "Dig Dug II (Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, motos,    0,        motos,     motos,    mappy_state, motos,    ROT90, "Namco", "Motos", MACHINE_SUPPORTS_SAVE )

@@ -502,7 +502,7 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( casloopy, casloopy_state )
+static MACHINE_CONFIG_START( casloopy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",SH2A,8000000)

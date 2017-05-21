@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VIC20_STD_H
+#define MAME_BUS_VIC20_STD_H
 
-#ifndef __VIC20_STD__
-#define __VIC20_STD__
+#pragma once
 
 #include "exp.h"
 
@@ -38,8 +38,6 @@ protected:
 
 
 // device type definition
-extern const device_type VIC20_STD;
+DECLARE_DEVICE_TYPE(VIC20_STD, vic20_standard_cartridge_device)
 
-
-
-#endif
+#endif // MAME_BUS_VIC20_STD_H

@@ -517,7 +517,7 @@ static GFXDECODE_START( terracre )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( ym3526, terracre_state )
+static MACHINE_CONFIG_START( ym3526 )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(terracre_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", terracre_state,  irq1_line_hold)
@@ -958,13 +958,13 @@ DRIVER_INIT_MEMBER(terracre_state,horekid)
 	m_mpProtData = mHoreKidProtData;
 }
 
-/*    YEAR, NAME,   PARENT,     MACHINE, INPUT,    INIT,     MONITOR,  COMPANY,      FULLNAME, FLAGS */
-GAME( 1985, terracre, 0,        ym3526,  terracre, driver_device, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, terracreo,terracre, ym3526,  terracre, driver_device, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, terracrea,terracre, ym3526,  terracre, driver_device, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, terracren,terracre, ym2203,  terracre, driver_device, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, amazon,   0,        amazon,  amazon, terracre_state,   amazon,   ROT270,  "Nichibutsu", "Soldier Girl Amazon", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, amatelas, amazon,   amazon,  amazon, terracre_state,   amatelas, ROT270,  "Nichibutsu", "Sei Senshi Amatelass", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, horekid,  0,        amazon,  horekid, terracre_state,  horekid,  ROT270,  "Nichibutsu", "Kid no Hore Hore Daisakusen", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, horekidb, horekid,  amazon,  horekid, terracre_state,  horekid,  ROT270,  "bootleg", "Kid no Hore Hore Daisakusen (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, boobhack, horekid,  amazon,  horekid, terracre_state,  horekid,  ROT270,  "bootleg", "Booby Kids (Italian manufactured graphic hack / bootleg of Kid no Hore Hore Daisakusen (bootleg))", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,     PARENT,   MACHINE, INPUT,    STATE,          INIT,     MONITOR, COMPANY,      FULLNAME, FLAGS
+GAME( 1985, terracre, 0,        ym3526,  terracre, terracre_state, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, terracreo,terracre, ym3526,  terracre, terracre_state, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, terracrea,terracre, ym3526,  terracre, terracre_state, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, terracren,terracre, ym2203,  terracre, terracre_state, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, amazon,   0,        amazon,  amazon,   terracre_state, amazon,   ROT270,  "Nichibutsu", "Soldier Girl Amazon", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, amatelas, amazon,   amazon,  amazon,   terracre_state, amatelas, ROT270,  "Nichibutsu", "Sei Senshi Amatelass", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, horekid,  0,        amazon,  horekid,  terracre_state, horekid,  ROT270,  "Nichibutsu", "Kid no Hore Hore Daisakusen", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, horekidb, horekid,  amazon,  horekid,  terracre_state, horekid,  ROT270,  "bootleg",    "Kid no Hore Hore Daisakusen (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, boobhack, horekid,  amazon,  horekid,  terracre_state, horekid,  ROT270,  "bootleg",    "Booby Kids (Italian manufactured graphic hack / bootleg of Kid no Hore Hore Daisakusen (bootleg))", MACHINE_SUPPORTS_SAVE )

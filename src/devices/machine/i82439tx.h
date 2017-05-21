@@ -2,8 +2,10 @@
 // copyright-holders:Olivier Galibert
 // Intel i82439hx northbridge (440hx)
 
-#ifndef I82439TX_H
-#define I82439TX_H
+#ifndef MAME_MACHINE_I82439TX_H
+#define MAME_MACHINE_I82439TX_H
+
+#pragma once
 
 #include "pci.h"
 
@@ -67,6 +69,6 @@ private:
 	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
 };
 
-extern const device_type I82439TX_NEW;
+DECLARE_DEVICE_TYPE(I82439TX_NEW, i82439tx_host_device)
 
-#endif
+#endif // MAME_MACHINE_I82439TX_H

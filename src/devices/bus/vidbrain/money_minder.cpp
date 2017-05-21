@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VB_MONEY_MINDER = device_creator<videobrain_money_minder_cartridge_device>;
+DEFINE_DEVICE_TYPE(VB_MONEY_MINDER, videobrain_money_minder_cartridge_device, "vb_money_minder", "VideoBrain Money Minder cartridge")
 
 
 
@@ -28,7 +28,7 @@ const device_type VB_MONEY_MINDER = device_creator<videobrain_money_minder_cartr
 //-------------------------------------------------
 
 videobrain_money_minder_cartridge_device::videobrain_money_minder_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VB_MONEY_MINDER, "VideoBrain Money Minder cartridge", tag, owner, clock, "vb_money_minder", __FILE__),
+	device_t(mconfig, VB_MONEY_MINDER, tag, owner, clock),
 	device_videobrain_expansion_card_interface(mconfig, *this)
 {
 }

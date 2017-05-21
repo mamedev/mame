@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CBM2_USER_PORT = device_creator<cbm2_user_port_device>;
+DEFINE_DEVICE_TYPE(CBM2_USER_PORT, cbm2_user_port_device, "cbm2_user_port", "CBM-II user port")
 
 
 
@@ -44,7 +44,7 @@ device_cbm2_user_port_interface::device_cbm2_user_port_interface(const machine_c
 //-------------------------------------------------
 
 cbm2_user_port_device::cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CBM2_USER_PORT, "CBM2 user port", tag, owner, clock, "cbm2_user_port", __FILE__),
+	device_t(mconfig, CBM2_USER_PORT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_write_sp(*this),

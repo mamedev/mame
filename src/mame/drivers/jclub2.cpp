@@ -1109,7 +1109,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(common_state::scanline_irq)
 }
 
 // Older hardware (ST-0020 + ST-0016)
-static MACHINE_CONFIG_START( jclub2o, jclub2o_state )
+static MACHINE_CONFIG_START( jclub2o )
 	MCFG_CPU_ADD("gamecpu", M68EC020, 12000000)
 	MCFG_CPU_PROGRAM_MAP(jclub2o_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
@@ -1148,7 +1148,7 @@ MACHINE_CONFIG_END
 
 
 // Newer hardware (ST-0032)
-static MACHINE_CONFIG_START( jclub2, jclub2_state )
+static MACHINE_CONFIG_START( jclub2 )
 	MCFG_CPU_ADD("gamecpu", M68EC020, 12000000)
 	MCFG_CPU_PROGRAM_MAP(jclub2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
@@ -1183,7 +1183,7 @@ static MACHINE_CONFIG_START( jclub2, jclub2_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( darkhors, darkhors_state )
+static MACHINE_CONFIG_START( darkhors )
 	MCFG_CPU_ADD("gamecpu", M68EC020, 12000000) // 36MHz/3 ??
 	MCFG_CPU_PROGRAM_MAP(darkhors_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
@@ -1216,7 +1216,7 @@ static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 528000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 528000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1506,16 +1506,16 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 
 
 // Older hardware (ST-0020 + ST-0016)
-GAME( 1994, jclub2v100, jclub2v112, jclub2o,  jclub2v100, driver_device,  0,        ROT0, "Seta",    "Jockey Club II (v1.00, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, jclub2v101, jclub2v112, jclub2o,  jclub2v100, driver_device,  0,        ROT0, "Seta",    "Jockey Club II (v1.01, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jclub2v110, jclub2v112, jclub2o,  jclub2v100, driver_device,  0,        ROT0, "Seta",    "Jockey Club II (v1.10X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jclub2v112, 0,          jclub2o,  jclub2v112, driver_device,  0,        ROT0, "Seta",    "Jockey Club II (v1.12X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, jclub2v203, jclub2v112, jclub2o,  jclub2v112, driver_device,  0,        ROT0, "Seta",    "Jockey Club II (v2.03X RC, older hardware, prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, jclub2v100, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  0,        ROT0, "Seta",    "Jockey Club II (v1.00, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, jclub2v101, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  0,        ROT0, "Seta",    "Jockey Club II (v1.01, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, jclub2v110, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  0,        ROT0, "Seta",    "Jockey Club II (v1.10X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, jclub2v112, 0,          jclub2o,  jclub2v112, jclub2o_state,  0,        ROT0, "Seta",    "Jockey Club II (v1.12X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, jclub2v203, jclub2v112, jclub2o,  jclub2v112, jclub2o_state,  0,        ROT0, "Seta",    "Jockey Club II (v2.03X RC, older hardware, prototype)", MACHINE_IMPERFECT_GRAPHICS )
 // Newer hardware (ST-0032)
-GAME( 1996, jclub2v200, jclub2v112, jclub2,   jclub2v112, driver_device,  0,        ROT0, "Seta",    "Jockey Club II (v2.00, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1996, jclub2v201, jclub2v112, jclub2,   jclub2v112, driver_device,  0,        ROT0, "Seta",    "Jockey Club II (v2.01X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1997, jclub2v204, jclub2v112, jclub2,   jclub2v112, driver_device,  0,        ROT0, "Seta",    "Jockey Club II (v2.04, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1997, jclub2v205, jclub2v112, jclub2,   jclub2v112, driver_device,  0,        ROT0, "Seta",    "Jockey Club II (v2.05, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, jclub2v220, jclub2v112, jclub2,   jclub2v112, driver_device,  0,        ROT0, "Seta",    "Jockey Club II (v2.20X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1996, jclub2v200, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.00, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1996, jclub2v201, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.01X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1997, jclub2v204, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.04, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1997, jclub2v205, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.05, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1998, jclub2v220, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.20X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 // Bootleg hardware
 GAME( 2001, darkhors,   jclub2v112, darkhors, darkhors,   darkhors_state, darkhors, ROT0, "bootleg", "Dark Horse (USA v4.00, bootleg of Jockey Club II)",     MACHINE_IMPERFECT_GRAPHICS )

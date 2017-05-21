@@ -12,7 +12,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_NUM_9_REV = device_creator<isa8_number_9_rev_device>;
+DEFINE_DEVICE_TYPE(ISA8_NUM_9_REV, isa8_number_9_rev_device, "number_9_rev", "Number Nine Revolution 512x32/1024x8")
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 16, isa8_number_9_rev_device )
 	AM_RANGE(0x00000, 0x3ffff) AM_NOP
@@ -80,12 +80,12 @@ machine_config_constructor isa8_number_9_rev_device::device_mconfig_additions() 
 //-------------------------------------------------
 
 isa8_number_9_rev_device::isa8_number_9_rev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA8_NUM_9_REV, "Number Nine Revolution 512x32/1024x8", tag, owner, clock, "number_9_rev", __FILE__),
-		device_isa8_card_interface(mconfig, *this),
-		m_upd7220(*this, "upd7220"),
-		m_palette(*this, "palette"),
-		m_ram(1024*1024),
-		m_overlay(1024), m_bank(0), m_mode(0), m_1024(false)
+	device_t(mconfig, ISA8_NUM_9_REV, tag, owner, clock),
+	device_isa8_card_interface(mconfig, *this),
+	m_upd7220(*this, "upd7220"),
+	m_palette(*this, "palette"),
+	m_ram(1024*1024),
+	m_overlay(1024), m_bank(0), m_mode(0), m_1024(false)
 {
 }
 

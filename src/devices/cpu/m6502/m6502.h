@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef __M6502FAM_H__
-#define __M6502FAM_H__
+#ifndef MAME_CPU_M6502_M6502_H
+#define MAME_CPU_M6502_M6502_H
 
 #define MCFG_M6502_DISABLE_DIRECT() \
 	downcast<m6502_device *>(device)->disable_direct();
@@ -27,7 +27,6 @@ public:
 	};
 
 	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	m6502_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	bool get_sync() const { return sync; }
 	void disable_direct() { direct_disabled = true; }
@@ -37,6 +36,8 @@ public:
 	devcb_write_line sync_w;
 
 protected:
+	m6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	class memory_interface {
 	public:
 		address_space *program, *sprogram;
@@ -327,6 +328,6 @@ enum {
 	M6502_SET_OVERFLOW = m6502_device::V_LINE
 };
 
-extern const device_type M6502;
+DECLARE_DEVICE_TYPE(M6502, m6502_device)
 
-#endif
+#endif // MAME_CPU_M6502_M6502_H

@@ -805,7 +805,7 @@ void newbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //  MACHINE_CONFIG( newbrain )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( newbrain, newbrain_state )
+static MACHINE_CONFIG_START( newbrain )
 	// basic system hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(newbrain_mreq)
@@ -943,7 +943,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE         INPUT       INIT    COMPANY                         FULLNAME        FLAGS
-COMP( 1981, newbrain,   0,          0,      newbrain_ad,    newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain AD",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1981, newbraina,  newbrain,   0,      newbrain_a,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain A",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1981, newbrainmd, newbrain,   0,      newbrain_md,    newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain MD",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE         INPUT     STATE             INIT    COMPANY                         FULLNAME        FLAGS
+COMP( 1981, newbrain,   0,          0,      newbrain_ad,    newbrain, newbrain_state,   0,      "Grundy Business Systems Ltd",  "NewBrain AD",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1981, newbraina,  newbrain,   0,      newbrain_a,     newbrain, newbrain_state,   0,      "Grundy Business Systems Ltd",  "NewBrain A",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1981, newbrainmd, newbrain,   0,      newbrain_md,    newbrain, newbrain_state,   0,      "Grundy Business Systems Ltd",  "NewBrain MD",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

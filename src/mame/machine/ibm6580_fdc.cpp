@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "ibm6580_fdc.h"
 
+#include "cpu/mcs48/mcs48.h"
+
 
 #define VERBOSE_DBG 2       /* general debug messages */
 
@@ -17,7 +19,7 @@
 	} while (0)
 
 
-const device_type DW_FDC = device_creator<dw_fdc_device>;
+DEFINE_DEVICE_TYPE(DW_FDC, dw_fdc_device, "dw_fdc", "IBM Displaywriter Floppy")
 
 ROM_START( dw_fdc )
 	ROM_REGION(0x800, "mcu", 0)
@@ -54,7 +56,7 @@ machine_config_constructor dw_fdc_device::device_mconfig_additions() const
 }
 
 dw_fdc_device::dw_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DW_FDC, "IBM Displaywriter Floppy", tag, owner, clock, "dw_kbd", __FILE__)
+	: device_t(mconfig, DW_FDC, tag, owner, clock)
 	, m_out_data(*this)
 	, m_out_clock(*this)
 	, m_out_strobe(*this)

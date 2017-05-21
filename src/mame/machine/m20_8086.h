@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef M20_8086_H_
-#define M20_8086_H_
+#ifndef MAME_MACHINE_M20_8086_H
+#define MAME_MACHINE_M20_8086_H
 
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
@@ -20,20 +20,22 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nvi_w);
 	DECLARE_WRITE16_MEMBER(handshake_w);
 	IRQ_CALLBACK_MEMBER(int_cb);
-	bool halted() { return m_8086_halt; }
-	required_device<cpu_device> m_8086;
+
+	void halt() { m_8086->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); }
+	bool halted() const { return m_8086_halt; }
 
 protected:
 	void device_start() override;
 	void device_reset() override;
 
 private:
+	required_device<cpu_device> m_8086;
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	bool m_8086_halt;
 	int m_nvi, m_vi;
 };
 
-extern const device_type M20_8086;
+DECLARE_DEVICE_TYPE(M20_8086, m20_8086_device)
 
-#endif /* M20_8086_H_ */
+#endif // MAME_MACHINE_M20_8086_H

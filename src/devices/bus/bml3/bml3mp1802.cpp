@@ -21,7 +21,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type BML3BUS_MP1802 = device_creator<bml3bus_mp1802_device>;
+DEFINE_DEVICE_TYPE(BML3BUS_MP1802, bml3bus_mp1802_device, "bml3mp1802", "Hitachi MP-1802 Floppy Controller Card")
 
 static SLOT_INTERFACE_START( mp1802_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
@@ -107,7 +107,7 @@ WRITE8_MEMBER( bml3bus_mp1802_device::bml3_mp1802_w)
 //**************************************************************************
 
 bml3bus_mp1802_device::bml3bus_mp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, BML3BUS_MP1802, "Hitachi MP-1802 Floppy Controller Card", tag, owner, clock, "bml3mp1802", __FILE__),
+	device_t(mconfig, BML3BUS_MP1802, tag, owner, clock),
 	device_bml3bus_card_interface(mconfig, *this),
 	m_fdc(*this, "fdc"),
 	m_floppy0(*this, "fdc:0"),
@@ -131,7 +131,7 @@ void bml3bus_mp1802_device::device_start()
 
 	// install into memory
 	address_space &space_prg = machine().firstcpu->space(AS_PROGRAM);
-	space_prg.install_readwrite_handler(0xff00, 0xff03, read8_delegate(FUNC(mb8866_t::read),(mb8866_t*)m_fdc), write8_delegate(FUNC(mb8866_t::write),(mb8866_t*)m_fdc));
+	space_prg.install_readwrite_handler(0xff00, 0xff03, read8_delegate(FUNC(mb8866_device::read),(mb8866_device*)m_fdc), write8_delegate(FUNC(mb8866_device::write),(mb8866_device*)m_fdc));
 	space_prg.install_readwrite_handler(0xff04, 0xff04, read8_delegate(FUNC(bml3bus_mp1802_device::bml3_mp1802_r), this), write8_delegate(FUNC(bml3bus_mp1802_device::bml3_mp1802_w), this));
 	// overwriting the main ROM (rather than using e.g. install_rom) should mean that bank switches for RAM expansion still work...
 	uint8_t *mainrom = device().machine().root_device().memregion("maincpu")->base();

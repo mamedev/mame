@@ -107,7 +107,7 @@ private:
 
 
 // device type definition
-extern const device_type ABC99;
+DECLARE_DEVICE_TYPE(ABC99, abc99_device)
 
 
 #endif // MAME_BUS_ABCKB_ABC99_H

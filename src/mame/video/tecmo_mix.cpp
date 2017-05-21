@@ -5,10 +5,10 @@
 #include "tecmo_mix.h"
 
 
-const device_type TECMO_MIXER = device_creator<tecmo_mix_device>;
+DEFINE_DEVICE_TYPE(TECMO_MIXER, tecmo_mix_device, "tecmo_mix", "Tecmo 16-bit Mixer")
 
 tecmo_mix_device::tecmo_mix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TECMO_MIXER, "Tecmo 16-bit Mixer", tag, owner, clock, "tecmo_mix", __FILE__),
+	: device_t(mconfig, TECMO_MIXER, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		m_sprpri_shift(0),
 		m_sprbln_shift(0),

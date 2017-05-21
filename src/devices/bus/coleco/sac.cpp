@@ -15,10 +15,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COLECO_SUPER_ACTION_CONTROLLER = device_creator<coleco_super_action_controller_t>;
+DEFINE_DEVICE_TYPE(COLECO_SUPER_ACTION_CONTROLLER, coleco_super_action_controller_device, "coleco_sac", "ColecoVision Super Action Controller")
 
 
-CUSTOM_INPUT_MEMBER( coleco_super_action_controller_t::keypad_r )
+CUSTOM_INPUT_MEMBER( coleco_super_action_controller_device::keypad_r )
 {
 	uint8_t data = 0xf;
 	uint16_t keypad = m_io_keypad->read();
@@ -41,7 +41,7 @@ CUSTOM_INPUT_MEMBER( coleco_super_action_controller_t::keypad_r )
 	return data;
 }
 
-INPUT_CHANGED_MEMBER( coleco_super_action_controller_t::slider_w )
+INPUT_CHANGED_MEMBER( coleco_super_action_controller_device::slider_w )
 {
 	// TODO
 }
@@ -57,7 +57,7 @@ static INPUT_PORTS_START( coleco_super_action_controller )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
 
 	PORT_START("COMMON1")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, coleco_super_action_controller_t, keypad_r, nullptr)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, coleco_super_action_controller_device, keypad_r, nullptr)
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
@@ -79,7 +79,7 @@ static INPUT_PORTS_START( coleco_super_action_controller )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON4 )
 
 	PORT_START("SLIDER")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE PORT_RESET PORT_CHANGED_MEMBER(DEVICE_SELF, coleco_super_action_controller_t, slider_w, nullptr)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE PORT_RESET PORT_CHANGED_MEMBER(DEVICE_SELF, coleco_super_action_controller_device, slider_w, nullptr)
 INPUT_PORTS_END
 
 
@@ -87,7 +87,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor coleco_super_action_controller_t::device_input_ports() const
+ioport_constructor coleco_super_action_controller_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( coleco_super_action_controller );
 }
@@ -99,11 +99,11 @@ ioport_constructor coleco_super_action_controller_t::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  coleco_super_action_controller_t - constructor
+//  coleco_super_action_controller_device - constructor
 //-------------------------------------------------
 
-coleco_super_action_controller_t::coleco_super_action_controller_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COLECO_SUPER_ACTION_CONTROLLER, "ColecoVision Super Action Controller", tag, owner, clock, "coleco_sac", __FILE__),
+coleco_super_action_controller_device::coleco_super_action_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, COLECO_SUPER_ACTION_CONTROLLER, tag, owner, clock),
 	device_colecovision_control_port_interface(mconfig, *this),
 	m_io_common0(*this, "COMMON0"),
 	m_io_common1(*this, "COMMON1"),
@@ -116,7 +116,7 @@ coleco_super_action_controller_t::coleco_super_action_controller_t(const machine
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void coleco_super_action_controller_t::device_start()
+void coleco_super_action_controller_device::device_start()
 {
 	// state saving
 	save_item(NAME(m_common0));
@@ -128,7 +128,7 @@ void coleco_super_action_controller_t::device_start()
 //  joy_r - joystick read
 //-------------------------------------------------
 
-uint8_t coleco_super_action_controller_t::joy_r()
+uint8_t coleco_super_action_controller_device::joy_r()
 {
 	uint8_t data = 0x7f;
 

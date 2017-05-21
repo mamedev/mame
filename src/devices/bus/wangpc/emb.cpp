@@ -32,7 +32,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_EMB = device_creator<wangpc_emb_device>;
+DEFINE_DEVICE_TYPE(WANGPC_EMB, wangpc_emb_device, "wangpc_emb", "Wang PC-PM031-B Extended Memory Board")
 
 
 
@@ -45,9 +45,10 @@ const device_type WANGPC_EMB = device_creator<wangpc_emb_device>;
 //-------------------------------------------------
 
 wangpc_emb_device::wangpc_emb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WANGPC_EMB, "Wang PC-PM031-B", tag, owner, clock, "wangpc_emb", __FILE__),
+	device_t(mconfig, WANGPC_EMB, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
-	m_ram(*this, "ram"), m_option(0), m_parity_error(0), m_parity_odd(0)
+	m_ram(*this, "ram"),
+	m_option(0), m_parity_error(0), m_parity_odd(0)
 {
 }
 

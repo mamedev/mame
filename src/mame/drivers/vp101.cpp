@@ -361,7 +361,7 @@ static INPUT_PORTS_START( vp50 )
 	PORT_BIT( 0xfffffff0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vp101, vp10x_state )
+static MACHINE_CONFIG_START( vp101 )
 	MCFG_CPU_ADD("maincpu", VR5500LE, 400000000)
 	MCFG_MIPS3_DCACHE_SIZE(32768)
 	MCFG_MIPS3_SYSTEM_CLOCK(100000000)
@@ -380,7 +380,7 @@ static MACHINE_CONFIG_START( vp101, vp10x_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vp50, vp10x_state )
+static MACHINE_CONFIG_START( vp50 )
 	MCFG_CPU_ADD("maincpu", TX4925LE, 200000000)
 	MCFG_MIPS3_DCACHE_SIZE(32768)
 	MCFG_MIPS3_SYSTEM_CLOCK(100000000)
@@ -453,7 +453,7 @@ ROM_START(zoofari)
 	DISK_IMAGE_READONLY("zoofari", 0, SHA1(8fb9cfb1ab2660f40b643fcd772243903bd69a6c) )
 ROM_END
 
-GAME( 2002,  specfrce,  0,  vp101,  vp101, driver_device,  0,  ROT0,  "ICE/Play Mechanix",    "Special Forces Elite Training (v01.02.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002,  specfrceo, specfrce,   vp101, vp101,          driver_device,  0,  ROT0,  "ICE/Play Mechanix",    "Special Forces Elite Training (v01.01.01)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2004,  jnero,     0,  vp101,  vp101, driver_device,  0,  ROT0,  "ICE/Play Mechanix",    "Johnny Nero Action Hero (v01.01.08)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2006,  zoofari,   0,  vp50,   vp50,  driver_device,  0,  ROT0,  "ICE/Play Mechanix",    "Zoofari", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2002,  specfrce,  0,          vp101,  vp101, vp10x_state,  0,  ROT0,  "ICE/Play Mechanix",    "Special Forces Elite Training (v01.02.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002,  specfrceo, specfrce,   vp101,  vp101, vp10x_state,  0,  ROT0,  "ICE/Play Mechanix",    "Special Forces Elite Training (v01.01.01)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2004,  jnero,     0,          vp101,  vp101, vp10x_state,  0,  ROT0,  "ICE/Play Mechanix",    "Johnny Nero Action Hero (v01.01.08)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006,  zoofari,   0,          vp50,   vp50,  vp10x_state,  0,  ROT0,  "ICE/Play Mechanix",    "Zoofari",                                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

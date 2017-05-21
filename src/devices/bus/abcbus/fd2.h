@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ABCBUS_FD2_H
+#define MAME_BUS_ABCBUS_FD2_H
 
-#ifndef __ABC_FD2__
-#define __ABC_FD2__
+#pragma once
 
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
@@ -24,14 +24,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> abc_fd2_t
+// ======================> abc_fd2_device
 
-class abc_fd2_t :  public device_t,
+class abc_fd2_device :  public device_t,
 					public device_abcbus_card_interface
 {
 public:
 	// construction/destruction
-	abc_fd2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc_fd2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -63,7 +63,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
-	required_device<fd1771_t> m_fdc;
+	required_device<fd1771_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_memory_region m_dos_rom;
@@ -75,8 +75,6 @@ private:
 
 
 // device type definition
-extern const device_type ABC_FD2;
+DECLARE_DEVICE_TYPE(ABC_FD2, abc_fd2_device)
 
-
-
-#endif
+#endif // MAME_BUS_ABCBUS_FD2_H

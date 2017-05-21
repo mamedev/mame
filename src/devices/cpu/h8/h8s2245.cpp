@@ -3,14 +3,14 @@
 #include "emu.h"
 #include "h8s2245.h"
 
-const device_type H8S2241 = device_creator<h8s2241_device>;
-const device_type H8S2242 = device_creator<h8s2242_device>;
-const device_type H8S2245 = device_creator<h8s2245_device>;
-const device_type H8S2246 = device_creator<h8s2246_device>;
+DEFINE_DEVICE_TYPE(H8S2241, h8s2241_device, "h8s2241", "H8S/2241")
+DEFINE_DEVICE_TYPE(H8S2242, h8s2242_device, "h8s2242", "H8S/2242")
+DEFINE_DEVICE_TYPE(H8S2245, h8s2245_device, "h8s2245", "H8S/2245")
+DEFINE_DEVICE_TYPE(H8S2246, h8s2246_device, "h8s2246", "H8S/2246")
 
 
-h8s2245_device::h8s2245_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	h8s2000_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h8s2245_device::map), this)),
+h8s2245_device::h8s2245_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
+	h8s2000_device(mconfig, type, tag, owner, clock, address_map_delegate(FUNC(h8s2245_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	dtc(*this, "dtc"),
@@ -35,60 +35,30 @@ h8s2245_device::h8s2245_device(const machine_config &mconfig, device_type type, 
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
 	sci2(*this, "sci2"),
-	watchdog(*this, "watchdog")
+	watchdog(*this, "watchdog"),
+	ram_start(start),
+	syscr(0)
 {
-	syscr = 0;
-	ram_start = 0;
 }
 
 h8s2245_device::h8s2245_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8s2000_device(mconfig, H8S2245, "H8S/2245", tag, owner, clock, "h8s2245", __FILE__, address_map_delegate(FUNC(h8s2245_device::map), this)),
-	intc(*this, "intc"),
-	adc(*this, "adc"),
-	dtc(*this, "dtc"),
-	port1(*this, "port1"),
-	port2(*this, "port2"),
-	port3(*this, "port3"),
-	port4(*this, "port4"),
-	port5(*this, "port5"),
-	porta(*this, "porta"),
-	portb(*this, "portb"),
-	portc(*this, "portc"),
-	portd(*this, "portd"),
-	porte(*this, "porte"),
-	portf(*this, "portf"),
-	portg(*this, "portg"),
-	timer8_0(*this, "timer8_0"),
-	timer8_1(*this, "timer8_1"),
-	timer16(*this, "timer16"),
-	timer16_0(*this, "timer16:0"),
-	timer16_1(*this, "timer16:1"),
-	timer16_2(*this, "timer16:2"),
-	sci0(*this, "sci0"),
-	sci1(*this, "sci1"),
-	sci2(*this, "sci2"),
-	watchdog(*this, "watchdog")
+	h8s2245_device(mconfig, H8S2245, tag, owner, clock, 0xffec00)
 {
-	syscr = 0;
-	ram_start = 0xffec00;
 }
 
 h8s2241_device::h8s2241_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8s2245_device(mconfig, H8S2241, "H8S/2241", tag, owner, clock, "h8s2241", __FILE__)
+	h8s2245_device(mconfig, H8S2241, tag, owner, clock, 0xffec00)
 {
-	ram_start = 0xffec00;
 }
 
 h8s2242_device::h8s2242_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8s2245_device(mconfig, H8S2242, "H8S/2242", tag, owner, clock, "h8s2242", __FILE__)
+	h8s2245_device(mconfig, H8S2242, tag, owner, clock, 0xffdc00)
 {
-	ram_start = 0xffdc00;
 }
 
 h8s2246_device::h8s2246_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8s2245_device(mconfig, H8S2246, "H8S/2246", tag, owner, clock, "h8s2246", __FILE__)
+	h8s2245_device(mconfig, H8S2246, tag, owner, clock, 0xffdc00)
 {
-	ram_start = 0xffdc00;
 }
 
 static MACHINE_CONFIG_FRAGMENT(h8s2245)

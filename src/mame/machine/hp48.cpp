@@ -914,7 +914,7 @@ void hp48_state::hp48_encode_nibble( uint8_t* dst, uint8_t* src, int size )
 
 
 /* ----- card images ------ */
-const device_type HP48_PORT = device_creator<hp48_port_image_device>;
+DEFINE_DEVICE_TYPE(HP48_PORT, hp48_port_image_device, "hp48_port_image", "HP48 memory card")
 
 /* helper for load and create */
 void hp48_port_image_device::hp48_fill_port()
@@ -1011,8 +1011,8 @@ void hp48_port_image_device::device_start()
 }
 
 hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HP48_PORT, "HP48 memory card", tag, owner, clock, "hp48_port_image", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, HP48_PORT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 

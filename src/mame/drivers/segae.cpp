@@ -1003,7 +1003,7 @@ uint32_t systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-static MACHINE_CONFIG_START( systeme, systeme_state )
+static MACHINE_CONFIG_START( systeme )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -1013,8 +1013,8 @@ static MACHINE_CONFIG_START( systeme, systeme_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
-		SEGA315_5124_WIDTH , SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256, \
-		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT + 192)
+			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
+			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 192)
 	MCFG_SCREEN_UPDATE_DRIVER(systeme_state, screen_update_systeme)
 
 	MCFG_DEVICE_ADD("vdp1", SEGA315_5124, 0)
@@ -1090,12 +1090,12 @@ DRIVER_INIT_MEMBER(systeme_state, fantzn2)
 }
 
 
-//    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1985, hangonjr, 0,        hangonjr, hangonjr, driver_device, 0,        ROT0,   "Sega", "Hang-On Jr.", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, transfrm, 0,        systeme,  transfrm, driver_device, 0,        ROT0,   "Sega", "Transformer", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, astrofl,  transfrm, systemex_315_5177, transfrm, driver_device, 0,        ROT0,   "Sega", "Astro Flash (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ridleofp, 0,        ridleofp, ridleofp, driver_device, 0,        ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opaopa,   0,        systemeb, opaopa,   systeme_state, opaopa,   ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, fantzn2,  0,        systemex, fantzn2,  systeme_state, fantzn2,  ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tetrisse, 0,        systeme,  tetrisse, driver_device, 0,        ROT0,   "Sega", "Tetris (Japan, System E)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, slapshtr, 0,        systeme,  slapshtr, driver_device, 0,        ROT0,   "Sega", "Slap Shooter", MACHINE_SUPPORTS_SAVE) // 1986 date from flyer
+//    YEAR, NAME,     PARENT,   MACHINE,           INPUT,    STATE          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1985, hangonjr, 0,        hangonjr,          hangonjr, systeme_state, 0,        ROT0,   "Sega", "Hang-On Jr.", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, transfrm, 0,        systeme,           transfrm, systeme_state, 0,        ROT0,   "Sega", "Transformer", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, astrofl,  transfrm, systemex_315_5177, transfrm, systeme_state, 0,        ROT0,   "Sega", "Astro Flash (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ridleofp, 0,        ridleofp,          ridleofp, systeme_state, 0,        ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opaopa,   0,        systemeb,          opaopa,   systeme_state, opaopa,   ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, fantzn2,  0,        systemex,          fantzn2,  systeme_state, fantzn2,  ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetrisse, 0,        systeme,           tetrisse, systeme_state, 0,        ROT0,   "Sega", "Tetris (Japan, System E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, slapshtr, 0,        systeme,           slapshtr, systeme_state, 0,        ROT0,   "Sega", "Slap Shooter", MACHINE_SUPPORTS_SAVE) // 1986 date from flyer

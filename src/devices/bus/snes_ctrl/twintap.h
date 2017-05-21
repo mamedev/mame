@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SNES_CTRL_TWINTAP_H
+#define MAME_BUS_SNES_CTRL_TWINTAP_H
 
-#ifndef __SNES_TWINTAP__
-#define __SNES_TWINTAP__
+#pragma once
 
 
 #include "ctrl.h"
@@ -50,5 +50,4 @@ private:
 // device type definition
 extern const device_type SNES_TWINTAP;
 
-
-#endif
+#endif // MAME_BUS_SNES_CTRL_TWINTAP_H

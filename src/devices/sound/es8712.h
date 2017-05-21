@@ -2,10 +2,10 @@
 // copyright-holders:Quench
 /* An interface for the ES8712 ADPCM chip */
 
-#pragma once
+#ifndef MAME_SOUND_ES8712_H
+#define MAME_SOUND_ES8712_H
 
-#ifndef __ES8712_H__
-#define __ES8712_H__
+#pragma once
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -26,15 +26,20 @@
 
 // ======================> es8712_device
 
-class es8712_device : public device_t,
-						public device_sound_interface
+class es8712_device : public device_t, public device_sound_interface
 {
 public:
 	es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~es8712_device() { }
 
 	// static configuration
-	template<class _Object> static devcb_base &set_reset_handler(device_t &device, _Object object) { return downcast<es8712_device &>(device).m_reset_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_reset_handler(device_t &device, Object &&cb) { return downcast<es8712_device &>(device).m_reset_handler.set_callback(std::forward<Object>(cb)); }
+
+	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8_MEMBER(read);
+
+	void play();
+	void set_bank_base(int base);
+	void set_frequency(int frequency);
 
 protected:
 	// device-level overrides
@@ -44,21 +49,11 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-public:
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read);
-
-public:
-	void play();
-	void set_bank_base(int base);
-	void set_frequency(int frequency);
-
 private:
 	void compute_tables();
 	void generate_adpcm(stream_sample_t *buffer, int samples);
 	void es8712_state_save_register();
 
-private:
 	required_region_ptr<uint8_t> m_rom;
 
 	devcb_write_line m_reset_handler;
@@ -79,7 +74,6 @@ private:
 	sound_stream *m_stream;   /* which stream are we playing on? */
 };
 
-extern const device_type ES8712;
+DECLARE_DEVICE_TYPE(ES8712, es8712_device)
 
-
-#endif /* __ES8712_H__ */
+#endif // MAME_SOUND_ES8712_H

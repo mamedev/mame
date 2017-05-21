@@ -70,6 +70,27 @@ unknown cycle: CME, SSE, SSS
 #include "tms1k_base.h"
 #include "debugger.h"
 
+tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, prgwidth, 0, program)
+	, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
+	, m_mpla(*this, "mpla")
+	, m_ipla(*this, "ipla")
+	, m_opla(*this, "opla")
+	, m_spla(*this, "spla")
+	, m_o_pins(o_pins)
+	, m_r_pins(r_pins)
+	, m_pc_bits(pc_bits)
+	, m_byte_bits(byte_bits)
+	, m_x_bits(x_bits)
+	, m_output_pla_table(nullptr)
+	, m_read_k(*this)
+	, m_write_o(*this)
+	, m_write_r(*this)
+	, m_power_off(*this)
+{
+}
+
 // disasm
 void tms1k_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {

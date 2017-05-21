@@ -14,7 +14,7 @@
     ***************** INITIALISATION *********************************************************************
 
     Method 1 :
-    * Key in with the Jackpot Key followed by the Audit Key (K+L Keys)
+    * Key in with the Jackpot Key followed by the Audit Key (F1 then F2 keys)
     * Hit UP (W key) twice (for gunnrose only)
     * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
     * A value (displayed below) will appear next to RF/AMT on the right of the screen
@@ -40,7 +40,7 @@
     swtht2nz 200
     wildone  200
     wtigernz 200
-    gunnrose
+    gunnrose N/A (no hopper to refill)
 
     Method 2 :
     * Key in with the Jackpot Key followed by the Audit Key
@@ -62,7 +62,7 @@
        'freeze' switch and the games don't accept inputs).
     * Key in with the Jackpot Key followed by the Audit Key.
     * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
-    * Press Service (default A) 4 times until you are in the Setup Screen, with Printer Pay Limit.
+    * Press Service (default A) 4 times until you are in the Setup Screen, showing Printer Pay Limit etc.
     * Press Bet 2 (default D) to change the Jackpot Win Limit. A higher value is better (3000 max)
     * Key out both the Jackpot and Audit Keys
 
@@ -187,14 +187,14 @@
         cause a note acceptor error), the note acceptor works, adding 4 credits ($1?).
         This is seemingly a quarter slot (25c). Not sure if other notes are possible.
      - Same gameplay as Gone Troppo, one interesting thing about this game is that
-        the KQJ symbols have actual faces instead of plain letters.
+        the KQJ symbols have actual faces instead of plain letters. These symbols were also found on some mechanical reel slots.
 
     08/03/2013 - Heihachi_73
     Cleaned up comments and erroneous ROM names (e.g. graphics ROMs named after the program ROM).
     Caribbean Gold II - copied cgold graphics ROMs u8+u11 (aka u20+u45) to cgold2, game now playable.
      Tiles 0x64 and 0x65 are used to show the game's denomination (credit value), however cgold does
      not use these tiles (there are seemingly unused line/bet/number tiles in this location), this
-     causes a minor glitch on the $/c sign. Tiles 0x277-0x288 also differ but are unused.
+     causes a graphics glitch on the $/cent signs.
     Promoted Fortune Hunter and clone to working status, as they were in fact working for quite a while.
     Fixed ROM names for kgbird/kgbirda; 5c and 10c variants were mixed up.
 
@@ -202,11 +202,16 @@
     Added hopper and meter outputs.
 
     27/03/2014
-    Added new game: Gun's and Roses Poker - gunnrose
+    Added new game: Guns and Roses Poker - gunnrose
 
     13/11/2015 - Roberto Fresca
-    Added new game: Fever Pitch? (2VXEC534, NSW, 90.36%).
-    Need to confirm the title.
+    Added new game: Fever Pitch (2VXEC534, NSW, 90.36%).
+
+    26/04/2017 - Heihachi_73
+    Added button labels and layout to gunnrose, position of buttons is guesswork at this stage.
+    This game does not have a cashout button. Credits are paid out using the jackpot key.
+    Changed jackpot and audit keys to F1 and F2 respectively.
+    Renamed nodump program ROM in clkwise as it had the wrong EPROM number.
 
 
 *************************************************************************************************************
@@ -245,13 +250,13 @@
     cgold can be set to credit play or coin play by toggling SW1-5. If SW1-5 is on, game is in credit mode; if SW1-5 is off,
     wins and remaining credits will be automatically paid out as coins.
 
-    Non-US games can enable/disable the double up (gamble) option by toggling the SW1-8 switch. Turning SW1 off will enable
+    Non-US games can enable/disable the double up (gamble) option by toggling the SW1-8 switch. Turning SW1-8 off will enable
     the double up option (default); turning SW1-8 on will disable double up and enable auto-spin on some games (so far, only
     eforesta and 3bagflvt allow this; other games simply ignore the buttons). The games respond slightly faster between games
     with double up disabled.
 
-    3 Bags Full, Fortune Hunter, Caribbean Gold 1 and 2, Gone Troppo and Top Gear do not have a double up option, and US-based
-    games ignore this switch setting (double up is always enabled on US games which support it).
+    3 Bags Full, Fortune Hunter, Fever Pitch, Caribbean Gold 1 and 2, Gone Troppo and Top Gear do not have a double up option,
+    and US-based games ignore this switch setting (double up is always enabled on US games which support it).
 
 
     TODO:
@@ -276,11 +281,13 @@
 
     7. When DIP SW7 is set to off/off, speed is dramatically reduced (noticeable on older Pentium 4-based systems).
 
-    8. rewrite video emulation by using custom drawing code.
+    8. Rewrite video emulation by using custom drawing code.
 
-    9. check what type of mc6845 this HW uses on real PCB, and hook it up properly.
+    9. Check what type of mc6845 this HW uses on real PCB, and hook it up properly.
 
-    10. fix 86 Lions (pre-Aristocrat Mk-4 HW, without prom and dunno what else)
+    10. Fix 86 Lions (pre-Aristocrat Mk-4 HW, without prom and dunno what else).
+
+    11. Fix coin input for the US games. Currently, only the note acceptor works. The reverse is true for cgold.
 
 
     ***************** POKER GAMES ************************************************************************
@@ -332,13 +339,13 @@
 #include "cgold2.lh"   // US 25cr without gamble
 #include "eforest.lh"  // US 45cr with gamble
 #include "fhunter.lh"  // US 45cr without gamble
+#include "fvrpitch.lh" // AU 25cr without gamble
 #include "goldenc.lh"  // NZ 90cr with double up
 #include "kgbird.lh"   // NZ 25cr with double up
 #include "topgear.lh"  // NZ 5 line without gamble
-#include "wildone.lh"  // Video poker
-#include "gunnrose.lh" // Video poker
 #include "gldnpkr.lh"  // Video poker
-#include "fvrpitch.lh"  // 5 line without gamble
+#include "gunnrose.lh" // Video poker
+#include "wildone.lh"  // Video poker
 
 uint8_t crtc_cursor_index = 0;
 uint8_t crtc_reg = 0;
@@ -1070,31 +1077,31 @@ INPUT PORTS
 static INPUT_PORTS_START(aristmk4)
 
 	PORT_START("via_port_b")
-	PORT_DIPNAME( 0x10, 0x00, "1" )                                                                                         // "COIN FAULT"
+	PORT_DIPNAME( 0x10, 0x00, "Coin Optic 1" )                                                                              // "COIN FAULT"
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) ) PORT_DIPLOCATION("AY:1")
-	PORT_DIPNAME( 0x20, 0x00, "2" )                                                                                         // "COIN FAULT"
+	PORT_DIPNAME( 0x20, 0x00, "Coin Optic 2" )                                                                              // "COIN FAULT"
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) ) PORT_DIPLOCATION("AY:2")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hopper Coin Release") PORT_CODE(KEYCODE_BACKSLASH)              // "ILLEGAL COIN PAID"
-
-	PORT_DIPNAME( 0x80, 0x00, "CBOPT1" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Hopper Coin Release") PORT_CODE(KEYCODE_BACKSLASH)        // "ILLEGAL COIN PAID"
+	PORT_DIPNAME( 0x80, 0x00, "CBOPT1" )       // Cashbox Optic, enable for 3bagflvt and eforesta or they will give a coin divertor error on the 5th coin, turn off for US games
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) ) PORT_DIPLOCATION("AY:4")
 
 	PORT_START("5002")
-	PORT_DIPNAME( 0x01, 0x00, "HOPCO2") // coins out hopper 2 , why triggers logic door ?
+	PORT_DIPNAME( 0x01, 0x00, "HOPCO2") // coins out hopper 2, why does it trigger logic door?
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5002:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "CBOPT2") // coin in cash box 2
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) ) PORT_DIPLOCATION("5002:2")
+	PORT_DIPNAME( 0x02, 0x02, "CBOPT2") // coin in cash box 2                                                                   off = "34 - COIN VALIDATOR FAULT"
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5002:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, "HOPHI2") // hopper 2 full
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5002:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DOPTI")  // photo optic door                                                                         DOOR OPEN SENSE SWITCH
+	PORT_DIPNAME( 0x08, 0x00, "DOPTI")  // photo optic door                                                                     DOOR OPEN SENSE SWITCH
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Audit Key") PORT_TOGGLE PORT_CODE(KEYCODE_K) // AUDTSW
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Audit Key") PORT_TOGGLE PORT_CODE(KEYCODE_F2) // AUDTSW
 	PORT_DIPNAME( 0x20, 0x00, "HOPLO1") // hopper 1 low
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5002:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
@@ -1108,7 +1115,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Main Door") PORT_TOGGLE PORT_CODE(KEYCODE_M) // DSWDT
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Jackpot Key") PORT_TOGGLE PORT_CODE(KEYCODE_L) // JKPTSW
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Jackpot Key") PORT_TOGGLE PORT_CODE(KEYCODE_F1) // JKPTSW
 	PORT_DIPNAME( 0x08, 0x08, "HOPHI1") // hopper 1 full
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
@@ -1121,8 +1128,9 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPNAME( 0x40, 0x00, "PTRTAC") // printer taco
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "PTRHOM") // printer home
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) ) PORT_DIPLOCATION("5003:8")
+	PORT_DIPNAME( 0x80, 0x80, "PTRHOM") // printer home, must be on
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("5005")
 	PORT_DIPNAME( 0x01, 0x01, "CREDIT SELECT 1")
@@ -1137,8 +1145,9 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPNAME( 0x08, 0x00, "5005-4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "CGDRSW") // Logic Door (Security Cage)
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) ) PORT_DIPLOCATION("5005:5")
+	PORT_DIPNAME( 0x10, 0x10, "CGDRSW") // Logic door (Security Cage)
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, "5005-6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5005:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
@@ -1166,7 +1175,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "5300-6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:6") // bill validator d/c , U.S must be on
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:6") // bill validator d/c, must be on for US games
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, "5300-7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:7")
@@ -1180,7 +1189,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("10 Credits Per Line") PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Collect") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Reserve") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Gamble") PORT_CODE(KEYCODE_U) // auto gamble & gamble
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Gamble") PORT_CODE(KEYCODE_U)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Win") PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-7 UNUSED")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-8 UNUSED")
@@ -1358,15 +1367,15 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPNAME( 0x20, 0x00, "DSW1 - Link Jackpot - S1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "DSW1 - Link Jackpot - S2" )
+	PORT_DIPNAME( 0x40, 0x00, "DSW1 - Link Jackpot - S2" ) // Cash credit option in fvrpitch/eforesta
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "DSW1 - Auto spin" )
+	PORT_DIPNAME( 0x80, 0x00, "DSW1 - Auto spin" ) // Disables double up, only eforesta supports auto spin with double up disabled
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "DSW2 - Maximum credit - S1" )
+	PORT_DIPNAME( 0x01, 0x00, "DSW2 - Maximum credit - S1" ) // Cash credit option in topgear
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "DSW2 - Maximum credit - S2" )
@@ -1432,6 +1441,7 @@ static INPUT_PORTS_START(eforest)
 	PORT_MODIFY("500d")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Play 7 Lines") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Play 9 Lines / Black") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_CODE(KEYCODE_A)
 
 	PORT_MODIFY("500e")
@@ -1451,7 +1461,6 @@ static INPUT_PORTS_START(arcwins)
 	PORT_MODIFY("500d")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Play 4 Lines") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Play 5 Lines / Black") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_Q)
 
 	PORT_MODIFY("500e")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Play 2 Lines") PORT_CODE(KEYCODE_E)
@@ -1468,6 +1477,11 @@ static INPUT_PORTS_START(cgold2)
 
 	PORT_MODIFY("500e")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Play 1 Line") PORT_CODE(KEYCODE_W)
+
+	PORT_MODIFY("via_port_b")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP ) PORT_NAME("Test1") PORT_CODE(KEYCODE_2) // coin optic 1?
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE ) PORT_NAME("Test2") PORT_CODE(KEYCODE_3) // coin optic 2?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH ) PORT_NAME("Test3") PORT_CODE(KEYCODE_4) // coin to cashbox?
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(fhunter)
@@ -1537,6 +1551,30 @@ static INPUT_PORTS_START(topgear)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Play 2 Lines") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(gunnrose)
+	PORT_INCLUDE(aristmk4)
+
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Red") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Draw") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Bet 2 / Hold 2") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Bet 3 / Hold 3") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-5 UNUSED")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-6 UNUSED")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-7 UNUSED")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-8 UNUSED")
+
+	PORT_MODIFY("500e")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Half Gamble") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Reserve") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Full Gamble") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Bet 1 / Hold 1") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Bet 5 / Hold 5") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Bet 4 / Hold 4") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Black") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Win") PORT_CODE(KEYCODE_A)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START(wildone)
 	PORT_INCLUDE(aristmk4)
 
@@ -1580,16 +1618,13 @@ static INPUT_PORTS_START(gldnpkr)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(fvrpitch)
-	PORT_INCLUDE(arcwins)
-
-	PORT_MODIFY("500d")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Play 5 Lines") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Reserve") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-5 UNUSED")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-6 UNUSED")
+	PORT_INCLUDE(3bagflnz)
 
 	PORT_MODIFY("500e")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Play 1 Line") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Play 5 Lines") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Play 4 Lines") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Play 3 Lines") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Play 2 Lines") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
 
@@ -1709,7 +1744,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_state::aristmk4_pf)
 	}
 }
 
-static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
+static MACHINE_CONFIG_START( aristmk4 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8) // 1.5mhz
 	MCFG_CPU_PROGRAM_MAP(aristmk4_map)
@@ -2212,7 +2247,7 @@ ROM_START( clkwise ) // MK2.5
 	ROM_LOAD("3vas003.u7", 0x06000, 0x2000, CRC(fe7d0ea4) SHA1(3f3f4809534065c33eca2cfff0d1d2a3e3992406))
 
 		/* GAME EPROMs */
-	ROM_LOAD("1vxec534.u9", 0x08000, 0x8000, NO_DUMP) // dead on arrival or blank chip (0xFFFFFFFF throughout ROM)
+	ROM_LOAD("clkwise.u9", 0x08000, 0x8000, NO_DUMP) // dead on arrival or blank chip (0xFFFFFFFF throughout ROM)
 
 		/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
@@ -2269,6 +2304,9 @@ ROM_START( cgold2 )
 	ROM_LOAD("3vlsh076.u45",   0x06000, 0x2000, BAD_DUMP CRC(10eff444) SHA1(4658b346add14010efa797ad9d31b6673e8e2526)) // using cgold ROM for now
 	ROM_LOAD("3vlsh076_a.u46", 0x08000, 0x2000, CRC(9580c2c2) SHA1(8a010fb9e349c066e1af53ed9aa659dbf7dbf17e))
 	ROM_LOAD("3vlsh076.u47",   0x0a000, 0x2000, CRC(f3cb845a) SHA1(288f7fe991bb60194a9ef9e8c9b2b18ebbd3b49c)) // matches cgold
+
+        // Note: cgold tiles are not a perfect match, cgold2 needs dollar and cent signs in tiles 0x64 and 0x65 respectively, which cgold does not have. This causes a garbled graphics in the denomination.
+        // Tiles 0x27F and 0x280 are cent and dollar signs, but these are unused by the game.
 
 		/* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
@@ -2344,6 +2382,31 @@ ROM_START( arcwins )
 	ROM_LOAD("1cm29.u71", 0x0000, 0x0200, CRC(ef25f5cc) SHA1(51d12f4b8b8712cbd18ec97ec04e1340cd85fc67))
 ROM_END
 
+/* Fever Pitch (2VXEC534, 90.36%)
+   Unhandled Mechanical meter 2 pulse: 04 --> Payout pulse.
+*/
+ROM_START( fvrpitch ) // MK2.5
+	ROM_REGION(0x10000, "maincpu", 0 )
+		/* VIDEO AND SOUND EPROM */
+	ROM_LOAD("3vas003.u7", 0x06000, 0x2000, CRC(fe7d0ea4) SHA1(3f3f4809534065c33eca2cfff0d1d2a3e3992406))
+
+		/* GAME EPROMS */
+	ROM_LOAD("2vxec534.u9", 0x08000, 0x8000, CRC(6f8780e8) SHA1(ebf1bfdf2ad727caa2fee34a6ae645ddba42f1cb)) // 90.36%
+
+		/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("1vlbh1299.u8",  0x00000, 0x2000, CRC(8d6294d2) SHA1(819ab872a3ea99801350dd7bdf07011cbc7689e0)) // is it VLBH instead of VLSH or a typo?
+	ROM_LOAD("1vlbh1299.u10", 0x02000, 0x2000, CRC(939b30af) SHA1(0253c6b1d336ad589322ee9058c1da68ac1e714a))
+	ROM_LOAD("1vlbh1299.u12", 0x04000, 0x2000, CRC(81913322) SHA1(4ed8b678e38784a41c1a46809a5ecb14256b4c75))
+	ROM_LOAD("1vlbh1299.u9",  0x06000, 0x2000, CRC(e0937d74) SHA1(19f567620e095b10f1d4f2a524331737bfa628b7))
+	ROM_LOAD("1vlbh1299.u11", 0x08000, 0x2000, CRC(bfa3bb9e) SHA1(610de284004906af5a5b594256e7d7ec846afff2))
+	ROM_LOAD("1vlbh1299.u13", 0x0a000, 0x2000, CRC(6d8fb9a6) SHA1(1d8b667eea57f5a4ce173af55f58b9bf56aaa05e))
+
+		/* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 ) // Using kgbird's 1CM29 PROM (colors seems correct) until original PROM is dumped.
+	ROM_LOAD("1cm29.u40", 0x0000, 0x0200, BAD_DUMP CRC(ef25f5cc) SHA1(51d12f4b8b8712cbd18ec97ec04e1340cd85fc67))
+ROM_END
+
 /* Video poker games */
 
 ROM_START( wildone )
@@ -2390,32 +2453,32 @@ ROM_START( gldnpkr ) // MK2.5
 	ROM_LOAD("2cm07.u40", 0x0000, 0x0200, CRC(1e3f402a) SHA1(f38da1ad6607df38add10c69febf7f5f8cd21744)) // Using 2CM07 until a correct PROM is confirmed
 ROM_END
 
-/* Fever Pitch? (2VXEC534, 90.36%)
-   Need some proof about the real name.
-   Unhandled Mechanical meter 2 pulse: 04 --> Payout pulse.
+/* Guns & Roses
+   Unhandled Mechanical meter 2 pulse: 04
 */
-ROM_START( fvrpitch ) // MK2.5
+ROM_START( gunnrose ) // MK2.5
 	ROM_REGION(0x10000, "maincpu", 0 )
 		/* VIDEO AND SOUND EPROM */
-	ROM_LOAD("vidsnd.u7", 0x06000, 0x2000, BAD_DUMP CRC(568bd63f) SHA1(128b0b085c8b97d1c90baeab4886c522c0bc9a0e)) // unknown EPROM name
+	ROM_LOAD("gnr.u7", 0x06000, 0x2000, CRC(fe7d0ea4) SHA1(3f3f4809534065c33eca2cfff0d1d2a3e3992406))   // 1VL/SH136 RED AND BLACK
 
 		/* GAME EPROMS */
-	ROM_LOAD("2vxec534_fever_pitch_90.36%.u9", 0x08000, 0x8000, CRC(6f8780e8) SHA1(ebf1bfdf2ad727caa2fee34a6ae645ddba42f1cb))  // 90.36%
+	ROM_LOAD("gnr.u9", 0x08000, 0x8000, CRC(4fb5f757) SHA1(a4129bca7e573faac0d11de41a9bf8ea144091ee))   // E/C606191SMP
 
 		/* SHAPE EPROMS */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("1vlbh1299_fever_pitch.u8",  0x00000, 0x2000, CRC(8d6294d2) SHA1(819ab872a3ea99801350dd7bdf07011cbc7689e0)) // unknown EPROM names, should contain VLSH or VL/SH letters on sticker
-	ROM_LOAD("1vlbh1299_fever_pitch.u10", 0x02000, 0x2000, CRC(939b30af) SHA1(0253c6b1d336ad589322ee9058c1da68ac1e714a))
-	ROM_LOAD("1vlbh1299_fever_pitch.u12", 0x04000, 0x2000, CRC(81913322) SHA1(4ed8b678e38784a41c1a46809a5ecb14256b4c75))
-	ROM_LOAD("1vlbh1299_fever_pitch.u9",  0x06000, 0x2000, CRC(e0937d74) SHA1(19f567620e095b10f1d4f2a524331737bfa628b7))
-	ROM_LOAD("1vlbh1299_fever_pitch.u11", 0x08000, 0x2000, CRC(bfa3bb9e) SHA1(610de284004906af5a5b594256e7d7ec846afff2))
-	ROM_LOAD("1vlbh1299_fever_pitch.u13", 0x0a000, 0x2000, CRC(6d8fb9a6) SHA1(1d8b667eea57f5a4ce173af55f58b9bf56aaa05e))
+	ROM_LOAD("gnr.u8",  0x00000, 0x2000, CRC(dec9e695) SHA1(a596c4243d6d39e0611ff714e19e14188c90b6f1))  // 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u10", 0x02000, 0x2000, CRC(e83b8e79) SHA1(595f41a5f59f938581a57b445370aa716c6b1409))  // 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u12", 0x04000, 0x2000, CRC(9134d029) SHA1(d698fb91d8f5fa78ffd056149421008d3f12c456))  // 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u9t", 0x06000, 0x2000, CRC(73a0c2cd) SHA1(662056d570eaa069483d378b77efcfb42eff6d0d))  // 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u11", 0x08000, 0x2000, CRC(c50adffe) SHA1(a7c4a3cdd4d5d31a1420e47859408caa75ce2636))  // 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u13", 0x0a000, 0x2000, CRC(e0a6bfc5) SHA1(07e4c8191503f0ea2de4f7ce18fe6290d20ef80e))  // 1VL/SH136 RED AND BLACK
 
 		/* COLOR PROM */
-	ROM_REGION(0x200, "proms", 0 ) // Using kgbird's 1CM29 PROM (colors seems correct) until original PROM is dumped.
-	ROM_LOAD("1cm29.u71", 0x0000, 0x0200, BAD_DUMP CRC(ef25f5cc) SHA1(51d12f4b8b8712cbd18ec97ec04e1340cd85fc67))
-ROM_END
+	ROM_REGION(0x200, "proms", 0 ) /* are either of these correct?  They are taken from different games */
+	//ROM_LOAD("2cm07.u40", 0x0000, 0x0200, CRC(1e3f402a) SHA1(f38da1ad6607df38add10c69febf7f5f8cd21744)) // Using 2CM07 until a correct PROM is confirmed
+	ROM_LOAD("1cm48.u40", 0x0000, 0x0200, BAD_DUMP CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890))
 
+ROM_END
 
 /* 86 Lions */
 
@@ -2435,55 +2498,31 @@ ROM_START( 86lions )
 	//  ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
 ROM_END
 
-ROM_START( gunnrose ) // MK2.5
-	ROM_REGION(0x10000, "maincpu", 0 )
-		/* VIDEO AND SOUND EPROM */
-	ROM_LOAD("gnr.u7", 0x06000, 0x2000, CRC(fe7d0ea4) SHA1(3f3f4809534065c33eca2cfff0d1d2a3e3992406))   // 1VL/SH136 RED AND BLACK
-
-		/* GAME EPROMS */
-	ROM_LOAD("gnr.u9", 0x08000, 0x8000, CRC(4fb5f757) SHA1(a4129bca7e573faac0d11de41a9bf8ea144091ee))   // E/C606191SMP
-
-		/* SHAPE EPROMS */
-	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("gnr.u8",  0x00000, 0x2000, CRC(dec9e695) SHA1(a596c4243d6d39e0611ff714e19e14188c90b6f1))  // 1VL/SH136 RED AND BLACK
-	ROM_LOAD("gnr.u10", 0x02000, 0x2000, CRC(e83b8e79) SHA1(595f41a5f59f938581a57b445370aa716c6b1409))  // 1VL/SH136 RED AND BLACK
-	ROM_LOAD("gnr.u12", 0x04000, 0x2000, CRC(9134d029) SHA1(d698fb91d8f5fa78ffd056149421008d3f12c456))  // 1VL/SH136 RED AND BLACK
-	ROM_LOAD("gnr.u9t", 0x06000, 0x2000, CRC(73a0c2cd) SHA1(662056d570eaa069483d378b77efcfb42eff6d0d))  // E/C606191SMP
-	ROM_LOAD("gnr.u11", 0x08000, 0x2000, CRC(c50adffe) SHA1(a7c4a3cdd4d5d31a1420e47859408caa75ce2636))  // 1VL/SH136 RED AND BLACK
-	ROM_LOAD("gnr.u13", 0x0a000, 0x2000, CRC(e0a6bfc5) SHA1(07e4c8191503f0ea2de4f7ce18fe6290d20ef80e))  // 1VL/SH136 RED AND BLACK
-
-		/* COLOR PROM */
-	ROM_REGION(0x200, "proms", 0 ) /* are either of these correct?  They are taken from different games */
-	//ROM_LOAD("2cm07.u71", 0x0000, 0x0200, CRC(1e3f402a) SHA1(f38da1ad6607df38add10c69febf7f5f8cd21744)) // Using 2CM07 until a correct PROM is confirmed
-	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, BAD_DUMP CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890))
-
-ROM_END
-
 GAMEL( 1985, 86lions,  0,        86lions,  aristmk4, aristmk4_state, aristmk4, ROT0, "Aristocrat", "86 Lions", MACHINE_NOT_WORKING, layout_topgear )
-GAMEL( 1996, eforest,  0,        aristmk4, eforest,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",         0, layout_eforest  )
-GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",          0, layout_aristmk4 ) // 10c, $1 = 10 credits
-GAMEL( 1996, eforestb, eforest,  aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)", 0, layout_arimk4nz ) // 5c, $2 = 40 credits
-GAMEL( 1996, 3bagflvt, 0,        aristmk4, 3bagflvt, aristmk4_state, aristmk4, ROT0, "Aristocrat", "3 Bags Full (5VXFC790, Victoria)",          0, layout_3bagflvt ) // 5c, $1 = 20 credits
-GAMEL( 1996, 3bagflnz, 3bagflvt, aristmk4, 3bagflnz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "3 Bags Full (3VXFC5345, New Zealand)",      0, layout_3bagflnz ) // 5c, $2 = 40 credits
-GAMEL( 1996, kgbird,   0,        aristmk4, kgbird,   aristmk4_state, aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 5c)",    0, layout_kgbird   ) // 5c, $2 = 40 credits
-GAMEL( 1996, kgbirda,  kgbird,   aristmk4, kgbird,   aristmk4_state, aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 10c)",   0, layout_kgbird   ) // 10c, $2 = 20 credits
-GAMEL( 1996, blkrhino, 0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Black Rhino (3VXFC5344, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits
-GAMEL( 1996, topgear,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Top Gear (4VXFC969, New Zealand)",          0, layout_topgear  ) // 10c, 1 coin = 1 credit
-GAMEL( 1996, wtigernz, 0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "White Tiger (3VXFC5342, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits
-GAMEL( 1998, phantomp, 0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Phantom Pays (4VXFC5431, New Zealand)",     0, layout_arimk4nz ) // 5c, $2 = 40 credits
-GAMEL( 1998, ffortune, 0,        aristmk4, goldenc,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Fantasy Fortune (1VXFC5460, New Zealand)",  0, layout_goldenc  ) // 5c, $2 = 40 credits
-GAMEL( 1998, swtht2nz, 0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Sweet Hearts II (1VXFC5461, New Zealand)",  0, layout_arimk4nz ) // 5c, $2 = 40 credits
-GAMEL( 1996, goldenc,  0,        aristmk4, goldenc,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Golden Canaries (1VXFC5462, New Zealand)",  0, layout_goldenc  ) // 2c, $2 = 100 credits
-GAMEL( 1999, autmoon,  0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Autumn Moon (1VXFC5488, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits
-GAMEL( 2000, coralr2,  0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Coral Riches II (1VXFC5472, New Zealand)",  0, layout_arimk4nz ) // 2c, $2 = 100 credits
-GAMEL( 1995, cgold2,   0,        aristmk4, cgold2,   aristmk4_state, aristmk4, ROT0, "Aristocrat", "Caribbean Gold II (3XF5182H04, USA)",       0, layout_cgold2   )
-GAMEL( 1996, fhunter,  0,        aristmk4, fhunter,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I01, USA)",          0, layout_fhunter  )
-GAMEL( 1996, fhuntera, fhunter,  aristmk4, fhunter,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I02, USA)",          0, layout_fhunter  )
-GAMEL( 1996, arcwins,  0,        aristmk4, arcwins,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, USA)",             0, layout_arcwins  )
-GAMEL( 1997, wildone,  0,  aristmk4_poker, wildone,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Wild One (4VXEC5357, New Zealand)",         0, layout_wildone  ) // 20c, $2 = 10 credits, video poker
-GAMEL( 1993, gunnrose, 0,  aristmk4_poker, wildone,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Guns and Roses (C606191SMP, Australia)",    MACHINE_WRONG_COLORS, layout_topgear  )
-GAMEL( 1986, gldnpkr,  0,  aristmk4_poker, gldnpkr,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Golden Poker (8VXEC037, New Zealand)", 0, layout_gldnpkr ) // possibly 20c, 1 coin = 1 credit, video poker
-GAMEL( 1986, gtroppo,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Gone Troppo (1VXEC542, New Zealand)",  0, layout_topgear ) // possibly 20c, 1 coin = 1 credit
-GAMEL( 1986, clkwise,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Clockwise (1VXEC534, New Zealand)",    MACHINE_NOT_WORKING, layout_topgear ) // 20c, 1 coin = 1 credit
-GAMEL( 1986, cgold,    0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Caribbean Gold (3VXEC449, USA)",       0, layout_topgear ) // 25c, 1 coin = 1 credit
-GAMEL( 1986, fvrpitch, 0,        aristmk4, fvrpitch, aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Fever Pitch? (2VXEC534, NSW, 90.36%)", 0, layout_fvrpitch  ) // 5c, $1 = 20 credits
+GAMEL( 1996, eforest,  0,        aristmk4, eforest,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",         0, layout_eforest  ) // 92.778%
+GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",          0, layout_aristmk4 ) // 10c, $1 = 10 credits, 90.483%
+GAMEL( 1996, eforestb, eforest,  aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)", 0, layout_arimk4nz ) // 5c, $2 = 40 credits, 88.43%
+GAMEL( 1996, 3bagflvt, 0,        aristmk4, 3bagflvt, aristmk4_state, aristmk4, ROT0, "Aristocrat", "3 Bags Full (5VXFC790, Victoria)",          0, layout_3bagflvt ) // 5c, $1 = 20 credits, 90.018%
+GAMEL( 1996, 3bagflnz, 3bagflvt, aristmk4, 3bagflnz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "3 Bags Full (3VXFC5345, New Zealand)",      0, layout_3bagflnz ) // 5c, $2 = 40 credits, 88.22%
+GAMEL( 1996, kgbird,   0,        aristmk4, kgbird,   aristmk4_state, aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 5c)",    0, layout_kgbird   ) // 5c, $2 = 40 credits, 87.98%
+GAMEL( 1996, kgbirda,  kgbird,   aristmk4, kgbird,   aristmk4_state, aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 10c)",   0, layout_kgbird   ) // 10c, $2 = 20 credits, 91.97%
+GAMEL( 1996, blkrhino, 0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Black Rhino (3VXFC5344, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits, 91.96%
+GAMEL( 1996, topgear,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Top Gear (4VXFC969, New Zealand)",          0, layout_topgear  ) // 10c, 10c = 1 credit, 87.471%
+GAMEL( 1996, wtigernz, 0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "White Tiger (3VXFC5342, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits, 91.99%
+GAMEL( 1998, phantomp, 0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Phantom Pays (4VXFC5431, New Zealand)",     0, layout_arimk4nz ) // 5c, $2 = 40 credits, 91.95%
+GAMEL( 1998, ffortune, 0,        aristmk4, goldenc,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Fantasy Fortune (1VXFC5460, New Zealand)",  0, layout_goldenc  ) // 5c, $2 = 40 credits, 87.90%
+GAMEL( 1998, swtht2nz, 0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Sweethearts II (1VXFC5461, New Zealand)",   0, layout_arimk4nz ) // 5c, $2 = 40 credits, 87.13%
+GAMEL( 1996, goldenc,  0,        aristmk4, goldenc,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Golden Canaries (1VXFC5462, New Zealand)",  0, layout_goldenc  ) // 2c, $2 = 100 credits, 87.30%
+GAMEL( 1999, autmoon,  0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Autumn Moon (1VXFC5488, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits, 87.27%
+GAMEL( 2000, coralr2,  0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Coral Riches II (1VXFC5472, New Zealand)",  0, layout_arimk4nz ) // 2c, $2 = 100 credits, 87.13%
+GAMEL( 1995, cgold2,   0,        aristmk4, cgold2,   aristmk4_state, aristmk4, ROT0, "Aristocrat", "Caribbean Gold II (3XF5182H04, USA)",       0, layout_cgold2   ) // 92.858%
+GAMEL( 1996, fhunter,  0,        aristmk4, fhunter,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I01, USA)",          0, layout_fhunter  ) // 90.018%
+GAMEL( 1996, fhuntera, fhunter,  aristmk4, fhunter,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I02, USA)",          0, layout_fhunter  ) // 92.047%
+GAMEL( 1996, arcwins,  0,        aristmk4, arcwins,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, USA)",             0, layout_arcwins  ) // 90.361%
+GAMEL( 1997, wildone,  0,  aristmk4_poker, wildone,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Wild One (4VXEC5357, New Zealand)",         0, layout_wildone  ) // 20c, $2 = 10 credits, video poker, 88.00%
+GAMEL( 1993, gunnrose, 0,  aristmk4_poker, gunnrose, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Guns and Roses (C606191SMP, NSW)",          MACHINE_WRONG_COLORS, layout_gunnrose ) // 20c, $1 = 5 credits
+GAMEL( 1986, gldnpkr,  0,  aristmk4_poker, gldnpkr,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Golden Poker (8VXEC037, New Zealand)", 0, layout_gldnpkr ) // 20c, 20c = 1 credit, video poker
+GAMEL( 1986, gtroppo,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Gone Troppo (1VXEC542, New Zealand)",  0, layout_topgear ) // 20c, 20c = 1 credit, 87.138%
+GAMEL( 1986, clkwise,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Clockwise (1VXEC534, New Zealand)",    MACHINE_NOT_WORKING, layout_topgear )
+GAMEL( 1986, cgold,    0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Caribbean Gold (3VXEC449, USA)",       0, layout_topgear ) // 25c, 25c = 1 credit
+GAMEL( 1986, fvrpitch, 0,        aristmk4, fvrpitch, aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Fever Pitch (2VXEC534, NSW)",  0, layout_fvrpitch ) // 5c, $1 = 20 credits, 90.360%

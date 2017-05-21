@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_ULTRATERM__
-#define __A2BUS_ULTRATERM__
+#ifndef MAME_BUS_A2BUS_A2ULTRATERM_H
+#define MAME_BUS_A2BUS_A2ULTRATERM_H
+
+#pragma once
 
 #include "a2bus.h"
 #include "video/mc6845.h"
@@ -23,21 +25,16 @@ class a2bus_videx160_device:
 	public device_a2bus_card_interface
 {
 public:
-	// construction/destruction
-	a2bus_videx160_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	uint8_t *m_rom, *m_chrrom;
-	uint8_t m_ram[256*16];
-	int m_framecnt;
-	uint8_t m_ctrl1, m_ctrl2;
-
 protected:
+	// construction/destruction
+	a2bus_videx160_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -48,6 +45,11 @@ protected:
 	virtual void write_cnxx(address_space &space, uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_c800(address_space &space, uint16_t offset) override;
 	virtual void write_c800(address_space &space, uint16_t offset, uint8_t data) override;
+
+	uint8_t *m_rom, *m_chrrom;
+	uint8_t m_ram[256*16];
+	int m_framecnt;
+	uint8_t m_ctrl1, m_ctrl2;
 
 	required_device<mc6845_device> m_crtc;
 
@@ -72,7 +74,7 @@ public:
 };
 
 // device type definition
-extern const device_type A2BUS_ULTRATERM;
-extern const device_type A2BUS_ULTRATERMENH;
+DECLARE_DEVICE_TYPE(A2BUS_ULTRATERM,    a2bus_ultraterm_device)
+DECLARE_DEVICE_TYPE(A2BUS_ULTRATERMENH, a2bus_ultratermenh_device)
 
-#endif /* __A2BUS_ULTRATERM__ */
+#endif // MAME_BUS_A2BUS_A2ULTRATERM_H

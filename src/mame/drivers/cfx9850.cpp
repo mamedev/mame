@@ -279,7 +279,7 @@ u32 cfx9850_state::screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-static MACHINE_CONFIG_START(cfx9850, cfx9850_state)
+static MACHINE_CONFIG_START(cfx9850)
 	MCFG_CPU_ADD("maincpu", HCD62121, 4300000)    /* X1 - 4.3 MHz */
 	MCFG_CPU_PROGRAM_MAP(cfx9850)
 	MCFG_HCD62121_KOL_CB(WRITE8(cfx9850_state, kol_w))
@@ -317,4 +317,4 @@ ROM_START(cfx9850)
 ROM_END
 
 
-COMP(1996, cfx9850, 0, 0, cfx9850, cfx9850, driver_device, 0, "Casio", "CFX-9850G", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1996, cfx9850, 0, 0, cfx9850, cfx9850, cfx9850_state, 0, "Casio", "CFX-9850G", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

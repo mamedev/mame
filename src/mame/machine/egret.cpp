@@ -53,7 +53,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EGRET = device_creator<egret_device>;
+DEFINE_DEVICE_TYPE(EGRET, egret_device, "egret", "Apple Egret")
 
 ROM_START( egret )
 	ROM_REGION(0x4400, EGRET_CPU_TAG, 0)
@@ -334,7 +334,7 @@ WRITE8_MEMBER( egret_device::pram_w )
 //-------------------------------------------------
 
 egret_device::egret_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, EGRET, "Apple Egret", tag, owner, clock, "egret", __FILE__),
+	: device_t(mconfig, EGRET, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	write_reset(*this),
 	write_linechange(*this),

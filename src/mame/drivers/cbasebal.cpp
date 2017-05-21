@@ -258,7 +258,7 @@ void cbasebal_state::machine_reset()
 	m_scroll_y[1] = 0;
 }
 
-static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
+static MACHINE_CONFIG_START( cbasebal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)   /* ??? */
@@ -287,7 +287,7 @@ static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)

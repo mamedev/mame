@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_OCEAN_H
+#define MAME_BUS_C64_OCEAN_H
 
-#ifndef __OCEAN__
-#define __OCEAN__
+#pragma once
 
 
 #include "exp.h"
@@ -44,7 +44,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_OCEAN;
+DECLARE_DEVICE_TYPE(C64_OCEAN, c64_ocean_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_OCEAN_H

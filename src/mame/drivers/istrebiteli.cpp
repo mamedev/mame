@@ -56,14 +56,14 @@ private:
 	uint8_t m_prev_data;
 };
 
-extern const device_type ISTREBITELI_SOUND;
+DECLARE_DEVICE_TYPE(ISTREBITELI_SOUND, istrebiteli_sound_device)
 
 //////////////////////////////////////////////////////////////
 
-const device_type ISTREBITELI_SOUND = device_creator<istrebiteli_sound_device>;
+DEFINE_DEVICE_TYPE(ISTREBITELI_SOUND, istrebiteli_sound_device, "istrebiteli_sound", "Istrebiteli Sound")
 
 istrebiteli_sound_device::istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ISTREBITELI_SOUND, "Istrebiteli Sound", tag, owner, clock, "istrebiteli_sound", __FILE__),
+	: device_t(mconfig, ISTREBITELI_SOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
 		m_rom(nullptr),
@@ -413,7 +413,7 @@ static GFXDECODE_START( istrebiteli )
 	GFXDECODE_ENTRY( "sprite", 0x0200, projectile_layout, 0, 2 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( istreb, istrebiteli_state)
+static MACHINE_CONFIG_START( istreb )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_8MHz / 4)       // KR580VM80A
 	MCFG_CPU_PROGRAM_MAP(mem_map)
@@ -466,4 +466,4 @@ ROM_START( istreb )
 	ROM_LOAD( "003-w3.bin", 0x000, 0x200, CRC(54eb4893) SHA1(c7a4724045c645ab728074ed7fef1882d9776005) )
 ROM_END
 
-GAME( 198?, istreb,  0,        istreb,  istreb,  driver_device,  0, ROT0, "Terminal", "Istrebiteli", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 198?, istreb,  0,        istreb,  istreb,  istrebiteli_state,  0, ROT0, "Terminal", "Istrebiteli", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

@@ -324,7 +324,7 @@ void munchmo_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
+static MACHINE_CONFIG_START( mnchmobl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_15MHz/4) // from pin 13 of XTAL-driven 163
@@ -435,5 +435,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, driver_device, 0, ROT270, "SNK", "Joyful Road (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, driver_device, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, munchmo_state, 0, ROT270, "SNK",                   "Joyful Road (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, munchmo_state, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

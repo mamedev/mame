@@ -80,7 +80,7 @@ public:
 	private:
 		const mem_t m;
 	};
-	typedef const ref_value_type& const_reference ;
+	typedef const ref_value_type& const_reference;
 	typedef const_reference reference;
 
 	enum enc_t

@@ -19,7 +19,7 @@
 
 
 // device type definitions
-const device_type I8155 = device_creator<i8155_device>;
+DEFINE_DEVICE_TYPE(I8155, i8155_device, "i8155", "Intel 8155 RIOT")
 const device_type I8156 = I8155;
 
 
@@ -203,7 +203,7 @@ inline void i8155_device::write_port(int port, uint8_t data)
 //-------------------------------------------------
 
 i8155_device::i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, I8155, "8155 RIOT", tag, owner, clock, "i8155", __FILE__),
+	: device_t(mconfig, I8155, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_in_pa_cb(*this),
 		m_in_pb_cb(*this),

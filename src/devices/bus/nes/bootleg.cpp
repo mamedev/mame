@@ -22,7 +22,7 @@
 #include "bootleg.h"
 
 #include "cpu/m6502/m6502.h"
-#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access PPU_BOTTOM_VISIBLE_SCANLINE
+#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 #include "screen.h"
 
 
@@ -39,131 +39,131 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_AX5705 = device_creator<nes_ax5705_device>;
-const device_type NES_SC127 = device_creator<nes_sc127_device>;
-const device_type NES_MARIOBABY = device_creator<nes_mbaby_device>;
-const device_type NES_ASN = device_creator<nes_asn_device>;
-const device_type NES_SMB3PIRATE = device_creator<nes_smb3p_device>;
-const device_type NES_BTL_DNINJA = device_creator<nes_btl_dn_device>;
-const device_type NES_WHIRLWIND_2706 = device_creator<nes_whirl2706_device>;
-const device_type NES_SMB2J = device_creator<nes_smb2j_device>;
-const device_type NES_SMB2JA = device_creator<nes_smb2ja_device>;
-const device_type NES_SMB2JB = device_creator<nes_smb2jb_device>;
-const device_type NES_09034A = device_creator<nes_09034a_device>;
-const device_type NES_TOBIDASE = device_creator<nes_tobidase_device>;
-const device_type NES_LH32 = device_creator<nes_lh32_device>;
-const device_type NES_LH10 = device_creator<nes_lh10_device>;
-const device_type NES_LH53 = device_creator<nes_lh53_device>;
-const device_type NES_2708 = device_creator<nes_2708_device>;
-const device_type NES_AC08 = device_creator<nes_ac08_device>;
-const device_type NES_UNL_BB = device_creator<nes_unl_bb_device>;
-const device_type NES_MMALEE = device_creator<nes_mmalee_device>;
-const device_type NES_SHUIGUAN = device_creator<nes_shuiguan_device>;
-const device_type NES_RT01 = device_creator<nes_rt01_device>;
+DEFINE_DEVICE_TYPE(NES_AX5705,         nes_ax5705_device,    "nes_ax5705",    "NES Cart AX5705 PCB")
+DEFINE_DEVICE_TYPE(NES_SC127,          nes_sc127_device,     "nes_sc127",     "NES Cart SC-127 PCB")
+DEFINE_DEVICE_TYPE(NES_MARIOBABY,      nes_mbaby_device,     "nes_mbaby",     "NES Cart Mario Baby Bootleg PCB")
+DEFINE_DEVICE_TYPE(NES_ASN,            nes_asn_device,       "nes_asn",       "NES Cart Ai Senshi Nicol Bootleg PCB")
+DEFINE_DEVICE_TYPE(NES_SMB3PIRATE,     nes_smb3p_device,     "nes_smb3p",     "NES Cart Super Mario Bros. 3 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_BTL_DNINJA,     nes_btl_dn_device,    "nes_btl_dn",    "NES Cart DragonNinja Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_WHIRLWIND_2706, nes_whirl2706_device, "nes_whirl2706", "NES Cart Whilwind 2706 PCB")
+DEFINE_DEVICE_TYPE(NES_SMB2J,          nes_smb2j_device,     "nes_smb2j",     "NES Cart Super Mario Bros. 2 Jpn PCB")
+DEFINE_DEVICE_TYPE(NES_SMB2JA,         nes_smb2ja_device,    "nes_smb2ja",    "NES Cart Super Mario Bros. 2 Jpn (Alt) PCB")
+DEFINE_DEVICE_TYPE(NES_SMB2JB,         nes_smb2jb_device,    "nes_smb2jb",    "NES Cart Super Mario Bros. 2 Jpn (Alt 2) PCB")
+DEFINE_DEVICE_TYPE(NES_09034A,         nes_09034a_device,    "nes_09034a",    "NES Cart 09-034A PCB")
+DEFINE_DEVICE_TYPE(NES_TOBIDASE,       nes_tobidase_device,  "nes_tobidase",  "NES Cart Tobidase Daisakusen Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_LH32,           nes_lh32_device,      "nes_lh32",      "NES Cart LH-32 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_LH10,           nes_lh10_device,      "nes_lh10",      "NES Cart LH-10 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_LH53,           nes_lh53_device,      "nes_lh53",      "NES Cart LH-53 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_2708,           nes_2708_device,      "nes_2708",      "NES Cart BTL-2708 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_AC08,           nes_ac08_device,      "nes_ac08",      "NES Cart AC08 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_UNL_BB,         nes_unl_bb_device,    "nes_unl_bb",    "NES Cart FDS+CHR Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_MMALEE,         nes_mmalee_device,    "nes_mmalee",    "NES Cart Super Mario Bros. Malee 2 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_SHUIGUAN,       nes_shuiguan_device,  "nes_shuiguan",  "NES Cart Shui Guan Pipe Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_RT01,           nes_rt01_device,      "nes_rt01",      "NES Cart RT-01 PCB")
 
 
 nes_ax5705_device::nes_ax5705_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_AX5705, "NES Cart AX5705 PCB", tag, owner, clock, "nes_ax5705", __FILE__)
+	: nes_nrom_device(mconfig, NES_AX5705, tag, owner, clock)
 {
 }
 
 nes_sc127_device::nes_sc127_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_SC127, "NES Cart SC-127 PCB", tag, owner, clock, "nes_sc127", __FILE__), m_irq_count(0), m_irq_enable(0)
-				{
+	: nes_nrom_device(mconfig, NES_SC127, tag, owner, clock), m_irq_count(0), m_irq_enable(0)
+{
 }
 
 nes_mbaby_device::nes_mbaby_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_MARIOBABY, "NES Cart Mario Baby Bootleg PCB", tag, owner, clock, "nes_mbaby", __FILE__), m_latch(0), m_irq_enable(0), irq_timer(nullptr)
-				{
+	: nes_nrom_device(mconfig, NES_MARIOBABY, tag, owner, clock), m_latch(0), m_irq_enable(0), irq_timer(nullptr)
+{
 }
 
 nes_asn_device::nes_asn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_ASN, "NES Cart Ai Senshi Nicol Bootleg PCB", tag, owner, clock, "nes_asn", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_ASN, tag, owner, clock), m_latch(0)
+{
 }
 
 nes_smb3p_device::nes_smb3p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_SMB3PIRATE, "NES Cart Super Mario Bros. 3 Pirate PCB", tag, owner, clock, "nes_smb3p", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
-				{
+	: nes_nrom_device(mconfig, NES_SMB3PIRATE, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+{
 }
 
 nes_btl_dn_device::nes_btl_dn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_BTL_DNINJA, "NES Cart DragonNinja Pirate PCB", tag, owner, clock, "nes_btl_dn", __FILE__), m_irq_count(0)
-				{
+	: nes_nrom_device(mconfig, NES_BTL_DNINJA, tag, owner, clock), m_irq_count(0)
+{
 }
 
 nes_whirl2706_device::nes_whirl2706_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_WHIRLWIND_2706, "NES Cart Whirlwind 2706 PCB", tag, owner, clock, "nes_whirl2706", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_WHIRLWIND_2706, tag, owner, clock), m_latch(0)
+{
 }
 
 nes_smb2j_device::nes_smb2j_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_SMB2J, "NES Cart Super Mario Bros. 2 Jpn PCB", tag, owner, clock, "nes_smb2j", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
-				{
+	: nes_nrom_device(mconfig, NES_SMB2J, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+{
 }
 
 nes_smb2ja_device::nes_smb2ja_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_SMB2JA, "NES Cart Super Mario Bros. 2 Jpn (Alt) PCB", tag, owner, clock, "nes_smb2ja", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
-				{
+	: nes_nrom_device(mconfig, NES_SMB2JA, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+{
 }
 
 nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_SMB2JB, "NES Cart Super Mario Bros. 2 Jpn (Alt 2) PCB", tag, owner, clock, "nes_smb2jb", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
-				{
+	: nes_nrom_device(mconfig, NES_SMB2JB, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+{
 }
 
 nes_09034a_device::nes_09034a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_09034A, "NES Cart 09-034A PCB", tag, owner, clock, "nes_09034a", __FILE__), m_reg(0)
-				{
+	: nes_nrom_device(mconfig, NES_09034A, tag, owner, clock), m_reg(0)
+{
 }
 
 nes_tobidase_device::nes_tobidase_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_TOBIDASE, "NES Cart Tobidase Daisakusen Pirate PCB", tag, owner, clock, "nes_tobidase", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_TOBIDASE, tag, owner, clock), m_latch(0)
+{
 }
 
 nes_lh32_device::nes_lh32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_LH32, "NES Cart LH-32 Pirate PCB", tag, owner, clock, "nes_lh32", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_LH32, tag, owner, clock), m_latch(0)
+{
 }
 
 nes_lh10_device::nes_lh10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_LH10, "NES Cart LH-10 Pirate PCB", tag, owner, clock, "nes_lh10", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_LH10, tag, owner, clock), m_latch(0)
+{
 }
 
 nes_lh53_device::nes_lh53_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_LH53, "NES Cart LH-53 Pirate PCB", tag, owner, clock, "nes_lh53", __FILE__), m_irq_count(0), m_irq_enable(0), m_reg(0), irq_timer(nullptr)
-				{
+	: nes_nrom_device(mconfig, NES_LH53, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_reg(0), irq_timer(nullptr)
+{
 }
 
 nes_2708_device::nes_2708_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_2708, "NES Cart BTL-2708 Pirate PCB", tag, owner, clock, "nes_2708", __FILE__)
+	: nes_nrom_device(mconfig, NES_2708, tag, owner, clock)
 {
 }
 
 nes_ac08_device::nes_ac08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_AC08, "NES Cart AC08 Pirate PCB", tag, owner, clock, "nes_ac08", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_AC08, tag, owner, clock), m_latch(0)
+{
 }
 
 nes_unl_bb_device::nes_unl_bb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_UNL_BB, "NES Cart FDS+CHR Pirate PCB", tag, owner, clock, "nes_unl_bb", __FILE__)
+	: nes_nrom_device(mconfig, NES_UNL_BB, tag, owner, clock)
 {
 }
 
 nes_mmalee_device::nes_mmalee_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_MMALEE, "NES Cart Super Mario Bros. Malee 2 Pirate PCB", tag, owner, clock, "nes_mmalee", __FILE__)
+	: nes_nrom_device(mconfig, NES_MMALEE, tag, owner, clock)
 {
 }
 
 nes_shuiguan_device::nes_shuiguan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_SHUIGUAN, "NES Cart Shui Guan Pipe Pirate PCB", tag, owner, clock, "nes_shuiguan", __FILE__), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+	: nes_nrom_device(mconfig, NES_SHUIGUAN, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }
 
 nes_rt01_device::nes_rt01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_RT01, "NES Cart RT-01 PCB", tag, owner, clock, "nes_rt01", __FILE__)
+	: nes_nrom_device(mconfig, NES_RT01, tag, owner, clock)
 {
 }
 
@@ -640,7 +640,7 @@ WRITE8_MEMBER(nes_ax5705_device::write_h)
 
 void nes_sc127_device::hblank_irq(int scanline, int vblank, int blanked)
 {
-	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE && m_irq_enable)
+	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE && m_irq_enable)
 	{
 		m_irq_count--;
 

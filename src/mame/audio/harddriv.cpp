@@ -8,8 +8,9 @@
 
 #include "emu.h"
 #include "includes/harddriv.h"
-#include "cpu/tms32010/tms32010.h"
 #include "machine/atarigen.h"
+
+#include "cpu/tms32010/tms32010.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -26,10 +27,10 @@
 //  harddriv_sound_board_device - constructor
 //-------------------------------------------------
 
-const device_type HARDDRIV_SOUND_BOARD_DEVICE = device_creator<harddriv_sound_board_device>;
+DEFINE_DEVICE_TYPE(HARDDRIV_SOUND_BOARD, harddriv_sound_board_device, "harddriv_sound", "Hard Drivin' Sound Board")
 
 harddriv_sound_board_device::harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, HARDDRIV_SOUND_BOARD_DEVICE, "Hard Drivin' Sound Board", tag, owner, clock, "harddriv_sound", __FILE__),
+	device_t(mconfig, HARDDRIV_SOUND_BOARD, tag, owner, clock),
 	m_soundcpu(*this, "soundcpu"),
 	m_dac(*this, "dac"),
 	m_sounddsp(*this, "sounddsp"),

@@ -619,7 +619,7 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5v)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
+static MACHINE_CONFIG_START( jpmsys5v )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(68000_map)
 
@@ -835,7 +835,7 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)
  *************************************/
 
 // later (incompatible with earlier revision) motherboards used a YM2413
-MACHINE_CONFIG_START( jpmsys5_ym, jpmsys5_state )
+MACHINE_CONFIG_START( jpmsys5_ym )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 
 	MCFG_CPU_PROGRAM_MAP(68000_awp_map)
@@ -889,7 +889,7 @@ MACHINE_CONFIG_START( jpmsys5_ym, jpmsys5_state )
 MACHINE_CONFIG_END
 
 // the first rev PCB used an SAA1099
-MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
+MACHINE_CONFIG_START( jpmsys5 )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(68000_awp_map_saa)
 
@@ -1039,8 +1039,8 @@ ROM_END
 
 
 /* Video based titles */
-GAME( 1994, monopoly    , 0         , jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Monopoly (JPM) (SYSTEM5 VIDEO, set 1)",         0 )
-GAME( 1994, monopolya   , monopoly  , jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Monopoly (JPM) (SYSTEM5 VIDEO, set 2)",         0 )
-GAME( 1995, monoplcl    , monopoly  , jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Monopoly Classic (JPM) (SYSTEM5 VIDEO)", 0 )
-GAME( 1995, monopldx    , 0         , jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Monopoly Deluxe (JPM) (SYSTEM5 VIDEO)",  0 )
-GAME( 199?, cashcade    , 0         , jpmsys5v, monopoly, driver_device, 0, ROT0, "JPM", "Cashcade (JPM) (SYSTEM5 VIDEO)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // shows a loading error.. is the set incomplete?
+GAME( 1994, monopoly    , 0         , jpmsys5v, monopoly, jpmsys5_state, 0, ROT0, "JPM", "Monopoly (JPM) (SYSTEM5 VIDEO, set 1)",         0 )
+GAME( 1994, monopolya   , monopoly  , jpmsys5v, monopoly, jpmsys5_state, 0, ROT0, "JPM", "Monopoly (JPM) (SYSTEM5 VIDEO, set 2)",         0 )
+GAME( 1995, monoplcl    , monopoly  , jpmsys5v, monopoly, jpmsys5_state, 0, ROT0, "JPM", "Monopoly Classic (JPM) (SYSTEM5 VIDEO)", 0 )
+GAME( 1995, monopldx    , 0         , jpmsys5v, monopoly, jpmsys5_state, 0, ROT0, "JPM", "Monopoly Deluxe (JPM) (SYSTEM5 VIDEO)",  0 )
+GAME( 199?, cashcade    , 0         , jpmsys5v, monopoly, jpmsys5_state, 0, ROT0, "JPM", "Cashcade (JPM) (SYSTEM5 VIDEO)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // shows a loading error.. is the set incomplete?

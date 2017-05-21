@@ -1100,15 +1100,15 @@ static ADDRESS_MAP_START( system24_cpu1_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x040000) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x0c0000) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x110000) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
+	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x110000) AM_DEVREADWRITE("tile", segas24_tile_device, tile_r, tile_w)
 	AM_RANGE(0x220000, 0x220001) AM_MIRROR(0x11fffe) AM_WRITENOP        /* Horizontal split position (ABSEL) */
 	AM_RANGE(0x240000, 0x240001) AM_MIRROR(0x11fffe) AM_WRITENOP        /* Scanline trigger position (XHOUT) */
 	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP        /* Frame trigger position (XVOUT) */
 	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP        /* Synchronization mode */
-	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
+	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_DEVREADWRITE("tile", segas24_tile_device, char_r, char_w)
 	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(sys16_paletteram_r, sys16_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_DEVREADWRITE("mixer", segas24_mixer, read, write)
-	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_DEVREADWRITE("sprite", segas24_sprite, read, write)
+	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_DEVREADWRITE("mixer", segas24_mixer_device, read, write)
+	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_DEVREADWRITE("sprite", segas24_sprite_device, read, write)
 	AM_RANGE(0x800000, 0x80003f) AM_MIRROR(0x1ffe00) AM_DEVREADWRITE8("io", sega_315_5296_device, read, write, 0x00ff)
 	AM_RANGE(0x800040, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(iod_r, iod_w)
 	AM_RANGE(0x800100, 0x800103) AM_MIRROR(0x1ffe00) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
@@ -1147,15 +1147,15 @@ static ADDRESS_MAP_START( system24_cpu2_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("subcpu")
 	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x0c0000) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x110000) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
+	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x110000) AM_DEVREADWRITE("tile", segas24_tile_device, tile_r, tile_w)
 	AM_RANGE(0x220000, 0x220001) AM_MIRROR(0x11fffe) AM_WRITENOP        /* Horizontal split position (ABSEL) */
 	AM_RANGE(0x240000, 0x240001) AM_MIRROR(0x11fffe) AM_WRITENOP        /* Scanline trigger position (XHOUT) */
 	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP        /* Frame trigger position (XVOUT) */
 	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP        /* Synchronization mode */
-	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
+	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_DEVREADWRITE("tile", segas24_tile_device, char_r, char_w)
 	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(sys16_paletteram_r, sys16_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_DEVREADWRITE("mixer", segas24_mixer, read, write)
-	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_DEVREADWRITE("sprite", segas24_sprite, read, write)
+	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_DEVREADWRITE("mixer", segas24_mixer_device, read, write)
+	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_DEVREADWRITE("sprite", segas24_sprite_device, read, write)
 	AM_RANGE(0x800000, 0x80003f) AM_MIRROR(0x1ffe00) AM_DEVREADWRITE8("io", sega_315_5296_device, read, write, 0x00ff)
 	AM_RANGE(0x800040, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(iod_r, iod_w)
 	AM_RANGE(0x800100, 0x800103) AM_MIRROR(0x1ffe00) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
@@ -1204,9 +1204,9 @@ void segas24_state::machine_start()
 		membank("bank2")->configure_entries(0, 16, usr1, 0x40000);
 	}
 
-	vtile = machine().device<segas24_tile>("tile");
-	vsprite = machine().device<segas24_sprite>("sprite");
-	vmixer = machine().device<segas24_mixer>("mixer");
+	vtile = machine().device<segas24_tile_device>("tile");
+	vsprite = machine().device<segas24_sprite_device>("sprite");
+	vmixer = machine().device<segas24_mixer_device>("mixer");
 }
 
 void segas24_state::machine_reset()
@@ -1875,7 +1875,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( system24, segas24_state )
+static MACHINE_CONFIG_START( system24 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)

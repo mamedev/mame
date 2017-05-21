@@ -77,7 +77,7 @@ INTERRUPT_GEN_MEMBER(adder5_state::ad5_fake_timer_int)
 //  m_maincpu->set_input_line_and_vector(5, HOLD_LINE, 0x8c);
 }
 
-MACHINE_CONFIG_START( bfm_ad5, adder5_state )
+MACHINE_CONFIG_START( bfm_ad5 )
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
 	MCFG_CPU_PROGRAM_MAP(ad5_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(adder5_state, ad5_fake_timer_int, 1000)

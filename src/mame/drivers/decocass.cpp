@@ -773,7 +773,7 @@ PALETTE_INIT_MEMBER(decocass_state, decocass)
 }
 
 
-static MACHINE_CONFIG_START( decocass, decocass_state )
+static MACHINE_CONFIG_START( decocass )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO_222, HCLK4) /* the earlier revision board doesn't have the 222 but must have the same thing implemented in logic for the M6502 */

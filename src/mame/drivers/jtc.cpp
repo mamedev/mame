@@ -720,7 +720,7 @@ static GFXDECODE_START( jtces40 )
 	GFXDECODE_ENTRY( UB8830D_TAG, 0x1000, jtces40_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( basic, jtc_state )
+static MACHINE_CONFIG_START( basic )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(UB8830D_TAG, UB8830D, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(jtc_mem)
@@ -760,7 +760,7 @@ static MACHINE_CONFIG_DERIVED( jtc, basic )
 	MCFG_RAM_DEFAULT_SIZE("2K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( jtces88, jtc, jtces88_state )
+static MACHINE_CONFIG_DERIVED( jtces88, jtc )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(UB8830D_TAG)
 	MCFG_CPU_PROGRAM_MAP(jtc_es1988_mem)
@@ -770,7 +770,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( jtces88, jtc, jtces88_state )
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( jtces23, basic, jtces23_state )
+static MACHINE_CONFIG_DERIVED( jtces23, basic )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(UB8830D_TAG)
 	MCFG_CPU_PROGRAM_MAP(jtc_es23_mem)
@@ -792,7 +792,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( jtces23, basic, jtces23_state )
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( jtces40, basic, jtces40_state )
+static MACHINE_CONFIG_DERIVED( jtces40, basic )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(UB8830D_TAG)
 	MCFG_CPU_PROGRAM_MAP(jtc_es40_mem)
@@ -846,8 +846,8 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY             FULLNAME                    FLAGS */
-COMP( 1987, jtc,        0,       0,     jtc,    jtc, driver_device,  0,     "Jugend+Technik",   "CompJU+TEr",               MACHINE_NOT_WORKING )
-COMP( 1988, jtces88,    jtc,     0,     jtces88,jtc, driver_device,  0,     "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)", MACHINE_NOT_WORKING )
-COMP( 1989, jtces23,    jtc,     0,     jtces23,jtces23, driver_device, 0,      "Jugend+Technik",   "CompJU+TEr (ES 2.3)",      MACHINE_NOT_WORKING )
-COMP( 1990, jtces40,    jtc,     0,     jtces40,jtces40, driver_device, 0,      "Jugend+Technik",   "CompJU+TEr (ES 4.0)",      MACHINE_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT    STATE          INIT  COMPANY             FULLNAME                    FLAGS */
+COMP( 1987, jtc,        0,       0,     jtc,    jtc,     jtc_state,     0,    "Jugend+Technik",   "CompJU+TEr",               MACHINE_NOT_WORKING )
+COMP( 1988, jtces88,    jtc,     0,     jtces88,jtc,     jtces88_state, 0,    "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)", MACHINE_NOT_WORKING )
+COMP( 1989, jtces23,    jtc,     0,     jtces23,jtces23, jtces23_state, 0,    "Jugend+Technik",   "CompJU+TEr (ES 2.3)",      MACHINE_NOT_WORKING )
+COMP( 1990, jtces40,    jtc,     0,     jtces40,jtces40, jtces40_state, 0,    "Jugend+Technik",   "CompJU+TEr (ES 4.0)",      MACHINE_NOT_WORKING )

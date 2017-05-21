@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CBMIEC_C1571_H
+#define MAME_BUS_CBMIEC_C1571_H
 
-#ifndef __C1571__
-#define __C1571__
+#pragma once
 
 #include "cbmiec.h"
 #include "bus/c64/bn1541.h"
@@ -35,16 +35,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c1571_t
+// ======================> c1571_device
 
-class c1571_t :  public device_t,
-					public device_cbm_iec_interface,
-					public device_c64_floppy_parallel_interface
+class c1571_device : public device_t, public device_cbm_iec_interface, public device_c64_floppy_parallel_interface
 {
 public:
 	// construction/destruction
-	c1571_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	c1571_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -77,6 +74,8 @@ public:
 	void wpt_callback(floppy_image_device *floppy, int state);
 
 protected:
+	c1571_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -103,7 +102,7 @@ protected:
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_device<mos6526_device> m_cia;
-	required_device<wd1770_t> m_fdc;
+	required_device<wd1770_device> m_fdc;
 	required_device<c64h156_device> m_ga;
 	required_device<floppy_image_device> m_floppy;
 	required_ioport m_address;
@@ -124,13 +123,13 @@ protected:
 };
 
 
-// ======================> c1570_t
+// ======================> c1570_device
 
-class c1570_t :  public c1571_t
+class c1570_device :  public c1571_device
 {
 public:
 	// construction/destruction
-	c1570_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1570_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -138,13 +137,13 @@ public:
 };
 
 
-// ======================> c1571cr_t
+// ======================> c1571cr_device
 
-class c1571cr_t :  public c1571_t
+class c1571cr_device :  public c1571_device
 {
 public:
 	// construction/destruction
-	c1571cr_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1571cr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -155,13 +154,13 @@ public:
 };
 
 
-// ======================> mini_chief_t
+// ======================> mini_chief_device
 
-class mini_chief_t :  public c1571_t
+class mini_chief_device :  public c1571_device
 {
 public:
 	// construction/destruction
-	mini_chief_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mini_chief_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -174,11 +173,9 @@ public:
 
 
 // device type definition
-extern const device_type C1570;
-extern const device_type C1571;
-extern const device_type C1571CR;
-extern const device_type MINI_CHIEF;
+DECLARE_DEVICE_TYPE(C1570,      c1570_device)
+DECLARE_DEVICE_TYPE(C1571,      c1571_device)
+DECLARE_DEVICE_TYPE(C1571CR,    c1571cr_device)
+DECLARE_DEVICE_TYPE(MINI_CHIEF, mini_chief_device)
 
-
-
-#endif
+#endif // MAME_BUS_CBMIEC_C1571_H

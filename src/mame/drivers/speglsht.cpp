@@ -395,7 +395,7 @@ uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-static MACHINE_CONFIG_START( speglsht, speglsht_state )
+static MACHINE_CONFIG_START( speglsht )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",ST0016_CPU, 8000000) /* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)

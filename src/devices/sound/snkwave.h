@@ -1,11 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_SOUND_SNKWAVE_H
+#define MAME_SOUND_SNKWAVE_H
+
 #pragma once
-
-#ifndef __SNKWAVE_H__
-#define __SNKWAVE_H__
-
-#define SNKWAVE_WAVEFORM_LENGTH 16
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -29,7 +27,8 @@ class snkwave_device : public device_t,
 {
 public:
 	snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~snkwave_device() { }
+
+	DECLARE_WRITE8_MEMBER( snkwave_w );
 
 protected:
 	// device-level overrides
@@ -38,13 +37,12 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-public:
-	DECLARE_WRITE8_MEMBER( snkwave_w );
-
 private:
+	static constexpr unsigned WAVEFORM_LENGTH = 16;
+	static constexpr unsigned CLOCK_SHIFT = 8;
+
 	void update_waveform(unsigned int offset, uint8_t data);
 
-private:
 	sound_stream *m_stream;
 	int m_external_clock;
 	int m_sample_rate;
@@ -55,10 +53,9 @@ private:
 	int m_waveform_position;
 
 	// decoded waveform table
-	int16_t m_waveform[SNKWAVE_WAVEFORM_LENGTH];
+	int16_t m_waveform[WAVEFORM_LENGTH];
 };
 
-extern const device_type SNKWAVE;
+DECLARE_DEVICE_TYPE(SNKWAVE, snkwave_device)
 
-
-#endif /* __SNKWAVE_H__ */
+#endif // MAME_SOUND_SNKWAVE_H

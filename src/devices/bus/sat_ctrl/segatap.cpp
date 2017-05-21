@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_SEGATAP = device_creator<saturn_segatap_device>;
+DEFINE_DEVICE_TYPE(SATURN_SEGATAP, saturn_segatap_device, "saturn_segatap", "saturn_segatap_device")
 
 
 //**************************************************************************
@@ -27,7 +27,7 @@ const device_type SATURN_SEGATAP = device_creator<saturn_segatap_device>;
 //-------------------------------------------------
 
 saturn_segatap_device::saturn_segatap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SATURN_SEGATAP, "Sega Saturn SegaTap", tag, owner, clock, "saturn_segatap", __FILE__),
+	device_t(mconfig, SATURN_SEGATAP, tag, owner, clock),
 	device_saturn_control_port_interface(mconfig, *this),
 	m_subctrl1_port(*this, "ctrl1"),
 	m_subctrl2_port(*this, "ctrl2"),

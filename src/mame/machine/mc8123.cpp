@@ -80,15 +80,15 @@ CPU #    Game                      Notes              Seed   Upper Limit
 #include "mc8123.h"
 
 
-const device_type MC8123 = device_creator<mc8123_device>;
+DEFINE_DEVICE_TYPE(MC8123, mc8123_device, "mc8123", "MC-8123")
 
 //-------------------------------------------------
 //  mc8123_device - constructor
 //-------------------------------------------------
 
 mc8123_device::mc8123_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: z80_device(mconfig, MC8123, "MC-8123", tag, owner, clock, "mc8123", __FILE__),
-		m_key(*this, "key", 0x2000)
+	: z80_device(mconfig, MC8123, tag, owner, clock)
+	, m_key(*this, "key", 0x2000)
 {
 }
 

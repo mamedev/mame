@@ -455,7 +455,7 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
 	timer_set(m_keyboard->cycles_to_attotime(100), TIMER_INTV_INTERRUPT2_COMPLETE);
 }
 
-static MACHINE_CONFIG_START( intv, intv_state )
+static MACHINE_CONFIG_START( intv )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CP1610, XTAL_3_579545MHz/4)        /* Colorburst/4 */
 	MCFG_CPU_PROGRAM_MAP(intv_mem)
@@ -469,8 +469,8 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_SCREEN_REFRESH_RATE(59.92)
 	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2400)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(intv_state, screen_update_intv)
-	MCFG_SCREEN_SIZE((STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTV_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTV_Y_SCALE)
-	MCFG_SCREEN_VISIBLE_AREA(0, (STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTV_X_SCALE-1, 0, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTV_Y_SCALE-1)
+	MCFG_SCREEN_SIZE(stic_device::SCREEN_WIDTH*INTV_X_SCALE, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE)
+	MCFG_SCREEN_VISIBLE_AREA(0, stic_device::SCREEN_WIDTH*INTV_X_SCALE-1, 0, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE-1)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x400)
@@ -547,8 +547,8 @@ static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 	/* crt controller */
 	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL_7_15909MHz)
 	MCFG_TMS9927_CHAR_WIDTH(8)
-	MCFG_TMS9927_OVERSCAN(STIC_OVERSCAN_LEFT_WIDTH*STIC_X_SCALE*INTVKBD_X_SCALE, STIC_OVERSCAN_RIGHT_WIDTH*STIC_X_SCALE*INTVKBD_X_SCALE,
-						  STIC_OVERSCAN_TOP_HEIGHT*STIC_Y_SCALE*INTVKBD_Y_SCALE, STIC_OVERSCAN_BOTTOM_HEIGHT*STIC_Y_SCALE*INTVKBD_Y_SCALE)
+	MCFG_TMS9927_OVERSCAN(stic_device::OVERSCAN_LEFT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE, stic_device::OVERSCAN_RIGHT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE,
+						  stic_device::OVERSCAN_TOP_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE, stic_device::OVERSCAN_BOTTOM_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(intv_state, screen_update_intvkbd)
@@ -652,10 +652,10 @@ DRIVER_INIT_MEMBER(intv_state,intvkbd)
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT        COMPANY   FULLNAME */
 CONS( 1979, intv,       0,      0,      intv,       0,       intv_state,    intv,       "Mattel", "Intellivision", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, intvsrs,    intv,   0,      intv,       0,       intv_state,    intv,       "Sears",  "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd,    intv_state,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd, intv_state,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 CONS( 1982, intv2,      intv,   0,      intv2,      0,       intv_state,    intv,       "Mattel", "Intellivision II", MACHINE_SUPPORTS_SAVE )
 
 // made up, user friendlier machines with pre-mounted passthu expansions

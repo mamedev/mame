@@ -615,7 +615,7 @@ INTERRUPT_GEN_MEMBER(ddealer_state::interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( ddealer, ddealer_state )
+static MACHINE_CONFIG_START( ddealer )
 
 	MCFG_CPU_ADD("maincpu" , M68000, XTAL_16MHz/2) /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(ddealer)

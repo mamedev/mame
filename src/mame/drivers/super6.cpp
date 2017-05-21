@@ -289,7 +289,7 @@ static ADDRESS_MAP_START( super6_io, AS_IO, 8, super6_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(WD2793_TAG, wd2793_t, read, write)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(WD2793_TAG, wd2793_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
 	AM_RANGE(0x14, 0x14) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x15, 0x15) AM_READ_PORT("J7") AM_WRITE(s100_w)
@@ -486,7 +486,7 @@ void super6_state::machine_reset()
 //  MACHINE_CONFIG( super6 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( super6, super6_state )
+static MACHINE_CONFIG_START( super6 )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_24MHz/4)
 	MCFG_CPU_PROGRAM_MAP(super6_mem)
@@ -574,5 +574,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1983, super6,  0,      0,      super6,  super6, driver_device,  0,      "Advanced Digital Corporation",   "Super Six",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE         INIT    COMPANY                         FULLNAME     FLAGS
+COMP( 1983, super6,  0,      0,      super6,  super6, super6_state, 0,      "Advanced Digital Corporation", "Super Six", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

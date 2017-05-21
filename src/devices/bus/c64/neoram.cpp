@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_NEORAM = device_creator<c64_neoram_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_NEORAM, c64_neoram_cartridge_device, "c64_neoram", "C64 NeoRAM cartridge")
 
 
 
@@ -28,7 +28,7 @@ const device_type C64_NEORAM = device_creator<c64_neoram_cartridge_device>;
 //-------------------------------------------------
 
 c64_neoram_cartridge_device::c64_neoram_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_NEORAM, "C64 NeoRAM cartridge", tag, owner, clock, "c64_neoram", __FILE__),
+	device_t(mconfig, C64_NEORAM, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
 	m_bank(0)

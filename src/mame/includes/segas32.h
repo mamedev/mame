@@ -5,6 +5,10 @@
     Sega System 32/Multi 32 hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_SEGAS32_H
+#define MAME_INCLUDES_SEGAS32_H
+
+#pragma once
 
 #include "sound/multipcm.h"
 #include "machine/s32comm.h"
@@ -17,7 +21,6 @@ class segas32_state : public device_t
 {
 public:
 	segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	segas32_state(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	required_shared_ptr<uint8_t> m_z80_shared_ram;
 	optional_shared_ptr<uint16_t> m_system32_workram;
@@ -239,6 +242,8 @@ public:
 	void init_titlef(void);
 
 protected:
+	segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
@@ -373,4 +378,6 @@ protected:
 /*----------- defined in machine/segas32.c -----------*/
 extern const uint8_t ga2_v25_opcode_table[];
 
-extern const device_type SEGA_S32_PCB;
+DECLARE_DEVICE_TYPE(SEGA_S32_PCB, segas32_state)
+
+#endif // MAME_INCLUDES_SEGAS32_H

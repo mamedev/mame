@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __NES_DISKSYS_H
-#define __NES_DISKSYS_H
+#ifndef MAME_BUS_NES_DISKSYS_H
+#define MAME_BUS_NES_DISKSYS_H
+
+#pragma once
 
 #include "nxrom.h"
 #include "imagedev/flopdrv.h"
@@ -15,10 +17,7 @@ public:
 	// construction/destruction
 	nes_disksys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	virtual DECLARE_READ8_MEMBER(read_ex) override;
@@ -33,11 +32,17 @@ public:
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	required_region_ptr<uint8_t> m_2c33_rom;
+
+private:
 	static void load_proc(device_image_interface &image, bool is_created);
 	static void unload_proc(device_image_interface &image);
 
-private:
-	uint8_t *m_2c33_rom;
 	std::unique_ptr<uint8_t[]> m_fds_data;    // here, we store a copy of the disk
 	required_device<legacy_floppy_image_device> m_disk;
 
@@ -64,8 +69,7 @@ private:
 };
 
 
-
 // device type definition
-extern const device_type NES_DISKSYS;
+DECLARE_DEVICE_TYPE(NES_DISKSYS, nes_disksys_device)
 
-#endif
+#endif // MAME_BUS_NES_DISKSYS_H

@@ -310,7 +310,7 @@ static INPUT_PORTS_START( cfrogger )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cfrogger, cfrogger_state )
+static MACHINE_CONFIG_START( cfrogger )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M58846, XTAL_600kHz)
@@ -426,7 +426,7 @@ static INPUT_PORTS_START( gjungler )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gjungler, gjungler_state )
+static MACHINE_CONFIG_START( gjungler )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M58846, XTAL_600kHz)
@@ -481,7 +481,7 @@ ROM_END
 
 
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1981, cfrogger, 0,        0, cfrogger, cfrogger, driver_device, 0, "Coleco", "Frogger (Coleco)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1981, cfrogger, 0,      0, cfrogger, cfrogger, cfrogger_state, 0, "Coleco", "Frogger (Coleco)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, gjungler, 0,        0, gjungler, gjungler, driver_device, 0, "Gakken / Konami", "Jungler (Gakken)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gjungler, 0,      0, gjungler, gjungler, gjungler_state, 0, "Gakken / Konami", "Jungler (Gakken)", MACHINE_SUPPORTS_SAVE )

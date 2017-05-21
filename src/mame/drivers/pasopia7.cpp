@@ -908,7 +908,7 @@ static SLOT_INTERFACE_START( pasopia7_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( p7_base, pasopia7_state )
+static MACHINE_CONFIG_START( p7_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pasopia7_mem)
@@ -1064,4 +1064,4 @@ DRIVER_INIT_MEMBER(pasopia7_state,p7_lcd)
 /* Driver */
 
 COMP( 1983, pasopia7,    0,        0,       p7_raster,     pasopia7, pasopia7_state,   p7_raster,  "Toshiba", "Pasopia 7 (Raster)", MACHINE_NOT_WORKING )
-COMP( 1983, pasopia7lcd, pasopia7, 0,       p7_lcd,        pasopia7, pasopia7_state,   p7_lcd,     "Toshiba", "Pasopia 7 (LCD)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, pasopia7lcd, pasopia7, 0,       p7_lcd,        pasopia7, pasopia7_state,   p7_lcd,     "Toshiba", "Pasopia 7 (LCD)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

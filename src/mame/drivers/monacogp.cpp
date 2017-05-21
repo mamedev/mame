@@ -142,7 +142,7 @@ public:
 	}
 
 	// devices
-	required_device<netlist_mame_device_t> m_maincpu;
+	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
 protected:
@@ -185,7 +185,7 @@ void monacogp_state::video_start()
 {
 }
 
-static MACHINE_CONFIG_START( monacogp, monacogp_state )
+static MACHINE_CONFIG_START( monacogp )
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
@@ -269,5 +269,5 @@ ROM_END
 
 
 
-GAME( 1980, monacogp,  0,         monacogp, 0, driver_device,  0, ROT0, "Sega", "Monaco GP (Set 1) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1980, monacogpa, monacogp,  monacogp, 0, driver_device,  0, ROT0, "Sega", "Monaco GP (Set 2) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1980, monacogp,  0,         monacogp, 0, monacogp_state,  0, ROT0, "Sega", "Monaco GP (Set 1) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1980, monacogpa, monacogp,  monacogp, 0, monacogp_state,  0, ROT0, "Sega", "Monaco GP (Set 2) [TTL]", MACHINE_IS_SKELETON )

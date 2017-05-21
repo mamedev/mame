@@ -537,7 +537,7 @@ DECO16IC_BANK_CB_MEMBER(dassault_state::bank_callback)
 	return ((bank >> 4) & 0xf) << 12;
 }
 
-static MACHINE_CONFIG_START( dassault, dassault_state )
+static MACHINE_CONFIG_START( dassault )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2)   /* 14MHz - Accurate */
@@ -628,11 +628,11 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, OKIM6295_PIN7_HIGH) // verified
+	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, PIN7_HIGH) // verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, OKIM6295_PIN7_HIGH) // verified
+	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, PIN7_HIGH) // verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END

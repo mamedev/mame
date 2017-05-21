@@ -5,14 +5,14 @@
     Midway Zeus2 Video
 
 **************************************************************************/
-#ifndef __ZEUS2_H__
-#define __ZEUS2_H__
+#ifndef MAME_VIDEO_ZEUS2_H
+#define MAME_VIDEO_ZEUS2_H
+
+#pragma once
 
 #include "video/poly.h"
 #include "video/rgbutil.h"
 #include "cpu/tms32031/tms32031.h"
-
-#pragma once
 
 /*************************************
 *  Constants
@@ -123,8 +123,8 @@ public:
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 	TIMER_CALLBACK_MEMBER(display_irq);
 
-	template<class _Object> static devcb_base &set_vblank_callback(device_t &device, _Object object) { return downcast<zeus2_device &>(device).m_vblank.set_callback(object); }
-	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<zeus2_device &>(device).m_irq.set_callback(object); }
+	template <class Object> static devcb_base &set_vblank_callback(device_t &device, Object &&cb) { return downcast<zeus2_device &>(device).m_vblank.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<zeus2_device &>(device).m_irq.set_callback(std::forward<Object>(cb)); }
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_irq;
 
@@ -438,6 +438,6 @@ public:
 };
 
 // device type definition
-extern const device_type ZEUS2;
+DECLARE_DEVICE_TYPE(ZEUS2, zeus2_device)
 
-#endif
+#endif // MAME_VIDEO_ZEUS2

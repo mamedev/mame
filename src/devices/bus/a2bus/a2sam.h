@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_SAM__
-#define __A2BUS_SAM__
+#ifndef MAME_BUS_A2BUS_A2SAM_H
+#define MAME_BUS_A2BUS_A2SAM_H
+
+#pragma once
 
 #include "a2bus.h"
 #include "sound/dac.h"
@@ -29,8 +31,6 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	required_device<dac_byte_interface> m_dac;
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -38,9 +38,11 @@ protected:
 	// overrides of standard a2bus slot functions
 	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
 	virtual bool take_c800() override;
+
+	required_device<dac_byte_interface> m_dac;
 };
 
 // device type definition
 extern const device_type A2BUS_SAM;
 
-#endif /* __A2BUS_SAM__ */
+#endif // MAME_BUS_A2BUS_A2SAM_H

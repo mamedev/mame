@@ -61,7 +61,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
@@ -178,7 +178,7 @@ public:
 		m_k056832(*this, "k056832"),
 		m_k055673(*this, "k055673"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
@@ -288,7 +288,7 @@ void giclassicsvr_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( giclassic, giclassic_state )
+static MACHINE_CONFIG_START( giclassic )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
@@ -314,7 +314,7 @@ static MACHINE_CONFIG_START( giclassic, giclassic_state )
 	MCFG_K056832_PALETTE("palette")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( giclassvr, giclassicsvr_state )
+static MACHINE_CONFIG_START( giclassvr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // unknown speed
@@ -373,5 +373,5 @@ ROM_START( giclassvr )
 	ROM_LOAD32_WORD( "gsgu_760_ad02.34k", 0x000002, 0x080000, CRC(8057a417) SHA1(82d4a1d84729e9f0a8aff4c219a19601b89caf15) )
 ROM_END
 
-GAME( 1998, giclasex, 0, giclassic, giclassic,  driver_device, 0, 0, "Konami", "GI-Classic EX (satellite terminal)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
-GAME( 1998, giclassvr, 0, giclassvr, giclassvr,  driver_device, 0, 0, "Konami", "GI-Classic EX (server)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
+GAME( 1998, giclasex,  0, giclassic, giclassic, giclassic_state,    0, 0, "Konami", "GI-Classic EX (satellite terminal)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
+GAME( 1998, giclassvr, 0, giclassvr, giclassvr, giclassicsvr_state, 0, 0, "Konami", "GI-Classic EX (server)",             MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)

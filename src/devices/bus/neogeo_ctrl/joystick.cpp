@@ -22,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEOGEO_JOY = device_creator<neogeo_joystick_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_JOY, neogeo_joystick_device, "neogeo_joy", "SNK Neo Geo Joystick")
 
 
 static INPUT_PORTS_START( neogeo_joy )
@@ -61,10 +61,10 @@ ioport_constructor neogeo_joystick_device::device_input_ports() const
 //-------------------------------------------------
 
 neogeo_joystick_device::neogeo_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, NEOGEO_JOY, "SNK Neo Geo Joystick", tag, owner, clock, "neogeo_joy", __FILE__),
-					device_neogeo_control_port_interface(mconfig, *this),
-					m_joy(*this, "JOY"),
-					m_ss(*this, "START_SELECT")
+	device_t(mconfig, NEOGEO_JOY, tag, owner, clock),
+	device_neogeo_control_port_interface(mconfig, *this),
+	m_joy(*this, "JOY"),
+	m_ss(*this, "START_SELECT")
 {
 }
 
@@ -118,7 +118,7 @@ uint8_t neogeo_joystick_device::read_start_sel()
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEOGEO_JOY_AC = device_creator<neogeo_joy_ac_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_JOY_AC, neogeo_joy_ac_device, "neogeo_joyac", "SNK Neo Geo Arcade Joystick")
 
 
 static INPUT_PORTS_START( neogeo_joy_ac )
@@ -162,10 +162,10 @@ ioport_constructor neogeo_joy_ac_device::device_input_ports() const
 //-------------------------------------------------
 
 neogeo_joy_ac_device::neogeo_joy_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, NEOGEO_JOY_AC, "SNK Neo Geo Arcade Joystick", tag, owner, clock, "neogeo_joyac", __FILE__),
-					device_neogeo_ctrl_edge_interface(mconfig, *this),
-					m_joy1(*this, "JOY1"),
-					m_joy2(*this, "JOY2")
+	device_t(mconfig, NEOGEO_JOY_AC, tag, owner, clock),
+	device_neogeo_ctrl_edge_interface(mconfig, *this),
+	m_joy1(*this, "JOY1"),
+	m_joy2(*this, "JOY2")
 {
 }
 

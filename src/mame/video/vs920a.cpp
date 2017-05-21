@@ -30,22 +30,22 @@ t=tile, p=palette
 #include "vs920a.h"
 
 
-const device_type VS920A = device_creator<vs920a_text_tilemap_device>;
+DEFINE_DEVICE_TYPE(VS920A, vs920a_text_tilemap_device, "vs920a", "VS920A Text Tilemap")
 
 vs920a_text_tilemap_device::vs920a_text_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VS920A, "VS920A Text Tilemap", tag, owner, clock, "vs920a", __FILE__),
-	m_vram(nullptr),
-	m_pal_base(0),
-	m_gfx_region(0),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG)
-
+	: device_t(mconfig, VS920A, tag, owner, clock)
+	, m_tmap(nullptr)
+	, m_vram()
+	, m_pal_base(0)
+	, m_gfx_region(0)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 
 
 void vs920a_text_tilemap_device::device_start()
 {
-	if(!m_gfxdecode->started())
+	if (!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
 	m_vram = make_unique_clear<uint16_t[]>(0x1000/2);
@@ -100,16 +100,6 @@ READ16_MEMBER(vs920a_text_tilemap_device::vram_r)
 	return m_vram[offset];
 }
 
-
-tilemap_t* vs920a_text_tilemap_device::get_tilemap()
-{
-	return m_tmap;
-}
-
-void vs920a_text_tilemap_device::set_pal_base(int pal_base)
-{
-	m_pal_base = pal_base;
-}
 
 void vs920a_text_tilemap_device::draw(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect, int priority)
 {

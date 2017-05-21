@@ -36,7 +36,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISA8_PC1640_IGA = device_creator<isa8_pc1640_iga_device>;
+DEFINE_DEVICE_TYPE(ISA8_PC1640_IGA, isa8_pc1640_iga_device, "pc1640_iga", "Amstrad PC1640 IGA")
 
 
 //-------------------------------------------------
@@ -69,7 +69,7 @@ const tiny_rom_entry *isa8_pc1640_iga_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_pc1640_iga_device::isa8_pc1640_iga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: isa8_ega_device(mconfig, ISA8_PC1640_IGA, "Amstrad PC1640 IGA", tag, owner, clock, "pc1640_iga", __FILE__)
+	: isa8_ega_device(mconfig, ISA8_PC1640_IGA, tag, owner, clock)
 {
 }
 

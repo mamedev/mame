@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_JOY = device_creator<saturn_joy_device>;
+DEFINE_DEVICE_TYPE(SATURN_JOY, saturn_joy_device, "saturn_joy", "Sega Saturn Joypad")
 
 
 static INPUT_PORTS_START( saturn_joy )
@@ -55,9 +55,9 @@ ioport_constructor saturn_joy_device::device_input_ports() const
 //-------------------------------------------------
 
 saturn_joy_device::saturn_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, SATURN_JOY, "Sega Saturn Joypad", tag, owner, clock, "saturn_joy", __FILE__),
-					device_saturn_control_port_interface(mconfig, *this),
-					m_joy(*this, "JOY")
+	device_t(mconfig, SATURN_JOY, tag, owner, clock),
+	device_saturn_control_port_interface(mconfig, *this),
+	m_joy(*this, "JOY")
 {
 	m_ctrl_id = 0x02;
 }

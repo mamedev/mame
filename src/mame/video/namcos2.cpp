@@ -3,9 +3,7 @@
 /* video hardware for Namco System II */
 
 #include "emu.h"
-
 #include "includes/namcos2.h"
-#include "includes/namcoic.h"
 
 void namcos2_state::TilemapCB(uint16_t code, int *tile, int *mask)
 {

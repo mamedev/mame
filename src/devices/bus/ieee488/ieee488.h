@@ -7,10 +7,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_IEEE488_IEEE488_H
+#define MAME_BUS_IEEE488_IEEE488_H
 
-#ifndef __IEEE488__
-#define __IEEE488__
+#pragma once
 
 
 
@@ -91,14 +91,14 @@ public:
 	// construction/destruction
 	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _write> devcb_base &set_eoi_callback(_write wr) { return m_write_eoi.set_callback(wr); }
-	template<class _write> devcb_base &set_dav_callback(_write wr) { return m_write_dav.set_callback(wr); }
-	template<class _write> devcb_base &set_nrfd_callback(_write wr) { return m_write_nrfd.set_callback(wr); }
-	template<class _write> devcb_base &set_ndac_callback(_write wr) { return m_write_ndac.set_callback(wr); }
-	template<class _write> devcb_base &set_ifc_callback(_write wr) { return m_write_ifc.set_callback(wr); }
-	template<class _write> devcb_base &set_srq_callback(_write wr) { return m_write_srq.set_callback(wr); }
-	template<class _write> devcb_base &set_atn_callback(_write wr) { return m_write_atn.set_callback(wr); }
-	template<class _write> devcb_base &set_ren_callback(_write wr) { return m_write_ren.set_callback(wr); }
+	template <class Object> devcb_base &set_eoi_callback(Object &&cb) { return m_write_eoi.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dav_callback(Object &&cb) { return m_write_dav.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nrfd_callback(Object &&cb) { return m_write_nrfd.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ndac_callback(Object &&cb) { return m_write_ndac.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ifc_callback(Object &&cb) { return m_write_ifc.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_srq_callback(Object &&cb) { return m_write_srq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_atn_callback(Object &&cb) { return m_write_atn.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ren_callback(Object &&cb) { return m_write_ren.set_callback(std::forward<Object>(cb)); }
 
 	void add_device(ieee488_slot_device *slot, device_t *target);
 
@@ -216,41 +216,42 @@ protected:
 class device_ieee488_interface : public device_slot_card_interface
 {
 	friend class ieee488_device;
+	template <class ElementType> friend class simple_list;
 
 public:
 	// construction/destruction
-	device_ieee488_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_ieee488_interface();
 
 	device_ieee488_interface *next() const { return m_next; }
-	device_ieee488_interface *m_next;
 
 	// optional operation overrides
-	virtual void ieee488_eoi(int state) { };
-	virtual void ieee488_dav(int state) { };
-	virtual void ieee488_nrfd(int state) { };
-	virtual void ieee488_ndac(int state) { };
-	virtual void ieee488_ifc(int state) { };
-	virtual void ieee488_srq(int state) { };
-	virtual void ieee488_atn(int state) { };
-	virtual void ieee488_ren(int state) { };
+	virtual void ieee488_eoi(int state) { }
+	virtual void ieee488_dav(int state) { }
+	virtual void ieee488_nrfd(int state) { }
+	virtual void ieee488_ndac(int state) { }
+	virtual void ieee488_ifc(int state) { }
+	virtual void ieee488_srq(int state) { }
+	virtual void ieee488_atn(int state) { }
+	virtual void ieee488_ren(int state) { }
+
+protected:
+	device_ieee488_interface(const machine_config &mconfig, device_t &device);
 
 	ieee488_device *m_bus;
 	ieee488_slot_device *m_slot;
+
+private:
+	device_ieee488_interface *m_next;
 };
 
 
 // device type definition
-extern const device_type IEEE488;
-extern const device_type IEEE488_SLOT;
-
-extern template class device_finder<ieee488_device, false>;
-extern template class device_finder<ieee488_device, true>;
+DECLARE_DEVICE_TYPE(IEEE488,      ieee488_device)
+DECLARE_DEVICE_TYPE(IEEE488_SLOT, ieee488_slot_device)
 
 
 SLOT_INTERFACE_EXTERN( cbm_ieee488_devices );
 SLOT_INTERFACE_EXTERN( hp_ieee488_devices );
 
 
-
-#endif
+#endif // MAME_BUS_IEEE488_IEEE488_H

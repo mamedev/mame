@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_WANGPCKB_H
+#define MAME_MACHINE_WANGPCKB_H
 
-#ifndef __WANGPC_KEYBOARD__
-#define __WANGPC_KEYBOARD__
+#pragma once
 
 
 #include "cpu/mcs51/mcs51.h"
@@ -33,23 +33,23 @@
 	MCFG_DEVICE_ADD(WANGPC_KEYBOARD_TAG, WANGPC_KEYBOARD, 0)
 
 #define MCFG_WANGPCKB_TXD_HANDLER(_devcb) \
-	devcb = &wangpc_keyboard_t::set_txd_handler(*device, DEVCB_##_devcb);
+	devcb = &wangpc_keyboard_device::set_txd_handler(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> wangpc_keyboard_t
+// ======================> wangpc_keyboard_device
 
-class wangpc_keyboard_t :  public device_t,
+class wangpc_keyboard_device :  public device_t,
 						   public device_serial_interface
 {
 public:
 	// construction/destruction
-	wangpc_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<wangpc_keyboard_t &>(device).m_txd_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<wangpc_keyboard_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -90,8 +90,6 @@ private:
 
 
 // device type definition
-extern const device_type WANGPC_KEYBOARD;
+DECLARE_DEVICE_TYPE(WANGPC_KEYBOARD, wangpc_keyboard_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_WANGPCKB_H

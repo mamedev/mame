@@ -178,7 +178,7 @@ void exp85_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( exp85, exp85_state )
+static MACHINE_CONFIG_START( exp85 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
 	MCFG_CPU_PROGRAM_MAP(exp85_mem)
@@ -233,5 +233,5 @@ ROM_START( exp85 )
 ROM_END
 
 /* System Drivers */
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   INIT    COMPANY         FULLNAME        FLAGS */
-COMP( 1979, exp85,  0,      0,      exp85,   exp85, driver_device,  0,    "Netronics",    "Explorer/85", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY         FULLNAME       FLAGS
+COMP( 1979, exp85,  0,      0,      exp85,   exp85, exp85_state, 0,    "Netronics",    "Explorer/85", 0 )

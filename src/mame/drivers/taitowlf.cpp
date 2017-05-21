@@ -365,7 +365,7 @@ PALETTE_INIT_MEMBER(taitowlf_state, taitowlf)
 }
 #endif
 
-static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
+static MACHINE_CONFIG_START( taitowlf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000)

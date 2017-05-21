@@ -125,7 +125,7 @@ WRITE_LINE_MEMBER(votrtnt_state::write_acia_clock)
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
+static MACHINE_CONFIG_START( votrtnt )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_2_4576MHz)  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
 	MCFG_CPU_PROGRAM_MAP(6802_mem)
@@ -168,5 +168,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME       PARENT      COMPAT  MACHINE     INPUT   CLASS         INIT      COMPANY    FULLNAME      FLAGS */
-COMP( 1980, votrtnt,   0,          0,      votrtnt,   votrtnt, driver_device, 0,     "Votrax", "Type 'N Talk", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT  COMPANY   FULLNAME        FLAGS
+COMP( 1980, votrtnt, 0,      0,      votrtnt, votrtnt, votrtnt_state, 0,    "Votrax", "Type 'N Talk", MACHINE_NOT_WORKING )

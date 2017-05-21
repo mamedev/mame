@@ -227,7 +227,7 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( sgi_ip6, sgi_ip6_state )
+static MACHINE_CONFIG_START( sgi_ip6 )
 	MCFG_CPU_ADD( "maincpu", R3041, 20000000 ) // FIXME: Should be R2000
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_CPU_PROGRAM_MAP( sgi_ip6_map )
@@ -265,5 +265,5 @@ ROM_START( sgi_ip6 )
 	ROM_LOAD( "4d202031.bin", 0x000000, 0x040000, CRC(065a290a) SHA1(6f5738e79643f94901e6efe3612468d14177f65b) )
 ROM_END
 
-/*     YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT     COMPANY   FULLNAME */
-COMP( 1988, sgi_ip6,  0,        0,        sgi_ip6,  sgi_ip6, sgi_ip6_state,  sgi_ip6,  "Silicon Graphics Inc", "4D/PI (R2000, 20MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT    STATE           INIT      COMPANY                 FULLNAME                FLAGS
+COMP( 1988, sgi_ip6,  0,        0,        sgi_ip6,  sgi_ip6, sgi_ip6_state,  sgi_ip6,  "Silicon Graphics Inc", "4D/PI (R2000, 20MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

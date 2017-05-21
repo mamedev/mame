@@ -712,7 +712,7 @@ static GFXDECODE_START( pc1251 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc1251_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pocketc,  pocketc_state)
+static MACHINE_CONFIG_START( pocketc )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_NVRAM_ADD_0FILL("cpu_nvram")
@@ -739,7 +739,7 @@ static MACHINE_CONFIG_START( pocketc,  pocketc_state)
 	MCFG_PALETTE_INIT_OWNER( pocketc_state, pocketc )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( pc1401, pocketc, pc1401_state )
+static MACHINE_CONFIG_DERIVED( pc1401, pocketc )
 	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc1401_mem)
 	MCFG_SC61860_READ_RESET_HANDLER(READLINE(pc1401_state,pc1401_reset))
@@ -760,7 +760,7 @@ static MACHINE_CONFIG_DERIVED( pc1402, pc1401 )
 	MCFG_CPU_PROGRAM_MAP( pc1402_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( pc1250, pocketc, pc1251_state )
+static MACHINE_CONFIG_DERIVED( pc1250, pocketc )
 	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP( pc1250_mem)
 	MCFG_SC61860_READ_RESET_HANDLER(NOOP)
@@ -802,7 +802,7 @@ static MACHINE_CONFIG_DERIVED( pc1261, pc1260 )
 	MCFG_CPU_PROGRAM_MAP( pc1261_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( pc1350, pocketc, pc1350_state )
+static MACHINE_CONFIG_DERIVED( pc1350, pocketc )
 	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP( pc1350_mem)
 	MCFG_SC61860_READ_RESET_HANDLER(NOOP)
@@ -830,7 +830,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( pc1350, pocketc, pc1350_state )
 	MCFG_RAM_EXTRA_OPTIONS("12K,20K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( pc1403, pocketc, pc1403_state )
+static MACHINE_CONFIG_DERIVED( pc1403, pocketc )
 	MCFG_CPU_ADD( "maincpu", SC61860, 256000 )
 	MCFG_CPU_PROGRAM_MAP( pc1403_mem)
 	MCFG_SC61860_READ_RESET_HANDLER(NOOP)
@@ -964,25 +964,25 @@ ROM_END
    pc1600
 */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE INPUT   INIT         COMPANY     FULLNAME */
-/* cpu sc61860 */
-COMP( 1982, pc1245, 0,  0,  pc1250, pc1251, pc1251_state,   pc1251,  "Sharp", "Pocket Computer 1245", MACHINE_NOT_WORKING  | MACHINE_NO_SOUND )
-COMP( 1982, pc1250, 0,  0,  pc1250, pc1251, pc1251_state,   pc1251,  "Sharp", "Pocket Computer 1250", MACHINE_NO_SOUND)
-COMP( 1982, pc1251, pc1250, 0,  pc1251, pc1251, pc1251_state,   pc1251,  "Sharp", "Pocket Computer 1251", MACHINE_NO_SOUND)
-COMP( 1982, pc1255, pc1250, 0,  pc1255, pc1251, pc1251_state,   pc1251,  "Sharp", "Pocket Computer 1255", MACHINE_NO_SOUND)
-COMP( 1983, trs80pc3,   pc1250, 0,  pc1251, pc1251, pc1251_state,   pc1251,  "Tandy Radio Shack", "TRS-80 Pocket Computer PC-3", MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   STATE          INIT    COMPANY  FULLNAME                     FLAGS
+// cpu sc61860
+COMP( 1982, pc1245,   0,      0,      pc1250,  pc1251, pc1251_state,  pc1251, "Sharp", "Pocket Computer 1245",      MACHINE_NOT_WORKING  | MACHINE_NO_SOUND )
+COMP( 1982, pc1250,   0,      0,      pc1250,  pc1251, pc1251_state,  pc1251, "Sharp", "Pocket Computer 1250",      MACHINE_NO_SOUND)
+COMP( 1982, pc1251,   pc1250, 0,      pc1251,  pc1251, pc1251_state,  pc1251, "Sharp", "Pocket Computer 1251",      MACHINE_NO_SOUND)
+COMP( 1982, pc1255,   pc1250, 0,      pc1255,  pc1251, pc1251_state,  pc1251, "Sharp", "Pocket Computer 1255",      MACHINE_NO_SOUND)
+COMP( 1983, trs80pc3, pc1250, 0,      pc1251,  pc1251, pc1251_state,  pc1251, "Tandy Radio Shack", "TRS-80 Pocket Computer PC-3", MACHINE_NO_SOUND)
 
-COMP( 1982, pc1260, 0,  0,  pc1260, pc1251, pc1251_state,   pc1251,  "Sharp", "Pocket Computer 1260", MACHINE_NOT_WORKING  | MACHINE_NO_SOUND )
-COMP( 1982, pc1261, pc1260, 0,  pc1261, pc1251, pc1251_state,   pc1251,  "Sharp", "Pocket Computer 1261/1262", MACHINE_NOT_WORKING  | MACHINE_NO_SOUND)
+COMP( 1982, pc1260,   0,      0,      pc1260,  pc1251, pc1251_state,  pc1251, "Sharp", "Pocket Computer 1260",      MACHINE_NOT_WORKING  | MACHINE_NO_SOUND )
+COMP( 1982, pc1261,   pc1260, 0,      pc1261,  pc1251, pc1251_state,  pc1251, "Sharp", "Pocket Computer 1261/1262", MACHINE_NOT_WORKING  | MACHINE_NO_SOUND)
 
-/* pc1261/pc1262 */
-COMP( 1984, pc1350, 0,  0,  pc1350, pc1350, driver_device,  0,   "Sharp", "Pocket Computer 1350", MACHINE_NO_SOUND )
-COMP( 198?, pc1450, 0,  0,  pc1350, pc1350, driver_device,  0,   "Sharp", "Pocket Computer 1450", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// pc1261/pc1262
+COMP( 1984, pc1350,   0,      0,      pc1350,  pc1350, pc1350_state,  0,      "Sharp", "Pocket Computer 1350",      MACHINE_NO_SOUND )
+COMP( 198?, pc1450,   0,      0,      pc1350,  pc1350, pc1350_state,  0,      "Sharp", "Pocket Computer 1450",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-COMP( 1983, pc1401, 0,  0,  pc1401, pc1401, pc1401_state,   pc1401, "Sharp", "Pocket Computer 1401", MACHINE_NO_SOUND)
-COMP( 1984, pc1402, pc1401, 0,  pc1402, pc1401, pc1401_state,   pc1401,  "Sharp", "Pocket Computer 1402", MACHINE_NO_SOUND)
-COMP( 198?, pc1360, pc1401, 0,  pc1401, pc1401, pc1401_state,   pc1401,  "Sharp", "Pocket Computer 1360", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983, pc1401,   0,      0,      pc1401,  pc1401, pc1401_state,  pc1401, "Sharp", "Pocket Computer 1401",      MACHINE_NO_SOUND)
+COMP( 1984, pc1402,   pc1401, 0,      pc1402,  pc1401, pc1401_state,  pc1401, "Sharp", "Pocket Computer 1402",      MACHINE_NO_SOUND)
+COMP( 198?, pc1360,   pc1401, 0,      pc1401,  pc1401, pc1401_state,  pc1401, "Sharp", "Pocket Computer 1360",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-/* 72kb rom, 32kb ram, cpu? pc1360 */
-COMP( 1986, pc1403, 0,  0,  pc1403, pc1403, pc1403_state,   pc1403,  "Sharp", "Pocket Computer 1403", MACHINE_NOT_WORKING  | MACHINE_NO_SOUND)
-COMP( 198?, pc1403h,    pc1403, 0,  pc1403h,pc1403, pc1403_state, pc1403,    "Sharp", "Pocket Computer 1403H", MACHINE_NOT_WORKING  | MACHINE_NO_SOUND)
+// 72kb rom, 32kb ram, cpu? pc1360
+COMP( 1986, pc1403,   0,      0,      pc1403,  pc1403, pc1403_state,  pc1403, "Sharp", "Pocket Computer 1403",      MACHINE_NOT_WORKING  | MACHINE_NO_SOUND)
+COMP( 198?, pc1403h,  pc1403, 0,      pc1403h, pc1403, pc1403_state,  pc1403, "Sharp", "Pocket Computer 1403H",     MACHINE_NOT_WORKING  | MACHINE_NO_SOUND)

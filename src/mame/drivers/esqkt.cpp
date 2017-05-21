@@ -201,14 +201,14 @@ WRITE_LINE_MEMBER(esqkt_state::duart_tx_b)
 	m_sq1panel->rx_w(state);
 }
 
-static MACHINE_CONFIG_START( kt, esqkt_state )
+static MACHINE_CONFIG_START( kt )
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(kt_map)
 
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_ESQPANEL2x16_SQ1_ADD("sq1panel")
+	MCFG_ESQPANEL2X16_SQ1_ADD("sq1panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 
 	MCFG_MC68681_ADD("duart", 4000000)

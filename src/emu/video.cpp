@@ -312,7 +312,7 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 
 	// add two text entries describing the image
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
-	std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().description);
+	std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().type.fullname());
 	png_info pnginfo = { nullptr };
 	png_add_text(&pnginfo, "Software", text1.c_str());
 	png_add_text(&pnginfo, "System", text2.c_str());
@@ -892,16 +892,17 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 
 	// loop until we reach our target
 	g_profiler.start(PROFILER_IDLE);
-	osd_ticks_t minimum_sleep = osd_ticks_per_second() / 1000;
 	osd_ticks_t current_ticks = osd_ticks();
 	while (current_ticks < target_ticks)
 	{
 		// compute how much time to sleep for, taking into account the average oversleep
 		osd_ticks_t delta = (target_ticks - current_ticks) * 1000 / (1000 + m_average_oversleep);
+		if (!delta)
+			delta = 1;
 
 		// see if we can sleep
 		bool slept = false;
-		if (allowed_to_sleep && delta >= minimum_sleep)
+		if (allowed_to_sleep)
 		{
 			osd_sleep(delta);
 			slept = true;
@@ -1309,7 +1310,7 @@ void video_manager::record_frame()
 			if (m_mng_frame == 0)
 			{
 				std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
-				std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().description);
+				std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().type.fullname());
 				png_add_text(&pnginfo, "Software", text1.c_str());
 				png_add_text(&pnginfo, "System", text2.c_str());
 			}

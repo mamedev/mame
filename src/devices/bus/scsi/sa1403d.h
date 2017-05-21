@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SCSI_SA1403D_H
+#define MAME_BUS_SCSI_SA1403D_H
 
-#ifndef __SA1403D__
-#define __SA1403D__
+#pragma once
 
 #include "scsihd.h"
 #include "imagedev/harddriv.h"
@@ -31,6 +31,6 @@ public:
 
 
 // device type definition
-extern const device_type SA1403D;
+DECLARE_DEVICE_TYPE(SA1403D, sa1403d_device)
 
-#endif
+#endif // MAME_BUS_SCSI_SA1403D_H

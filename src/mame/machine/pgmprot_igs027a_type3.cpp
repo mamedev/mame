@@ -188,7 +188,7 @@ MACHINE_START_MEMBER(pgm_arm_type3_state,pgm_arm_type3)
 
 /******* ARM 55857G *******/
 
-MACHINE_CONFIG_START( pgm_arm_type3, pgm_arm_type3_state )
+MACHINE_CONFIG_START( pgm_arm_type3 )
 	MCFG_FRAGMENT_ADD(pgmbase)
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3 )

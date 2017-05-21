@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_AGAT7RAM__
-#define __A2BUS_AGAT7RAM__
+#ifndef MAME_BUS_A2BUS_AGAT7RAM_H
+#define MAME_BUS_A2BUS_AGAT7RAM_H
+
+#pragma once
 
 #include "emu.h"
 #include "a2bus.h"
@@ -24,10 +26,11 @@ class a2bus_agat7ram_device:
 {
 public:
 	// construction/destruction
-	a2bus_agat7ram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a2bus_agat7ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	a2bus_agat7ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -50,6 +53,6 @@ private:
 };
 
 // device type definition
-extern const device_type A2BUS_AGAT7RAM;
+DECLARE_DEVICE_TYPE(A2BUS_AGAT7RAM, a2bus_agat7ram_device)
 
-#endif /* __A2BUS_AGAT7RAM__ */
+#endif // MAME_BUS_A2BUS_AGAT7RAM_H

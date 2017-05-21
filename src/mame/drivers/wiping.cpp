@@ -289,7 +289,7 @@ INTERRUPT_GEN_MEMBER(wiping_state::sound_timer_irq)
 
 
 
-static MACHINE_CONFIG_START( wiping, wiping_state )
+static MACHINE_CONFIG_START( wiping )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz */
@@ -391,5 +391,5 @@ ROM_END
 
 
 
-GAME( 1982, wiping,  0,      wiping, wiping, driver_device,  0, ROT90, "Nichibutsu", "Wiping", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rugrats, wiping, wiping, rugrats, driver_device, 0, ROT90, "Nichibutsu", "Rug Rats", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wiping,  0,      wiping, wiping,  wiping_state, 0, ROT90, "Nichibutsu", "Wiping",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rugrats, wiping, wiping, rugrats, wiping_state, 0, ROT90, "Nichibutsu", "Rug Rats", MACHINE_SUPPORTS_SAVE )

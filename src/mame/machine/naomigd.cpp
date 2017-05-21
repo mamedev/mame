@@ -98,7 +98,7 @@ SH4 IO port A bits
 
 */
 
-const device_type NAOMI_GDROM_BOARD = device_creator<naomi_gdrom_board>;
+DEFINE_DEVICE_TYPE(NAOMI_GDROM_BOARD, naomi_gdrom_board, "segadimm", "Sega DIMM Board")
 
 const uint32_t naomi_gdrom_board::DES_LEFTSWAP[] = {
 	0x00000000, 0x00000001, 0x00000100, 0x00000101, 0x00010000, 0x00010001, 0x00010100, 0x00010101,
@@ -401,7 +401,7 @@ void naomi_gdrom_board::write_from_qword(uint8_t *region, uint64_t qword)
 }
 
 naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: naomi_board(mconfig, NAOMI_GDROM_BOARD, "Sega DIMM Board", tag, owner, clock, "segadimm", __FILE__)
+	: naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock)
 {
 	image_tag = nullptr;
 	pic_tag = nullptr;

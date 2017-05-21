@@ -268,7 +268,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tunhunt, tunhunt_state )
+static MACHINE_CONFIG_START( tunhunt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz/6)        /* ??? */
@@ -393,6 +393,6 @@ ROM_END
  *
  *************************************/
 
-/*         rom   parent  machine    inp         init */
-GAME( 1979,tunhunt,  0,       tunhunt,   tunhunt, driver_device,    0,  ORIENTATION_SWAP_XY, "Atari", "Tunnel Hunt", MACHINE_SUPPORTS_SAVE )
-GAME( 1981,tunhuntc, tunhunt, tunhunt,   tunhunt, driver_device,    0,  ORIENTATION_SWAP_XY, "Atari (Centuri license)", "Tunnel Hunt (Centuri)", MACHINE_SUPPORTS_SAVE )
+/*         rom       parent   machine    inp      state          init */
+GAME( 1979,tunhunt,  0,       tunhunt,   tunhunt, tunhunt_state,    0,  ORIENTATION_SWAP_XY, "Atari", "Tunnel Hunt", MACHINE_SUPPORTS_SAVE )
+GAME( 1981,tunhuntc, tunhunt, tunhunt,   tunhunt, tunhunt_state,    0,  ORIENTATION_SWAP_XY, "Atari (Centuri license)", "Tunnel Hunt (Centuri)", MACHINE_SUPPORTS_SAVE )

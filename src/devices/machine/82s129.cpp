@@ -11,11 +11,11 @@
 
 const uint32_t prom82s129_base_device::PROM_SIZE = 256;
 
-const device_type PROM82S126 = device_creator<prom82s126_device>;
-const device_type PROM82S129 = device_creator<prom82s129_device>;
+DEFINE_DEVICE_TYPE(PROM82S126, prom82s126_device, "82s126", "82S126 1K-bit bipolar PROM")
+DEFINE_DEVICE_TYPE(PROM82S129, prom82s129_device, "82s129", "82S129 1K-bit bipolar PROM")
 
-prom82s129_base_device::prom82s129_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+prom82s129_base_device::prom82s129_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_region(*this, DEVICE_SELF)
 	, m_out_func(*this)
 	, m_o1_func(*this)
@@ -30,12 +30,12 @@ prom82s129_base_device::prom82s129_base_device(const machine_config &mconfig, de
 }
 
 prom82s126_device::prom82s126_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: prom82s129_base_device(mconfig, PROM82S126, "82S126 1K-bit TTL bipolar PROM", tag, owner, clock, "82s126")
+	: prom82s129_base_device(mconfig, PROM82S126, tag, owner, clock)
 {
 }
 
 prom82s129_device::prom82s129_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: prom82s129_base_device(mconfig, PROM82S126, "82S129 1K-bit TTL bipolar PROM", tag, owner, clock, "82s129")
+	: prom82s129_base_device(mconfig, PROM82S129, tag, owner, clock)
 {
 }
 

@@ -10,8 +10,10 @@
  *
  ****************************************************************************/
 
-#ifndef Z80NE_H_
-#define Z80NE_H_
+#ifndef MAME_INCLUDES_Z80NE_H
+#define MAME_INCLUDES_Z80NE_H
+
+#pragma once
 
 #include "video/mc6847.h"
 #include "imagedev/cassette.h"
@@ -158,7 +160,7 @@ protected:
 	optional_device<floppy_connector> m_floppy3;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
-	optional_device<fd1771_t> m_wd1771;
+	optional_device<fd1771_device> m_wd1771;
 	required_memory_region m_region_z80ne;
 	optional_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
@@ -190,4 +192,4 @@ protected:
 	void reset_lx390_banking();
 };
 
-#endif /* Z80NE_H_ */
+#endif // MAME_INCLUDES_Z80NE_H

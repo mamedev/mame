@@ -1,35 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller, hap
 
-#ifndef __I8085_H__
-#define __I8085_H__
+#ifndef MAME_CPU_I8085_I8085_H
+#define MAME_CPU_I8085_I8085_H
 
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-enum
-{
-	I8085_PC, I8085_SP, I8085_AF, I8085_BC, I8085_DE, I8085_HL,
-	I8085_A, I8085_B, I8085_C, I8085_D, I8085_E, I8085_F, I8085_H, I8085_L,
-	I8085_STATUS, I8085_SOD, I8085_SID, I8085_INTE,
-	I8085_HALT, I8085_IM
-};
-
 #define I8085_INTR_LINE     0
 #define I8085_RST55_LINE    1
 #define I8085_RST65_LINE    2
 #define I8085_RST75_LINE    3
-
-#define I8085_STATUS_INTA   0x01
-#define I8085_STATUS_WO     0x02
-#define I8085_STATUS_STACK  0x04
-#define I8085_STATUS_HLTA   0x08
-#define I8085_STATUS_OUT    0x10
-#define I8085_STATUS_M1     0x20
-#define I8085_STATUS_INP    0x40
-#define I8085_STATUS_MEMR   0x80
 
 
 // STATUS changed callback
@@ -55,21 +38,42 @@ enum
 	i8085a_cpu_device::static_set_clk_out(*device, clock_update_delegate(&_class::_func, #_class "::" _func, owner));
 
 
-class i8085a_cpu_device :  public cpu_device
+class i8085a_cpu_device : public cpu_device
 {
 public:
+	// FIXME: public because drivers/altair.cpp, drivers/ipc.cpp and drivers/unior.cpp set initial PC through state interface
+	// should fix boot vector loading in these drivers
+	// machine/lviv.cpp and machine/poly88.cpp also access registers via state interface when handling snapshot files
+	enum
+	{
+		I8085_PC, I8085_SP, I8085_AF, I8085_BC, I8085_DE, I8085_HL,
+		I8085_A, I8085_B, I8085_C, I8085_D, I8085_E, I8085_F, I8085_H, I8085_L,
+		I8085_STATUS, I8085_SOD, I8085_SID, I8085_INTE,
+		I8085_HALT, I8085_IM
+	};
+
+	static constexpr uint8_t STATUS_INTA   = 0x01;
+	static constexpr uint8_t STATUS_WO     = 0x02;
+	static constexpr uint8_t STATUS_STACK  = 0x04;
+	static constexpr uint8_t STATUS_HLTA   = 0x08;
+	static constexpr uint8_t STATUS_OUT    = 0x10;
+	static constexpr uint8_t STATUS_M1     = 0x20;
+	static constexpr uint8_t STATUS_INP    = 0x40;
+	static constexpr uint8_t STATUS_MEMR   = 0x80;
+
 	// construction/destruction
 	i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int cputype);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_out_status_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_out_status_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_inte_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_out_inte_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_sid_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_in_sid_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_sod_func(device_t &device, _Object object) { return downcast<i8085a_cpu_device &>(device).m_out_sod_func.set_callback(object); }
+	template <class Object> static devcb_base &set_out_status_func(device_t &device, Object &&cb) { return downcast<i8085a_cpu_device &>(device).m_out_status_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_inte_func(device_t &device, Object &&cb) { return downcast<i8085a_cpu_device &>(device).m_out_inte_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_sid_func(device_t &device, Object &&cb) { return downcast<i8085a_cpu_device &>(device).m_in_sid_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_sod_func(device_t &device, Object &&cb) { return downcast<i8085a_cpu_device &>(device).m_out_sod_func.set_callback(std::forward<Object>(cb)); }
 	static void static_set_clk_out(device_t &device, clock_update_delegate &&clk_out) { downcast<i8085a_cpu_device &>(device).m_clk_out_func = std::move(clk_out); }
 
 protected:
+	i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cputype);
+
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_clock_changed() override;
@@ -180,8 +184,8 @@ protected:
 };
 
 
-extern const device_type I8080;
-extern const device_type I8080A;
-extern const device_type I8085A;
+DECLARE_DEVICE_TYPE(I8080,  i8080_cpu_device)
+DECLARE_DEVICE_TYPE(I8080A, i8080a_cpu_device)
+DECLARE_DEVICE_TYPE(I8085A, i8085a_cpu_device)
 
-#endif
+#endif // MAME_CPU_I8085_I8085_H

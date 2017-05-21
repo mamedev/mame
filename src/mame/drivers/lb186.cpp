@@ -15,15 +15,16 @@
 class lb186_state : public driver_device
 {
 public:
-	lb186_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_fdc(*this, "fdc"),
-	m_scsi(*this, "scsibus:7:ncr5380")
-	{}
+	lb186_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_fdc(*this, "fdc")
+		, m_scsi(*this, "scsibus:7:ncr5380")
+	{
+	}
 
 	required_device<i80186_cpu_device> m_maincpu;
-	required_device<wd1772_t> m_fdc;
+	required_device<wd1772_device> m_fdc;
 	required_device<ncr5380n_device> m_scsi;
 
 	DECLARE_WRITE8_MEMBER(sio_out_w);
@@ -93,7 +94,7 @@ static ADDRESS_MAP_START( lb186_io, AS_IO, 16, lb186_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x101f) AM_DEVREADWRITE8("sc2681", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0x1080, 0x108f) AM_DEVREADWRITE8("scsibus:7:ncr5380", ncr5380n_device, read, write, 0x00ff)
-	AM_RANGE(0x1100, 0x1107) AM_DEVREADWRITE8("fdc", wd1772_t, read, write, 0x00ff)
+	AM_RANGE(0x1100, 0x1107) AM_DEVREADWRITE8("fdc", wd1772_device, read, write, 0x00ff)
 	AM_RANGE(0x1180, 0x1181) AM_READWRITE8(scsi_dack_r, scsi_dack_w, 0x00ff)
 	AM_RANGE(0x1200, 0x1201) AM_WRITE8(drive_sel_w, 0x00ff)
 ADDRESS_MAP_END
@@ -118,7 +119,7 @@ FLOPPY_FORMATS_MEMBER( lb186_state::floppy_formats )
 	FLOPPY_NASLITE_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_START( lb186, lb186_state )
+static MACHINE_CONFIG_START( lb186 )
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lb186_map)
 	MCFG_CPU_IO_MAP(lb186_io)
@@ -160,4 +161,4 @@ ROM_START( lb186 )
 	ROM_LOAD16_BYTE("a75516_v3.35.rom", 0x0001, 0x2000, CRC(9d9a5e22) SHA1(070be31c622f50508e8cbdb797c79978b6a4b8f6))
 ROM_END
 
-COMP( 1985, lb186, 0, 0, lb186, 0, driver_device, 0, "Ampro Computers", "Little Board/186", MACHINE_NO_SOUND_HW )
+COMP( 1985, lb186, 0, 0, lb186, 0, lb186_state, 0, "Ampro Computers", "Little Board/186", MACHINE_NO_SOUND_HW )

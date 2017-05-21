@@ -19,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PCE_CART_SLOT = device_creator<pce_cart_slot_device>;
+DEFINE_DEVICE_TYPE(PCE_CART_SLOT, pce_cart_slot_device, "pce_cart_slot", "PCE/TG16 Cartridge Slot")
 
 //**************************************************************************
 //    PCE cartridges Interface
@@ -136,11 +136,11 @@ void device_pce_cart_interface::rom_map_setup(uint32_t size)
 //  pce_cart_slot_device - constructor
 //-------------------------------------------------
 pce_cart_slot_device::pce_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, PCE_CART_SLOT, "PCE & TG16 Cartridge Slot", tag, owner, clock, "pce_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_interface("pce_cart"),
-						m_type(PCE_STD), m_cart(nullptr)
+	device_t(mconfig, PCE_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_interface("pce_cart"),
+	m_type(PCE_STD), m_cart(nullptr)
 {
 }
 

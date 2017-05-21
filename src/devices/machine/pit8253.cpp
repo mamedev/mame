@@ -43,11 +43,17 @@ enum
 #define LOG2(msg)       do { if (VERBOSE >= 2) logerror msg; } while (0)
 
 
-const device_type PIT8253 = device_creator<pit8253_device>;
+DEFINE_DEVICE_TYPE(PIT8253, pit8253_device, "pit8253", "Intel 8253 PIT")
+DEFINE_DEVICE_TYPE(PIT8254, pit8254_device, "pit8254", "Intel 8254 PIT")
 
 
 pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PIT8253, "8253 PIT", tag, owner, clock, "pit8253", __FILE__),
+	pit8253_device(mconfig, PIT8253, tag, owner, clock)
+{
+}
+
+pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_clk0(0),
 	m_clk1(0),
 	m_clk2(0),
@@ -57,22 +63,9 @@ pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_clk0(0),
-	m_clk1(0),
-	m_clk2(0),
-	m_out0_handler(*this),
-	m_out1_handler(*this),
-	m_out2_handler(*this)
-{
-}
-
-
-const device_type PIT8254 = device_creator<pit8254_device>;
 
 pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pit8253_device(mconfig, PIT8254, "8254 PIT", tag, owner, clock, "pit8254", __FILE__)
+	: pit8253_device(mconfig, PIT8254, tag, owner, clock)
 {
 }
 

@@ -16,8 +16,8 @@
 #include "emu.h"
 #include "machine/pc_fdc.h"
 
-const device_type PC_FDC_XT = device_creator<pc_fdc_xt_device>;
-const device_type PC_FDC_AT = device_creator<pc_fdc_at_device>;
+DEFINE_DEVICE_TYPE(PC_FDC_XT, pc_fdc_xt_device, "pc_fdc_xt", "PC FDC (XT)")
+DEFINE_DEVICE_TYPE(PC_FDC_AT, pc_fdc_at_device, "pc_fdc_at", "PC FDC (AT)")
 
 static MACHINE_CONFIG_FRAGMENT( cfg )
 	MCFG_UPD765A_ADD("upd765", false, false)
@@ -45,8 +45,8 @@ DEVICE_ADDRESS_MAP_START(map, 8, pc_fdc_at_device)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
 ADDRESS_MAP_END
 
-pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	pc_fdc_interface(mconfig, type, name, tag, owner, clock, shortname, source), fdc(*this, "upd765"),
+pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	pc_fdc_interface(mconfig, type, tag, owner, clock), fdc(*this, "upd765"),
 	intrq_cb(*this),
 	drq_cb(*this)
 {
@@ -183,10 +183,10 @@ void pc_fdc_family_device::check_drq()
 		drq_cb(drq);
 }
 
-pc_fdc_xt_device::pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : pc_fdc_family_device(mconfig, PC_FDC_XT, "PC FDC XT", tag, owner, clock, "pc_fdc_xt", __FILE__)
+pc_fdc_xt_device::pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : pc_fdc_family_device(mconfig, PC_FDC_XT, tag, owner, clock)
 {
 }
 
-pc_fdc_at_device::pc_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : pc_fdc_family_device(mconfig, PC_FDC_AT, "PC FDC AT", tag, owner, clock, "pc_fdc_at", __FILE__)
+pc_fdc_at_device::pc_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : pc_fdc_family_device(mconfig, PC_FDC_AT, tag, owner, clock)
 {
 }

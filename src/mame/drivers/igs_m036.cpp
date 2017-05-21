@@ -245,7 +245,7 @@ void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 
 #define IGS036_CPU ARM7
 
-static MACHINE_CONFIG_START( igs_m036, igs_m036_state )
+static MACHINE_CONFIG_START( igs_m036 )
 	MCFG_CPU_ADD("maincpu",IGS036_CPU, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_m036_map)
@@ -264,7 +264,7 @@ static MACHINE_CONFIG_START( igs_m036, igs_m036_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( igs_m036_tt, igs_m036_state )
+static MACHINE_CONFIG_START( igs_m036_tt )
 	MCFG_CPU_ADD("maincpu",IGS036_CPU, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_m036_map)
@@ -319,10 +319,10 @@ DRIVER_INIT_MEMBER(igs_m036_state, igsm312)
 
 ***************************************************************************/
 
-GAME( 200?,  cjdh2,      0,     igs_m036, igs_m036, igs_m036_state, cjdh2,        ROT0, "IGS", "Chao Ji Da Heng 2 (V311CN)", MACHINE_IS_SKELETON )
-GAME( 200?,  cjdh2a,     cjdh2, igs_m036, igs_m036, igs_m036_state, cjdh2,        ROT0, "IGS", "Chao Ji Da Heng 2 (V311CNA)", MACHINE_IS_SKELETON )
-GAME( 200?,  cjdh2b,     cjdh2, igs_m036, igs_m036, igs_m036_state, cjdh2,        ROT0, "IGS", "Chao Ji Da Heng 2 (V311CNB)", MACHINE_IS_SKELETON )
-GAME( 200?,  cjdh2c,     cjdh2, igs_m036, igs_m036, igs_m036_state, cjdh2,        ROT0, "IGS", "Chao Ji Da Heng 2 (V215CN)", MACHINE_IS_SKELETON )
+GAME( 200?,  cjdh2,      0,     igs_m036,    igs_m036, igs_m036_state, cjdh2,     ROT0, "IGS", "Chao Ji Da Heng 2 (V311CN)", MACHINE_IS_SKELETON )
+GAME( 200?,  cjdh2a,     cjdh2, igs_m036,    igs_m036, igs_m036_state, cjdh2,     ROT0, "IGS", "Chao Ji Da Heng 2 (V311CNA)", MACHINE_IS_SKELETON )
+GAME( 200?,  cjdh2b,     cjdh2, igs_m036,    igs_m036, igs_m036_state, cjdh2,     ROT0, "IGS", "Chao Ji Da Heng 2 (V311CNB)", MACHINE_IS_SKELETON )
+GAME( 200?,  cjdh2c,     cjdh2, igs_m036,    igs_m036, igs_m036_state, cjdh2,     ROT0, "IGS", "Chao Ji Da Heng 2 (V215CN)", MACHINE_IS_SKELETON )
 
 GAME( 200?,  cjddzsp,    0,     igs_m036_tt, igs_m036, igs_m036_state, cjddzsp,   ROT0, "IGS", "Super Dou Di Zhu Special (V122CN)", MACHINE_IS_SKELETON )
 

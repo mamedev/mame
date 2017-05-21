@@ -6,15 +6,15 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_C64_16KB_H
+#define MAME_BUS_C64_16KB_H
+
 #pragma once
 
-#ifndef __C64_16KB__
-#define __C64_16KB__
 
-
+#include "exp.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "exp.h"
 
 
 
@@ -51,8 +51,6 @@ private:
 
 
 // device type definition
-extern const device_type C64_16KB;
+DECLARE_DEVICE_TYPE(C64_16KB, c64_16kb_cartridge_device)
 
-
-
-#endif
+#endif // MAME_BUS_C64_16KB_H

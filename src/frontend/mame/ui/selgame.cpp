@@ -375,13 +375,13 @@ void menu_select_game::handle()
 					if (!mfav.isgame_favorite(driver))
 					{
 						mfav.add_favorite_game(driver);
-						machine().popmessage(_("%s\n added to favorites list."), driver->description);
+						machine().popmessage(_("%s\n added to favorites list."), driver->type.fullname());
 					}
 
 					else
 					{
 						mfav.remove_favorite_game();
-						machine().popmessage(_("%s\n removed from favorites list."), driver->description);
+						machine().popmessage(_("%s\n removed from favorites list."), driver->type.fullname());
 					}
 				}
 			}
@@ -546,7 +546,7 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 						cloneof = false;
 				}
 
-				item_append(elem->description, "", (cloneof) ? (flags_ui | FLAG_INVERT) : flags_ui, (void *)elem);
+				item_append(elem->type.fullname(), "", (cloneof) ? (flags_ui | FLAG_INVERT) : flags_ui, (void *)elem);
 				curitem++;
 			}
 		}
@@ -872,6 +872,16 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
+            if ((ui_swinfo->driver->flags & MACHINE_TYPE_ARCADE) == 0)
+            {
+                for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
+                    if (!swlistdev.get_info().empty())
+                    {
+                        menu::stack_push<menu_select_software>(ui(), container(), ui_swinfo->driver);
+                        return;
+                    }
+            }
+
 			// if everything looks good, schedule the new driver
 			s_bios biosname;
 			if (!mopt.skip_bios_menu() && has_multiple_bios(ui_swinfo->driver, biosname))
@@ -931,7 +941,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 			}
 
 			std::string error_string;
-			std::string string_list = std::string(ui_swinfo->listname).append(":").append(ui_swinfo->shortname).append(":").append(ui_swinfo->part).append(":").append(ui_swinfo->instance);
+			std::string string_list = string_format("%s:%s:%s:%s", ui_swinfo->listname, ui_swinfo->shortname, ui_swinfo->part, ui_swinfo->instance);
 			mopt.set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 			std::string snap_list = std::string(ui_swinfo->listname).append(PATH_SEPARATOR).append(ui_swinfo->shortname);
 			mopt.set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
@@ -1185,7 +1195,7 @@ void menu_select_game::populate_search()
 	for (; index < m_displaylist.size(); ++index)
 	{
 		// pick the best match between driver name and description
-		int curpenalty = fuzzy_substring(m_search, m_displaylist[index]->description);
+		int curpenalty = fuzzy_substring(m_search, m_displaylist[index]->type.fullname());
 		int tmp = fuzzy_substring(m_search, m_displaylist[index]->name);
 		curpenalty = std::min(curpenalty, tmp);
 
@@ -1219,7 +1229,7 @@ void menu_select_game::populate_search()
 			if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 				cloneof = false;
 		}
-		item_append(m_searchlist[curitem]->description, "", (!cloneof) ? flags_ui : (FLAG_INVERT | flags_ui),
+		item_append(m_searchlist[curitem]->type.fullname(), "", (!cloneof) ? flags_ui : (FLAG_INVERT | flags_ui),
 			(void *)m_searchlist[curitem]);
 	}
 }
@@ -1238,7 +1248,7 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 
 	int cloneof = driver_list::non_bios_clone(*driver);
 	if (cloneof != -1)
-		util::stream_format(str, _("Driver is Clone of: %1$-.100s\n"), driver_list::driver(cloneof).description);
+		util::stream_format(str, _("Driver is Clone of: %1$-.100s\n"), driver_list::driver(cloneof).type.fullname());
 	else
 		str << _("Driver is Parent:\n");
 
@@ -1407,7 +1417,7 @@ bool menu_select_game::load_available_machines()
 	file.gets(rbuf, MAX_CHAR_INFO);
 	file.gets(rbuf, MAX_CHAR_INFO);
 	readbuf = chartrimcarriage(rbuf);
-	std::string a_rev = std::string(UI_VERSION_TAG).append(bare_build_version);
+	std::string a_rev = string_format("%s%s", UI_VERSION_TAG, bare_build_version);
 
 	// version not matching ? exit
 	if (a_rev != readbuf)
@@ -1732,7 +1742,7 @@ std::string menu_select_game::make_driver_description(game_driver const &driver)
 std::string menu_select_game::make_software_description(ui_software_info const &software) const
 {
 	// first line is system
-	return string_format(_("System: %1$-.100s"), software.driver->description);
+	return string_format(_("System: %1$-.100s"), software.driver->type.fullname());
 }
 
 } // namespace ui

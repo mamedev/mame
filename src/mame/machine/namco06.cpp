@@ -85,18 +85,18 @@
 #include "machine/namco06.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
 {
 	if (!m_nmicpu->suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
-		LOG(("NMI cpu '%s'\n",m_nmicpu->tag()));
+		LOG("NMI cpu '%s'\n",m_nmicpu->tag());
 		m_nmicpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
-		LOG(("NMI not generated because cpu '%s' is suspended\n",m_nmicpu->tag()));
+		LOG("NMI not generated because cpu '%s' is suspended\n",m_nmicpu->tag());
 }
 
 
@@ -104,7 +104,7 @@ READ8_MEMBER( namco_06xx_device::data_r )
 {
 	uint8_t result = 0xff;
 
-	LOG(("%s: 06XX '%s' read offset %d\n",machine().describe_context(),tag(),offset));
+	LOG("%s: 06XX '%s' read offset %d\n",machine().describe_context(),tag(),offset);
 
 	if (!(m_control & 0x10))
 	{
@@ -112,10 +112,10 @@ READ8_MEMBER( namco_06xx_device::data_r )
 		return 0;
 	}
 
-	if ((m_control & (1 << 0)) && !m_read_0.isnull()) result &= m_read_0(space, 0);
-	if ((m_control & (1 << 1)) && !m_read_1.isnull()) result &= m_read_1(space, 0);
-	if ((m_control & (1 << 2)) && !m_read_2.isnull()) result &= m_read_2(space, 0);
-	if ((m_control & (1 << 3)) && !m_read_3.isnull()) result &= m_read_3(space, 0);
+	if (BIT(m_control, 0)) result &= m_read[0](space, 0);
+	if (BIT(m_control, 1)) result &= m_read[1](space, 0);
+	if (BIT(m_control, 2)) result &= m_read[2](space, 0);
+	if (BIT(m_control, 3)) result &= m_read[3](space, 0);
 
 	return result;
 }
@@ -123,40 +123,40 @@ READ8_MEMBER( namco_06xx_device::data_r )
 
 WRITE8_MEMBER( namco_06xx_device::data_w )
 {
-	LOG(("%s: 06XX '%s' write offset %d = %02x\n",machine().describe_context(),tag(),offset,data));
+	LOG("%s: 06XX '%s' write offset %d = %02x\n",machine().describe_context(),tag(),offset,data);
 
 	if (m_control & 0x10)
 	{
 		logerror("%s: 06XX '%s' write in read mode %02x\n",machine().describe_context(),tag(),m_control);
 		return;
 	}
-	if ((m_control & (1 << 0)) && !m_write_0.isnull()) m_write_0(space, 0, data);
-	if ((m_control & (1 << 1)) && !m_write_1.isnull()) m_write_1(space, 0, data);
-	if ((m_control & (1 << 2)) && !m_write_2.isnull()) m_write_2(space, 0, data);
-	if ((m_control & (1 << 3)) && !m_write_3.isnull()) m_write_3(space, 0, data);
+	if (BIT(m_control, 0)) m_write[0](space, 0, data);
+	if (BIT(m_control, 1)) m_write[1](space, 0, data);
+	if (BIT(m_control, 2)) m_write[2](space, 0, data);
+	if (BIT(m_control, 3)) m_write[3](space, 0, data);
 }
 
 
 READ8_MEMBER( namco_06xx_device::ctrl_r )
 {
-	LOG(("%s: 06XX '%s' ctrl_r\n",machine().describe_context(),tag()));
+	LOG("%s: 06XX '%s' ctrl_r\n",machine().describe_context(),tag());
 	return m_control;
 }
 
 WRITE8_MEMBER( namco_06xx_device::ctrl_w )
 {
-	LOG(("%s: 06XX '%s' control %02x\n",space.machine().describe_context(),tag(),data));
+	LOG("%s: 06XX '%s' control %02x\n",space.machine().describe_context(),tag(),data);
 
 	m_control = data;
 
 	if ((m_control & 0x0f) == 0)
 	{
-		LOG(("disabling nmi generate timer\n"));
+		LOG("disabling nmi generate timer\n");
 		m_nmi_timer->adjust(attotime::never);
 	}
 	else
 	{
-		LOG(("setting nmi generate timer to 200us\n"));
+		LOG("setting nmi generate timer to 200us\n");
 
 		// this timing is critical. Due to a bug, Bosconian will stop responding to
 		// inputs if a transfer terminates at the wrong time.
@@ -164,34 +164,26 @@ WRITE8_MEMBER( namco_06xx_device::ctrl_w )
 		// not have enough time to process the incoming controls.
 		m_nmi_timer->adjust(attotime::from_usec(200), 0, attotime::from_usec(200));
 
-		if (m_control & 0x10) {
-			if ((m_control & (1 << 0)) && !m_readreq_0.isnull()) m_readreq_0(space, 0);
-			if ((m_control & (1 << 1)) && !m_readreq_1.isnull()) m_readreq_1(space, 0);
-			if ((m_control & (1 << 2)) && !m_readreq_2.isnull()) m_readreq_2(space, 0);
-			if ((m_control & (1 << 3)) && !m_readreq_3.isnull()) m_readreq_3(space, 0);
+		if (m_control & 0x10)
+		{
+			if (BIT(m_control, 0)) m_readreq[0](space, 0);
+			if (BIT(m_control, 1)) m_readreq[1](space, 0);
+			if (BIT(m_control, 2)) m_readreq[2](space, 0);
+			if (BIT(m_control, 3)) m_readreq[3](space, 0);
 		}
 	}
 }
 
 
-const device_type NAMCO_06XX = device_creator<namco_06xx_device>;
+DEFINE_DEVICE_TYPE(NAMCO_06XX, namco_06xx_device, "namco06", "Namco 06xx")
 
 namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_06XX, "Namco 06xx", tag, owner, clock, "namco06xx", __FILE__)
+	: device_t(mconfig, NAMCO_06XX, tag, owner, clock)
 	, m_control(0)
 	, m_nmicpu(*this, finder_base::DUMMY_TAG)
-	, m_read_0(*this)
-	, m_read_1(*this)
-	, m_read_2(*this)
-	, m_read_3(*this)
-	, m_readreq_0(*this)
-	, m_readreq_1(*this)
-	, m_readreq_2(*this)
-	, m_readreq_3(*this)
-	, m_write_0(*this)
-	, m_write_1(*this)
-	, m_write_2(*this)
-	, m_write_3(*this)
+	, m_read{ { *this }, { *this }, { *this }, { *this } }
+	, m_readreq{ { *this }, { *this }, { *this }, { *this } }
+	, m_write{ { *this }, { *this }, { *this }, { *this } }
 {
 }
 
@@ -201,18 +193,15 @@ namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *
 
 void namco_06xx_device::device_start()
 {
-	m_read_0.resolve();
-	m_read_1.resolve();
-	m_read_2.resolve();
-	m_read_3.resolve();
-	m_readreq_0.resolve();
-	m_readreq_1.resolve();
-	m_readreq_2.resolve();
-	m_readreq_3.resolve();
-	m_write_0.resolve();
-	m_write_1.resolve();
-	m_write_2.resolve();
-	m_write_3.resolve();
+	for (devcb_read8 &cb : m_read)
+		cb.resolve_safe(0xff);
+
+	for (devcb_write_line &cb : m_readreq)
+		cb.resolve_safe();
+
+	for (devcb_write8 &cb : m_write)
+		cb.resolve_safe();
+
 	/* allocate a timer */
 	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namco_06xx_device::nmi_generate),this));
 

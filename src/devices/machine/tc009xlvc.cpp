@@ -17,7 +17,7 @@
 #include "screen.h"
 
 
-const device_type TC0091LVC = device_creator<tc0091lvc_device>;
+DEFINE_DEVICE_TYPE(TC0091LVC, tc0091lvc_device, "tc009xlvc", "Taito TC0091LVC")
 
 
 READ8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_r)
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( tc0091lvc_map8, AS_0, 8, tc0091lvc_device )
 ADDRESS_MAP_END
 
 tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0091LVC, "Taito TC0091LVC", tag, owner, clock, "tc0091lvc", __FILE__)
+	: device_t(mconfig, TC0091LVC, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, nullptr, *ADDRESS_MAP_NAME(tc0091lvc_map8))
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)

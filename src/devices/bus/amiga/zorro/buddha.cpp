@@ -36,7 +36,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BUDDHA = device_creator<buddha_device>;
+DEFINE_DEVICE_TYPE(BUDDHA, buddha_device, "buddha", "Buddha IDE controller")
 
 //-------------------------------------------------
 //  mmio_map - device-specific memory mapped I/O
@@ -98,7 +98,7 @@ const tiny_rom_entry *buddha_device::device_rom_region() const
 //-------------------------------------------------
 
 buddha_device::buddha_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, BUDDHA, "Buddha IDE controller", tag, owner, clock, "buddha", __FILE__),
+	device_t(mconfig, BUDDHA, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_ata_0(*this, "ata_0"),
 	m_ata_1(*this, "ata_1"),

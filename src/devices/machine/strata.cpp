@@ -23,7 +23,6 @@
 #include "emu.h"
 #include "strata.h"
 
-#define MAX_STRATA  1
 
 #define FEEPROM_SIZE        0x800000    // 64Mbit
 #define BLOCK_SIZE          0x020000
@@ -44,11 +43,11 @@
 #define SET_BLOCKLOCK(block) (m_blocklock[(block) >> 3] |= 1 << ((block) & 7))
 #define CLEAR_BLOCKLOCK(block) (m_blocklock[(block) >> 3] &= ~(1 << ((block) & 7)))
 
-const device_type STRATAFLASH = device_creator<strataflash_device>;
+DEFINE_DEVICE_TYPE(STRATAFLASH, strataflash_device, "strataflash", "Intel 28F640J5")
 
 strataflash_device::strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, STRATAFLASH, "Intel 28F640J5", tag, owner, clock, "strataflash", __FILE__),
-		device_nvram_interface(mconfig, *this)
+	: device_t(mconfig, STRATAFLASH, tag, owner, clock)
+	, device_nvram_interface(mconfig, *this)
 {
 }
 
@@ -179,7 +178,7 @@ void strataflash_device::nvram_write(emu_file &file)
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-void strataflash_device::device_start(void)
+void strataflash_device::device_start()
 {
 	m_mode = FM_NORMAL;
 	m_status = 0x80;

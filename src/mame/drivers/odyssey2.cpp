@@ -657,7 +657,7 @@ static MACHINE_CONFIG_FRAGMENT( odyssey2_cartslot )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
+static MACHINE_CONFIG_START( odyssey2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8048, ( ( XTAL_7_15909MHz * 3 ) / 4 ) )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
@@ -691,7 +691,7 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( videopac, odyssey2_state )
+static MACHINE_CONFIG_START( videopac )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8048, ( XTAL_17_73447MHz / 3 ) )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
@@ -717,7 +717,7 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( g7400, g7400_state )
+static MACHINE_CONFIG_START( g7400 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8048, XTAL_5_911MHz )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
@@ -758,7 +758,7 @@ static MACHINE_CONFIG_START( g7400, g7400_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( odyssey3, g7400_state )
+static MACHINE_CONFIG_START( odyssey3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8048, XTAL_5_911MHz )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
@@ -837,9 +837,9 @@ ROM_START (odyssey3)
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
-/*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     INIT      COMPANY     FULLNAME     FLAGS */
-COMP( 1978, odyssey2, 0,        0,      odyssey2, odyssey2, odyssey2_state, odyssey2, "Magnavox", "Odyssey 2", 0 )
-COMP( 1979, videopac, odyssey2, 0,      videopac, odyssey2, odyssey2_state, odyssey2, "Philips", "Videopac G7000/C52", 0 )
-COMP( 1983, g7400, odyssey2, 0,         g7400,    odyssey2, odyssey2_state, odyssey2, "Philips", "Videopac Plus G7400", MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1983, jopac, odyssey2, 0,         g7400,    odyssey2, odyssey2_state, odyssey2, "Brandt", "Jopac JO7400", MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1983, odyssey3, odyssey2, 0,      odyssey3, odyssey2, odyssey2_state, odyssey2, "Magnavox", "Odyssey 3 Command Center (prototype)", MACHINE_IMPERFECT_GRAPHICS )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY     FULLNAME                                FLAGS */
+COMP( 1978, odyssey2, 0,        0,      odyssey2, odyssey2, odyssey2_state, odyssey2, "Magnavox", "Odyssey 2",                            0 )
+COMP( 1979, videopac, odyssey2, 0,      videopac, odyssey2, odyssey2_state, odyssey2, "Philips",  "Videopac G7000/C52",                   0 )
+COMP( 1983, g7400,    odyssey2, 0,      g7400,    odyssey2, g7400_state,    odyssey2, "Philips",  "Videopac Plus G7400",                  MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, jopac,    odyssey2, 0,      g7400,    odyssey2, g7400_state,    odyssey2, "Brandt", "  Jopac JO7400",                         MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, odyssey3, odyssey2, 0,      odyssey3, odyssey2, g7400_state,    odyssey2, "Magnavox", "Odyssey 3 Command Center (prototype)", MACHINE_IMPERFECT_GRAPHICS )

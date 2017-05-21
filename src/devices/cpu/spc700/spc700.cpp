@@ -62,10 +62,12 @@ Address  Function Register  R/W  When Reset          Remarks
 /* ================================ INCLUDES ============================== */
 /* ======================================================================== */
 
-#include <limits.h>
 #include "emu.h"
-#include "debugger.h"
 #include "spc700.h"
+
+#include "debugger.h"
+
+#include <limits.h>
 
 
 /* ======================================================================== */
@@ -216,11 +218,11 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 
 
 
-const device_type SPC700 = device_creator<spc700_device>;
+DEFINE_DEVICE_TYPE(SPC700, spc700_device, "spc700", "SPC700")
 
 
 spc700_device::spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SPC700, "SPC700", tag, owner, clock, "spc700", __FILE__)
+	: cpu_device(mconfig, SPC700, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_a(0)
 	, m_x(0)
@@ -895,7 +897,7 @@ void spc700_device::SET_FLAG_I(uint32_t value)
 			CLK(BCLK);                                                      \
 			DST     = EA_##MODE();                                          \
 			FLAG_NZ = read_8_##MODE(DST);                                   \
-			FLAG_C  = FLAG_NZ << 8;                                         \
+			FLAG_C  = FLAG_N << 8;                                          \
 			FLAG_NZ >>= 1;                                                  \
 			write_8_##MODE(DST, FLAG_NZ)
 
@@ -1090,7 +1092,7 @@ void spc700_device::SET_FLAG_I(uint32_t value)
 			CLK(BCLK);                                                      \
 			DST     = EA_##MODE();                                          \
 			FLAG_NZ = read_8_##MODE(DST) | (FLAG_C & 0x100);                \
-			FLAG_C  = FLAG_NZ << 8;                                         \
+			FLAG_C  = FLAG_N << 8;                                          \
 			FLAG_NZ >>= 1;                                                  \
 			write_8_##MODE(DST, FLAG_NZ)
 
@@ -1171,7 +1173,7 @@ void spc700_device::SET_FLAG_I(uint32_t value)
 			CLK(BCLK);                                                      \
 			DST     = EA_##MODE();                                          \
 			FLAG_NZ = read_8_##MODE(DST);                                   \
-			write_8_##MODE(DST, FLAG_NZ & ~REG_A);                          \
+			write_8_##MODE(DST, FLAG_N & ~REG_A);                           \
 			FLAG_NZ &= REG_A
 
 /* Test and Set Bits */
@@ -1179,7 +1181,7 @@ void spc700_device::SET_FLAG_I(uint32_t value)
 			CLK(BCLK);                                                      \
 			DST     = EA_##MODE();                                          \
 			FLAG_NZ = read_8_##MODE(DST);                                   \
-			write_8_##MODE(DST, FLAG_NZ | REG_A);                           \
+			write_8_##MODE(DST, FLAG_N | REG_A);                            \
 			FLAG_NZ &= REG_A
 
 /* Exchange high and low nybbles of accumulator */
@@ -1250,14 +1252,14 @@ void spc700_device::state_string_export(const device_state_entry &entry, std::st
 	{
 		case STATE_GENFLAGS:
 			str = string_format("%c%c%c%c%c%c%c%c",
-				(m_flag_n & 0x80)        ? 'N':'.',
-				((m_flag_v & 0x80) >> 1) ? 'V':'.',
-				(m_flag_p>>3)            ? 'P':'.',
-				(m_flag_b)               ? 'B':'.',
-				(m_flag_h & HFLAG_SET)   ? 'H':'.',
-				( m_flag_i)              ? 'I':'.',
-				((!m_flag_z) << 1)       ? 'Z':'.',
-				((m_flag_c >> 8)&1)      ? 'C':'.'
+				(FLAG_N & 0x80)      ? 'N':'.',
+				(FLAG_V & 0x80)      ? 'V':'.',
+				(FLAG_P)             ? 'P':'.',
+				(FLAG_B)             ? 'B':'.',
+				(FLAG_H & HFLAG_SET) ? 'H':'.',
+				(FLAG_I)             ? 'I':'.',
+				(!FLAG_Z)            ? 'Z':'.',
+				(FLAG_C & 0x100)     ? 'C':'.'
 			);
 			break;
 	}
@@ -1280,14 +1282,14 @@ void spc700_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case SPC700_P:
-			m_debugger_temp = ((m_flag_n & 0x80)          |
-					((m_flag_v & 0x80) >> 1)    |
-					m_flag_p>>3             |
-					m_flag_b                    |
-					(m_flag_h & HFLAG_SET)  |
-					m_flag_i                    |
-					((!m_flag_z) << 1)      |
-					((m_flag_c >> 8)&1));
+			m_debugger_temp = ((FLAG_N & 0x80)          |
+					((FLAG_V & 0x80) >> 1)    |
+					FLAG_P>>3             |
+					FLAG_B                    |
+					(FLAG_H & HFLAG_SET)  |
+					FLAG_I                    |
+					((!FLAG_Z) << 1)      |
+					((FLAG_C >> 8)&1));
 			break;
 
 		case STATE_GENSP:

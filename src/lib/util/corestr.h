@@ -59,6 +59,7 @@ char *core_strdup(const char *str);
 
 /* additional string compare helper (up to 16 characters at the moment) */
 int core_strwildcmp(const char *sp1, const char *sp2);
+bool core_iswildstr(const char *sp);
 
 
 int strcatvprintf(std::string &str, const char *format, va_list args);

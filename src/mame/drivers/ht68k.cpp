@@ -54,7 +54,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
-	required_device<wd1770_t> m_fdc;
+	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
@@ -73,7 +73,7 @@ static ADDRESS_MAP_START(ht68k_mem, AS_PROGRAM, 16, ht68k_state)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("p_ram") // 512 KB RAM / ROM at boot
 	//AM_RANGE(0x00080000, 0x000fffff) // Expansion
 	//AM_RANGE(0x00d80000, 0x00d8ffff) // Printer
-	AM_RANGE(0x00e00000, 0x00e00007) AM_MIRROR(0xfff8) AM_DEVREADWRITE8("wd1770", wd1770_t, read, write, 0x00ff) // FDC WD1770
+	AM_RANGE(0x00e00000, 0x00e00007) AM_MIRROR(0xfff8) AM_DEVREADWRITE8("wd1770", wd1770_device, read, write, 0x00ff) // FDC WD1770
 	AM_RANGE(0x00e80000, 0x00e800ff) AM_MIRROR(0xff00) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
 	AM_RANGE(0x00f00000, 0x00f07fff) AM_ROM AM_MIRROR(0xf8000) AM_REGION("user1",0)
 ADDRESS_MAP_END
@@ -123,7 +123,7 @@ static SLOT_INTERFACE_START( ht68k_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( ht68k, ht68k_state )
+static MACHINE_CONFIG_START( ht68k )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(ht68k_mem)
@@ -158,5 +158,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                     FULLNAME                    FLAGS */
-COMP( 1987, ht68k,  0,       0,      ht68k,     ht68k, driver_device,   0,   "Hawthorne Technology", "TinyGiant HT68k", MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY                 FULLNAME           FLAGS
+COMP( 1987, ht68k,  0,       0,      ht68k,     ht68k, ht68k_state, 0,    "Hawthorne Technology", "TinyGiant HT68k", MACHINE_NO_SOUND)

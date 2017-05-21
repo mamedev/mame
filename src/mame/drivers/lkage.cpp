@@ -505,7 +505,7 @@ void lkage_state::machine_reset()
 
 }
 
-static MACHINE_CONFIG_START( lkage, lkage_state )
+static MACHINE_CONFIG_START( lkage )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
@@ -554,7 +554,7 @@ static MACHINE_CONFIG_START( lkage, lkage_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( lkageb, lkage_state )
+static MACHINE_CONFIG_START( lkageb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CPU_CLOCK)
@@ -935,10 +935,10 @@ DRIVER_INIT_MEMBER(lkage_state,bygone)
 	m_sprite_dx=1;
 }
 
-GAME( 1984, lkage,    0,        lkage,    lkage, lkage_state,    lkage,    ROT0, "Taito Corporation", "The Legend of Kage", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageo,   lkage,    lkage,    lkage, lkage_state,    lkage,    ROT0, "Taito Corporation", "The Legend of Kage (older)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageoo,  lkage,    lkage,    lkage, lkage_state,    lkage,    ROT0, "Taito Corporation", "The Legend of Kage (oldest)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb,   lkage,    lkageb,   lkageb, lkage_state,   lkage,    ROT0, "bootleg", "The Legend of Kage (bootleg set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb2,  lkage,    lkageb,   lkageb, lkage_state,   lkage,    ROT0, "bootleg", "The Legend of Kage (bootleg set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb3,  lkage,    lkageb,   lkageb, lkage_state,   lkage,    ROT0, "bootleg", "The Legend of Kage (bootleg set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, bygone,   0,        lkage,    bygone, lkage_state,   bygone,   ROT0, "Taito Corporation", "Bygone (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkage,    0,        lkage,    lkage,  lkage_state,   lkage,    ROT0, "Taito Corporation", "The Legend of Kage",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageo,   lkage,    lkage,    lkage,  lkage_state,   lkage,    ROT0, "Taito Corporation", "The Legend of Kage (older)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageoo,  lkage,    lkage,    lkage,  lkage_state,   lkage,    ROT0, "Taito Corporation", "The Legend of Kage (oldest)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb,   lkage,    lkageb,   lkageb, lkage_state,   lkage,    ROT0, "bootleg",           "The Legend of Kage (bootleg set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb2,  lkage,    lkageb,   lkageb, lkage_state,   lkage,    ROT0, "bootleg",           "The Legend of Kage (bootleg set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb3,  lkage,    lkageb,   lkageb, lkage_state,   lkage,    ROT0, "bootleg",           "The Legend of Kage (bootleg set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bygone,   0,        lkage,    bygone, lkage_state,   bygone,   ROT0, "Taito Corporation", "Bygone (prototype)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

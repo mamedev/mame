@@ -1084,7 +1084,7 @@ GFXDECODE_END
  *************************************/
 
 /* Core MCR monoboard system with no sound */
-static MACHINE_CONFIG_START( mcrmono, mcr3_state )
+static MACHINE_CONFIG_START( mcrmono )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)

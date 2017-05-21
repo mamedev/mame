@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef __CENTRONICS_DSJOY_H__
-#define __CENTRONICS_DSJOY_H__
+#ifndef MAME_BUS_CENTRONICS_DSJOY_H
+#define MAME_BUS_CENTRONICS_DSJOY_H
 
 #pragma once
 
@@ -42,6 +42,6 @@ private:
 };
 
 // device type definition
-extern const device_type DEMPA_SHINBUNSHA_JOYSTICK;
+DECLARE_DEVICE_TYPE(DEMPA_SHINBUNSHA_JOYSTICK, dempa_shinbunsha_joystick_device)
 
-#endif
+#endif // MAME_BUS_CENTRONICS_DSJOY_H

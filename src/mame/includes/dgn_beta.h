@@ -108,7 +108,7 @@ public:
 	required_device<pia6821_device> m_pia_0;
 	required_device<pia6821_device> m_pia_1;
 	required_device<pia6821_device> m_pia_2;
-	required_device<wd2797_t> m_fdc;
+	required_device<wd2797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;

@@ -40,10 +40,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_82S129_H
+#define MAME_MACHINE_82S129_H
 
-#ifndef PROM82S129_H
-#define PROM82S129_H
+#pragma once
 
 
 #define MCFG_82S126_OUTPUT_CB(_devcb) \
@@ -85,15 +85,12 @@
 class prom82s129_base_device : public device_t
 {
 public:
-	// construction/destruction
-	prom82s129_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
-
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_out_cb(device_t &device, _Object object) { return downcast<prom82s129_base_device &>(device).m_out_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_o1_cb(device_t &device, _Object object) { return downcast<prom82s129_base_device &>(device).m_o1_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_o2_cb(device_t &device, _Object object) { return downcast<prom82s129_base_device &>(device).m_o2_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_o3_cb(device_t &device, _Object object) { return downcast<prom82s129_base_device &>(device).m_o3_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_o4_cb(device_t &device, _Object object) { return downcast<prom82s129_base_device &>(device).m_o4_func.set_callback(object); }
+	template <class Object> static devcb_base &set_out_cb(device_t &device, Object &&cb) { return downcast<prom82s129_base_device &>(device).m_out_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_o1_cb(device_t &device, Object &&cb) { return downcast<prom82s129_base_device &>(device).m_o1_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_o2_cb(device_t &device, Object &&cb) { return downcast<prom82s129_base_device &>(device).m_o2_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_o3_cb(device_t &device, Object &&cb) { return downcast<prom82s129_base_device &>(device).m_o3_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_o4_cb(device_t &device, Object &&cb) { return downcast<prom82s129_base_device &>(device).m_o4_func.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( ce1_w );
 	DECLARE_WRITE_LINE_MEMBER( ce2_w );
@@ -117,6 +114,9 @@ public:
 	uint8_t get_output() const { return m_out; }
 
 protected:
+	// construction/destruction
+	prom82s129_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -164,5 +164,7 @@ public:
 // device type definition
 extern const device_type PROM82S126;
 extern const device_type PROM82S129;
+DECLARE_DEVICE_TYPE(PROM82S126, prom82s126_device)
+DECLARE_DEVICE_TYPE(PROM82S129, prom82s129_device)
 
-#endif /* PROM82S129_H */
+#endif // MAME_MACHINE_82S129_H

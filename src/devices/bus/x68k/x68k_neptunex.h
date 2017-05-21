@@ -10,11 +10,13 @@
  * 0xECE400-0xECE7FF: "Y1"
  */
 
-#ifndef X68K_NEPTUNEX_H_
-#define X68K_NEPTUNEX_H_
+#ifndef MAME_BUS_X68K_X68K_NEPTUNEX_H
+#define MAME_BUS_X68K_X68K_NEPTUNEX_H
 
-#include "machine/dp8390.h"
+#pragma once
+
 #include "x68kexp.h"
+#include "machine/dp8390.h"
 
 #define NEPTUNE_IRQ_VECTOR 0xf9
 
@@ -28,11 +30,12 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	void x68k_neptune_irq_w(int state);
 	DECLARE_READ8_MEMBER(x68k_neptune_mem_read);
 	DECLARE_WRITE8_MEMBER(x68k_neptune_mem_write);
 	DECLARE_READ16_MEMBER(x68k_neptune_port_r);
 	DECLARE_WRITE16_MEMBER(x68k_neptune_port_w);
+
+	void x68k_neptune_irq_w(int state);
 
 protected:
 	// device-level overrides
@@ -48,6 +51,6 @@ private:
 };
 
 // device type definition
-extern const device_type X68K_NEPTUNEX;
+DECLARE_DEVICE_TYPE(X68K_NEPTUNEX, x68k_neptune_device)
 
-#endif /* X68K_NEPTUNEX_H_ */
+#endif // MAME_BUS_X68K_X68K_NEPTUNEX_H

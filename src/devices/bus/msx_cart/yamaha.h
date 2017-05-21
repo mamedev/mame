@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef __MSX_CART_YAMAHA_H
-#define __MSX_CART_YAMAHA_H
+#ifndef MAME_BUS_MSX_CART_YAMAHA_H
+#define MAME_BUS_MSX_CART_YAMAHA_H
+
+#pragma once
 
 #include "bus/msx_cart/cartridge.h"
 #include "sound/ym2151.h"
@@ -9,25 +11,26 @@
 #include "machine/ym2148.h"
 
 
-extern const device_type MSX_CART_SFG01;
-extern const device_type MSX_CART_SFG05;
+DECLARE_DEVICE_TYPE(MSX_CART_SFG01, msx_cart_sfg01_device)
+DECLARE_DEVICE_TYPE(MSX_CART_SFG05, msx_cart_sfg05_device)
 
 
-class msx_cart_sfg : public device_t
-					, public msx_cart_interface
+class msx_cart_sfg_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_sfg(const machine_config &mconfig, const device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
-
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void device_start() override;
 
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
 	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(ym2148_irq_w);
+
+protected:
+	msx_cart_sfg_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -44,21 +47,21 @@ private:
 };
 
 
-class msx_cart_sfg01 : public msx_cart_sfg
+class msx_cart_sfg01_device : public msx_cart_sfg_device
 {
 public:
-	msx_cart_sfg01(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_sfg01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 
-class msx_cart_sfg05 : public msx_cart_sfg
+class msx_cart_sfg05_device : public msx_cart_sfg_device
 {
 public:
-	msx_cart_sfg05(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_sfg05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-#endif
+#endif // MAME_BUS_MSX_CART_YAMAHA_H

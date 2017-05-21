@@ -104,14 +104,13 @@ WRITE8_MEMBER( jeutel_state::porta_w )
 {
 	if ((data & 0xf0) == 0xf0)
 	{
-		m_tms->ctl_w(space, offset, TMS5110_CMD_RESET);
+		m_tms->ctl_w(space, offset, tms5110_device::CMD_RESET);
 		m_tms->pdc_w(1);
 		m_tms->pdc_w(0);
 	}
-	else
-	if ((data & 0xf0) == 0xd0)
+	else if ((data & 0xf0) == 0xd0)
 	{
-		m_tms->ctl_w(space, offset, TMS5110_CMD_SPEAK);
+		m_tms->ctl_w(space, offset, tms5110_device::CMD_SPEAK);
 		m_tms->pdc_w(1);
 		m_tms->pdc_w(0);
 	}
@@ -184,7 +183,7 @@ DRIVER_INIT_MEMBER( jeutel_state, jeutel )
 {
 }
 
-static MACHINE_CONFIG_START( jeutel, jeutel_state )
+static MACHINE_CONFIG_START( jeutel )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3300000)
 	MCFG_CPU_PROGRAM_MAP(jeutel_map)
@@ -268,5 +267,5 @@ ROM_START(olympic)
 ROM_END
 
 
-GAME(1983,  leking,   0,  jeutel,  jeutel, jeutel_state,  jeutel,  ROT0, "Jeutel", "Le King", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1983,  leking,   0,  jeutel,  jeutel, jeutel_state,  jeutel,  ROT0, "Jeutel", "Le King",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1984,  olympic,  0,  jeutel,  jeutel, jeutel_state,  jeutel,  ROT0, "Jeutel", "Olympic Games", MACHINE_IS_SKELETON_MECHANICAL)

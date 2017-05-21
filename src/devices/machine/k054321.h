@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-#pragma once
+#ifndef MAME_MACHINE_K054321_H
+#define MAME_MACHINE_K054321_H
 
-#ifndef MAME_K054321_H
-#define MAME_K054321_H
+#pragma once
 
 #define MCFG_K054321_ADD(_tag, _left, _right)	\
 	MCFG_DEVICE_ADD(_tag, K054321, 0) \
@@ -49,6 +49,6 @@ private:
 	void propagate_volume();
 };
 
-extern const device_type K054321;
+DECLARE_DEVICE_TYPE(K054321, k054321_device)
 
-#endif
+#endif // MAME_MACHINE_K054321_H

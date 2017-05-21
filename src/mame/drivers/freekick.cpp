@@ -708,7 +708,7 @@ MACHINE_RESET_MEMBER(freekick_state,oigas)
 	m_cnt = 0;
 }
 
-static MACHINE_CONFIG_START( omega, freekick_state )
+static MACHINE_CONFIG_START( omega )
 	MCFG_CPU_ADD("maincpu", MC8123, XTAL_18_432MHz/6) // unknown divisor
 	MCFG_CPU_PROGRAM_MAP(omega_map)
 	MCFG_CPU_IO_MAP(omega_io_map)
@@ -741,7 +741,7 @@ static MACHINE_CONFIG_START( omega, freekick_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( base, freekick_state )
+static MACHINE_CONFIG_START( base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)
@@ -1391,20 +1391,20 @@ DRIVER_INIT_MEMBER(freekick_state,gigas)
  *  Game driver(s)
  *
  *************************************/
-/*    YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT     ROT     COMPANY                         FULLNAME                                FLAGS  */
-GAME( 1986, gigas,     0,        gigasm,    gigas,    freekick_state, gigas,   ROT270, "Sega",                         "Gigas (MC-8123, 317-5002)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gigasb,    gigas,    gigas,     gigas,    freekick_state, gigasb,  ROT270, "bootleg",                      "Gigas (bootleg)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, oigas,     gigas ,   oigas,     gigas,    freekick_state, gigasb,  ROT270, "bootleg",                      "Oigas (bootleg)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gigasm2b,  0,        gigas,     gigasm2,  freekick_state, gigasb,  ROT270, "bootleg",                      "Gigas Mark II (bootleg)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1986, omega,     0,        omega,     omega,    freekick_state, gigas,   ROT270, "Nihon System",                 "Omega",                                MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pbillrd,   0,        pbillrd,   pbillrd,  driver_device,  0,       ROT0,   "Nihon System",                 "Perfect Billiard",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pbillrds,  pbillrd,  pbillrdm,  pbillrd,  freekick_state, pbillrds,ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-0030)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pbillrdsa, pbillrd,  pbillrdm,  pbillrd,  freekick_state, pbillrds,ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-5008)", MACHINE_SUPPORTS_SAVE ) // sticker on CPU module different (wrong?) functionality the same
-GAME( 1987, freekick,  0,        freekickb, freekck,  driver_device, 0,        ROT270, "Nihon System (Merit license)", "Free Kick (NS6201-A 1987.10)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, freekicka, freekick, freekickb, freekck,  driver_device, 0,        ROT270, "Nihon System",                 "Free Kick (NS6201-A 1987.9)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1987, freekickb1,freekick, freekickb, freekck,  driver_device, 0,        ROT270, "bootleg",                      "Free Kick (bootleg set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, freekickb2,freekick, freekickb, freekck,  driver_device, 0,        ROT270, "bootleg",                      "Free Kick (bootleg set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, freekickb3,freekick, freekickb, freekck,  driver_device, 0,        ROT270, "bootleg",                      "Free Kick (bootleg set 3)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, countrun,  0,        freekickb, countrun, driver_device, 0,        ROT0,   "Nihon System (Sega license)",  "Counter Run (NS6201-A 1988.3)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // CPU module not dumped
-GAME( 1988, countrunb, countrun, freekickb, countrun, driver_device, 0,        ROT0,   "bootleg",                      "Counter Run (bootleg set 1)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, countrunb2,countrun, freekickb, countrun, driver_device, 0,        ROT0,   "bootleg",                      "Counter Run (bootleg set 2)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    MACHINE    INPUT     STATE           INIT      ROT     COMPANY                         FULLNAME                                FLAGS
+GAME( 1986, gigas,      0,        gigasm,    gigas,    freekick_state, gigas,    ROT270, "Sega",                         "Gigas (MC-8123, 317-5002)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gigasb,     gigas,    gigas,     gigas,    freekick_state, gigasb,   ROT270, "bootleg",                      "Gigas (bootleg)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, oigas,      gigas ,   oigas,     gigas,    freekick_state, gigasb,   ROT270, "bootleg",                      "Oigas (bootleg)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gigasm2b,   0,        gigas,     gigasm2,  freekick_state, gigasb,   ROT270, "bootleg",                      "Gigas Mark II (bootleg)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1986, omega,      0,        omega,     omega,    freekick_state, gigas,    ROT270, "Nihon System",                 "Omega",                                MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pbillrd,    0,        pbillrd,   pbillrd,  freekick_state, 0,        ROT0,   "Nihon System",                 "Perfect Billiard",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pbillrds,   pbillrd,  pbillrdm,  pbillrd,  freekick_state, pbillrds, ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-0030)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pbillrdsa,  pbillrd,  pbillrdm,  pbillrd,  freekick_state, pbillrds, ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-5008)", MACHINE_SUPPORTS_SAVE ) // sticker on CPU module different (wrong?) functionality the same
+GAME( 1987, freekick,   0,        freekickb, freekck,  freekick_state, 0,        ROT270, "Nihon System (Merit license)", "Free Kick (NS6201-A 1987.10)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, freekicka,  freekick, freekickb, freekck,  freekick_state, 0,        ROT270, "Nihon System",                 "Free Kick (NS6201-A 1987.9)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, freekickb1, freekick, freekickb, freekck,  freekick_state, 0,        ROT270, "bootleg",                      "Free Kick (bootleg set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, freekickb2, freekick, freekickb, freekck,  freekick_state, 0,        ROT270, "bootleg",                      "Free Kick (bootleg set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, freekickb3, freekick, freekickb, freekck,  freekick_state, 0,        ROT270, "bootleg",                      "Free Kick (bootleg set 3)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, countrun,   0,        freekickb, countrun, freekick_state, 0,        ROT0,   "Nihon System (Sega license)",  "Counter Run (NS6201-A 1988.3)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // CPU module not dumped
+GAME( 1988, countrunb,  countrun, freekickb, countrun, freekick_state, 0,        ROT0,   "bootleg",                      "Counter Run (bootleg set 1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, countrunb2, countrun, freekickb, countrun, freekick_state, 0,        ROT0,   "bootleg",                      "Counter Run (bootleg set 2)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

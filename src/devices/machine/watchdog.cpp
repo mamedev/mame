@@ -19,17 +19,17 @@
 //  WATCHDOG TIMER DEVICE
 //**************************************************************************
 
-const device_type WATCHDOG_TIMER = device_creator<watchdog_timer_device>;
+DEFINE_DEVICE_TYPE(WATCHDOG_TIMER, watchdog_timer_device, "watchdog", "Watchdog Timer")
 
 //-------------------------------------------------
 //  watchdog_timer_device - constructor
 //-------------------------------------------------
 
 watchdog_timer_device::watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, WATCHDOG_TIMER, "Watchdog timer", tag, owner, clock, "watchdog", __FILE__),
-		m_vblank_count(0),
-		m_time(attotime::zero),
-		m_screen_tag(nullptr)
+	: device_t(mconfig, WATCHDOG_TIMER, tag, owner, clock)
+	, m_vblank_count(0)
+	, m_time(attotime::zero)
+	, m_screen_tag(nullptr)
 {
 }
 

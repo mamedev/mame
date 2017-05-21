@@ -53,7 +53,7 @@ machine_config_constructor voodoo_pci_device::device_mconfig_additions() const
 	}
 }
 
-const device_type VOODOO_PCI = device_creator<voodoo_pci_device>;
+DEFINE_DEVICE_TYPE(VOODOO_PCI, voodoo_pci_device, "voodoo_pci", "Voodoo PCI")
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, voodoo_pci_device)
 	AM_RANGE(0x40, 0x5f) AM_READWRITE  (pcictrl_r,  pcictrl_w)
@@ -78,7 +78,7 @@ DEVICE_ADDRESS_MAP_START(io_map, 32, voodoo_pci_device)
 ADDRESS_MAP_END
 
 voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, VOODOO_PCI, "Voodoo PCI", tag, owner, clock, "voodoo_pci", __FILE__),
+	: pci_device(mconfig, VOODOO_PCI, tag, owner, clock),
 		m_voodoo(*this, "voodoo"), m_fbmem(2), m_tmumem0(0), m_tmumem1(0)
 {
 }

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CBM2_24K = device_creator<cbm2_24k_cartridge_device>;
+DEFINE_DEVICE_TYPE(CBM2_24K, cbm2_24k_cartridge_device, "cbm2_24k", "CBM-II 24K RAM/ROM cartridge")
 
 
 
@@ -28,7 +28,7 @@ const device_type CBM2_24K = device_creator<cbm2_24k_cartridge_device>;
 //-------------------------------------------------
 
 cbm2_24k_cartridge_device::cbm2_24k_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CBM2_24K, "24K RAM/ROM cartridge", tag, owner, clock, "cbm2_24k", __FILE__),
+	device_t(mconfig, CBM2_24K, tag, owner, clock),
 	device_cbm2_expansion_card_interface(mconfig, *this),
 	m_ram(*this, "ram")
 {

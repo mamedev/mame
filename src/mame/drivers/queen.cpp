@@ -270,7 +270,7 @@ void queen_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( queen, queen_state )
+static MACHINE_CONFIG_START( queen )
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 533000000/16) // Celeron or Pentium 3, 533 Mhz
 	MCFG_CPU_PROGRAM_MAP(queen_map)
 	MCFG_CPU_IO_MAP(queen_io)
@@ -308,4 +308,4 @@ ROM_START( queen )
 ROM_END
 
 
-GAME( 2002?, queen,  0,    queen, at_keyboard, driver_device,  0, ROT0, "STG", "Queen?", MACHINE_IS_SKELETON )
+GAME( 2002?, queen,  0,    queen, at_keyboard, queen_state,  0, ROT0, "STG", "Queen?", MACHINE_IS_SKELETON )

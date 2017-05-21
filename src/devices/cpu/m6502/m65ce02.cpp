@@ -11,15 +11,15 @@
 #include "emu.h"
 #include "m65ce02.h"
 
-const device_type M65CE02 = device_creator<m65ce02_device>;
+DEFINE_DEVICE_TYPE(M65CE02, m65ce02_device, "m65ce02", "M65CE02")
 
 m65ce02_device::m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m65c02_device(mconfig, M65CE02, "M65CE02", tag, owner, clock, "m65ce02", __FILE__), TMP3(0), Z(0), B(0)
+	m65ce02_device(mconfig, M65CE02, tag, owner, clock)
 {
 }
 
-m65ce02_device::m65ce02_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	m65c02_device(mconfig, type, name, tag, owner, clock, shortname, source), TMP3(0), Z(0), B(0)
+m65ce02_device::m65ce02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	m65c02_device(mconfig, type, tag, owner, clock), TMP3(0), Z(0), B(0)
 {
 }
 

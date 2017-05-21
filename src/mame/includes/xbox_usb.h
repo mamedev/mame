@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Samuele Zannoli
+#ifndef MAME_INCLUDES_XBOX_USB_H
+#define MAME_INCLUDES_XBOX_USB_H
 
 #pragma once
 
@@ -453,12 +455,12 @@ protected:
 	usb_device_configuration *selected_configuration;
 };
 
-extern const device_type OHCI_GAME_CONTROLLER;
+DECLARE_DEVICE_TYPE(OHCI_GAME_CONTROLLER, ohci_game_controller_device)
 
-class ohci_game_controller : public device_t, public ohci_function
+class ohci_game_controller_device : public device_t, public ohci_function
 {
 public:
-	ohci_game_controller(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void initialize(running_machine &machine) override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
@@ -487,3 +489,5 @@ private:
 	required_ioport m_Black; // analog button
 	required_ioport m_White; // analog button
 };
+
+#endif // MAME_INCLUDES_XBOX_USB_H

@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
+#include "emu.h"
+#include "coco_dwsock.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef __GNUC__
@@ -8,16 +11,12 @@
 #include <fcntl.h>
 #include <sys/types.h>
 
-#include "emu.h"
-#include "osdcore.h"
-
-#include "coco_dwsock.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COCO_DWSOCK = device_creator<beckerport_device>;
+DEFINE_DEVICE_TYPE(COCO_DWSOCK, beckerport_device, "coco_dwsock", "Virtual Becker Port")
 
 //-------------------------------------------------
 //  INPUT_PORTS( coco_drivewire )
@@ -64,8 +63,8 @@ INPUT_CHANGED_MEMBER(beckerport_device::drivewire_port_changed)
 //-------------------------------------------------
 
 beckerport_device::beckerport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, COCO_DWSOCK, "Virtual Becker Port", tag, owner, clock, "coco_dwsock", __FILE__), m_hostname(nullptr),
-	m_dwconfigport(*this, DRIVEWIRE_PORT_TAG), m_dwtcpport(0)
+	: device_t(mconfig, COCO_DWSOCK, tag, owner, clock)
+	, m_hostname(nullptr), m_dwconfigport(*this, DRIVEWIRE_PORT_TAG), m_dwtcpport(0)
 {
 	m_head = 0;
 	m_rx_pending = 0;
@@ -163,7 +162,7 @@ READ8_MEMBER(beckerport_device::read)
 			fprintf(stderr, "%s: read from bad offset %d\n", __FILE__, offset);
 	}
 
-	return (int)data;
+	return data;
 }
 
 /*-------------------------------------------------

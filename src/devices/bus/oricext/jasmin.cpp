@@ -4,7 +4,7 @@
 #include "jasmin.h"
 #include "formats/oric_dsk.h"
 
-const device_type JASMIN = device_creator<jasmin_device>;
+DEFINE_DEVICE_TYPE(JASMIN, jasmin_device, "jasmin", "Jasmin floppy drive interface")
 
 ROM_START( jasmin )
 	ROM_REGION( 0x800, "jasmin", 0 )
@@ -35,7 +35,7 @@ INPUT_PORTS_START( jasmin )
 INPUT_PORTS_END
 
 DEVICE_ADDRESS_MAP_START(map, 8, jasmin_device)
-	AM_RANGE(0x3f4, 0x3f7) AM_DEVREADWRITE("fdc", wd1770_t, read, write)
+	AM_RANGE(0x3f4, 0x3f7) AM_DEVREADWRITE("fdc", wd1770_device, read, write)
 	AM_RANGE(0x3f8, 0x3f8) AM_WRITE(side_sel_w)
 	AM_RANGE(0x3f9, 0x3f9) AM_WRITE(fdc_reset_w)
 	AM_RANGE(0x3fa, 0x3fa) AM_WRITE(ram_access_w)
@@ -44,7 +44,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, jasmin_device)
 ADDRESS_MAP_END
 
 jasmin_device::jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	oricext_device(mconfig, JASMIN, "Jasmin floppy drive interface", tag, owner, clock, "jasmin", __FILE__),
+	oricext_device(mconfig, JASMIN, tag, owner, clock),
 	fdc(*this, "fdc"), side_sel(false), fdc_reset(false), ram_access(false), rom_access(false), jasmin_rom(nullptr), cur_floppy(nullptr)
 {
 }

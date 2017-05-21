@@ -221,7 +221,7 @@ static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)                        /* R: fe30-fe3f  NC             Not Connected                   */
 																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_WRITE(bbc_wd1770_status_w)                                      /*    fe80-fe83  1770 FDC       Drive control register          */
-	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_t, read, write)                   /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
+	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)              /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)                        /* R: fe30-fe3f  NC             Not Connected                   */
 																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_WRITE(bbc_wd1770_status_w)                                      /*    fe80-fe83  1770 FDC       Drive control register          */
-	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_t, read, write)                   /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
+	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)              /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
@@ -836,7 +836,7 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-static MACHINE_CONFIG_START( bbca, bbc_state )
+static MACHINE_CONFIG_START( bbca )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_16MHz/8)         /* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(bbca_mem)
@@ -1269,7 +1269,7 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-static MACHINE_CONFIG_START( bbcm, bbc_state )
+static MACHINE_CONFIG_START( bbcm )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, XTAL_16MHz/8)        /* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(bbcm_mem)

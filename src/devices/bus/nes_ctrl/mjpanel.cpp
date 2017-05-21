@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_MJPANEL = device_creator<nes_mjpanel_device>;
+DEFINE_DEVICE_TYPE(NES_MJPANEL, nes_mjpanel_device, "nes_mjpanel", "Famicom Mahjong Panel")
 
 
 static INPUT_PORTS_START( nes_mjpanel )
@@ -71,7 +71,7 @@ ioport_constructor nes_mjpanel_device::device_input_ports() const
 //-------------------------------------------------
 
 nes_mjpanel_device::nes_mjpanel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NES_MJPANEL, "Famicom Mahjong Panel", tag, owner, clock, "nes_mjpanel", __FILE__)
+	: device_t(mconfig, NES_MJPANEL, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_panel(*this, "MJPANEL.%u", 0)
 	, m_latch(0)

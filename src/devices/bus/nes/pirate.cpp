@@ -18,7 +18,7 @@
 #include "pirate.h"
 
 #include "cpu/m6502/m6502.h"
-#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access PPU_BOTTOM_VISIBLE_SCANLINE
+#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 #include "screen.h"
 
 
@@ -35,96 +35,96 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_AGCI_50282 = device_creator<nes_agci_device>;
-const device_type NES_DREAMTECH01 = device_creator<nes_dreamtech_device>;
-const device_type NES_FUKUTAKE = device_creator<nes_fukutake_device>;
-const device_type NES_FUTUREMEDIA = device_creator<nes_futuremedia_device>;
-const device_type NES_MAGSERIES = device_creator<nes_magseries_device>;
-const device_type NES_DAOU306 = device_creator<nes_daou306_device>;
-const device_type NES_CC21 = device_creator<nes_cc21_device>;
-const device_type NES_XIAOZY = device_creator<nes_xiaozy_device>;
-const device_type NES_EDU2K = device_creator<nes_edu2k_device>;
-const device_type NES_T230 = device_creator<nes_t230_device>;
-const device_type NES_MK2 = device_creator<nes_mk2_device>;
-const device_type NES_WHERO = device_creator<nes_whero_device>;
-const device_type NES_43272 = device_creator<nes_43272_device>;
-const device_type NES_TF1201 = device_creator<nes_tf1201_device>;
-const device_type NES_CITYFIGHT = device_creator<nes_cityfight_device>;
+DEFINE_DEVICE_TYPE(NES_AGCI_50282,  nes_agci_device,        "nes_agci50282",   "NES Cart AGCI 50282 PCB")
+DEFINE_DEVICE_TYPE(NES_DREAMTECH01, nes_dreamtech_device,   "nes_dreamtech",   "NES Cart Dreamtech01 PCB")
+DEFINE_DEVICE_TYPE(NES_FUKUTAKE,    nes_fukutake_device,    "nes_futuremedia", "NES Cart Fukutake Study Box PCB")
+DEFINE_DEVICE_TYPE(NES_FUTUREMEDIA, nes_futuremedia_device, "nes_fukutake",    "NES Cart FutureMedia PCB")
+DEFINE_DEVICE_TYPE(NES_MAGSERIES,   nes_magseries_device,   "nes_magseries",   "NES Cart Magical Series PCB")
+DEFINE_DEVICE_TYPE(NES_DAOU306,     nes_daou306_device,     "nes_daou306",     "NES Cart Daou 306 PCB")
+DEFINE_DEVICE_TYPE(NES_CC21,        nes_cc21_device,        "nes_cc21",        "NES Cart CC-21 PCB")
+DEFINE_DEVICE_TYPE(NES_XIAOZY,      nes_xiaozy_device,      "nes_xiaozy",      "NES Cart Xiao Zhuan Yuan PCB")
+DEFINE_DEVICE_TYPE(NES_EDU2K,       nes_edu2k_device,       "nes_edu2k",       "NES Cart Educational Computer 2000 PCB")
+DEFINE_DEVICE_TYPE(NES_T230,        nes_t230_device,        "nes_t230",        "NES Cart T-230 PCB")
+DEFINE_DEVICE_TYPE(NES_MK2,         nes_mk2_device,         "nes_mk2",         "NES Cart Mortal Kombat 2 PCB")
+DEFINE_DEVICE_TYPE(NES_WHERO,       nes_whero_device,       "nes_whero",       "NES Cart World Heroes PCB")
+DEFINE_DEVICE_TYPE(NES_43272,       nes_43272_device,       "nes_43272",       "NES Cart UNL-43272 PCB")
+DEFINE_DEVICE_TYPE(NES_TF1201,      nes_tf1201_device,      "nes_tf1201",      "NES Cart UNL-TF1201 PCB")
+DEFINE_DEVICE_TYPE(NES_CITYFIGHT,   nes_cityfight_device,   "nes_cityfight",   "NES Cart City Fighter PCB")
 
 
 nes_agci_device::nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_AGCI_50282, "NES Cart AGCI 50282 PCB", tag, owner, clock, "nes_agci50282", __FILE__)
+	: nes_nrom_device(mconfig, NES_AGCI_50282, tag, owner, clock)
 {
 }
 
 nes_dreamtech_device::nes_dreamtech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_DREAMTECH01, "NES Cart Dreamtech01 PCB", tag, owner, clock, "nes_dreamtech", __FILE__)
+	: nes_nrom_device(mconfig, NES_DREAMTECH01, tag, owner, clock)
 {
 }
 
 nes_fukutake_device::nes_fukutake_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_FUKUTAKE, "NES Cart Fukutake Study Box PCB", tag, owner, clock, "nes_fukutake", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_FUKUTAKE, tag, owner, clock), m_latch(0)
+{
 }
 
 nes_futuremedia_device::nes_futuremedia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_FUTUREMEDIA, "NES Cart FutureMedia PCB", tag, owner, clock, "nes_futuremedia", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
-				{
+	: nes_nrom_device(mconfig, NES_FUTUREMEDIA, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
+{
 }
 
 nes_magseries_device::nes_magseries_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_MAGSERIES, "NES Cart Magical Series PCB", tag, owner, clock, "nes_magseries", __FILE__)
+	: nes_nrom_device(mconfig, NES_MAGSERIES, tag, owner, clock)
 {
 }
 
 nes_daou306_device::nes_daou306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_DAOU306, "NES Cart Daou 306 PCB", tag, owner, clock, "nes_daou306", __FILE__)
+	: nes_nrom_device(mconfig, NES_DAOU306, tag, owner, clock)
 {
 }
 
 nes_cc21_device::nes_cc21_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_CC21, "NES Cart CC-21 PCB", tag, owner, clock, "nes_cc21", __FILE__)
+	: nes_nrom_device(mconfig, NES_CC21, tag, owner, clock)
 {
 }
 
 nes_xiaozy_device::nes_xiaozy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_XIAOZY, "NES Cart Xiao Zhuan Yuan PCB", tag, owner, clock, "nes_xiaozy", __FILE__)
+	: nes_nrom_device(mconfig, NES_XIAOZY, tag, owner, clock)
 {
 }
 
 nes_edu2k_device::nes_edu2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_EDU2K, "NES Cart Educational Computer 2000 PCB", tag, owner, clock, "nes_edu2k", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_EDU2K, tag, owner, clock)
+{
 }
 
 nes_t230_device::nes_t230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_T230, "NES Cart T-230 PCB", tag, owner, clock, "nes_t230", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_enable(0), m_irq_enable_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_T230, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_enable(0), m_irq_enable_latch(0)
+{
 }
 
 nes_mk2_device::nes_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_MK2, "NES Cart Mortal Kombat 2 PCB", tag, owner, clock, "nes_mk2", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
-				{
+	: nes_nrom_device(mconfig, NES_MK2, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
+{
 }
 
 nes_whero_device::nes_whero_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_WHERO, "NES Cart World Heroes PCB", tag, owner, clock, "nes_whero", __FILE__), m_reg(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_enable_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_WHERO, tag, owner, clock), m_reg(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_enable_latch(0)
+{
 }
 
 nes_43272_device::nes_43272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_43272, "NES Cart UNL-43272 PCB", tag, owner, clock, "nes_43272", __FILE__), m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_43272, tag, owner, clock), m_latch(0)
+{
 }
 
 nes_tf1201_device::nes_tf1201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_TF1201, "NES Cart UNL-TF1201 PCB", tag, owner, clock, "nes_tf1201", __FILE__), m_prg(0), m_swap(0), m_irq_count(0), m_irq_enable(0), m_irq_enable_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_TF1201, tag, owner, clock), m_prg(0), m_swap(0), m_irq_count(0), m_irq_enable(0), m_irq_enable_latch(0)
+{
 }
 
 nes_cityfight_device::nes_cityfight_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_CITYFIGHT, "NES Cart City Fighter PCB", tag, owner, clock, "nes_cityfight", __FILE__), m_prg_reg(0), m_prg_mode(0), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
-				{
+	: nes_nrom_device(mconfig, NES_CITYFIGHT, tag, owner, clock), m_prg_reg(0), m_prg_mode(0), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+{
 }
 
 
@@ -530,7 +530,7 @@ READ8_MEMBER(nes_fukutake_device::read_m)
 
 void nes_futuremedia_device::hblank_irq(int scanline, int vblank, int blanked)
 {
-	//  if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
+	//  if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{
 		if (m_irq_enable && m_irq_count)
 		{
@@ -853,7 +853,7 @@ WRITE8_MEMBER(nes_t230_device::write_h)
 // Same IRQ as MMC3
 void nes_mk2_device::hblank_irq( int scanline, int vblank, int blanked )
 {
-	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
+	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{
 		int prior_count = m_irq_count;
 		if ((m_irq_count == 0) || m_irq_clear)

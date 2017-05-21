@@ -6,8 +6,10 @@
 
 */
 
-#ifndef _TMS1000_H_
-#define _TMS1000_H_
+#ifndef MAME_CPU_TMS1000_TMS1000_H
+#define MAME_CPU_TMS1000_TMS1000_H
+
+#pragma once
 
 #include "tms1k_base.h"
 
@@ -16,9 +18,10 @@ class tms1000_cpu_device : public tms1k_base_device
 {
 public:
 	tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
+	tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
 	// overrides
 	virtual void device_reset() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -73,13 +76,13 @@ public:
 };
 
 
-extern const device_type TMS1000;
-extern const device_type TMS1070;
-extern const device_type TMS1040;
-extern const device_type TMS1200;
-extern const device_type TMS1700;
-extern const device_type TMS1730;
-extern const device_type MC141000;
-extern const device_type MC141200;
+DECLARE_DEVICE_TYPE(TMS1000,  tms1000_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1070,  tms1070_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1040,  tms1040_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1200,  tms1200_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1700,  tms1700_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1730,  tms1730_cpu_device)
+DECLARE_DEVICE_TYPE(MC141000, mc141000_cpu_device)
+DECLARE_DEVICE_TYPE(MC141200, mc141200_cpu_device)
 
-#endif /* _TMS1000_H_ */
+#endif // MAME_CPU_TMS1000_TMS1000_H

@@ -233,7 +233,7 @@ static ADDRESS_MAP_START(interpro_io_map, AS_1, 32, interpro_state)
 	// this is probably the srx arbiter ga
 	AM_RANGE(0x7f000200, 0x7f0002ff) AM_RAM
 	AM_RANGE(0x7f000300, 0x7f00030f) AM_READWRITE16(system_r, system_w, 0xffff)
-	AM_RANGE(0x7f000400, 0x7f00040f) AM_DEVREADWRITE8(INTERPRO_SCC1_TAG, scc85C30_device, ba_cd_inv_r, ba_cd_inv_w, 0xff)
+	AM_RANGE(0x7f000400, 0x7f00040f) AM_DEVREADWRITE8(INTERPRO_SCC1_TAG, scc85c30_device, ba_cd_inv_r, ba_cd_inv_w, 0xff)
 	AM_RANGE(0x7f000410, 0x7f00041f) AM_DEVREADWRITE8(INTERPRO_SCC2_TAG, scc85230_device, ba_cd_inv_r, ba_cd_inv_w, 0xff)
 	AM_RANGE(0x7f000500, 0x7f0006ff) AM_READWRITE8(rtc_r, rtc_w, 0xff)
 	AM_RANGE(0x7f000700, 0x7f00077f) AM_READ(idprom_r)
@@ -262,7 +262,7 @@ SLOT_INTERFACE_END
 static INPUT_PORTS_START(ip2800)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START(ip2800, interpro_state)
+static MACHINE_CONFIG_START(ip2800)
 	MCFG_CPU_ADD(INTERPRO_CPU_TAG, CLIPPER_C400, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(clipper_insn_map)
 	MCFG_CPU_DATA_MAP(clipper_data_map)

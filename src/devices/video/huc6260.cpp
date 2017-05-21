@@ -21,12 +21,17 @@
 
 #include "screen.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
-#define LOG 0
 
 #define HUC6260_HSYNC_LENGTH    237
-#define HUC6260_HSYNC_START     ( HUC6260_WPF - HUC6260_HSYNC_LENGTH )
+#define HUC6260_HSYNC_START     ( huc6260_device::WPF - HUC6260_HSYNC_LENGTH )
 
+
+constexpr unsigned huc6260_device::PALETTE_SIZE;
+constexpr unsigned huc6260_device::WPF;
+constexpr unsigned huc6260_device::LPF;
 
 PALETTE_INIT_MEMBER(huc6260_device, huc6260)
 {
@@ -45,11 +50,11 @@ PALETTE_INIT_MEMBER(huc6260_device, huc6260)
 }
 
 
-const device_type HUC6260 = device_creator<huc6260_device>;
+DEFINE_DEVICE_TYPE(HUC6260, huc6260_device, "huc6260", "Hudson HuC6260 VCE")
 
 
 huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:   device_t(mconfig, HUC6260, "HuC6260 VCE", tag, owner, clock, "huc6260", __FILE__),
+	:   device_t(mconfig, HUC6260, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		m_next_pixel_data_cb(*this),
 		m_time_til_next_event_cb(*this),
@@ -83,7 +88,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		bitmap_line[ h ] = m_palette[ m_pixel_data ];
 		m_pixel_clock = ( m_pixel_clock + 1 ) % m_pixels_per_clock;
-		h = ( h + 1 ) % HUC6260_WPF;
+		h = ( h + 1 ) % WPF;
 
 		switch( h )
 		{
@@ -92,7 +97,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //          if ( v == 0 )
 //          {
 //              /* Check if the screen should be resized */
-//              m_height = HUC6260_LPF - ( m_blur ? 1 : 0 );
+//              m_height = LPF - ( m_blur ? 1 : 0 );
 //              if ( m_height != video_screen_get_height( m_screen ) )
 //              {
 //                  rectangle visible_area;
@@ -103,7 +108,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //                  visible_area.max_x = 64 + 1024 + 64 - 1;
 //                  visible_area.max_y = 18 + 242 - 1;
 //
-//                  video_screen_configure( m_screen, HUC6260_WPF, m_height, &visible_area, HZ_TO_ATTOSECONDS( device->clock / ( HUC6260_WPF * m_height ) ) );
+//                  video_screen_configure( m_screen, WPF, m_height, &visible_area, HZ_TO_ATTOSECONDS( device->clock / ( WPF * m_height ) ) );
 //              }
 //          }
 			break;
@@ -160,10 +165,10 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		event_hpos = hpos + next_event_clocks;
 		event_vpos = vpos;
-		while ( event_hpos > HUC6260_WPF )
+		while ( event_hpos > WPF )
 		{
 			event_vpos += 1;
-			event_hpos -= HUC6260_WPF;
+			event_hpos -= WPF;
 		}
 
 		if ( event_vpos < v || ( event_vpos == v && event_hpos <= h ) )
@@ -256,7 +261,7 @@ WRITE8_MEMBER( huc6260_device::write )
 void huc6260_device::device_start()
 {
 	m_timer = timer_alloc();
-	m_bmp = std::make_unique<bitmap_ind16>(HUC6260_WPF, HUC6260_LPF );
+	m_bmp = std::make_unique<bitmap_ind16>(WPF, LPF);
 
 	/* Resolve callbacks */
 	m_hsync_changed_cb.resolve();
@@ -299,7 +304,7 @@ void huc6260_device::device_reset()
 }
 
 static MACHINE_CONFIG_FRAGMENT( huc6260 )
-	MCFG_PALETTE_ADD("palette",  HUC6260_PALETTE_SIZE )
+	MCFG_PALETTE_ADD("palette",  huc6260_device::PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(huc6260_device, huc6260)
 MACHINE_CONFIG_END
 

@@ -13,10 +13,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_6522VIA_H
+#define MAME_MACHINE_6522VIA_H
 
-#ifndef __6522VIA_H__
-#define __6522VIA_H__
+#pragma once
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -56,24 +56,44 @@
 
 // ======================> via6522_device
 
-class via6522_device :  public device_t
+class via6522_device : public device_t
 {
 public:
+	enum
+	{
+		VIA_PB = 0,
+		VIA_PA = 1,
+		VIA_DDRB = 2,
+		VIA_DDRA = 3,
+		VIA_T1CL = 4,
+		VIA_T1CH = 5,
+		VIA_T1LL = 6,
+		VIA_T1LH = 7,
+		VIA_T2CL = 8,
+		VIA_T2CH = 9,
+		VIA_SR = 10,
+		VIA_ACR = 11,
+		VIA_PCR = 12,
+		VIA_IFR = 13,
+		VIA_IER = 14,
+		VIA_PANH = 15
+	};
+
 	// construction/destruction
 	via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// TODO: REMOVE THESE
-	template<class _Object> static devcb_base &set_readpa_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_in_a_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_readpb_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_in_b_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_readpa_handler(device_t &device, Object &&cb) { return downcast<via6522_device &>(device).m_in_a_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_readpb_handler(device_t &device, Object &&cb) { return downcast<via6522_device &>(device).m_in_b_handler.set_callback(std::forward<Object>(cb)); }
 
 	// TODO: CONVERT THESE TO WRITE LINE
-	template<class _Object> static devcb_base &set_writepa_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_out_a_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_writepb_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_out_b_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_writepa_handler(device_t &device, Object &&cb) { return downcast<via6522_device &>(device).m_out_a_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_writepb_handler(device_t &device, Object &&cb) { return downcast<via6522_device &>(device).m_out_b_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_ca2_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_ca2_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_cb1_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_cb1_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_cb2_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_cb2_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_ca2_handler(device_t &device, Object &&cb) { return downcast<via6522_device &>(device).m_ca2_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_cb1_handler(device_t &device, Object &&cb) { return downcast<via6522_device &>(device).m_cb1_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_cb2_handler(device_t &device, Object &&cb) { return downcast<via6522_device &>(device).m_cb2_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<via6522_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 
@@ -104,26 +124,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_cb1 );
 	DECLARE_WRITE_LINE_MEMBER( write_cb2 );
 
-	enum
-	{
-		VIA_PB = 0,
-		VIA_PA = 1,
-		VIA_DDRB = 2,
-		VIA_DDRA = 3,
-		VIA_T1CL = 4,
-		VIA_T1CH = 5,
-		VIA_T1LL = 6,
-		VIA_T1LH = 7,
-		VIA_T2CL = 8,
-		VIA_T2CH = 9,
-		VIA_SR = 10,
-		VIA_ACR = 11,
-		VIA_PCR = 12,
-		VIA_IFR = 13,
-		VIA_IER = 14,
-		VIA_PANH = 15
-	};
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -131,11 +131,11 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	static const device_timer_id TIMER_SHIFT = 0;
-	static const device_timer_id TIMER_T1 = 1;
-	static const device_timer_id TIMER_T2 = 2;
-	static const device_timer_id TIMER_CA2 = 3;
-	static const device_timer_id TIMER_SHIFT_IRQ = 4;
+	static constexpr device_timer_id TIMER_SHIFT = 0;
+	static constexpr device_timer_id TIMER_T1 = 1;
+	static constexpr device_timer_id TIMER_T2 = 2;
+	static constexpr device_timer_id TIMER_CA2 = 3;
+	static constexpr device_timer_id TIMER_SHIFT_IRQ = 4;
 
 	uint16_t get_counter1_value();
 
@@ -213,7 +213,7 @@ private:
 
 
 // device type definition
-extern const device_type VIA6522;
+DECLARE_DEVICE_TYPE(VIA6522, via6522_device)
 
 
-#endif /* __6522VIA_H__ */
+#endif // MAME_MACHINE_6522VIA_H

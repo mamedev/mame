@@ -711,7 +711,7 @@ void taitoair_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( airsys, taitoair_state )
+static MACHINE_CONFIG_START( airsys )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) // MC68000P12
@@ -992,8 +992,8 @@ ROM_START( ainfernoj )
 ROM_END
 
 
-/*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY  FULLNAME */
-GAME( 1988, topland,  0,        airsys,   topland, driver_device,  0,        ROT0,    "Taito Corporation Japan",   "Top Landing (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, toplandj, topland,  airsys,   topland, driver_device,  0,       ROT0,     "Taito Corporation",         "Top Landing (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1990, ainferno, 0,        airsys,   ainferno, driver_device, 0,        ROT0,    "Taito America Corporation", "Air Inferno (US)", MACHINE_NOT_WORKING )
-GAME( 1990, ainfernoj,ainferno, airsys,   ainferno, driver_device, 0,        ROT0,    "Taito Corporation Japan",   "Air Inferno (Japan)", MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT  MONITOR  COMPANY                      FULLNAME               FLAGS
+GAME( 1988, topland,   0,        airsys,   topland,  taitoair_state, 0,    ROT0,    "Taito Corporation Japan",   "Top Landing (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, toplandj,  topland,  airsys,   topland,  taitoair_state, 0,    ROT0,    "Taito Corporation",         "Top Landing (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, ainferno,  0,        airsys,   ainferno, taitoair_state, 0,    ROT0,    "Taito America Corporation", "Air Inferno (US)",    MACHINE_NOT_WORKING )
+GAME( 1990, ainfernoj, ainferno, airsys,   ainferno, taitoair_state, 0,    ROT0,    "Taito Corporation Japan",   "Air Inferno (Japan)", MACHINE_NOT_WORKING )

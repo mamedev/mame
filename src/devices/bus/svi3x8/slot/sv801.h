@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SVI3X8_SLOT_SV801_H
+#define MAME_BUS_SVI3X8_SLOT_SV801_H
 
-#ifndef __SVI3X8_SLOT_SV801_H__
-#define __SVI3X8_SLOT_SV801_H__
+#pragma once
 
 #include "slot.h"
 #include "machine/wd_fdc.h"
@@ -44,7 +44,7 @@ protected:
 private:
 	DECLARE_WRITE8_MEMBER( motor_w );
 
-	required_device<fd1793_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 
@@ -55,6 +55,6 @@ private:
 };
 
 // device type definition
-extern const device_type SV801;
+DECLARE_DEVICE_TYPE(SV801, sv801_device)
 
-#endif // __SVI3X8_SLOT_SV801_H__
+#endif // MAME_BUS_SVI3X8_SLOT_SV801_H

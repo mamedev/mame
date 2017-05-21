@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ASTROCADE_CART_SLOT = device_creator<astrocade_cart_slot_device>;
+DEFINE_DEVICE_TYPE(ASTROCADE_CART_SLOT, astrocade_cart_slot_device, "astrocade_cart_slot", "Bally Astrocade Cartridge Slot")
 
 //**************************************************************************
 //    Astrocade Cartridges Interface
@@ -63,10 +63,10 @@ void device_astrocade_cart_interface::rom_alloc(uint32_t size, const char *tag)
 //  astrocade_cart_slot_device - constructor
 //-------------------------------------------------
 astrocade_cart_slot_device::astrocade_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, ASTROCADE_CART_SLOT, "Bally Astrocade Cartridge Slot", tag, owner, clock, "astrocade_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(ASTROCADE_STD), m_cart(nullptr)
+	device_t(mconfig, ASTROCADE_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(ASTROCADE_STD), m_cart(nullptr)
 {
 }
 

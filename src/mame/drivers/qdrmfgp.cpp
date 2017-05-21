@@ -574,7 +574,7 @@ void qdrmfgp_state::machine_reset()
  *  Machine driver
  *
  *************************************/
-static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
+static MACHINE_CONFIG_START( qdrmfgp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /*  16.000 MHz */
@@ -618,7 +618,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
+static MACHINE_CONFIG_START( qdrmfgp2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /*  16.000 MHz */
@@ -709,6 +709,6 @@ ROM_END
  *
  *************************************/
 
-/*     year  rom       clone     machine   inputs    init */
-GAME(  1994, qdrmfgp,  0,        qdrmfgp,  qdrmfgp, driver_device,  0,        ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix (Japan)", 0 )
-GAME(  1995, qdrmfgp2, 0,        qdrmfgp2, qdrmfgp2, driver_device, 0,        ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix 2 - Shin-Kyoku Nyuukadayo (Japan)", 0 )
+/*     year  rom       clone     machine   inputs    state          init */
+GAME(  1994, qdrmfgp,  0,        qdrmfgp,  qdrmfgp,  qdrmfgp_state, 0,        ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix (Japan)", 0 )
+GAME(  1995, qdrmfgp2, 0,        qdrmfgp2, qdrmfgp2, qdrmfgp_state, 0,        ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix 2 - Shin-Kyoku Nyuukadayo (Japan)", 0 )

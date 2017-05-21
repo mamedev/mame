@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#pragma once
+#ifndef MAME_AUDIO_ZACCARIA_H
+#define MAME_AUDIO_ZACCARIA_H
 
-#ifndef __AUDIO_ZACCARIA_H__
-#define __AUDIO_ZACCARIA_H__
+#pragma once
 
 #include "machine/6821pia.h"
 #include "machine/netlist.h"
@@ -15,8 +15,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern device_type const ZACCARIA_1B11107;
-extern device_type const ZACCARIA_1B11142;
+DECLARE_DEVICE_TYPE(ZACCARIA_1B11107, zac1b11107_audio_device)
+DECLARE_DEVICE_TYPE(ZACCARIA_1B11142, zac1b11142_audio_device)
 
 
 
@@ -36,22 +36,19 @@ extern device_type const ZACCARIA_1B11142;
 class zac1b111xx_melody_base : public device_t, public device_mixer_interface
 {
 public:
-	zac1b111xx_melody_base(
-			machine_config const &mconfig,
-			device_type devtype,
-			char const *name,
-			char const *tag,
-			device_t *owner,
-			uint32_t clock,
-			char const *shortname,
-			char const *source);
-
 	DECLARE_READ8_MEMBER(melodypia_porta_r);
 	DECLARE_WRITE8_MEMBER(melodypia_porta_w);
 	DECLARE_WRITE8_MEMBER(melodypia_portb_w);
 	DECLARE_READ8_MEMBER(melodypsg1_portb_r);
 
 protected:
+	zac1b111xx_melody_base(
+			machine_config const &mconfig,
+			device_type devtype,
+			char const *tag,
+			device_t *owner,
+			u32 clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -60,14 +57,14 @@ protected:
 	required_device<ay8910_device>  m_melodypsg1;
 	required_device<ay8910_device>  m_melodypsg2;
 
-	uint8_t   m_melody_command;
+	u8  m_melody_command;
 };
 
 
 class zac1b11107_audio_device : public zac1b111xx_melody_base
 {
 public:
-	zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	// host interface
 	DECLARE_WRITE8_MEMBER(sound_w);
@@ -85,10 +82,10 @@ protected:
 class zac1b11142_audio_device : public zac1b111xx_melody_base
 {
 public:
-	template<class _Object> static devcb_base &static_set_acs_cb(device_t &device, _Object object)
-	{ return downcast<zac1b11142_audio_device &>(device).m_acs_cb.set_callback(object); }
+	template <class Object> static devcb_base &static_set_acs_cb(device_t &device, Object &&cb)
+	{ return downcast<zac1b11142_audio_device &>(device).m_acs_cb.set_callback(std::forward<Object>(cb)); }
 
-	zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	// host interface
 	DECLARE_WRITE8_MEMBER(hs_w);
@@ -114,15 +111,15 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	devcb_write_line    m_acs_cb;
+	devcb_write_line                m_acs_cb;
 
 	required_device<cpu_device>     m_audiocpu;
 	required_device<pia6821_device> m_pia_1i;
 	required_device<tms5220_device> m_speech;
 
-	required_ioport m_inputs;
+	required_ioport                 m_inputs;
 
-	uint8_t   m_host_command;
+	u8 m_host_command;
 };
 
 #endif // __AUDIO_ZACCARIA_H__

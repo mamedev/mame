@@ -4,8 +4,10 @@
     Intel Flash ROM emulation
 */
 
-#ifndef _INTELFLASH_H_
-#define _INTELFLASH_H_
+#ifndef MAME_MACHINE_INTELFSH_H
+#define MAME_MACHINE_INTELFSH_H
+
+#pragma once
 
 
 //**************************************************************************
@@ -156,9 +158,8 @@ public:
 
 protected:
 	// construction/destruction
-	intelfsh_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
+	intelfsh_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
-protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -202,10 +203,6 @@ protected:
 
 class intelfsh8_device : public intelfsh_device
 {
-protected:
-	// construction/destruction
-	intelfsh8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
-
 public:
 	// public interface
 	uint8_t read(offs_t offset) { return read_full(offset); }
@@ -215,6 +212,10 @@ public:
 
 	uint8_t read_raw(offs_t offset) { return m_data[offset]; }
 	void write_raw(offs_t offset, uint8_t data) { m_data[offset] = data; }
+
+protected:
+	// construction/destruction
+	intelfsh8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 };
 
 
@@ -222,10 +223,6 @@ public:
 
 class intelfsh16_device : public intelfsh_device
 {
-protected:
-	// construction/destruction
-	intelfsh16_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
-
 public:
 	// public interface
 	uint16_t read(offs_t offset) { return read_full(offset); }
@@ -235,6 +232,10 @@ public:
 
 	uint16_t read_raw(offs_t offset) { return m_data[offset*2] | (m_data[offset*2+1] << 8); }
 	void write_raw(offs_t offset, uint16_t data) { m_data[offset*2] = data; m_data[offset*2+1] = data >> 8; }
+
+protected:
+	// construction/destruction
+	intelfsh16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 };
 
 
@@ -424,37 +425,37 @@ public:
 
 
 // device type definition
-extern const device_type INTEL_28F016S5;
-extern const device_type SHARP_LH28F016S;
-extern const device_type SHARP_LH28F016S_16BIT;
-extern const device_type ATMEL_29C010;
-extern const device_type AMD_29F010;
-extern const device_type AMD_29F040;
-extern const device_type AMD_29F080;
-extern const device_type AMD_29F400T;
-extern const device_type AMD_29F800T;
-extern const device_type AMD_29LV200T;
-extern const device_type FUJITSU_29F160T;
-extern const device_type FUJITSU_29F016A;
-extern const device_type FUJITSU_29DL16X;
-extern const device_type INTEL_E28F400B;
-extern const device_type MACRONIX_29L001MC;
-extern const device_type MACRONIX_29LV160TMC;
-extern const device_type TMS_29F040;
+DECLARE_DEVICE_TYPE(INTEL_28F016S5,        intel_28f016s5_device)
+DECLARE_DEVICE_TYPE(SHARP_LH28F016S,       sharp_lh28f016s_device)
+DECLARE_DEVICE_TYPE(SHARP_LH28F016S_16BIT, sharp_lh28f016s_16bit_device)
+DECLARE_DEVICE_TYPE(ATMEL_29C010,          atmel_29c010_device)
+DECLARE_DEVICE_TYPE(AMD_29F010,            amd_29f010_device)
+DECLARE_DEVICE_TYPE(AMD_29F040,            amd_29f040_device)
+DECLARE_DEVICE_TYPE(AMD_29F080,            amd_29f080_device)
+DECLARE_DEVICE_TYPE(AMD_29F400T,           amd_29f400t_device)
+DECLARE_DEVICE_TYPE(AMD_29F800T,           amd_29f800t_device)
+DECLARE_DEVICE_TYPE(AMD_29LV200T,          amd_29lv200t_device)
+DECLARE_DEVICE_TYPE(FUJITSU_29F160T,       fujitsu_29f160t_device)
+DECLARE_DEVICE_TYPE(FUJITSU_29F016A,       fujitsu_29f016a_device)
+DECLARE_DEVICE_TYPE(FUJITSU_29DL16X,       fujitsu_29dl16x_device)
+DECLARE_DEVICE_TYPE(INTEL_E28F400B,        intel_e28f400b_device)
+DECLARE_DEVICE_TYPE(MACRONIX_29L001MC,     macronix_29l001mc_device)
+DECLARE_DEVICE_TYPE(MACRONIX_29LV160TMC,   macronix_29lv160tmc_device)
+DECLARE_DEVICE_TYPE(TMS_29F040,            tms_29f040_device)
 
-extern const device_type PANASONIC_MN63F805MNP;
-extern const device_type SANYO_LE26FV10N1TS;
-extern const device_type SST_28SF040;
-extern const device_type SST_39VF020;
+DECLARE_DEVICE_TYPE(PANASONIC_MN63F805MNP, panasonic_mn63f805mnp_device)
+DECLARE_DEVICE_TYPE(SANYO_LE26FV10N1TS,    sanyo_le26fv10n1ts_device)
+DECLARE_DEVICE_TYPE(SST_28SF040,           sst_28sf040_device)
+DECLARE_DEVICE_TYPE(SST_39VF020,           sst_39vf020_device)
 
-extern const device_type SHARP_LH28F400;
-extern const device_type INTEL_E28F008SA;
-extern const device_type INTEL_TE28F160;
-extern const device_type INTEL_TE28F320;
-extern const device_type SHARP_UNK128MBIT;
-extern const device_type INTEL_28F320J3D;
-extern const device_type INTEL_28F320J5;
-extern const device_type SST_39VF400A;
-extern const device_type ATMEL_49F4096;
+DECLARE_DEVICE_TYPE(SHARP_LH28F400,        sharp_lh28f400_device)
+DECLARE_DEVICE_TYPE(INTEL_E28F008SA,       intel_e28f008sa_device)
+DECLARE_DEVICE_TYPE(INTEL_TE28F160,        intel_te28f160_device)
+DECLARE_DEVICE_TYPE(INTEL_TE28F320,        intel_te28f320_device)
+DECLARE_DEVICE_TYPE(SHARP_UNK128MBIT,      sharp_unk128mbit_device)
+DECLARE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device)
+DECLARE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device)
+DECLARE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device)
+DECLARE_DEVICE_TYPE(ATMEL_49F4096,         atmel_49f4096_device)
 
-#endif
+#endif // MAME_MACHINE_INTELFSH_H

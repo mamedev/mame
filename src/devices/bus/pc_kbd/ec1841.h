@@ -6,13 +6,13 @@
 
 *********************************************************************/
 
+#ifndef MAME_BUS_PC_KBD_EC1841_H
+#define MAME_BUS_PC_KBD_EC1841_H
+
 #pragma once
 
-#ifndef __PC_KBD_EC_1841__
-#define __PC_KBD_EC_1841__
-
-#include "cpu/mcs48/mcs48.h"
 #include "pc_kbdc.h"
+#include "cpu/mcs48/mcs48.h"
 
 
 
@@ -22,8 +22,7 @@
 
 // ======================> ec_1841_keyboard_device
 
-class ec_1841_keyboard_device :  public device_t,
-										public device_pc_kbd_interface
+class ec_1841_keyboard_device : public device_t, public device_pc_kbd_interface
 {
 public:
 	// construction/destruction
@@ -61,6 +60,6 @@ private:
 
 
 // device type definition
-extern const device_type PC_KBD_EC_1841;
+DECLARE_DEVICE_TYPE(PC_KBD_EC_1841, ec_1841_keyboard_device)
 
-#endif
+#endif // MAME_BUS_PC_KBD_EC1841_H

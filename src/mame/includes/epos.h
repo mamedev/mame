@@ -27,10 +27,12 @@ public:
 	/* misc */
 	int      m_counter;
 	int      m_input_multiplex;
+	bool     m_ay_porta_multiplex;
 	DECLARE_WRITE8_MEMBER(dealer_decrypt_rom);
 	DECLARE_WRITE8_MEMBER(port_1_w);
-	DECLARE_READ8_MEMBER(read_prta);
-	DECLARE_WRITE8_MEMBER(write_prtc);
+	DECLARE_READ8_MEMBER(i8255_porta_r);
+	DECLARE_WRITE8_MEMBER(i8255_portc_w);
+	DECLARE_READ8_MEMBER(ay_porta_mpx_r);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(dealer_pal_w);
 	DECLARE_DRIVER_INIT(dealer);

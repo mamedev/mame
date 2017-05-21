@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV801 = device_creator<sv801_device>;
+DEFINE_DEVICE_TYPE(SV801, sv801_device, "sv801", "SV-801 Disk Controller")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -57,7 +57,7 @@ machine_config_constructor sv801_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 sv801_device::sv801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SV801, "SV-801 Disk Controller", tag, owner, clock, "sv801", __FILE__),
+	device_t(mconfig, SV801, tag, owner, clock),
 	device_svi_slot_interface(mconfig, *this),
 	m_fdc(*this, "fdc"),
 	m_floppy0(*this, "fdc:0"),

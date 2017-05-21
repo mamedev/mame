@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COLECOVISION_STANDARD = device_creator<colecovision_standard_cartridge_device>;
+DEFINE_DEVICE_TYPE(COLECOVISION_STANDARD, colecovision_standard_cartridge_device, "colecovision_standard", "ColecoVision standard cartridge")
 
 
 
@@ -28,7 +28,7 @@ const device_type COLECOVISION_STANDARD = device_creator<colecovision_standard_c
 //-------------------------------------------------
 
 colecovision_standard_cartridge_device::colecovision_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COLECOVISION_STANDARD, "ColecoVision standard cartridge", tag, owner, clock, "colecovision_standard", __FILE__),
+	device_t(mconfig, COLECOVISION_STANDARD, tag, owner, clock),
 	device_colecovision_cartridge_interface(mconfig, *this)
 {
 }

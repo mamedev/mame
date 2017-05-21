@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __VCS_SLOT_H
-#define __VCS_SLOT_H
+#ifndef MAME_BUS_VCS_VCS_SLOT_H
+#define MAME_BUS_VCS_VCS_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -48,19 +50,18 @@ class device_vcs_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_vcs_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vcs_cart_interface();
 
 	// reading from ROM
 	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
 	// writing to RAM chips (sometimes it is in a different range than write_bank!)
-	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
+	virtual DECLARE_WRITE8_MEMBER(write_ram) { }
 
 	// read/write to bankswitch address
 	virtual DECLARE_READ8_MEMBER(read_bank) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_bank) {}
+	virtual DECLARE_WRITE8_MEMBER(write_bank) { }
 
-	virtual void setup_addon_ptr(uint8_t *ptr) {}
+	virtual void setup_addon_ptr(uint8_t *ptr) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -70,6 +71,8 @@ public:
 	uint32_t  get_ram_size() { return m_ram.size(); }
 
 protected:
+	device_vcs_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -87,9 +90,6 @@ public:
 	// construction/destruction
 	vcs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vcs_cart_slot_device();
-
-	// device-level overrides
-	virtual void device_start() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -118,6 +118,9 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
 
 private:
+	// device-level overrides
+	virtual void device_start() override;
+
 	device_vcs_cart_interface*       m_cart;
 	int m_type;
 
@@ -155,4 +158,4 @@ extern const device_type VCS_CART_SLOT;
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
-#endif
+#endif // MAME_BUS_VCS_VCS_SLOT_H

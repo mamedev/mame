@@ -734,7 +734,7 @@ static INPUT_PORTS_START( clcd )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // clears screen and goes into infinite loop
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START(clcd, clcd_state)
+static MACHINE_CONFIG_START(clcd)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
 	MCFG_CPU_PROGRAM_MAP(clcd_mem)
@@ -840,5 +840,5 @@ ROM_START( clcd )
 ROM_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                         FULLNAME       FLAGS */
-COMP( 1985, clcd,   0,      0,       clcd,      clcd, driver_device,     0, "Commodore Business Machines", "LCD (Prototype)", 0 )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY                        FULLNAME           FLAGS */
+COMP( 1985, clcd,   0,      0,       clcd,      clcd,  clcd_state,  0,     "Commodore Business Machines", "LCD (Prototype)", 0 )

@@ -871,7 +871,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( supercon, novag6502_state )
+static MACHINE_CONFIG_START( supercon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_8MHz/2)
@@ -889,7 +889,7 @@ static MACHINE_CONFIG_START( supercon, novag6502_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cforte, novag6502_state )
+static MACHINE_CONFIG_START( cforte )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 5000000) // 5MHz
@@ -911,7 +911,7 @@ static MACHINE_CONFIG_START( cforte, novag6502_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sexpert, novag6502_state )
+static MACHINE_CONFIG_START( sexpert )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_10MHz/2) // or XTAL_12MHz/2
@@ -1052,17 +1052,17 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     INIT                      COMPANY, FULLNAME, FLAGS */
-CONS( 1984, supercon,  0,        0,      supercon, supercon, driver_device,   0,       "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT   CMP MACHINE   INPUT     STATE            INIT     COMPANY, FULLNAME, FLAGS
+CONS( 1984, supercon,  0,        0, supercon, supercon, novag6502_state, 0,       "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1986, cforteb,   0,        0,      cforte,   cforte,   driver_device,   0,       "Novag", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, cforteb,   0,        0, cforte,   cforte,   novag6502_state, 0,       "Novag", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1987, sfortea,   0,        0,      sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, sfortea1,  sfortea,  0,      sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, sforteb,   sfortea,  0,      sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, sfortec,   sfortea,  0,      sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, sfortea,   0,        0, sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, sfortea1,  sfortea,  0, sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, sforteb,   sfortea,  0, sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, sfortec,   sfortea,  0, sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1987, sexperta,  0,        0,      sexpert,  sexpert,  novag6502_state, sexpert, "Novag", "Super Expert (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, sexpertb,  sexperta, 0,      sexpert,  sexpert,  novag6502_state, sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, sexpertc,  sexperta, 0,      sexpert,  sexpert,  novag6502_state, sexpert, "Novag", "Super Expert (version C, V3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, sexpertc1, sexperta, 0,      sexpert,  sexpert,  novag6502_state, sexpert, "Novag", "Super Expert (version C, V1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, sexperta,  0,        0, sexpert,  sexpert,  novag6502_state, sexpert, "Novag", "Super Expert (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, sexpertb,  sexperta, 0, sexpert,  sexpert,  novag6502_state, sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, sexpertc,  sexperta, 0, sexpert,  sexpert,  novag6502_state, sexpert, "Novag", "Super Expert (version C, V3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, sexpertc1, sexperta, 0, sexpert,  sexpert,  novag6502_state, sexpert, "Novag", "Super Expert (version C, V1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_PC1512KB_H
+#define MAME_MACHINE_PC1512KB_H
 
-#ifndef __PC1512_KEYBOARD__
-#define __PC1512_KEYBOARD__
+#pragma once
 
 
 #include "bus/vcs_ctrl/ctrl.h"
@@ -30,10 +30,10 @@
 //**************************************************************************
 
 #define MCFG_PC1512_KEYBOARD_CLOCK_CALLBACK(_write) \
-	devcb = &pc1512_keyboard_t::set_clock_wr_callback(*device, DEVCB_##_write);
+	devcb = &pc1512_keyboard_device::set_clock_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_PC1512_KEYBOARD_DATA_CALLBACK(_write) \
-	devcb = &pc1512_keyboard_t::set_data_wr_callback(*device, DEVCB_##_write);
+	devcb = &pc1512_keyboard_device::set_data_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -41,16 +41,16 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> pc1512_keyboard_t
+// ======================> pc1512_keyboard_device
 
-class pc1512_keyboard_t :  public device_t
+class pc1512_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	pc1512_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_clock_wr_callback(device_t &device, _Object object) { return downcast<pc1512_keyboard_t &>(device).m_write_clock.set_callback(object); }
-	template<class _Object> static devcb_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<pc1512_keyboard_t &>(device).m_write_data.set_callback(object); }
+	template <class Object> static devcb_base &set_clock_wr_callback(device_t &device, Object &&cb) { return downcast<pc1512_keyboard_device &>(device).m_write_clock.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data_wr_callback(device_t &device, Object &&cb) { return downcast<pc1512_keyboard_device &>(device).m_write_data.set_callback(std::forward<Object>(cb)); }
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -102,8 +102,7 @@ private:
 
 
 // device type definition
-extern const device_type PC1512_KEYBOARD;
+DECLARE_DEVICE_TYPE(PC1512_KEYBOARD, pc1512_keyboard_device)
 
 
-
-#endif
+#endif // MAME_MACHINE_PC1512KB_H

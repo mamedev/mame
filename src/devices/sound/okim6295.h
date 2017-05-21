@@ -8,24 +8,12 @@
 
 ***************************************************************************/
 
+#ifndef MAME_SOUND_OKIM6295_H
+#define MAME_SOUND_OKIM6295_H
+
 #pragma once
 
-#ifndef __OKIM6295_H__
-#define __OKIM6295_H__
-
 #include "sound/okiadpcm.h"
-
-
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-enum
-{
-	OKIM6295_PIN7_LOW = 0,
-	OKIM6295_PIN7_HIGH = 1
-};
 
 
 
@@ -33,16 +21,16 @@ enum
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_OKIM6295_ADD(_tag, _clock, _pin7) \
-	MCFG_DEVICE_ADD(_tag, OKIM6295, _clock) \
-	MCFG_OKIM6295_PIN7(_pin7)
+#define MCFG_OKIM6295_ADD(tag, clock, pin7) \
+		MCFG_DEVICE_ADD((tag), OKIM6295, (clock)) \
+		MCFG_OKIM6295_PIN7(pin7)
 
-#define MCFG_OKIM6295_REPLACE(_tag, _clock, _pin7) \
-	MCFG_DEVICE_REPLACE(_tag, OKIM6295, _clock) \
-	MCFG_OKIM6295_PIN7(_pin7)
+#define MCFG_OKIM6295_REPLACE(tag, clock, pin7) \
+		MCFG_DEVICE_REPLACE((tag), OKIM6295, (clock)) \
+		MCFG_OKIM6295_PIN7(pin7)
 
-#define MCFG_OKIM6295_PIN7(_pin7) \
-	okim6295_device::static_set_pin7(*device, _pin7);
+#define MCFG_OKIM6295_PIN7(pin7) \
+		okim6295_device::static_set_pin7(*device, (okim6295_device::pin7));
 
 
 //**************************************************************************
@@ -57,6 +45,12 @@ class okim6295_device : public device_t,
 						public device_rom_interface
 {
 public:
+	enum
+	{
+		PIN7_LOW = 0,
+		PIN7_HIGH = 1
+	};
+
 	// construction/destruction
 	okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -104,7 +98,7 @@ protected:
 	optional_memory_region  m_region;
 
 	// internal state
-	static const int OKIM6295_VOICES = 4;
+	static constexpr int OKIM6295_VOICES = 4;
 
 	okim_voice          m_voice[OKIM6295_VOICES];
 	int32_t               m_command;
@@ -116,7 +110,7 @@ protected:
 
 
 // device type definition
-extern const device_type OKIM6295;
+DECLARE_DEVICE_TYPE(OKIM6295, okim6295_device)
 
 
-#endif /* __OKIM6295_H__ */
+#endif // MAME_SOUND_OKIM6295_H

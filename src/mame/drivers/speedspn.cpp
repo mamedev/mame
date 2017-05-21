@@ -277,7 +277,7 @@ void speedspn_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( speedspn, speedspn_state )
+static MACHINE_CONFIG_START( speedspn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,6000000)      /* 6 MHz */
@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( speedspn, speedspn_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
@@ -339,4 +339,4 @@ ROM_END
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1994, speedspn, 0, speedspn, speedspn, driver_device, 0, ROT180, "TCH", "Speed Spin", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, speedspn, 0, speedspn, speedspn, speedspn_state, 0, ROT180, "TCH", "Speed Spin", MACHINE_SUPPORTS_SAVE )

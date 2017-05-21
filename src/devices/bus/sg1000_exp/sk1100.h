@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SG1000_EXP_SK1100_H
+#define MAME_BUS_SG1000_EXP_SK1100_H
 
-#ifndef __SEGA_SK1100__
-#define __SEGA_SK1100__
+#pragma once
 
 
 #include "sg1000exp.h"
@@ -64,7 +64,7 @@ private:
 
 
 // device type definition
-extern const device_type SEGA_SK1100;
+DECLARE_DEVICE_TYPE(SEGA_SK1100, sega_sk1100_device)
 
 
-#endif
+#endif // MAME_BUS_SG1000_EXP_SK1100_H

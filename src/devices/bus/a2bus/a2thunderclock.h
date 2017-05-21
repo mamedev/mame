@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_THUNDERCLOCK__
-#define __A2BUS_THUNDERCLOCK__
+#ifndef MAME_BUS_A2BUS_A2THUNDERCLOCK_H
+#define MAME_BUS_A2BUS_A2THUNDERCLOCK_H
+
+#pragma once
 
 #include "a2bus.h"
 #include "machine/upd1990a.h"
@@ -24,7 +26,6 @@ class a2bus_thunderclock_device:
 {
 public:
 	// construction/destruction
-	a2bus_thunderclock_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a2bus_thunderclock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
@@ -34,6 +35,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( upd_dataout_w );
 
 protected:
+	a2bus_thunderclock_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -51,6 +54,6 @@ private:
 };
 
 // device type definition
-extern const device_type A2BUS_THUNDERCLOCK;
+DECLARE_DEVICE_TYPE(A2BUS_THUNDERCLOCK, a2bus_thunderclock_device)
 
-#endif /* __A2BUS_THUNDERCLOCK__ */
+#endif // MAME_BUS_A2BUS_A2THUNDERCLOCK_H

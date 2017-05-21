@@ -554,7 +554,7 @@ MACHINE_START_MEMBER(route16_state, ttmahjng)
 }
 
 
-static MACHINE_CONFIG_START( route16, route16_state )
+static MACHINE_CONFIG_START( route16 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
@@ -1077,19 +1077,19 @@ DRIVER_INIT_MEMBER(route16_state,route16a)
  *
  *************************************/
 
-GAME( 1981, route16,  0,        route16,  route16, route16_state,  route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16a, route16,  route16,  route16, route16_state,  route16a, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16c, route16,  route16,  route16, route16_state,  route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
-GAME( 1981, route16bl,route16,  route16,  route16, driver_device,  0,        ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, routex,   route16,  routex,   route16, driver_device,  0,        ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16,  0,        route16,  route16,  route16_state, route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16a, route16,  route16,  route16,  route16_state, route16a, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16c, route16,  route16,  route16,  route16_state, route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
+GAME( 1981, route16bl,route16,  route16,  route16,  route16_state, 0,        ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, routex,   route16,  routex,   route16,  route16_state, 0,        ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, speakres, 0,        speakres, speakres, driver_device, 0,        ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakresb,speakres, speakres, speakres, driver_device, 0,        ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvox, speakres, stratvox, stratvox, driver_device, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxa,speakres, stratvox, stratvox, driver_device, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxb,speakres, stratvox, stratvox, driver_device, 0,        ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho, speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho2,speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakhlp, speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1980, speakres, 0,        speakres, speakres, route16_state, 0,        ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakresb,speakres, speakres, speakres, route16_state, 0,        ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvox, speakres, stratvox, stratvox, route16_state, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxa,speakres, stratvox, stratvox, route16_state, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxb,speakres, stratvox, stratvox, route16_state, 0,        ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho, speakres, spacecho, spacecho, route16_state, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho2,speakres, spacecho, spacecho, route16_state, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakhlp, speakres, spacecho, spacecho, route16_state, 0,        ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, driver_device, 0,        ROT0,   "Taito", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, route16_state, 0,        ROT0,   "Taito", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )

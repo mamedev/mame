@@ -376,7 +376,7 @@ INTERRUPT_GEN_MEMBER(brkthru_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( brkthru, brkthru_state )
+static MACHINE_CONFIG_START( brkthru )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
@@ -416,7 +416,7 @@ static MACHINE_CONFIG_START( brkthru, brkthru_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( darwin, brkthru_state )
+static MACHINE_CONFIG_START( darwin )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
@@ -654,7 +654,7 @@ DRIVER_INIT_MEMBER(brkthru_state,brkthru)
  *
  *************************************/
 
-GAME( 1986, brkthru,  0,       brkthru, brkthru, brkthru_state,  brkthru, ROT0,   "Data East USA",         "Break Thru (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthru,  0,       brkthru, brkthru,  brkthru_state, brkthru, ROT0,   "Data East USA",         "Break Thru (US)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1986, brkthruj, brkthru, brkthru, brkthruj, brkthru_state, brkthru, ROT0,   "Data East Corporation", "Kyohkoh-Toppa (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, forcebrk, brkthru, brkthru, brkthruj, brkthru_state, brkthru, ROT0,   "bootleg",               "Force Break (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, darwin,   0,       darwin,  darwin, brkthru_state,   brkthru, ROT270, "Data East Corporation", "Darwin 4078 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darwin,   0,       darwin,  darwin,   brkthru_state, brkthru, ROT270, "Data East Corporation", "Darwin 4078 (Japan)",   MACHINE_SUPPORTS_SAVE )

@@ -250,7 +250,7 @@ void amspdwy_state::machine_reset()
 	m_wheel_return[1] = 0;
 }
 
-static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
+static MACHINE_CONFIG_START( amspdwy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3000000)
@@ -383,5 +383,5 @@ ROM_END
 
 /* (C) 1987 ETI 8402 MAGNOLIA ST. #C SANTEE, CA 92071 */
 
-GAME( 1987, amspdwy,  0,       amspdwy, amspdwy, driver_device,  0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, driver_device, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, amspdwy,  0,       amspdwy, amspdwy,  amspdwy_state, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, amspdwy_state, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 2)", MACHINE_SUPPORTS_SAVE )

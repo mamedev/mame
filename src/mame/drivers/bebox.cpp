@@ -138,10 +138,10 @@ WRITE_LINE_MEMBER(bebox_state::bebox_keyboard_interrupt)
 
 static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("mpc105", MPC105)
-	SLOT_INTERFACE("cirrus", CIRRUS)
+	SLOT_INTERFACE("cirrus", PCI_CIRRUS_SVGA)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( bebox, bebox_state )
+static MACHINE_CONFIG_START( bebox )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("ppc1", PPC603, 66000000)  /* 66 MHz */
 	MCFG_CPU_PROGRAM_MAP(bebox_mem)
@@ -257,6 +257,6 @@ ROM_START(bebox2)
 	ROM_LOAD( "bootnub.rom", 0x000000, 0x4000, CRC(5348d09a) SHA1(1b637a3d7a2b072aa128dd5c037bbb440d525c1a) )
 ROM_END
 
-/*     YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     INIT    COMPANY             FULLNAME */
-COMP( 1995,  bebox,    0,      0,      bebox,    bebox, bebox_state,    bebox,   "Be Inc",  "BeBox Dual603-66", MACHINE_NOT_WORKING )
-COMP( 1996,  bebox2,   bebox,  0,      bebox2,   bebox, bebox_state,    bebox,   "Be Inc",  "BeBox Dual603-133", MACHINE_NOT_WORKING )
+/*    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT   STATE           INIT     COMPANY    FULLNAME */
+COMP( 1995,  bebox,    0,      0,      bebox,    bebox,  bebox_state,    bebox,   "Be Inc",  "BeBox Dual603-66",  MACHINE_NOT_WORKING )
+COMP( 1996,  bebox2,   bebox,  0,      bebox2,   bebox,  bebox_state,    bebox,   "Be Inc",  "BeBox Dual603-133", MACHINE_NOT_WORKING )

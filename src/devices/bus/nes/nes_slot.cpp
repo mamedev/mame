@@ -93,7 +93,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NES_CART_SLOT = device_creator<nes_cart_slot_device>;
+DEFINE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device, "nes_cart_slot", "NES Cartridge Slot")
 
 
 //**************************************************************************
@@ -105,31 +105,32 @@ const device_type NES_CART_SLOT = device_creator<nes_cart_slot_device>;
 //-------------------------------------------------
 
 device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconfig, device_t &device)
-						: device_slot_card_interface(mconfig, device),
-						m_prg(nullptr),
-						m_vrom(nullptr),
-						m_ciram(nullptr),
-						m_prg_size(0),
-						m_vrom_size(0), m_maincpu(nullptr),
-						m_mapper_sram(nullptr),
-						m_mapper_sram_size(0),
-						m_ce_mask(0),
-						m_ce_state(0),
-						m_vrc_ls_prg_a(0),
-						m_vrc_ls_prg_b(0),
-						m_vrc_ls_chr(0),
-						m_mirroring(PPU_MIRROR_NONE),
-						m_pcb_ctrl_mirror(false),
-						m_four_screen_vram(false),
-						m_has_trainer(false),
-						m_x1_005_alt_mirroring(false),
-						m_bus_conflict(true),
-						m_open_bus(0),
-						m_prg_chunks(0),
-						m_prg_mask(0xffff),
-						m_chr_source(CHRRAM),
-						m_vrom_chunks(0),
-						m_vram_chunks(0)
+	: device_slot_card_interface(mconfig, device)
+	, m_prg(nullptr)
+	, m_vrom(nullptr)
+	, m_ciram(nullptr)
+	, m_prg_size(0)
+	, m_vrom_size(0)
+	, m_maincpu(nullptr)
+	, m_mapper_sram(nullptr)
+	, m_mapper_sram_size(0)
+	, m_ce_mask(0)
+	, m_ce_state(0)
+	, m_vrc_ls_prg_a(0)
+	, m_vrc_ls_prg_b(0)
+	, m_vrc_ls_chr(0)
+	, m_mirroring(PPU_MIRROR_NONE)
+	, m_pcb_ctrl_mirror(false)
+	, m_four_screen_vram(false)
+	, m_has_trainer(false)
+	, m_x1_005_alt_mirroring(false)
+	, m_bus_conflict(true)
+	, m_open_bus(0)
+	, m_prg_chunks(0)
+	, m_prg_mask(0xffff)
+	, m_chr_source(CHRRAM)
+	, m_vrom_chunks(0)
+	, m_vram_chunks(0)
 {
 }
 
@@ -742,13 +743,14 @@ void device_nes_cart_interface::nes_banks_restore()
 //-------------------------------------------------
 //  nes_cart_slot_device - constructor
 //-------------------------------------------------
-nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, NES_CART_SLOT, "NES Cartridge Slot", tag, owner, clock, "nes_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_crc_hack(0), m_cart(nullptr),
-						m_pcb_id(NO_BOARD),
-						m_must_be_loaded(1)
+nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NES_CART_SLOT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_slot_interface(mconfig, *this)
+	, m_crc_hack(0)
+	, m_cart(nullptr)
+	, m_pcb_id(NO_BOARD)
+	, m_must_be_loaded(1)
 {
 }
 

@@ -121,7 +121,7 @@ public:
 	required_device<x2210_device> m_videosram;
 	required_device<palette_device> m_palette;
 	required_memory_region m_chargen;
-	required_device<fd1795_t> m_fdc;
+	required_device<fd1795_device> m_fdc;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -763,7 +763,7 @@ I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 	}
 }
 
-static MACHINE_CONFIG_START( wicat, wicat_state )
+static MACHINE_CONFIG_START( wicat )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(wicat_mem)
@@ -1001,5 +1001,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY          FULLNAME       FLAGS */
-COMP( 1982, wicat, 0,       0,     wicat, wicat, driver_device, 0, "Millennium Systems", "Wicat System 150", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT  COMPANY               FULLNAME            FLAGS
+COMP( 1982, wicat, 0,      0,      wicat,   wicat, wicat_state, 0,    "Millennium Systems", "Wicat System 150", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
