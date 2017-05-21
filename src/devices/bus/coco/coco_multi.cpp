@@ -54,8 +54,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "coco_gmc.h"
-#include "coco_pak.h"
 #include "coco_fdc.h"
 
 #define SLOT1_TAG           "slot1"

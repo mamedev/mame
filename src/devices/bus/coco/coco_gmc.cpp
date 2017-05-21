@@ -17,10 +17,37 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "coco_gmc.h"
+#include "coco_pak.h"
+#include "sound/sn76496.h"
 #include "speaker.h"
 
 #define SN76489AN_TAG   "gmc_psg"
+
+//**************************************************************************
+//  TYPE DECLARATIONS
+//**************************************************************************
+
+namespace
+{
+	// ======================> coco_pak_banked_device
+
+	class coco_pak_gmc_device :
+		public coco_pak_banked_device
+	{
+	public:
+		// construction/destruction
+		coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		virtual machine_config_constructor device_mconfig_additions() const override;
+
+	protected:
+		// device-level overrides
+		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+
+	private:
+		required_device<sn76489a_device> m_psg;
+	};
+};
+
 
 static MACHINE_CONFIG_FRAGMENT(cocopak_gmc)
 	MCFG_SPEAKER_STANDARD_MONO("gmc_speaker")

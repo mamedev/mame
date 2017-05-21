@@ -42,9 +42,6 @@ protected:
 };
 
 
-// device type definition
-DECLARE_DEVICE_TYPE(COCO_PAK, coco_pak_device)
-
 // ======================> coco_pak_banked_device
 
 class coco_pak_banked_device : public coco_pak_device
@@ -63,9 +60,5 @@ protected:
 private:
 	void banked_pak_set_bank(uint32_t bank);
 };
-
-
-// device type definition
-DECLARE_DEVICE_TYPE(COCO_PAK_BANKED, coco_pak_banked_device)
 
 #endif // MAME_BUS_COCO_COCO_PAK_H

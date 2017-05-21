@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    coco_pak.c
+    coco_pak.cpp
 
     Code for emulating standard CoCo cartridges
 
@@ -13,6 +13,7 @@
 
 #define CARTSLOT_TAG            "cart"
 #define CART_AUTOSTART_TAG      "cart_autostart"
+
 
 /***************************************************************************
     IMPLEMENTATION
