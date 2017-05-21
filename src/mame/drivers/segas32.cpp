@@ -537,6 +537,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/mb8421.h"
 //#include "machine/mb89352.h"
 #include "machine/msm6253.h"
+#include "machine/upd4701.h"
 #include "machine/315_5296.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
@@ -899,56 +900,6 @@ WRITE_LINE_MEMBER(segas32_state::display_enable_0_w)
 WRITE_LINE_MEMBER(segas32_state::display_enable_1_w)
 {
 	m_system32_displayenable[1] = state;
-}
-
-
-
-/*************************************
- *
- *  I/O expansion range
- *
- *************************************/
-
-
-
-
-/*************************************
- *
- *  Game-specific custom I/O
- *
- *************************************/
-
-READ8_MEMBER(segas32_trackball_state::sonic_custom_io_r)
-{
-	switch (offset)
-	{
-		case 0x00/2:
-		case 0x04/2:
-		case 0x08/2:
-		case 0x0c/2:
-		case 0x10/2:
-		case 0x14/2:
-			return (uint8_t)(m_track_ports[offset/2]->read() - m_sonic_last[offset/2]);
-	}
-
-	logerror("%06X:unknown sonic_custom_io_r(%X) & %04X\n", space.device().safe_pc(), offset*2, mem_mask);
-	return 0xff;
-}
-
-
-WRITE8_MEMBER(segas32_trackball_state::sonic_custom_io_w)
-{
-	switch (offset)
-	{
-		case 0x00/2:
-		case 0x08/2:
-		case 0x10/2:
-			m_sonic_last[offset/2 + 0] = m_track_ports[offset/2 + 0]->read();
-			m_sonic_last[offset/2 + 1] = m_track_ports[offset/2 + 1]->read();
-			return;
-	}
-
-	logerror("%06X:unknown sonic_custom_io_w(%X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
 }
 
 
@@ -2134,22 +2085,22 @@ static INPUT_PORTS_START( sonic )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
 
 	PORT_START("mainpcb:TRACKX1")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START("mainpcb:TRACKY1")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("mainpcb:TRACKX2")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(2)
 
 	PORT_START("mainpcb:TRACKY2")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(2)
 
 	PORT_START("mainpcb:TRACKX3")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(3)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(3)
 
 	PORT_START("mainpcb:TRACKY3")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(3)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(3)
 INPUT_PORTS_END
 
 
@@ -2395,7 +2346,10 @@ machine_config_constructor segas32_analog_state::device_mconfig_additions() cons
 
 static ADDRESS_MAP_START( system32_trackball_map, AS_PROGRAM, 16, segas32_trackball_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
+	//AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
+	AM_RANGE(0xc00040, 0xc00047) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("upd1", upd4701_device, read_xy, reset_xy, 0x00ff)
+	AM_RANGE(0xc00048, 0xc0004f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("upd2", upd4701_device, read_xy, reset_xy, 0x00ff)
+	AM_RANGE(0xc00050, 0xc00057) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("upd3", upd4701_device, read_xy, reset_xy, 0x00ff)
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
@@ -2404,13 +2358,24 @@ static MACHINE_CONFIG_FRAGMENT( system32_trackball )
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_trackball_map)
+
+	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX1")
+	MCFG_UPD4701_PORTY("TRACKY1")
+
+	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX2")
+	MCFG_UPD4701_PORTY("TRACKY2")
+
+	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX3")
+	MCFG_UPD4701_PORTY("TRACKY3")
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_S32_TRACKBALL_DEVICE, segas32_trackball_state, "segas32_pcb_trackball", "Sega System 32 trackball PCB")
 
 segas32_trackball_state::segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segas32_state(mconfig, SEGA_S32_TRACKBALL_DEVICE, tag, owner, clock)
-	, m_track_ports(*this, {"TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3"})
 {
 }
 
