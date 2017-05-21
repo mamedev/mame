@@ -28,7 +28,6 @@
 
 #include "bus/coco/coco_dwsock.h"
 #include "bus/coco/coco_fdc.h"
-#include "bus/coco/coco_ssc.h"
 #include "bus/coco/coco_gmc.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_t4426.h"

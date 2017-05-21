@@ -14,6 +14,7 @@
 #pragma once
 
 #include "softlist_dev.h"
+#include "cpu/tms7000/tms7000.h"
 
 
 /***************************************************************************
@@ -215,5 +216,6 @@ private:
 extern const device_type COCO_ORCH90;
 extern const device_type COCO_MULTIPAK;
 extern const device_type COCO_232;
+extern const device_type COCO_SSC;
 
 #endif // MAME_BUS_COCO_COCOCART_H

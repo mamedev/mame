@@ -31,9 +31,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "coco_ssc.h"
+#include "sound/ay8910.h"
+#include "sound/sp0256.h"
+#include "machine/netlist.h"
+#include "netlist/devices/net_lib.h"
 #include "cpu/tms7000/tms7000.h"
 #include "speaker.h"
+#include "cococart.h"
+#include "machine/ram.h"
 
 #define LOG_SSC 0
 #define PIC_TAG "pic7040"
@@ -53,6 +58,93 @@
 #define C_ALD  0x20
 #define C_ACS  0x40
 #define C_BSY  0x80
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+namespace
+{
+	class cocossc_sac_device;
+
+	// ======================> coco_ssc_device
+
+	class coco_ssc_device :
+		public device_t,
+		public device_cococart_interface
+	{
+	public:
+		// construction/destruction
+		coco_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+		// optional information overrides
+		virtual const tiny_rom_entry *device_rom_region() const override;
+		virtual machine_config_constructor device_mconfig_additions() const override;
+
+		virtual void device_reset() override;
+
+		DECLARE_READ8_MEMBER(ssc_port_a_r);
+		DECLARE_WRITE8_MEMBER(ssc_port_b_w);
+		DECLARE_READ8_MEMBER(ssc_port_c_r);
+		DECLARE_WRITE8_MEMBER(ssc_port_c_w);
+		DECLARE_READ8_MEMBER(ssc_port_d_r);
+		DECLARE_WRITE8_MEMBER(ssc_port_d_w);
+
+	protected:
+		// device-level overrides
+		virtual void device_start() override;
+		virtual DECLARE_READ8_MEMBER(ff7d_read);
+		virtual DECLARE_WRITE8_MEMBER(ff7d_write);
+		virtual void set_sound_enable(bool sound_enable) override;
+	private:
+		uint8_t reset_line;
+		uint8_t tms7000_porta;
+		uint8_t tms7000_portb;
+		uint8_t tms7000_portc;
+		uint8_t tms7000_portd;
+		required_device<cpu_device> m_tms7040;
+		required_device<ram_device> m_staticram;
+		required_device<ay8910_device> m_ay;
+		required_device<sp0256_device> m_spo;
+		required_device<cocossc_sac_device> m_sac;
+	};
+
+	// ======================> Color Computer Sound Activity Circuit filter
+
+	class cocossc_sac_device : public device_t,
+		public device_sound_interface
+	{
+	public:
+		cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		~cocossc_sac_device() { }
+		bool sound_activity_circuit_output();
+
+	protected:
+		// device-level overrides
+		virtual void device_start() override;
+
+		// sound stream update overrides
+		virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	private:
+		sound_stream*  m_stream;
+		double m_rms[16];
+		int m_index;
+	};
+};
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(COCO_SSC, coco_ssc_device, "coco_ssc", "CoCo S/SC PAK");
+DEFINE_DEVICE_TYPE(COCOSSC_SAC, cocossc_sac_device, "cocossc_sac", "CoCo SSC Sound Activity Circuit");
+
+
+//**************************************************************************
+//  MACHINE FRAGMENTS AND ADDRESS MAPS
+//**************************************************************************
 
 static ADDRESS_MAP_START(ssc_io_map, AS_IO, 8, coco_ssc_device)
 	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(ssc_port_a_r)
@@ -85,7 +177,7 @@ static MACHINE_CONFIG_FRAGMENT(coco_ssc)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "coco_sac_tag", AY8913_GAIN)
 
-	MCFG_COCOSSC_SAC_ADD("coco_sac_tag", DERIVED_CLOCK(1, 2))
+	MCFG_DEVICE_ADD("coco_sac_tag", COCOSSC_SAC, DERIVED_CLOCK(1, 2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_psg", 1.0)
 MACHINE_CONFIG_END
 
@@ -95,13 +187,6 @@ ROM_START(coco_ssc)
 	ROM_REGION(0x10000, SP0256_TAG, 0)
 	ROM_LOAD("sp0256-al2.bin", 0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc))
 ROM_END
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(COCO_SSC, coco_ssc_device, "coco_ssc", "CoCo S/SC PAK");
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -387,8 +472,6 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_d_w)
 	tms7000_portd = data;
 }
 
-// device type definition
-DEFINE_DEVICE_TYPE(COCOSSC_SAC, cocossc_sac_device, "cocossc_sac", "CoCo SSC Sound Activity Circuit");
 
 //-------------------------------------------------
 //  cocossc_sac_device - constructor
