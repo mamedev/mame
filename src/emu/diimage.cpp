@@ -175,23 +175,6 @@ iodevice_t device_image_interface::device_typeid(const char *name)
 	return (iodevice_t)-1;
 }
 
-/*-------------------------------------------------
-    device_compute_hash - compute a hash,
-    using this device's partial hash if appropriate
--------------------------------------------------*/
-
-void device_image_interface::device_compute_hash(util::hash_collection &hashes, const void *data, size_t length, const char *types) const
-{
-	/* retrieve the partial hash func */
-	device_image_partialhash_func partialhash = get_partial_hash();
-
-	/* compute the hash */
-	if (partialhash)
-		partialhash(hashes, (const unsigned char*)data, length, types);
-	else
-		hashes.compute(reinterpret_cast<const u8 *>(data), length, types);
-}
-
 //-------------------------------------------------
 //  set_image_filename - specifies the filename of
 //  an image
@@ -513,46 +496,41 @@ bool device_image_interface::load_software_region(const char *tag, optional_shar
 // to be loaded
 // ****************************************************************************
 
-void device_image_interface::run_hash(util::core_file &file, void (*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *),
-	util::hash_collection &hashes, const char *types)
+void device_image_interface::run_hash(util::core_file &file, uint32_t skip_bytes, util::hash_collection &hashes, const char *types)
 {
 	// reset the hash; we want to override existing data
 	hashes.reset();
 
-	// figure out the size
-	u32 size = (u32) file.size();
-	if (size != file.size())
-		throw false;
+	// figure out the size, and "cap" the skip bytes
+	uint64_t size = file.size();
+	skip_bytes = (uint32_t) std::min((uint64_t) skip_bytes, size);
 
-	// only do anything if we have data
-	if (size > 0)
+	// seek to the beginning
+	file.seek(skip_bytes, SEEK_SET);
+	uint64_t position = skip_bytes;
+
+	// keep on reading hashes
+	while(position < size)
 	{
-		std::vector<u8> buf((size_t)size);
+		uint8_t buffer[8192];
 
-		// clear it out
-		memset(&buf[0], 0, size);
+		// read bytes
+		uint32_t count = (uint32_t) std::min(size - position, (uint64_t) sizeof(buffer));
+		uint32_t actual_count = file.read(buffer, count);
+		position += actual_count;		
 
-		// read the file
-		file.seek(0, SEEK_SET);
-		file.read(&buf[0], size);
-
-		// get the hashes
-		if (partialhash)
-			partialhash(hashes, &buf[0], size, types);
-		else
-			hashes.compute(&buf[0], size, types);
-
-		// cleanup
-		file.seek(0, SEEK_SET);
+		// and compute the hashes
+		hashes.compute(buffer, actual_count, types);
 	}
+
+	// cleanup
+	file.seek(0, SEEK_SET);
 }
 
 
 
 void device_image_interface::image_checkhash()
 {
-	device_image_partialhash_func partialhash;
-
 	// only calculate CRC if it hasn't been calculated, and the open_mode is read only
 	u32 crcval;
 	if (!m_hash.crc(crcval) && is_readonly() && !m_created)
@@ -566,10 +544,8 @@ void device_image_interface::image_checkhash()
 		if (loaded_through_softlist())
 			return;
 
-		// retrieve the partial hash func
-		partialhash = get_partial_hash();
-
-		run_hash(*m_file, partialhash, m_hash, util::hash_collection::HASH_TYPES_ALL);
+		// run the hash
+		run_hash(*m_file, unhashed_header_length(), m_hash, util::hash_collection::HASH_TYPES_ALL);
 	}
 	return;
 }
@@ -577,12 +553,9 @@ void device_image_interface::image_checkhash()
 
 util::hash_collection device_image_interface::calculate_hash_on_file(util::core_file &file) const
 {
-	// retrieve the partial hash func
-	device_image_partialhash_func partialhash = get_partial_hash();
-
-	// and calculate the hash
+	// calculate the hash
 	util::hash_collection hash;
-	run_hash(file, partialhash, hash, util::hash_collection::HASH_TYPES_ALL);
+	run_hash(file, unhashed_header_length(), hash, util::hash_collection::HASH_TYPES_ALL);
 	return hash;
 }
 
