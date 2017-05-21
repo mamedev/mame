@@ -1,5 +1,5 @@
-// license:BSD-3-Clause,AJR
-// copyright-holders:smf
+// license:BSD-3-Clause
+// copyright-holders:smf,AJR
 /***************************************************************************
 
     NEC µPD4701A 2-Axis Incremental Encoder Counter
