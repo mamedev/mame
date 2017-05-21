@@ -14,7 +14,12 @@
 #pragma once
 
 #include "softlist_dev.h"
+
+// it isn't clear why these need to be included; they don't seem
+// to be picked up by the build system despite being in use by
+// the various CoCo cartridge implementations
 #include "cpu/tms7000/tms7000.h"
+#include "machine/ds1315.h"
 
 
 /***************************************************************************
