@@ -1317,6 +1317,14 @@ configuration { "Debug", "gmake" }
 		"-Wno-terminate",
 	}
 
+if _OPTIONS["targetos"]=="linux" then
+	configuration { "cmake" }
+		links {
+			"dl",
+			"rt",
+		}
+end
+
 configuration { }
 
 if (_OPTIONS["SOURCES"] ~= nil) then
