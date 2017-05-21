@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    coco_232.cpp
+    coco_rs232.cpp
 
     Code for emulating the CoCo RS-232 PAK
 
@@ -20,6 +20,16 @@
 #define UART_TAG        "uart"
 
 
+/***************************************************************************
+	IMPLEMENTATION
+***************************************************************************/
+
+static MACHINE_CONFIG_FRAGMENT(coco_rs232)
+	MCFG_DEVICE_ADD(UART_TAG, MOS6551, 0)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+MACHINE_CONFIG_END
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -34,14 +44,27 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		coco_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: device_t(mconfig, COCO_RS232, tag, owner, clock)
+			, device_cococart_interface(mconfig, *this)
+			, m_uart(*this, UART_TAG)
+		{
+		}
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual machine_config_constructor device_mconfig_additions() const override
+		{
+			return MACHINE_CONFIG_NAME(coco_rs232);
+		}
 
 	protected:
 		// device-level overrides
-		virtual void device_start() override;
+		virtual void device_start() override
+		{
+			install_readwrite_handler(0xFF68, 0xFF6B,
+				read8_delegate(FUNC(mos6551_device::read), (mos6551_device *)m_uart),
+				write8_delegate(FUNC(mos6551_device::write), (mos6551_device *)m_uart));
+		}
 
 	private:
 		// internal state
@@ -50,56 +73,8 @@ namespace
 };
 
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-static MACHINE_CONFIG_FRAGMENT(coco_rs232)
-	MCFG_DEVICE_ADD(UART_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
-MACHINE_CONFIG_END
-
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  DEVICE DECLARATION
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(COCO_RS232, coco_rs232_device, "coco_rs232", "CoCo RS-232 PAK")
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  coco_rs232_device - constructor
-//-------------------------------------------------
-
-coco_rs232_device::coco_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, COCO_RS232, tag, owner, clock)
-	, device_cococart_interface(mconfig, *this)
-	, m_uart(*this, UART_TAG)
-{
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void coco_rs232_device::device_start()
-{
-	install_readwrite_handler(0xFF68, 0xFF6F,
-		read8_delegate(FUNC(mos6551_device::read), (mos6551_device *)m_uart),
-		write8_delegate(FUNC(mos6551_device::write), (mos6551_device *)m_uart));
-}
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor coco_rs232_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( coco_rs232 );
-}
