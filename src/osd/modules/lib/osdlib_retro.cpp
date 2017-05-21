@@ -1,6 +1,8 @@
 
 #include <stdlib.h>
+#ifdef __GNUC__
 #include <unistd.h>
+#endif
 #ifndef _WIN32
 #include <sys/mman.h>
 #else
@@ -11,7 +13,9 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <time.h>
+#ifdef __GNUC__
 #include <sys/time.h>
+#endif
 #ifdef SDLMAME_EMSCRIPTEN
 #include <emscripten.h>
 #endif

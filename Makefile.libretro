@@ -4,6 +4,7 @@ RETRO ?= 1
 NOWERROR ?= 1
 CONFIG ?= libretro"
 NO_USE_MIDI ?= 1
+NO_USE_PORTAUDIO ?= 1
 PTR64 ?= 1 
 TARGET ?= mame
 # OS ?= linux
@@ -26,6 +27,8 @@ ifeq ($(platform),)
 	ifeq ($(UNAME_S),)
 		platform = win
 	else ifneq ($(findstring MINGW,$(UNAME_S)),)
+		platform = win
+	else ifneq ($(findstring MSYS,$(UNAME_S)),)
 		platform = win
 	else ifneq ($(findstring Darwin,$(UNAME_S)),)
 		platform = osx
@@ -82,7 +85,7 @@ endif
 #
 ###########################################################################
 
-BUILDFLAGS = RETRO=$(RETRO) REGENIE=$(REGENIE) VERBOSE=$(VERBOSE) NOWERROR=$(NOWERROR) OSD="retro" NO_USE_MIDI=$(NO_USE_MIDI)
+BUILDFLAGS = RETRO=$(RETRO) REGENIE=$(REGENIE) VERBOSE=$(VERBOSE) NOWERROR=$(NOWERROR) OSD="retro" NO_USE_MIDI=$(NO_USE_MIDI) NO_USE_PORTAUDIO=$(NO_USE_PORTAUDIO)
 
 ifneq ($(PYTHON_EXECUTABLE),)
 	BUILDFLAGS += PYTHON_EXECUTABLE=$(PYTHON_EXECUTABLE)
@@ -103,12 +106,12 @@ endif
 PLATFLAGS =
 
 ifneq ($(platform),android)
-ifneq ($(PTR64),)
-	PLATFLAGS += PTR64=$(PTR64)
-endif
-ifneq ($(platform),)
-	PLATFLAGS += LIBRETRO_OS="$(platform)"
-endif
+	ifneq ($(PTR64),)
+		PLATFLAGS += PTR64=$(PTR64)
+	endif
+	ifneq ($(platform),)
+		PLATFLAGS += LIBRETRO_OS="$(platform)"
+	endif
 endif
 ifeq ($(platform),win)
 	ifeq ($(MSYSTEM),MINGW64)
@@ -168,7 +171,10 @@ all: build
 build:
 	$(MAKE) $(BUILDFLAGS) $(PLATFLAGS) $(TARGETFLAGS)
 
+vs2015:
+	$(MAKE) $(BUILDFLAGS) $(PLATFLAGS) $(TARGETFLAGS) vs2015
+
 clean:
 	$(MAKE) $(BUILDFLAGS) $(PLATFLAGS) $(TARGETFLAGS) clean
 
-.PHONY: all build clean
+.PHONY: all build clean vs2015

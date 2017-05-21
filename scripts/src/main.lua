@@ -84,9 +84,9 @@ end
 	end
 
 	configuration { "vs*" }
-	flags {
-		"Unicode",
-	}
+		flags {
+			"Unicode",
+		}
 
 	configuration { "winstore*" }
 		-- Windows Required Files
@@ -224,6 +224,9 @@ end
 			targetextension ".dylib"
 		elseif _OPTIONS["targetos"]=="windows" then
 			targetextension ".dll"
+			flags {
+				"NoImportLib",
+			}
 		elseif _OPTIONS["targetos"]=="osx" then
 			targetextension ".dylib"
 		else

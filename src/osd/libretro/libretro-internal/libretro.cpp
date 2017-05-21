@@ -1,4 +1,6 @@
+#ifdef __GNUC__
 #include <unistd.h>
+#endif
 #include <stdint.h>
 #include <string.h>
 

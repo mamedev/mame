@@ -75,13 +75,15 @@ project ("osd_" .. _OPTIONS["osd"])
 --	kind (LIBTYPE)
 	kind "StaticLib"
 
-   buildoptions {
- 		"-fPIC"
-	}
+	if string.sub(_ACTION,1,4) ~= "vs20" then
+		buildoptions {
+			"-fPIC"
+		}
 
-   linkoptions{
-		"-shared -Wl,--version-script=" .. MAME_DIR .. "src/osd/libretro/libretro-internal/link.T -Wl,--no-undefined"
-	}
+		linkoptions{
+			"-shared -Wl,--version-script=" .. MAME_DIR .. "src/osd/libretro/libretro-internal/link.T -Wl,--no-undefined"
+		}
+	end
 
 	dofile("retro_cfg.lua")
 	osdmodulesbuild()
@@ -95,6 +97,7 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/file",
 		MAME_DIR .. "src/osd/modules/render",
 		MAME_DIR .. "3rdparty",
+		MAME_DIR .. "3rdparty/bgfx/include",
 		MAME_DIR .. "src/osd/libretro",
 		MAME_DIR .. "src/osd/libretro/libretro-internal",
 	}
@@ -133,14 +136,15 @@ project ("ocore_" .. _OPTIONS["osd"])
 
 	dofile("retro_cfg.lua")
 
-  	buildoptions {
- 		"-fPIC"
-	}
-
+	if string.sub(_ACTION,1,4) ~= "vs20" then
+		buildoptions {
+			"-fPIC"
+		}
    
-	linkoptions{
-		"-shared -Wl,--version-script=src/osd/libretro/libretro-internal/link.T -Wl,--no-undefined"
-	}
+		linkoptions{
+			"-shared -Wl,--version-script=src/osd/libretro/libretro-internal/link.T -Wl,--no-undefined"
+		}
+	end
 	
 	includedirs {
 		MAME_DIR .. "src/emu",
