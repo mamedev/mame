@@ -213,6 +213,17 @@ private:
 	COCO CARTRIDGE DEVICES
 ***************************************************************************/
 
+// device type definitions - CoCo FDC
+extern const device_type COCO_FDC;
+extern const device_type COCO_FDC_V11;
+extern const device_type COCO3_HDB1;
+extern const device_type CP400_FDC;
+
+// device type definitions - Dragon FDC
+extern const device_type DRAGON_FDC;
+extern const device_type SDTANDY_FDC;
+
+// device type definitions - other
 extern const device_type COCO_ORCH90;
 extern const device_type COCO_MULTIPAK;
 extern const device_type COCO_232;

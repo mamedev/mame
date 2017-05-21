@@ -4,7 +4,7 @@
 
     coco_fdc.h
 
-    CoCo/Dragon Floppy Disk Controller
+    CoCo/Dragon Floppy Disk Controller base classes
 
 *********************************************************************/
 
@@ -73,15 +73,5 @@ private:
 	bool m_intrq;
 	bool m_drq;
 };
-
-// device type definitions - CoCo FDC
-extern const device_type COCO_FDC;
-extern const device_type COCO_FDC_V11;
-extern const device_type COCO3_HDB1;
-extern const device_type CP400_FDC;
-
-// device type definitions - Dragon FDC
-extern const device_type DRAGON_FDC;
-extern const device_type SDTANDY_FDC;
 
 #endif // MAME_BUS_COCO_COCO_FDC_H

@@ -54,7 +54,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "coco_fdc.h"
+#include "cococart.h"
 
 #define SLOT1_TAG           "slot1"
 #define SLOT2_TAG           "slot2"
