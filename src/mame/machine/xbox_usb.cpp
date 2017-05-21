@@ -8,7 +8,7 @@
 //#define LOG_OHCI
 
 /*
- * Ohci usb controller
+ * OHCI usb controller
  */
 
 #ifdef LOG_OHCI
@@ -721,11 +721,9 @@ void ohci_usb_controller::usb_ohci_interrupts()
 {
 	if (((ohcist.hc_regs[HcInterruptStatus] & ohcist.hc_regs[HcInterruptEnable]) != 0) && ((ohcist.hc_regs[HcInterruptEnable] & MasterInterruptEnable) != 0))
 	{
-		//m_interrupt_handler(1);
 		irq_callback(1);
 	} else
 	{
-		//m_interrupt_handler(0);
 		irq_callback(0);
 	}
 }
@@ -849,8 +847,8 @@ void ohci_usb_controller::usb_ohci_device_address_changed(int old_address, int n
 }
 
 /*
-* ohci device base class
-*/
+ * Base class for usb devices
+ */
 
 ohci_function::ohci_function()
 {
@@ -1322,6 +1320,35 @@ int ohci_function::execute_transfer(int endpoint, int pid, uint8_t *buffer, int 
 	return size;
 }
 
+/*
+ * Usb port connector
+ */
+
+DEFINE_DEVICE_TYPE(OHCI_USB_CONNECTOR, ohci_usb_connector, "usb_connector", "Usb Connector Abstraction");
+
+ohci_usb_connector::ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, OHCI_USB_CONNECTOR, tag, owner, clock),
+	device_slot_interface(mconfig, *this)
+{
+}
+
+ohci_usb_connector::~ohci_usb_connector()
+{
+}
+
+void ohci_usb_connector::device_start()
+{
+}
+
+ohci_function* ohci_usb_connector::get_device()
+{
+	return dynamic_cast<ohci_function *>(get_card_device());
+}
+
+/*
+ * Game controller usb device
+ */
+
 INPUT_PORTS_START(xbox_controller)
 	PORT_START("ThumbstickLh") // left analog thumbstick horizontal movement
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_NAME("ThumbstickLh") PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 0xff)
@@ -1391,6 +1418,7 @@ DEFINE_DEVICE_TYPE(OHCI_GAME_CONTROLLER, ohci_game_controller_device, "ohci_gc",
 ohci_game_controller_device::ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, OHCI_GAME_CONTROLLER, tag, owner, clock),
 	ohci_function(),
+	device_slot_card_interface(mconfig, *this),
 	m_ThumbstickLh(*this, "ThumbstickLh"),
 	m_ThumbstickLv(*this, "ThumbstickLv"),
 	m_ThumbstickRh(*this, "ThumbstickRh"),

@@ -229,14 +229,15 @@ mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *ta
 	: pci_device(mconfig, MCPX_OHCI, tag, owner, clock),
 	ohci_usb(nullptr),
 	m_interrupt_handler(*this),
-	timer(nullptr)
+	timer(nullptr),
+	connecteds_count(0)
 {
 }
 
 void mcpx_ohci_device::plug_usb_device(int port, ohci_function *function)
 {
 	function->set_bus_manager(ohci_usb);
-	ohci_usb->usb_ohci_plug(port, function); // connect to root hub port 3, chihiro needs to use 1 and 2
+	ohci_usb->usb_ohci_plug(port, function);
 }
 
 void mcpx_ohci_device::device_start()
@@ -256,6 +257,8 @@ void mcpx_ohci_device::device_start()
 	timer = timer_alloc(0);
 	ohci_usb->set_timer(timer);
 	ohci_usb->start();
+	for (int i=0;i < connecteds_count;i++)
+		plug_usb_device(connecteds[i].port, connecteds[i].dev);
 }
 
 void mcpx_ohci_device::device_reset()
@@ -263,6 +266,27 @@ void mcpx_ohci_device::device_reset()
 	pci_device::device_reset();
 	if (ohci_usb)
 		ohci_usb->reset();
+}
+
+void mcpx_ohci_device::device_config_complete()
+{
+	char id[8];
+
+	for (int i = 1; i<=4; i++)
+	{
+		sprintf(id, "port%d", i);
+		ohci_usb_connector *conn = downcast<ohci_usb_connector *>(subdevice(id));
+		if (conn)
+		{
+			ohci_function *func = conn->get_device();
+			if (func)
+			{
+				connecteds[connecteds_count].dev = func;
+				connecteds[connecteds_count].port = i;
+				connecteds_count++;
+			}
+		}
+	}
 }
 
 void mcpx_ohci_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
