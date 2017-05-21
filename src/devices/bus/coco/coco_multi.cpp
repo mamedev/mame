@@ -54,7 +54,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "coco_232.h"
 #include "coco_ssc.h"
 #include "coco_gmc.h"
 #include "coco_pak.h"

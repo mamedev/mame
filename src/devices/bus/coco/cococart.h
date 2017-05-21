@@ -214,6 +214,6 @@ private:
 
 extern const device_type COCO_ORCH90;
 extern const device_type COCO_MULTIPAK;
-
+extern const device_type COCO_232;
 
 #endif // MAME_BUS_COCO_COCOCART_H

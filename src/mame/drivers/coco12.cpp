@@ -26,7 +26,6 @@
 #include "emu.h"
 #include "includes/coco12.h"
 
-#include "bus/coco/coco_232.h"
 #include "bus/coco/coco_dwsock.h"
 #include "bus/coco/coco_fdc.h"
 #include "bus/coco/coco_ssc.h"

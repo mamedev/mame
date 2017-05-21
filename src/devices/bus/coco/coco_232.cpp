@@ -9,7 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "coco_232.h"
+#include "cococart.h"
+#include "machine/mos6551.h"
 
 
 /***************************************************************************
@@ -17,6 +18,37 @@
 ***************************************************************************/
 
 #define UART_TAG        "uart"
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> coco_232_device
+
+namespace
+{
+	class coco_232_device :
+		public device_t,
+		public device_cococart_interface
+	{
+	public:
+		// construction/destruction
+		coco_232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+		// optional information overrides
+		virtual machine_config_constructor device_mconfig_additions() const override;
+
+	protected:
+		// device-level overrides
+		virtual void device_start() override;
+
+	private:
+		// internal state
+		required_device<mos6551_device> m_uart;
+	};
+};
+
 
 /***************************************************************************
     IMPLEMENTATION
