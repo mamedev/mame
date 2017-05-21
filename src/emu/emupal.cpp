@@ -28,6 +28,7 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 		m_membits_supplied(false),
 		m_endianness(),
 		m_endianness_supplied(false),
+		m_prom_region(*this, finder_base::DUMMY_TAG),
 		m_init(palette_init_delegate()),
 		m_raw_to_rgb(raw_to_rgb_converter())
 {
@@ -87,6 +88,12 @@ void palette_device::static_enable_shadows(device_t &device)
 void palette_device::static_enable_hilights(device_t &device)
 {
 	downcast<palette_device &>(device).m_enable_hilights = true;
+}
+
+
+void palette_device::static_set_prom_region(device_t &device, const char *region)
+{
+	downcast<palette_device &>(device).m_prom_region.set_tag(region);
 }
 
 
@@ -393,35 +400,37 @@ void palette_device::palette_init_3bit_bgr(palette_device &palette)
 
 void palette_device::palette_init_RRRRGGGGBBBB_proms(palette_device &palette)
 {
-	const u8 *color_prom = machine().root_device().memregion("proms")->base();
-	int i;
+	if (!m_prom_region.found())
+		throw emu_fatalerror("Unable to find color PROM region '%s'.", m_prom_region.finder_tag());
 
-	for (i = 0; i < palette.entries(); i++)
+	const u8 *colors = m_prom_region->base();
+
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3;
 
 		// red component
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = (colors[i] >> 0) & 0x01;
+		bit1 = (colors[i] >> 1) & 0x01;
+		bit2 = (colors[i] >> 2) & 0x01;
+		bit3 = (colors[i] >> 3) & 0x01;
+		int r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		// green component
-		bit0 = (color_prom[i + palette.entries()] >> 0) & 0x01;
-		bit1 = (color_prom[i + palette.entries()] >> 1) & 0x01;
-		bit2 = (color_prom[i + palette.entries()] >> 2) & 0x01;
-		bit3 = (color_prom[i + palette.entries()] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = (colors[i + palette.entries()] >> 0) & 0x01;
+		bit1 = (colors[i + palette.entries()] >> 1) & 0x01;
+		bit2 = (colors[i + palette.entries()] >> 2) & 0x01;
+		bit3 = (colors[i + palette.entries()] >> 3) & 0x01;
+		int g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		// blue component
-		bit0 = (color_prom[i + 2*palette.entries()] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2*palette.entries()] >> 1) & 0x01;
-		bit2 = (color_prom[i + 2*palette.entries()] >> 2) & 0x01;
-		bit3 = (color_prom[i + 2*palette.entries()] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = (colors[i + 2*palette.entries()] >> 0) & 0x01;
+		bit1 = (colors[i + 2*palette.entries()] >> 1) & 0x01;
+		bit2 = (colors[i + 2*palette.entries()] >> 2) & 0x01;
+		bit3 = (colors[i + 2*palette.entries()] >> 3) & 0x01;
+		int b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 

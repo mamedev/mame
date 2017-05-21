@@ -133,7 +133,7 @@ static MACHINE_CONFIG_START( ichibanjyan )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ichibanjyan)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 512)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

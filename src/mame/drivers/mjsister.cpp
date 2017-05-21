@@ -501,7 +501,7 @@ static MACHINE_CONFIG_START( mjsister )
 	MCFG_SCREEN_UPDATE_DRIVER(mjsister_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 
 	/* sound hardware */
