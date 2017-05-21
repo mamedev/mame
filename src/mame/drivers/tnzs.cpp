@@ -1730,8 +1730,8 @@ P0-056A     K1100476A J1100201A 3xZ80B  EMPTY*3 27c1000 NONE    1x6164      No  
     of the other boards.
 (D) InsectorX has a lot of rework on its PCB, two greenwires for each of the
     two LH534000 mask ROMs, and four wires connected to the X1-004 I/O chip
-    pins 18, 19, 20, and 21, connecting it to 4 pins of a dip16 chip @ U43
-    with its markings sanded off. Is this chip at U43 a tiny MCU?
+    pins 18, 19, 20, and 21, connecting it to the 4 input pins of a Toshiba
+    TD62064AP Darlington driver @ U43.
 *   tnzs(j,u) uses a sub board with a z80b and 23c1000 mask ROMs on it for gfx,
     plugged into the four LH534000 mask ROM sockets and the 2nd z80 socket.
     Like Kageki's P0-038A mainboard, this mainboard has a third z80 on it which
