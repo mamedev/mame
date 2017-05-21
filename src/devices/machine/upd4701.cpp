@@ -145,6 +145,26 @@ WRITE_LINE_MEMBER(upd4701_device::resety_w)
 }
 
 //-------------------------------------------------
+//  reset_x - pulse the X counter reset line
+//-------------------------------------------------
+
+WRITE8_MEMBER(upd4701_device::reset_x)
+{
+	resetx_w(1);
+	resetx_w(0);
+}
+
+//-------------------------------------------------
+//  reset_y - pulse the Y counter reset line
+//-------------------------------------------------
+
+WRITE8_MEMBER(upd4701_device::reset_y)
+{
+	resety_w(1);
+	resety_w(0);
+}
+
+//-------------------------------------------------
 //  reset_xy - pulse the counter reset lines
 //-------------------------------------------------
 
