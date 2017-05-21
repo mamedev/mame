@@ -701,18 +701,10 @@ void peribox_slot_device::device_start()
 void peribox_slot_device::device_config_complete()
 {
 	m_slotnumber = get_index_from_tagname();
-	device_t *carddev = subdevices().first();
-	peribox_device *peb = static_cast<peribox_device*>(owner());
-	if (carddev != nullptr)
-	{
-		peb->set_slot_loaded(m_slotnumber, this);
-		m_card = static_cast<ti_expansion_card_device*>(carddev);
-	}
-	else
-	{
-		peb->set_slot_loaded(m_slotnumber, nullptr);
-		m_card = nullptr;
-	}
+	m_card = downcast<ti_expansion_card_device *>(subdevices().first());
+	peribox_device *peb = dynamic_cast<peribox_device*>(owner());
+	if (peb)
+		peb->set_slot_loaded(m_slotnumber, m_card ? this : nullptr);
 }
 
 /*
