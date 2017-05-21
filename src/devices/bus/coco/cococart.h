@@ -231,5 +231,6 @@ extern const device_type COCO_SSC;
 extern const device_type COCO_PAK;
 extern const device_type COCO_PAK_BANKED;
 extern const device_type COCO_PAK_GMC;
+extern const device_type COCO_T4426;
 
 #endif // MAME_BUS_COCO_COCOCART_H
