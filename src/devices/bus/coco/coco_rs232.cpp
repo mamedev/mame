@@ -24,17 +24,17 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> coco_232_device
+// ======================> coco_rs232_device
 
 namespace
 {
-	class coco_232_device :
+	class coco_rs232_device :
 		public device_t,
 		public device_cococart_interface
 	{
 	public:
 		// construction/destruction
-		coco_232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		coco_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -63,18 +63,19 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(COCO_232, coco_232_device, "coco_232", "CoCo RS-232 PAK")
+DEFINE_DEVICE_TYPE(COCO_RS232, coco_rs232_device, "coco_rs232", "CoCo RS-232 PAK")
+
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
-//  coco_232_device - constructor
+//  coco_rs232_device - constructor
 //-------------------------------------------------
 
-coco_232_device::coco_232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, COCO_232, tag, owner, clock)
+coco_rs232_device::coco_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, COCO_RS232, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_uart(*this, UART_TAG)
 {
@@ -85,7 +86,7 @@ coco_232_device::coco_232_device(const machine_config &mconfig, const char *tag,
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void coco_232_device::device_start()
+void coco_rs232_device::device_start()
 {
 	install_readwrite_handler(0xFF68, 0xFF6F,
 		read8_delegate(FUNC(mos6551_device::read), (mos6551_device *)m_uart),
@@ -98,7 +99,7 @@ void coco_232_device::device_start()
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor coco_232_device::device_mconfig_additions() const
+machine_config_constructor coco_rs232_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( coco_rs232 );
 }

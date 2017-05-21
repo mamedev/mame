@@ -231,7 +231,7 @@ extern const device_type SDTANDY_FDC;
 // device type definitions - other
 extern const device_type COCO_ORCH90;
 extern const device_type COCO_MULTIPAK;
-extern const device_type COCO_232;
+extern const device_type COCO_RS232;
 extern const device_type COCO_SSC;
 extern const device_type COCO_PAK;
 extern const device_type COCO_PAK_BANKED;
