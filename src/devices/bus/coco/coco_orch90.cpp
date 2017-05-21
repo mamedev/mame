@@ -13,11 +13,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "coco_orch90.h"
+#include "cococart.h"
 
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
+
+//**************************************************************************
+//  MACHINE AND ROM DECLARATIONS
+//**************************************************************************
 
 static MACHINE_CONFIG_FRAGMENT(coco_orch90)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -28,66 +33,77 @@ static MACHINE_CONFIG_FRAGMENT(coco_orch90)
 	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
+
+ROM_START(coco_orch90)
+	ROM_REGION(0x2000, "eprom", ROMREGION_ERASE00)
+	ROM_LOAD("orchestra 90 (1984)(26 - 3143)(tandy).rom", 0x0000, 0x2000, CRC(15fb39af) SHA1(6a20fee9c70b36a6435ac8378f31d5b626017df0))
+ROM_END
+
+
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  ORCH90 DEVICE CLASS
+//**************************************************************************
+
+namespace
+{
+	// ======================> coco_orch90_device
+
+	class coco_orch90_device :
+		public device_t,
+		public device_cococart_interface
+	{
+	public:
+		// construction/destruction
+		coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: device_t(mconfig, COCO_ORCH90, tag, owner, clock)
+			, device_cococart_interface(mconfig, *this)
+			, m_ldac(*this, "ldac")
+			, m_rdac(*this, "rdac")
+		{
+		}
+
+		// optional information overrides
+		virtual machine_config_constructor device_mconfig_additions() const override
+		{
+			return MACHINE_CONFIG_NAME(coco_orch90);
+		}
+
+	protected:
+		// device-level overrides
+		virtual void device_start() override
+		{
+			// install handlers
+			install_write_handler(0xFF7A, 0xFF7A, write8_delegate(FUNC(coco_orch90_device::write_left), this));
+			install_write_handler(0xFF7B, 0xFF7B, write8_delegate(FUNC(coco_orch90_device::write_right), this));
+
+			// Orch-90 ties CART to Q
+			set_line_value(cococart_slot_device::line::CART, cococart_slot_device::line_value::Q);
+		}
+
+		virtual const tiny_rom_entry *device_rom_region() const override
+		{
+			return ROM_NAME(coco_orch90);
+		}
+
+		// CoCo cartridge level overrides
+		virtual uint8_t *get_cart_base() override
+		{
+			return memregion("eprom")->base();
+		}
+
+	private:
+		WRITE8_MEMBER(write_left)	{ m_ldac->write(data); }
+		WRITE8_MEMBER(write_right)	{ m_rdac->write(data); }
+
+		// internal state
+		required_device<dac_byte_interface> m_ldac;
+		required_device<dac_byte_interface> m_rdac;
+	};
+};
+
+
+//**************************************************************************
+//  DEVICE DECLARATION
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(COCO_ORCH90, coco_orch90_device, "coco_orch90", "CoCo Orch-90 PAK")
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  coco_orch90_device - constructor
-//-------------------------------------------------
-
-coco_orch90_device::coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, COCO_ORCH90, tag, owner, clock)
-	, device_cococart_interface(mconfig, *this )
-	, m_ldac(*this, "ldac")
-	, m_rdac(*this, "rdac")
-{
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void coco_orch90_device::device_start()
-{
-	install_write_handler(0xFF7A, 0xFF7A, write8_delegate(FUNC(coco_orch90_device::write_left), this));
-	install_write_handler(0xFF7B, 0xFF7B, write8_delegate(FUNC(coco_orch90_device::write_right), this));
-}
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor coco_orch90_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( coco_orch90 );
-}
-
-
-//-------------------------------------------------
-//  write_left
-//-------------------------------------------------
-
-WRITE8_MEMBER(coco_orch90_device::write_left)
-{
-	m_ldac->write(data);
-}
-
-
-//-------------------------------------------------
-//  write_right
-//-------------------------------------------------
-
-WRITE8_MEMBER(coco_orch90_device::write_right)
-{
-	m_rdac->write(data);
-}

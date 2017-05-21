@@ -551,3 +551,13 @@ void device_cococart_interface::install_readwrite_handler(uint16_t addrstart, ui
 	space.install_read_handler(addrstart, addrend, rhandler);
 	space.install_write_handler(addrstart, addrend, whandler);
 }
+
+
+//-------------------------------------------------
+//	set_line_value
+//-------------------------------------------------
+
+void device_cococart_interface::set_line_value(cococart_slot_device::line line, cococart_slot_device::line_value value)
+{
+	dynamic_cast<cococart_slot_device *>(device().owner())->set_line_value(line, value);
+}

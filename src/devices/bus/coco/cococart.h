@@ -188,6 +188,9 @@ protected:
 	void install_write_handler(uint16_t addrstart, uint16_t addrend, write8_delegate whandler);
 	void install_readwrite_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler, write8_delegate whandler);
 
+	// setting line values
+	void set_line_value(cococart_slot_device::line line, cococart_slot_device::line_value value);
+
 private:
 	cococart_base_update_delegate m_update;
 };
@@ -203,5 +206,12 @@ private:
 
 #define MCFG_COCO_CARTRIDGE_REMOVE(_tag)        \
 	MCFG_DEVICE_REMOVE(_tag)
+
+
+/***************************************************************************
+	COCO CARTRIDGE DEVICES
+***************************************************************************/
+
+extern const device_type COCO_ORCH90;
 
 #endif // MAME_BUS_COCO_COCOCART_H

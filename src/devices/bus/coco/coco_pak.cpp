@@ -115,7 +115,7 @@ void coco_pak_device::device_reset()
 			: cococart_slot_device::line_value::CLEAR;
 
 		// normal CoCo PAKs tie their CART line to Q - the system clock
-		dynamic_cast<cococart_slot_device *>(owner())->set_line_value(cococart_slot_device::line::CART, cart_line);
+		set_line_value(cococart_slot_device::line::CART, cart_line);
 	}
 }
 

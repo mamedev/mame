@@ -56,7 +56,6 @@
 #include "emu.h"
 #include "coco_multi.h"
 #include "coco_232.h"
-#include "coco_orch90.h"
 #include "coco_ssc.h"
 #include "coco_gmc.h"
 #include "coco_pak.h"
