@@ -18,7 +18,6 @@
 #include "bus/coco/coco_gmc.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_fdc.h"
-#include "bus/coco/coco_multi.h"
 #include "formats/vdk_dsk.h"
 #include "formats/dmk_dsk.h"
 #include "imagedev/flopdrv.h"
