@@ -1370,6 +1370,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
+#include "machine/upd4701.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2612intf.h"
@@ -1685,29 +1686,6 @@ ADDRESS_MAP_END
                                 Caliber 50
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::calibr50_ip_r)
-{
-	int dir1 = m_rot[0]->read();  // analog port
-	int dir2 = m_rot[1]->read();  // analog port
-
-	switch (offset)
-	{
-		case 0x00/2:    return m_p1->read();        // p1
-		case 0x02/2:    return m_p2->read();        // p2
-
-		case 0x08/2:    return m_coins->read();     // Coins
-
-		case 0x10/2:    return (dir1 & 0xff);       // lower 8 bits of p1 rotation
-		case 0x12/2:    return (dir1 >> 8);         // upper 4 bits of p1 rotation
-		case 0x14/2:    return (dir2 & 0xff);       // lower 8 bits of p2 rotation
-		case 0x16/2:    return (dir2 >> 8);         // upper 4 bits of p2 rotation
-		case 0x18/2:    return 0xffff;              // ? (value's read but not used)
-		default:
-			logerror("PC %06X - Read input %02X !\n", space.device().safe_pc(), offset*2);
-			return 0;
-	}
-}
-
 WRITE16_MEMBER(seta_state::calibr50_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
@@ -1733,7 +1711,12 @@ static ADDRESS_MAP_START( calibr50_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM
 
 	AM_RANGE(0x904000, 0x904fff) AM_RAM                             //
-	AM_RANGE(0xa00000, 0xa00019) AM_READ(calibr50_ip_r)             // Input Ports
+	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("P1")                 // X1-004
+	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("P2")                 // X1-004
+	AM_RANGE(0xa00008, 0xa00009) AM_READ_PORT("COINS")              // X1-004
+	AM_RANGE(0xa00010, 0xa00017) AM_DEVREAD8("upd4701", upd4701_device, read_xy, 0x00ff)
+	AM_RANGE(0xa00018, 0xa00019) AM_DEVREAD8("upd4701", upd4701_device, reset_xy, 0x00ff)
+
 /**/AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
@@ -3747,10 +3730,10 @@ static INPUT_PORTS_START( calibr50 )
 	PORT_DIPSETTING(      0x0000, "Coin Mode 2" )
 
 	PORT_START("ROT1")  // Rotation Player 1
-	PORT_BIT( 0xfff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
+	PORT_BIT( 0xfff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_RESET PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 
 	PORT_START("ROT2")  // Rotation Player 2
-	PORT_BIT( 0xfff, 0x00, IPT_DIAL ) PORT_PLAYER(2) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
+	PORT_BIT( 0xfff, 0x00, IPT_DIAL ) PORT_PLAYER(2) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_RESET PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -7935,6 +7918,10 @@ static MACHINE_CONFIG_START( calibr50 )
 	MCFG_CPU_PROGRAM_MAP(calibr50_sub_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(seta_state, irq0_line_hold, 4*60)  /* IRQ: 4/frame
 	                           NMI: when the 68k writes the sound latch */
+
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("ROT1")
+	MCFG_UPD4701_PORTY("ROT2")
 
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 

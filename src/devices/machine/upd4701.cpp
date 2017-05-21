@@ -148,6 +148,15 @@ WRITE_LINE_MEMBER(upd4701_device::resety_w)
 //  reset_xy - pulse the counter reset lines
 //-------------------------------------------------
 
+READ8_MEMBER(upd4701_device::reset_xy)
+{
+	resetx_w(1);
+	resety_w(1);
+	resetx_w(0);
+	resety_w(0);
+	return space.unmap();
+}
+
 WRITE8_MEMBER(upd4701_device::reset_xy)
 {
 	resetx_w(1);

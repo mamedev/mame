@@ -154,7 +154,6 @@ public:
 	DECLARE_WRITE16_MEMBER(sharedram_68000_w);
 	DECLARE_WRITE16_MEMBER(sub_ctrl_w);
 	DECLARE_READ16_MEMBER(seta_dsw_r);
-	DECLARE_READ16_MEMBER(calibr50_ip_r);
 	DECLARE_WRITE16_MEMBER(calibr50_soundlatch_w);
 	DECLARE_READ16_MEMBER(usclssic_dsw_r);
 	DECLARE_READ16_MEMBER(usclssic_trackball_x_r);
