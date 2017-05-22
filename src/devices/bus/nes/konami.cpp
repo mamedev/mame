@@ -633,7 +633,7 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( vrc6 )
+static MACHINE_CONFIG_START( vrc6 )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -767,7 +767,7 @@ WRITE8_MEMBER(nes_konami_vrc7_device::write_h)
 
 // FIXME: we currently emulate this as a base YM2413!
 
-static MACHINE_CONFIG_FRAGMENT( vrc7 )
+static MACHINE_CONFIG_START( vrc7 )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")

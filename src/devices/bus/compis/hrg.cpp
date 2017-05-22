@@ -72,10 +72,10 @@ UPD7220_DISPLAY_PIXELS_MEMBER( compis_uhrg_device::display_pixels )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( hrg )
+//  MACHINE_CONFIG_START( hrg )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( hrg )
+static MACHINE_CONFIG_START( hrg )
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -105,10 +105,10 @@ machine_config_constructor compis_hrg_device::device_mconfig_additions() const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( uhrg )
+//  MACHINE_CONFIG_START( uhrg )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( uhrg )
+static MACHINE_CONFIG_START( uhrg )
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(50)

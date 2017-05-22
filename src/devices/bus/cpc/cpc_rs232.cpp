@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(CPC_RS232,     cpc_rs232_device,     "cpc_ser",    "Pace RS23
 DEFINE_DEVICE_TYPE(CPC_RS232_AMS, cpc_ams_rs232_device, "cpc_serams", "Amstrad RS232C interface")
 
 // device machine config
-static MACHINE_CONFIG_FRAGMENT( cpc_rs232 )
+static MACHINE_CONFIG_START( cpc_rs232 )
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(2000000)
 	MCFG_PIT8253_CLK1(2000000)

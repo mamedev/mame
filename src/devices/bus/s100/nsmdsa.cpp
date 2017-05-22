@@ -53,10 +53,10 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( mds_a )
+//  MACHINE_CONFIG_START( mds_a )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( mds_a )
+static MACHINE_CONFIG_START( mds_a )
 	MCFG_FLOPPY_DRIVE_ADD("floppy0", mds_a_floppies, "525sd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("floppy1", mds_a_floppies, "525sd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( snes_dsp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( snes_dsp_lorom )
+static MACHINE_CONFIG_START( snes_dsp_lorom )
 	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
 	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
 	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
@@ -196,7 +196,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( snes_dsp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( snes_dsp_hirom )
+static MACHINE_CONFIG_START( snes_dsp_hirom )
 	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
 	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_hirom)
 	MCFG_CPU_DATA_MAP(dsp_data_map_hirom)
@@ -315,7 +315,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( snes_st010 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( snes_st010 )
+static MACHINE_CONFIG_START( snes_st010 )
 	MCFG_CPU_ADD("dsp", UPD96050, 10000000)
 	MCFG_CPU_PROGRAM_MAP(st01x_prg_map)
 	MCFG_CPU_DATA_MAP(st01x_data_map)
@@ -325,7 +325,7 @@ MACHINE_CONFIG_END
 //  MACHINE_DRIVER( snes_st011 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( snes_st011 )
+static MACHINE_CONFIG_START( snes_st011 )
 	MCFG_CPU_ADD("dsp", UPD96050, 15000000)
 	MCFG_CPU_PROGRAM_MAP(st01x_prg_map)
 	MCFG_CPU_DATA_MAP(st01x_data_map)

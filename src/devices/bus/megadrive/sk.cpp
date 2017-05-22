@@ -64,7 +64,7 @@ WRITE16_MEMBER(md_rom_sk_device::write)
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( sk_slot )
+//  MACHINE_CONFIG_START( sk_slot )
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START(sk_sub_cart)
@@ -76,7 +76,7 @@ static SLOT_INTERFACE_START(sk_sub_cart)
 // add all types??
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( sk_slot )
+static MACHINE_CONFIG_START( sk_slot )
 	MCFG_MD_CARTRIDGE_ADD("subslot", sk_sub_cart, nullptr)
 	MCFG_MD_CARTRIDGE_NOT_MANDATORY
 MACHINE_CONFIG_END

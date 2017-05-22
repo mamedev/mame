@@ -28,10 +28,10 @@ DEFINE_DEVICE_TYPE(POFO_HPC104_2, pofo_hpc104_2_device, "pofo_hpc104_2", "Atari 
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( hpc104 )
+//  MACHINE_CONFIG_START( hpc104 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( hpc104 )
+static MACHINE_CONFIG_START( hpc104 )
 	MCFG_PORTFOLIO_MEMORY_CARD_SLOT_ADD(PORTFOLIO_MEMORY_CARD_SLOT_B_TAG, portfolio_memory_cards, nullptr)
 
 	MCFG_PORTFOLIO_EXPANSION_SLOT_ADD(PORTFOLIO_EXPANSION_SLOT_TAG, XTAL_4_9152MHz, portfolio_expansion_cards, nullptr)

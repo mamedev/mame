@@ -200,7 +200,7 @@ uint16_t naomi_m2_board::read_callback(uint32_t addr)
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( naomim2 )
+static MACHINE_CONFIG_START( naomim2 )
 	MCFG_DEVICE_ADD("segam2crypt", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(naomi_m2_board, read_callback)
 MACHINE_CONFIG_END

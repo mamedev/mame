@@ -125,7 +125,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( abc80_keyboard )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( abc80_keyboard )
+static MACHINE_CONFIG_START( abc80_keyboard )
 	MCFG_CPU_ADD(I8048_TAG, I8048, 4000000)
 	MCFG_CPU_IO_MAP(abc80_keyboard_io)
 	MCFG_DEVICE_DISABLE()

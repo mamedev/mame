@@ -130,15 +130,8 @@ void xbox_state::hack_eeprom()
 
 void xbox_state::machine_start()
 {
-	ohci_game_controller_device *usb_device;
-
 	xbox_base_state::machine_start();
 	xbox_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
-	usb_device = machine().device<ohci_game_controller_device>("ohci_gamepad");
-	if (usb_device != nullptr) {
-		usb_device->initialize(machine());
-		machine().device<mcpx_ohci_device>(":pci:02.0")->plug_usb_device(3, usb_device); // connect to root hub port 3, chihiro needs to use 1 and 2
-	}
 	// savestates
 	//save_item(NAME(item));
 }
@@ -160,6 +153,10 @@ void xbox_state::machine_reset()
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
 }
 
+SLOT_INTERFACE_START(usb_xbox)
+	SLOT_INTERFACE("xbox_controller", OHCI_GAME_CONTROLLER)
+SLOT_INTERFACE_END
+
 SLOT_INTERFACE_START(xbox_ata_devices)
 	SLOT_INTERFACE("hdd", IDE_HARDDISK)
 	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
@@ -175,7 +172,12 @@ static MACHINE_CONFIG_DERIVED(xbox, xbox_base)
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:1")
 	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "cdrom", true)
 
-	/* sound hardware */
+	MCFG_USB_PORT_ADD(":pci:02.0:port1", usb_xbox, nullptr, false)
+	MCFG_USB_PORT_ADD(":pci:02.0:port2", usb_xbox, nullptr, false)
+	MCFG_USB_PORT_ADD(":pci:02.0:port3", usb_xbox, "xbox_controller", false)
+	MCFG_USB_PORT_ADD(":pci:02.0:port4", usb_xbox, nullptr, false)
+
+/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 //  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

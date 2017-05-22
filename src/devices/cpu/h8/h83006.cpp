@@ -46,7 +46,7 @@ h83007_device::h83007_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT(h83006)
+static MACHINE_CONFIG_START(h83006)
 	MCFG_H8H_INTC_ADD("intc")
 	MCFG_H8_ADC_3006_ADD("adc", "intc", 23)
 	MCFG_H8_PORT_ADD("port4", h8_device::PORT_4, 0x00, 0x00)

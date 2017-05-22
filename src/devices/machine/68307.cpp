@@ -44,7 +44,7 @@ ADDRESS_MAP_END
 
 
 
-static MACHINE_CONFIG_FRAGMENT( 68307fragment )
+static MACHINE_CONFIG_START( 68307fragment )
 	MCFG_MC68681_ADD("internal68681", 16000000/4) // ?? Mhz - should be specified in inline config
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(m68307_cpu_device, m68307_duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(m68307_cpu_device, m68307_duart_txa))

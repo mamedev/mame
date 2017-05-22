@@ -30,10 +30,10 @@ DEFINE_DEVICE_TYPE(POFO_HPC101, pofo_hpc101_device, "pofo_hpc101", "Atari Portfo
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( hpc101 )
+//  MACHINE_CONFIG_START( hpc101 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( hpc101 )
+static MACHINE_CONFIG_START( hpc101 )
 	MCFG_DEVICE_ADD(M82C55A_TAG, I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("cent_ctrl_out", output_latch_device, write))

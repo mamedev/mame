@@ -1712,7 +1712,7 @@ void apollo_graphics_15i::register_vblank_callback()
  MACHINE DRIVERS
  ***************************************************************************/
 
-MACHINE_CONFIG_FRAGMENT( apollo_graphics )
+MACHINE_CONFIG_START( apollo_graphics )
 	MCFG_DEFAULT_LAYOUT( layout_apollo_15i )
 	MCFG_SCREEN_ADD(VIDEO_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -1882,7 +1882,7 @@ void apollo_graphics_15i::device_reset()
 
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( apollo_mono19i )
+MACHINE_CONFIG_START( apollo_mono19i )
 	MCFG_DEFAULT_LAYOUT( layout_apollo )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_SCREEN_ADD(VIDEO_SCREEN_TAG, RASTER)

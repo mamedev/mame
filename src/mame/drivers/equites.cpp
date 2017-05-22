@@ -1034,7 +1034,7 @@ static const char *const alphamc07_sample_names[] =
 #define MSM5232_BASE_VOLUME 1.0
 
 // the sound board is the same in all games
-static MACHINE_CONFIG_FRAGMENT( common_sound )
+static MACHINE_CONFIG_START( common_sound )
 
 	MCFG_CPU_ADD("audiocpu", I8085A, XTAL_6_144MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

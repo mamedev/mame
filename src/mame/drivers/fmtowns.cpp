@@ -2687,7 +2687,7 @@ static GFXDECODE_START( towns )
 	GFXDECODE_ENTRY( "user",   0x180000, fnt_chars_16x16,  0, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_FRAGMENT( towns_base )
+static MACHINE_CONFIG_START( towns_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I386, 16000000)
 	MCFG_CPU_PROGRAM_MAP(towns_mem)

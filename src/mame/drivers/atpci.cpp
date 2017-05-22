@@ -22,7 +22,7 @@ public:
 
 };
 
-static MACHINE_CONFIG_FRAGMENT( tx_config )
+static MACHINE_CONFIG_START( tx_config )
 	MCFG_I82439TX_CPU( "maincpu" )
 	MCFG_I82439TX_REGION( "isa" )
 MACHINE_CONFIG_END

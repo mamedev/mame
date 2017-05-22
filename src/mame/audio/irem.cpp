@@ -429,7 +429,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_CONFIG_FRAGMENT( irem_audio_base )
+static MACHINE_CONFIG_START( irem_audio_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
@@ -497,7 +497,7 @@ static MACHINE_CONFIG_FRAGMENT( irem_audio_base )
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( m52_sound_c_audio )
+MACHINE_CONFIG_START( m52_sound_c_audio )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
@@ -531,7 +531,7 @@ MACHINE_CONFIG_FRAGMENT( m52_sound_c_audio )
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( m52_large_audio)  /* 10 yard fight */
+MACHINE_CONFIG_START( m52_large_audio)  /* 10 yard fight */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */

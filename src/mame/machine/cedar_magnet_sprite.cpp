@@ -199,7 +199,7 @@ WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port9c_w)
 //  printf("%s:sprite_port9c_w %02x\n", machine().describe_context(), data);
 }
 
-static MACHINE_CONFIG_FRAGMENT( cedar_magnet_sprite )
+static MACHINE_CONFIG_START( cedar_magnet_sprite )
 	MCFG_CPU_ADD("spritecpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(cedar_magnet_sprite_map)
 	MCFG_CPU_IO_MAP(cedar_magnet_sprite_io)

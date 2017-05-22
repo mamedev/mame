@@ -84,7 +84,7 @@ namespace
 
 		virtual uint8_t* get_cart_base() override;
 
-		// these are only public so they can be in a MACHINE_CONFIG_FRAGMENT
+		// these are only public so they can be in a MACHINE_CONFIG_START
 		// declaration; don't think about them as publically accessable
 		DECLARE_WRITE_LINE_MEMBER(multi_slot1_cart_w);
 		DECLARE_WRITE_LINE_MEMBER(multi_slot1_nmi_w);
@@ -158,7 +158,7 @@ static SLOT_INTERFACE_START(coco_cart_slot4)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_FRAGMENT(coco_multi)
+static MACHINE_CONFIG_START(coco_multi)
 	MCFG_COCO_CARTRIDGE_ADD(SLOT1_TAG, coco_cart_slot1_3, nullptr)
 	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_cart_w))
 	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_nmi_w))

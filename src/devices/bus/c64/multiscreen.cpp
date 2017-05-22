@@ -108,10 +108,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_multiscreen )
+//  MACHINE_CONFIG_START( c64_multiscreen )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_multiscreen )
+static MACHINE_CONFIG_START( c64_multiscreen )
 	MCFG_CPU_ADD(MC6802P_TAG, M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(multiscreen_mem)
 

@@ -263,10 +263,10 @@ SLOT_INTERFACE_START( t4426_cart )
 SLOT_INTERFACE_END
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( coco_sound )
+//  MACHINE_CONFIG_START( coco_sound )
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( coco_sound )
+MACHINE_CONFIG_START( coco_sound )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
@@ -284,7 +284,7 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( coco_floating )
+//  MACHINE_CONFIG ( coco_floating )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START(coco_floating_map, AS_PROGRAM, 8, coco_state)
@@ -292,7 +292,7 @@ static ADDRESS_MAP_START(coco_floating_map, AS_PROGRAM, 8, coco_state)
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_FRAGMENT( coco_floating )
+MACHINE_CONFIG_START( coco_floating )
 	MCFG_DEVICE_ADD(FLOATING_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(coco_floating_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)

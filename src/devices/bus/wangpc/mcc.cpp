@@ -52,10 +52,10 @@ DEFINE_DEVICE_TYPE(WANGPC_MCC, wangpc_mcc_device, "wangpc_mcc", "Wang PC-PM043 M
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( wangpc_mcc )
+//  MACHINE_CONFIG_START( wangpc_mcc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wangpc_mcc )
+static MACHINE_CONFIG_START( wangpc_mcc )
 	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 4000000, 0, 0, 0, 0)
 	MCFG_Z80DART_ADD(Z80DART_TAG, 4000000, 0, 0, 0, 0)
 MACHINE_CONFIG_END

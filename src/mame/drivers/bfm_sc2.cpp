@@ -2186,17 +2186,17 @@ INPUT_PORTS_END
 // machine config fragments for different meters numbers //////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_FRAGMENT( _3meters )
+MACHINE_CONFIG_START( _3meters )
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(3)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( _5meters )
+MACHINE_CONFIG_START( _5meters )
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( _8meters )
+MACHINE_CONFIG_START( _8meters )
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
 MACHINE_CONFIG_END

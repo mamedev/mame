@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(A1BUS_CASSETTE, a1bus_cassette_device, "a1cass", "Apple I cas
 
 /* sound output */
 
-MACHINE_CONFIG_FRAGMENT( cassette )
+MACHINE_CONFIG_START( cassette )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 	MCFG_CASSETTE_INTERFACE("apple1_cass")

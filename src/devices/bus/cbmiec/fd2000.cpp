@@ -213,7 +213,7 @@ FLOPPY_FORMATS_END
 //  MACHINE_DRIVER( fd2000 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( fd2000 )
+static MACHINE_CONFIG_START( fd2000 )
 	MCFG_CPU_ADD(G65SC02PI2_TAG, M65C02, XTAL_24MHz/12)
 	MCFG_CPU_PROGRAM_MAP(fd2000_mem)
 
@@ -233,7 +233,7 @@ MACHINE_CONFIG_END
 //  MACHINE_DRIVER( fd4000 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( fd4000 )
+static MACHINE_CONFIG_START( fd4000 )
 	MCFG_CPU_ADD(R65C02P4_TAG, M65C02, XTAL_24MHz/6)
 	MCFG_CPU_PROGRAM_MAP(fd4000_mem)
 

@@ -1096,7 +1096,7 @@ void ti_rs232_pio_device::device_reset()
 	incoming_dtr(1, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_FRAGMENT( ti_rs232 )
+static MACHINE_CONFIG_START( ti_rs232 )
 	MCFG_DEVICE_ADD("tms9902_0", TMS9902, 3000000)
 	MCFG_TMS9902_INT_CB(WRITELINE(ti_rs232_pio_device, int0_callback))            /* called when interrupt pin state changes */
 	MCFG_TMS9902_RCV_CB(WRITELINE(ti_rs232_pio_device, rcv0_callback))            /* called when a character is received */

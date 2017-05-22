@@ -50,10 +50,10 @@ READ_LINE_MEMBER( vp590_device::gd_r )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( vp590 )
+//  MACHINE_CONFIG_START( vp590 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( vp590 )
+static MACHINE_CONFIG_START( vp590 )
 	MCFG_DEVICE_ADD(CDP1862_TAG, CDP1862, CPD1862_CLOCK)
 	MCFG_CDP1861_RD_CALLBACK(DEVREADLINE(DEVICE_SELF, vp590_device, rd_r))
 	MCFG_CDP1861_BD_CALLBACK(DEVREADLINE(DEVICE_SELF, vp590_device, bd_r))

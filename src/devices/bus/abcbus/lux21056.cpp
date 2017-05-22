@@ -244,7 +244,7 @@ WRITE_LINE_MEMBER( luxor_55_21056_device::write_sasi_msg )
 //  MACHINE_DRIVER( luxor_55_21056 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( luxor_55_21056 )
+static MACHINE_CONFIG_START( luxor_55_21056 )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(luxor_55_21056_mem)
 	MCFG_CPU_IO_MAP(luxor_55_21056_io)

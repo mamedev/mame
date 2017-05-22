@@ -163,7 +163,7 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // Fully populated JSA-I, not used by anyone
-MACHINE_CONFIG_FRAGMENT( jsa_i_config )
+MACHINE_CONFIG_START( jsa_i_config )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
@@ -190,7 +190,7 @@ MACHINE_CONFIG_END
 
 
 // Fully populated JSA-II
-MACHINE_CONFIG_FRAGMENT( jsa_ii_config )
+MACHINE_CONFIG_START( jsa_ii_config )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)

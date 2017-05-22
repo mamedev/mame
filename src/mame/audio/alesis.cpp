@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(ALESIS_DM3AG, alesis_dm3ag_device, "alesis_dm3ag", "Alesis DM
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_FRAGMENT( alesis_dm3ag )
+static MACHINE_CONFIG_START( alesis_dm3ag )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker1", "rspeaker1")
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker2", "rspeaker2")
 	MCFG_SOUND_ADD("dac", PCM54HP, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker1", 1.0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker1", 1.0) // PCM54HP DAC + R63/R73-75 + Sample and hold

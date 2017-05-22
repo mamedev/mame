@@ -683,7 +683,7 @@ static SLOT_INTERFACE_START( bwg_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )          // 80 tracks
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_FRAGMENT( bwg_fdc )
+MACHINE_CONFIG_START( bwg_fdc )
 	MCFG_WD1773_ADD(FDC_TAG, XTAL_8MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_drq_w))

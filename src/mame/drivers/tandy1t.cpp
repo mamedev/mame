@@ -601,7 +601,7 @@ static const gfx_layout t1000_charlayout =
 	8
 };
 
-static MACHINE_CONFIG_FRAGMENT( cfg_fdc_35 )
+static MACHINE_CONFIG_START( cfg_fdc_35 )
 	MCFG_DEVICE_MODIFY("fdc:0")
 	MCFG_SLOT_DEFAULT_OPTION("35dd")
 	MCFG_SLOT_FIXED(true)
@@ -609,7 +609,7 @@ static MACHINE_CONFIG_FRAGMENT( cfg_fdc_35 )
 	MCFG_DEVICE_REMOVE("fdc:1")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( cfg_fdc_525 )
+static MACHINE_CONFIG_START( cfg_fdc_525 )
 	MCFG_DEVICE_MODIFY("fdc:0")
 	MCFG_SLOT_FIXED(true)
 
@@ -620,7 +620,7 @@ static GFXDECODE_START( t1000 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, t1000_charlayout, 3, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_FRAGMENT(tandy1000_common)
+static MACHINE_CONFIG_START(tandy1000_common)
 	MCFG_DEVICE_ADD("mb", T1000_MOTHERBOARD, 0)
 	t1000_mb_device::static_set_cputag(*device, "maincpu");
 
@@ -651,11 +651,11 @@ static MACHINE_CONFIG_FRAGMENT(tandy1000_common)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT(tandy1000_90key)
+static MACHINE_CONFIG_START(tandy1000_90key)
 	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT(tandy1000_101key)
+static MACHINE_CONFIG_START(tandy1000_101key)
 	MCFG_AT_KEYB_ADD("pc_keyboard", 1, DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
 MACHINE_CONFIG_END
 

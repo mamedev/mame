@@ -360,7 +360,7 @@ ADDRESS_MAP_END
     MACHINE CONFIG
 *****************************************************************************/
 
-MACHINE_CONFIG_FRAGMENT( keytronic_pc3270 )
+MACHINE_CONFIG_START( keytronic_pc3270 )
 	MCFG_CPU_ADD("kb_keytr", I8051, 11060250)
 	MCFG_CPU_PROGRAM_MAP(keytronic_pc3270_program)
 	MCFG_CPU_IO_MAP(keytronic_pc3270_io)

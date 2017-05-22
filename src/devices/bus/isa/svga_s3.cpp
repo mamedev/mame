@@ -36,7 +36,7 @@ ROM_END
 DEFINE_DEVICE_TYPE(ISA16_SVGA_S3, isa16_svga_s3_device, "s3_764", "Number Nine 9FX Vision 330 (S3 764)")
 
 
-static MACHINE_CONFIG_FRAGMENT( vga_s3 )
+static MACHINE_CONFIG_START( vga_s3 )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3_vga_device, screen_update)
@@ -149,7 +149,7 @@ ROM_END
 DEFINE_DEVICE_TYPE(ISA16_S3VIRGE, isa16_s3virge_device, "s3virge", "S3 ViRGE Graphics Card")
 
 
-static MACHINE_CONFIG_FRAGMENT( vga_s3virge )
+static MACHINE_CONFIG_START( vga_s3virge )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3virge_vga_device, screen_update)
@@ -225,7 +225,7 @@ void isa16_s3virge_device::device_reset()
  *  S3 ViRGE/DX
  */
 
-static MACHINE_CONFIG_FRAGMENT( vga_s3virgedx )
+static MACHINE_CONFIG_START( vga_s3virgedx )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3virgedx_vga_device, screen_update)
@@ -314,7 +314,7 @@ void isa16_s3virgedx_device::device_reset()
  *  Diamond Stealth 3D 2000 Pro
  */
 
-static MACHINE_CONFIG_FRAGMENT( vga_stealth3d2kpro )
+static MACHINE_CONFIG_START( vga_stealth3d2kpro )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3virgedx_rev1_vga_device, screen_update)

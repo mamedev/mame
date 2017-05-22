@@ -64,10 +64,10 @@ const tiny_rom_entry *newbrain_eim_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( newbrain_eim )
+//  MACHINE_CONFIG_START( newbrain_eim )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( newbrain_eim )
+static MACHINE_CONFIG_START( newbrain_eim )
 	// devices
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_16MHz/8)
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(MC6850_TAG, acia6850_device, write_rxc))

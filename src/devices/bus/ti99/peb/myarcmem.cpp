@@ -190,7 +190,7 @@ ROM_START( myarc_exp )
 	ROM_LOAD("myarc512k_xb2_dsr.bin", 0x0000, 0x2000, CRC(41fbb96d) SHA1(4dc7fdfa46842957bcbb0cf2c37764e4bb6d877a)) /* DSR for Ramdisk etc. */
 ROM_END
 
-MACHINE_CONFIG_FRAGMENT( myarc_exp )
+MACHINE_CONFIG_START( myarc_exp )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512k")
 	MCFG_RAM_DEFAULT_VALUE(0)

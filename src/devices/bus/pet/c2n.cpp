@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(C1531, c1531_device, "c1531", "Commodore 1531 Datassette")
 //  MACHINE_CONFIG( c2n )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c2n )
+static MACHINE_CONFIG_START( c2n )
 	MCFG_CASSETTE_ADD("cassette" )
 	MCFG_CASSETTE_FORMATS(cbm_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)

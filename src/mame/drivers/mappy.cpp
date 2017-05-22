@@ -1666,7 +1666,7 @@ MACHINE_START_MEMBER(mappy_state,mappy)
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( superpac_common )
+static MACHINE_CONFIG_START( superpac_common )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */
@@ -1832,7 +1832,7 @@ static MACHINE_CONFIG_START( phozon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( mappy_common )
+static MACHINE_CONFIG_START( mappy_common )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)   /* 1.536 MHz */

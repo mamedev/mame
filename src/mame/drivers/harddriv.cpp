@@ -1416,7 +1416,7 @@ INTERRUPT_GEN_MEMBER(harddriv_state::video_int_gen)
 
 
 /* Driver board without MSP (used by Race Drivin' cockpit) */
-static MACHINE_CONFIG_FRAGMENT( driver_nomsp )
+static MACHINE_CONFIG_START( driver_nomsp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, HARDDRIV_MASTER_CLOCK/4)
@@ -1464,7 +1464,7 @@ MACHINE_CONFIG_END
 
 
 /* Driver board with MSP (used by Hard Drivin' cockpit) */
-static MACHINE_CONFIG_FRAGMENT( driver_msp )
+static MACHINE_CONFIG_START( driver_msp )
 
 	MCFG_FRAGMENT_ADD( driver_nomsp )
 
@@ -1482,7 +1482,7 @@ MACHINE_CONFIG_END
 
 
 /* Multisync board without MSP (used by STUN Runner, Steel Talons, Race Drivin' compact) */
-static MACHINE_CONFIG_FRAGMENT( multisync_nomsp )
+static MACHINE_CONFIG_START( multisync_nomsp )
 
 	MCFG_FRAGMENT_ADD( driver_nomsp )
 
@@ -1503,7 +1503,7 @@ MACHINE_CONFIG_END
 
 
 /* Multisync board with MSP (used by Hard Drivin' compact) */
-static MACHINE_CONFIG_FRAGMENT( multisync_msp )
+static MACHINE_CONFIG_START( multisync_msp )
 
 	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
@@ -1521,7 +1521,7 @@ MACHINE_CONFIG_END
 
 
 /* Multisync II board (used by Hard Drivin's Airborne) */
-static MACHINE_CONFIG_FRAGMENT( multisync2 )
+static MACHINE_CONFIG_START( multisync2 )
 
 	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
@@ -1544,7 +1544,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 /* ADSP/ADSP II boards (used by Hard/Race Drivin', STUN Runner) */
-static MACHINE_CONFIG_FRAGMENT( adsp )
+static MACHINE_CONFIG_START( adsp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("adsp", ADSP2100, XTAL_32MHz/4)
@@ -1554,7 +1554,7 @@ MACHINE_CONFIG_END
 
 
 /* DS III/IV board (used by Steel Talons, Street Drivin' and Hard Drivin's Airborne) */
-static MACHINE_CONFIG_FRAGMENT( ds3 )
+static MACHINE_CONFIG_START( ds3 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("adsp", ADSP2101, XTAL_12MHz)
@@ -1596,7 +1596,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 /* DSK board (used by Race Drivin') */
-static MACHINE_CONFIG_FRAGMENT( dsk )
+static MACHINE_CONFIG_START( dsk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("dsp32", DSP32C, XTAL_40MHz)
@@ -1612,7 +1612,7 @@ MACHINE_CONFIG_END
 
 
 /* DSK II board (used by Hard Drivin's Airborne) */
-static MACHINE_CONFIG_FRAGMENT( dsk2 )
+static MACHINE_CONFIG_START( dsk2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("dsp32", DSP32C, XTAL_40MHz)
@@ -1631,14 +1631,14 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static MACHINE_CONFIG_FRAGMENT( harddriv )
+static MACHINE_CONFIG_START( harddriv )
 	MCFG_FRAGMENT_ADD( driver_msp )
 	/* basic machine hardware */        /* original driver board with MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
 	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( harddrivc )
+static MACHINE_CONFIG_START( harddrivc )
 	MCFG_FRAGMENT_ADD( multisync_msp )
 
 	/* basic machine hardware */        /* multisync board with MSP */
@@ -1646,7 +1646,7 @@ static MACHINE_CONFIG_FRAGMENT( harddrivc )
 	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( racedriv )
+static MACHINE_CONFIG_START( racedriv )
 	MCFG_FRAGMENT_ADD( driver_nomsp )
 
 	/* basic machine hardware */        /* original driver board without MSP */
@@ -1655,7 +1655,7 @@ static MACHINE_CONFIG_FRAGMENT( racedriv )
 	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( racedrivc )
+static MACHINE_CONFIG_START( racedrivc )
 
 	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
@@ -1666,7 +1666,7 @@ static MACHINE_CONFIG_FRAGMENT( racedrivc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( racedrivc_panorama_side )
+static MACHINE_CONFIG_START( racedrivc_panorama_side )
 
 	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
@@ -1683,7 +1683,7 @@ WRITE_LINE_MEMBER(harddriv_state::sound_int_write_line)
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( stunrun )
+static MACHINE_CONFIG_START( stunrun )
 
 	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
@@ -1705,7 +1705,7 @@ static MACHINE_CONFIG_FRAGMENT( stunrun )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( steeltal )
+static MACHINE_CONFIG_START( steeltal )
 	MCFG_FRAGMENT_ADD( multisync_msp )
 
 	/* basic machine hardware */        /* multisync board with MSP */
@@ -1728,7 +1728,7 @@ static MACHINE_CONFIG_FRAGMENT( steeltal )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( strtdriv )
+static MACHINE_CONFIG_START( strtdriv )
 
 	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
@@ -1740,7 +1740,7 @@ static MACHINE_CONFIG_FRAGMENT( strtdriv )
 	MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( hdrivair )
+static MACHINE_CONFIG_START( hdrivair )
 
 	MCFG_FRAGMENT_ADD( multisync2 )
 

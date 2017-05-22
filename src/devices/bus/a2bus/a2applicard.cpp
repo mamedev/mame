@@ -37,7 +37,7 @@ static ADDRESS_MAP_START( z80_io, AS_IO, 8, a2bus_applicard_device )
 	AM_RANGE(0x00, 0x60) AM_MIRROR(0xff00) AM_READWRITE(z80_io_r, z80_io_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( a2applicard )
+MACHINE_CONFIG_START( a2applicard )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 6000000) // Z80 runs at 6 MHz
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)

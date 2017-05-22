@@ -315,7 +315,7 @@ VIDEO_RESET_MEMBER(gameplan_state,gameplan)
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( gameplan_video )
+MACHINE_CONFIG_START( gameplan_video )
 	MCFG_VIDEO_START_OVERRIDE(gameplan_state,gameplan)
 	MCFG_VIDEO_RESET_OVERRIDE(gameplan_state,gameplan)
 
@@ -325,7 +325,7 @@ MACHINE_CONFIG_FRAGMENT( gameplan_video )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_FRAGMENT( leprechn_video )
+MACHINE_CONFIG_START( leprechn_video )
 	MCFG_VIDEO_START_OVERRIDE(gameplan_state,leprechn)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(gameplan_state, screen_update_leprechn)

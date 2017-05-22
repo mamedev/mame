@@ -52,7 +52,7 @@ h8s2653_device::h8s2653_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT(h8s2655)
+static MACHINE_CONFIG_START(h8s2655)
 	MCFG_H8S_INTC_ADD("intc")
 	MCFG_H8_ADC_2655_ADD("adc", "intc", 28)
 	MCFG_H8_PORT_ADD("port1", h8_device::PORT_1, 0x00, 0x00)

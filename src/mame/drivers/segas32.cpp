@@ -2233,7 +2233,7 @@ GFXDECODE_END
  *************************************/
 
 
-static MACHINE_CONFIG_FRAGMENT( system32 )
+static MACHINE_CONFIG_START( system32 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V60, MASTER_CLOCK/2)
@@ -2315,7 +2315,7 @@ static ADDRESS_MAP_START( system32_analog_map, AS_PROGRAM, 16, segas32_state )
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( system32_analog )
+static MACHINE_CONFIG_START( system32_analog )
 	MCFG_FRAGMENT_ADD( system32 )
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -2353,7 +2353,7 @@ static ADDRESS_MAP_START( system32_trackball_map, AS_PROGRAM, 16, segas32_trackb
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( system32_trackball )
+static MACHINE_CONFIG_START( system32_trackball )
 	MCFG_FRAGMENT_ADD( system32 )
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -2394,7 +2394,7 @@ static ADDRESS_MAP_START( system32_4player_map, AS_PROGRAM, 16, segas32_state )
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( system32_4player )
+static MACHINE_CONFIG_START( system32_4player )
 	MCFG_FRAGMENT_ADD( system32 )
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -2428,7 +2428,7 @@ static ADDRESS_MAP_START( ga2_main_map, AS_PROGRAM, 16, segas32_state )
 	AM_IMPORT_FROM(system32_4player_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( system32_v25 )
+static MACHINE_CONFIG_START( system32_v25 )
 	MCFG_FRAGMENT_ADD( system32_4player )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -2458,7 +2458,7 @@ machine_config_constructor segas32_v25_state::device_mconfig_additions() const
 
 
 
-static MACHINE_CONFIG_FRAGMENT( system32_upd7725 )
+static MACHINE_CONFIG_START( system32_upd7725 )
 	MCFG_FRAGMENT_ADD( system32_analog )
 
 	/* add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's rom board where an fd1149 could go */
@@ -2506,7 +2506,7 @@ static ADDRESS_MAP_START( system32_cd_map, AS_PROGRAM, 16, segas32_state )
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( system32_cd )
+static MACHINE_CONFIG_START( system32_cd )
 	MCFG_FRAGMENT_ADD( system32 )
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -2534,7 +2534,7 @@ machine_config_constructor segas32_cd_state::device_mconfig_additions() const
 
 
 
-static MACHINE_CONFIG_FRAGMENT( multi32 )
+static MACHINE_CONFIG_START( multi32 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V70, MULTI32_CLOCK/2)
@@ -2629,7 +2629,7 @@ static ADDRESS_MAP_START( multi32_analog_map, AS_PROGRAM, 32, sega_multi32_analo
 	AM_IMPORT_FROM(multi32_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( multi32_analog )
+static MACHINE_CONFIG_START( multi32_analog )
 	MCFG_FRAGMENT_ADD(multi32)
 
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -2678,7 +2678,7 @@ static ADDRESS_MAP_START( multi32_6player_map, AS_PROGRAM, 32, segas32_state )
 	AM_IMPORT_FROM(multi32_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( multi32_6player )
+static MACHINE_CONFIG_START( multi32_6player )
 	MCFG_FRAGMENT_ADD(multi32)
 
 	MCFG_DEVICE_MODIFY("maincpu")

@@ -148,7 +148,7 @@ static SLOT_INTERFACE_START( arcstick_daisy )
 	SLOT_INTERFACE("arcstick", NES_ARCSTICK)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( arcstick )
+static MACHINE_CONFIG_START( arcstick )
 	// expansion port to allow daisy chaining
 	MCFG_FC_EXPANSION_PORT_ADD("subexp", arcstick_daisy, nullptr)
 MACHINE_CONFIG_END

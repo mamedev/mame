@@ -211,7 +211,7 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_FRAGMENT (fcscsi1)
+static MACHINE_CONFIG_START (fcscsi1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68010, CPU_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
 	MCFG_CPU_PROGRAM_MAP (fcscsi1_mem)

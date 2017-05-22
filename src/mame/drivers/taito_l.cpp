@@ -157,14 +157,6 @@ void taitol_1cpu_state::state_register()
 	save_item(NAME(m_extport));
 }
 
-void horshoes_state::state_register()
-{
-	taitol_1cpu_state::state_register();
-
-	save_item(NAME(m_trackx));
-	save_item(NAME(m_tracky));
-}
-
 
 MACHINE_START_MEMBER(taitol_state, taito_l)
 {
@@ -234,13 +226,6 @@ void taitol_1cpu_state::taito_machine_reset()
 	taitol_state::taito_machine_reset();
 
 	m_extport = 0;
-}
-
-void horshoes_state::taito_machine_reset()
-{
-	taitol_1cpu_state::taito_machine_reset();
-
-	m_trackx = m_tracky = 0;
 }
 
 
@@ -585,35 +570,22 @@ WRITE8_MEMBER(champwr_state::msm5205_volume_w)
 READ8_MEMBER(horshoes_state::tracky_reset_r)
 {
 	/* reset the trackball counter */
-	m_tracky = m_analog0->read();
+	m_upd4701->resetx_w(1);
+	m_upd4701->resetx_w(0);
 	return 0;
 }
 
 READ8_MEMBER(horshoes_state::trackx_reset_r)
 {
 	/* reset the trackball counter */
-	m_trackx = m_analog1->read();
+	m_upd4701->resety_w(1);
+	m_upd4701->resety_w(0);
 	return 0;
 }
 
-READ8_MEMBER(horshoes_state::tracky_lo_r)
+READ8_MEMBER(horshoes_state::trackball_r)
 {
-	return (m_analog0->read() - m_tracky) & 0xff;
-}
-
-READ8_MEMBER(horshoes_state::tracky_hi_r)
-{
-	return (m_analog0->read() - m_tracky) >> 8;
-}
-
-READ8_MEMBER(horshoes_state::trackx_lo_r)
-{
-	return (m_analog1->read() - m_trackx) & 0xff;
-}
-
-READ8_MEMBER(horshoes_state::trackx_hi_r)
-{
-	return (m_analog1->read() - m_trackx) >> 8;
+	return m_upd4701->read_xy(space, offset >> 2);
 }
 
 
@@ -816,12 +788,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( horshoes_map, AS_PROGRAM, 8, horshoes_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
-	AM_RANGE(0xa800, 0xa800) AM_READ(tracky_lo_r)
+	AM_RANGE(0xa800, 0xa800) AM_SELECT(0x000c) AM_READ(trackball_r)
 	AM_RANGE(0xa802, 0xa802) AM_READ(tracky_reset_r)
 	AM_RANGE(0xa803, 0xa803) AM_READ(trackx_reset_r)
-	AM_RANGE(0xa804, 0xa804) AM_READ(tracky_hi_r)
-	AM_RANGE(0xa808, 0xa808) AM_READ(trackx_lo_r)
-	AM_RANGE(0xa80c, 0xa80c) AM_READ(trackx_hi_r)
 	AM_RANGE(0xb801, 0xb801) AM_READNOP // Watchdog or interrupt ack
 	AM_RANGE(0xb802, 0xb802) AM_WRITE(bankg_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP
@@ -1391,10 +1360,10 @@ static INPUT_PORTS_START( horshoes )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
 	PORT_START("AN0")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE
 
 	PORT_START("AN1")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_RESET
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( plgirls )
@@ -1904,6 +1873,10 @@ static MACHINE_CONFIG_DERIVED( horshoes, plotting )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(horshoes_map)
+
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("AN0")
+	MCFG_UPD4701_PORTY("AN1")
 
 	MCFG_MACHINE_RESET_OVERRIDE(horshoes_state, horshoes)
 MACHINE_CONFIG_END

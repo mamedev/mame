@@ -77,12 +77,12 @@ md_seprom_mm96_device::md_seprom_mm96_device(const machine_config &mconfig, cons
 //-------------------------------------------------
 
 // MD_SEPROM_CODEMAST
-MACHINE_CONFIG_FRAGMENT( md_i2c_24c08 )
+MACHINE_CONFIG_START( md_i2c_24c08 )
 	MCFG_24C08_ADD("i2cmem")
 MACHINE_CONFIG_END
 
 // MD_SEPROM_MM96
-MACHINE_CONFIG_FRAGMENT( md_i2c_24c16a )
+MACHINE_CONFIG_START( md_i2c_24c16a )
 	MCFG_24C16A_ADD("i2cmem")
 MACHINE_CONFIG_END
 

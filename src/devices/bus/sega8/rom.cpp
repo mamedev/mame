@@ -713,7 +713,7 @@ WRITE8_MEMBER(sega8_eeprom_device::write_mapper)
 	}
 }
 
-MACHINE_CONFIG_FRAGMENT( gg_eeprom )
+MACHINE_CONFIG_START( gg_eeprom )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 

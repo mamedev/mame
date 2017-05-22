@@ -458,7 +458,7 @@ uint32_t exidy440_state::screen_update_topsecex(screen_device &screen, bitmap_in
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( exidy440_video )
+MACHINE_CONFIG_START( exidy440_video )
 	MCFG_VIDEO_START_OVERRIDE(exidy440_state,exidy440)
 	MCFG_PALETTE_ADD("palette", 256)
 
@@ -470,7 +470,7 @@ MACHINE_CONFIG_FRAGMENT( exidy440_video )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_FRAGMENT( topsecex_video )
+MACHINE_CONFIG_START( topsecex_video )
 	MCFG_VIDEO_START_OVERRIDE(exidy440_state,topsecex)
 
 	MCFG_SCREEN_MODIFY("screen")

@@ -109,7 +109,7 @@ static ADDRESS_MAP_START(stereo_fx_rom, AS_PROGRAM, 8, stereo_fx_device)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( stereo_fx )
+static MACHINE_CONFIG_START( stereo_fx )
 	MCFG_CPU_ADD("stereo_fx_cpu", I80C31, XTAL_30MHz)
 	MCFG_CPU_IO_MAP(stereo_fx_io)
 	MCFG_CPU_PROGRAM_MAP(stereo_fx_rom)

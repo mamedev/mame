@@ -44,7 +44,7 @@ static ADDRESS_MAP_START( m6809_mem, AS_PROGRAM, 8, a2bus_themill_device )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dma_r, dma_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( a2themill )
+MACHINE_CONFIG_START( a2themill )
 	MCFG_CPU_ADD(M6809_TAG, M6809, 1021800)   // M6809 runs at ~1 MHz as per Stellation Two's print ads
 	MCFG_CPU_PROGRAM_MAP(m6809_mem)
 MACHINE_CONFIG_END

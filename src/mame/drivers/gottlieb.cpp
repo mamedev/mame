@@ -672,7 +672,7 @@ static const char *const qbert_knocker_names[] =
 	nullptr   /* end of array */
 };
 
-MACHINE_CONFIG_FRAGMENT( qbert_knocker )
+MACHINE_CONFIG_START( qbert_knocker )
 	MCFG_SPEAKER_ADD("knocker", 0.0, 0.0, 1.0)
 
 	MCFG_SOUND_ADD("knocker_sam", SAMPLES, 0)

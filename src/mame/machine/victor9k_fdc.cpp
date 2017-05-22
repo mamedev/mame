@@ -155,10 +155,10 @@ FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( victor_9000_fdc )
+//  MACHINE_CONFIG_START( victor_9000_fdc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( victor_9000_fdc )
+static MACHINE_CONFIG_START( victor_9000_fdc )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_30MHz/6)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(victor_9000_fdc_device, floppy_p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(victor_9000_fdc_device, floppy_p1_w))

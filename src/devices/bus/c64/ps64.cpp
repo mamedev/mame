@@ -71,10 +71,10 @@ static struct votrax_sc02_interface votrax_intf =
 */
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_ps64 )
+//  MACHINE_CONFIG_START( c64_ps64 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_ps64 )
+static MACHINE_CONFIG_START( c64_ps64 )
 	//MCFG_SPEAKER_STANDARD_MONO("mono")
 	//MCFG_VOTRAX_SC02_ADD(SSI263_TAG, 2000000, votrax_intf)
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

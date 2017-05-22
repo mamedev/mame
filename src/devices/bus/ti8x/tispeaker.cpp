@@ -15,7 +15,7 @@ namespace bus { namespace ti8x {
 
 namespace {
 
-MACHINE_CONFIG_FRAGMENT(ti_speaker_stereo)
+MACHINE_CONFIG_START(ti_speaker_stereo)
 	MCFG_SPEAKER_STANDARD_STEREO("outl", "outr")
 
 	MCFG_SOUND_ADD("lspkr", SPEAKER_SOUND, 0)
@@ -26,7 +26,7 @@ MACHINE_CONFIG_FRAGMENT(ti_speaker_stereo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_FRAGMENT(ti_speaker_mono)
+MACHINE_CONFIG_START(ti_speaker_mono)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("spkr", SPEAKER_SOUND, 0)

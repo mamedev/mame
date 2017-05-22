@@ -1,5 +1,5 @@
-// license:BSD-3-Clause,AJR
-// copyright-holders:smf
+// license:BSD-3-Clause
+// copyright-holders:smf,AJR
 /***************************************************************************
 
     NEC µPD4701A 2-Axis Incremental Encoder Counter
@@ -145,8 +145,37 @@ WRITE_LINE_MEMBER(upd4701_device::resety_w)
 }
 
 //-------------------------------------------------
+//  reset_x - pulse the X counter reset line
+//-------------------------------------------------
+
+WRITE8_MEMBER(upd4701_device::reset_x)
+{
+	resetx_w(1);
+	resetx_w(0);
+}
+
+//-------------------------------------------------
+//  reset_y - pulse the Y counter reset line
+//-------------------------------------------------
+
+WRITE8_MEMBER(upd4701_device::reset_y)
+{
+	resety_w(1);
+	resety_w(0);
+}
+
+//-------------------------------------------------
 //  reset_xy - pulse the counter reset lines
 //-------------------------------------------------
+
+READ8_MEMBER(upd4701_device::reset_xy)
+{
+	resetx_w(1);
+	resety_w(1);
+	resetx_w(0);
+	resety_w(0);
+	return space.unmap();
+}
 
 WRITE8_MEMBER(upd4701_device::reset_xy)
 {

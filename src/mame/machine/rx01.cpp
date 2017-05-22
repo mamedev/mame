@@ -34,7 +34,7 @@ static const floppy_interface rx01_floppy_interface =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( rx01 )
+MACHINE_CONFIG_START( rx01 )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(rx01_floppy_interface)
 MACHINE_CONFIG_END
 

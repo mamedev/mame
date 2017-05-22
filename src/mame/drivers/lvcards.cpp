@@ -499,8 +499,8 @@ static MACHINE_CONFIG_DERIVED( ponttehk, lvcards )
 	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 
 	// video hardware
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(lvcards_state,ponttehk)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 MACHINE_CONFIG_END
 
 ROM_START( lvpoker )

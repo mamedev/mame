@@ -231,7 +231,7 @@ static const char *const astrob_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( astrob_sound_board )
+MACHINE_CONFIG_START( astrob_sound_board )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -418,7 +418,7 @@ static const char *const sega005_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( 005_sound_board )
+MACHINE_CONFIG_START( 005_sound_board )
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(segag80r_state, sega005_sound_a_w))
@@ -580,7 +580,7 @@ static const char *const spaceod_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( spaceod_sound_board )
+MACHINE_CONFIG_START( spaceod_sound_board )
 
 	/* sound hardware */
 
@@ -678,7 +678,7 @@ static const char *const monsterb_sample_names[] =
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
+MACHINE_CONFIG_START( monsterb_sound_board )
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(segag80r_state, monsterb_sound_a_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(segag80r_state, monsterb_sound_b_w))

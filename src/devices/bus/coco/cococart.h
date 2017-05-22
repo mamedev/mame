@@ -19,6 +19,7 @@
 // devices.  For some reason, the build system will not necessarily
 // identify them as dependencies.  Adding these #include's here seems
 // to rectify the problem
+#include "cpu/tms7000/tms7000.h"
 #include "machine/mos6551.h"
 #include "machine/6850acia.h"
 #include "machine/msm6242.h"

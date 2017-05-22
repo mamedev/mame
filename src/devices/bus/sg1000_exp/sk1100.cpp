@@ -154,7 +154,7 @@ ioport_constructor sega_sk1100_device::device_input_ports() const
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( sk1100_config )
+static MACHINE_CONFIG_START( sk1100_config )
 	/* devices */
 	MCFG_DEVICE_ADD(UPD9255_0_TAG, I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(sega_sk1100_device, ppi_pa_r))

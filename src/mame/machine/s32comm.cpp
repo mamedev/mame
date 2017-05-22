@@ -73,7 +73,7 @@ Sega System Multi32 Comm PCB 837-8792-91
 #define VERBOSE 0
 #include "logmacro.h"
 
-MACHINE_CONFIG_FRAGMENT( s32comm )
+MACHINE_CONFIG_START( s32comm )
 MACHINE_CONFIG_END
 
 //**************************************************************************

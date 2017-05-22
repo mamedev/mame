@@ -119,7 +119,7 @@ static SLOT_INTERFACE_START( coco_fdc_floppies )
 	SLOT_INTERFACE("qd", FLOPPY_525_QD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT(coco_fdc)
+static MACHINE_CONFIG_START(coco_fdc)
 	MCFG_WD1773_ADD(WD_TAG, XTAL_8MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(coco_fdc_device_base, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(coco_fdc_device_base, fdc_drq_w))

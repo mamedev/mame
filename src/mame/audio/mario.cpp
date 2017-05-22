@@ -628,7 +628,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( mario_audio )
+MACHINE_CONFIG_START( mario_audio )
 
 #if USE_8039
 	MCFG_CPU_ADD("audiocpu", I8039, I8035_CLOCK)         /* 730 kHz */
@@ -671,7 +671,7 @@ MACHINE_CONFIG_FRAGMENT( mario_audio )
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( masao_audio )
+MACHINE_CONFIG_START( masao_audio )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 24576000/16)  /* ???? */
 	MCFG_CPU_PROGRAM_MAP(masao_sound_map)

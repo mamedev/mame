@@ -122,7 +122,7 @@ WRITE_LINE_MEMBER(xtide_device::ide_interrupt)
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( xtide_config )
+static MACHINE_CONFIG_START( xtide_config )
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(xtide_device, ide_interrupt))
 

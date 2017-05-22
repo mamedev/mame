@@ -77,7 +77,7 @@ static const char *const spacefb_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( spacefb_audio )
+MACHINE_CONFIG_START( spacefb_audio )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

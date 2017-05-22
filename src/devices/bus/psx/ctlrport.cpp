@@ -25,7 +25,7 @@ void psx_controller_port_device::device_config_complete()
 	m_dev = dynamic_cast<device_psx_controller_interface *>(get_card_device());
 }
 
-static MACHINE_CONFIG_FRAGMENT( psx_memory_card )
+static MACHINE_CONFIG_START( psx_memory_card )
 	MCFG_PSXCARD_ADD("card")
 MACHINE_CONFIG_END
 

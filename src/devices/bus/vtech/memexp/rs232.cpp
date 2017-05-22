@@ -35,7 +35,7 @@ const tiny_rom_entry *vtech_rs232_interface_device::device_rom_region() const
 //  machine configurations
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( rs232 )
+static MACHINE_CONFIG_START( rs232 )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(vtech_rs232_interface_device, rs232_rx_w))
 MACHINE_CONFIG_END

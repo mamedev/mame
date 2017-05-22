@@ -83,7 +83,7 @@ namespace
 	IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_FRAGMENT(coco_dc_modem_device)
+static MACHINE_CONFIG_START(coco_dc_modem_device)
 	MCFG_DEVICE_ADD(UART_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(coco_dc_modem_device, uart_irq_w))

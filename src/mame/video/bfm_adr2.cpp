@@ -542,7 +542,7 @@ ADDRESS_MAP_END
 
 ///////////////////////////////////////////////////////////////////////////
 
-static MACHINE_CONFIG_FRAGMENT( adder2 )
+static MACHINE_CONFIG_START( adder2 )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE( 400, 280)
 	MCFG_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)

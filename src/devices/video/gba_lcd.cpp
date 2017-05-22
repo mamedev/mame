@@ -1832,7 +1832,7 @@ void gba_lcd_device::device_reset()
 	m_hbl_timer->adjust(attotime::never);
 }
 
-static MACHINE_CONFIG_FRAGMENT(gba_lcd)
+static MACHINE_CONFIG_START(gba_lcd)
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_16_777216MHz / 4, 308, 0, 240, 228, 0, 160)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, gba_lcd_device, screen_update)

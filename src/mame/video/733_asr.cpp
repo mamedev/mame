@@ -710,7 +710,7 @@ uint32_t asr733_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-static MACHINE_CONFIG_FRAGMENT( asr733 )
+static MACHINE_CONFIG_START( asr733 )
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(asr733_device, asr733)
 

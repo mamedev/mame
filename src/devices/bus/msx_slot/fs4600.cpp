@@ -27,7 +27,7 @@ msx_slot_fs4600_device::msx_slot_fs4600_device(const machine_config &mconfig, co
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( fs4600 )
+static MACHINE_CONFIG_START( fs4600 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 

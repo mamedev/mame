@@ -790,7 +790,7 @@ static SLOT_INTERFACE_START( camplynx_floppies )
 	SLOT_INTERFACE( "drive1", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( lynx_common )
+static MACHINE_CONFIG_START( lynx_common )
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
@@ -802,7 +802,7 @@ static MACHINE_CONFIG_FRAGMENT( lynx_common )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.02)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( lynx_disk )
+static MACHINE_CONFIG_START( lynx_disk )
 	MCFG_FD1793_ADD("fdc", XTAL_24MHz / 24)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "drive0", camplynx_state::camplynx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

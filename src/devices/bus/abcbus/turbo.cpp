@@ -82,7 +82,7 @@ static const z80_daisy_config daisy_chain[] =
 //  MACHINE_DRIVER( turbo_kontroller )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( turbo_kontroller )
+static MACHINE_CONFIG_START( turbo_kontroller )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(turbo_kontroller_mem)
 	MCFG_CPU_IO_MAP(turbo_kontroller_io)

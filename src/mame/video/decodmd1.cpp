@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( decodmd1_io_map, AS_IO, 8, decodmd_type1_device )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(dmd_port_r, dmd_port_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( decodmd1 )
+static MACHINE_CONFIG_START( decodmd1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("dmdcpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(decodmd1_map)

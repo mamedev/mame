@@ -114,7 +114,7 @@ extern const device_type MCPX_SMBUS;
 /*
  * OHCI USB Controller
  */
-
+class usb_function_device;
 class mcpx_ohci_device : public pci_device {
 public:
 	mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -129,6 +129,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_config_complete() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
@@ -137,6 +138,11 @@ private:
 	emu_timer *timer;
 	std::function<void(void)> hack_callback;
 	DECLARE_ADDRESS_MAP(ohci_mmio, 32);
+	struct dev_t {
+		ohci_function *dev;
+		int port;
+	} connecteds[4];
+	int connecteds_count;
 };
 
 extern const device_type MCPX_OHCI;

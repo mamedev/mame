@@ -15,7 +15,7 @@
 
 #define ym3812_StdClock 3579545
 
-static MACHINE_CONFIG_FRAGMENT( adlib_config )
+static MACHINE_CONFIG_START( adlib_config )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 3.00)

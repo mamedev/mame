@@ -61,7 +61,7 @@ static ADDRESS_MAP_START( vp931_portmap, AS_IO, 8, phillips_22vp931_device )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_FRAGMENT( vp931 )
+static MACHINE_CONFIG_START( vp931 )
 	MCFG_CPU_ADD("vp931", I8049, XTAL_11MHz)
 	MCFG_CPU_IO_MAP(vp931_portmap)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(phillips_22vp931_device, i8049_port1_r))

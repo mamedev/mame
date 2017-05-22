@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( namco_53xx_map_io, AS_IO, 8,namco_53xx_device )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_FRAGMENT( namco_53xx )
+static MACHINE_CONFIG_START( namco_53xx )
 	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
 	MCFG_CPU_IO_MAP(namco_53xx_map_io)
 MACHINE_CONFIG_END

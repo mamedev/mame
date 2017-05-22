@@ -64,7 +64,7 @@ WRITE_LINE_MEMBER(kc_d002_device::out_halt_w)
 	m_slot->m_out_halt_cb(state);
 }
 
-static MACHINE_CONFIG_FRAGMENT( kc_d002 )
+static MACHINE_CONFIG_START( kc_d002 )
 	MCFG_DEVICE_ADD("m0", KCCART_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
 	MCFG_KCCART_SLOT_NEXT_SLOT("m4")

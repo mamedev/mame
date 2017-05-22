@@ -57,7 +57,7 @@ const tiny_rom_entry *sa1403d_device::device_rom_region() const
 //  MACHINE_DRIVER( sa1403d )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( sa1403d )
+static MACHINE_CONFIG_START( sa1403d )
 	MCFG_HARDDISK_ADD("image")
 MACHINE_CONFIG_END
 

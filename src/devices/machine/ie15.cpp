@@ -566,7 +566,7 @@ static GFXDECODE_START( ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
 
-static MACHINE_CONFIG_FRAGMENT( ie15core )
+static MACHINE_CONFIG_START( ie15core )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD("maincpu", IE15_CPU, XTAL_30_8MHz/10)
 	MCFG_CPU_PROGRAM_MAP(ie15_mem)
@@ -586,7 +586,7 @@ static MACHINE_CONFIG_FRAGMENT( ie15core )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( ie15 )
+static MACHINE_CONFIG_START( ie15 )
 	MCFG_FRAGMENT_ADD(ie15core)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
