@@ -592,8 +592,8 @@ Derby Owners Club World Edition EX (Rev D)      840-0088C  22336D   7 (128Mb)  3
 Giga Wing 2                                     841-0014C  22270    5 (128Mb)  315-6319A  315-6213  317-5064-COM  ?
 Mobile Suit Gundam: Federation Vs. Zeon         841-0017C  23638   10 (128Mb)  315-6319A  315-6213  317-5070-COM  not present
 Moero! Justice Gakuen / Project Justice (Rev A) 841-0015C  23548A  11 (128Mb)  315-6319A  315-6213  317-5065-COM  present
-MushiKing - The King Of Beetle 2K4 2ND          840-0152C  24241    5 (128Mb)  315-6319A  315-6213  not present   not present  requires 610-0669 barcode reader
-MushiKing - The King Of Beetle 2K5 1ST          840-0158C  24286    7 (128Mb)  315-6319A  315-6213  not present   not present  requires 610-0669 barcode reader
+MushiKing The King Of Beetles 2004 Second (Jap) 840-0152C  24241    5 (128Mb)  315-6319A  315-6213  not present   not present  requires 610-0669 barcode reader
+MushiKing The King Of Beetles 2005 First (Jap)  840-0158C  24286    7 (128Mb)  315-6319A  315-6213  not present   not present  requires 610-0669 barcode reader
 Oinori-daimyoujin Matsuri                       840-0126B  24053    5 (128Mb)  315-6319A  315-6213  not present   not present  requires 837-14274 "G2 EXPANSION BD" (similar to hopper 837-14381 but with ARC NET chip)
 Samba de Amigo Ver. 2000                        840-0047C  23600   11 (128Mb)  315-6319A  315-6213  317-0295-COM  ?
 Star Horse (main screens)                       840-0054C  23625    4 (128Mb)  315-6319   315-6213  not present   present      requires 837-13785 ARCNET&IO BD
@@ -4380,6 +4380,21 @@ ROM_START( mtkob2 )
 
 	// 840-0150    2003     317-0394-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "3892fb3a" )
+ROM_END
+
+ROM_START( mushi2k4 )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x5800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-24241.ic22",	0x00000000,	0x00400000, CRC(ad9237ce) SHA1(f1010a30281ae55bbaece17b6c6a6e9e558d291f) )
+	ROM_LOAD( "mpr-24242.ic1",	0x00800000,	0x01000000, CRC(b4b81edb) SHA1(65f1527b276838b6b20e14c563fe5ef1e7d0ff27) )
+	ROM_LOAD( "mpr-24243.ic2",	0x01800000,	0x01000000, CRC(ff812290) SHA1(57835738ba7d47c999dfdef6c93d10b4f2c55cd4) )
+	ROM_LOAD( "mpr-24244.ic3",	0x02800000,	0x01000000, CRC(f6b97d21) SHA1(f45c868500fd6bf751c84546df40054510a673c9) )
+	ROM_LOAD( "mpr-24245.ic4",	0x03800000,	0x01000000, CRC(9dcee46f) SHA1(570bc01a2d5efdbec8403e68831a8eafe77ca31f) )
+	ROM_LOAD( "mpr-24246.ic5",	0x04800000,	0x01000000, CRC(fd97e2f5) SHA1(c9f7438049def346c9a2f2275110c5b385cb57f0) )
+
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
 
 ROM_START( mushi2k5 )
@@ -9964,9 +9979,9 @@ ROM_END
 // 0132 Mushiking 2K3 2ND (Japan)
 /* 0136    */ GAME( 2004, shootplm,  naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool The Medal Version B / Shootout Pool Prize Version B (Export, Japan)", GAME_FLAGS )
 /* 0140    */ GAME( 2004, kick4csh,  naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Kick '4' Cash (Export)", GAME_FLAGS )
-/* 0150    */ GAME( 2003, mtkob2,    naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle 2K3 2nd (World)", GAME_FLAGS ) // not for Japan
-// 0152 Mushiking 2K4 2ND (Japan)
-/* 0158    */ GAME( 2005, mushi2k5,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle 2K5 1st (Japan)", GAME_FLAGS )
+/* 0150    */ GAME( 2003, mtkob2,    naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND, World)", GAME_FLAGS ) // not for Japan
+/* 0152    */ GAME( 2004, mushi2k4,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2004 Second (Japan)", GAME_FLAGS )
+/* 0158    */ GAME( 2005, mushi2k5,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2005 First (Japan)", GAME_FLAGS )
 /* 0164    */ GAME( 2005, mushi2eo,  mushik2e, naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 1.001) (World)", GAME_FLAGS ) // not for Japan, version can be changed in secret menu
 /* 0164    */ GAME( 2005, mushik2e,  naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 2.001) (World)", GAME_FLAGS ) // not for Japan, version can be changed in secret menu
 /* 0166    */ GAME( 2006, zunou,     naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Touch De Zunou (Japan, Rev A)", GAME_FLAGS )
