@@ -25,10 +25,10 @@ public:
 	DECLARE_WRITE8_MEMBER(stfight_sprite_bank_w);
 	DECLARE_WRITE8_MEMBER(stfight_vh_latch_w);
 
+protected:
 	uint32_t screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
