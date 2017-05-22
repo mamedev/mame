@@ -61,6 +61,8 @@ puzznici note
 
 #include "cpu/z80/z80.h"
 
+#include "machine/i8255.h"
+
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
 #include "sound/msm5205.h"
@@ -763,10 +765,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( palamed_map, AS_PROGRAM, 8, taitol_1cpu_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
-	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("IN1")
-	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN2")
-	AM_RANGE(0xa803, 0xa803) AM_WRITENOP    // Control register, function unknown
+	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // Control register, function unknown (copy of 8822)
 	AM_RANGE(0xb001, 0xb001) AM_READNOP // Watchdog or interrupt ack
 ADDRESS_MAP_END
@@ -775,10 +774,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cachat_map, AS_PROGRAM, 8, taitol_1cpu_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
-	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("IN1")
-	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN2")
-	AM_RANGE(0xa803, 0xa803) AM_WRITENOP    // Control register, function unknown
+	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // Control register, function unknown
 	AM_RANGE(0xb001, 0xb001) AM_READNOP // Watchdog or interrupt ack (value ignored)
 	AM_RANGE(0xfff8, 0xfff8) AM_READWRITE(rombankswitch_r, rombankswitch_w)
@@ -1888,6 +1884,11 @@ static MACHINE_CONFIG_DERIVED( palamed, plotting )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(palamed_map)
 
+	MCFG_DEVICE_ADD("ppi", I8255, 0) // Toshiba TMP8255AP-5
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_1cpu_state, palamed)
 MACHINE_CONFIG_END
 
@@ -1897,6 +1898,11 @@ static MACHINE_CONFIG_DERIVED( cachat, plotting )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cachat_map)
+
+	MCFG_DEVICE_ADD("ppi", I8255, 0) // NEC D70155C
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_1cpu_state, cachat)
 MACHINE_CONFIG_END
