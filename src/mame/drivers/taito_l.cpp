@@ -56,6 +56,7 @@ puzznici note
 #include "includes/taito_l.h"
 #include "includes/taitoipt.h"
 #include "machine/taito68705interface.h"
+#include "machine/taitoio.h"
 
 #include "audio/taitosnd.h"
 
@@ -623,13 +624,7 @@ static ADDRESS_MAP_START( fhawk_2_map, AS_PROGRAM, 8, fhawk_state )
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
 	AM_RANGE(0xc801, 0xc801) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA") AM_WRITENOP   // Direct copy of input port 0
-	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")
-	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("IN1")
-	AM_RANGE(0xd004, 0xd004) AM_WRITE(control2_w)
-	AM_RANGE(0xd005, 0xd006) AM_WRITENOP    // Always 0
-	AM_RANGE(0xd007, 0xd007) AM_READ_PORT("IN2")
+	AM_RANGE(0xd000, 0xd007) AM_DEVREADWRITE("tc0220ioc", tc0220ioc_device, read, write)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
@@ -690,12 +685,7 @@ static ADDRESS_MAP_START( champwr_2_map, AS_PROGRAM, 8, champwr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWA") AM_WRITENOP   // Watchdog
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSWB")
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN0")
-	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("IN1")
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(control2_w)
-	AM_RANGE(0xe007, 0xe007) AM_READ_PORT("IN2")
+	AM_RANGE(0xe000, 0xe007) AM_DEVREADWRITE("tc0220ioc", tc0220ioc_device, read, write)
 	AM_RANGE(0xe008, 0xe00f) AM_READNOP
 	AM_RANGE(0xe800, 0xe800) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
 	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
@@ -796,12 +786,7 @@ static ADDRESS_MAP_START( evilston_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSWA") AM_WRITENOP   //watchdog ?
-	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("DSWB")
-	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN0")
-	AM_RANGE(0xa803, 0xa803) AM_READ_PORT("IN1")
-	AM_RANGE(0xa804, 0xa804) AM_WRITENOP    //coin couters/locks ?
-	AM_RANGE(0xa807, 0xa807) AM_READ_PORT("IN2")
+	AM_RANGE(0xa800, 0xa807) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( evilston_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
@@ -1678,6 +1663,13 @@ static MACHINE_CONFIG_START( fhawk )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
@@ -1750,6 +1742,8 @@ static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 
 	MCFG_CPU_MODIFY("slave")
 	MCFG_CPU_PROGRAM_MAP(raimais_2_map)
+
+	MCFG_DEVICE_REMOVE("tc0220ioc") // I/O chip is a TC0040IOC
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
@@ -1921,6 +1915,13 @@ static MACHINE_CONFIG_START( evilston )
 	MCFG_CPU_PERIODIC_INT_DRIVER(taitol_state, nmi_line_pulse, 60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
