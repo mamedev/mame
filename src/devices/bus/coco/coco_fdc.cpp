@@ -85,7 +85,7 @@ protected:
 	// device-level overrides
 	virtual DECLARE_READ8_MEMBER(scs_read) override;
 	virtual DECLARE_WRITE8_MEMBER(scs_write) override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// methods
 	virtual void update_lines() override;
@@ -119,7 +119,7 @@ static SLOT_INTERFACE_START( coco_fdc_floppies )
 	SLOT_INTERFACE("qd", FLOPPY_525_QD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(coco_fdc)
+MACHINE_CONFIG_MEMBER(coco_fdc_device_base::device_add_mconfig )
 	MCFG_WD1773_ADD(WD_TAG, XTAL_8MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(coco_fdc_device_base, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(coco_fdc_device_base, fdc_drq_w))
@@ -211,17 +211,6 @@ coco_fdc_device_base::rtc_type coco_fdc_device_base::real_time_clock()
 	}
 
 	return result;
-}
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor coco_fdc_device_base::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(coco_fdc);
 }
 
 

@@ -45,7 +45,7 @@ namespace
 		}
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual void device_add_mconfig(machine_config &config) override;
 
 		// callbacks
 		WRITE_LINE_MEMBER(uart_irq_w)
@@ -83,7 +83,7 @@ namespace
 	IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_START(coco_dc_modem_device)
+MACHINE_CONFIG_MEMBER(coco_dc_modem_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(UART_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(coco_dc_modem_device, uart_irq_w))
@@ -108,11 +108,3 @@ const tiny_rom_entry *coco_dc_modem_device::device_rom_region() const
 }
 
 
-//-------------------------------------------------
-//  device_mconfig_additions
-//-------------------------------------------------
-
-machine_config_constructor coco_dc_modem_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(coco_dc_modem_device);
-}

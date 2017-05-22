@@ -79,7 +79,7 @@ namespace
 
 		// optional information overrides
 		virtual const tiny_rom_entry *device_rom_region() const override;
-		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual void device_add_mconfig(machine_config &config) override;
 
 		virtual void device_reset() override;
 
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START(ssc_rom, AS_PROGRAM, 8, coco_ssc_device)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(PIC_TAG, 0)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START(coco_ssc)
+MACHINE_CONFIG_MEMBER(coco_ssc_device::device_add_mconfig)
 	MCFG_CPU_ADD(PIC_TAG, TMS7040, DERIVED_CLOCK(1, 2))
 	MCFG_CPU_PROGRAM_MAP(ssc_rom)
 	MCFG_CPU_IO_MAP(ssc_io_map)
@@ -225,19 +225,14 @@ void coco_ssc_device::device_start()
 	save_item(NAME(tms7000_portd));
 }
 
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
 void coco_ssc_device::device_reset()
 {
 	reset_line = 0;
-}
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor coco_ssc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( coco_ssc );
 }
 
 

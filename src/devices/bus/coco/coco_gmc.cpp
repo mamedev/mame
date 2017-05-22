@@ -37,7 +37,7 @@ namespace
 	public:
 		// construction/destruction
 		coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual void device_add_mconfig(machine_config &config) override;
 
 	protected:
 		// device-level overrides
@@ -49,11 +49,12 @@ namespace
 };
 
 
-static MACHINE_CONFIG_START(cocopak_gmc)
+MACHINE_CONFIG_MEMBER(coco_pak_gmc_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("gmc_speaker")
 	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL_4MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "gmc_speaker", 1.0)
 MACHINE_CONFIG_END
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -71,15 +72,6 @@ coco_pak_gmc_device::coco_pak_gmc_device(const machine_config &mconfig, const ch
 {
 }
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor coco_pak_gmc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cocopak_gmc );
-}
 
 //-------------------------------------------------
 //    scs_write

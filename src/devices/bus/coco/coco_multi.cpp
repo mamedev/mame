@@ -80,7 +80,7 @@ namespace
 		coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual void device_add_mconfig(machine_config &config) override;
 
 		virtual uint8_t* get_cart_base() override;
 
@@ -158,7 +158,7 @@ static SLOT_INTERFACE_START(coco_cart_slot4)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START(coco_multi)
+MACHINE_CONFIG_MEMBER(coco_multipak_device::device_add_mconfig)
 	MCFG_COCO_CARTRIDGE_ADD(SLOT1_TAG, coco_cart_slot1_3, nullptr)
 	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_cart_w))
 	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_nmi_w))
@@ -226,17 +226,6 @@ void coco_multipak_device::device_start()
 void coco_multipak_device::device_reset()
 {
 	m_select = 0xFF;
-}
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor coco_multipak_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( coco_multi );
 }
 
 

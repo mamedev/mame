@@ -21,18 +21,8 @@
 
 
 //**************************************************************************
-//  MACHINE AND ROM DECLARATIONS
+//  ROM DECLARATIONS
 //**************************************************************************
-
-static MACHINE_CONFIG_START(coco_orch90)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // ls374.ic5 + r7 (8x20k) + r9 (8x10k)
-	MCFG_SOUND_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // ls374.ic4 + r6 (8x20k) + r8 (8x10k)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
-
 
 ROM_START(coco_orch90)
 	ROM_REGION(0x2000, "eprom", ROMREGION_ERASE00)
@@ -63,10 +53,7 @@ namespace
 		}
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override
-		{
-			return MACHINE_CONFIG_NAME(coco_orch90);
-		}
+		virtual void device_add_mconfig(machine_config &config) override;
 
 	protected:
 		// device-level overrides
@@ -100,6 +87,20 @@ namespace
 		required_device<dac_byte_interface> m_rdac;
 	};
 };
+
+
+//**************************************************************************
+//  MACHINE AND ROM DECLARATIONS
+//**************************************************************************
+
+MACHINE_CONFIG_MEMBER(coco_orch90_device::device_add_mconfig)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // ls374.ic5 + r7 (8x20k) + r9 (8x10k)
+	MCFG_SOUND_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // ls374.ic4 + r6 (8x20k) + r8 (8x10k)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
 
 
 //**************************************************************************

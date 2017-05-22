@@ -95,7 +95,7 @@ namespace
 		coco_t4426_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual void device_add_mconfig(machine_config &config) override;
 		virtual const tiny_rom_entry *device_rom_region() const override;
 		virtual ioport_constructor device_input_ports() const override;
 
@@ -130,7 +130,7 @@ namespace
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_START(coco_t4426)
+MACHINE_CONFIG_MEMBER(coco_t4426_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(UART_TAG, ACIA6850, 0) // TODO: Figure out address mapping for ACIA
 	MCFG_DEVICE_ADD(PIA_TAG, PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_t4426_device, pia_A_w))
@@ -213,16 +213,6 @@ void coco_t4426_device::device_start()
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
 }
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor coco_t4426_device::device_mconfig_additions() const
-{
-	LOG("%s()\n", FUNCNAME );
-	return MACHINE_CONFIG_NAME( coco_t4426 );
-}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

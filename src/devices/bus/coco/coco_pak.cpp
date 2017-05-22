@@ -19,9 +19,6 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_START(coco_pak)
-MACHINE_CONFIG_END
-
 ROM_START( coco_pak )
 	ROM_REGION(0x8000, CARTSLOT_TAG, ROMREGION_ERASE00)
 	// this region is filled by cococart_slot_device::call_load()
@@ -75,15 +72,6 @@ void coco_pak_device::device_start()
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
 }
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor coco_pak_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( coco_pak );
-}
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
