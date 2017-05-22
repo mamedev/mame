@@ -29,18 +29,6 @@ function cmake.files(prj)
     }, true, 1)
 end
 
-function cmake.linkdepends(prj, platforms, nativeplatform, cc)
-    for _, platform in ipairs(platforms) do
-        for cfg in premake.eachconfig(prj, platform) do
-            if cfg.platform == nativeplatform then
-                _p('if(CMAKE_BUILD_TYPE MATCHES \"%s\")', cfg.name)
-                _p(1, 'target_link_libraries(%s%s%s)', premake.esc(prj.name), cmake.list(premake.esc(premake.getlinks(cfg, "siblings", "basename"))), cmake.list(cc.getlinkflags(cfg)))
-                _p('endif()')
-            end
-        end
-    end
-end
-
 function cmake.customtasks(prj)
     local dirs = {}
     for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
@@ -176,19 +164,28 @@ function cmake.project(prj)
     -- add custom tasks
     cmake.customtasks(prj)
 
-    if (prj.kind == 'StaticLib') then
-        _p('add_library(%s STATIC ${source_list})', premake.esc(prj.name))
-    end
-    if (prj.kind == 'SharedLib') then
-        _p('add_library(%s SHARED ${source_list})', premake.esc(prj.name))
-    end
-    if (prj.kind == 'ConsoleApp' or prj.kind == 'WindowedApp') then
-        _p('add_executable(%s ${source_list})', premake.esc(prj.name))
+    for _, platform in ipairs(platforms) do
+        for cfg in premake.eachconfig(prj, platform) do
 
-        -- add library dependencies
-        cmake.linkdepends(prj, platforms, nativeplatform, cc)
+            -- TODO: Extend support for 32-bit targets on 64-bit hosts
+            if cfg.platform == nativeplatform then
+                _p('if(CMAKE_BUILD_TYPE MATCHES \"%s\")', cfg.name)
+
+                if (prj.kind == 'StaticLib') then
+                    _p(1, 'add_library(%s STATIC ${source_list})', premake.esc(cfg.buildtarget.basename))
+                end
+                if (prj.kind == 'SharedLib') then
+                    _p(1, 'add_library(%s SHARED ${source_list})', premake.esc(cfg.buildtarget.basename))
+                end
+                if (prj.kind == 'ConsoleApp' or prj.kind == 'WindowedApp') then
+                    _p(1, 'add_executable(%s ${source_list})', premake.esc(cfg.buildtarget.basename))
+                    _p(1, 'target_link_libraries(%s%s%s)', premake.esc(cfg.buildtarget.basename), cmake.list(premake.esc(premake.getlinks(cfg, "siblings", "basename"))), cmake.list(cc.getlinkflags(cfg)))
+                end
+                _p('endif()')
+                _p('')
+            end
+        end
     end
-    _p('')
 
     -- per-dependency build rules
     cmake.dependencyRules(prj)
