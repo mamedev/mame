@@ -81,7 +81,6 @@ public:
 private:
 	// internal helpers
 	void remove_references(ATTR_UNUSED device_t &device);
-	device_t &config_new_device(device_t &device);
 
 	// internal state
 	const game_driver &     m_gamedrv;
