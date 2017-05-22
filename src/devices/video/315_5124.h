@@ -90,7 +90,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_0) ? &m_space_config : nullptr; }
 
@@ -192,18 +192,19 @@ class sega315_5378_device : public sega315_5124_device
 public:
 	sega315_5378_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT( sega315_5378 );
-
 	virtual void set_sega315_5124_compatibility_mode(bool sega315_5124_compatibility_mode) override;
 
 protected:
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void update_palette() override;
 	virtual void cram_write(uint8_t data) override;
 	virtual void blit_scanline( int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line ) override;
 	virtual uint16_t get_name_table_row(int row) override;
+
+private:
+	DECLARE_PALETTE_INIT( sega315_5378 );
 };
 
 
