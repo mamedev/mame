@@ -85,9 +85,6 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		}
 	}
 
-	// when finished, set the game driver
-	driver_device::static_set_game(*m_root_device, gamedrv);
-
 	// then notify all devices that their configuration is complete
 	for (device_t &device : device_iterator(root_device()))
 		if (!device.configured())
@@ -156,6 +153,9 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 		// allocate the root device directly
 		assert(!m_root_device);
 		m_root_device = type(*this, tag, nullptr, clock);
+		driver_device *driver = dynamic_cast<driver_device *>(m_root_device.get());
+		if (driver)
+			driver_device::static_set_game(*driver, m_gamedrv);
 		m_root_device->add_machine_configuration(*this);
 		return m_root_device.get();
 	}
