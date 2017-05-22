@@ -116,8 +116,11 @@ READ8_MEMBER(stv_state::stv_ioga_r)
 		case 0x09: res = ioport("PORTE")->read(); break; // P3
 		case 0x0b: res = ioport("PORTF")->read(); break; // P4
 		case 0x0d:
-			if (m_ioga_mode & 0x80)
-				res = (ioport(portg[(m_ioga_portg >> 1) & 3])->read()) >> (((m_ioga_portg & 1) ^ 1) * 8);	 // PORT-G counter mode
+			if (m_ioga_mode & 0x80) // PORT-G in counter mode
+			{
+				res = (ioport(portg[(m_ioga_portg >> 1) & 3])->read()) >> (((m_ioga_portg & 1) ^ 1) * 8);
+				m_ioga_portg = (m_ioga_portg & 0xf8) | ((m_ioga_portg + 1) & 7); // counter# is auto-incremented then read
+			}
 			else
 				res = ioport("PORTG")->read();
 			break;
@@ -148,6 +151,7 @@ WRITE8_MEMBER(stv_state::stv_ioga_w)
 			machine().bookkeeping().coin_lockout_w(1,~data & 0x08);
 			break;
 		case 0x0d:
+			// then bit 7==0 - reset counters, currently this is unhandled, instead counters reset after each read (PORT_RESET used)
 			m_ioga_portg = data;
 			break;
 		case 0x1d:
