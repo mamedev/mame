@@ -161,17 +161,6 @@ const tiny_rom_entry *driver_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  device_input_ports - return a pointer to the
-//  game's input ports
-//-------------------------------------------------
-
-ioport_constructor driver_device::device_input_ports() const
-{
-	return m_system->ipt;
-}
-
-
-//-------------------------------------------------
 //  device_start - device override which calls
 //  the various helpers
 //-------------------------------------------------
