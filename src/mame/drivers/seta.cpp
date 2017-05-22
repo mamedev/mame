@@ -1626,6 +1626,40 @@ WRITE_LINE_MEMBER(seta_state::screen_vblank_seta_buffer_sprites)
 ***************************************************************************/
 
 
+READ16_MEMBER(seta_state::ipl0_ack_r)
+{
+	m_maincpu->set_input_line(1, CLEAR_LINE);
+	return 0;
+}
+
+WRITE16_MEMBER(seta_state::ipl0_ack_w)
+{
+	m_maincpu->set_input_line(1, CLEAR_LINE);
+}
+
+READ16_MEMBER(seta_state::ipl1_ack_r)
+{
+	m_maincpu->set_input_line(2, CLEAR_LINE);
+	return 0;
+}
+
+WRITE16_MEMBER(seta_state::ipl1_ack_w)
+{
+	m_maincpu->set_input_line(2, CLEAR_LINE);
+}
+
+READ16_MEMBER(seta_state::ipl2_ack_r)
+{
+	m_maincpu->set_input_line(4, CLEAR_LINE);
+	return 0;
+}
+
+WRITE16_MEMBER(seta_state::ipl2_ack_w)
+{
+	m_maincpu->set_input_line(4, CLEAR_LINE);
+}
+
+
 /***************************************************************************
                                 Thundercade
 ***************************************************************************/
@@ -1699,10 +1733,9 @@ WRITE16_MEMBER(seta_state::calibr50_soundlatch_w)
 static ADDRESS_MAP_START( calibr50_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM                             // ROM
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                             // RAM
-	AM_RANGE(0x100000, 0x100007) AM_READNOP                         // ? (same as a00010-a00017?)
+	AM_RANGE(0x100000, 0x100001) AM_READ(ipl2_ack_r)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM                             // NVRAM
-	AM_RANGE(0x300000, 0x300001) AM_READNOP                         // ? (value's read but not used)
-	AM_RANGE(0x300000, 0x300001) AM_WRITENOP                        // ? (random value)
+	AM_RANGE(0x300000, 0x300001) AM_READWRITE(ipl1_ack_r, ipl1_ack_w)
 	AM_RANGE(0x400000, 0x400001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP                        // ?
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
@@ -1794,12 +1827,12 @@ static ADDRESS_MAP_START( usclssic_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xb40000, 0xb40003) AM_READ(usclssic_trackball_x_r)        // TrackBall X
 	AM_RANGE(0xb40000, 0xb40001) AM_WRITE(usclssic_lockout_w)           // Coin Lockout + Tiles Banking
 	AM_RANGE(0xb40004, 0xb40007) AM_READ(usclssic_trackball_y_r)        // TrackBall Y + Buttons
-	AM_RANGE(0xb4000a, 0xb4000b) AM_WRITENOP                            // ? (value's not important. In lev2&6)
+	AM_RANGE(0xb4000a, 0xb4000b) AM_WRITE(ipl1_ack_w)
 	AM_RANGE(0xb40010, 0xb40011) AM_READ_PORT("COINS")                  // Coins
 	AM_RANGE(0xb40010, 0xb40011) AM_WRITE(calibr50_soundlatch_w)        // To Sub CPU
 	AM_RANGE(0xb40018, 0xb4001f) AM_READ(usclssic_dsw_r)                // 2 DSWs
 	AM_RANGE(0xb40018, 0xb40019) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xb80000, 0xb80001) AM_READNOP                             // Watchdog (value is discarded)?
+	AM_RANGE(0xb80000, 0xb80001) AM_READ(ipl2_ack_r)
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)         // Sprites Code + X + Attr
 	AM_RANGE(0xd00000, 0xd03fff) AM_RAM_WRITE(seta_vram_0_w) AM_SHARE("vram_0") // VRAM
 	AM_RANGE(0xd04000, 0xd04fff) AM_RAM                                 //
@@ -7844,10 +7877,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::calibr50_interrupt)
 	int scanline = param;
 
 	if((scanline % 64) == 0)
-		m_maincpu->set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, ASSERT_LINE);
 
 	if(scanline == 248)
-		m_maincpu->set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
 

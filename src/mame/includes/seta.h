@@ -247,6 +247,12 @@ public:
 	uint32_t screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_seta_buffer_sprites);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_setaroul);
+	DECLARE_READ16_MEMBER(ipl0_ack_r);
+	DECLARE_WRITE16_MEMBER(ipl0_ack_w);
+	DECLARE_READ16_MEMBER(ipl1_ack_r);
+	DECLARE_WRITE16_MEMBER(ipl1_ack_w);
+	DECLARE_READ16_MEMBER(ipl2_ack_r);
+	DECLARE_WRITE16_MEMBER(ipl2_ack_w);
 	void uPD71054_update_timer(device_t *cpu, int no);
 	INTERRUPT_GEN_MEMBER(wrofaero_interrupt);
 	TIMER_CALLBACK_MEMBER(uPD71054_timer_callback);
