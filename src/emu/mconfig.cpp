@@ -155,7 +155,7 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 		m_root_device = type(*this, tag, nullptr, clock);
 		driver_device *driver = dynamic_cast<driver_device *>(m_root_device.get());
 		if (driver)
-			driver_device::static_set_game(*driver, m_gamedrv);
+			driver->set_game_driver(m_gamedrv);
 		m_root_device->add_machine_configuration(*this);
 		return m_root_device.get();
 	}

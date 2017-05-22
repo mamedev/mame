@@ -130,6 +130,23 @@ ATTR_COLD void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owne
 	MACHINE_CONFIG_NAME(_base)(config, owner, device);
 
 /**
+ @def MACHINE_CONFIG_MEMBER(_name)
+ Begins a device machine configuration member (usually overriding device_t::device_add_mconfig).
+ @param _name name of this config
+ @param _base name of the parent config
+ @hideinitializer
+*/
+#define MACHINE_CONFIG_MEMBER(_name) \
+ATTR_COLD void _name(machine_config &config) \
+{ \
+	device_t *const owner = this; \
+	device_t *device = nullptr; \
+	devcb_base *devcb = nullptr; \
+	(void)owner; \
+	(void)device; \
+	(void)devcb; \
+
+/**
 @def MACHINE_CONFIG_END
 Ends a machine_config.
 @hideinitializer

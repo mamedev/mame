@@ -118,7 +118,7 @@ public:
 	};
 
 	// inline configuration helpers
-	static void static_set_game(device_t &device, const game_driver &game);
+	void set_game_driver(const game_driver &game);
 	static void static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback);
 
 	// dummy driver_init callbacks
