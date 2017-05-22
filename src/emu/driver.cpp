@@ -161,6 +161,27 @@ const tiny_rom_entry *driver_device::device_rom_region() const
 
 
 //-------------------------------------------------
+//  device_add_mconfig - add machine configuration
+//-------------------------------------------------
+
+void driver_device::device_add_mconfig(machine_config &config)
+{
+	m_system->machine_config(config, this, nullptr);
+}
+
+
+//-------------------------------------------------
+//  device_input_ports - return a pointer to the
+//  game's input ports
+//-------------------------------------------------
+
+ioport_constructor driver_device::device_input_ports() const
+{
+	return m_system->ipt;
+}
+
+
+//-------------------------------------------------
 //  device_start - device override which calls
 //  the various helpers
 //-------------------------------------------------
