@@ -43,6 +43,7 @@ ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, 
 		m_motor_sense(TICKET_MOTOR_ACTIVE_LOW),
 		m_status_sense(TICKET_STATUS_ACTIVE_LOW),
 		m_period(attotime::from_msec(100)),
+		m_hopper_type(false),
 		m_active_bit(0x80),
 		m_motoron(0),
 		m_ticketdispensed(0),
@@ -83,11 +84,12 @@ void ticket_dispenser_device::static_set_period(device_t &device, const attotime
 //  the motor and status bits
 //-------------------------------------------------
 
-void ticket_dispenser_device::static_set_senses(device_t &device, uint8_t motor_sense, uint8_t status_sense)
+void ticket_dispenser_device::static_set_senses(device_t &device, uint8_t motor_sense, uint8_t status_sense, bool hopper_type)
 {
 	ticket_dispenser_device &ticket = downcast<ticket_dispenser_device &>(device);
 	ticket.m_motor_sense = motor_sense;
 	ticket.m_status_sense = status_sense;
+	ticket.m_hopper_type = hopper_type;
 }
 
 
@@ -140,9 +142,12 @@ WRITE8_MEMBER( ticket_dispenser_device::write )
 	{
 		if (m_power)
 		{
-			LOG(("%s: Ticket Power Off\n", machine().describe_context()));
-			m_timer->adjust(attotime::never);
-			machine().output().set_led_value(2,0);
+			if (m_hopper_type == false || m_status == m_ticketnotdispensed)
+			{
+				LOG(("%s: Ticket Power Off\n", machine().describe_context()));
+				m_timer->adjust(attotime::never);
+				machine().output().set_led_value(2, 0);
+			}
 			m_power = 0;
 		}
 	}
@@ -204,6 +209,13 @@ void ticket_dispenser_device::device_timer(emu_timer &timer, device_timer_id id,
 		m_status ^= m_active_bit;
 		LOG(("Ticket Status Changed to %02X\n", m_status));
 		m_timer->adjust(m_period);
+	}
+	else if (m_hopper_type)
+	{
+		m_status ^= m_active_bit;
+		LOG(("%s: Ticket Power Off\n", machine().describe_context()));
+		m_timer->adjust(attotime::never);
+		machine().output().set_led_value(2, 0);
 	}
 
 	// update LED status (fixme: should map to an output)

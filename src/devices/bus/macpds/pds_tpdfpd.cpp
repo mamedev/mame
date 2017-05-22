@@ -41,7 +41,7 @@
 
 #define VRAM_SIZE   (256*1024)  // PCB has a jumper for 1MByte; may require different EPROMs
 
-MACHINE_CONFIG_FRAGMENT( sedisplay )
+MACHINE_CONFIG_START( sedisplay )
 	MCFG_SCREEN_ADD( SEDISPLAY_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, macpds_sedisplay_device, screen_update)
 	MCFG_SCREEN_SIZE(1280, 960)

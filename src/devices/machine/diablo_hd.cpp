@@ -1442,7 +1442,7 @@ void diablo_hd_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
-MACHINE_CONFIG_FRAGMENT( diablo_drive )
+MACHINE_CONFIG_START( diablo_drive )
 	MCFG_DIABLO_ADD("drive")
 MACHINE_CONFIG_END
 

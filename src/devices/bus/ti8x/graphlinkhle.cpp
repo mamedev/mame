@@ -12,7 +12,7 @@ namespace bus { namespace ti8x {
 
 namespace {
 
-MACHINE_CONFIG_FRAGMENT(graph_link_hle)
+MACHINE_CONFIG_START(graph_link_hle)
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(graph_link_hle_device, rx_w))
 MACHINE_CONFIG_END

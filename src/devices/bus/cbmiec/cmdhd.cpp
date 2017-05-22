@@ -76,7 +76,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( cmd_hd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( cmd_hd )
+static MACHINE_CONFIG_START( cmd_hd )
 	MCFG_CPU_ADD(M6502_TAG, M6502, 2000000)
 	MCFG_CPU_PROGRAM_MAP(cmd_hd_mem)
 

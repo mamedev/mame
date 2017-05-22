@@ -379,7 +379,7 @@ static MACHINE_CONFIG_DERIVED( taito4, taito )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(taito_state, pia_cb2_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( taito_ay_audio )
+static MACHINE_CONFIG_START( taito_ay_audio )
 	MCFG_CPU_MODIFY( "audiocpu" )
 	MCFG_CPU_PROGRAM_MAP(taito_sub_map5)
 

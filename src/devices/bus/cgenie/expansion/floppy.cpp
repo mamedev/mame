@@ -70,7 +70,7 @@ const tiny_rom_entry *cgenie_fdc_device::device_rom_region() const
 //  machine configurations
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( cgenie_fdc )
+static MACHINE_CONFIG_START( cgenie_fdc )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", cgenie_fdc_device, timer_callback, attotime::from_msec(25))
 
 	MCFG_FD1793_ADD("fd1793", XTAL_1MHz)

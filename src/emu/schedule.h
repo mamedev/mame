@@ -134,7 +134,6 @@ public:
 	// timers, specified by callback/name
 	emu_timer *timer_alloc(timer_expired_delegate callback, void *ptr = nullptr);
 	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0, void *ptr = nullptr);
-	void timer_pulse(const attotime &period, timer_expired_delegate callback, int param = 0, void *ptr = nullptr);
 	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0, void *ptr = nullptr) { timer_set(attotime::zero, callback, param, ptr); }
 
 	// timers, specified by device/id; generally devices should use the device_t methods instead

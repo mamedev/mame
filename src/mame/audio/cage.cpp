@@ -626,7 +626,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( cage )
+MACHINE_CONFIG_START( cage )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cage", TMS32031, 33868800)

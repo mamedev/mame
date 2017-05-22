@@ -89,7 +89,7 @@ ADDRESS_MAP_END
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r0 )
+MACHINE_CONFIG_START( gottlieb_sound_r0 )
 	// audio CPU
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // M6503 - clock is a gate, a resistor and a capacitor. Freq unknown.
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r0_map)
@@ -292,7 +292,7 @@ ADDRESS_MAP_END
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r1 )
+MACHINE_CONFIG_START( gottlieb_sound_r1 )
 	// audio CPU
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4) // the board can be set to /2 as well
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r1_map)
@@ -309,7 +309,7 @@ MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r1 )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r1_with_votrax )
+MACHINE_CONFIG_START( gottlieb_sound_r1_with_votrax )
 	MCFG_FRAGMENT_ADD(gottlieb_sound_r1)
 
 	// add the VOTRAX
@@ -673,7 +673,7 @@ ADDRESS_MAP_END
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r2 )
+MACHINE_CONFIG_START( gottlieb_sound_r2 )
 	// audio CPUs
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND2_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(gottlieb_sound_r2_map)

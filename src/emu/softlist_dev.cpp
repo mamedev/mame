@@ -155,21 +155,32 @@ void software_list_device::find_approx_matches(const std::string &name, int matc
 				int shortpenalty = driver_list::penalty_compare(name.c_str(), swinfo.shortname().c_str());
 				int curpenalty = std::min(longpenalty, shortpenalty);
 
-				// insert into the sorted table of matches
-				for (int matchnum = matches - 1; matchnum >= 0; matchnum--)
+				// make sure it isn't already in the table
+				bool skip = false;
+				for (int matchnum = 0; matchnum < matches; matchnum++)
 				{
-					// stop if we're worse than the current entry
-					if (curpenalty >= penalty[matchnum])
-						break;
+					if ((penalty[matchnum] == curpenalty) && (swinfo.longname() == list[matchnum]->longname()) && (swinfo.shortname() == list[matchnum]->shortname()))
+						skip = true;
+				}
 
-					// as long as this isn't the last entry, bump this one down
-					if (matchnum < matches - 1)
+				if (!skip)
+				{
+					// insert into the sorted table of matches
+					for (int matchnum = matches - 1; matchnum >= 0; matchnum--)
 					{
-						penalty[matchnum + 1] = penalty[matchnum];
-						list[matchnum + 1] = list[matchnum];
+						// stop if we're worse than the current entry
+						if (curpenalty >= penalty[matchnum])
+							break;
+
+						// as long as this isn't the last entry, bump this one down
+						if (matchnum < matches - 1)
+						{
+							penalty[matchnum + 1] = penalty[matchnum];
+							list[matchnum + 1] = list[matchnum];
+						}
+						list[matchnum] = &swinfo;
+						penalty[matchnum] = curpenalty;
 					}
-					list[matchnum] = &swinfo;
-					penalty[matchnum] = curpenalty;
 				}
 			}
 		}

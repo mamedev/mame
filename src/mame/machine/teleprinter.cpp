@@ -211,7 +211,7 @@ uint32_t teleprinter_device::tp_update(screen_device &device, bitmap_rgb32 &bitm
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-MACHINE_CONFIG_FRAGMENT( generic_teleprinter )
+MACHINE_CONFIG_START( generic_teleprinter )
 	MCFG_SCREEN_ADD(TELEPRINTER_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */

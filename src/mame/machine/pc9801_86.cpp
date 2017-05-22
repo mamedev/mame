@@ -48,7 +48,7 @@ WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 	machine().device<pic8259_device>(":pic8259_slave")->ir4_w(state || (m_pcmirq ? ASSERT_LINE : CLEAR_LINE));
 }
 
-static MACHINE_CONFIG_FRAGMENT( pc9801_86_config )
+static MACHINE_CONFIG_START( pc9801_86_config )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pc9801_86_device, sound_irq))

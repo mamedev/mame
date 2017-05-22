@@ -172,7 +172,7 @@ WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( tmpz84c015 )
+static MACHINE_CONFIG_START( tmpz84c015 )
 
 	/* basic machine hardware */
 	MCFG_Z80SIO0_ADD("tmpz84c015_sio", DERIVED_CLOCK(1,1), 0, 0, 0, 0)

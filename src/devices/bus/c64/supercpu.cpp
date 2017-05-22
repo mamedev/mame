@@ -57,10 +57,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_supercpu )
+//  MACHINE_CONFIG_START( c64_supercpu )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_supercpu )
+static MACHINE_CONFIG_START( c64_supercpu )
 	MCFG_CPU_ADD(G65816_TAG, G65816, 1000000)
 	MCFG_CPU_PROGRAM_MAP(c64_supercpu_map)
 

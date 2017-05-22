@@ -340,7 +340,7 @@ void nouspikel_ide_interface_device::device_reset()
 	m_tms9995_mode =  false; // (device->type()==TMS9995);
 }
 
-MACHINE_CONFIG_FRAGMENT( tn_ide )
+MACHINE_CONFIG_START( tn_ide )
 	MCFG_DEVICE_ADD( "ide_rtc", RTC65271, 0 )
 	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(nouspikel_ide_interface_device, clock_interrupt_callback))
 	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", nullptr, false)

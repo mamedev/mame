@@ -219,7 +219,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( snes_dsp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( snes_dsp_pfest94 )
+static MACHINE_CONFIG_START( snes_dsp_pfest94 )
 	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
 	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
 	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)

@@ -183,7 +183,7 @@ ADDRESS_MAP_END
 //  machine configurations
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( mvme350 )
+MACHINE_CONFIG_START( mvme350 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD (MVME350_CPU_TAG, M68010, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP (mvme350_mem)

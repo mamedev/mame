@@ -43,9 +43,9 @@ DEFINE_DEVICE_TYPE(C64_IDE64, c64_ide64_cartridge_device, "c64_ide64", "C64 IDE6
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_ide64 )
+//  MACHINE_CONFIG_START( c64_ide64 )
 //-------------------------------------------------
-static MACHINE_CONFIG_FRAGMENT( c64_ide64 )
+static MACHINE_CONFIG_START( c64_ide64 )
 	MCFG_ATMEL_29C010_ADD(AT29C010A_TAG)
 	MCFG_DS1302_ADD(DS1302_TAG, XTAL_32_768kHz)
 

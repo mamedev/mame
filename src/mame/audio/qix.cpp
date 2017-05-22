@@ -170,7 +170,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( qix_audio )
+MACHINE_CONFIG_START( qix_audio )
 	MCFG_CPU_ADD("audiocpu", M6802, SOUND_CLOCK_OSC/2)      /* 0.92 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
@@ -204,7 +204,7 @@ MACHINE_CONFIG_FRAGMENT( qix_audio )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_FRAGMENT( slither_audio )
+MACHINE_CONFIG_START( slither_audio )
 	MCFG_DEVICE_ADD("sndpia0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("P2"))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, slither_coinctl_w))

@@ -83,7 +83,7 @@ ADDRESS_MAP_END
 //  MACHINE_CONFIG
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( cuda )
+static MACHINE_CONFIG_START( cuda )
 	MCFG_CPU_ADD(CUDA_CPU_TAG, M68HC05EG, XTAL_32_768kHz*192)   // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
 	MCFG_CPU_PROGRAM_MAP(cuda_map)
 MACHINE_CONFIG_END

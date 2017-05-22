@@ -886,12 +886,12 @@ IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-MACHINE_CONFIG_FRAGMENT( megadriv_timers )
+MACHINE_CONFIG_START( megadriv_timers )
 	MCFG_TIMER_DEVICE_ADD("md_scan_timer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_FRAGMENT( md_ntsc )
+MACHINE_CONFIG_START( md_ntsc )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(megadriv_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
@@ -940,7 +940,7 @@ MACHINE_CONFIG_END
 
 /************ PAL hardware has a different master clock *************/
 
-MACHINE_CONFIG_FRAGMENT( md_pal )
+MACHINE_CONFIG_START( md_pal )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(megadriv_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)

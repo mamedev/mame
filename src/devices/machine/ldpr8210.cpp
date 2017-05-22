@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( pr8210_portmap, AS_IO, 8, pioneer_pr8210_device )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_FRAGMENT( pr8210 )
+static MACHINE_CONFIG_START( pr8210 )
 	MCFG_CPU_ADD("pr8210", I8049, XTAL_4_41MHz)
 	MCFG_CPU_IO_MAP(pr8210_portmap)
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pioneer_pr8210_device, i8049_bus_r))
@@ -850,7 +850,7 @@ static ADDRESS_MAP_START( simutrek_portmap, AS_IO, 8, simutrek_special_device )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_FRAGMENT( simutrek )
+static MACHINE_CONFIG_START( simutrek )
 	MCFG_CPU_ADD("simutrek", I8748, XTAL_6MHz)
 	MCFG_CPU_IO_MAP(simutrek_portmap)
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(simutrek_special_device, i8748_port2_r))

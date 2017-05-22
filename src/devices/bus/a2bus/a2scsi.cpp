@@ -50,7 +50,7 @@ DEFINE_DEVICE_TYPE(A2BUS_SCSI, a2bus_scsi_device, "a2scsi", "Apple II SCSI Card"
 #define SCSI_BUS_TAG     "scsibus"
 #define SCSI_5380_TAG    "scsibus:7:ncr5380"
 
-static MACHINE_CONFIG_FRAGMENT( ncr5380 )
+static MACHINE_CONFIG_START( ncr5380 )
 	MCFG_DEVICE_CLOCK(10000000)
 	MCFG_NCR5380N_DRQ_HANDLER(DEVWRITELINE("^^", a2bus_scsi_device, drq_w))
 MACHINE_CONFIG_END
@@ -61,7 +61,7 @@ static SLOT_INTERFACE_START( scsi_devices )
 	SLOT_INTERFACE_INTERNAL("ncr5380", NCR5380N)
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_FRAGMENT( scsi )
+MACHINE_CONFIG_START( scsi )
 	MCFG_NSCSI_BUS_ADD(SCSI_BUS_TAG)
 	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:1", scsi_devices, nullptr, false)

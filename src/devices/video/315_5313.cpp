@@ -179,7 +179,7 @@ void sega315_5313_device::static_set_palette_tag(device_t &device, const char *t
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( sega_genesis_vdp )
+static MACHINE_CONFIG_START( sega_genesis_vdp )
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
 MACHINE_CONFIG_END

@@ -57,7 +57,7 @@ bool mm1_keyoard_device::first_time = true;
 //  MACHINE_DRIVER( mm1_keyboard )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( mm1_keyboard )
+static MACHINE_CONFIG_START( mm1_keyboard )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("keyboard_and_chassis_sounds", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(2)

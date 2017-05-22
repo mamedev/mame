@@ -57,7 +57,7 @@ DEFINE_DEVICE_TYPE(A2BUS_CORVUS, a2bus_corvus_device, "a2corvus", "Corvus Flat C
 #define CORVUS_ROM_REGION  "corvus_rom"
 #define CORVUS_HD_TAG      "corvushd"
 
-static MACHINE_CONFIG_FRAGMENT(corvus)
+static MACHINE_CONFIG_START(corvus)
 	MCFG_DEVICE_ADD(CORVUS_HD_TAG, CORVUS_HDC, 0)
 	MCFG_HARDDISK_ADD("harddisk1")
 	MCFG_HARDDISK_INTERFACE("corvus_hdd")

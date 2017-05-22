@@ -11369,6 +11369,7 @@ dorachan                        // (c) 1980 Craul Denshi
 @source:dotrikun.cpp
 dotrikun                        // cabinet test board
 dotrikun2                       // cabinet test board
+dotriman
 
 @source:dps1.cpp
 dps1                            //
@@ -14297,6 +14298,7 @@ venus                           // bootleg
 h19                             // Heath H19 (Zenith Z-19)
 super19                         // Super19 replacement ROMS for H19
 watz19                          // Watzman replacement ROMS for H19
+ultra19                         // ULTRA ROM replacement ROMS for H19
 
 @source:h8.cpp
 h8                              //
@@ -34749,7 +34751,7 @@ nameclub                        //
 nclubv2                         //
 nclubv3                         // 1997.07 Name Club Ver. 3
 othellos                        // 1998.07 Othello Shiyouyo (Success)
-patocar                         // 1999.03 Hashire Patrol Car
+patocar                         // 2001.?? Hashire Patrol Car
 pblbeach                        // 1996.03 Pebble Beach the Great Shot (T&E Soft)
 pclb2elk                        // 1997.07 Print Club Custom
 pckobe99                        // Print Club Custom 3
@@ -35167,6 +35169,7 @@ wboy2u                          // 834-5984 (c) 1986 + Escape license (S1)
 wboy3                           // 834-5984 (c) 1986 + Escape license (S1)
 wboy4                           // 834-5984 (c) 1986 + Escape license (S1)
 wboy5                           // 834-5984 (c) 1986 + Escape license (S1)
+wboy6                           // 834-5984 (c) 1986 + Escape license (S1)
 wboyo                           // 834-5984 (c) 1986 + Escape license (S1)
 wboysys2                        // 834-5984  (c) 1986 + Escape license (S1)
 wboysys2a                       //
@@ -37102,6 +37105,7 @@ votrtnt                         // 1980 Votrax Type-'N-Talk
 
 @source:voyager.cpp
 voyager                         // (c) 2002 Team Play, Inc.
+voyagers						// (c) 2002 Team Play, Inc.
 policet2                        // (c) 2003 Team Play, Inc.
 
 @source:vp101.cpp

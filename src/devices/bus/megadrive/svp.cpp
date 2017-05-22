@@ -344,7 +344,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( md_svp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( md_svp )
+static MACHINE_CONFIG_START( md_svp )
 	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
 	MCFG_CPU_PROGRAM_MAP(md_svp_ssp_map)
 	MCFG_CPU_IO_MAP(md_svp_ext_map)

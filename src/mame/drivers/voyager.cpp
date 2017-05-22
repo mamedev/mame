@@ -7,11 +7,17 @@ Police Trainer 2 (c) 2003 Team Play, Inc. / Phantom Systems
 
 skeleton driver by R. Belmont
 
-Both of these games run Linux.
+All of these games run Linux.
 
 Motherboard is FIC AZIIEA with AMD Duron processor of unknown speed
 Chipset: VIA KT133a with VT8363A Northbridge and VT82C686B Southbridge
 Video: Jaton 3DForce2MX-32, based on Nvidia GeForce 2MX chipset w/32 MB of VRAM
+I/O: JAMMA adapter board connects to parallel port, VGA out, audio out.
+	Labelled "MEGAJAMMA 101 REV A2" for the stand-up Voyager
+	
+HDD for stand-up Voyager is a Maxtor D740X-6L 20 GB model.
+
+Upright Voyager runs at 15 kHz standard res, sit-down at 24 kHz medium res.
 
 TODO: VIA KT133a chipset support, GeForce 2MX video support, lots of things ;-)
 
@@ -513,6 +519,7 @@ DRIVER_INIT_MEMBER(voyager_state,voyager)
 	intel82439tx_init();
 }
 
+// unknown version and cabinet style, but believed to be the deluxe sit-down.
 ROM_START( voyager )
 	ROM_REGION( 0x40000, "bios", 0 )
 	ROM_LOAD( "stv.u23", 0x000000, 0x040000, CRC(0bed28b6) SHA1(8e7f17af65ca9d17c5c7ddedb2313507d0ea8181) )
@@ -525,6 +532,21 @@ ROM_START( voyager )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "voyager", 0, SHA1(8b94f2420f6abb40148e4ba6eed8819d8e85dbde))
+ROM_END
+
+// upright version 1.002
+ROM_START( voyagers )
+	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_LOAD( "stv.u23", 0x000000, 0x040000, CRC(0bed28b6) SHA1(8e7f17af65ca9d17c5c7ddedb2313507d0ea8181) )
+
+	ROM_REGION( 0x8000, "video_bios", 0 )   // incorrect, need GeForce 2MX BIOS for 32MB card
+	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) BAD_DUMP SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+	ROM_CONTINUE(                                 0x0001, 0x4000 )
+
+	ROM_REGION( 0x800, "nvram", ROMREGION_ERASE00 )
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "voyagers", 0, SHA1(839527eee24272e5ad59b871975feadfdfc07a9a))
 ROM_END
 
 ROM_START( policet2 )
@@ -542,4 +564,5 @@ ROM_START( policet2 )
 ROM_END
 
 GAME( 2002, voyager,  0, voyager, voyager, voyager_state,  voyager, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2002, voyagers, voyager, voyager, voyager, voyager_state,  voyager, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager (stand-up version 1.002)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 GAME( 2003, policet2, 0, voyager, voyager, voyager_state,  voyager, ROT0, "Team Play/Phantom Entertainment", "Police Trainer 2", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

@@ -80,7 +80,7 @@ msx_cart_msx_audio_hxmu900_device::msx_cart_msx_audio_hxmu900_device(const machi
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( msx_audio_hxmu900 )
+static MACHINE_CONFIG_START( msx_audio_hxmu900 )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("y8950", Y8950, XTAL_3_579545MHz)    // Not verified
@@ -140,7 +140,7 @@ msx_cart_msx_audio_nms1205_device::msx_cart_msx_audio_nms1205_device(const machi
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( msx_audio_nms1205 )
+static MACHINE_CONFIG_START( msx_audio_nms1205 )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	// At the same time the sound is also output on two output on the nms1205 cartridge itself
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -249,7 +249,7 @@ msx_cart_msx_audio_fsca1_device::msx_cart_msx_audio_fsca1_device(const machine_c
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( msx_audio_fsca1 )
+static MACHINE_CONFIG_START( msx_audio_fsca1 )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("y8950", Y8950, XTAL_3_579545MHz)

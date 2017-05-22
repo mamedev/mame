@@ -46,14 +46,14 @@ void at_mb_device::device_start()
 		i80286_cpu_device::static_set_a20_callback(*m_maincpu, i80286_cpu_device::a20_cb(&at_mb_device::a20_286, this));
 }
 
-MACHINE_CONFIG_FRAGMENT( at_softlists )
+MACHINE_CONFIG_START( at_softlists )
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
 	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
 	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( at_mb )
+static MACHINE_CONFIG_START( at_mb )
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))

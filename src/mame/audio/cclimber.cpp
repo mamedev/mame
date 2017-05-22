@@ -20,7 +20,7 @@ SAMPLES_START_CB_MEMBER( cclimber_audio_device::sh_start )
 	}
 }
 
-MACHINE_CONFIG_FRAGMENT( cclimber_audio )
+MACHINE_CONFIG_START( cclimber_audio )
 	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK/2)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(cclimber_audio_device, sample_select_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":speaker", 0.5)

@@ -19,10 +19,10 @@ DEFINE_DEVICE_TYPE(C64_DELA_EP64, c64_dela_ep64_cartridge_device, "c64_dela_ep64
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_dela_ep64 )
+//  MACHINE_CONFIG_START( c64_dela_ep64 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_dela_ep64 )
+static MACHINE_CONFIG_START( c64_dela_ep64 )
 	MCFG_GENERIC_SOCKET_ADD("eprom1", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("rom,bin")
 	MCFG_GENERIC_SOCKET_ADD("eprom2", generic_linear_slot, nullptr)

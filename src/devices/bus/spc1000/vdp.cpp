@@ -19,7 +19,7 @@ WRITE_LINE_MEMBER(spc1000_vdp_exp_device::vdp_interrupt)
 	// nothing here?
 }
 
-static MACHINE_CONFIG_FRAGMENT(scp1000_vdp)
+static MACHINE_CONFIG_START(scp1000_vdp)
 
 	MCFG_DEVICE_ADD("tms", TMS9928A, XTAL_10_738635MHz / 2) // TODO: which clock?
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)

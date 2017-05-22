@@ -452,7 +452,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* Basic DCS system with ADSP-2105 and 2k of SRAM (T-unit, V-unit, Killer Instinct) */
-MACHINE_CONFIG_FRAGMENT( dcs_audio_2k )
+MACHINE_CONFIG_START( dcs_audio_2k )
 	MCFG_CPU_ADD("dcs", ADSP2105, XTAL_10MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device,timer_enable_callback))   /* callback for timer fired */
@@ -498,7 +498,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( dcs2_audio_2115 )
+MACHINE_CONFIG_START( dcs2_audio_2115 )
 	MCFG_CPU_ADD("dcs2", ADSP2115, XTAL_16MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device,timer_enable_callback))   /* callback for timer fired */
@@ -536,7 +536,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( dcs2_audio_dsio )
+MACHINE_CONFIG_START( dcs2_audio_dsio )
 	MCFG_CPU_ADD("dsio", ADSP2181, XTAL_32MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device,timer_enable_callback))   /* callback for timer fired */
@@ -573,7 +573,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( dcs2_audio_denver )
+MACHINE_CONFIG_START( dcs2_audio_denver )
 	MCFG_CPU_ADD("denver", ADSP2181, XTAL_33_333MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device,timer_enable_callback))   /* callback for timer fired */

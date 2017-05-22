@@ -303,7 +303,7 @@ void huc6260_device::device_reset()
 	m_timer->adjust( m_screen->time_until_pos( ( m_screen->vpos() + 1 ) % 263, 0 ) );
 }
 
-static MACHINE_CONFIG_FRAGMENT( huc6260 )
+static MACHINE_CONFIG_START( huc6260 )
 	MCFG_PALETTE_ADD("palette",  huc6260_device::PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(huc6260_device, huc6260)
 MACHINE_CONFIG_END

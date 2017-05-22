@@ -53,7 +53,7 @@ DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i82371sb_isa_device)
 	// end-VGA-HACK
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( southbridge )
+static MACHINE_CONFIG_START( southbridge )
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(i82371sb_isa_device, at_pit8254_out0_changed))

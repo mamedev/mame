@@ -85,7 +85,7 @@
 
 DEFINE_DEVICE_TYPE(A2BUS_MOUSE, a2bus_mouse_device, "a2mouse", "Apple II Mouse Card")
 
-static MACHINE_CONFIG_FRAGMENT( mouse )
+static MACHINE_CONFIG_START( mouse )
 	MCFG_CPU_ADD(MOUSE_MCU_TAG, M68705P3, 2043600)
 	MCFG_M68705_PORTA_R_CB(READ8(a2bus_mouse_device, mcu_port_a_r))
 	MCFG_M68705_PORTB_R_CB(READ8(a2bus_mouse_device, mcu_port_b_r))

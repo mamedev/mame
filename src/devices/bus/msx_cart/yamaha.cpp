@@ -46,7 +46,7 @@ msx_cart_sfg05_device::msx_cart_sfg05_device(const machine_config &mconfig, cons
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( msx_sfg )
+static MACHINE_CONFIG_START( msx_sfg )
 	// YM2151 (OPM)
 	// YM3012 (DAC)
 	// YM2148 (MKS)

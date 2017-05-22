@@ -513,7 +513,7 @@ void ti99_single_cart_conn_device::device_reset()
 	m_cartridge->set_slot(0);
 }
 
-static MACHINE_CONFIG_FRAGMENT( single_slot )
+static MACHINE_CONFIG_START( single_slot )
 	MCFG_DEVICE_ADD("cartridge", TI99CART, 0)
 MACHINE_CONFIG_END
 
@@ -812,7 +812,7 @@ void ti99_multi_cart_conn_device::device_reset(void)
 	m_grom_selected = false;
 }
 
-static MACHINE_CONFIG_FRAGMENT( multi_slot )
+static MACHINE_CONFIG_START( multi_slot )
 	MCFG_DEVICE_ADD("cartridge1", TI99CART, 0)
 	MCFG_DEVICE_ADD("cartridge2", TI99CART, 0)
 	MCFG_DEVICE_ADD("cartridge3", TI99CART, 0)
@@ -1247,7 +1247,7 @@ void ti99_gkracker_device::device_reset()
 	m_grom_selected = false;
 }
 
-static MACHINE_CONFIG_FRAGMENT( gkracker_slot )
+static MACHINE_CONFIG_START( gkracker_slot )
 	MCFG_DEVICE_ADD("cartridge", TI99CART, 0)
 MACHINE_CONFIG_END
 
@@ -1668,7 +1668,7 @@ void ti99_cartridge_device::device_config_complete()
 /*
     5 GROMs that may be contained in a cartridge
 */
-static MACHINE_CONFIG_FRAGMENT( ti99_cartridge )
+static MACHINE_CONFIG_START( ti99_cartridge )
 	MCFG_GROM_ADD( GROM3_TAG, 3, CARTGROM_TAG, 0x0000, WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM4_TAG, 4, CARTGROM_TAG, 0x2000, WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM5_TAG, 5, CARTGROM_TAG, 0x4000, WRITELINE(ti99_cartridge_device, ready_line))

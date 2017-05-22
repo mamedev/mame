@@ -72,7 +72,7 @@ enum
 //  MACHINE FRAGMENTS
 //**************************************************************************
 
-static MACHINE_CONFIG_FRAGMENT( nsub_audio )
+static MACHINE_CONFIG_START( nsub_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* samples */

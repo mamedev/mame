@@ -62,7 +62,7 @@ void s11c_bg_device::data_w(uint8_t data)
 	m_pia40->portb_w(data);
 }
 
-MACHINE_CONFIG_FRAGMENT( s11c_bg )
+MACHINE_CONFIG_START( s11c_bg )
 	MCFG_CPU_ADD("bgcpu", M6809E, XTAL_8MHz) // MC68B09E (note: schematics show this as 8mhz/2, but games crash very quickly with that speed?)
 	MCFG_CPU_PROGRAM_MAP(s11c_bg_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))

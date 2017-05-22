@@ -197,7 +197,7 @@ WRITE8_MEMBER( decocpu_type1_device::solenoid2_w )
 	// todo
 }
 
-static MACHINE_CONFIG_FRAGMENT( decocpu1 )
+static MACHINE_CONFIG_START( decocpu1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(decocpu1_map)
@@ -245,7 +245,7 @@ static MACHINE_CONFIG_FRAGMENT( decocpu1 )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( decocpu2 )
+static MACHINE_CONFIG_START( decocpu2 )
 	MCFG_FRAGMENT_ADD(decocpu1)
 
 	/* basic machine hardware */

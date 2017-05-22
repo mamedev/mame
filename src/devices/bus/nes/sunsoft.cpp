@@ -608,7 +608,7 @@ WRITE8_MEMBER(nes_sunsoft_5_device::write_h)
 // YM2149F operating in this mode. To use an AY-3-8910 as a substitute,
 // you would need an external divider to reduce the clock speed by half.
 
-static MACHINE_CONFIG_FRAGMENT( sun_5b )
+static MACHINE_CONFIG_START( sun_5b )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")

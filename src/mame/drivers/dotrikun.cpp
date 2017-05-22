@@ -223,6 +223,12 @@ ROM_START( dotrikun2 )
 	ROM_LOAD( "14479.mpr",  0x0000, 0x4000, CRC(a6aa7fa5) SHA1(4dbea33fb3541fdacf2195355751078a33bb30d5) )
 ROM_END
 
+ROM_START( dotriman )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "14479a.mpr", 0x0000, 0x4000, CRC(4ba6d2f5) SHA1(db805e9121ecbd41fac4593b58d7f071e7dbc720) )
+ROM_END
+
 
 GAMEL(1990, dotrikun,  0,        dotrikun, dotrikun, dotrikun_state, 0, ROT0, "Sega", "Dottori Kun (new version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
 GAMEL(1990, dotrikun2, dotrikun, dotrikun, dotrikun, dotrikun_state, 0, ROT0, "Sega", "Dottori Kun (old version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
+GAMEL(2016, dotriman,  dotrikun, dotrikun, dotrikun, dotrikun_state, 0, ROT0, "hack (Chris Covell)", "Dottori-Man Jr.", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )

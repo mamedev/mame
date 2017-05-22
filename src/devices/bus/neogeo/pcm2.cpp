@@ -49,7 +49,7 @@ void neogeo_pcm2_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-static MACHINE_CONFIG_FRAGMENT( pcm2_cart )
+static MACHINE_CONFIG_START( pcm2_cart )
 	MCFG_CMC_PROT_ADD("cmc_prot")
 	MCFG_PCM2_PROT_ADD("pcm2_prot")
 MACHINE_CONFIG_END

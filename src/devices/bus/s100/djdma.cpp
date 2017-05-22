@@ -73,10 +73,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( s100_djdma )
+//  MACHINE_CONFIG_START( s100_djdma )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( s100_djdma )
+static MACHINE_CONFIG_START( s100_djdma )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(djdma_mem)
 	MCFG_CPU_IO_MAP(djdma_io)

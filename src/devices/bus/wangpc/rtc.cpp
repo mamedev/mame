@@ -100,10 +100,10 @@ static const z80_daisy_config wangpc_rtc_daisy_chain[] =
 };
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( wangpc_rtc )
+//  MACHINE_CONFIG_START( wangpc_rtc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wangpc_rtc )
+static MACHINE_CONFIG_START( wangpc_rtc )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2000000)
 	MCFG_Z80_DAISY_CHAIN(wangpc_rtc_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(wangpc_rtc_mem)

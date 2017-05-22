@@ -1184,7 +1184,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_FRAGMENT( tms5110_route )
+static MACHINE_CONFIG_START( tms5110_route )
 
 	/* sound hardware */
 	MCFG_TMS5110_M0_CB(DEVWRITELINE("tms6100", tms6100_device, m0_w))

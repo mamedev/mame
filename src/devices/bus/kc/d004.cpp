@@ -63,7 +63,7 @@ static const z80_daisy_config kc_d004_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_FRAGMENT(kc_d004)
+static MACHINE_CONFIG_START(kc_d004)
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(kc_d004_mem)
 	MCFG_CPU_IO_MAP(kc_d004_io)
@@ -83,7 +83,7 @@ static MACHINE_CONFIG_FRAGMENT(kc_d004)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT(kc_d004_gide)
+static MACHINE_CONFIG_START(kc_d004_gide)
 	MCFG_FRAGMENT_ADD(kc_d004)
 
 	MCFG_CPU_MODIFY(Z80_TAG)

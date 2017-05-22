@@ -293,7 +293,7 @@ WRITE_LINE_MEMBER(taito_en_device::duart_irq_handler)
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( taito_en_sound )
+MACHINE_CONFIG_START( taito_en_sound )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", M68000, XTAL_30_4761MHz / 2)

@@ -733,7 +733,7 @@ INPUT_PORTS_END
     MACHINE CONFIGURATION FRAGMENTS
 ***************************************************************************/
 
-MACHINE_CONFIG_FRAGMENT(sparc_keyboard)
+MACHINE_CONFIG_START(sparc_keyboard)
 	MCFG_SPEAKER_STANDARD_MONO("bell")
 	MCFG_SOUND_ADD("beeper", BEEP, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 1.0)

@@ -771,7 +771,7 @@ static const char *const jf33_sample_names[] =
 //  MACHINE_DRIVER
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( jf13 )
+static MACHINE_CONFIG_START( jf13 )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -782,7 +782,7 @@ static MACHINE_CONFIG_FRAGMENT( jf13 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( jf17 )
+static MACHINE_CONFIG_START( jf17 )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -793,7 +793,7 @@ static MACHINE_CONFIG_FRAGMENT( jf17 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( jf19 )
+static MACHINE_CONFIG_START( jf19 )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -804,7 +804,7 @@ static MACHINE_CONFIG_FRAGMENT( jf19 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( jf23 )
+static MACHINE_CONFIG_START( jf23 )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -815,7 +815,7 @@ static MACHINE_CONFIG_FRAGMENT( jf23 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( jf24 )
+static MACHINE_CONFIG_START( jf24 )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -826,7 +826,7 @@ static MACHINE_CONFIG_FRAGMENT( jf24 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( jf29 )
+static MACHINE_CONFIG_START( jf29 )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -837,7 +837,7 @@ static MACHINE_CONFIG_FRAGMENT( jf29 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( jf33 )
+static MACHINE_CONFIG_START( jf33 )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")

@@ -586,7 +586,7 @@ static MACHINE_CONFIG_DERIVED( pinbo, base )
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pinbo)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,pinbo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_chameleo)

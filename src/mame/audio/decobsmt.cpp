@@ -35,7 +35,7 @@ void decobsmt_device::bsmt_ready_callback()
 	m_ourcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE); /* BSMT is ready */
 }
 
-MACHINE_CONFIG_FRAGMENT( decobsmt )
+MACHINE_CONFIG_START( decobsmt )
 	MCFG_CPU_ADD(M6809_TAG, M6809, (3579580/2))
 	MCFG_CPU_PROGRAM_MAP(decobsmt_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(decobsmt_device, decobsmt_firq_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */

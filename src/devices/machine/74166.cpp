@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(TTL166, ttl166_device, "ttl166", "SN54/74166")
 //  machine configurations
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( ttl166 )
+static MACHINE_CONFIG_START( ttl166 )
 	MCFG_TIMER_DRIVER_ADD("timer", ttl166_device, qh_output)
 MACHINE_CONFIG_END
 

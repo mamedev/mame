@@ -58,7 +58,7 @@ static GFXDECODE_START( cshooter )
 	GFXDECODE_ENTRY( "fg_gfx", 0,     char16layout, 0, 16  )
 GFXDECODE_END
 
-static MACHINE_CONFIG_FRAGMENT( airraid_vid )
+static MACHINE_CONFIG_START( airraid_vid )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

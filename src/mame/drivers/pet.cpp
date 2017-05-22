@@ -1683,7 +1683,7 @@ MACHINE_RESET_MEMBER( cbm8296_state, cbm8296 )
 //  MACHINE_CONFIG( 4k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( 4k )
+static MACHINE_CONFIG_START( 4k )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
@@ -1694,7 +1694,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( 8k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( 8k )
+static MACHINE_CONFIG_START( 8k )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
@@ -1705,7 +1705,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( 8k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( 16k )
+static MACHINE_CONFIG_START( 16k )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K")
@@ -1716,7 +1716,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( 8k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( 32k )
+static MACHINE_CONFIG_START( 32k )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END

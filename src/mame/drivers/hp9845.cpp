@@ -3601,7 +3601,7 @@ static ADDRESS_MAP_START(ppu_io_map , AS_IO , 16 , hp9845_base_state)
 	AM_RANGE(HP_MAKE_IOADDR(T15_PA , 0) , HP_MAKE_IOADDR(T15_PA , 3))        AM_DEVREADWRITE("t15" , hp_taco_device , reg_r , reg_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT(hp9845_base)
+static MACHINE_CONFIG_START(hp9845_base)
 	MCFG_CPU_ADD("lpu", HP_5061_3001, 5700000)
 	MCFG_CPU_PROGRAM_MAP(global_mem_map)
 	MCFG_HPHYBRID_SET_9845_BOOT(true)

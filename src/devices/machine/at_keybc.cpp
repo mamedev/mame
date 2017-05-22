@@ -25,7 +25,7 @@ static INPUT_PORTS_START( at_keybc )
 INPUT_PORTS_END
 
 // machine fragment
-static MACHINE_CONFIG_FRAGMENT( at_keybc )
+static MACHINE_CONFIG_START( at_keybc )
 	MCFG_CPU_ADD("at_keybc", I8042, DERIVED_CLOCK(1,1))
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(at_keyboard_controller_device, t0_r))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(at_keyboard_controller_device, t1_r))

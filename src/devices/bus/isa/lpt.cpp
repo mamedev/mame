@@ -19,7 +19,7 @@ isa8_lpt_device::isa8_lpt_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( lpt_config )
+static MACHINE_CONFIG_START( lpt_config )
 	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
 	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(isa8_lpt_device, pc_cpu_line))
 MACHINE_CONFIG_END

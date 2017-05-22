@@ -15,7 +15,7 @@
 
 #define MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_option, _fixed) MCFG_SLOT_OPTION_RESET MCFG_FRAGMENT_ADD(slot_options_##_slot_intf) MCFG_SLOT_DEFAULT_OPTION(_def_option) MCFG_SLOT_FIXED(_fixed)
 #define SLOT_INTERFACE_NAME(name) MACHINE_CONFIG_NAME(slot_options_##name)
-#define SLOT_INTERFACE_START(name) MACHINE_CONFIG_FRAGMENT(slot_options_##name)
+#define SLOT_INTERFACE_START(name) MACHINE_CONFIG_START(slot_options_##name)
 #define SLOT_INTERFACE(name,device) MCFG_SLOT_OPTION_ADD(name, device)
 #define SLOT_INTERFACE_INTERNAL(name,device) MCFG_SLOT_OPTION_ADD(name, device) MCFG_SLOT_OPTION_SELECTABLE(name, false)
 #define SLOT_INTERFACE_END MACHINE_CONFIG_END

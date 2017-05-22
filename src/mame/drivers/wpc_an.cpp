@@ -315,7 +315,7 @@ DRIVER_INIT_MEMBER(wpc_an_state,wpc_an)
 	memcpy(fixed,&ROM[codeoff],0x8000);  // copy static code from end of U6 ROM.
 }
 
-static MACHINE_CONFIG_FRAGMENT( wpc_an_base )
+static MACHINE_CONFIG_START( wpc_an_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(wpc_an_map)

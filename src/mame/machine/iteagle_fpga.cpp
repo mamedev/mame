@@ -17,7 +17,7 @@
 
 DEFINE_DEVICE_TYPE(ITEAGLE_FPGA, iteagle_fpga_device, "iteagle_fpga", "ITEagle FPGA")
 
-MACHINE_CONFIG_FRAGMENT(iteagle_fpga)
+MACHINE_CONFIG_START(iteagle_fpga)
 	MCFG_NVRAM_ADD_0FILL("eagle2_rtc")
 	// RS232 serial ports
 	// The console terminal (com1) operates at 38400 baud
@@ -615,7 +615,7 @@ DEVICE_ADDRESS_MAP_START(eeprom_map, 32, iteagle_eeprom_device)
 	AM_RANGE(0x0000, 0x000F) AM_READWRITE(eeprom_r, eeprom_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( iteagle_eeprom )
+MACHINE_CONFIG_START( iteagle_eeprom )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
@@ -734,7 +734,7 @@ WRITE32_MEMBER( iteagle_eeprom_device::eeprom_w )
 // Attached Peripheral Controller
 //************************************
 
-MACHINE_CONFIG_FRAGMENT(eagle1)
+MACHINE_CONFIG_START(eagle1)
 	MCFG_NVRAM_ADD_0FILL("eagle1_rtc")
 MACHINE_CONFIG_END
 

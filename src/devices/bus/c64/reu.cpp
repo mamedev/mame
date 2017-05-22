@@ -28,10 +28,10 @@ DEFINE_DEVICE_TYPE(C64_REU1764, c64_reu1764_cartridge_device, "c64_1764reu", "17
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_reu )
+//  MACHINE_CONFIG_START( c64_reu )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_reu )
+static MACHINE_CONFIG_START( c64_reu )
 	MCFG_MOS8726_ADD(MOS8726R1_TAG)
 
 	MCFG_GENERIC_SOCKET_ADD("rom", generic_linear_slot, nullptr)

@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( nmk004_sound_io_map, AS_IO, 8, nmk004_device )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_FRAGMENT( nmk004 )
+static MACHINE_CONFIG_START( nmk004 )
 	MCFG_CPU_ADD("mcu",TMP90840, DERIVED_CLOCK(1,1)) // Toshiba TMP90C840AF in QFP64 package with 8Kbyte internal ROM
 	MCFG_CPU_PROGRAM_MAP(nmk004_sound_mem_map)
 	MCFG_CPU_IO_MAP(nmk004_sound_io_map)

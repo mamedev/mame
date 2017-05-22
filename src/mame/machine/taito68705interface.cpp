@@ -47,14 +47,14 @@
 
 namespace {
 
-MACHINE_CONFIG_FRAGMENT( taito68705 )
+MACHINE_CONFIG_START( taito68705 )
 	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
 	MCFG_M68705_PORTC_R_CB(READ8(taito68705_mcu_device, mcu_portc_r))
 	MCFG_M68705_PORTA_W_CB(WRITE8(taito68705_mcu_device, mcu_pa_w))
 	MCFG_M68705_PORTB_W_CB(WRITE8(taito68705_mcu_device, mcu_portb_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( arkanoid_68705p3 )
+MACHINE_CONFIG_START( arkanoid_68705p3 )
 	MCFG_CPU_ADD("mcu", M68705P3, DERIVED_CLOCK(1, 1))
 	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_mcu_device_base, mcu_pb_r))
 	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_mcu_device_base, mcu_pc_r))
@@ -62,7 +62,7 @@ MACHINE_CONFIG_FRAGMENT( arkanoid_68705p3 )
 	MCFG_M68705_PORTC_W_CB(WRITE8(arkanoid_mcu_device_base, mcu_pc_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( arkanoid_68705p5 )
+MACHINE_CONFIG_START( arkanoid_68705p5 )
 	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
 	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_mcu_device_base, mcu_pb_r))
 	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_mcu_device_base, mcu_pc_r))

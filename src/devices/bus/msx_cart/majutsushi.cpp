@@ -26,7 +26,7 @@ msx_cart_majutsushi_device::msx_cart_majutsushi_device(const machine_config &mco
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( majutsushi )
+static MACHINE_CONFIG_START( majutsushi )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC

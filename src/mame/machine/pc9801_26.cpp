@@ -46,7 +46,7 @@ WRITE_LINE_MEMBER(pc9801_26_device::pc9801_sound_irq)
 	machine().device<pic8259_device>(":pic8259_slave")->ir4_w(state);
 }
 
-static MACHINE_CONFIG_FRAGMENT( pc9801_26_config )
+static MACHINE_CONFIG_START( pc9801_26_config )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("opn", YM2203, MAIN_CLOCK_X1*2) // unknown clock / divider
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(pc9801_26_device, pc9801_sound_irq))

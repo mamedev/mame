@@ -39,10 +39,10 @@ void o2_voice_device::device_start()
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( sub_slot )
+//  MACHINE_CONFIG_START( sub_slot )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( o2voice )
+static MACHINE_CONFIG_START( o2voice )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)

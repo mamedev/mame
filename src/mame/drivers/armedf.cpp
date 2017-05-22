@@ -1237,7 +1237,7 @@ MACHINE_RESET_MEMBER(armedf_state,armedf)
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( terraf_sound )
+static MACHINE_CONFIG_START( terraf_sound )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)

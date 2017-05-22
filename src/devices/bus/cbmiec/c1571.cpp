@@ -600,7 +600,7 @@ SLOT_INTERFACE_END
 //  MACHINE_DRIVER( c1570 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c1570 )
+static MACHINE_CONFIG_START( c1570 )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1571_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -651,7 +651,7 @@ machine_config_constructor c1570_device::device_mconfig_additions() const
 //  MACHINE_DRIVER( c1571 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c1571 )
+static MACHINE_CONFIG_START( c1571 )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1571_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -702,7 +702,7 @@ machine_config_constructor c1571_device::device_mconfig_additions() const
 //  MACHINE_DRIVER( c1571cr )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c1571cr )
+static MACHINE_CONFIG_START( c1571cr )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1571_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -747,7 +747,7 @@ machine_config_constructor c1571cr_device::device_mconfig_additions() const
 //  MACHINE_DRIVER( mini_chief )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( mini_chief )
+static MACHINE_CONFIG_START( mini_chief )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(mini_chief_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)

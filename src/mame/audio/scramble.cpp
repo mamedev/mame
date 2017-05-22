@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( ad2083_sound_io_map, AS_IO, 8, scramble_state )
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay2", ay8910_device, address_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( ad2083_audio )
+MACHINE_CONFIG_START( ad2083_audio )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(ad2083_sound_map)

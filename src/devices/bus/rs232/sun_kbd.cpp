@@ -6,7 +6,7 @@ DEFINE_DEVICE_TYPE(SUN_KBD_ADAPTOR, sun_keyboard_adaptor_device, "sunkbd_adaptor
 
 
 namespace {
-MACHINE_CONFIG_FRAGMENT(sun_keyboard_adaptor)
+MACHINE_CONFIG_START(sun_keyboard_adaptor)
 	MCFG_SUNKBD_PORT_ADD("keyboard", default_sun_keyboard_devices, nullptr)
 	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(sun_keyboard_adaptor_device, output_rxd))
 MACHINE_CONFIG_END

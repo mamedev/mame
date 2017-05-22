@@ -160,7 +160,7 @@ static SLOT_INTERFACE_START(supergb_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_FRAGMENT( supergb )
+static MACHINE_CONFIG_START( supergb )
 	MCFG_CPU_ADD("sgb_cpu", LR35902, 4295454)   /* 4.295454 MHz */
 	MCFG_CPU_PROGRAM_MAP(supergb_map)
 	MCFG_LR35902_TIMER_CB(WRITE8(sns_rom_sgb_device, gb_timer_callback))
@@ -192,7 +192,7 @@ const tiny_rom_entry *sns_rom_sgb1_device::device_rom_region() const
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( supergb2 )
+static MACHINE_CONFIG_START( supergb2 )
 	MCFG_CPU_ADD("sgb_cpu", LR35902, XTAL_4_194304Mhz)   /* 4.194MHz derived from clock on sgb2 pcb */
 	MCFG_CPU_PROGRAM_MAP(supergb_map)
 	MCFG_LR35902_TIMER_CB(WRITE8(sns_rom_sgb_device, gb_timer_callback))

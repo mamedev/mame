@@ -45,7 +45,7 @@ static SLOT_INTERFACE_START( drives )
 	SLOT_INTERFACE("35dd", FLOPPY_35_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( mufdc_device )
+static MACHINE_CONFIG_START( mufdc_device )
 	MCFG_MCS3201_ADD("fdc")
 	MCFG_MCS3201_INPUT_HANDLER(READ8(mufdc_device, fdc_input_r))
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(mufdc_device, fdc_irq_w))

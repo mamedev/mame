@@ -186,7 +186,7 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_FRAGMENT( newbrain_video )
+MACHINE_CONFIG_START( newbrain_video )
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(newbrain_state, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
