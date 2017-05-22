@@ -59,7 +59,6 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_2_ldp_write);
 	DECLARE_DRIVER_INIT(istellar);
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(istellar);
 	uint32_t screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_istellar);
 	required_device<cpu_device> m_maincpu;
@@ -276,43 +275,6 @@ static INPUT_PORTS_START( istellar )
 	/* SERVICE might be hanging out back here */
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(istellar_state, istellar)
-{
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-
-	for (i = 0; i < palette.entries(); i++)
-	{
-		int r,g,b;
-		int bit0,bit1,bit2,bit3;
-
-		/* Daphne says "TODO: get the real interstellar resistor values" */
-
-		/* red component */
-		bit0 = (color_prom[i+0x000] >> 0) & 0x01;
-		bit1 = (color_prom[i+0x000] >> 1) & 0x01;
-		bit2 = (color_prom[i+0x000] >> 2) & 0x01;
-		bit3 = (color_prom[i+0x000] >> 3) & 0x01;
-		r = (0x8f * bit3) + (0x43 * bit2) + (0x1f * bit1) + (0x0e * bit0);
-
-		/* green component */
-		bit0 = (color_prom[i+0x100] >> 0) & 0x01;
-		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
-		bit2 = (color_prom[i+0x100] >> 2) & 0x01;
-		bit3 = (color_prom[i+0x100] >> 3) & 0x01;
-		g = (0x8f * bit3) + (0x43 * bit2) + (0x1f * bit1) + (0x0e * bit0);
-
-		/* blue component */
-		bit0 = (color_prom[i+0x200] >> 0) & 0x01;
-		bit1 = (color_prom[i+0x200] >> 1) & 0x01;
-		bit2 = (color_prom[i+0x200] >> 2) & 0x01;
-		bit3 = (color_prom[i+0x200] >> 3) & 0x01;
-		b = (0x8f * bit3) + (0x43 * bit2) + (0x1f * bit1) + (0x0e * bit0);
-
-		palette.set_pen_color(i,rgb_t(r,g,b));
-	}
-}
-
 static const gfx_layout istellar_gfx_layout =
 {
 	8,8,
@@ -364,8 +326,8 @@ static MACHINE_CONFIG_START( istellar )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(istellar_state, istellar)
+	// Daphne says "TODO: get the real interstellar resistor values"
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", istellar)
 
