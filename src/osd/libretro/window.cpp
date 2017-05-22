@@ -376,6 +376,7 @@ int retro_window_info::xy_to_render_target(int x, int y, int *xt, int *yt)
 int retro_window_info::window_init()
 {
 	int result;
+	float oldfps;
 
 	// set the initial maximized state
 	// FIXME: Does not belong here
@@ -400,7 +401,8 @@ int retro_window_info::window_init()
 		sprintf(m_title, "%s: %s [%s] - Screen %d", emulator_info::get_appname(), m_machine.system().description, m_machine.system().name, m_index);
 
 	result = complete_create();
-
+	
+	oldfps=retro_fps;
 	if(machine().first_screen()!= nullptr)
 		retro_fps = ATTOSECONDS_TO_HZ(machine().first_screen()->refresh_attoseconds());
 	
@@ -418,7 +420,7 @@ int retro_window_info::window_init()
 		fb_pitch=tempwidth;
 		fb_height=tempheight;
 
-		if(fb_width>max_width || fb_height>max_height)
+		if(fb_width>max_width || fb_height>max_height || oldfps!=retro_fps)
 			NEWGAME_FROM_OSD = 1;
 		else NEWGAME_FROM_OSD = 2;
 
@@ -548,7 +550,7 @@ void retro_window_info::update()
 
 				if(fb_width>max_width || fb_height>max_height)
 					NEWGAME_FROM_OSD = 1;
-				else NEWGAME_FROM_OSD = 2;
+				else (NEWGAME_FROM_OSD==1)?NEWGAME_FROM_OSD = 1:NEWGAME_FROM_OSD = 2;
 
 					video_changed=false;
 				}
