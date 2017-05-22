@@ -138,7 +138,7 @@ WRITE8_MEMBER( wdxt_gen_device::ram_w )
 //  MACHINE_DRIVER( wdxt_gen )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wdxt_gen )
+static MACHINE_CONFIG_START( wdxt_gen )
 	MCFG_CPU_ADD(WD1015_TAG, I8049, 5000000)
 	MCFG_CPU_IO_MAP(wd1015_io)
 	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE(WD11C00_17_TAG, wd11c00_17_device, busy_r))

@@ -139,7 +139,7 @@ static const char *const astrof_sample_names[] =
 	nullptr
 };
 
-MACHINE_CONFIG_FRAGMENT( astrof_audio )
+MACHINE_CONFIG_START( astrof_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(4)
@@ -161,7 +161,7 @@ WRITE8_MEMBER(astrof_state::spfghmk2_audio_w)
 }
 
 
-MACHINE_CONFIG_FRAGMENT( spfghmk2_audio )
+MACHINE_CONFIG_START( spfghmk2_audio )
 	/* nothing yet */
 MACHINE_CONFIG_END
 
@@ -195,7 +195,7 @@ WRITE8_MEMBER(astrof_state::tomahawk_audio_w)
 }
 
 
-MACHINE_CONFIG_FRAGMENT( tomahawk_audio )
+MACHINE_CONFIG_START( tomahawk_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                   // noise + filter: N/C

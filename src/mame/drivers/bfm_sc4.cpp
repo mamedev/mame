@@ -890,7 +890,7 @@ WRITE_LINE_MEMBER(sc4_state::bfmdm01_busy)
 	// Must tie back to inputs somehow!
 }
 
-MACHINE_CONFIG_FRAGMENT( sc4_common )
+MACHINE_CONFIG_START( sc4_common )
 	MCFG_CPU_ADD("maincpu", M68307, 16000000)    // 68307! (EC000 core)
 	MCFG_CPU_PROGRAM_MAP(sc4_map)
 	MCFG_MC68307_SERIAL_A_TX_CALLBACK(WRITELINE(sc4_state, m68307_duart_txa))

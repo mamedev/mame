@@ -98,10 +98,10 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( newbrain_fdc )
+//  MACHINE_CONFIG_START( newbrain_fdc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( newbrain_fdc )
+static MACHINE_CONFIG_START( newbrain_fdc )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(newbrain_fdc_mem)
 	MCFG_CPU_IO_MAP(newbrain_fdc_io)

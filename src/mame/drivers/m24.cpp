@@ -238,7 +238,7 @@ FLOPPY_FORMATS_MEMBER( m24_state::floppy_formats )
 	FLOPPY_M20_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_FRAGMENT( cfg_m20_format )
+static MACHINE_CONFIG_START( cfg_m20_format )
 	MCFG_DEVICE_MODIFY("fdc:0")
 	static_cast<floppy_connector *>(device)->set_formats(m24_state::floppy_formats);
 

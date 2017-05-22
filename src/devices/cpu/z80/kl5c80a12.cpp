@@ -46,7 +46,7 @@ void kl5c80a12_device::device_reset()
 
 
 /* CPU interface */
-static MACHINE_CONFIG_FRAGMENT( kl5c80a12 )
+static MACHINE_CONFIG_START( kl5c80a12 )
 MACHINE_CONFIG_END
 
 machine_config_constructor kl5c80a12_device::device_mconfig_additions() const

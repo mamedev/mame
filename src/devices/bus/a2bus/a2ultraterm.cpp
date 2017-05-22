@@ -73,7 +73,7 @@ static const rgb_t ultraterm_palette[4] =
 	rgb_t(0xff,0xff,0xff)
 };
 
-MACHINE_CONFIG_FRAGMENT( a2ultraterm )
+MACHINE_CONFIG_START( a2ultraterm )
 	MCFG_SCREEN_ADD( ULTRATERM_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_LOW, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( ULTRATERM_MC6845_NAME, mc6845_device, screen_update )

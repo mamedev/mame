@@ -458,7 +458,7 @@ SLOT_INTERFACE_START( peribox_slot )
 	SLOT_INTERFACE("tifdc", TI99_FDC)
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_FRAGMENT( peribox_device )
+MACHINE_CONFIG_START( peribox_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT2, peribox_slot )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT3, peribox_slot )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slot )
@@ -500,7 +500,7 @@ SLOT_INTERFACE_START( peribox_slotg )
 	SLOT_INTERFACE("hfdc", TI99_HFDC)
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_FRAGMENT( peribox_gen_device )
+MACHINE_CONFIG_START( peribox_gen_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT2, peribox_slotg )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT3, peribox_slotg )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slotg )
@@ -538,7 +538,7 @@ SLOT_INTERFACE_START( peribox_slot998 )
 	SLOT_INTERFACE("hfdc", TI99_HFDC)
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_FRAGMENT( peribox_998_device )
+MACHINE_CONFIG_START( peribox_998_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT2, peribox_slot998 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT3, peribox_slot998 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slot998 )
@@ -585,7 +585,7 @@ SLOT_INTERFACE_START( peribox_hs_slot )
 	SLOT_INTERFACE("hsgpl", TI99_HSGPL)
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_FRAGMENT( peribox_sg_device )
+MACHINE_CONFIG_START( peribox_sg_device )
 	MCFG_PERIBOX_SLOT_ADD_DEF( PEBSLOT2, peribox_ev_slot, "evpc" )
 	MCFG_PERIBOX_SLOT_ADD_DEF( PEBSLOT3, peribox_hs_slot, "hsgpl" )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slotp )
@@ -611,7 +611,7 @@ peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *
 	m_address_prefix = 0x70000;
 }
 
-MACHINE_CONFIG_FRAGMENT( peribox_ev_device )
+MACHINE_CONFIG_START( peribox_ev_device )
 	MCFG_PERIBOX_SLOT_ADD_DEF( PEBSLOT2, peribox_ev_slot, "evpc" )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT3, peribox_slot )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slot )

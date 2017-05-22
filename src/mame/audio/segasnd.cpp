@@ -215,7 +215,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( sega_speech_board )
+MACHINE_CONFIG_START( sega_speech_board )
 
 	/* CPU for the speech board */
 	MCFG_CPU_ADD("audiocpu", I8035, SPEECH_MASTER_CLOCK)        /* divide by 15 in CPU */
@@ -859,7 +859,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( segausb )
+MACHINE_CONFIG_START( segausb )
 
 	/* CPU for the usb board */
 	MCFG_CPU_ADD("ourcpu", I8035, USB_MASTER_CLOCK)     /* divide by 15 in CPU */
@@ -889,7 +889,7 @@ static ADDRESS_MAP_START( usb_map_rom, AS_PROGRAM, 8, usb_sound_device )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(":usbcpu", 0)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( segausb_rom )
+MACHINE_CONFIG_START( segausb_rom )
 
 	/* CPU for the usb board */
 	MCFG_CPU_ADD("ourcpu", I8035, USB_MASTER_CLOCK)     /* divide by 15 in CPU */

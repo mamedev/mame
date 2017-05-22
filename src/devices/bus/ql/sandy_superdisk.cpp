@@ -78,10 +78,10 @@ WRITE_LINE_MEMBER( sandy_super_disk_device::busy_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( sandy_super_disk )
+//  MACHINE_CONFIG_START( sandy_super_disk )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( sandy_super_disk )
+static MACHINE_CONFIG_START( sandy_super_disk )
 	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_super_disk_floppies, "35dd", sandy_super_disk_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_super_disk_floppies, nullptr, sandy_super_disk_device::floppy_formats)

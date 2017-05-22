@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( decodmd3_map, AS_PROGRAM, 16, decodmd_type3_device )
 	AM_RANGE(0x00c00020, 0x00c00021) AM_READWRITE(latch_r,status_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( decodmd3 )
+static MACHINE_CONFIG_START( decodmd3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("dmdcpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(decodmd3_map)

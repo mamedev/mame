@@ -46,7 +46,7 @@ static ADDRESS_MAP_START(finalchs_mem , AS_PROGRAM, 8, isa8_finalchs_device)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( finalchs_config )
+static MACHINE_CONFIG_START( finalchs_config )
 	MCFG_CPU_ADD("maincpu",M65C02,5000000)
 	MCFG_CPU_PROGRAM_MAP(finalchs_mem)
 MACHINE_CONFIG_END

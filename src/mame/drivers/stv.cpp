@@ -1120,7 +1120,7 @@ MACHINE_CONFIG_END
 	MCFG_GENERIC_CARTSLOT_ADD(_tag, generic_plain_slot, "stv_cart")  \
 	MCFG_GENERIC_LOAD(stv_state, _load)
 
-MACHINE_CONFIG_FRAGMENT( stv_cartslot )
+MACHINE_CONFIG_START( stv_cartslot )
 
 	MCFG_STV_CARTSLOT_ADD("stv_slot1", stv_cart1)
 	MCFG_STV_CARTSLOT_ADD("stv_slot2", stv_cart2)

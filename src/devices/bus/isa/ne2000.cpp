@@ -4,7 +4,7 @@
 #include "ne2000.h"
 
 
-static MACHINE_CONFIG_FRAGMENT(ne2000_config)
+static MACHINE_CONFIG_START(ne2000_config)
 	MCFG_DEVICE_ADD("dp8390d", DP8390D, 0)
 	MCFG_DP8390D_IRQ_CB(WRITELINE(ne2000_device, ne2000_irq_w))
 	MCFG_DP8390D_MEM_READ_CB(READ8(ne2000_device, ne2000_mem_read))

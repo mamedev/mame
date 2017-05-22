@@ -207,7 +207,7 @@ ADDRESS_MAP_END
 //  machine configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( williams_cvsd_sound )
+static MACHINE_CONFIG_START( williams_cvsd_sound )
 	MCFG_CPU_ADD("cpu", M6809E, CVSD_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_cvsd_map)
 
@@ -546,7 +546,7 @@ ADDRESS_MAP_END
 //  machine configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( williams_narc_sound )
+static MACHINE_CONFIG_START( williams_narc_sound )
 	MCFG_CPU_ADD("cpu0", M6809E, NARC_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_narc_master_map)
 
@@ -820,7 +820,7 @@ ADDRESS_MAP_END
 //  machine configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( williams_adpcm_sound )
+static MACHINE_CONFIG_START( williams_adpcm_sound )
 	MCFG_CPU_ADD("cpu", M6809E, ADPCM_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_adpcm_map)
 

@@ -445,10 +445,10 @@ FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c2040 )
+//  MACHINE_CONFIG_START( c2040 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c2040 )
+static MACHINE_CONFIG_START( c2040 )
 	// DOS
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c2040_main_mem)
@@ -503,10 +503,10 @@ machine_config_constructor c2040_device::device_mconfig_additions() const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c3040 )
+//  MACHINE_CONFIG_START( c3040 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c3040 )
+static MACHINE_CONFIG_START( c3040 )
 	// DOS
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c2040_main_mem)
@@ -561,10 +561,10 @@ machine_config_constructor c3040_device::device_mconfig_additions() const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c4040 )
+//  MACHINE_CONFIG_START( c4040 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c4040 )
+static MACHINE_CONFIG_START( c4040 )
 	// DOS
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c2040_main_mem)

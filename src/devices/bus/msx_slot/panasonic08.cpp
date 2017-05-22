@@ -33,7 +33,7 @@ msx_slot_panasonic08_device::msx_slot_panasonic08_device(const machine_config &m
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( panasonic08 )
+static MACHINE_CONFIG_START( panasonic08 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 

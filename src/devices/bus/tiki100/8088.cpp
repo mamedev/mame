@@ -62,10 +62,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( tiki100_8088 )
+//  MACHINE_CONFIG_START( tiki100_8088 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( tiki100_8088 )
+static MACHINE_CONFIG_START( tiki100_8088 )
 	MCFG_CPU_ADD(I8088_TAG, I8088, 6000000)
 	MCFG_CPU_PROGRAM_MAP(i8088_mem)
 	MCFG_CPU_IO_MAP(i8088_io)

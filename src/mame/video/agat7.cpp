@@ -35,7 +35,7 @@
 
 DEFINE_DEVICE_TYPE(AGAT7VIDEO, agat7video_device, "agat7video", "Agat-7 Video")
 
-MACHINE_CONFIG_FRAGMENT(agat7video)
+MACHINE_CONFIG_START(agat7video)
 	MCFG_SCREEN_ADD("a7screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_5MHz, 672, 0, 512, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(agat7video_device, screen_update)

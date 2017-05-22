@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(A2BUS_ZIPDRIVE, a2bus_zipdrive_device, "a2zipdrv", "Zip Techn
 #define ZIPDRIVE_ROM_REGION  "zipdrive_rom"
 #define ZIPDRIVE_ATA_TAG     "zipdrive_ata"
 
-static MACHINE_CONFIG_FRAGMENT( zipdrive )
+static MACHINE_CONFIG_START( zipdrive )
 	MCFG_ATA_INTERFACE_ADD(ZIPDRIVE_ATA_TAG, ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
 

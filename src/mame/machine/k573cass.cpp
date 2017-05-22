@@ -76,7 +76,7 @@ konami573_cassette_x_device::konami573_cassette_x_device(const machine_config &m
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( cassx )
+static MACHINE_CONFIG_START( cassx )
 	MCFG_X76F041_ADD( "eeprom" )
 MACHINE_CONFIG_END
 
@@ -125,7 +125,7 @@ konami573_cassette_xi_device::konami573_cassette_xi_device(const machine_config 
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( cassxi )
+static MACHINE_CONFIG_START( cassxi )
 	MCFG_X76F041_ADD( "eeprom" )
 	MCFG_DS2401_ADD( "id" )
 	MCFG_DEVICE_ADD( "adc0838", ADC0838, 0 )
@@ -198,7 +198,7 @@ konami573_cassette_y_device::konami573_cassette_y_device(const machine_config &m
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( cassy )
+static MACHINE_CONFIG_START( cassy )
 	MCFG_X76F100_ADD( "eeprom" )
 MACHINE_CONFIG_END
 
@@ -279,7 +279,7 @@ konami573_cassette_yi_device::konami573_cassette_yi_device(const machine_config 
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( cassyi )
+static MACHINE_CONFIG_START( cassyi )
 	MCFG_X76F100_ADD( "eeprom" )
 	MCFG_DS2401_ADD( "id" )
 MACHINE_CONFIG_END
@@ -312,7 +312,7 @@ konami573_cassette_zi_device::konami573_cassette_zi_device(const machine_config 
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( casszi )
+static MACHINE_CONFIG_START( casszi )
 	MCFG_DS2401_ADD( "id" )
 	MCFG_ZS01_ADD( "eeprom" )
 	MCFG_ZS01_DS2401( "id" )

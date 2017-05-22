@@ -29,8 +29,8 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		m_gamedrv(gamedrv),
 		m_options(options)
 {
-	// construct the config
-	(*gamedrv.machine_config)(*this, nullptr, nullptr);
+	// add the root device and construct the config
+	(*gamedrv.machine_config)(*this, device_add(nullptr, "root", gamedrv.type, 0), nullptr);
 
 	// intialize slot devices - make sure that any required devices have been allocated
 	for (device_slot_interface &slot : slot_interface_iterator(root_device()))

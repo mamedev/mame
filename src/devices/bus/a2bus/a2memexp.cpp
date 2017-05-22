@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(A2BUS_RAMFACTOR, a2bus_ramfactor_device,   "a2ramfac", "Appli
 
 #define MEMEXP_ROM_REGION  "memexp_rom"
 
-MACHINE_CONFIG_FRAGMENT( memexp )
+MACHINE_CONFIG_START( memexp )
 MACHINE_CONFIG_END
 
 ROM_START( memexp )

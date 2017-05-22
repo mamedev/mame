@@ -5,7 +5,7 @@
 
 #define SADDR 0xcc000
 
-static MACHINE_CONFIG_FRAGMENT(el2_3c503_config)
+static MACHINE_CONFIG_START(el2_3c503_config)
 	MCFG_DEVICE_ADD("dp8390d", DP8390D, 0)
 	MCFG_DP8390D_IRQ_CB(WRITELINE(el2_3c503_device, el2_3c503_irq_w))
 	MCFG_DP8390D_MEM_READ_CB(READ8(el2_3c503_device, el2_3c503_mem_read))

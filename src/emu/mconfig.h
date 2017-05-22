@@ -63,7 +63,7 @@ public:
 	screen_device *first_screen() const;
 	emu_options &options() const { return m_options; }
 	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
-	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) const { return downcast<_DeviceClass *>(device(tag)); }
+	template <class DeviceClass> inline DeviceClass *device(const char *tag) const { return downcast<DeviceClass *>(device(tag)); }
 
 	// public state
 	attotime                m_minimum_quantum;          // minimum scheduling quantum
@@ -104,25 +104,12 @@ private:
 
 /**
  @def MACHINE_CONFIG_START(_name)
- Begins a new machine config.
+ Begins a new machine/device config.
  @param _name name of this config
  @hideinitializer
  */
 #define MACHINE_CONFIG_START(_name) \
-ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
-{ \
-	devcb_base *devcb = nullptr; \
-	(void)devcb; \
-	if (owner == nullptr) owner = config.device_add(nullptr, "root", config.gamedrv().type, 0);
-
-/**
- @def MACHINE_CONFIG_FRAGMENT(_name)
- Begins a partial machine_config that can only be included in another "root" machine_config. This is also used for machine_configs that are specified as part of a device.
- @param _name name of this config fragment
- @hideinitializer
-*/
-#define MACHINE_CONFIG_FRAGMENT(_name) \
-ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
+ATTR_COLD void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
 { \
 	devcb_base *devcb = nullptr; \
 	(void)devcb; \
@@ -136,12 +123,12 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
  @hideinitializer
 */
 #define MACHINE_CONFIG_DERIVED(_name, _base) \
-ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
+ATTR_COLD void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
 { \
 	devcb_base *devcb = nullptr; \
 	(void)devcb; \
-	owner = MACHINE_CONFIG_NAME(_base)(config, owner, device); \
-	assert(owner != nullptr);
+	assert(owner != nullptr); \
+	MACHINE_CONFIG_NAME(_base)(config, owner, device);
 
 /**
 @def MACHINE_CONFIG_END
@@ -149,7 +136,6 @@ Ends a machine_config.
 @hideinitializer
 */
 #define MACHINE_CONFIG_END \
-	return owner; \
 }
 
 //*************************************************************************/
@@ -163,7 +149,7 @@ References an external machine config.
 @hideinitializer
 */
 #define MACHINE_CONFIG_EXTERN(_name) \
-	extern device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device)
+	extern void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device)
 
 //*************************************************************************/
 /** @name Core machine config options */

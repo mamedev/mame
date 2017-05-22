@@ -395,7 +395,7 @@ DEFINE_DEVICE_TYPE(IBM5160_MOTHERBOARD, ibm5160_mb_device, "ibm5160_mb", "IBM 51
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-static MACHINE_CONFIG_FRAGMENT( ibm5160_mb_config )
+static MACHINE_CONFIG_START( ibm5160_mb_config )
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
@@ -591,7 +591,7 @@ DEFINE_DEVICE_TYPE(IBM5150_MOTHERBOARD, ibm5150_mb_device, "ibm5150_mb", "IBM 51
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
-static MACHINE_CONFIG_FRAGMENT( ibm5150_mb_config )
+static MACHINE_CONFIG_START( ibm5150_mb_config )
 	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
 
 	MCFG_DEVICE_MODIFY("pc_kbdc")
@@ -775,7 +775,7 @@ WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
 
 DEFINE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device, "ec1841_mb", "EC-1840 motherboard")
 
-static MACHINE_CONFIG_FRAGMENT( ec1841_mb_config )
+static MACHINE_CONFIG_START( ec1841_mb_config )
 	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
 
 	MCFG_DEVICE_MODIFY("ppi8255")
@@ -908,7 +908,7 @@ pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, device_typ
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-static MACHINE_CONFIG_FRAGMENT( pc_noppi_mb_config )
+static MACHINE_CONFIG_START( pc_noppi_mb_config )
 	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
 
 	MCFG_DEVICE_REMOVE("pc_kbdc")

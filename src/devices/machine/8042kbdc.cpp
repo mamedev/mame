@@ -208,7 +208,7 @@ kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( keyboard )
+static MACHINE_CONFIG_START( keyboard )
 	MCFG_AT_KEYB_ADD("at_keyboard", 1, WRITELINE(kbdc8042_device, keyboard_w))
 MACHINE_CONFIG_END
 

@@ -174,7 +174,7 @@ SOUND_RESET_MEMBER( cinemat_state, spacewar )
 	generic_init(&cinemat_state::spacewar_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( spacewar_sound )
+MACHINE_CONFIG_START( spacewar_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, spacewar)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -222,7 +222,7 @@ SOUND_RESET_MEMBER( cinemat_state, barrier )
 	generic_init(&cinemat_state::barrier_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( barrier_sound )
+MACHINE_CONFIG_START( barrier_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, barrier)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -275,7 +275,7 @@ SOUND_RESET_MEMBER( cinemat_state, speedfrk )
 	generic_init(&cinemat_state::speedfrk_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( speedfrk_sound )
+MACHINE_CONFIG_START( speedfrk_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, speedfrk)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -344,7 +344,7 @@ SOUND_RESET_MEMBER( cinemat_state, starhawk )
 	generic_init(&cinemat_state::starhawk_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( starhawk_sound )
+MACHINE_CONFIG_START( starhawk_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, starhawk)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -407,7 +407,7 @@ SOUND_RESET_MEMBER( cinemat_state, sundance )
 	generic_init(&cinemat_state::sundance_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( sundance_sound )
+MACHINE_CONFIG_START( sundance_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, sundance)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -489,7 +489,7 @@ SOUND_RESET_MEMBER( cinemat_state, tailg )
 	generic_init(&cinemat_state::tailg_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( tailg_sound )
+MACHINE_CONFIG_START( tailg_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, tailg)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -551,7 +551,7 @@ SOUND_RESET_MEMBER( cinemat_state, warrior )
 	generic_init(&cinemat_state::warrior_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( warrior_sound )
+MACHINE_CONFIG_START( warrior_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, warrior)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -639,7 +639,7 @@ SOUND_RESET_MEMBER( cinemat_state, armora )
 	generic_init(&cinemat_state::armora_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( armora_sound )
+MACHINE_CONFIG_START( armora_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, armora)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -724,7 +724,7 @@ SOUND_RESET_MEMBER( cinemat_state, ripoff )
 	generic_init(&cinemat_state::ripoff_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( ripoff_sound )
+MACHINE_CONFIG_START( ripoff_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, ripoff)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -831,7 +831,7 @@ SOUND_RESET_MEMBER( cinemat_state, starcas )
 	generic_init(&cinemat_state::starcas_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( starcas_sound )
+MACHINE_CONFIG_START( starcas_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, starcas)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -959,7 +959,7 @@ SOUND_RESET_MEMBER( cinemat_state, solarq )
 	generic_init(&cinemat_state::solarq_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( solarq_sound )
+MACHINE_CONFIG_START( solarq_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, solarq)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1087,7 +1087,7 @@ SOUND_RESET_MEMBER( cinemat_state, boxingb )
 	generic_init(&cinemat_state::boxingb_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( boxingb_sound )
+MACHINE_CONFIG_START( boxingb_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, boxingb)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1194,7 +1194,7 @@ SOUND_RESET_MEMBER( cinemat_state, wotw )
 	generic_init(&cinemat_state::wotw_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( wotw_sound )
+MACHINE_CONFIG_START( wotw_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, wotw)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1308,7 +1308,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( demon_sound )
+MACHINE_CONFIG_START( demon_sound )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)

@@ -79,7 +79,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_FRAGMENT(coco_t4426)
+static MACHINE_CONFIG_START(coco_t4426)
 	MCFG_DEVICE_ADD(UART_TAG, ACIA6850, 0) // TODO: Figure out address mapping for ACIA
 	MCFG_DEVICE_ADD(PIA_TAG, PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_t4426_device, pia_A_w))

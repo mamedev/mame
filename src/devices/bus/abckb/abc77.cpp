@@ -127,7 +127,7 @@ DISCRETE_SOUND_END
 //  MACHINE_DRIVER( abc77 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( abc77 )
+static MACHINE_CONFIG_START( abc77 )
 	// keyboard cpu
 	MCFG_CPU_ADD(I8035_TAG, I8035, XTAL_4_608MHz)
 	MCFG_CPU_PROGRAM_MAP(abc77_map)

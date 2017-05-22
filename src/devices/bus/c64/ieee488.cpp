@@ -137,10 +137,10 @@ WRITE8_MEMBER( c64_ieee488_device::tpi_pc_w )
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_ieee488 )
+//  MACHINE_CONFIG_START( c64_ieee488 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_ieee488 )
+static MACHINE_CONFIG_START( c64_ieee488 )
 	MCFG_DEVICE_ADD(MOS6525_TAG, TPI6525, 0)
 	MCFG_TPI6525_IN_PA_CB(READ8(c64_ieee488_device, tpi_pa_r))
 	MCFG_TPI6525_OUT_PA_CB(WRITE8(c64_ieee488_device, tpi_pa_w))

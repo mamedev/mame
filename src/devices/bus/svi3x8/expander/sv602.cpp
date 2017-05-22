@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(SV602, sv602_device, "sv602", "SV-602 Single Slot Expander")
 //  machine configurations
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( sv602 )
+static MACHINE_CONFIG_START( sv602 )
 	MCFG_SVI_SLOT_BUS_ADD
 	MCFG_SVI_SLOT_INT_HANDLER(WRITELINE(sv602_device, int_w))
 	MCFG_SVI_SLOT_ROMDIS_HANDLER(WRITELINE(sv602_device, romdis_w))

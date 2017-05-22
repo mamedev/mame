@@ -143,7 +143,7 @@ DEFINE_DEVICE_TYPE(GALGAMES_CART, galgames_cart_device, "starpak_cart", "Galaxy 
 
 // BIOS "cart"
 
-static MACHINE_CONFIG_FRAGMENT( bios )
+static MACHINE_CONFIG_START( bios )
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
 
@@ -169,7 +169,7 @@ DEFINE_DEVICE_TYPE(GALGAMES_BIOS_CART, galgames_bios_cart_device, "galgames_bios
 
 // STARPAK2 cart
 
-static MACHINE_CONFIG_FRAGMENT( starpak2 )
+static MACHINE_CONFIG_START( starpak2 )
 	MCFG_CPU_ADD("pic", PIC16C56, XTAL_4MHz)  // !! PIC12C508 !! 4MHz internal RC oscillator (selected by the configuration word)
 	MCFG_PIC16C5x_READ_B_CB( READ8( galgames_cart_device, int_pic_data_r))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(galgames_cart_device, int_pic_data_w))
@@ -200,7 +200,7 @@ DEFINE_DEVICE_TYPE(GALGAMES_STARPAK2_CART, galgames_starpak2_cart_device, "starp
 
 // STARPAK3 cart
 
-static MACHINE_CONFIG_FRAGMENT( starpak3 )
+static MACHINE_CONFIG_START( starpak3 )
 	MCFG_CPU_ADD("pic", PIC16C56, XTAL_4MHz)
 	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(galgames_cart_device, int_pic_bank_w))
 	MCFG_PIC16C5x_READ_B_CB( READ8( galgames_cart_device, int_pic_data_r))

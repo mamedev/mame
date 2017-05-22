@@ -423,7 +423,7 @@ static ADDRESS_MAP_START( driversnd_dsp_io_map, AS_IO, 16, harddriv_sound_board_
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_FRAGMENT( harddriv_snd )
+static MACHINE_CONFIG_START( harddriv_snd )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", M68000, XTAL_16MHz/2)

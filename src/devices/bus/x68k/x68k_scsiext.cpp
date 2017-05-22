@@ -35,7 +35,7 @@ const tiny_rom_entry *x68k_scsiext_device::device_rom_region() const
 }
 
 // device machine config
-static MACHINE_CONFIG_FRAGMENT( x68k_scsiext )
+static MACHINE_CONFIG_START( x68k_scsiext )
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_1)

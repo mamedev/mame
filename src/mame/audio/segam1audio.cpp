@@ -42,7 +42,7 @@ static ADDRESS_MAP_START( mpcm2_map, AS_0, 8, segam1audio_device )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION(":m1pcm2", 0)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( segam1audio )
+MACHINE_CONFIG_START( segam1audio )
 	MCFG_CPU_ADD(M68000_TAG, M68000, 10000000)  // verified on real h/w
 	MCFG_CPU_PROGRAM_MAP(segam1audio_map)
 

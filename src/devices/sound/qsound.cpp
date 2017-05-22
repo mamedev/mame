@@ -57,7 +57,7 @@ ADDRESS_MAP_END
 
 
 // machine fragment
-static MACHINE_CONFIG_FRAGMENT( qsound )
+static MACHINE_CONFIG_START( qsound )
 	MCFG_CPU_ADD("qsound", DSP16, QSOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dsp16_program_map)
 	MCFG_CPU_DATA_MAP(dsp16_data_map)

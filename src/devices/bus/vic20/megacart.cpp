@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(VIC20_MEGACART, vic20_megacart_device, "vic20_megacart", "VIC
 //  MACHINE_DRIVER( vic20_megacart )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( vic20_megacart )
+static MACHINE_CONFIG_START( vic20_megacart )
 
 MACHINE_CONFIG_END
 

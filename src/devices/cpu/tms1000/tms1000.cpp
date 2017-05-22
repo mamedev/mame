@@ -102,7 +102,7 @@ mc141200_cpu_device::mc141200_cpu_device(const machine_config &mconfig, const ch
 
 
 // machine configs
-static MACHINE_CONFIG_FRAGMENT(tms1000)
+static MACHINE_CONFIG_START(tms1000)
 
 	// microinstructions PLA, output PLA
 	MCFG_PLA_ADD("mpla", 8, 16, 30)

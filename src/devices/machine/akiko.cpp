@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(AKIKO, akiko_device, "akiko", "CBM AKIKO")
 //  machine configurations
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( akiko )
+static MACHINE_CONFIG_START( akiko )
 MACHINE_CONFIG_END
 
 machine_config_constructor akiko_device::device_mconfig_additions() const

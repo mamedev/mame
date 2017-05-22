@@ -92,10 +92,10 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( comx_fd )
+//  MACHINE_CONFIG_START( comx_fd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( comx_fd )
+static MACHINE_CONFIG_START( comx_fd )
 	MCFG_WD1770_ADD(WD1770_TAG, XTAL_8MHz)
 
 	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", comx_fd_floppies, "525sd35t", comx_fd_device::floppy_formats)

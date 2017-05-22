@@ -52,7 +52,7 @@ DEFINE_DEVICE_TYPE(A2BUS_TIMEMASTERHO, a2bus_timemasterho_device, "a2tmstho", "A
 #define TIMEMASTER_PIA_TAG      "timemst_pia"
 #define TIMEMASTER_M5832_TAG    "timemst_msm"
 
-MACHINE_CONFIG_FRAGMENT( timemaster )
+MACHINE_CONFIG_START( timemaster )
 	MCFG_DEVICE_ADD(TIMEMASTER_PIA_TAG, PIA6821, 1021800)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(a2bus_timemasterho_device, pia_out_a))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a2bus_timemasterho_device, pia_out_b))

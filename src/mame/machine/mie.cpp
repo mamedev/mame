@@ -53,7 +53,7 @@ static ADDRESS_MAP_START( mie_port, AS_IO, 8, mie_device)
 	AM_RANGE(0x91, 0x91) AM_READ(jvs_sense_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( mie )
+static MACHINE_CONFIG_START( mie )
 	MCFG_CPU_ADD("mie", Z80, DERIVED_CLOCK(1,1))
 	MCFG_CPU_PROGRAM_MAP(mie_map)
 	MCFG_CPU_IO_MAP(mie_port)

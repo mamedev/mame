@@ -97,7 +97,7 @@ WRITE_LINE_MEMBER( vic1112_device::via1_irq_w )
 //  MACHINE_DRIVER( vic1112 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( vic1112 )
+static MACHINE_CONFIG_START( vic1112 )
 	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 0)
 	MCFG_VIA6522_READPB_HANDLER(READ8(vic1112_device, via0_pb_r))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic1112_device, via0_pb_w))

@@ -12,7 +12,7 @@
 #include "boot_kof2k3.h"
 
 
-static MACHINE_CONFIG_FRAGMENT( kof2k3bl_cart )
+static MACHINE_CONFIG_START( kof2k3bl_cart )
 	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
 	MCFG_CMC_PROT_ADD("cmc_prot")
 	MCFG_PCM2_PROT_ADD("pcm2_prot")

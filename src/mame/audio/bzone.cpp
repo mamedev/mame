@@ -397,7 +397,7 @@ WRITE8_MEMBER(bzone_state::bzone_sounds_w)
 }
 
 
-MACHINE_CONFIG_FRAGMENT( bzone_audio )
+MACHINE_CONFIG_START( bzone_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

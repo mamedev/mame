@@ -1838,7 +1838,7 @@ static GFXDECODE_START( majtitle )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_FRAGMENT( m72_audio_chips )
+static MACHINE_CONFIG_START( m72_audio_chips )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 

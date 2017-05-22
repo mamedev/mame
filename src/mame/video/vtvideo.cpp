@@ -880,7 +880,7 @@ TIMER_CALLBACK_MEMBER(vt100_video_device::lba7_change)
 	m_lba7 = (m_lba7) ? 0 : 1;
 }
 
-static MACHINE_CONFIG_FRAGMENT(vt100_video)
+static MACHINE_CONFIG_START(vt100_video)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
@@ -894,7 +894,7 @@ machine_config_constructor vt100_video_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(vt100_video);
 }
 
-static MACHINE_CONFIG_FRAGMENT(rainbow_video)
+static MACHINE_CONFIG_START(rainbow_video)
 	MCFG_PALETTE_ADD("palette", 4)
 MACHINE_CONFIG_END
 

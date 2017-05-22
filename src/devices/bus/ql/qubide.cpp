@@ -89,10 +89,10 @@ const tiny_rom_entry *qubide_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( qubide )
+//  MACHINE_CONFIG_START( qubide )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( qubide )
+static MACHINE_CONFIG_START( qubide )
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
 

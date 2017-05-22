@@ -682,7 +682,7 @@ DEVICE_ADDRESS_MAP_START(mcpx_ide_io, 32, mcpx_ide_device)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT(mcpx_ide)
+static MACHINE_CONFIG_START(mcpx_ide)
 	MCFG_DEVICE_ADD("ide", BUS_MASTER_IDE_CONTROLLER, 0)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(mcpx_ide_device, ide_interrupt))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)

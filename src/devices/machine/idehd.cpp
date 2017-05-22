@@ -857,7 +857,7 @@ uint8_t ide_hdd_device::calculate_status()
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
-static MACHINE_CONFIG_FRAGMENT( hdd_image )
+static MACHINE_CONFIG_START( hdd_image )
 	MCFG_HARDDISK_ADD( "image" )
 MACHINE_CONFIG_END
 

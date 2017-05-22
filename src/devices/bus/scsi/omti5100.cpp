@@ -176,7 +176,7 @@ void omti5100_device::WriteData( uint8_t *data, int dataLength )
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( omti5100 )
+static MACHINE_CONFIG_START( omti5100 )
 	MCFG_HARDDISK_ADD("image0")
 	MCFG_HARDDISK_ADD("image1")
 MACHINE_CONFIG_END

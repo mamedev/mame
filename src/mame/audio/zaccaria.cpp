@@ -144,7 +144,7 @@ ADDRESS_MAP_END
 //  MACHINE FRAGMENTS
 //**************************************************************************
 
-MACHINE_CONFIG_FRAGMENT(zac1b111xx_base_config)
+MACHINE_CONFIG_START(zac1b111xx_base_config)
 	MCFG_CPU_ADD("melodycpu", M6802, XTAL_3_579545MHz) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(zac1b111xx_melody_base_map)
 

@@ -59,9 +59,9 @@ const tiny_rom_entry *powermate_ide_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( adam_ata )
+//  MACHINE_CONFIG_START( adam_ata )
 //-------------------------------------------------
-static MACHINE_CONFIG_FRAGMENT( adam_ata )
+static MACHINE_CONFIG_START( adam_ata )
 	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 

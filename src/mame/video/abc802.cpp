@@ -200,10 +200,10 @@ uint32_t abc802_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( abc802_video )
+//  MACHINE_CONFIG_START( abc802_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( abc802_video )
+MACHINE_CONFIG_START( abc802_video )
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)

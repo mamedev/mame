@@ -83,10 +83,10 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::rtc_tp_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
+//  MACHINE_CONFIG_START( s100_wunderbus )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
+static MACHINE_CONFIG_START( s100_wunderbus )
 	MCFG_PIC8259_ADD(I8259A_TAG, DEVWRITELINE(DEVICE_SELF, s100_wunderbus_device, pic_int_w), VCC, NOOP)
 	MCFG_DEVICE_ADD(INS8250_1_TAG, INS8250, XTAL_18_432MHz/10)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))

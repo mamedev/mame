@@ -106,7 +106,7 @@ DEFINE_DEVICE_TYPE(I8274_NEW,      i8274_new_device,   "i8274_new",      "Intel 
 //-------------------------------------------------
 //  device_mconfig_additions -
 //-------------------------------------------------
-MACHINE_CONFIG_FRAGMENT( z80sio )
+MACHINE_CONFIG_START( z80sio )
 	MCFG_DEVICE_ADD(CHANA_TAG, Z80SIO_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHANB_TAG, Z80SIO_CHANNEL, 0)
 MACHINE_CONFIG_END

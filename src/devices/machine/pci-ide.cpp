@@ -46,7 +46,7 @@ DEVICE_ADDRESS_MAP_START(bus_master_map, 32, ide_pci_device)
 	AM_RANGE(0x8, 0xf) AM_DEVREADWRITE("ide2", bus_master_ide_controller_device, bmdma_r, bmdma_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT(pci_ide)
+static MACHINE_CONFIG_START(pci_ide)
 	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", "cdrom", true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(ide_pci_device, ide_interrupt))
 	//MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)

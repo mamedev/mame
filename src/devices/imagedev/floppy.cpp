@@ -1344,7 +1344,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 #define FLOPSPK "flopsndout"
 
-MACHINE_CONFIG_FRAGMENT( floppy_img )
+MACHINE_CONFIG_START( floppy_img )
 	MCFG_SPEAKER_STANDARD_MONO(FLOPSPK)
 	MCFG_SOUND_ADD(FLOPSND_TAG, FLOPPYSOUND, 44100)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, FLOPSPK, 0.5)

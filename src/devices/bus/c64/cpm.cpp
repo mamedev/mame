@@ -55,10 +55,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_cpm )
+//  MACHINE_CONFIG_START( c64_cpm )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_cpm )
+static MACHINE_CONFIG_START( c64_cpm )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 3000000)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)

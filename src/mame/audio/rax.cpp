@@ -470,7 +470,7 @@ WRITE32_MEMBER(acclaim_rax_device::dmovlay_callback)
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( rax )
+MACHINE_CONFIG_START( rax )
 	MCFG_CPU_ADD("adsp", ADSP2181, XTAL_16_67MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(acclaim_rax_device, adsp_sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(acclaim_rax_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction

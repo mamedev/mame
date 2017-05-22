@@ -25,7 +25,7 @@ ROM_END
 DEFINE_DEVICE_TYPE(ISA16_SVGA_CIRRUS,        isa16_svga_cirrus_device,        "dm_clgd5430", "Diamond Speedstar Pro SE ISA Graphics Card (BIOS v1.00)")
 DEFINE_DEVICE_TYPE(ISA16_SVGA_CIRRUS_GD542X, isa16_svga_cirrus_gd542x_device, "clgd542x",    "Generic Cirrus Logic CD542 Graphics Card (BIOS v1.20)")
 
-static MACHINE_CONFIG_FRAGMENT( vga_cirrus )
+static MACHINE_CONFIG_START( vga_cirrus )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5430_device, screen_update)
@@ -112,7 +112,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-static MACHINE_CONFIG_FRAGMENT( vga_cirrus_gd542x )
+static MACHINE_CONFIG_START( vga_cirrus_gd542x )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)

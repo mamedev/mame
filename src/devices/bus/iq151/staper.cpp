@@ -21,7 +21,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_FRAGMENT( iq151_staper )
+static MACHINE_CONFIG_START( iq151_staper )
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(iq151_staper_device, ppi_porta_r))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(iq151_staper_device, ppi_portb_w))

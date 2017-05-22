@@ -810,7 +810,7 @@ WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
 }
 
 // 4 x EPROM sockets (16K) in BBC-A, these should grow to 16 for BBC-B and later...
-static MACHINE_CONFIG_FRAGMENT( bbc_eprom_sockets )
+static MACHINE_CONFIG_START( bbc_eprom_sockets )
 MCFG_GENERIC_SOCKET_ADD("exp_rom1", generic_linear_slot, "bbc_cart")
 MCFG_GENERIC_EXTENSIONS("bin,rom")
 MCFG_GENERIC_LOAD(bbc_state, exp1_load)

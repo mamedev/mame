@@ -82,10 +82,10 @@ FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( ql_trump_card )
+//  MACHINE_CONFIG_START( ql_trump_card )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( ql_trump_card )
+static MACHINE_CONFIG_START( ql_trump_card )
 	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", ql_trump_card_floppies, "35dd", ql_trump_card_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", ql_trump_card_floppies, nullptr, ql_trump_card_device::floppy_formats)

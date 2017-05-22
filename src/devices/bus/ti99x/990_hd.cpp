@@ -959,7 +959,7 @@ WRITE16_MEMBER(ti990_hdc_device::write)
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( ti990_hdc )
+static MACHINE_CONFIG_START( ti990_hdc )
 	MCFG_HARDDISK_ADD( "harddisk1" )
 	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
 	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)

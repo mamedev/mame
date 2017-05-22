@@ -14,7 +14,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_FRAGMENT( dmv_k803 )
+static MACHINE_CONFIG_START( dmv_k803 )
 	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(dmv_k803_device, rtc_irq_w))
 MACHINE_CONFIG_END

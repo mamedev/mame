@@ -182,7 +182,7 @@ static SLOT_INTERFACE_START( beta_disk_floppies )
 	SLOT_INTERFACE( "drive3", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( beta_disk )
+static MACHINE_CONFIG_START( beta_disk )
 	MCFG_KR1818VG93_ADD("wd179x", XTAL_8MHz / 8)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", beta_disk_floppies, "drive0", beta_disk_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

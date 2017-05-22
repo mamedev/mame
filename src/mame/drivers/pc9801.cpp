@@ -3236,12 +3236,12 @@ SLOT_INTERFACE_START(pc9801_atapi_devices)
 	SLOT_INTERFACE("pc9801_cd", PC9801_CD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( pc9801_keyboard )
+static MACHINE_CONFIG_START( pc9801_keyboard )
 	MCFG_DEVICE_ADD("keyb", PC9801_KBD, 53)
 	MCFG_PC9801_KBD_IRQ_CALLBACK(DEVWRITELINE("pic8259_master", pic8259_device, ir1_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( pc9801_mouse )
+static MACHINE_CONFIG_START( pc9801_mouse )
 	MCFG_DEVICE_ADD("ppi8255_mouse", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(pc9801_state, ppi_mouse_porta_r))
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(pc9801_state, ppi_mouse_porta_w))
@@ -3253,13 +3253,13 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_mouse )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", pc9801_state, mouse_irq_cb, attotime::from_hz(120))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( pc9801_cbus )
+static MACHINE_CONFIG_START( pc9801_cbus )
 	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus, "pc9801_26")
 	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus, nullptr)
 //  TODO: six max slots
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( pc9801_sasi )
+static MACHINE_CONFIG_START( pc9801_sasi )
 	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
 	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
 	MCFG_SCSI_IO_HANDLER(WRITELINE(pc9801_state, write_sasi_io)) // bit2
@@ -3281,7 +3281,7 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_sasi )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( pc9801_ide )
+static MACHINE_CONFIG_START( pc9801_ide )
 	MCFG_ATA_INTERFACE_ADD("ide1", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide1_irq_w))
 	MCFG_ATA_INTERFACE_ADD("ide2", pc9801_atapi_devices, "pc9801_cd", nullptr, false)
@@ -3290,7 +3290,7 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_ide )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","pc98_cd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( pc9801_common )
+static MACHINE_CONFIG_START( pc9801_common )
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(MAIN_CLOCK_X1) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))

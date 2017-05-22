@@ -124,7 +124,7 @@ uint8_t saturn_multitap_device::read_id(int idx)
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( multitap_slot )
+static MACHINE_CONFIG_START( multitap_slot )
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl1", saturn_joys, "joypad")
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl2", saturn_joys, "joypad")
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl3", saturn_joys, "joypad")

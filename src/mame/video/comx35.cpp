@@ -88,7 +88,7 @@ void comx35_state::video_start()
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_FRAGMENT( comx35_pal_video )
+MACHINE_CONFIG_START( comx35_pal_video )
 	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
 
 	/* sound hardware */
@@ -108,7 +108,7 @@ MACHINE_CONFIG_FRAGMENT( comx35_pal_video )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( comx35_ntsc_video )
+MACHINE_CONFIG_START( comx35_ntsc_video )
 	MCFG_CDP1869_SCREEN_NTSC_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_NTSC)
 
 	/* sound hardware */

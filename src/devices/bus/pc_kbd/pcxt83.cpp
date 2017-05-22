@@ -72,7 +72,7 @@ const tiny_rom_entry *ibm_pc_xt_83_keyboard_device::device_rom_region() const
 //  MACHINE_DRIVER( ibm_pc_xt_83_keyboard )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( ibm_pc_xt_83_keyboard )
+static MACHINE_CONFIG_START( ibm_pc_xt_83_keyboard )
 	MCFG_CPU_ADD(I8048_TAG, I8048, MCS48_LC_CLOCK(IND_U(47), CAP_P(20.7)))
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(ibm_pc_xt_83_keyboard_device, bus_r))
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(ibm_pc_xt_83_keyboard_device, bus_w))

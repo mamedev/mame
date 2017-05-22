@@ -794,7 +794,7 @@ FLOPPY_FORMATS_MEMBER( amstrad_state::aleste_floppy_formats )
 	FLOPPY_MSX_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
+static MACHINE_CONFIG_START( cpcplus_cartslot )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "gx4000_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,cpr")
 	MCFG_GENERIC_MANDATORY

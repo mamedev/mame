@@ -376,7 +376,7 @@ ADDRESS_MAP_END
 //  machine configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( midway_ssio )
+static MACHINE_CONFIG_START( midway_ssio )
 	MCFG_CPU_ADD("cpu", Z80, SSIO_CLOCK/2/4)
 	MCFG_CPU_PROGRAM_MAP(ssio_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, midway_ssio_device, clock_14024, SSIO_CLOCK/2/16/10)
@@ -589,7 +589,7 @@ ADDRESS_MAP_END
 //  machine configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT(midway_sounds_good)
+static MACHINE_CONFIG_START(midway_sounds_good)
 	MCFG_CPU_ADD("cpu", M68000, SOUNDSGOOD_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(soundsgood_map)
 
@@ -754,7 +754,7 @@ ADDRESS_MAP_END
 //  machine configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT(midway_turbo_cheap_squeak)
+static MACHINE_CONFIG_START(midway_turbo_cheap_squeak)
 	MCFG_CPU_ADD("cpu", M6809E, TURBOCS_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(turbocs_map)
 
@@ -967,7 +967,7 @@ ADDRESS_MAP_END
 //  machine configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT(midway_squawk_n_talk)
+static MACHINE_CONFIG_START(midway_squawk_n_talk)
 	MCFG_CPU_ADD("cpu", M6802, SQUAWKTALK_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(squawkntalk_map)
 

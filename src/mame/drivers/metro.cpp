@@ -3723,7 +3723,7 @@ static MACHINE_CONFIG_DERIVED( batlbubl, msgogo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( metro_upd7810_sound )
+static MACHINE_CONFIG_START( metro_upd7810_sound )
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
 	MCFG_UPD7810_RXD(READLINE(metro_state, metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
@@ -3733,7 +3733,7 @@ static MACHINE_CONFIG_FRAGMENT( metro_upd7810_sound )
 	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(metro_state, metro_sound_rombank_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( daitorid_upd7810_sound )
+static MACHINE_CONFIG_START( daitorid_upd7810_sound )
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_12MHz)
 	MCFG_UPD7810_RXD(READLINE(metro_state, metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)

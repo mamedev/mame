@@ -62,7 +62,7 @@ const tiny_rom_entry *k7659_keyboard_device::device_rom_region() const
 //  MACHINE_DRIVER( k7659_keyboard )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( k7659_keyboard )
+static MACHINE_CONFIG_START( k7659_keyboard )
 
 MACHINE_CONFIG_END
 

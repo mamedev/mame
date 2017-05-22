@@ -163,7 +163,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( s1410 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( s1410 )
+static MACHINE_CONFIG_START( s1410 )
 	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(s1410_mem)
 	MCFG_CPU_IO_MAP(s1410_io)

@@ -98,10 +98,10 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( s100_dj2db )
+//  MACHINE_CONFIG_START( s100_dj2db )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( s100_dj2db )
+static MACHINE_CONFIG_START( s100_dj2db )
 	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, XTAL_5_0688MHz)
 	MCFG_COM8116_FR_HANDLER(WRITELINE(s100_dj2db_device, fr_w))
 

@@ -215,7 +215,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( epson_ex800 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( epson_ex800 )
+static MACHINE_CONFIG_START( epson_ex800 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", UPD7810, 12000000)  /* 12 MHz? */
 	MCFG_CPU_PROGRAM_MAP(ex800_mem)

@@ -54,7 +54,7 @@ void neogeo_sma_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-static MACHINE_CONFIG_FRAGMENT( sma_cart )
+static MACHINE_CONFIG_START( sma_cart )
 	MCFG_SMA_PROT_ADD("sma_prot")
 	MCFG_CMC_PROT_ADD("cmc_prot")
 MACHINE_CONFIG_END

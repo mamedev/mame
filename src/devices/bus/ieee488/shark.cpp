@@ -75,10 +75,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( mshark )
+//  MACHINE_CONFIG_START( mshark )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( mshark )
+static MACHINE_CONFIG_START( mshark )
 	// basic machine hardware
 	MCFG_CPU_ADD(I8085_TAG, I8085A, 1000000)
 	MCFG_CPU_PROGRAM_MAP(mshark_mem)

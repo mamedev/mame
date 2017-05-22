@@ -811,7 +811,7 @@ WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pb_w )
 //  MACHINE_DRIVER( c1541 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c1541 )
+static MACHINE_CONFIG_START( c1541 )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1541_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -855,7 +855,7 @@ machine_config_constructor c1541_device_base::device_mconfig_additions() const
 //  MACHINE_DRIVER( c1541c )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c1541c )
+static MACHINE_CONFIG_START( c1541c )
 	MCFG_FRAGMENT_ADD(c1541)
 MACHINE_CONFIG_END
 
@@ -875,7 +875,7 @@ machine_config_constructor c1541c_device::device_mconfig_additions() const
 //  MACHINE_DRIVER( c1541dd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c1541dd )
+static MACHINE_CONFIG_START( c1541dd )
 	MCFG_FRAGMENT_ADD(c1541)
 
 	MCFG_CPU_MODIFY(M6502_TAG)
@@ -898,7 +898,7 @@ machine_config_constructor c1541_dolphin_dos_device::device_mconfig_additions() 
 //  MACHINE_DRIVER( c1541pd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c1541pd )
+static MACHINE_CONFIG_START( c1541pd )
 	MCFG_FRAGMENT_ADD(c1541)
 
 	MCFG_CPU_MODIFY(M6502_TAG)
@@ -921,7 +921,7 @@ machine_config_constructor c1541_professional_dos_v1_device::device_mconfig_addi
 //  MACHINE_DRIVER( c1541pdc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c1541pdc )
+static MACHINE_CONFIG_START( c1541pdc )
 	MCFG_FRAGMENT_ADD(c1541)
 
 	MCFG_CPU_MODIFY(M6502_TAG)

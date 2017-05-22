@@ -95,10 +95,10 @@ const tiny_rom_entry *comx_eb_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( comx_eb )
+//  MACHINE_CONFIG_START( comx_eb )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( comx_eb )
+static MACHINE_CONFIG_START( comx_eb )
 	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT1_TAG, comx_expansion_cards, "fd")
 	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot1_irq_w))
 	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT2_TAG, comx_expansion_cards, "clm")

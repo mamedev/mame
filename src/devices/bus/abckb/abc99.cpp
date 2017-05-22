@@ -149,7 +149,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( abc99 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( abc99 )
+static MACHINE_CONFIG_START( abc99 )
 	// keyboard CPU
 	MCFG_CPU_ADD(I8035_Z2_TAG, I8035, XTAL_6MHz/3) // from Z5 T0 output
 	MCFG_CPU_PROGRAM_MAP(abc99_z2_mem)

@@ -109,7 +109,7 @@ static GFXDECODE_START( stfight )
 	GFXDECODE_ENTRY( "spr_gfx", 0x0000, spritelayout, 0, 32 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_FRAGMENT( stfight_vid )
+static MACHINE_CONFIG_START( stfight_vid )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

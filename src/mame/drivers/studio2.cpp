@@ -613,7 +613,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_FRAGMENT( studio2_cartslot )
+static MACHINE_CONFIG_START( studio2_cartslot )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "studio2_cart")
 	MCFG_GENERIC_EXTENSIONS("st2,bin,rom")
 	MCFG_GENERIC_LOAD(studio2_state, studio2_cart_load)

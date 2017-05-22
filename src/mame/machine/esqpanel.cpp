@@ -200,7 +200,7 @@ void esqpanel_device::set_analog_value(offs_t offset, uint16_t value)
 
 /* panel with 1x22 VFD display used in the EPS-16 and EPS-16 Plus */
 
-static MACHINE_CONFIG_FRAGMENT(esqpanel1x22)
+static MACHINE_CONFIG_START(esqpanel1x22)
 	MCFG_ESQ1X22_ADD("vfd")
 MACHINE_CONFIG_END
 
@@ -218,7 +218,7 @@ esqpanel1x22_device::esqpanel1x22_device(const machine_config &mconfig, const ch
 
 /* panel with 2x40 VFD display used in the ESQ-1, VFX-SD, SD-1, and others */
 
-static MACHINE_CONFIG_FRAGMENT(esqpanel2x40)
+static MACHINE_CONFIG_START(esqpanel2x40)
 	MCFG_ESQ2X40_ADD("vfd")
 MACHINE_CONFIG_END
 
@@ -235,7 +235,7 @@ esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const ch
 }
 
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
-static MACHINE_CONFIG_FRAGMENT(esqpanel2x16_sq1)
+static MACHINE_CONFIG_START(esqpanel2x16_sq1)
 	MCFG_ESQ2X16_SQ1_ADD("vfd")
 MACHINE_CONFIG_END
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------

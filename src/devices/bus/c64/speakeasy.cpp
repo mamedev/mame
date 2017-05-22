@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(C64_SPEAKEASY, c64_speakeasy_cartridge_device, "c64_speakeasy
 //  MACHINE_DRIVER( speakeasy )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( speakeasy )
+static MACHINE_CONFIG_START( speakeasy )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD(SC01A_TAG, VOTRAX_SC01, 720000)

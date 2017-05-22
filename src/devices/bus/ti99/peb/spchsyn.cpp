@@ -149,7 +149,7 @@ void ti_speech_synthesizer_device::device_reset()
 	m_sbe = false;
 }
 
-MACHINE_CONFIG_FRAGMENT( ti99_speech )
+MACHINE_CONFIG_START( ti99_speech )
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
