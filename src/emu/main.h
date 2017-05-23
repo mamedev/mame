@@ -40,7 +40,6 @@ enum
 //**************************************************************************
 //    TYPE DEFINITIONS
 //**************************************************************************
-class osd_interface;
 
 class emulator_info
 {
@@ -65,8 +64,6 @@ public:
 	static bool standalone();
 };
 
-// ======================> machine_manager
-class ui_manager;
 
 class machine_manager
 {
@@ -101,5 +98,4 @@ protected:
 	std::unique_ptr<http_manager> m_http;
 };
 
-
-#endif  /* MAME_EMU_MAIN_H */
+#endif // MAME_EMU_MAIN_H

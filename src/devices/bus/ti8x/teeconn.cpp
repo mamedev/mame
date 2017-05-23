@@ -12,7 +12,7 @@ namespace bus { namespace ti8x {
 
 namespace {
 
-MACHINE_CONFIG_FRAGMENT(tee_connector)
+MACHINE_CONFIG_START(tee_connector)
 	MCFG_TI8X_LINK_PORT_ADD("a", default_ti8x_link_devices, nullptr)
 	MCFG_TI8X_LINK_TIP_HANDLER(WRITELINE(tee_connector_device, tip_a_w))
 	MCFG_TI8X_LINK_RING_HANDLER(WRITELINE(tee_connector_device, ring_a_w))

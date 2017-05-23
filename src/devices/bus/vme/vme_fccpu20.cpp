@@ -244,7 +244,7 @@ ADDRESS_MAP_END
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_FRAGMENT (fccpu20)
+static MACHINE_CONFIG_START (fccpu20)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68020, CLOCK50 / 3) /* Crytstal verified from picture HCI */
 	MCFG_CPU_PROGRAM_MAP (cpu20_mem)

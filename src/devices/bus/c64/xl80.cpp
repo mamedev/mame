@@ -120,10 +120,10 @@ GFXDECODE_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_xl80 )
+//  MACHINE_CONFIG_START( c64_xl80 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_xl80 )
+static MACHINE_CONFIG_START( c64_xl80 )
 	MCFG_SCREEN_ADD_MONOCHROME(MC6845_SCREEN_TAG, RASTER, rgb_t::white())
 	MCFG_SCREEN_UPDATE_DEVICE(HD46505SP_TAG, h46505_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*8)

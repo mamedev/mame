@@ -927,7 +927,7 @@ static void scsi_dma_write( twinkle_state *state, uint32_t *p_n_psxram, uint32_t
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( cdrom_config )
+static MACHINE_CONFIG_START( cdrom_config )
 	MCFG_DEVICE_MODIFY( "cdda" )
 	MCFG_SOUND_ROUTE( 0, "^^^^speakerleft", 1.0 )
 	MCFG_SOUND_ROUTE( 1, "^^^^speakerright", 1.0 )

@@ -94,10 +94,10 @@ GFXDECODE_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( vic20_video_pak )
+//  MACHINE_CONFIG_START( vic20_video_pak )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( vic20_video_pak )
+static MACHINE_CONFIG_START( vic20_video_pak )
 	MCFG_SCREEN_ADD_MONOCHROME(MC6845_SCREEN_TAG, RASTER, rgb_t::white())
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, h46505_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*8)

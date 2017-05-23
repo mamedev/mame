@@ -642,10 +642,10 @@ WRITE8_MEMBER(wecleman_state::wecleman_K00723216_bank_w)
 static ADDRESS_MAP_START( wecleman_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8500, 0x8500) AM_WRITENOP    // incresed with speed (global volume)?
-	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)    // Protection
-	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)   // Protection
-	AM_RANGE(0x9006, 0x9006) AM_WRITENOP    // ?
+	AM_RANGE(0x8500, 0x8500) AM_WRITENOP            // increased with speed (global volume)?
+	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)    // 007452: Protection
+	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)   // 007452: Protection
+	AM_RANGE(0x9006, 0x9006) AM_WRITENOP            // 007452: ?
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From main CPU
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write) // K007232 (Reading offset 5/b triggers the sample)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)

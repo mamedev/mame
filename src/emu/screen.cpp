@@ -37,10 +37,10 @@ const attotime screen_device::DEFAULT_FRAME_PERIOD(attotime::from_hz(DEFAULT_FRA
 
 u32 screen_device::m_id_counter = 0;
 
-class screen_device_svg_renderer {
+class screen_device::svg_renderer {
 public:
-	screen_device_svg_renderer(memory_region *region);
-	~screen_device_svg_renderer();
+	svg_renderer(memory_region *region);
+	~svg_renderer();
 
 	int width() const;
 	int height() const;
@@ -89,7 +89,7 @@ private:
 	void blit(bitmap_rgb32 &bitmap, const cached_bitmap &src) const;
 };
 
-screen_device_svg_renderer::screen_device_svg_renderer(memory_region *region)
+screen_device::svg_renderer::svg_renderer(memory_region *region)
 {
 	char *s = new char[region->bytes()+1];
 	memcpy(s, region->base(), region->bytes());
@@ -137,23 +137,23 @@ screen_device_svg_renderer::screen_device_svg_renderer(memory_region *region)
 #endif
 }
 
-screen_device_svg_renderer::~screen_device_svg_renderer()
+screen_device::svg_renderer::~svg_renderer()
 {
 	nsvgDeleteRasterizer(m_rasterizer);
 	nsvgDelete(m_image);
 }
 
-int screen_device_svg_renderer::width() const
+int screen_device::svg_renderer::width() const
 {
 	return int(m_image->width + 0.5);
 }
 
-int screen_device_svg_renderer::height() const
+int screen_device::svg_renderer::height() const
 {
 	return int(m_image->height + 0.5);
 }
 
-void screen_device_svg_renderer::render_state(std::vector<u32> &dest, const std::vector<bool> &state)
+void screen_device::svg_renderer::render_state(std::vector<u32> &dest, const std::vector<bool> &state)
 {
 	for(int key = 0; key != m_key_count; key++) {
 		if (state[key])
@@ -187,7 +187,7 @@ void screen_device_svg_renderer::render_state(std::vector<u32> &dest, const std:
 	}
 }
 
-void screen_device_svg_renderer::blit(bitmap_rgb32 &bitmap, const cached_bitmap &src) const
+void screen_device::svg_renderer::blit(bitmap_rgb32 &bitmap, const cached_bitmap &src) const
 {
 	const u32 *s = &src.image[0];
 	for(int y=0; y<src.sy; y++) {
@@ -201,7 +201,7 @@ void screen_device_svg_renderer::blit(bitmap_rgb32 &bitmap, const cached_bitmap 
 	}
 }
 
-int screen_device_svg_renderer::render(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+int screen_device::svg_renderer::render(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int nsx = bitmap.width();
 	int nsy = bitmap.height();
@@ -236,12 +236,12 @@ int screen_device_svg_renderer::render(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-void screen_device_svg_renderer::output_notifier(const char *outname, s32 value, void *param)
+void screen_device::svg_renderer::output_notifier(const char *outname, s32 value, void *param)
 {
-	static_cast<screen_device_svg_renderer *>(param)->output_change(outname, value);
+	static_cast<svg_renderer *>(param)->output_change(outname, value);
 }
 
-void screen_device_svg_renderer::output_change(const char *outname, s32 value)
+void screen_device::svg_renderer::output_change(const char *outname, s32 value)
 {
 	auto l = m_key_ids.find(outname);
 	if (l == m_key_ids.end())
@@ -249,7 +249,7 @@ void screen_device_svg_renderer::output_change(const char *outname, s32 value)
 	m_key_state[l->second] = value;
 }
 
-void screen_device_svg_renderer::compute_initial_bboxes(std::vector<bbox> &bboxes)
+void screen_device::svg_renderer::compute_initial_bboxes(std::vector<bbox> &bboxes)
 {
 	bboxes.resize(m_key_count);
 	for(int key = 0; key != m_key_count; key++) {
@@ -300,7 +300,7 @@ void screen_device_svg_renderer::compute_initial_bboxes(std::vector<bbox> &bboxe
 	}
 }
 
-void screen_device_svg_renderer::compute_diff_image(const std::vector<u32> &rend, const bbox &bb, cached_bitmap &dest) const
+void screen_device::svg_renderer::compute_diff_image(const std::vector<u32> &rend, const bbox &bb, cached_bitmap &dest) const
 {
 	int x0, y0, x1, y1;
 	x0 = y0 = x1 = y1 = -1;
@@ -354,7 +354,7 @@ void screen_device_svg_renderer::compute_diff_image(const std::vector<u32> &rend
 
 }
 
-bool screen_device_svg_renderer::compute_mask_intersection_bbox(int key1, int key2, bbox &bb) const
+bool screen_device::svg_renderer::compute_mask_intersection_bbox(int key1, int key2, bbox &bb) const
 {
 	const cached_bitmap &c1 = m_cache[key1];
 	const cached_bitmap &c2 = m_cache[key2];
@@ -403,7 +403,7 @@ bool screen_device_svg_renderer::compute_mask_intersection_bbox(int key1, int ke
 	return true;
 }
 
-void screen_device_svg_renderer::compute_dual_diff_image(const std::vector<u32> &rend, const bbox &bb, const cached_bitmap &src1, const cached_bitmap &src2, cached_bitmap &dest) const
+void screen_device::svg_renderer::compute_dual_diff_image(const std::vector<u32> &rend, const bbox &bb, const cached_bitmap &src1, const cached_bitmap &src2, cached_bitmap &dest) const
 {
 	dest.x = bb.x0;
 	dest.y = bb.y0;
@@ -426,7 +426,7 @@ void screen_device_svg_renderer::compute_dual_diff_image(const std::vector<u32> 
 	}
 }
 
-void screen_device_svg_renderer::rebuild_cache()
+void screen_device::svg_renderer::rebuild_cache()
 {
 	m_cache.clear();
 	std::vector<u32> rend(m_sx*m_sy);
@@ -814,8 +814,8 @@ void screen_device::device_start()
 		memory_region *reg = owner()->memregion(m_svg_region);
 		if (!reg)
 			fatalerror("SVG region \"%s\" does not exist\n", m_svg_region);
-		m_svg = std::make_unique<screen_device_svg_renderer>(reg);
-		machine().output().set_notifier(nullptr, screen_device_svg_renderer::output_notifier, m_svg.get());
+		m_svg = std::make_unique<svg_renderer>(reg);
+		machine().output().set_notifier(nullptr, svg_renderer::output_notifier, m_svg.get());
 
 		if (0)
 		{

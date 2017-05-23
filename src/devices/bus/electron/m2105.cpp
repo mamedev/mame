@@ -54,7 +54,7 @@ ROM_END
 //  MACHINE_DRIVER( m2105 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( m2105 )
+static MACHINE_CONFIG_START( m2105 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

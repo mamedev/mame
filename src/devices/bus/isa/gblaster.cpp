@@ -20,7 +20,7 @@
 
   jumperable? normally 0x220
 */
-static MACHINE_CONFIG_FRAGMENT( game_blaster_config )
+static MACHINE_CONFIG_START( game_blaster_config )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SAA1099_ADD("saa1099.1", 7159090)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)

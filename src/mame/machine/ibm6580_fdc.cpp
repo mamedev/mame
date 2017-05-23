@@ -32,7 +32,7 @@ const tiny_rom_entry *dw_fdc_device::device_rom_region() const
 	return ROM_NAME( dw_fdc );
 }
 
-static MACHINE_CONFIG_FRAGMENT( dw_fdc )
+static MACHINE_CONFIG_START( dw_fdc )
 	MCFG_CPU_ADD("mcu", I8048, XTAL_24MHz/4)    // divisor is unverified
 //  MCFG_MCS48_PORT_BUS_IN_CB(READ8(dw_fdc_device, bus_r))
 //  MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(dw_fdc_device, bus_w))

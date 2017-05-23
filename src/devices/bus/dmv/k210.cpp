@@ -14,7 +14,7 @@
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_FRAGMENT( dmv_k210 )
+static MACHINE_CONFIG_START( dmv_k210 )
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(dmv_k210_device, porta_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(dmv_k210_device, portb_r))

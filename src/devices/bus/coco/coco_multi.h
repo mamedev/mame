@@ -36,7 +36,7 @@ public:
 
 	virtual uint8_t* get_cart_base() override;
 
-	// these are only public so they can be in a MACHINE_CONFIG_FRAGMENT
+	// these are only public so they can be in a MACHINE_CONFIG_START
 	// declaration; don't think about them as publically accessable
 	DECLARE_WRITE_LINE_MEMBER(multi_slot1_cart_w);
 	DECLARE_WRITE_LINE_MEMBER(multi_slot1_nmi_w);

@@ -20,7 +20,7 @@
 DEFINE_DEVICE_TYPE(NES_BARCODE_BATTLER, nes_bcbattle_device, "nes_bcbattle", "Epoch Barcode Battler (FC)")
 
 
-MACHINE_CONFIG_FRAGMENT( nes_battler )
+MACHINE_CONFIG_START( nes_battler )
 	MCFG_BARCODE_READER_ADD("battler")
 MACHINE_CONFIG_END
 

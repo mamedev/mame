@@ -24,7 +24,7 @@ SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 DEFINE_DEVICE_TYPE(CPC_PLAYCITY, cpc_playcity_device, "cpc_playcity", "PlayCity")
 
 // device machine config
-static MACHINE_CONFIG_FRAGMENT( cpc_playcity )
+static MACHINE_CONFIG_START( cpc_playcity )
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(cpc_playcity_device,ctc_zc1_cb))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc",z80ctc_device,trg3))

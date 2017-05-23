@@ -21,7 +21,7 @@
 
 DEFINE_DEVICE_TYPE(A2BUS_LASER128, a2bus_laser128_device, "a2laser128", "VTech Laser 128 Internal Device")
 
-MACHINE_CONFIG_FRAGMENT( a2laser128 )
+MACHINE_CONFIG_START( a2laser128 )
 MACHINE_CONFIG_END
 
 /***************************************************************************

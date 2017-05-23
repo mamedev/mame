@@ -135,7 +135,7 @@ ADDRESS_MAP_START( pcat32_io_common, AS_IO, 32, pcat_base_state )
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", am9517a_device, read, write, 0x00ff00ff)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT(pcat_common)
+MACHINE_CONFIG_START(pcat_common)
 	MCFG_PIC8259_ADD( "pic8259_1", INPUTLINE("maincpu", 0), VCC, READ8(pcat_base_state, get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NOOP)
 	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL_14_31818MHz/3 )

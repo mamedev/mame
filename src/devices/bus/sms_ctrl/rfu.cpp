@@ -139,7 +139,7 @@ READ32_MEMBER( sms_rapid_fire_device::pixel_r )
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( rfire_slot )
+static MACHINE_CONFIG_START( rfire_slot )
 	MCFG_SMS_CONTROL_PORT_ADD("ctrl", sms_control_port_devices, "joypad")
 	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITELINE(sms_rapid_fire_device, th_pin_w))
 	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_rapid_fire_device, pixel_r))

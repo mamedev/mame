@@ -227,7 +227,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(gluck2);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -278,43 +277,6 @@ uint32_t gluck2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
-}
-
-
-PALETTE_INIT_MEMBER(gluck2_state, gluck2)
-{
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-
-	for (i = 0; i < 0x100; i++)
-	{
-		int bit0, bit1, bit2, bit3;
-		int r, g, b;
-
-		/* red component */
-		bit0 = (color_prom[i + 0x000] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0x000] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0x000] >> 2) & 0x01;
-		bit3 = (color_prom[i + 0x000] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		/* green component */
-		bit0 = (color_prom[i + 0x100] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0x100] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0x100] >> 2) & 0x01;
-		bit3 = (color_prom[i + 0x100] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		/* blue component */
-		bit0 = (color_prom[i + 0x200] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0x200] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0x200] >> 2) & 0x01;
-		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
-
-	}
 }
 
 
@@ -538,8 +500,7 @@ static MACHINE_CONFIG_START( gluck2 )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gluck2)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(gluck2_state, gluck2)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

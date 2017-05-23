@@ -3385,7 +3385,7 @@ void psxcpu_device::set_disable_rom_berr(bool mode)
 	m_disable_rom_berr = mode;
 }
 
-static MACHINE_CONFIG_FRAGMENT( psx )
+static MACHINE_CONFIG_START( psx )
 	MCFG_DEVICE_ADD( "irq", PSX_IRQ, 0 )
 	MCFG_PSX_IRQ_HANDLER( INPUTLINE( DEVICE_SELF, PSXCPU_IRQ0 ) )
 

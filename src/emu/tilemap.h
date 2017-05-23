@@ -426,12 +426,6 @@ enum tilemap_standard_mapper
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward declarations
-class tilemap_t;
-class tilemap_manager;
-class tilemap_device;
-
-
 // global types
 typedef u32 tilemap_memory_index;
 
@@ -818,4 +812,4 @@ inline running_machine &tilemap_t::machine() const
 }
 
 
-#endif  // MAME_EMU_TILEMAP_H
+#endif // MAME_EMU_TILEMAP_H

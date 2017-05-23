@@ -58,7 +58,7 @@ tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char
 
 
 // machine configs
-static MACHINE_CONFIG_FRAGMENT(tms0980)
+static MACHINE_CONFIG_START(tms0980)
 
 	// main opcodes PLA, microinstructions PLA, output PLA, segment PLA
 	MCFG_PLA_ADD("ipla", 9, 22, 24)
@@ -76,7 +76,7 @@ machine_config_constructor tms0980_cpu_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(tms0980);
 }
 
-static MACHINE_CONFIG_FRAGMENT(tms1980)
+static MACHINE_CONFIG_START(tms1980)
 
 	// main opcodes PLA, microinstructions PLA, output PLA
 	MCFG_PLA_ADD("ipla", 9, 22, 24)

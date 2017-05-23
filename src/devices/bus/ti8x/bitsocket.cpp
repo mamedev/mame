@@ -12,7 +12,7 @@ namespace bus { namespace ti8x {
 
 namespace {
 
-MACHINE_CONFIG_FRAGMENT(bit_socket)
+MACHINE_CONFIG_START(bit_socket)
 	MCFG_DEVICE_ADD("stream", BITBANGER, 0)
 MACHINE_CONFIG_END
 

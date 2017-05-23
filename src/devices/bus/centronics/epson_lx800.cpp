@@ -66,7 +66,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( epson_lx800 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( epson_lx800 )
+static MACHINE_CONFIG_START( epson_lx800 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
 	MCFG_CPU_PROGRAM_MAP(lx800_mem)

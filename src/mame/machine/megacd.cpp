@@ -285,7 +285,7 @@ static GFXDECODE_START( segacd )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
+static MACHINE_CONFIG_START( segacd_fragment )
 
 	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(segacd_map)

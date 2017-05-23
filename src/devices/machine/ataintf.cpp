@@ -269,7 +269,7 @@ void ata_interface_device::device_start()
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( ata_interface )
+static MACHINE_CONFIG_START( ata_interface )
 	MCFG_DEVICE_ADD( "0", ATA_SLOT, 0 )
 	MCFG_DEVICE_ADD( "1", ATA_SLOT, 0 )
 MACHINE_CONFIG_END

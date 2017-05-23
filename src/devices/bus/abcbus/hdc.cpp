@@ -81,7 +81,7 @@ static const z80_daisy_config daisy_chain[] =
 //  MACHINE_DRIVER( abc_hdc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( abc_hdc )
+static MACHINE_CONFIG_START( abc_hdc )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(abc_hdc_mem)
 	MCFG_CPU_IO_MAP(abc_hdc_io)

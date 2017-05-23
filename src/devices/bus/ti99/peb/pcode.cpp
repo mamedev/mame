@@ -322,7 +322,7 @@ INPUT_CHANGED_MEMBER( ti_pcode_card_device::switch_changed )
 }
 
 
-MACHINE_CONFIG_FRAGMENT( ti99_pcode )
+MACHINE_CONFIG_START( ti99_pcode )
 	MCFG_GROM_ADD( PGROM0_TAG, 0, PCODE_GROM_TAG, 0x0000, WRITELINE(ti_pcode_card_device, ready_line))
 	MCFG_GROM_ADD( PGROM1_TAG, 1, PCODE_GROM_TAG, 0x2000, WRITELINE(ti_pcode_card_device, ready_line))
 	MCFG_GROM_ADD( PGROM2_TAG, 2, PCODE_GROM_TAG, 0x4000, WRITELINE(ti_pcode_card_device, ready_line))

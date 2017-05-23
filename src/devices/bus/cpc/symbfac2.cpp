@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(CPC_SYMBIFACE2, cpc_symbiface2_device, "cpc_symf2", "SYMBiFAC
 //**************************************************************************
 
 // device machine config
-static MACHINE_CONFIG_FRAGMENT( cpc_symbiface2 )
+static MACHINE_CONFIG_START( cpc_symbiface2 )
 	MCFG_ATA_INTERFACE_ADD("ide",ata_devices,"hdd",nullptr,false)
 	MCFG_DS12885_ADD("rtc")
 	MCFG_NVRAM_ADD_1FILL("nvram")

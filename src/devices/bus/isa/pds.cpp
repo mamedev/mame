@@ -56,7 +56,7 @@ void isa8_pds_device::device_stop()
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( pds_config )
+static MACHINE_CONFIG_START( pds_config )
 	MCFG_DEVICE_ADD("pds_ppi", I8255, 0)
 MACHINE_CONFIG_END
 

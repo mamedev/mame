@@ -31,7 +31,7 @@ void nscsi_cdrom_device::device_reset()
 	cur_lba = -1;
 }
 
-static MACHINE_CONFIG_FRAGMENT(scsi_cdrom)
+static MACHINE_CONFIG_START(scsi_cdrom)
 	MCFG_CDROM_ADD("image")
 	MCFG_CDROM_INTERFACE("cdrom")
 MACHINE_CONFIG_END

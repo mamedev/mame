@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(A2BUS_PIC, a2bus_pic_device, "a2pic", "Apple Parallel Interfa
 #define PIC_ROM_REGION  "pic_rom"
 #define PIC_CENTRONICS_TAG "pic_ctx"
 
-MACHINE_CONFIG_FRAGMENT( pic )
+MACHINE_CONFIG_START( pic )
 	MCFG_CENTRONICS_ADD(PIC_CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("ctx_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(a2bus_pic_device, ack_w))

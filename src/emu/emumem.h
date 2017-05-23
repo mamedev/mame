@@ -56,25 +56,11 @@ enum read_or_write
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// referenced types from other classes
-class device_memory_interface;
-class device_t;
-class game_driver;
-
-// forward declarations of classes defined here
-class address_map;
-class address_map_entry;
-class memory_manager;
-class memory_bank;
-class memory_block;
-class memory_share;
-class direct_read_data;
-class address_space;
+// private classes declared in emumem.cpp
 class address_table;
 class address_table_read;
-class address_table_write;
 class address_table_setoffset;
-
+class address_table_write;
 
 // offsets and addresses are 32-bit (for now...)
 typedef u32 offs_t;

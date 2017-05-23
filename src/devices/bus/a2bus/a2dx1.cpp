@@ -23,7 +23,7 @@
 
 DEFINE_DEVICE_TYPE(A2BUS_DX1, a2bus_dx1_device, "a2dx1", "Decillonix DX-1")
 
-MACHINE_CONFIG_FRAGMENT( a2dx1 )
+MACHINE_CONFIG_START( a2dx1 )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_SOUND_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC

@@ -32,7 +32,7 @@ static ADDRESS_MAP_START( dsbz80io_map, AS_IO, 8, dsbz80_device )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_FRAGMENT( dsbz80 )
+MACHINE_CONFIG_START( dsbz80 )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)     /* unknown clock, but probably pretty slow considering the z80 does like nothing */
 	MCFG_CPU_PROGRAM_MAP(dsbz80_map)
 	MCFG_CPU_IO_MAP(dsbz80io_map)

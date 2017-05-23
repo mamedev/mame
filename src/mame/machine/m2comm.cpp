@@ -171,7 +171,7 @@ Sega PC BD MODEL2 C-CRX COMMUNICATION 837-12839
 #define VERBOSE 0
 #include "logmacro.h"
 
-MACHINE_CONFIG_FRAGMENT( m2comm )
+MACHINE_CONFIG_START( m2comm )
 MACHINE_CONFIG_END
 
 //**************************************************************************

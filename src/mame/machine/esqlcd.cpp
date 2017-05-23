@@ -13,7 +13,7 @@
 DEFINE_DEVICE_TYPE(ESQ2X16_SQ1, esq2x16_sq1_device, "esq2x16_sq1", "Ensoniq 2x16 VFD (SQ-1 variant)")
 
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
-static MACHINE_CONFIG_FRAGMENT(esq2x16)
+static MACHINE_CONFIG_START(esq2x16)
 	MCFG_DEFAULT_LAYOUT(layout_esq2by16)
 MACHINE_CONFIG_END
 

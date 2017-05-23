@@ -155,8 +155,6 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
 	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_lghost_value));
 	save_item(NAME(m_lghost_select));
-	save_item(NAME(m_wwally_last_x));
-	save_item(NAME(m_wwally_last_y));
 }
 
 
@@ -593,52 +591,17 @@ WRITE8_MEMBER( segas18_state::lghost_gun_recoil_w )
 
 READ16_MEMBER( segas18_state::wwally_custom_io_r )
 {
-	switch (offset)
-	{
-		case 0x3000/2:
-			return (ioport("TRACKX1")->read() - m_wwally_last_x[0]) & 0xff;
+	if (offset >= 0x3000/2 && offset < 0x3018/2)
+		return m_upd4701[(offset & 0x0018/2) >> 2]->read_xy(space, offset & 0x0006/2);
 
-		case 0x3004/2:
-			return (ioport("TRACKY1")->read() - m_wwally_last_y[0]) & 0xff;
-
-		case 0x3008/2:
-			return (ioport("TRACKX2")->read() - m_wwally_last_x[1]) & 0xff;
-
-		case 0x300c/2:
-			return (ioport("TRACKY2")->read() - m_wwally_last_y[1]) & 0xff;
-
-		case 0x3010/2:
-			return (ioport("TRACKX3")->read() - m_wwally_last_x[2]) & 0xff;
-
-		case 0x3014/2:
-			return (ioport("TRACKY3")->read() - m_wwally_last_y[2]) & 0xff;
-	}
 	return open_bus_r(space, 0, mem_mask);
 }
 
 
 WRITE16_MEMBER( segas18_state::wwally_custom_io_w )
 {
-	switch (offset)
-	{
-		case 0x3000/2:
-		case 0x3004/2:
-			m_wwally_last_x[0] = ioport("TRACKX1")->read();
-			m_wwally_last_y[0] = ioport("TRACKY1")->read();
-			break;
-
-		case 0x3008/2:
-		case 0x300c/2:
-			m_wwally_last_x[1] = ioport("TRACKX2")->read();
-			m_wwally_last_y[1] = ioport("TRACKY2")->read();
-			break;
-
-		case 0x3010/2:
-		case 0x3014/2:
-			m_wwally_last_x[2] = ioport("TRACKX3")->read();
-			m_wwally_last_y[2] = ioport("TRACKY3")->read();
-			break;
-	}
+	if (offset >= 0x3000/2 && offset < 0x3018/2)
+		m_upd4701[(offset & 0x0018/2) >> 2]->reset_xy(space, 0);
 }
 
 
@@ -1288,22 +1251,22 @@ static INPUT_PORTS_START( wwally )
 	//"SW2:8" unused
 
 	PORT_START("TRACKX1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_REVERSE
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_REVERSE PORT_RESET
 
 	PORT_START("TRACKY1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_RESET
 
 	PORT_START("TRACKX2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(2) PORT_REVERSE
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(2) PORT_REVERSE PORT_RESET
 
 	PORT_START("TRACKY2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(2)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(2) PORT_RESET
 
 	PORT_START("TRACKX3")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(3) PORT_REVERSE
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(3) PORT_REVERSE PORT_RESET
 
 	PORT_START("TRACKY3")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(3)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(3) PORT_RESET
 INPUT_PORTS_END
 
 
@@ -1447,6 +1410,34 @@ static MACHINE_CONFIG_DERIVED( lghost, system18 )
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY("io")
 	MCFG_315_5296_OUT_PORTC_CB(WRITE8(segas18_state, lghost_gun_recoil_w))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( wwally_fd1094, system18_fd1094 )
+	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX1")
+	MCFG_UPD4701_PORTY("TRACKY1")
+
+	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX2")
+	MCFG_UPD4701_PORTY("TRACKY2")
+
+	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX3")
+	MCFG_UPD4701_PORTY("TRACKY3")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( wwally, system18 )
+	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX1")
+	MCFG_UPD4701_PORTY("TRACKY1")
+
+	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX2")
+	MCFG_UPD4701_PORTY("TRACKY2")
+
+	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX3")
+	MCFG_UPD4701_PORTY("TRACKY3")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system18_i8751, system18 )
@@ -3232,8 +3223,8 @@ GAME( 1989, shdancer,  0,        system18,             shdancer, segas18_state, 
 GAME( 1989, shdancerj, shdancer, system18,             shdancer, segas18_state, generic_shad, ROT0,   "Sega",          "Shadow Dancer (Japan)", 0 )
 GAME( 1989, shdancer1, shdancer, system18,             shdancer, segas18_state, generic_shad, ROT0,   "Sega",          "Shadow Dancer (US)", 0 )
 
-GAME( 1992, wwallyj,   0,        system18_fd1094,      wwally,   segas18_state, wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev B, Japan) (FD1094 317-0197B)", 0 ) // the roms do contain an english logo so maybe there is a world / us set too
-GAME( 1992, wwallyja,  wwallyj,  system18_fd1094,      wwally,   segas18_state, wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev A, Japan) (FD1094 317-0197A)", 0 )
+GAME( 1992, wwallyj,   0,        wwally_fd1094,        wwally,   segas18_state, wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev B, Japan) (FD1094 317-0197B)", 0 ) // the roms do contain an english logo so maybe there is a world / us set too
+GAME( 1992, wwallyja,  wwallyj,  wwally_fd1094,        wwally,   segas18_state, wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev A, Japan) (FD1094 317-0197A)", 0 )
 
 // decrypted bootleg sets
 
@@ -3263,5 +3254,5 @@ GAME( 1990, mwalkd,     mwalk,    system18_i8751,mwalk,    segas18_state, generi
 GAME( 1990, mwalkud,    mwalk,    system18_i8751,mwalka,   segas18_state, generic_5874, ROT0,   "bootleg",          "Michael Jackson's Moonwalker (US) (bootleg of FD1094/8751 317-0158)", 0 )
 GAME( 1990, mwalkjd,    mwalk,    system18_i8751,mwalk,    segas18_state, generic_5874, ROT0,   "bootleg",          "Michael Jackson's Moonwalker (Japan) (bootleg of FD1094/8751 317-0157 set)", 0 )
 
-GAME( 1992, wwallyjd,   wwallyj,  system18,      wwally,   segas18_state, wwally,       ROT0,   "bootleg",          "Wally wo Sagase! (rev B, Japan) (bootleg of FD1094 317-0197B set)", 0 )
-GAME( 1992, wwallyjad,  wwallyj,  system18,      wwally,   segas18_state, wwally,       ROT0,   "bootleg",          "Wally wo Sagase! (rev A, Japan) (bootleg of FD1094 317-0197A set)", 0 )
+GAME( 1992, wwallyjd,   wwallyj,  wwally,        wwally,   segas18_state, wwally,       ROT0,   "bootleg",          "Wally wo Sagase! (rev B, Japan) (bootleg of FD1094 317-0197B set)", 0 )
+GAME( 1992, wwallyjad,  wwallyj,  wwally,        wwally,   segas18_state, wwally,       ROT0,   "bootleg",          "Wally wo Sagase! (rev A, Japan) (bootleg of FD1094 317-0197A set)", 0 )

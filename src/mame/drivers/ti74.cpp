@@ -287,7 +287,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(ti74_state::battery_status_changed)
 {
-	if (machine().phase() == MACHINE_PHASE_RUNNING)
+	if (machine().phase() == machine_phase::RUNNING)
 		update_battery_status(newval);
 }
 

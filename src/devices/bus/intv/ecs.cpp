@@ -90,11 +90,11 @@ void intv_ecs_device::late_subslot_setup()
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( sub_slot )
+//  MACHINE_CONFIG_START( sub_slot )
 //-------------------------------------------------
 
 
-static MACHINE_CONFIG_FRAGMENT( sub_slot )
+static MACHINE_CONFIG_START( sub_slot )
 	MCFG_SPEAKER_STANDARD_MONO("mono_ecs")
 
 	MCFG_SOUND_ADD("ay8914", AY8914, XTAL_3_579545MHz/2)

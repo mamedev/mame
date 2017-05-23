@@ -324,7 +324,7 @@ static SLOT_INTERFACE_START(ade_cart)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_FRAGMENT( camerica_aladdin )
+MACHINE_CONFIG_START( camerica_aladdin )
 	MCFG_ALADDIN_MINICART_ADD("ade_slot", ade_cart)
 MACHINE_CONFIG_END
 

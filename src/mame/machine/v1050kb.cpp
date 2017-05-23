@@ -72,7 +72,7 @@ DISCRETE_SOUND_END
 //  MACHINE_DRIVER( v1050_keyboard )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( v1050_keyboard )
+static MACHINE_CONFIG_START( v1050_keyboard )
 	MCFG_CPU_ADD(I8049_TAG, I8049, XTAL_4_608MHz)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(v1050_keyboard_device, kb_p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(v1050_keyboard_device, kb_p1_w))

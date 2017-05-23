@@ -22,8 +22,6 @@
 
 // ======================> bookkeeping_manager
 
-enum class config_type;
-
 class bookkeeping_manager
 {
 public:

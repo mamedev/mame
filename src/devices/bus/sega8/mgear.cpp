@@ -41,7 +41,7 @@ void sega8_mgear_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-static MACHINE_CONFIG_FRAGMENT( sub_slot )
+static MACHINE_CONFIG_START( sub_slot )
 	MCFG_SMS_CARTRIDGE_ADD("subslot", sms_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sms")
 MACHINE_CONFIG_END

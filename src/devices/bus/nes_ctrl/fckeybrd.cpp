@@ -119,7 +119,7 @@ ioport_constructor nes_fckeybrd_device::device_input_ports() const
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( fc_keyboard )
+static MACHINE_CONFIG_START( fc_keyboard )
 	MCFG_CASSETTE_ADD("tape")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fc_cass")

@@ -311,7 +311,7 @@ cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-MACHINE_CONFIG_FRAGMENT( cmi01a_device )
+MACHINE_CONFIG_START( cmi01a_device )
 	MCFG_DEVICE_ADD("cmi01a_pia_0", PIA6821, 0) // pia_cmi01a_1_config
 	MCFG_PIA_READCB1_HANDLER(READLINE(cmi01a_device, tri_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(cmi01a_device, ws_dir_w))

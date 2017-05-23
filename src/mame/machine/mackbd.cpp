@@ -91,7 +91,7 @@ ADDRESS_MAP_END
 //  MACHINE_CONFIG
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( mackbd )
+static MACHINE_CONFIG_START( mackbd )
 	MCFG_CPU_ADD(MACKBD_CPU_TAG, I8021, 3000000)    // "the approximate clock rate of the MPU is 3 MHz"
 	MCFG_CPU_PROGRAM_MAP(mackbd_map)
 	MCFG_CPU_IO_MAP(mackbd_io_map)

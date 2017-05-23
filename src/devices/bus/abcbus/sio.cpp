@@ -76,7 +76,7 @@ const tiny_rom_entry *abc_sio_device::device_rom_region() const
 //  MACHINE_DRIVER( abc_sio )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( abc_sio )
+static MACHINE_CONFIG_START( abc_sio )
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_4_9152MHz)
 	MCFG_Z80DART_ADD(Z80SIO_TAG, 0, 0, 0, 0, 0)
 MACHINE_CONFIG_END

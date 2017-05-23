@@ -286,10 +286,10 @@ FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c8280 )
+//  MACHINE_CONFIG_START( c8280 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c8280 )
+static MACHINE_CONFIG_START( c8280 )
 	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c8280_main_mem)
 

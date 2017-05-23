@@ -48,7 +48,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( nec_p72 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( nec_p72 )
+static MACHINE_CONFIG_START( nec_p72 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33, XTAL_16MHz/2) /* TODO it's actually a V40 */
 	MCFG_CPU_PROGRAM_MAP(p72_mem)

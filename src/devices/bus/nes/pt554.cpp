@@ -87,7 +87,7 @@ static const char *const pt554_sample_names[] =
 //  MACHINE_DRIVER
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( pt554 )
+static MACHINE_CONFIG_START( pt554 )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")

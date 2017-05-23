@@ -81,7 +81,7 @@ READ32_MEMBER( sms_ctrl_adaptor_device::pixel_r )
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( sms_adp_slot )
+static MACHINE_CONFIG_START( sms_adp_slot )
 	MCFG_SMS_CONTROL_PORT_ADD("ctrl", sms_control_port_devices, "joypad")
 	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITELINE(sms_ctrl_adaptor_device, th_pin_w))
 	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_ctrl_adaptor_device, pixel_r))

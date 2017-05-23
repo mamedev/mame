@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(VIC20_SPEAKEASY, vic20_speakeasy_device, "vic20_speakeasy", "
 //  MACHINE_DRIVER( speakeasy )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( speakeasy )
+static MACHINE_CONFIG_START( speakeasy )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD(SC01A_TAG, VOTRAX_SC01, 720000)

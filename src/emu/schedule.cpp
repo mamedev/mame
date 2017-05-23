@@ -594,18 +594,6 @@ void device_scheduler::timer_set(const attotime &duration, timer_expired_delegat
 
 
 //-------------------------------------------------
-//  timer_pulse - allocate an anonymous non-device
-//  timer and set it to go off at the given
-//  frequency
-//-------------------------------------------------
-
-void device_scheduler::timer_pulse(const attotime &period, timer_expired_delegate callback, int param, void *ptr)
-{
-	m_timer_allocator.alloc()->init(machine(), callback, ptr, false).adjust(period, param, period);
-}
-
-
-//-------------------------------------------------
 //  timer_alloc - allocate a global device timer
 //  and return a pointer
 //-------------------------------------------------

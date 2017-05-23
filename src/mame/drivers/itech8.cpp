@@ -1697,7 +1697,7 @@ static MACHINE_CONFIG_DERIVED( itech8_core_hi, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2203 )
+static MACHINE_CONFIG_START( itech8_sound_ym2203 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1717,7 +1717,7 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2203 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2608b )
+static MACHINE_CONFIG_START( itech8_sound_ym2608b )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1731,7 +1731,7 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2608b )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812 )
+static MACHINE_CONFIG_START( itech8_sound_ym3812 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1752,7 +1752,7 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812_external )
+static MACHINE_CONFIG_START( itech8_sound_ym3812_external )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)

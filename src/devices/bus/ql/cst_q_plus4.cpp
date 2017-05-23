@@ -47,10 +47,10 @@ const tiny_rom_entry *cst_q_plus4_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( cst_q_plus4 )
+//  MACHINE_CONFIG_START( cst_q_plus4 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( cst_q_plus4 )
+static MACHINE_CONFIG_START( cst_q_plus4 )
 	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
 
 	MCFG_QL_EXPANSION_SLOT_ADD("exp1", ql_expansion_cards, nullptr)

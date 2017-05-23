@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( vic1520 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( vic1520 )
+static MACHINE_CONFIG_START( vic1520 )
 	MCFG_CPU_ADD(M6500_1_TAG, M6502, XTAL_2MHz) // M6500/1
 	MCFG_CPU_PROGRAM_MAP(vic1520_mem)
 MACHINE_CONFIG_END

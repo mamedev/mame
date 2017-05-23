@@ -24,7 +24,7 @@
 
 DEFINE_DEVICE_TYPE(A1BUS_CFFA, a1bus_cffa_device, "cffa1", "CFFA Compact Flash for Apple I")
 
-MACHINE_CONFIG_FRAGMENT( cffa )
+MACHINE_CONFIG_START( cffa )
 	MCFG_ATA_INTERFACE_ADD(CFFA_ATA_TAG, ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
 

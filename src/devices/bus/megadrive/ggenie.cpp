@@ -158,7 +158,7 @@ WRITE16_MEMBER(md_rom_ggenie_device::write)
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( ggenie_slot )
+//  MACHINE_CONFIG_START( ggenie_slot )
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START(ggenie_sub_cart)
@@ -169,7 +169,7 @@ static SLOT_INTERFACE_START(ggenie_sub_cart)
 	SLOT_INTERFACE_INTERNAL("rom_fram",  MD_ROM_FRAM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( ggenie_slot )
+static MACHINE_CONFIG_START( ggenie_slot )
 	MCFG_MD_CARTRIDGE_ADD("subslot", ggenie_sub_cart, nullptr)
 	MCFG_MD_CARTRIDGE_NOT_MANDATORY
 MACHINE_CONFIG_END

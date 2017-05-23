@@ -41,7 +41,7 @@ void nscsi_harddisk_device::device_reset()
 	cur_lba = -1;
 }
 
-static MACHINE_CONFIG_FRAGMENT(scsi_harddisk)
+static MACHINE_CONFIG_START(scsi_harddisk)
 	MCFG_HARDDISK_ADD("image")
 	MCFG_HARDDISK_INTERFACE("scsi_hdd")
 MACHINE_CONFIG_END

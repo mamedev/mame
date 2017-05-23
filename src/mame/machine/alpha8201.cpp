@@ -313,7 +313,7 @@ void alpha_8201_device::device_start()
 }
 
 // machine config additions
-static MACHINE_CONFIG_FRAGMENT(alpha8201)
+static MACHINE_CONFIG_START(alpha8201)
 
 	MCFG_CPU_ADD("mcu", HD44801, DERIVED_CLOCK(1,1)) // 8H
 	MCFG_HMCS40_READ_R_CB(0, READ8(alpha_8201_device, mcu_data_r))

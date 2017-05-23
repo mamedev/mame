@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol, Enik Land
 /*********************************************************************
 
-    sega315_5124.c
+    sega315_5124.cpp
 
     Implementation of video hardware chips used by Sega System E,
     Master System, and Game Gear.
@@ -1686,21 +1686,14 @@ void sega315_5124_device::device_reset()
 	memset(m_CRAM, 0, sizeof(m_CRAM));
 }
 
-static MACHINE_CONFIG_FRAGMENT( sega315_5124 )
+//-------------------------------------------------
+//  device_add_mconfig - add machine configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( sega315_5124_device::device_add_mconfig )
 	MCFG_PALETTE_ADD("palette", SEGA315_5124_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor sega315_5124_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sega315_5124 );
-}
-
 
 void sega315_5378_device::device_reset()
 {
@@ -1708,17 +1701,11 @@ void sega315_5378_device::device_reset()
 	m_draw_time = DRAW_TIME_GG;
 }
 
-static MACHINE_CONFIG_FRAGMENT( sega315_5378 )
+//-------------------------------------------------
+//  device_add_mconfig - add machine configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( sega315_5378_device::device_add_mconfig )
 	MCFG_PALETTE_ADD("palette", SEGA315_5378_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(sega315_5378_device, sega315_5378)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor sega315_5378_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sega315_5378 );
-}

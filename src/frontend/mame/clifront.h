@@ -16,6 +16,7 @@
 
 // don't include osd_interface in header files
 class osd_interface;
+class mame_machine_manager;
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -33,9 +34,20 @@ public:
 	// execute based on the incoming argc/argv
 	int execute(std::vector<std::string> &args);
 
-	// direct access to the command operations
+	// should we parse slot options for the auxillary verb in question?
+	static bool parse_slot_options_for_auxverb(const std::string &auxverb);
 
 private:
+	struct info_command_struct
+	{
+		const char *option;
+		int min_args;
+		int max_args;
+		bool specify_system;
+		void (cli_frontend::*function)(const std::vector<std::string> &args);
+		const char *usage;
+	};
+
 	// commands
 	void listxml(const std::vector<std::string> &args);
 	void listfull(const std::vector<std::string> &args);
@@ -61,6 +73,7 @@ private:
 	void display_help(const char *exename);
 	void output_single_softlist(FILE *out, software_list_device &swlist);
 	void start_execution(mame_machine_manager *manager, std::vector<std::string> &args);
+	static const info_command_struct *find_command(const std::string &s);
 
 	// internal state
 	emu_options &       m_options;

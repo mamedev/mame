@@ -117,7 +117,7 @@ static DEVICE_INPUT_DEFAULTS_START( fruitpc_sb_def )
 	DEVICE_INPUT_DEFAULTS("CONFIG", 0x03, 0x01)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_FRAGMENT( fruitpc_sb_conf )
+static MACHINE_CONFIG_START( fruitpc_sb_conf )
 	MCFG_DEVICE_MODIFY("pc_joy")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
 MACHINE_CONFIG_END

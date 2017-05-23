@@ -45,7 +45,7 @@ SLOT_INTERFACE_START(electron_floppies)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_FRAGMENT( plus3 )
+MACHINE_CONFIG_START( plus3 )
 	/* fdc */
 	MCFG_WD1770_ADD("fdc", XTAL_16MHz / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", electron_floppies, "35dd", floppy_formats)

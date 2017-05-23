@@ -821,7 +821,7 @@ static MACHINE_CONFIG_DERIVED( endurord_base, sharrier_base )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segahang_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( sound_board_2203 )
+static MACHINE_CONFIG_START( sound_board_2203 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
@@ -849,7 +849,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( sound_board_2203x2 )
+static MACHINE_CONFIG_START( sound_board_2203x2 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
@@ -887,7 +887,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203x2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( sound_board_2151 )
+static MACHINE_CONFIG_START( sound_board_2151 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)

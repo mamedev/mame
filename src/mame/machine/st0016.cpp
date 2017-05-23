@@ -106,7 +106,7 @@ READ8_MEMBER(st0016_cpu_device::soundram_read)
 }
 
 /* CPU interface */
-static MACHINE_CONFIG_FRAGMENT( st0016_cpu )
+static MACHINE_CONFIG_START( st0016_cpu )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)

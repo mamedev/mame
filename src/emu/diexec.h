@@ -111,10 +111,6 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class emu_timer;
-class screen_device;
-class device_scheduler;
-
 
 // interrupt callback for VBLANK and timed interrupts
 typedef device_delegate<void (device_t &)> device_interrupt_delegate;

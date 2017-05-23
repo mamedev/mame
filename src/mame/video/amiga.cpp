@@ -1096,7 +1096,7 @@ void amiga_state::update_screenmode()
 //  MACHINE DRIVER FRAGMENTS
 //**************************************************************************
 
-MACHINE_CONFIG_FRAGMENT( pal_video )
+MACHINE_CONFIG_START( pal_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS
 	(
@@ -1108,7 +1108,7 @@ MACHINE_CONFIG_FRAGMENT( pal_video )
 	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( ntsc_video )
+MACHINE_CONFIG_START( ntsc_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS
 	(

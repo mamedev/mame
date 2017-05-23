@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(A2BUS_SSC, a2bus_ssc_device, "a2ssc", "Apple Super Serial Car
 #define SSC_ACIA_TAG    "ssc_acia"
 #define SSC_RS232_TAG   "ssc_rs232"
 
-MACHINE_CONFIG_FRAGMENT( ssc )
+MACHINE_CONFIG_START( ssc )
 	MCFG_DEVICE_ADD(SSC_ACIA_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2bus_ssc_device, acia_irq_w))

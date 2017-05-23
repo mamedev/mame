@@ -49,17 +49,6 @@ INPUT_PORTS_START(a1200_us_keyboard)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_FRAGMENT(a1200kbd_revB)
-	MCFG_CPU_ADD("mpu", M68HC705C8A, XTAL_3MHz)
-	MCFG_M68HC05_PORTB_R_CB(READ8(a1200_kbd_device, mpu_portb_r));
-	MCFG_M68HC05_PORTD_R_CB(IOPORT("MOD"));
-	MCFG_M68HC05_PORTA_W_CB(WRITE8(a1200_kbd_device, mpu_porta_w));
-	MCFG_M68HC05_PORTB_W_CB(WRITE8(a1200_kbd_device, mpu_portb_w));
-	MCFG_M68HC05_PORTC_W_CB(WRITE8(a1200_kbd_device, mpu_portc_w));
-	MCFG_M68HC05_TCMP_CB(WRITELINE(a1200_kbd_device, mpu_tcmp));
-MACHINE_CONFIG_END
-
-
 ROM_START(a1200kbd_revB)
 	ROM_REGION(0x2000, "mpu", 0)
 	ROM_LOAD("DFA_Rev_B_A1200_HC705.bin", 0x0000, 0x2000, CRC(2a77eec4) SHA1(301ec6a69404457d912c89e3fc54095eda9f0e93))
@@ -137,10 +126,15 @@ WRITE_LINE_MEMBER(a1200_kbd_device::mpu_tcmp)
 	m_host->krst_w(state);
 }
 
-machine_config_constructor a1200_kbd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(a1200kbd_revB);
-}
+MACHINE_CONFIG_MEMBER(a1200_kbd_device::device_add_mconfig)
+	MCFG_CPU_ADD("mpu", M68HC705C8A, XTAL_3MHz)
+	MCFG_M68HC05_PORTB_R_CB(READ8(a1200_kbd_device, mpu_portb_r));
+	MCFG_M68HC05_PORTD_R_CB(IOPORT("MOD"));
+	MCFG_M68HC05_PORTA_W_CB(WRITE8(a1200_kbd_device, mpu_porta_w));
+	MCFG_M68HC05_PORTB_W_CB(WRITE8(a1200_kbd_device, mpu_portb_w));
+	MCFG_M68HC05_PORTC_W_CB(WRITE8(a1200_kbd_device, mpu_portc_w));
+	MCFG_M68HC05_TCMP_CB(WRITELINE(a1200_kbd_device, mpu_tcmp));
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *a1200_kbd_device::device_rom_region() const
 {

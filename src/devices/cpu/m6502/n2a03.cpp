@@ -129,7 +129,7 @@ const address_space_config *n2a03_device::memory_space_config(address_spacenum s
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( n2a03_device )
+static MACHINE_CONFIG_START( n2a03_device )
 	MCFG_SOUND_ADD("nesapu", NES_APU, DERIVED_CLOCK(1,1) )
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.50)

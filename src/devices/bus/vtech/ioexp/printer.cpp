@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(VTECH_PRINTER_INTERFACE, vtech_printer_interface_device, "vte
 //  machine configurations
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( printer_interface )
+static MACHINE_CONFIG_START( printer_interface )
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(vtech_printer_interface_device, busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("latch", "centronics")

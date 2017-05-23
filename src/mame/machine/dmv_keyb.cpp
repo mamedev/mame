@@ -27,7 +27,7 @@ ROM_START( dmv_keyboard )
 ROM_END
 
 
-static MACHINE_CONFIG_FRAGMENT( dmv_keyboard )
+static MACHINE_CONFIG_START( dmv_keyboard )
 	MCFG_CPU_ADD("mcu", I8741, XTAL_6MHz)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(dmv_keyboard_device, port1_r))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(dmv_keyboard_device, port2_r))

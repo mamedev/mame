@@ -275,16 +275,9 @@ class segas32_trackball_state :  public segas32_state
 public:
 	segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(sonic_custom_io_r);
-	DECLARE_WRITE8_MEMBER(sonic_custom_io_w);
-
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
-
-private:
-	required_ioport_array<6> m_track_ports;
-	uint8_t m_sonic_last[6];
 };
 
 class segas32_4player_state :  public segas32_state

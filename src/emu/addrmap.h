@@ -43,10 +43,6 @@ enum map_handler_type
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward declarations
-class validity_checker;
-
-
 // address map handler data
 class map_handler_data
 {

@@ -268,10 +268,10 @@ SLOT_INTERFACE_START( t4426_cart )
 SLOT_INTERFACE_END
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( coco_sound )
+//  MACHINE_CONFIG_START( coco_sound )
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( coco_sound )
+MACHINE_CONFIG_START( coco_sound )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks

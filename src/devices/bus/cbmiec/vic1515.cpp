@@ -59,7 +59,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( vic1515 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( vic1515 )
+static MACHINE_CONFIG_START( vic1515 )
 	MCFG_CPU_ADD("maincpu", I8039, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(vic1515_mem)
 	MCFG_CPU_IO_MAP(vic1515_io)

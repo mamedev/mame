@@ -22,7 +22,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_FRAGMENT(coco_rs232)
+static MACHINE_CONFIG_START(coco_rs232)
 	MCFG_DEVICE_ADD(UART_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 MACHINE_CONFIG_END

@@ -380,7 +380,7 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_FRAGMENT(pg685_backplane)
+static MACHINE_CONFIG_START(pg685_backplane)
 	MCFG_DEVICE_ADD("bppit", PIT8253, 0)
 
 	MCFG_PIC8259_ADD("bppic", NOOP, VCC, NOOP) // ???
@@ -388,7 +388,7 @@ static MACHINE_CONFIG_FRAGMENT(pg685_backplane)
 	MCFG_DEVICE_ADD("bpuart", MC2661, XTAL_4_9152MHz) // internal clock
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT(pg685_module)
+static MACHINE_CONFIG_START(pg685_module)
 	MCFG_DEVICE_ADD("fdc", FD1797, XTAL_4MHz / 2) // divider guessed
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("mainpic", pic8259_device, ir4_w))
 

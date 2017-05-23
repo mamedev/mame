@@ -495,7 +495,7 @@ void galaxian_sound_device::sound_stream_update(sound_stream &stream, stream_sam
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( galaxian_audio )
+MACHINE_CONFIG_START( galaxian_audio )
 
 	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
@@ -505,7 +505,7 @@ MACHINE_CONFIG_FRAGMENT( galaxian_audio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( mooncrst_audio )
+MACHINE_CONFIG_START( mooncrst_audio )
 
 	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)

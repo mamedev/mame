@@ -111,7 +111,7 @@ void tmpz84c011_device::device_reset()
 
 
 /* CPU interface */
-static MACHINE_CONFIG_FRAGMENT( tmpz84c011 )
+static MACHINE_CONFIG_START( tmpz84c011 )
 	MCFG_DEVICE_ADD("tmpz84c011_ctc", Z80CTC, DERIVED_CLOCK(1,1) )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(tmpz84c011_device, zc0_cb_trampoline_w))

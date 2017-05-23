@@ -26,7 +26,7 @@ two 6809s and as the reset generator for the entire system.
 #include "machine/c117.h"
 
 
-static MACHINE_CONFIG_FRAGMENT( namco_c117 )
+static MACHINE_CONFIG_START( namco_c117 )
 	MCFG_WATCHDOG_ADD("watchdog")
 MACHINE_CONFIG_END
 

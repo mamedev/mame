@@ -55,7 +55,7 @@ void ti99_colorbus_device::device_config_complete()
 
 void device_ti99_colorbus_interface::interface_config_complete()
 {
-	m_colorbus = downcast<ti99_colorbus_device*>(device().owner());
+	m_colorbus = dynamic_cast<ti99_colorbus_device*>(device().owner());
 }
 
 SLOT_INTERFACE_START( ti99_colorbus_port )

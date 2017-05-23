@@ -300,7 +300,7 @@ static const char *const safarir_sample_names[] =
 };
 
 
-static MACHINE_CONFIG_FRAGMENT( safarir_audio )
+static MACHINE_CONFIG_START( safarir_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(6)

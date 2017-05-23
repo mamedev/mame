@@ -516,7 +516,7 @@ static MACHINE_CONFIG_START( pturn )
 	MCFG_SCREEN_UPDATE_DRIVER(pturn_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x100)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pturn)
 

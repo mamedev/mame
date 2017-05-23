@@ -120,7 +120,7 @@ static SLOT_INTERFACE_START(dragon_fdc_device_base)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_FRAGMENT(dragon_fdc)
+static MACHINE_CONFIG_START(dragon_fdc)
 	MCFG_WD2797_ADD(WD2797_TAG, XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_drq_w))

@@ -12,9 +12,6 @@
 
 #pragma once
 
-class render_container;
-class render_texture;
-
 
 /***************************************************************************
     CONSTANTS

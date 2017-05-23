@@ -19,7 +19,7 @@
 DEFINE_DEVICE_TYPE(PC_FDC_XT, pc_fdc_xt_device, "pc_fdc_xt", "PC FDC (XT)")
 DEFINE_DEVICE_TYPE(PC_FDC_AT, pc_fdc_at_device, "pc_fdc_at", "PC FDC (AT)")
 
-static MACHINE_CONFIG_FRAGMENT( cfg )
+static MACHINE_CONFIG_START( cfg )
 	MCFG_UPD765A_ADD("upd765", false, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc_fdc_family_device, irq_w))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(pc_fdc_family_device, drq_w))

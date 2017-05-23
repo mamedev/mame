@@ -73,7 +73,7 @@ static SLOT_INTERFACE_START( sd725_floppies )
 	SLOT_INTERFACE("sd320", EPSON_SD_320)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT(spc1000_fdd)
+static MACHINE_CONFIG_START(spc1000_fdd)
 
 	/* sub CPU(5 inch floppy drive) */
 	MCFG_CPU_ADD("fdccpu", Z80, XTAL_4MHz)       /* 4 MHz */

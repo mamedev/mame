@@ -1521,7 +1521,7 @@ mos8568_device::mos8568_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-static MACHINE_CONFIG_FRAGMENT(mos8563)
+static MACHINE_CONFIG_START(mos8563)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(mos8563_device, mos8563)
 MACHINE_CONFIG_END

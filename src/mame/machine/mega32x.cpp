@@ -1771,7 +1771,7 @@ const rom_entry *sega_32x_device::device_rom_region() const
 #define _32X_INTERLEAVE_LEVEL \
 	MCFG_QUANTUM_TIME(attotime::from_hz(1800000))
 
-static MACHINE_CONFIG_FRAGMENT( _32x_ntsc )
+static MACHINE_CONFIG_START( _32x_ntsc )
 
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
 	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
@@ -1801,7 +1801,7 @@ static MACHINE_CONFIG_FRAGMENT( _32x_ntsc )
 	_32X_INTERLEAVE_LEVEL
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( _32x_pal )
+static MACHINE_CONFIG_START( _32x_pal )
 
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
 	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )

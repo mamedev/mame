@@ -44,7 +44,7 @@ tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *
 
 
 // machine configs
-static MACHINE_CONFIG_FRAGMENT(tp0320)
+static MACHINE_CONFIG_START(tp0320)
 
 	// main opcodes PLA(partial), microinstructions PLA
 	MCFG_PLA_ADD("ipla", 9, 6, 8)

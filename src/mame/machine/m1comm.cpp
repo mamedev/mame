@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( m1comm_io, AS_IO, 8, m1comm_device )
 	AM_RANGE(0xff, 0xff) AM_RAM
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( m1comm )
+MACHINE_CONFIG_START( m1comm )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 8000000) /* 32 MHz / 4 */
 	MCFG_CPU_PROGRAM_MAP(m1comm_mem)
 	MCFG_CPU_IO_MAP(m1comm_io)

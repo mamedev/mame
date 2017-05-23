@@ -16,7 +16,7 @@ cedar_magnet_flop_device::cedar_magnet_flop_device(const machine_config &mconfig
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( cedar_magnet_flop )
+static MACHINE_CONFIG_START( cedar_magnet_flop )
 	MCFG_NVRAM_ADD_NO_FILL("floppy_nvram")
 MACHINE_CONFIG_END
 

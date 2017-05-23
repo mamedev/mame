@@ -772,7 +772,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::console_ready_cart )
 */
 WRITE_LINE_MEMBER( ti99_4x_state::console_reset )
 {
-	if (machine().phase() != MACHINE_PHASE_INIT)
+	if (machine().phase() != machine_phase::INIT)
 	{
 		logerror("ti99_4x: Console reset line = %d\n", state);
 		m_cpu->set_input_line(INT_9900_RESET, state);

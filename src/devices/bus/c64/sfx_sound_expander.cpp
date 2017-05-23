@@ -38,10 +38,10 @@ WRITE_LINE_MEMBER( c64_sfx_sound_expander_cartridge_device::opl_irq_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_sfx_sound_expander )
+//  MACHINE_CONFIG_START( c64_sfx_sound_expander )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_sfx_sound_expander )
+static MACHINE_CONFIG_START( c64_sfx_sound_expander )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(YM3526_TAG, YM3526, XTAL_3_579545MHz)
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(c64_sfx_sound_expander_cartridge_device, opl_irq_w))

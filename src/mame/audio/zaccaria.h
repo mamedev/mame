@@ -35,12 +35,6 @@ DECLARE_DEVICE_TYPE(ZACCARIA_1B11142, zac1b11142_audio_device)
 
 class zac1b111xx_melody_base : public device_t, public device_mixer_interface
 {
-public:
-	DECLARE_READ8_MEMBER(melodypia_porta_r);
-	DECLARE_WRITE8_MEMBER(melodypia_porta_w);
-	DECLARE_WRITE8_MEMBER(melodypia_portb_w);
-	DECLARE_READ8_MEMBER(melodypsg1_portb_r);
-
 protected:
 	zac1b111xx_melody_base(
 			machine_config const &mconfig,
@@ -49,6 +43,12 @@ protected:
 			device_t *owner,
 			u32 clock);
 
+	DECLARE_READ8_MEMBER(melodypia_porta_r);
+	DECLARE_WRITE8_MEMBER(melodypia_porta_w);
+	DECLARE_WRITE8_MEMBER(melodypia_portb_w);
+	DECLARE_READ8_MEMBER(melodypsg1_portb_r);
+
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -70,12 +70,12 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
+protected:
 	// PSG output handlers
 	DECLARE_WRITE8_MEMBER(melodypsg1_porta_w);
 	DECLARE_WRITE8_MEMBER(melodypsg2_porta_w);
 
-protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -92,21 +92,24 @@ public:
 	DECLARE_READ_LINE_MEMBER(acs_r);
 	DECLARE_WRITE_LINE_MEMBER(ressound_w);
 
+	// master audio section handlers
+	DECLARE_READ8_MEMBER(host_command_r);
+	DECLARE_WRITE8_MEMBER(melody_command_w);
+	DECLARE_INPUT_CHANGED_MEMBER(p1_changed);
+
+protected:
 	// melody section handlers
 	DECLARE_WRITE8_MEMBER(ay_4g_porta_w);
 	DECLARE_WRITE8_MEMBER(ay_4h_porta_w);
 	DECLARE_WRITE8_MEMBER(ay_4h_portb_w);
 
 	// master audio section handlers
-	DECLARE_READ8_MEMBER(host_command_r);
-	DECLARE_WRITE8_MEMBER(melody_command_w);
 	DECLARE_WRITE8_MEMBER(pia_1i_portb_w);
 
 	// input ports don't push
 	INTERRUPT_GEN_MEMBER(input_poll);
 
-protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -122,4 +125,4 @@ protected:
 	u8 m_host_command;
 };
 
-#endif // __AUDIO_ZACCARIA_H__
+#endif // MAME_AUDIO_ZACCARIA_H

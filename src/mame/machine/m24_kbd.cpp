@@ -16,7 +16,7 @@ const tiny_rom_entry *m24_keyboard_device::device_rom_region() const
 	return ROM_NAME( m24_keyboard );
 }
 
-static MACHINE_CONFIG_FRAGMENT( m24_keyboard )
+static MACHINE_CONFIG_START( m24_keyboard )
 	MCFG_CPU_ADD("mcu", I8049, XTAL_6MHz)
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(m24_keyboard_device, bus_w))
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(m24_keyboard_device, p1_r))

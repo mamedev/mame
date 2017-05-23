@@ -361,6 +361,7 @@ public:
 
 	DECLARE_WRITE32_MEMBER(timekeeper_w);
 	DECLARE_READ32_MEMBER(timekeeper_r);
+	void reset_sio(void);
 	DECLARE_READ8_MEMBER(sio_r);
 	DECLARE_WRITE8_MEMBER(sio_w);
 	DECLARE_WRITE8_MEMBER( cpu_io_w );
@@ -432,9 +433,10 @@ void vegas_state::machine_reset()
 		m_dcs->reset_w(1);
 		m_dcs->reset_w(0);
 	}
-
-	/* initialize IRQ states */
-	m_sio_irq_state = 0;
+	// Clear CPU IO registers
+	memset(m_cpuio_data, 0, ARRAY_LENGTH(m_cpuio_data));
+	// Clear SIO registers
+	reset_sio();
 }
 
 
@@ -531,6 +533,14 @@ WRITE_LINE_MEMBER(vegas_state::ethernet_interrupt)
 	update_sio_irqs();
 }
 
+void vegas_state::reset_sio()
+{
+	m_sio_irq_clear = 0;
+	m_sio_irq_enable = 0;
+	m_sio_irq_state = 0;
+	m_sio_led_state = 0;
+	update_sio_irqs();
+}
 
 READ8_MEMBER(vegas_state::sio_r)
 {
@@ -647,7 +657,7 @@ WRITE8_MEMBER(vegas_state::sio_w)
 			space.device().execute().eat_cycles(100);
 			break;
 		}
-		if (LOG_SIO)
+		if (LOG_SIO && index != 6)
 			logerror("sio_w: offset: %08x index: %d data: %02X\n", offset, index, data);
 	}
 }
@@ -658,13 +668,13 @@ WRITE8_MEMBER(vegas_state::sio_w)
  *
  *************************************/
 
-WRITE8_MEMBER( vegas_state::cpu_io_w )
+WRITE8_MEMBER(vegas_state::cpu_io_w)
 {
 	// 0: system LED
 	// 1: PLD Config / Clock Gen
 	// 2: PLD Status / Jammma Serial Sense
 	// 3: System Reset Bit 0=>enable sio, Bit 1=>enable ide, Bit 2=>enable PCI
-	if (LOG_SIO && offset != 0)
+	if (1 && offset != 0)
 		logerror("%08X:cpuio write to offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, data);
 	if (offset < 4)
 		m_cpuio_data[offset] = data;
@@ -674,10 +684,16 @@ WRITE8_MEMBER( vegas_state::cpu_io_w )
 		if (!(data & 0x1)) {
 			// Need to clear this register while programming SIO FPGA so that fpga config data doesn't register in sio_w
 			m_cpuio_data[3] &= ~0x1;
+			// Reset the SIO registers
+			reset_sio();
+		}
+	}
+	if (offset == 3) {
+		if (!(data & 0x2)) {
+			// Reset IDE
 		}
 	}
 }
-
 
 READ8_MEMBER( vegas_state::cpu_io_r )
 {
@@ -1312,6 +1328,7 @@ static MACHINE_CONFIG_START( vegascore )
 
 	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x10950646, 0x07, 0x0)
 	MCFG_IDE_PCI_IRQ_HANDLER(DEVWRITELINE(PCI_ID_NILE, vrc5074_device, pci_intr_d))
+	//MCFG_IDE_PCI_SET_PIF(0x8f)
 
 	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_2, ":maincpu")
 	MCFG_VOODOO_PCI_FBMEM(2)
@@ -1478,6 +1495,18 @@ static MACHINE_CONFIG_DERIVED( nbanfl, vegasban )
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
 	MCFG_MIDWAY_IOASIC_UPPER(498/* or 478 or 487 */)
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nbagold, vegasban)
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
+
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
+	MCFG_MIDWAY_IOASIC_UPPER(494 /* ??? */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(vegas_state, ioasic_irq))
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
@@ -1714,7 +1743,8 @@ ROM_START( nbanfl )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )
 	ROM_LOAD( "blitz00_sep22_1999.u27", 0x000000, 0x80000, CRC(6a9bd382) SHA1(18b942df6af86ea944c24166dbe88148334eaff9) ) // 16:00:32 Sep 22 1999 BIOS FOR BLITZ00 USING BANSHEE / 16:00:26 Sep 22 1999 POST FOR BLITZ00 USING BANSHEE
 //  ROM_LOAD( "bootnflnba.bin", 0x000000, 0x80000, CRC(3def7053) SHA1(8f07567929f40a2269a42495dfa9dd5edef688fe) ) // 1 byte different to above (0x51b95 is 0x1b instead of 0x18)
-	ROM_LOAD( "blitz00_nov30_1999.u27", 0x000000, 0x80000, CRC(4242bf14) SHA1(c1fcec67d7463df5f41afc89f22c3b4484279534) ) // 15:10:49 Nov 30 1999 BIOS FOR BLITZ00 USING BANSHEE / 15:10:43 Nov 30 1999 POST FOR BLITZ00 USING BANSHEE
+	// Possibly bad dump
+	//ROM_LOAD( "blitz00_nov30_1999.u27", 0x000000, 0x80000, CRC(4242bf14) SHA1(c1fcec67d7463df5f41afc89f22c3b4484279534) ) // 15:10:49 Nov 30 1999 BIOS FOR BLITZ00 USING BANSHEE / 15:10:43 Nov 30 1999 POST FOR BLITZ00 USING BANSHEE
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
@@ -1915,7 +1945,7 @@ GAME( 1999, roadburn1,  roadburn, roadburn, roadburn, vegas_state, roadburn, ROT
 /* Durango + DSIO? + Voodoo banshee */
 GAME( 1998, nbashowt,   0,        nbashowt, nbashowt, vegas_state, nbashowt, ROT0, "Midway Games",  "NBA Showtime: NBA on NBC (ver 2.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, nbanfl,     0,        nbanfl,   nbashowt, vegas_state, nbanfl,   ROT0, "Midway Games",  "NBA Showtime / NFL Blitz 2000 (ver 2.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, nbagold ,   0,        nbanfl,   nbashowt, vegas_state, nbanfl,   ROT0, "Midway Games",  "NBA Showtime Gold / NFL Blitz 2000 (ver 3.0) (Sports Station?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, nbagold ,   0,        nbagold,  nbashowt, vegas_state, nbanfl,   ROT0, "Midway Games",  "NBA Showtime Gold / NFL Blitz 2000 (ver 3.0) (Sports Station?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 
 /* Durango + Denver SIO + Voodoo 3 */

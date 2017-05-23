@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( epson_lx810l )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
+static MACHINE_CONFIG_START( epson_lx810l )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
 	MCFG_CPU_PROGRAM_MAP(lx810l_mem)

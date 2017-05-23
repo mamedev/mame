@@ -51,7 +51,7 @@ const tiny_rom_entry *tandy2k_keyboard_device::device_rom_region() const
 //  MACHINE_DRIVER( tandy2k_keyboard )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( tandy2k_keyboard )
+static MACHINE_CONFIG_START( tandy2k_keyboard )
 	MCFG_CPU_ADD(I8048_TAG, I8048, 1000000) // ?
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(tandy2k_keyboard_device, kb_p1_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(tandy2k_keyboard_device, kb_p2_w))

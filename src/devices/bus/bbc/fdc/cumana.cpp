@@ -39,7 +39,7 @@ static SLOT_INTERFACE_START( bbc_floppies_525 )
 	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( cumana )
+static MACHINE_CONFIG_START( cumana )
 	MCFG_MB8877_ADD("mb8877a", XTAL_16MHz / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_cumanafdc_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_cumanafdc_device, fdc_drq_w))

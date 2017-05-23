@@ -61,7 +61,7 @@ h8s2246_device::h8s2246_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT(h8s2245)
+static MACHINE_CONFIG_START(h8s2245)
 	MCFG_H8S_INTC_ADD("intc")
 	MCFG_H8_ADC_2245_ADD("adc", "intc", 28)
 	MCFG_H8_DTC_ADD("dtc", "intc", 24)

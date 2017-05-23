@@ -641,41 +641,38 @@ void info_xml_creator::output_rom(driver_enumerator *drivlist, device_t &device)
 	for (int rom_type = 0; rom_type < 3; rom_type++)
 		for (const rom_entry *region = rom_first_region(device); region != nullptr; region = rom_next_region(region))
 		{
-			bool is_disk = ROMREGION_ISDISKDATA(region);
+			bool const is_disk = ROMREGION_ISDISKDATA(region);
 
 			// disk regions only work for disks
 			if ((is_disk && rom_type != 2) || (!is_disk && rom_type == 2))
 				continue;
 
 			// iterate through ROM entries
+			std::string bios_name;
 			for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
 			{
-				bool is_bios = ROM_GETBIOSFLAGS(rom);
-				const char *name = ROM_GETNAME(rom);
-				int offset = ROM_GETOFFSET(rom);
-				const char *merge_name = nullptr;
-				char bios_name[100];
-
 				// BIOS ROMs only apply to bioses
+				bool const is_bios = ROM_GETBIOSFLAGS(rom);
 				if ((is_bios && rom_type != 0) || (!is_bios && rom_type == 0))
 					continue;
 
 				// if we have a valid ROM and we are a clone, see if we can find the parent ROM
 				util::hash_collection hashes(ROM_GETHASHDATA(rom));
-				if (do_merge_name && !hashes.flag(util::hash_collection::FLAG_NO_DUMP))
-					merge_name = get_merge_name(*drivlist, hashes);
+				const char *const merge_name = (do_merge_name && !hashes.flag(util::hash_collection::FLAG_NO_DUMP)) ? get_merge_name(*drivlist, hashes) : nullptr;
 
 				// scan for a BIOS name
-				bios_name[0] = 0;
+				bios_name.clear();
 				if (!is_disk && is_bios)
 				{
 					// scan backwards through the ROM entries
 					for (const rom_entry *brom = rom - 1; brom != device.rom_region(); brom--)
+					{
 						if (ROMENTRY_ISSYSTEM_BIOS(brom))
 						{
-							strcpy(bios_name, ROM_GETNAME(brom));
+							bios_name = ROM_GETNAME(brom);
 							break;
 						}
+					}
 				}
 
 				std::ostringstream output;
@@ -687,12 +684,13 @@ void info_xml_creator::output_rom(driver_enumerator *drivlist, device_t &device)
 					output << "\t\t<disk";
 
 				// add name, merge, bios, and size tags */
-				if (name != nullptr && name[0] != 0)
+				const char *const name = ROM_GETNAME(rom);
+				if (name && name[0])
 					util::stream_format(output, " name=\"%s\"", util::xml::normalize_string(name));
-				if (merge_name != nullptr)
+				if (merge_name)
 					util::stream_format(output, " merge=\"%s\"", util::xml::normalize_string(merge_name));
-				if (bios_name[0] != 0)
-					util::stream_format(output, " bios=\"%s\"", util::xml::normalize_string(bios_name));
+				if (!bios_name.empty())
+					util::stream_format(output, " bios=\"%s\"", util::xml::normalize_string(bios_name.c_str()));
 				if (!is_disk)
 					util::stream_format(output, " size=\"%u\"", rom_file_size(rom));
 
@@ -708,13 +706,14 @@ void info_xml_creator::output_rom(driver_enumerator *drivlist, device_t &device)
 				// append a region name
 				util::stream_format(output, " region=\"%s\"", ROMREGION_GETTAG(region));
 
-				// for non-disk entries, print offset
 				if (!is_disk)
-					util::stream_format(output, " offset=\"%x\"", offset);
-
-				// for disk entries, add the disk index
+				{
+					// for non-disk entries, print offset
+					util::stream_format(output, " offset=\"%x\"", ROM_GETOFFSET(rom));
+				}
 				else
 				{
+					// for disk entries, add the disk index
 					util::stream_format(output, " index=\"%x\"", DISK_GETINDEX(rom));
 					util::stream_format(output, " writable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
 				}
@@ -1608,7 +1607,7 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 
 void info_xml_creator::output_slots(machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes)
 {
-	for (const device_slot_interface &slot : slot_interface_iterator(device))
+	for (device_slot_interface &slot : slot_interface_iterator(device))
 	{
 		// shall we list fixed slots as non-configurable?
 		bool const listed(!slot.fixed() && strcmp(slot.device().tag(), device.tag()));
@@ -1631,12 +1630,12 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 			{
 				if (devtypes || (listed && option.second->selectable()))
 				{
-					device_t *const dev = config.device_add(&device, "_dummy", option.second->devtype(), 0);
+					device_t *const dev = config.device_add(&slot.device(), "_dummy", option.second->devtype(), 0);
 					if (!dev->configured())
 						dev->config_complete();
 
 					if (devtypes)
-						for (device_t &device : device_iterator(*dev)) devtypes->insert(&device.type());
+						for (device_t &subdevice : device_iterator(*dev)) devtypes->insert(&subdevice.type());
 
 					if (listed && option.second->selectable())
 					{
@@ -1648,7 +1647,7 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 						fprintf(m_output, "/>\n");
 					}
 
-					config.device_remove(&device, "_dummy");
+					config.device_remove(&slot.device(), "_dummy");
 				}
 			}
 

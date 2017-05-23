@@ -2020,7 +2020,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_FRAGMENT( z80_ym2151 )
+static MACHINE_CONFIG_START( z80_ym2151 )
 
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -2040,7 +2040,7 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_FRAGMENT( z80_ym2151_upd7759 )
+static MACHINE_CONFIG_START( z80_ym2151_upd7759 )
 
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_7759_map)
@@ -2059,7 +2059,7 @@ static MACHINE_CONFIG_FRAGMENT( z80_ym2151_upd7759 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( datsu_ym2151_msm5205 )
+static MACHINE_CONFIG_START( datsu_ym2151_msm5205 )
 	/* TODO:
 	- other games might use this sound configuration
 	- speaker is likely to be mono for the bootlegs, not stereo.
@@ -2082,7 +2082,7 @@ static MACHINE_CONFIG_FRAGMENT( datsu_ym2151_msm5205 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( datsu_2x_ym2203_msm5205 )
+static MACHINE_CONFIG_START( datsu_2x_ym2203_msm5205 )
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(shinobi_datsu_sound_map)
 

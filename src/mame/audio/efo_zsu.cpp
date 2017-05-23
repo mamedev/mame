@@ -188,7 +188,7 @@ TIMER_CALLBACK_MEMBER(cedar_magnet_sound_device::reset_assert_callback)
 
 
 
-static MACHINE_CONFIG_FRAGMENT( efo_zsu )
+static MACHINE_CONFIG_START( efo_zsu )
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(zsu_map)
 	MCFG_CPU_IO_MAP(zsu_io)
@@ -237,7 +237,7 @@ static MACHINE_CONFIG_FRAGMENT( efo_zsu )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( cedar_magnet_sound )
+static MACHINE_CONFIG_START( cedar_magnet_sound )
 	MCFG_FRAGMENT_ADD(efo_zsu)
 
 	MCFG_CPU_MODIFY("soundcpu")

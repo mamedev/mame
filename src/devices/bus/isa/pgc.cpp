@@ -138,7 +138,7 @@ static GFXDECODE_START( pgc )
 	GFXDECODE_REVERSEBITS("chargen", 0, pgc_charlayout, 0, 1)
 GFXDECODE_END
 
-MACHINE_CONFIG_FRAGMENT( pcvideo_pgc )
+MACHINE_CONFIG_START( pcvideo_pgc )
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pgc_map)
 	MCFG_CPU_IO_MAP(pgc_io)

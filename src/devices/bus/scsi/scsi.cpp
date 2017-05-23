@@ -61,7 +61,7 @@ scsi_port_device::scsi_port_device(const machine_config &mconfig, const char *ta
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( scsi_port )
+static MACHINE_CONFIG_START( scsi_port )
 	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE1, SCSI_PORT_SLOT, 0 )
 	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE2, SCSI_PORT_SLOT, 0 )
 	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE3, SCSI_PORT_SLOT, 0 )

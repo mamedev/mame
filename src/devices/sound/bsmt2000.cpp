@@ -43,7 +43,7 @@ ADDRESS_MAP_END
 
 
 // machine fragment
-static MACHINE_CONFIG_FRAGMENT( bsmt2000 )
+static MACHINE_CONFIG_START( bsmt2000 )
 	MCFG_CPU_ADD("bsmt2000", TMS32015, DERIVED_CLOCK(1,1))
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 	// data map is internal to the CPU

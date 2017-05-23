@@ -34,10 +34,10 @@ DEFINE_DEVICE_TYPE(C64_TURBO232, c64_turbo232_cartridge_device, "c64_turbo232", 
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_turbo232 )
+//  MACHINE_CONFIG_START( c64_turbo232 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_turbo232 )
+static MACHINE_CONFIG_START( c64_turbo232 )
 	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_3_6864MHz)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(c64_turbo232_cartridge_device, acia_irq_w))

@@ -99,10 +99,10 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( ep64_exdos )
+//  MACHINE_CONFIG_START( ep64_exdos )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( ep64_exdos )
+static MACHINE_CONFIG_START( ep64_exdos )
 	MCFG_WD1770_ADD(WD1770_TAG, XTAL_8MHz)
 
 	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", ep64_exdos_floppies, "35dd", ep64_exdos_device::floppy_formats)

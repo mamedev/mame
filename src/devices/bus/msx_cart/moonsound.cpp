@@ -35,7 +35,7 @@ static ADDRESS_MAP_START( ymf278b_map, AS_0, 8, msx_cart_moonsound_device )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_FRAGMENT( moonsound )
+static MACHINE_CONFIG_START( moonsound )
 	// The moonsound cartridge has a separate stereo output.
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ymf278b", YMF278B, YMF278B_STD_CLOCK)

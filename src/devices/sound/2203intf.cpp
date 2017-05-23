@@ -111,7 +111,8 @@ void ym2203_device::calculate_rates()
 
 void ym2203_device::device_stop()
 {
-	ym2203_shutdown(m_chip);
+	if (m_chip)
+		ym2203_shutdown(m_chip);
 }
 
 //-------------------------------------------------
