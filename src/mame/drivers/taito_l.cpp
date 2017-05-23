@@ -28,6 +28,9 @@ Notes:
   TileMap system, so we have to tilemap_mark_all_tiles_dirty() to compensate
 - kurikinta has some debug dip switches (invulnerability, slow motion) so might
   be a prototype. It also doesn't have service mode (or has it disabled).
+- Of the several multi-processor games that use the MB8421 dual-port RAM for
+  communications, Evil Stone seems to be the only one to use its special
+  interrupt feature.
 
 TODO:
 - plgirls doesn't work without a kludge because of an interrupt issue. This
@@ -40,8 +43,6 @@ TODO:
 - Text Plane colours are only right in Cuby Bop once you've started a game
   & reset
 - Scrolling in Cuby Bop's Game seems incorrect.
-- Repeated SFXs in Evil Stone (with previous hack, it was used to die at level 1 boss)
-- Evil Stone audio NMI source is unknown.
 
 puzznici note
 - this set is a bootleg, it uses a converted board without the MCU and has
@@ -63,6 +64,7 @@ puzznici note
 #include "cpu/z80/z80.h"
 
 #include "machine/i8255.h"
+#include "machine/mb8421.h"
 
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
@@ -285,6 +287,7 @@ MACHINE_RESET_MEMBER(horshoes_state, horshoes)
 
 IRQ_CALLBACK_MEMBER(taitol_state::irq_callback)
 {
+	m_main_cpu->set_input_line(0, CLEAR_LINE);
 	return m_irq_adr_table[m_last_irq_level];
 }
 
@@ -301,17 +304,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(taitol_state::vbl_interrupt)
 	if (scanline == 120 && (m_irq_enable & 1))
 	{
 		m_last_irq_level = 0;
-		m_main_cpu->set_input_line(0, HOLD_LINE);
+		m_main_cpu->set_input_line(0, ASSERT_LINE);
 	}
 	else if (scanline == 0 && (m_irq_enable & 2))
 	{
 		m_last_irq_level = 1;
-		m_main_cpu->set_input_line(0, HOLD_LINE);
+		m_main_cpu->set_input_line(0, ASSERT_LINE);
 	}
 	else if (scanline == 240 && (m_irq_enable & 4))
 	{
 		m_last_irq_level = 2;
-		m_main_cpu->set_input_line(0, HOLD_LINE);
+		m_main_cpu->set_input_line(0, ASSERT_LINE);
 	}
 }
 
@@ -640,7 +643,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x8000, 0x87ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mux_r, mux_w)
 	AM_RANGE(0x8801, 0x8801) AM_WRITE(mux_ctrl_w) AM_READNOP    // Watchdog or interrupt ack (value ignored)
 	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
@@ -651,7 +654,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( raimais_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
 ADDRESS_MAP_END
 
 
@@ -710,7 +713,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kurikint_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(mux_r, mux_w)
 	AM_RANGE(0xa801, 0xa801) AM_WRITE(mux_ctrl_w) AM_READNOP    // Watchdog or interrupt ack (value ignored)
 ADDRESS_MAP_END
@@ -718,7 +721,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kurikint_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 ADDRESS_MAP_END
 
@@ -785,14 +788,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( evilston_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
 	AM_RANGE(0xa800, 0xa807) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( evilston_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank7")
 ADDRESS_MAP_END
@@ -1745,6 +1748,8 @@ static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 
 	MCFG_DEVICE_REMOVE("tc0220ioc") // I/O chip is a TC0040IOC
 
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1768,6 +1773,8 @@ static MACHINE_CONFIG_START( kurikint )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
@@ -1912,7 +1919,6 @@ static MACHINE_CONFIG_START( evilston )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)     /* not verified */
 	MCFG_CPU_PROGRAM_MAP(evilston_2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(taitol_state, nmi_line_pulse, 60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -1922,6 +1928,9 @@ static MACHINE_CONFIG_START( evilston )
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+	MCFG_MB8421_INTL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
@@ -2574,4 +2583,4 @@ GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   taitol_1cpu_state, 0,    
 GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "Hot-B", "Play Girls 2", 0 )
 GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
 
-GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", MACHINE_IMPERFECT_SOUND ) // not Taito PCB, just uses TC0090LVC
+GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone" )
