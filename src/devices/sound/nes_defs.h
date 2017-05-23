@@ -121,7 +121,6 @@ struct apu_t
 		uint8 cur_byte = 0;
 		bool enabled = false;
 		bool irq_occurred = false;
-		address_space *memory = nullptr;
 		signed char vol = 0;
 	};
 

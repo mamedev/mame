@@ -47,28 +47,42 @@
 #define NES_BATTERY 0
 #define NES_WRAM 1
 
-
-class nes_state : public driver_device
+// so that the NES and Famiclones (VT03 for example) can use some common functionality
+class nes_base_state : public driver_device
 {
 public:
-	nes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_ppu(*this, "ppu")
-		, m_ctrl1(*this, "ctrl1")
-		, m_ctrl2(*this, "ctrl2")
-		, m_exp(*this, "exp")
-		, m_cartslot(*this, "nes_slot")
-		, m_disk(*this, "disk")
-	{
-	}
+	nes_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ctrl1(*this, "ctrl1"),
+		m_ctrl2(*this, "ctrl2")
+	{ }
 
-	int nes_ppu_vidaccess(int address, int data);
-	void ppu_nmi(int *ppu_regs);
+	required_device<cpu_device> m_maincpu;
+	required_device<nes_control_port_device> m_ctrl1;
+	required_device<nes_control_port_device> m_ctrl2;
 
 	DECLARE_READ8_MEMBER(nes_in0_r);
 	DECLARE_READ8_MEMBER(nes_in1_r);
 	DECLARE_WRITE8_MEMBER(nes_in0_w);
+};
+
+class nes_state : public nes_base_state
+{
+public:
+	nes_state(const machine_config &mconfig, device_type type, const char *tag)
+		: nes_base_state(mconfig, type, tag),
+			m_ppu(*this, "ppu"),
+			m_exp(*this, "exp"),
+			m_cartslot(*this, "nes_slot"),
+			m_disk(*this, "disk")
+		{ }
+
+
+	int nes_ppu_vidaccess(int address, int data);
+	void ppu_nmi(int *ppu_regs);
+
+
 	DECLARE_READ8_MEMBER(fc_in0_r);
 	DECLARE_READ8_MEMBER(fc_in1_r);
 	DECLARE_WRITE8_MEMBER(fc_in0_w);
@@ -91,6 +105,8 @@ public:
 	void setup_disk(nes_disksys_device *slot);
 
 private:
+	memory_bank       *m_prg_bank_mem[5];
+
 	/* video-related */
 	int m_last_frame_flip;
 
@@ -100,15 +116,11 @@ private:
 	uint8_t      *m_vram;
 	std::unique_ptr<uint8_t[]>    m_ciram; //PPU nametable RAM - external to PPU!
 
-	required_device<cpu_device> m_maincpu;
+
 	required_device<ppu2c0x_device> m_ppu;
-	required_device<nes_control_port_device> m_ctrl1;
-	required_device<nes_control_port_device> m_ctrl2;
 	optional_device<nes_control_port_device> m_exp;
 	optional_device<nes_cart_slot_device> m_cartslot;
 	optional_device<nes_disksys_device> m_disk;
-
-	memory_bank       *m_prg_bank_mem[5];
 };
 
 #endif // MAME_INCLUDES_NES_H
