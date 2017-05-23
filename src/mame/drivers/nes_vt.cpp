@@ -365,6 +365,9 @@ void nes_vt_state::machine_reset()
 
 int nes_vt_state::calculate_real_video_address(int addr, int extended, int readtype)
 {
+	// might be a VT09 only feature (8bpp or 4bpp direct colour mode??)
+	int alt_order = m_ppu->get_201x_reg(0x0) & 0x40;
+
 	if (readtype == 0)
 	{
 		if (m_ppu->get_201x_reg(0x0) & 0x10)
@@ -505,7 +508,16 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 		finaladdr = ((m_410x[0x0] & 0x0F) << 21) | (va20_va18 << 18) | (va17_va10 << 10) | (addr & 0x03ff);
 		
 		if (is4bpp)
-			finaladdr = ((finaladdr &~0xf) << 1) | (va34 << 4) | (finaladdr & 0xf);	
+		{
+			if (!alt_order)
+			{
+				finaladdr = ((finaladdr &~0xf) << 1) | (va34 << 4) | (finaladdr & 0xf);
+			}
+			else
+			{
+				finaladdr = (finaladdr << 1) | (va34 << 4);
+			}
+		}
 	}
 	else
 	{
@@ -544,7 +556,17 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 		finaladdr = ((m_410x[0x0] & 0x0f) << 21) | (va17_va10 << 13) | (eva2_eva0 << 10) | (addr & 0x03ff);
 
 		if (is4bpp)
-			finaladdr = ((finaladdr &~0xf) << 1) | (va34 << 4) | (finaladdr & 0xf);
+		{
+			if (!alt_order)
+			{
+				finaladdr = ((finaladdr &~0xf) << 1) | (va34 << 4) | (finaladdr & 0xf);
+			}
+			else
+			{
+				finaladdr = (finaladdr << 1) | (va34 << 4);
+			}
+
+		}
 	}
 
 	return finaladdr;
@@ -741,8 +763,22 @@ static const gfx_layout helper_layout =
 	4*64
 };
 
+static const gfx_layout helper2_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0*8, 1*8, 2*8, 3*8 },
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0*16, 1*16, 2*16, 3*16,4*16,5*16,5*16,6*16,7*16 },
+	4*64
+};
+
+
+
 static GFXDECODE_START( vt03_helper )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_layout,  0x0, 2  )
+	GFXDECODE_ENTRY( "mainrom", 0, helper2_layout,  0x0, 2  )
 GFXDECODE_END
 
 

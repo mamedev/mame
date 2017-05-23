@@ -761,6 +761,11 @@ void ppu2c0x_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, ui
 	bitmap.pix16(m_scanline, sprite_xpos + pixel) = paldata[pixel_data];
 }
 
+void ppu2c0x_device::read_extra_sprite_bits(int sprite_index)
+{
+	// needed for some clones
+}
+
 void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
 {
 	bitmap_ind16 &bitmap = *m_bitmap;
@@ -811,6 +816,7 @@ void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
 		pri   =  m_spriteram[sprite_index + 2] & 0x20;
 		flipx =  m_spriteram[sprite_index + 2] & 0x40;
 		flipy =  m_spriteram[sprite_index + 2] & 0x80;
+		read_extra_sprite_bits(sprite_index);
 
 		if (size == 16)
 		{
