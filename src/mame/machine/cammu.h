@@ -6,12 +6,6 @@
 
 #pragma once
 
-// the following enables a very crude instruction cache - it has known (future)
-// problems, but speeds up cpu execution quite noticeably in the short term by
-// avoiding some of the delays in the mame memory subsystem
-#define ICACHE_ENTRIES 32768
-#define DCACHE_ENTRIES 32768
-
 #define MCFG_CAMMU_SSW_CB(_sswcb) \
 	devcb = &cammu_device::static_set_ssw_callback(*device, DEVCB_##_sswcb);
 
@@ -57,21 +51,6 @@ protected:
 
 private:
 	devcb_read32 m_ssw_func;
-
-#if ICACHE_ENTRIES
-	struct icache
-	{
-		u32 offset;
-		u32 data;
-	} m_icache[ICACHE_ENTRIES];
-#endif
-#if DCACHE_ENTRIES
-	struct dcache
-	{
-		u32 offset;
-		u32 data;
-	} m_dcache[DCACHE_ENTRIES];
-#endif
 };
 
 class cammu_c4_device : public cammu_device

@@ -18,14 +18,13 @@
  *   - bus errors
  */
 
+#define VERBOSE 0
+#define DTU 1 // enable preliminary/incomplete address translation
+
 #include "emu.h"
 #include "cammu.h"
 
-#define VERBOSE 0
-#define DTU 1
-
 // each variant of the cammu has different registers and a different addressing map
-// TODO: decode the cammu registers properly
 DEVICE_ADDRESS_MAP_START(map, 32, cammu_c4t_device)
 	AM_RANGE(0x008, 0x00b) AM_READWRITE(ram_line_r, ram_line_w)
 	AM_RANGE(0x010, 0x013) AM_READWRITE(s_pdo_r, s_pdo_w)
@@ -75,8 +74,9 @@ DEVICE_ADDRESS_MAP_START(map, 32, cammu_c4i_device)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(map, 32, cammu_c3_device)
-	// following is actually tlb
-	AM_RANGE(0x800, 0x8ff) AM_NOP
+	// the first AM_NOP in each range is in fact the TLB in the C3 CAMMU
+
+	AM_RANGE(0x800, 0x8ff) AM_NOP 
 	AM_RANGE(0x904, 0x907) AM_READWRITE(d_s_pdo_r, d_s_pdo_w)
 	AM_RANGE(0x908, 0x90b) AM_READWRITE(d_u_pdo_r, d_u_pdo_w)
 	AM_RANGE(0x910, 0x913) AM_READWRITE(d_fault_r, d_fault_w)
@@ -193,6 +193,7 @@ READ32_MEMBER(cammu_device::insn_r)
 	// if not in mapped mode, default to main memory space
 	if ((ssw & 0x04000000) == 0)
 		return m_main_space->read_dword(va);
+
 #if DTU
 	// get the page table entry
 	u32 pte = get_pte(va, ssw & 0x40000000, false);
@@ -207,21 +208,7 @@ READ32_MEMBER(cammu_device::insn_r)
 	case 1:
 	case 2:
 	case 3:
-#if ICACHE_ENTRIES
-		{
-			const u16 slot = offset & (ICACHE_ENTRIES - 1);
-
-			if (m_icache[slot].offset != offset)
-			{
-				m_icache[slot].offset = offset;
-				m_icache[slot].data = m_main_space->read_dword(ra);
-			}
-
-			return m_icache[slot].data;
-		}
-#else
 		return m_main_space->read_dword(ra, mem_mask);
-#endif
 
 	case 4:
 		return m_io_space->read_dword(ra, mem_mask);
@@ -235,25 +222,10 @@ READ32_MEMBER(cammu_device::insn_r)
 	}
 
 	return 0;
-
 #else
 	// FIXME: currently maps addresses with upper bits 0x00 or 0x7f1 to main memory and everything else to I/O
 	if ((va & 0xff000000) == 0x00000000 || (va & 0xfff00000) == 0x7f100000)
-	{
-#if ICACHE_ENTRIES
-		const u16 slot = offset & (ICACHE_ENTRIES - 1);
-
-		if (m_icache[slot].offset != offset)
-		{
-			m_icache[slot].offset = offset;
-			m_icache[slot].data = m_main_space->read_dword(va);
-		}
-
-		return m_icache[slot].data;
-#else
 		return m_main_space->read_dword(va, mem_mask);
-#endif
-	}
 	else
 		return m_io_space->read_dword(va, mem_mask);
 #endif
@@ -306,21 +278,7 @@ READ32_MEMBER(cammu_device::data_r)
 	case 1:
 	case 2:
 	case 3:
-#if DCACHE_ENTRIES
-		{
-			const u16 slot = offset & (DCACHE_ENTRIES - 1);
-
-			if (m_dcache[slot].offset != offset)
-			{
-				m_dcache[slot].offset = offset;
-				m_dcache[slot].data = m_main_space->read_dword(ra);
-			}
-
-			return m_dcache[slot].data;
-		}
-#else
 		return m_main_space->read_dword(ra, mem_mask);
-#endif
 
 	case 4: 
 		return m_io_space->read_dword(ra, mem_mask);
@@ -337,20 +295,7 @@ READ32_MEMBER(cammu_device::data_r)
 #else
 	// FIXME: currently maps addresses with upper bits 0x00 or 0x7f1 to main memory and everything else to I/O
 	if ((va & 0xff000000) == 0x00000000 || (va & 0xfff00000) == 0x7f100000)
-	{
-#if DCACHE_ENTRIES
-		const u16 slot = offset & (DCACHE_ENTRIES - 1);
-
-		if (m_dcache[slot].offset != offset)
-		{
-			m_dcache[slot].offset = offset;
-			m_dcache[slot].data = m_main_space->read_dword(va);
-		}
-
-		return m_dcache[slot].data;
-#endif
 		return m_main_space->read_dword(va, mem_mask);
-	}
 	else
 		return m_io_space->read_dword(va, mem_mask);
 #endif
@@ -409,19 +354,6 @@ WRITE32_MEMBER(cammu_device::data_w)
 	case 1:
 	case 2:
 	case 3:
-#if DCACHE_ENTRIES
-		{
-			const u16 slot = offset & (DCACHE_ENTRIES - 1);
-
-			if (mem_mask == 0xffffffff)
-			{
-				m_dcache[slot].offset = offset;
-				m_dcache[slot].data = data;
-			}
-			else
-				m_dcache[slot].offset = 0;
-		}
-#endif
 		m_main_space->write_dword(ra, data, mem_mask);
 		break;
 
@@ -441,20 +373,7 @@ WRITE32_MEMBER(cammu_device::data_w)
 #else
 	// FIXME: currently maps addresses with upper bits 0x00 or 0x7f1 to main memory and everything else to I/O
 	if ((va & 0xff000000) == 0x00000000 || (va & 0xfff00000) == 0x7f100000)
-	{
-#if DCACHE_ENTRIES
-		const u16 slot = offset & (DCACHE_ENTRIES - 1);
-
-		if (mem_mask == 0xffffffff)
-		{
-			m_dcache[slot].offset = offset;
-			m_dcache[slot].data = data;
-		}
-		else
-			m_dcache[slot].offset = 0;
-#endif
 		m_main_space->write_dword(va, data, mem_mask);
-	}
 	else
 		m_io_space->write_dword(va, data, mem_mask);
 #endif
