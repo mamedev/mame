@@ -18,10 +18,11 @@
  *   - bus errors
  */
 
+#include "emu.h"
+
 #define VERBOSE 0
 #define DTU 1 // enable preliminary/incomplete address translation
 
-#include "emu.h"
 #include "cammu.h"
 
 // each variant of the cammu has different registers and a different addressing map
