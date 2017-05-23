@@ -2405,7 +2405,7 @@ segas32_4player_state::segas32_4player_state(const machine_config &mconfig, cons
 }
 
 segas32_4player_state::segas32_4player_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_4PLAYER_DEVICE, tag, owner, clock)
+	: segas32_state(mconfig, type, tag, owner, clock)
 {
 }
 
