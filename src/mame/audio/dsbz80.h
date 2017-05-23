@@ -27,9 +27,6 @@ public:
 	// construction/destruction
 	dsbz80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// static configuration
 	template<class _Object> static devcb_base &set_rxd_handler(device_t &device, _Object &&object) { return downcast<dsbz80_device &>(device).m_rxd_handler.set_callback(std::forward<_Object>(object)); }
 
@@ -37,7 +34,6 @@ public:
 	required_device<i8251_device> m_uart;
 
 	DECLARE_WRITE_LINE_MEMBER(write_txd);
-	DECLARE_WRITE_LINE_MEMBER(output_txd);
 
 	DECLARE_WRITE8_MEMBER(mpeg_trigger_w);
 	DECLARE_WRITE8_MEMBER(mpeg_start_w);
@@ -50,7 +46,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
@@ -60,6 +56,8 @@ private:
 	int mp_pos, audio_pos, audio_avail;
 
 	devcb_write_line   m_rxd_handler;
+
+	DECLARE_WRITE_LINE_MEMBER(output_txd);
 };
 
 

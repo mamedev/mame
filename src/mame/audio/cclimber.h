@@ -39,14 +39,11 @@ public:
 	DECLARE_WRITE8_MEMBER( sample_trigger_w );
 	DECLARE_WRITE8_MEMBER( sample_rate_w );
 	DECLARE_WRITE8_MEMBER( sample_volume_w );
-	DECLARE_WRITE8_MEMBER( sample_select_w );
-
-	SAMPLES_START_CB_MEMBER( sh_start );
 
 protected:
 	// device level overrides
 	virtual void device_start() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	void play_sample(int start,int freq,int volume);
 
@@ -57,6 +54,10 @@ private:
 	int m_sample_volume;
 	optional_device<samples_device> m_samples;
 	optional_region_ptr<uint8_t> m_samples_region;
+
+	DECLARE_WRITE8_MEMBER( sample_select_w );
+
+	SAMPLES_START_CB_MEMBER( sh_start );
 };
 
 
