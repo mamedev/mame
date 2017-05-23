@@ -230,10 +230,21 @@ void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, uint16_t back_pen,
 	}
 }
 
+void ppu_vt03_device::read_extra_sprite_bits(int sprite_index)
+{
+	m_extra_sprite_bits = (m_spriteram[sprite_index + 2] & 0x1c) >>2;
+}
+
+uint8_t ppu_vt03_device::get_speva2_speva0()
+{
+	return m_extra_sprite_bits;
+}
+
 void ppu_vt03_device::set_2010_reg(uint8_t data)
 {
-	/* 7   : COLCOMP
-		6,5 : UNUSED
+	/*  7   : COLCOMP
+		6   : UNUSED (8bpp enable on VT09?)
+		5   : UNUSED
 		4   : BKEXTEN
 		3   : SPEXTEN
 		2   : SP16EN

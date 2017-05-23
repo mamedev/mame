@@ -125,6 +125,7 @@ public:
 	virtual void read_sprite_plane_data(int address);
 	virtual void make_sprite_pixel_data(uint8_t &pixel_data, int flipx);
 	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_ind16& bitmap);
+	virtual void read_extra_sprite_bits(int sprite_index);
 
 	void draw_sprites( uint8_t *line_priority );
 	void render_scanline();
@@ -216,6 +217,7 @@ protected:
 	// used in rendering
 	uint8_t m_planebuf[2];
 	int                         m_scanline;         /* scanline count */
+	std::unique_ptr<uint8_t[]>  m_spriteram;           /* sprite ram */
 
 private:
 	static constexpr device_timer_id TIMER_HBLANK = 0;
@@ -226,7 +228,6 @@ private:
 	inline void writebyte(offs_t address, uint8_t data);
 
 	std::unique_ptr<bitmap_ind16>                m_bitmap;          /* target bitmap */
-	std::unique_ptr<uint8_t[]>  m_spriteram;           /* sprite ram */
 	std::unique_ptr<pen_t[]>    m_colortable;          /* color table modified at run time */
 	std::unique_ptr<pen_t[]>    m_colortable_mono;     /* monochromatic color table modified at run time */
 

@@ -42,6 +42,7 @@ public:
 	virtual void read_sprite_plane_data(int address) override;
 	virtual void make_sprite_pixel_data(uint8_t &pixel_data, int flipx) override;
 	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_ind16& bitmap) override;
+	virtual void read_extra_sprite_bits(int sprite_index) override;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -51,6 +52,7 @@ public:
 
 	uint8_t get_va34();
 	uint8_t get_m_read_bg4_bg3();
+	uint8_t get_speva2_speva0();
 
 private:
 	devcb_read8 m_read_bg;
@@ -62,6 +64,7 @@ private:
 	int m_va34;
 
 	uint8_t m_extplanebuf[2];
+	uint8_t m_extra_sprite_bits;
 
 	palette_device *m_palette;
 

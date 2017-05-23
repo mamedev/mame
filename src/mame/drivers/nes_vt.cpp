@@ -14,7 +14,9 @@
   VT02 - banking scheme to access 32MB, Dual APU with PCM support
   VT03 - above + 4bpp sprite / bg modes, enhanced palette
   
-  VT08 - 8bpp or direct colour modes?
+  VT08 - ?
+
+  VT09 - 8bpp or direct colour modes?
   
   VT16 - ?
   VT18 - ?
@@ -374,6 +376,17 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 			extended = 0;
 		}
 	}
+	else if (readtype == 1)
+	{
+		if (m_ppu->get_201x_reg(0x0) & 0x08)
+		{
+			extended = 1;
+		}
+		else
+		{
+			extended = 0;
+		}
+	}
 
 	/*
 	Calculating TVA17 - TVA10
@@ -517,8 +530,10 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 			break;
 
 		case 1: // sprite display
-			is4bpp = m_ppu->get_201x_reg(0x0) & 0x04;
-			// todo (need something using it to test)
+			is4bpp = m_ppu->get_201x_reg(0x0) & 0x04; // 16 colors or 16-pixel wide (both adjust the read)
+
+			eva2_eva0 |= m_ppu->get_speva2_speva0();			
+			
 			break;
 
 		case 2: // CPU R/W access
@@ -526,7 +541,7 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 			break;
 		}
 
-		finaladdr = ((m_410x[0x0] & 0x0F) << 21) | (va17_va10 << 13) | (eva2_eva0 << 10) | (addr & 0x03ff);
+		finaladdr = ((m_410x[0x0] & 0x0f) << 21) | (va17_va10 << 13) | (eva2_eva0 << 10) | (addr & 0x03ff);
 
 		if (is4bpp)
 			finaladdr = ((finaladdr &~0xf) << 1) | (va34 << 4) | (finaladdr & 0xf);
