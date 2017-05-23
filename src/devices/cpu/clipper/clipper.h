@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
+
 #ifndef MAME_CPU_CLIPPER_CLIPPER_H
 #define MAME_CPU_CLIPPER_CLIPPER_H
 
 #pragma once
 
 #include <limits.h>
-
 
 class clipper_device : public cpu_device
 {
@@ -164,7 +164,7 @@ class clipper_device : public cpu_device
 	};
 
 public:
-	DECLARE_READ_LINE_MEMBER(ssw) { return m_ssw; }
+	DECLARE_READ32_MEMBER(ssw) { return m_ssw; }
 
 protected:
 	clipper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

@@ -21,14 +21,44 @@
 #define LOG_MCGA(...) {}
 #endif
 
-DEVICE_ADDRESS_MAP_START(map, 16, interpro_mcga_device)
-  AM_RANGE(0x00, 0x3f) AM_READWRITE16(read, write, 0xffff)
+DEVICE_ADDRESS_MAP_START(map, 32, interpro_mcga_device)
+	AM_RANGE(0x00, 0x03) AM_READWRITE16(reg00_r, reg00_w, 0xffff)
+	AM_RANGE(0x08, 0x0b) AM_READWRITE16(control_r, control_w, 0xffff)
+	AM_RANGE(0x10, 0x13) AM_READWRITE16(error_r, error_w, 0xffff)
+	AM_RANGE(0x18, 0x1b) AM_READWRITE8(frcrd_r, frcrd_w, 0xff)
+	AM_RANGE(0x20, 0x23) AM_READWRITE8(cbsub_r, cbsub_w, 0xff)
+	AM_RANGE(0x28, 0x2b) AM_READWRITE16(reg28_r, reg28_w, 0xffff)
+	AM_RANGE(0x30, 0x33) AM_READWRITE16(reg30_r, reg30_w, 0xffff)
+	AM_RANGE(0x38, 0x3b) AM_READWRITE16(memsize_r, memsize_w, 0xffff)
+ADDRESS_MAP_END
+
+DEVICE_ADDRESS_MAP_START(map, 32, interpro_fmcc_device)
+	AM_RANGE(0x00, 0x03) AM_READWRITE16(reg00_r, reg00_w, 0xffff)
+	AM_RANGE(0x08, 0x0b) AM_READWRITE16(control_r, control_w, 0xffff)
+	AM_RANGE(0x10, 0x13) AM_READWRITE16(error_r, error_w, 0xffff)
+	AM_RANGE(0x18, 0x1b) AM_READWRITE8(frcrd_r, frcrd_w, 0xff)
+	AM_RANGE(0x20, 0x23) AM_READWRITE8(cbsub_r, cbsub_w, 0xff)
+	AM_RANGE(0x28, 0x2b) AM_READWRITE16(reg28_r, reg28_w, 0xffff)
+	AM_RANGE(0x30, 0x33) AM_READWRITE16(reg30_r, reg30_w, 0xffff)
+	AM_RANGE(0x38, 0x3b) AM_READWRITE16(memsize_r, memsize_w, 0xffff)
+	AM_RANGE(0x48, 0x4b) AM_READWRITE16(error_control_r, error_control_w, 0xffff)
 ADDRESS_MAP_END
 
 DEFINE_DEVICE_TYPE(INTERPRO_MCGA, interpro_mcga_device, "mcga", "InterPro MCGA")
+DEFINE_DEVICE_TYPE(INTERPRO_FMCC, interpro_fmcc_device, "fmcc", "InterPro FMCC")
+
+interpro_mcga_device::interpro_mcga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+{
+}
 
 interpro_mcga_device::interpro_mcga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, INTERPRO_MCGA, tag, owner, clock)
+	: interpro_mcga_device(mconfig, INTERPRO_MCGA, tag, owner, clock)
+{
+}
+
+interpro_fmcc_device::interpro_fmcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: interpro_mcga_device(mconfig, INTERPRO_FMCC, tag, owner, clock)
 {
 }
 
@@ -38,53 +68,30 @@ void interpro_mcga_device::device_start()
 
 void interpro_mcga_device::device_reset()
 {
-	m_reg[0] = 0x00ff;  // 0x00
-	m_reg[2] = MCGA_CTRL_ENREFRESH | MCGA_CTRL_CBITFRCSUB | MCGA_CTRL_CBITFRCRD;  // 0x08 ctrl
-																				   //m_mcga[4] = 0x8000;  // 0x10 error
-	m_reg[10] = 0x00ff; // 0x28
-	m_reg[14] = 0x0340; // 0x38 memsize
+	m_reg[0] = 0x00ff;
+	m_control = MCGA_CTRL_ENREFRESH | MCGA_CTRL_CBITFRCSUB | MCGA_CTRL_CBITFRCRD;
+	m_reg[1] = 0x00ff;
+	m_memsize = 0x0340;
 }
 
-WRITE16_MEMBER(interpro_mcga_device::write)
+WRITE16_MEMBER(interpro_mcga_device::control_w)
 {
-	/*
-	read  MEMSIZE 0x38 mask 0xffff
-	read  0x00 mask 0x0000
-	write CBSUB   0x20 mask 0x00ff data 0
-	write FRCRD   0x18 mask 0x00ff data 0
-	read  ERROR   0x10 mask 0xffff
-	read  0x00 mask 0xffff
+	m_control = data & MCGA_CTRL_MASK;
 
-	(0x38 >> 8) & 0xF == 3?
-
-	if (0x00 != 0xFF) -> register reset error
-
-	0x00 = 0x0055 (test value & 0xff)
-	r7 = 0x00 & 0xff
-	*/
-	LOG_MCGA("mcga write offset = 0x%08x, mask = 0x%08x, data = 0x%08x, pc = 0x%08x\n", offset, mem_mask, data, space.device().safe_pc());
-	switch (offset)
-	{
-	case 0x02: // MCGA_CTRL
-			   // HACK: set or clear error status depending on ENMMBE bit
-		if (data & MCGA_CTRL_ENMMBE)
-			m_reg[4] |= MCGA_ERROR_VALID;
-		//      else
-		//          m_reg[4] &= ~MCGA_ERROR_VALID;
-
-	default:
-		m_reg[offset] = data;
-		break;
-	}
+	// HACK: set or clear error status depending on ENMMBE bit
+	if (data & MCGA_CTRL_ENMMBE)
+		m_error |= MCGA_ERROR_VALID;
+	//		else
+	//			error &= ~MCGA_ERROR_VALID;
 }
 
-READ16_MEMBER(interpro_mcga_device::read)
+WRITE16_MEMBER(interpro_fmcc_device::control_w)
 {
-	LOG_MCGA("mcga read offset = 0x%08x, mask = 0x%08x, pc = 0x%08x\n", offset, mem_mask, space.device().safe_pc());
+	m_control = data & FMCC_CTRL_MASK;
 
-	switch (offset)
-	{
-	default:
-		return m_reg[offset];
-	}
+	// HACK: set or clear error status depending on ENMMBE bit
+	if (data & MCGA_CTRL_ENMMBE)
+		m_error |= MCGA_ERROR_VALID;
+	//		else
+	//			error &= ~MCGA_ERROR_VALID;
 }
