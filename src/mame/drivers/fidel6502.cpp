@@ -676,7 +676,7 @@ READ8_MEMBER(fidel6502_state::eas_input_r)
 WRITE8_MEMBER(fidel6502_state::eas_ppi_porta_w)
 {
 	// pull output low during reset (see TODO)
-	if (machine().phase() == MACHINE_PHASE_RESET)
+	if (machine().phase() == machine_phase::RESET)
 		data = 0;
 
 	// d0-d5: TSI C0-C5

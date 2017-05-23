@@ -7,10 +7,12 @@
     Natural keyboard input support.
 
 ***************************************************************************/
-#ifndef EMU_NATKEYBOARD_H
-#define EMU_NATKEYBOARD_H
+#ifndef MAME_EMU_NATKEYBOARD_H
+#define MAME_EMU_NATKEYBOARD_H
 
 #pragma once
+
+#include <iosfwd>
 
 
 //**************************************************************************
@@ -53,7 +55,8 @@ public:
 	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
 
 	// debugging
-	std::string dump();
+	void dump(std::ostream &str) const;
+	std::string dump() const;
 
 private:
 	enum
@@ -76,7 +79,7 @@ private:
 	attotime choose_delay(char32_t ch);
 	void internal_post(char32_t ch);
 	void timer(void *ptr, int param);
-	std::string unicode_to_string(char32_t ch);
+	std::string unicode_to_string(char32_t ch) const;
 	const keycode_map_entry *find_code(char32_t ch) const;
 
 	// internal state
@@ -96,4 +99,7 @@ private:
 	std::vector<keycode_map_entry>  m_keycode_map;      // keycode map
 };
 
-#endif
+
+inline std::ostream &operator<<(std::ostream &str, natural_keyboard const &kbd) { kbd.dump(str); return str; }
+
+#endif // MAME_EMU_NATKEYBOARD_H

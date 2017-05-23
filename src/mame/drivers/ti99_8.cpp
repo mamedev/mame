@@ -621,7 +621,7 @@ void ti99_8_state::console_ready(int state)
 WRITE_LINE_MEMBER( ti99_8_state::console_reset )
 {
 	if (TRACE_RESET) logerror("Incoming RESET line = %d\n", state);
-	if (machine().phase() != MACHINE_PHASE_INIT)
+	if (machine().phase() != machine_phase::INIT)
 	{
 		// RESET the 9901
 		m_tms9901->rst1_line(state);

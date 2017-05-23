@@ -6,6 +6,7 @@
 #pragma once
 
 #include "rs232.h"
+#include "dipty.h"
 
 class pseudo_terminal_device : public device_t,
 								public device_serial_interface,

@@ -340,7 +340,7 @@ void hh_hmcs40_state::set_interrupt(int line, int state)
 
 	if (state != m_int[line])
 	{
-		if (machine().phase() >= MACHINE_PHASE_RESET)
+		if (machine().phase() >= machine_phase::RESET)
 			m_maincpu->set_input_line(line, state ? ASSERT_LINE : CLEAR_LINE);
 		m_int[line] = state;
 	}

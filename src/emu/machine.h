@@ -21,21 +21,18 @@
 
 #include <time.h>
 
-// forward declaration instead of osdepend.h
-class osd_interface;
-
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
 // machine phases
-enum machine_phase
+enum class machine_phase
 {
-	MACHINE_PHASE_PREINIT,
-	MACHINE_PHASE_INIT,
-	MACHINE_PHASE_RESET,
-	MACHINE_PHASE_RUNNING,
-	MACHINE_PHASE_EXIT
+	PREINIT,
+	INIT,
+	RESET,
+	RUNNING,
+	EXIT
 };
 
 
@@ -52,15 +49,15 @@ enum machine_notification
 
 
 // debug flags
-const int DEBUG_FLAG_ENABLED        = 0x00000001;       // debugging is enabled
-const int DEBUG_FLAG_CALL_HOOK      = 0x00000002;       // CPU cores must call instruction hook
-const int DEBUG_FLAG_WPR_PROGRAM    = 0x00000010;       // watchpoints are enabled for PROGRAM memory reads
-const int DEBUG_FLAG_WPR_DATA       = 0x00000020;       // watchpoints are enabled for DATA memory reads
-const int DEBUG_FLAG_WPR_IO         = 0x00000040;       // watchpoints are enabled for IO memory reads
-const int DEBUG_FLAG_WPW_PROGRAM    = 0x00000100;       // watchpoints are enabled for PROGRAM memory writes
-const int DEBUG_FLAG_WPW_DATA       = 0x00000200;       // watchpoints are enabled for DATA memory writes
-const int DEBUG_FLAG_WPW_IO         = 0x00000400;       // watchpoints are enabled for IO memory writes
-const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is enabled
+constexpr int DEBUG_FLAG_ENABLED        = 0x00000001;       // debugging is enabled
+constexpr int DEBUG_FLAG_CALL_HOOK      = 0x00000002;       // CPU cores must call instruction hook
+constexpr int DEBUG_FLAG_WPR_PROGRAM    = 0x00000010;       // watchpoints are enabled for PROGRAM memory reads
+constexpr int DEBUG_FLAG_WPR_DATA       = 0x00000020;       // watchpoints are enabled for DATA memory reads
+constexpr int DEBUG_FLAG_WPR_IO         = 0x00000040;       // watchpoints are enabled for IO memory reads
+constexpr int DEBUG_FLAG_WPW_PROGRAM    = 0x00000100;       // watchpoints are enabled for PROGRAM memory writes
+constexpr int DEBUG_FLAG_WPW_DATA       = 0x00000200;       // watchpoints are enabled for DATA memory writes
+constexpr int DEBUG_FLAG_WPW_IO         = 0x00000400;       // watchpoints are enabled for IO memory writes
+constexpr int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is enabled
 
 
 
@@ -79,26 +76,6 @@ const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is e
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// forward declarations
-class render_manager;
-class sound_manager;
-class video_manager;
-class ui_manager;
-class tilemap_manager;
-class debug_view_manager;
-class network_manager;
-class bookkeeping_manager;
-class configuration_manager;
-class output_manager;
-class ui_input_manager;
-class crosshair_manager;
-class image_manager;
-class rom_load_manager;
-class debugger_manager;
-class osd_interface;
-enum class config_type;
-
 
 // ======================> system_time
 
@@ -213,7 +190,7 @@ public:
 	driver_device *driver_data() const { return &downcast<driver_device &>(root_device()); }
 	template<class _DriverClass> _DriverClass *driver_data() const { return &downcast<_DriverClass &>(root_device()); }
 	machine_phase phase() const { return m_current_phase; }
-	bool paused() const { return m_paused || (m_current_phase != MACHINE_PHASE_RUNNING); }
+	bool paused() const { return m_paused || (m_current_phase != machine_phase::RUNNING); }
 	bool exit_pending() const { return m_exit_pending; }
 	bool ui_active() const { return m_ui_active; }
 	const char *basename() const { return m_basename.c_str(); }

@@ -202,7 +202,7 @@ void debugger_cpu::source_script(const char *file)
 		m_source_file = fopen(file, "r");
 		if (!m_source_file)
 		{
-			if (m_machine.phase() == MACHINE_PHASE_RUNNING)
+			if (m_machine.phase() == machine_phase::RUNNING)
 				m_machine.debugger().console().printf("Cannot open command file '%s'\n", file);
 			else
 				fatalerror("Cannot open command file '%s'\n", file);

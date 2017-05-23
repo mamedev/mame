@@ -198,4 +198,4 @@ private:
 };
 
 
-#endif  // MAME_EMU_SCHEDULE_H */
+#endif  // MAME_EMU_SCHEDULE_H

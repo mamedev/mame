@@ -889,7 +889,7 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 			break;
 
 		default:
-			if (machine().phase() > MACHINE_PHASE_RESET)
+			if (machine().phase() > machine_phase::RESET)
 				logerror("%s unknown io_w $%X to $0F%02X at $%04X\n", tag(), data, offset, m_prev_pc);
 			break;
 	}

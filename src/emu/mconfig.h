@@ -29,11 +29,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward references
-struct gfx_decode_entry;
-class driver_device;
-class screen_device;
-
 struct internal_layout
 {
 	size_t decompressed_size;

@@ -2583,4 +2583,4 @@ GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   taitol_1cpu_state, 0,    
 GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "Hot-B", "Play Girls 2", 0 )
 GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
 
-GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone" )
+GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 )
