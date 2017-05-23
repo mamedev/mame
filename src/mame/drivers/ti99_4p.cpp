@@ -191,8 +191,8 @@ private:
 	required_device<tms9900_device>        m_cpu;
 	required_device<tms9901_device>        m_tms9901;
 	required_device<cassette_image_device> m_cassette;
-	required_device<peribox_device>        m_peribox;
-	required_device<ti99_joyport_device>   m_joyport;
+	required_device<bus::ti99::peb::peribox_device>        m_peribox;
+	required_device<bus::ti99::joyport::joyport_device>   m_joyport;
 	required_device<ram_device> m_scratchpad;
 	required_device<ram_device> m_amsram;
 

@@ -106,6 +106,14 @@
 #include "emu.h"
 #include "998board.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_MAINBOARD8, bus::ti99::internal, mainboard8_device, "ti998_mainboard", "TI-99/8 Mainboard")
+DEFINE_DEVICE_TYPE_NS(TI99_VAQUERRO, bus::ti99::internal, vaquerro_device, "ti998_vaquerro", "TI-99/8 Logical Address Space Decoder")
+DEFINE_DEVICE_TYPE_NS(TI99_MOFETTA, bus::ti99::internal, mofetta_device, "ti998_mofetta", "TI-99/8 Physical Address Space Decoder")
+DEFINE_DEVICE_TYPE_NS(TI99_OSO, bus::ti99::internal, oso_device, "ti998_oso", "TI-99/8 Hexbus interface")
+DEFINE_DEVICE_TYPE_NS(TI99_AMIGO, bus::ti99::internal, amigo_device, "ti998_amigo", "TI-99/8 Address space mapper")
+
+namespace bus { namespace ti99 { namespace internal {
+
 #define TRACE_CRU 0
 #define TRACE_ADDRESS 0
 #define TRACE_MAP 0
@@ -1014,9 +1022,6 @@ machine_config_constructor mainboard8_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( ti998_mainboard );
 }
 
-DEFINE_DEVICE_TYPE(TI99_MAINBOARD8, mainboard8_device, "ti998_mainboard", "TI-99/8 Mainboard")
-
-
 /***************************************************************************
   ===== VAQUERRO: Logical Address Space decoder =====
 
@@ -1510,8 +1515,6 @@ void vaquerro_device::video_waitstate_generator::clock_in(line_state clkout)
 	}
 }
 
-DEFINE_DEVICE_TYPE(TI99_VAQUERRO, vaquerro_device, "ti998_vaquerro", "TI-99/8 Logical Address Space Decoder")
-
 /***************************************************************************
   ===== MOFETTA: Physical Address Space decoder =====
 
@@ -1769,9 +1772,6 @@ void mofetta_device::device_reset()
 	m_txspg = false;
 	m_prefix = 0;
 }
-
-
-DEFINE_DEVICE_TYPE(TI99_MOFETTA, mofetta_device, "ti998_mofetta", "TI-99/8 Physical Address Space Decoder")
 
 /***************************************************************************
 
@@ -2166,8 +2166,6 @@ void amigo_device::device_reset()
 	m_logical_space = true;
 }
 
-DEFINE_DEVICE_TYPE(TI99_AMIGO, amigo_device, "ti998_amigo", "TI-99/8 Address space mapper")
-
 /***************************************************************************
 
   ===== OSO: Hexbus interface =====
@@ -2305,4 +2303,5 @@ void oso_device::device_start()
 	save_item(NAME(m_xmit));
 }
 
-DEFINE_DEVICE_TYPE(TI99_OSO, oso_device, "ti998_oso", "TI-99/8 Hexbus interface")
+} } } // end namespace bus::ti99::internal
+

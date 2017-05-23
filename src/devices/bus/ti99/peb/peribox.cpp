@@ -196,6 +196,16 @@ CRUCLK*  51||52  DBIN
 #include "memex.h"
 #include "horizon.h"
 
+DEFINE_DEVICE_TYPE_NS(PERIBOX,      bus::ti99::peb, peribox_device,      "peribox",      "Peripheral expansion box")
+DEFINE_DEVICE_TYPE_NS(PERIBOX_SLOT, bus::ti99::peb, peribox_slot_device, "peribox_slot", "TI P-Box slot")
+
+DEFINE_DEVICE_TYPE_NS(PERIBOX_EV,   bus::ti99::peb, peribox_ev_device,   "peribox_ev",   "Peripheral expansion box EVPC")
+DEFINE_DEVICE_TYPE_NS(PERIBOX_SG,   bus::ti99::peb, peribox_sg_device,   "peribox_sg",   "Peripheral expansion box SGCPU")
+DEFINE_DEVICE_TYPE_NS(PERIBOX_GEN,  bus::ti99::peb, peribox_gen_device,  "peribox_gen",  "Peripheral expansion box Geneve")
+DEFINE_DEVICE_TYPE_NS(PERIBOX_998,  bus::ti99::peb, peribox_998_device,  "peribox_998",  "Peripheral expansion box 99/8")
+
+namespace bus { namespace ti99 { namespace peb {
+
 /*
     Debugging flags. Set to 0 or 1.
 */
@@ -744,10 +754,4 @@ WRITE_LINE_MEMBER( peribox_slot_device::set_ready )
 }
 
 /***************************************************************************/
-DEFINE_DEVICE_TYPE(PERIBOX,      peribox_device,      "peribox",      "Peripheral expansion box")
-DEFINE_DEVICE_TYPE(PERIBOX_SLOT, peribox_slot_device, "peribox_slot", "TI P-Box slot")
-
-DEFINE_DEVICE_TYPE(PERIBOX_EV,   peribox_ev_device,   "peribox_ev",   "Peripheral expansion box EVPC")
-DEFINE_DEVICE_TYPE(PERIBOX_SG,   peribox_sg_device,   "peribox_sg",   "Peripheral expansion box SGCPU")
-DEFINE_DEVICE_TYPE(PERIBOX_GEN,  peribox_gen_device,  "peribox_gen",  "Peripheral expansion box Geneve")
-DEFINE_DEVICE_TYPE(PERIBOX_998,  peribox_998_device,  "peribox_998",  "Peripheral expansion box 99/8")
+} } } // end namespace bus::ti99::peb

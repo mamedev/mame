@@ -13,12 +13,12 @@
 
 *****************************************************************************/
 
-#ifndef MAME_BUS_TI99X_998BOARD_H
-#define MAME_BUS_TI99X_998BOARD_H
+#ifndef MAME_BUS_TI99_INTERNAL_998BOARD_H
+#define MAME_BUS_TI99_INTERNAL_998BOARD_H
 
 #pragma once
 
-#include "ti99defs.h"
+#include "bus/ti99/ti99defs.h"
 #include "gromport.h"
 
 #include "bus/ti99/peb/peribox.h"
@@ -28,18 +28,14 @@
 #include "sound/tms5220.h"
 #include "video/tms9928a.h"
 
-DECLARE_DEVICE_TYPE(TI99_MAINBOARD8, mainboard8_device)
+namespace bus { namespace ti99 { namespace internal {
 
 #define VAQUERRO_TAG "vaquerro"
 #define MOFETTA_TAG "mofetta"
 #define AMIGO_TAG "amigo"
 #define OSO_TAG "oso"
 
-DECLARE_DEVICE_TYPE(TI99_VAQUERRO, vaquerro_device)
-DECLARE_DEVICE_TYPE(TI99_MOFETTA,  mofetta_device)
-DECLARE_DEVICE_TYPE(TI99_AMIGO,    amigo_device)
-DECLARE_DEVICE_TYPE(TI99_OSO,      oso_device)
-
+class mainboard8_device;
 
 /*
     Custom chip: Vaquerro
@@ -83,7 +79,7 @@ public:
 
 private:
 	/*
-		Wait state generator (part of Vaquerro)
+	    Wait state generator (part of Vaquerro)
 	*/
 	class waitstate_generator
 	{
@@ -513,8 +509,8 @@ private:
 	required_device<tms9928a_device>        m_video;
 	required_device<sn76496_base_device>    m_sound;
 	required_device<cd2501ecd_device>       m_speech;
-	required_device<ti99_gromport_device>   m_gromport;
-	required_device<peribox_device>         m_peb;
+	required_device<gromport_device>   m_gromport;
+	required_device<bus::ti99::peb::peribox_device>         m_peb;
 	required_device<ram_device>             m_sram;
 	required_device<ram_device>             m_dram;
 
@@ -546,14 +542,21 @@ private:
 	uint8_t*   m_pascalrom;
 };
 
+} } } // end namespace bus::ti99::internal
+
 #define MCFG_MAINBOARD8_READY_CALLBACK(_write) \
-	devcb = &mainboard8_device::set_ready_wr_callback(*device, DEVCB_##_write);
+	devcb = &bus::ti99::internal::mainboard8_device::set_ready_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MAINBOARD8_RESET_CALLBACK(_write) \
-	devcb = &mainboard8_device::set_reset_wr_callback(*device, DEVCB_##_write);
+	devcb = &bus::ti99::internal::mainboard8_device::set_reset_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MAINBOARD8_HOLD_CALLBACK(_write) \
-	devcb = &mainboard8_device::set_hold_wr_callback(*device, DEVCB_##_write);
+	devcb = &bus::ti99::internal::mainboard8_device::set_hold_wr_callback(*device, DEVCB_##_write);
 
+DECLARE_DEVICE_TYPE_NS(TI99_MAINBOARD8, bus::ti99::internal, mainboard8_device)
+DECLARE_DEVICE_TYPE_NS(TI99_VAQUERRO, bus::ti99::internal, vaquerro_device)
+DECLARE_DEVICE_TYPE_NS(TI99_MOFETTA,  bus::ti99::internal, mofetta_device)
+DECLARE_DEVICE_TYPE_NS(TI99_AMIGO,    bus::ti99::internal, amigo_device)
+DECLARE_DEVICE_TYPE_NS(TI99_OSO,      bus::ti99::internal, oso_device)
 
-#endif
+#endif // MAME_BUS_TI99_INTERNAL_998BOARD_H

@@ -22,7 +22,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/ram.h"
 
-DECLARE_DEVICE_TYPE(TI99_BWG, snug_bwg_device)
+namespace bus { namespace ti99 { namespace peb {
 
 class snug_bwg_device : public ti_expansion_card_device
 {
@@ -138,5 +138,9 @@ private:
 	// Link to the real-time clock on the board.
 	required_device<mm58274c_device> m_clock;
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_BWG, bus::ti99::peb, snug_bwg_device)
 
 #endif // MAME_BUS_TI99_PED_BWG_H

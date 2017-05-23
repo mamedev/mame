@@ -11,12 +11,12 @@
 
 *****************************************************************************/
 
-#ifndef MAME_BUS_TI99X_DATAMUX_H
-#define MAME_BUS_TI99X_DATAMUX_H
+#ifndef MAME_BUS_TI99_INTERNAL_DATAMUX_H
+#define MAME_BUS_TI99_INTERNAL_DATAMUX_H
 
 #pragma once
 
-#include "ti99defs.h"
+#include "bus/ti99/ti99defs.h"
 #include "machine/tmc0430.h"
 #include "gromport.h"
 #include "bus/ti99/peb/peribox.h"
@@ -24,15 +24,15 @@
 #include "video/tms9928a.h"
 #include "machine/ram.h"
 
-DECLARE_DEVICE_TYPE(TI99_DATAMUX, ti99_datamux_device)
+namespace bus { namespace ti99 { namespace internal {
 
 /*
     Main class
 */
-class ti99_datamux_device : public device_t
+class datamux_device : public device_t
 {
 public:
-	ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_SETOFFSET_MEMBER( setoffset );
@@ -45,7 +45,7 @@ public:
 
 	template <class Object> static devcb_base &static_set_ready_callback(device_t &device, Object &&cb)
 	{
-		return downcast<ti99_datamux_device &>(device).m_ready.set_callback(std::forward<Object>(cb));
+		return downcast<datamux_device &>(device).m_ready.set_callback(std::forward<Object>(cb));
 	}
 
 protected:
@@ -64,10 +64,10 @@ private:
 	optional_device<sn76496_base_device> m_sound;
 
 	// Link to the peripheral expansion box
-	required_device<peribox_device> m_peb;
+	required_device<bus::ti99::peb::peribox_device> m_peb;
 
 	// Link to the cartridge port (aka GROM port)
-	required_device<ti99_gromport_device> m_gromport;
+	required_device<gromport_device> m_gromport;
 
 	// Memory expansion (internal, 16 bit)
 	required_device<ram_device> m_ram16b;
@@ -137,6 +137,10 @@ private:
 /******************************************************************************/
 
 #define MCFG_DMUX_READY_HANDLER( _intcallb ) \
-	devcb = &ti99_datamux_device::static_set_ready_callback( *device, DEVCB_##_intcallb );
+	devcb = &bus::ti99::internal::datamux_device::static_set_ready_callback( *device, DEVCB_##_intcallb );
 
-#endif // MAME_BUS_TI99X_DATAMUX_H
+} } } // end namespace bus::ti99::internal
+
+DECLARE_DEVICE_TYPE_NS(TI99_DATAMUX, bus::ti99::internal, datamux_device)
+	
+#endif // MAME_BUS_TI99_INTERNAL_DATAMUX_H

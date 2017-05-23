@@ -59,6 +59,10 @@
 #include "formats/mfm_hd.h"
 #include "formats/ti99_dsk.h"       // Format
 
+DEFINE_DEVICE_TYPE_NS(TI99_HFDC, bus::ti99::peb, myarc_hfdc_device, "ti99_hfdc", "Myarc Hard and Floppy Disk Controller")
+
+namespace bus { namespace ti99 { namespace peb {
+
 #define BUFFER "ram"
 #define FDC_TAG "hdc9234"
 #define CLOCK_TAG "mm58274c"
@@ -1112,4 +1116,4 @@ ioport_constructor myarc_hfdc_device::device_input_ports() const
 	return INPUT_PORTS_NAME( ti99_hfdc );
 }
 
-DEFINE_DEVICE_TYPE(TI99_HFDC, myarc_hfdc_device, "ti99_hfdc", "Myarc Hard and Floppy Disk Controller")
+} } } // end namespace bus::ti99::peb

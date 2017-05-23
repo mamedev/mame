@@ -40,6 +40,11 @@
 #include "handset.h"
 #include "machine/tms9901.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_JOYSTICK, bus::ti99::joyport, ti99_twin_joystick_device, "ti99_twinjoy", "TI-99/4(A) Twin Joysticks")
+DEFINE_DEVICE_TYPE_NS(TI99_HANDSET, bus::ti99::joyport, ti99_handset_device, "ti99_handset", "TI-99/4 IR handset")
+
+namespace bus { namespace ti99 { namespace joyport {
+
 #define LOG logerror
 #define VERBOSE 1
 
@@ -469,8 +474,6 @@ ioport_constructor ti99_handset_device::device_input_ports() const
 	return INPUT_PORTS_NAME( handset );
 }
 
-DEFINE_DEVICE_TYPE(TI99_HANDSET, ti99_handset_device, "ti99_handset", "TI-99/4 IR handset")
-
 /******************************************************************************
     Twin Joystick
 ******************************************************************************/
@@ -534,5 +537,4 @@ ioport_constructor ti99_twin_joystick_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( joysticks );
 }
-
-DEFINE_DEVICE_TYPE(TI99_JOYSTICK, ti99_twin_joystick_device, "ti99_twinjoy", "TI-99/4(A) Twin Joysticks")
+} } } // end namespace bus::ti99::joyport

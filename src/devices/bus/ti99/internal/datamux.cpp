@@ -71,10 +71,14 @@
 #include "emu.h"
 #include "datamux.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_DATAMUX, bus::ti99::internal, datamux_device, "ti99_datamux", "TI-99 Databus multiplexer")
+
+namespace bus { namespace ti99 { namespace internal {
+
 /*
     Constructor
 */
-ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+datamux_device::datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TI99_DATAMUX, tag, owner, clock),
 	m_video(*owner, VDP_TAG),
 	m_sound(*owner, TISOUNDCHIP_TAG),
@@ -107,7 +111,7 @@ ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const ch
     DEVICE ACCESSOR FUNCTIONS
 ***************************************************************************/
 
-void ti99_datamux_device::read_all(address_space& space, uint16_t addr, uint8_t *value)
+void datamux_device::read_all(address_space& space, uint16_t addr, uint8_t *value)
 {
 	// Valid access
 	bool validaccess = ((addr & 0x0400)==0);
@@ -145,7 +149,7 @@ void ti99_datamux_device::read_all(address_space& space, uint16_t addr, uint8_t 
 	m_peb->memen_in(CLEAR_LINE);
 }
 
-void ti99_datamux_device::write_all(address_space& space, uint16_t addr, uint8_t value)
+void datamux_device::write_all(address_space& space, uint16_t addr, uint8_t value)
 {
 	// GROM access
 	if ((addr & 0xf801)==0x9800)
@@ -181,7 +185,7 @@ void ti99_datamux_device::write_all(address_space& space, uint16_t addr, uint8_t
 	m_peb->memen_in(CLEAR_LINE);
 }
 
-void ti99_datamux_device::setaddress_all(address_space& space, uint16_t addr)
+void datamux_device::setaddress_all(address_space& space, uint16_t addr)
 {
 	line_state a14 = ((addr & 2)!=0)? ASSERT_LINE : CLEAR_LINE;
 
@@ -224,7 +228,7 @@ void ti99_datamux_device::setaddress_all(address_space& space, uint16_t addr)
     mapped devices are excluded because their state would be changed
     unpredictably by the debugger access.
 */
-uint16_t ti99_datamux_device::debugger_read(address_space& space, uint16_t addr)
+uint16_t datamux_device::debugger_read(address_space& space, uint16_t addr)
 {
 	uint16_t addrb = addr << 1;
 	uint16_t value = 0;
@@ -270,7 +274,7 @@ uint16_t ti99_datamux_device::debugger_read(address_space& space, uint16_t addr)
 	return value;
 }
 
-void ti99_datamux_device::debugger_write(address_space& space, uint16_t addr, uint16_t data)
+void datamux_device::debugger_write(address_space& space, uint16_t addr, uint16_t data)
 {
 	uint16_t addrb = addr << 1;
 
@@ -320,7 +324,7 @@ void ti99_datamux_device::debugger_write(address_space& space, uint16_t addr, ui
 
     mem_mask is always ffff on TMS processors (cannot control bus width)
 */
-READ16_MEMBER( ti99_datamux_device::read )
+READ16_MEMBER( datamux_device::read )
 {
 	uint16_t value = 0;
 
@@ -372,7 +376,7 @@ READ16_MEMBER( ti99_datamux_device::read )
 /*
     Write access.
 */
-WRITE16_MEMBER( ti99_datamux_device::write )
+WRITE16_MEMBER( datamux_device::write )
 {
 	if (machine().side_effect_disabled())
 	{
@@ -416,7 +420,7 @@ WRITE16_MEMBER( ti99_datamux_device::write )
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-SETOFFSET_MEMBER( ti99_datamux_device::setoffset )
+SETOFFSET_MEMBER( datamux_device::setoffset )
 {
 	m_addr_buf = offset << 1;
 	m_waitcount = 0;
@@ -463,7 +467,7 @@ SETOFFSET_MEMBER( ti99_datamux_device::setoffset )
     The datamux is connected to the clock line in order to operate
     the wait state counter and to read/write the bytes.
 */
-WRITE_LINE_MEMBER( ti99_datamux_device::clock_in )
+WRITE_LINE_MEMBER( datamux_device::clock_in )
 {
 	// return immediately if the datamux is currently inactive
 	if (m_waitcount>0)
@@ -523,18 +527,18 @@ WRITE_LINE_MEMBER( ti99_datamux_device::clock_in )
 /*
     Combine the external (sysready) and the own (muxready) READY states.
 */
-void ti99_datamux_device::ready_join()
+void datamux_device::ready_join()
 {
 	m_ready((m_sysready==CLEAR_LINE || m_muxready==CLEAR_LINE)? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( ti99_datamux_device::dbin_in )
+WRITE_LINE_MEMBER( datamux_device::dbin_in )
 {
 	m_dbin = (line_state)state;
 	if (TRACE_ADDRESS) logerror("data bus in = %d\n", (m_dbin==ASSERT_LINE)? 1:0 );
 }
 
-WRITE_LINE_MEMBER( ti99_datamux_device::ready_line )
+WRITE_LINE_MEMBER( datamux_device::ready_line )
 {
 	if (TRACE_READY)
 	{
@@ -546,7 +550,7 @@ WRITE_LINE_MEMBER( ti99_datamux_device::ready_line )
 }
 
 /* Called from VDP via console. */
-WRITE_LINE_MEMBER( ti99_datamux_device::gromclk_in )
+WRITE_LINE_MEMBER( datamux_device::gromclk_in )
 {
 	// Don't propagate the clock in idle phase
 	if (m_grom_idle) return;
@@ -568,7 +572,7 @@ WRITE_LINE_MEMBER( ti99_datamux_device::gromclk_in )
     DEVICE LIFECYCLE FUNCTIONS
 ***************************************************************************/
 
-void ti99_datamux_device::device_start(void)
+void datamux_device::device_start(void)
 {
 	m_muxready = ASSERT_LINE;
 	m_ready.resolve();
@@ -586,11 +590,11 @@ void ti99_datamux_device::device_start(void)
 	save_item(NAME(m_grom_idle));
 }
 
-void ti99_datamux_device::device_stop(void)
+void datamux_device::device_stop(void)
 {
 }
 
-void ti99_datamux_device::device_reset(void)
+void datamux_device::device_reset(void)
 {
 	m_consolerom = (uint16_t*)owner()->memregion(CONSOLEROM)->base();
 	m_use32k = (ioport("RAM")->read()==1);
@@ -611,7 +615,7 @@ void ti99_datamux_device::device_reset(void)
 	m_spacep = &cpu->space(AS_PROGRAM);
 }
 
-void ti99_datamux_device::device_config_complete()
+void datamux_device::device_config_complete()
 {
 	m_grom[0] = downcast<tmc0430_device*>(owner()->subdevice(GROM0_TAG));
 	m_grom[1] = downcast<tmc0430_device*>(owner()->subdevice(GROM1_TAG));
@@ -632,9 +636,10 @@ INPUT_PORTS_START( datamux )
 
 INPUT_PORTS_END
 
-ioport_constructor ti99_datamux_device::device_input_ports() const
+ioport_constructor datamux_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(datamux);
 }
 
-DEFINE_DEVICE_TYPE(TI99_DATAMUX, ti99_datamux_device, "ti99_datamux", "TI-99 Databus multiplexer")
+} } } // end namespace bus::ti99::internal
+

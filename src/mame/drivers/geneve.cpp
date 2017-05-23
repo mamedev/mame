@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /******************************************************************************
-    MESS Driver for the Myarc Geneve 9640.
+    Myarc Geneve 9640.
 
     The Geneve has two operation modes.  One is compatible with the TI-99/4a,
     the other is not.
@@ -202,14 +202,13 @@
     Rewritten 2012 by Michael Zapf
 ******************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 #include "machine/tms9901.h"
 #include "machine/mm58274c.h"
 #include "sound/sn76496.h"
 
-#include "bus/ti99x/genboard.h"
+#include "bus/ti99/internal/genboard.h"
 
 #include "bus/ti99/colorbus/colorbus.h"
 #include "bus/ti99/joyport/joyport.h"
@@ -263,11 +262,11 @@ public:
 
 	required_device<tms9995_device>         m_cpu;
 	required_device<tms9901_device>         m_tms9901;
-	required_device<geneve_keyboard_device> m_keyboard;
-	required_device<geneve_mapper_device>   m_mapper;
-	required_device<peribox_device>         m_peribox;
-	required_device<ti99_joyport_device>    m_joyport;
-	required_device<ti99_colorbus_device>   m_colorbus;
+	required_device<bus::ti99::internal::geneve_keyboard_device> m_keyboard;
+	required_device<bus::ti99::internal::geneve_mapper_device>   m_mapper;
+	required_device<bus::ti99::peb::peribox_device>         m_peribox;
+	required_device<bus::ti99::joyport::joyport_device>    m_joyport;
+	required_device<bus::ti99::colorbus::ti99_colorbus_device>   m_colorbus;
 
 	DECLARE_WRITE_LINE_MEMBER( inta );
 	DECLARE_WRITE_LINE_MEMBER( intb );
@@ -295,7 +294,7 @@ public:
 */
 
 static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8, geneve_state)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(GMAPPER_TAG, geneve_mapper_device, readm, writem) AM_DEVSETOFFSET(GMAPPER_TAG, geneve_mapper_device, setoffset)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, readm, writem) AM_DEVSETOFFSET(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, setoffset)
 ADDRESS_MAP_END
 
 /*
@@ -318,12 +317,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(geneve)
 
 	PORT_START( "MODE" )
-	PORT_CONFNAME( 0x01, 0x00, "Operating mode" ) PORT_CHANGED_MEMBER(PERIBOX_TAG, peribox_device, genmod_changed, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Operating mode" ) PORT_CHANGED_MEMBER(PERIBOX_TAG, bus::ti99::peb::peribox_device, genmod_changed, 0)
 		PORT_CONFSETTING(    0x00, "Standard" )
 		PORT_CONFSETTING(    GENMOD, "GenMod" )
 
 	PORT_START( "BOOTROM" )
-	PORT_CONFNAME( 0x03, GENEVE_098, "Boot ROM" ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, settings_changed, 3)
+	PORT_CONFNAME( 0x03, GENEVE_098, "Boot ROM" ) PORT_CHANGED_MEMBER(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 3)
 		PORT_CONFSETTING( GENEVE_098, "Version 0.98" )
 		PORT_CONFSETTING( GENEVE_100, "Version 1.00" )
 		PORT_CONFSETTING( GENEVE_PFM512, "PFM 512" )
@@ -336,10 +335,10 @@ static INPUT_PORTS_START(geneve)
 		PORT_CONFSETTING( 0x02, "384 KiB" )
 
 	PORT_START( "GENMODDIPS" )
-	PORT_DIPNAME( GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, settings_changed, 1)
+	PORT_DIPNAME( GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 1)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GM_TURBO, DEF_STR( On ))
-	PORT_DIPNAME( GM_TIM, GM_TIM, "Genmod TI mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, settings_changed, 2)
+	PORT_DIPNAME( GM_TIM, GM_TIM, "Genmod TI mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 2)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GM_TIM, DEF_STR( On ))
 
@@ -703,12 +702,12 @@ static MACHINE_CONFIG_START( geneve_60hz )
 	MCFG_TMS9901_P0_HANDLER( WRITELINE( geneve_state, peripheral_bus_reset) )
 	MCFG_TMS9901_P1_HANDLER( WRITELINE( geneve_state, VDP_reset) )
 	MCFG_TMS9901_P2_HANDLER( WRITELINE( geneve_state, joystick_select) )
-	MCFG_TMS9901_P4_HANDLER( DEVWRITELINE( GMAPPER_TAG, geneve_mapper_device, pfm_select_lsb) )  // new for PFM
-	MCFG_TMS9901_P5_HANDLER( DEVWRITELINE( GMAPPER_TAG, geneve_mapper_device, pfm_output_enable) )  // new for PFM
-	MCFG_TMS9901_P6_HANDLER( DEVWRITELINE( GKEYBOARD_TAG, geneve_keyboard_device, reset_line) )
+	MCFG_TMS9901_P4_HANDLER( DEVWRITELINE( GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_lsb) )  // new for PFM
+	MCFG_TMS9901_P5_HANDLER( DEVWRITELINE( GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_output_enable) )  // new for PFM
+	MCFG_TMS9901_P6_HANDLER( DEVWRITELINE( GKEYBOARD_TAG, bus::ti99::internal::geneve_keyboard_device, reset_line) )
 	MCFG_TMS9901_P7_HANDLER( WRITELINE( geneve_state, extbus_wait_states) )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( geneve_state, video_wait_states) )
-	MCFG_TMS9901_P13_HANDLER( DEVWRITELINE( GMAPPER_TAG, geneve_mapper_device, pfm_select_msb) )   // new for PFM
+	MCFG_TMS9901_P13_HANDLER( DEVWRITELINE( GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_msb) )   // new for PFM
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( geneve_state, tms9901_interrupt) )
 
 	// Mapper

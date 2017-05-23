@@ -121,6 +121,10 @@
 #include "emu.h"
 #include "hsgpl.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_HSGPL, bus::ti99::peb, snug_high_speed_gpl_device, "ti99_hsgpl", "SNUG High-speed GPL card")
+
+namespace bus { namespace ti99 { namespace peb {
+
 #define CRU_BASE 0x1B00
 #define SUPERCART_BASE 0x0800
 
@@ -714,4 +718,4 @@ ioport_constructor snug_high_speed_gpl_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ti99_hsgpl);
 }
 
-DEFINE_DEVICE_TYPE(TI99_HSGPL, snug_high_speed_gpl_device, "ti99_hsgpl", "SNUG High-speed GPL card")
+} } } // end namespace bus::ti99::peb

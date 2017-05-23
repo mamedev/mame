@@ -46,9 +46,10 @@
 #include "machine/tms9901.h"
 #include "imagedev/cassette.h"
 
-#include "bus/ti99x/ti99defs.h"
-#include "bus/ti99x/datamux.h"
-#include "bus/ti99x/gromport.h"
+#include "bus/ti99/ti99defs.h"
+#include "bus/ti99/internal/datamux.h"
+#include "bus/ti99/internal/gromport.h"
+#include "bus/ti99/internal/evpcconn.h"
 
 #include "bus/ti99/joyport/joyport.h"
 #include "bus/ti99/peb/peribox.h"
@@ -165,10 +166,10 @@ private:
 	// Connected devices
 	required_device<tms9900_device>     m_cpu;
 	required_device<tms9901_device>     m_tms9901;
-	required_device<ti99_gromport_device> m_gromport;
-	required_device<peribox_device>     m_peribox;
-	required_device<ti99_joyport_device> m_joyport;
-	required_device<ti99_datamux_device> m_datamux;
+	required_device<bus::ti99::internal::gromport_device>   m_gromport;
+	required_device<bus::ti99::peb::peribox_device>             m_peribox;
+	required_device<bus::ti99::joyport::joyport_device>     m_joyport;
+	required_device<bus::ti99::internal::datamux_device>    m_datamux;
 	optional_device<tms9928a_device>    m_video;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
@@ -207,7 +208,7 @@ enum
 */
 static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4x_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(DATAMUX_TAG, ti99_datamux_device, read, write) AM_DEVSETOFFSET(DATAMUX_TAG, ti99_datamux_device, setoffset)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(DATAMUX_TAG, bus::ti99::internal::datamux_device, read, write) AM_DEVSETOFFSET(DATAMUX_TAG, bus::ti99::internal::datamux_device, setoffset)
 ADDRESS_MAP_END
 
 /*
@@ -878,7 +879,7 @@ static MACHINE_CONFIG_START( ti99_4 )
 	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
-	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
+	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
 
 	// Sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("sound_out")
@@ -998,7 +999,7 @@ static MACHINE_CONFIG_START( ti99_4a )
 	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
-	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
+	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
 
 	// Sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("sound_out")
@@ -1162,7 +1163,7 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz )
 	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX_EV, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
-	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
+	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
 
 	// Cassette drives
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")

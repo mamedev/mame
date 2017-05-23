@@ -16,17 +16,12 @@
 
 #pragma once
 
-#include "bus/ti99x/ti99defs.h"
+#include "bus/ti99/ti99defs.h"
 
-DECLARE_DEVICE_TYPE(PERIBOX,      peribox_device)
-DECLARE_DEVICE_TYPE(PERIBOX_SLOT, peribox_slot_device)
-
-DECLARE_DEVICE_TYPE(PERIBOX_EV,   peribox_ev_device)
-DECLARE_DEVICE_TYPE(PERIBOX_SG,   peribox_sg_device)
-DECLARE_DEVICE_TYPE(PERIBOX_GEN,  peribox_gen_device)
-DECLARE_DEVICE_TYPE(PERIBOX_998,  peribox_998_device)
+namespace bus { namespace ti99 { namespace peb {
 
 class ti_expansion_card_device;
+class peribox_slot_device;
 
 /*****************************************************************************
     The overall Peripheral Expansion Box.
@@ -257,15 +252,25 @@ protected:
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false)
 
 #define MCFG_PERIBOX_INTA_HANDLER( _inta ) \
-	devcb = &peribox_device::static_set_inta_callback( *device, DEVCB_##_inta );
+	devcb = &bus::ti99::peb::peribox_device::static_set_inta_callback( *device, DEVCB_##_inta );
 
 #define MCFG_PERIBOX_INTB_HANDLER( _intb ) \
-	devcb = &peribox_device::static_set_intb_callback( *device, DEVCB_##_intb );
+	devcb = &bus::ti99::peb::peribox_device::static_set_intb_callback( *device, DEVCB_##_intb );
 
 #define MCFG_PERIBOX_READY_HANDLER( _ready ) \
-	devcb = &peribox_device::static_set_ready_callback( *device, DEVCB_##_ready );
+	devcb = &bus::ti99::peb::peribox_device::static_set_ready_callback( *device, DEVCB_##_ready );
 
 #define MCFG_PERIBOX_LCP_HANDLER( _lcp ) \
-	devcb = &peribox_device::static_set_lcp_callback( *device, DEVCB_##_lcp );
+	devcb = &bus::ti99::peb::peribox_device::static_set_lcp_callback( *device, DEVCB_##_lcp );
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(PERIBOX,      bus::ti99::peb, peribox_device)
+DECLARE_DEVICE_TYPE_NS(PERIBOX_SLOT, bus::ti99::peb, peribox_slot_device)
+
+DECLARE_DEVICE_TYPE_NS(PERIBOX_EV,   bus::ti99::peb, peribox_ev_device)
+DECLARE_DEVICE_TYPE_NS(PERIBOX_SG,   bus::ti99::peb, peribox_sg_device)
+DECLARE_DEVICE_TYPE_NS(PERIBOX_GEN,  bus::ti99::peb, peribox_gen_device)
+DECLARE_DEVICE_TYPE_NS(PERIBOX_998,  bus::ti99::peb, peribox_998_device)
 
 #endif // MAME_BUS_TI99_PEB_PERIBOX_H
