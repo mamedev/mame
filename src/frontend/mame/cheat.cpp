@@ -114,16 +114,16 @@ inline std::string number_and_format::format() const
 	switch (m_format)
 	{
 	default:
-	case util::xml::data_node::int_format::DECIMAL:
+	case util::xml::int_format::DECIMAL:
 		return string_format("%d", uint32_t(m_value));
 
-	case util::xml::data_node::int_format::DECIMAL_HASH:
+	case util::xml::int_format::DECIMAL_HASH:
 		return string_format("#%d", uint32_t(m_value));
 
-	case util::xml::data_node::int_format::HEX_DOLLAR:
+	case util::xml::int_format::HEX_DOLLAR:
 		return string_format("$%X", uint32_t(m_value));
 
-	case util::xml::data_node::int_format::HEX_C:
+	case util::xml::int_format::HEX_C:
 		return string_format("0x%X", uint32_t(m_value));
 	}
 }
@@ -139,30 +139,30 @@ inline std::string number_and_format::format() const
 //-------------------------------------------------
 
 cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, const char *filename, util::xml::data_node const &paramnode)
-	: m_minval(number_and_format(paramnode.get_attribute_int("min", 0), paramnode.get_attribute_int_format("min")))
-	, m_maxval(number_and_format(paramnode.get_attribute_int("max", 0), paramnode.get_attribute_int_format("max")))
-	, m_stepval(number_and_format(paramnode.get_attribute_int("step", 1), paramnode.get_attribute_int_format("step")))
+	: m_minval(number_and_format(paramnode.attribute("min").as_int(0)), util::xml::get_attribute_int_format(paramnode.attribute("min").as_string(nullptr)))
+	, m_maxval(number_and_format(paramnode.attribute("max").as_int(0)), util::xml::get_attribute_int_format(paramnode.attribute("max").as_string(nullptr)))
+	, m_stepval(number_and_format(paramnode.attribute("step").as_int(1)), util::xml::get_attribute_int_format(paramnode.attribute("step").as_string(nullptr)))
 	, m_value(0)
 	, m_curtext()
 	, m_itemlist()
 {
 	// iterate over items
-	for (util::xml::data_node const *itemnode = paramnode.get_child("item"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("item"))
+	for (util::xml::data_node const itemnode : paramnode.children("item"))
 	{
 		// check for nullptr text
-		if (!itemnode->get_value() || !itemnode->get_value()[0])
-			throw emu_fatalerror("%s.xml(%d): item is missing text\n", filename, itemnode->line);
+		if (!itemnode.text().get() || !itemnode.text().get()[0])
+			throw emu_fatalerror("%s.xml(%s): item is missing text\n", filename, itemnode.parent().parent().attribute("desc").value());
 
 		// check for non-existant value
-		if (!itemnode->has_attribute("value"))
-			throw emu_fatalerror("%s.xml(%d): item is value\n", filename, itemnode->line);
+		if (!itemnode.attribute("value"))
+			throw emu_fatalerror("%s.xml(%s): item is value\n", filename, itemnode.parent().parent().attribute("desc").value());
 
 		// extract the parameters
-		uint64_t const value(itemnode->get_attribute_int("value", 0));
-		util::xml::data_node::int_format const format(itemnode->get_attribute_int_format("value"));
+		uint64_t const value(itemnode.attribute("value").as_int( 0));
+		util::xml::int_format const format(util::xml::get_attribute_int_format("value"));
 
 		// allocate and append a new item
-		item &curitem(*m_itemlist.emplace(m_itemlist.end(), itemnode->get_value(), value, format));
+		item &curitem(*m_itemlist.emplace(m_itemlist.end(), itemnode.text().get(), value, format));
 
 		// ensure the maximum expands to suit
 		m_maxval = std::max(m_maxval, curitem.value());
@@ -322,7 +322,7 @@ cheat_script::cheat_script(
 	: m_state(SCRIPT_STATE_RUN)
 {
 	// read the core attributes
-	char const *const state(scriptnode.get_attribute_string("state", "run"));
+	char const *const state(scriptnode.attribute("state").as_string( "run"));
 	if (!std::strcmp(state, "on"))
 		m_state = SCRIPT_STATE_ON;
 	else if (!std::strcmp(state, "off"))
@@ -330,17 +330,17 @@ cheat_script::cheat_script(
 	else if (!std::strcmp(state, "change"))
 		m_state = SCRIPT_STATE_CHANGE;
 	else if (std::strcmp(state, "run"))
-		throw emu_fatalerror("%s.xml(%d): invalid script state '%s'\n", filename, scriptnode.line, state);
+		throw emu_fatalerror("%s.xml(%s): invalid script state '%s'\n", filename, scriptnode.parent().attribute("desc").value(), state);
 
 	// iterate over nodes within the script
-	for (util::xml::data_node const *entrynode = scriptnode.get_first_child(); entrynode != nullptr; entrynode = entrynode->get_next_sibling())
+	for (util::xml::data_node const entrynode: scriptnode.children())
 	{
-		if (!std::strcmp(entrynode->get_name(), "action")) // handle action nodes
-			m_entrylist.push_back(std::make_unique<script_entry>(manager, symbols, filename, *entrynode, true));
-		else if (!std::strcmp(entrynode->get_name(), "output")) // handle output nodes
-			m_entrylist.push_back(std::make_unique<script_entry>(manager, symbols, filename, *entrynode, false));
+		if (!std::strcmp(entrynode.name(), "action")) // handle action nodes
+			m_entrylist.push_back(std::make_unique<script_entry>(manager, symbols, filename, entrynode, true));
+		else if (!std::strcmp(entrynode.name(), "output")) // handle output nodes
+			m_entrylist.push_back(std::make_unique<script_entry>(manager, symbols, filename, entrynode, false));
 		else // anything else is ignored
-			osd_printf_warning("%s.xml(%d): unknown script item '%s' will be lost if saved\n", filename, entrynode->line, entrynode->get_name());
+			osd_printf_warning("%s.xml(%s): unknown script item '%s' will be lost if saved\n", filename, entrynode.parent().parent().attribute("desc").value(), entrynode.name());
 	}
 }
 
@@ -405,16 +405,16 @@ cheat_script::script_entry::script_entry(
 	try
 	{
 		// read the condition if present
-		expression = entrynode.get_attribute_string("condition", nullptr);
+		expression = entrynode.attribute("condition").as_string( nullptr);
 		if (expression)
 			m_condition.parse(expression);
 
 		if (isaction)
 		{
 			// if this is an action, parse the expression
-			expression = entrynode.get_value();
+			expression = entrynode.text().get();
 			if (!expression || !expression[0])
-				throw emu_fatalerror("%s.xml(%d): missing expression in action tag\n", filename, entrynode.line);
+				throw emu_fatalerror("%s.xml(%s): missing expression in action tag\n", filename, entrynode.parent().parent().attribute("desc").value());
 			m_expression.parse(expression);
 		}
 		else
@@ -422,43 +422,43 @@ cheat_script::script_entry::script_entry(
 			// otherwise, parse the attributes and arguments
 
 			// extract format
-			char const *const format(entrynode.get_attribute_string("format", nullptr));
+			char const *const format(entrynode.attribute("format").as_string( nullptr));
 			if (!format || !format[0])
-				throw emu_fatalerror("%s.xml(%d): missing format in output tag\n", filename, entrynode.line);
+				throw emu_fatalerror("%s.xml(%s): missing format in output tag\n", filename, entrynode.parent().parent().attribute("desc").value());
 			m_format = format;
 
 			// extract other attributes
-			m_line = entrynode.get_attribute_int("line", 0);
+			m_line = entrynode.attribute("line").as_int( 0);
 			m_justify = ui::text_layout::LEFT;
-			char const *const align(entrynode.get_attribute_string("align", "left"));
+			char const *const align(entrynode.attribute("align").as_string( "left"));
 			if (!std::strcmp(align, "center"))
 				m_justify = ui::text_layout::CENTER;
 			else if (!std::strcmp(align, "right"))
 				m_justify = ui::text_layout::RIGHT;
 			else if (std::strcmp(align, "left"))
-				throw emu_fatalerror("%s.xml(%d): invalid alignment '%s' specified\n", filename, entrynode.line, align);
+				throw emu_fatalerror("%s.xml(%s): invalid alignment '%s' specified\n", filename, entrynode.parent().parent().attribute("desc").value(), align);
 
 			// then parse arguments
 			int totalargs(0);
-			for (util::xml::data_node const *argnode = entrynode.get_child("argument"); argnode != nullptr; argnode = argnode->get_next_sibling("argument"))
+			for (util::xml::data_node const argnode : entrynode.children("argument"))
 			{
-				auto curarg = std::make_unique<output_argument>(manager, symbols, filename, *argnode);
+				auto curarg = std::make_unique<output_argument>(manager, symbols, filename, argnode);
 				// verify we didn't overrun the argument count
 				totalargs += curarg->count();
 
 				m_arglist.push_back(std::move(curarg));
 
 				if (totalargs > MAX_ARGUMENTS)
-					throw emu_fatalerror("%s.xml(%d): too many arguments (found %d, max is %d)\n", filename, argnode->line, totalargs, MAX_ARGUMENTS);
+					throw emu_fatalerror("%s.xml(%s): too many arguments (found %d, max is %d)\n", filename, argnode.parent().parent().parent().attribute("desc").value(), totalargs, MAX_ARGUMENTS);
 			}
 
 			// validate the format against the arguments
-			validate_format(filename, entrynode.line);
+			//validate_format(filename, entrynode.line);
 		}
 	}
 	catch (expression_error const &err)
 	{
-		throw emu_fatalerror("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, entrynode.line, expression, err.code_string());
+		throw emu_fatalerror("%s.xml(%s): error parsing cheat expression \"%s\" (%s)\n", filename, entrynode.parent().parent().attribute("desc").value(), expression, err.code_string());
 	}
 }
 
@@ -611,12 +611,12 @@ cheat_script::script_entry::output_argument::output_argument(
 	, m_count(0)
 {
 	// first extract attributes
-	m_count = argnode.get_attribute_int("count", 1);
+	m_count = argnode.attribute("count").as_int( 1);
 
 	// read the expression
-	char const *const expression(argnode.get_value());
+	char const *const expression(argnode.text().get());
 	if (!expression || !expression[0])
-		throw emu_fatalerror("%s.xml(%d): missing expression in argument tag\n", filename, argnode.line);
+		throw emu_fatalerror("%s.xml(%s): missing expression in argument tag\n", filename, argnode.parent().parent().parent().attribute("desc").value());
 
 	// parse it
 	try
@@ -625,7 +625,7 @@ cheat_script::script_entry::output_argument::output_argument(
 	}
 	catch (expression_error const &err)
 	{
-		throw emu_fatalerror("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, argnode.line, expression, err.code_string());
+		throw emu_fatalerror("%s.xml(%s): error parsing cheat expression \"%s\" (%s)\n", filename, argnode.parent().parent().parent().attribute("desc").value(), expression, err.code_string());
 	}
 }
 
@@ -682,17 +682,17 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 	, m_argindex(0)
 {
 	// pull the variable count out ahead of things
-	int const tempcount(cheatnode.get_attribute_int("tempvariables", DEFAULT_TEMP_VARIABLES));
+	int const tempcount(cheatnode.attribute("tempvariables").as_int( DEFAULT_TEMP_VARIABLES));
 	if (tempcount < 1)
-		throw emu_fatalerror("%s.xml(%d): invalid tempvariables attribute (%d)\n", filename, cheatnode.line, tempcount);
+		throw emu_fatalerror("%s.xml(%s): invalid tempvariables attribute (%d)\n", filename, cheatnode.attribute("desc").value(), tempcount);
 
 	// allocate memory for the cheat
 	m_numtemp = tempcount;
 
 	// get the description
-	char const *const description(cheatnode.get_attribute_string("desc", nullptr));
+	char const *const description(cheatnode.attribute("desc").as_string( nullptr));
 	if (!description || !description[0])
-		throw emu_fatalerror("%s.xml(%d): empty or missing desc attribute on cheat\n", filename, cheatnode.line);
+		throw emu_fatalerror("%s.xml(%s): empty or missing desc attribute on cheat\n", filename, cheatnode.attribute("desc").value());
 	m_description = description;
 
 	// create the symbol table
@@ -701,42 +701,42 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		m_symbols.add(string_format("temp%d", curtemp).c_str(), symbol_table::READ_WRITE);
 
 	// read the first comment node
-	util::xml::data_node const *const commentnode(cheatnode.get_child("comment"));
+	util::xml::data_node const commentnode = cheatnode.child("comment");
 	if (commentnode != nullptr)
 	{
 		// set the value if not nullptr
-		if (commentnode->get_value() && commentnode->get_value()[0])
-			m_comment.assign(commentnode->get_value());
+		if (commentnode.text().get() && commentnode.text().get()[0])
+			m_comment.assign(commentnode.text().get());
 
 		// only one comment is kept
-		util::xml::data_node const *const nextcomment(commentnode->get_next_sibling("comment"));
+		util::xml::data_node const nextcomment = commentnode.next_sibling("comment");
 		if (nextcomment)
-			osd_printf_warning("%s.xml(%d): only one comment node is retained; ignoring additional nodes\n", filename, nextcomment->line);
+			osd_printf_warning("%s.xml(%s): only one comment node is retained; ignoring additional nodes\n", filename, nextcomment.parent().attribute("desc").value());
 	}
 
 	// read the first parameter node
-	util::xml::data_node const *const paramnode(cheatnode.get_child("parameter"));
+	util::xml::data_node const paramnode = cheatnode.child("parameter");
 	if (paramnode != nullptr)
 	{
 		// load this parameter
-		m_parameter.reset(new cheat_parameter(manager, m_symbols, filename, *paramnode));
+		m_parameter.reset(new cheat_parameter(manager, m_symbols, filename, paramnode));
 
 		// only one parameter allowed
-		util::xml::data_node const *const nextparam(paramnode->get_next_sibling("parameter"));
+		util::xml::data_node const nextparam = paramnode.next_sibling("parameter");
 		if (nextparam)
-			osd_printf_warning("%s.xml(%d): only one parameter node allowed; ignoring additional nodes\n", filename, nextparam->line);
+			osd_printf_warning("%s.xml(%s): only one parameter node allowed; ignoring additional nodes\n", filename, nextparam.parent().attribute("desc").value());
 	}
 
 	// read the script nodes
-	for (util::xml::data_node const *scriptnode = cheatnode.get_child("script"); scriptnode != nullptr; scriptnode = scriptnode->get_next_sibling("script"))
+	for (util::xml::data_node const scriptnode : cheatnode.children("script"))
 	{
 		// load this entry
-		std::unique_ptr<cheat_script> curscript(new cheat_script(manager, m_symbols, filename, *scriptnode));
+		std::unique_ptr<cheat_script> curscript(new cheat_script(manager, m_symbols, filename, scriptnode));
 
 		// if we have a script already for this slot, it is an error
 		std::unique_ptr<cheat_script> &slot = script_for_state(curscript->state());
 		if (slot)
-			osd_printf_warning("%s.xml(%d): only one on script allowed; ignoring additional scripts\n", filename, scriptnode->line);
+			osd_printf_warning("%s.xml(%s): only one on script allowed; ignoring additional scripts\n", filename, scriptnode.parent().attribute("desc").value());
 		else
 			slot = std::move(curscript);
 	}
@@ -1400,32 +1400,29 @@ void cheat_manager::load_cheats(const char *filename)
 			osd_printf_verbose("Loading cheats file from %s\n", cheatfile.fullpath());
 
 			// read the XML file into internal data structures
-			util::xml::parse_options options = { nullptr };
-			util::xml::parse_error error;
-			options.error = &error;
-			std::unique_ptr<util::xml::data_node, void (*)(util::xml::data_node *)> rootnode(util::xml::data_node::file_read(cheatfile, &options), [] (util::xml::data_node *node) { node->file_free(); });
+			util::xml::document_node rootnode(cheatfile);
 
 			// if unable to parse the file, just bail
 			if (rootnode == nullptr)
-				throw emu_fatalerror("%s.xml(%d): error parsing XML (%s)\n", filename, error.error_line, error.error_message);
+				throw emu_fatalerror("%s.xml(%d): error parsing XML (%s)\n", filename, rootnode.err_offset(), rootnode.err_desc());
 
 			// find the layout node
-			util::xml::data_node const *const mamecheatnode(rootnode->get_child("mamecheat"));
+			util::xml::data_node const mamecheatnode(rootnode.child("mamecheat"));
 			if (mamecheatnode == nullptr)
 				throw emu_fatalerror("%s.xml: missing mamecheatnode node", filename);
 
 			// validate the config data version
-			int const version(mamecheatnode->get_attribute_int("version", 0));
+			int const version(mamecheatnode.attribute("version").as_int( 0));
 			if (version != CHEAT_VERSION)
-				throw emu_fatalerror("%s.xml(%d): Invalid cheat XML file: unsupported version", filename, mamecheatnode->line);
+				throw emu_fatalerror("%s.xml: Invalid cheat XML file: unsupported version", filename);
 
 			// parse all the elements
-			for (util::xml::data_node const *cheatnode = mamecheatnode->get_child("cheat"); cheatnode != nullptr; cheatnode = cheatnode->get_next_sibling("cheat"))
+			for (util::xml::data_node const cheatnode : mamecheatnode.children("cheat"))
 			{
 				try
 				{
 					// load this entry
-					auto curcheat = std::make_unique<cheat_entry>(*this, m_symtable, filename, *cheatnode);
+					auto curcheat = std::make_unique<cheat_entry>(*this, m_symtable, filename, cheatnode);
 
 					// make sure we're not a duplicate
 					if (REMOVE_DUPLICATE_CHEATS && curcheat->is_duplicate())

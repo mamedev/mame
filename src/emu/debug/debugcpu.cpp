@@ -226,24 +226,22 @@ bool debugger_cpu::comment_save()
 	bool comments_saved = false;
 
 	// if we don't have a root, bail
-	util::xml::data_node *const root = util::xml::data_node::file_create();
-	if (root == nullptr)
-		return false;
+	util::xml::document_node root;
 
 	// wrap in a try/catch to handle errors
 	try
 	{
 		// create a comment node
-		util::xml::data_node *const commentnode = root->add_child("mamecommentfile", nullptr);
+		util::xml::data_node commentnode = root.append_child("mamecommentfile");
 		if (commentnode == nullptr)
 			throw emu_exception();
-		commentnode->set_attribute_int("version", COMMENT_VERSION);
+		commentnode.get_or_append_attribute("version").set_value( COMMENT_VERSION);
 
 		// create a system node
-		util::xml::data_node *const systemnode = commentnode->add_child("system", nullptr);
+		util::xml::data_node systemnode = commentnode.append_child("system");
 		if (systemnode == nullptr)
 			throw emu_exception();
-		systemnode->set_attribute("name", m_machine.system().name);
+		systemnode.get_or_append_attribute("name").set_value( m_machine.system().name);
 
 		// for each device
 		bool found_comments = false;
@@ -251,13 +249,13 @@ bool debugger_cpu::comment_save()
 			if (device.debug() && device.debug()->comment_count() > 0)
 			{
 				// create a node for this device
-				util::xml::data_node *const curnode = systemnode->add_child("cpu", nullptr);
+				util::xml::data_node curnode = systemnode.append_child("cpu");
 				if (curnode == nullptr)
 					throw emu_exception();
-				curnode->set_attribute("tag", device.tag());
+				curnode.get_or_append_attribute("tag").set_value( device.tag());
 
 				// export the comments
-				if (!device.debug()->comment_export(*curnode))
+				if (!device.debug()->comment_export(curnode))
 					throw emu_exception();
 				found_comments = true;
 			}
@@ -269,19 +267,17 @@ bool debugger_cpu::comment_save()
 			osd_file::error filerr = file.open(m_machine.basename(), ".cmt");
 			if (filerr == osd_file::error::NONE)
 			{
-				root->file_write(file);
+				root.file_write(file);
 				comments_saved = true;
 			}
 		}
 	}
 	catch (emu_exception &)
 	{
-		root->file_free();
 		return false;
 	}
 
 	// free and get out of here
-	root->file_free();
 	return comments_saved;
 }
 
@@ -301,54 +297,45 @@ bool debugger_cpu::comment_load(bool is_inline)
 		return false;
 
 	// wrap in a try/catch to handle errors
-	util::xml::data_node *const root = util::xml::data_node::file_read(file, nullptr);
+	util::xml::document_node root(file);
 	try
 	{
-		// read the file
-		if (root == nullptr)
-			throw emu_exception();
-
 		// find the config node
-		util::xml::data_node const *const commentnode = root->get_child("mamecommentfile");
+		util::xml::data_node const commentnode = root.child("mamecommentfile");
 		if (commentnode == nullptr)
 			throw emu_exception();
 
 		// validate the config data version
-		int version = commentnode->get_attribute_int("version", 0);
+		int version = commentnode.attribute("version").as_int( 0);
 		if (version != COMMENT_VERSION)
 			throw emu_exception();
 
 		// check to make sure the file is applicable
-		util::xml::data_node const *const systemnode = commentnode->get_child("system");
-		const char *const name = systemnode->get_attribute_string("name", "");
+		util::xml::data_node const systemnode = commentnode.child("system");
+		const char *const name = systemnode.attribute("name").as_string( "");
 		if (strcmp(name, m_machine.system().name) != 0)
 			throw emu_exception();
 
 		// iterate over devices
-		for (util::xml::data_node const *cpunode = systemnode->get_child("cpu"); cpunode; cpunode = cpunode->get_next_sibling("cpu"))
+		for (util::xml::data_node const cpunode : systemnode.children("cpu"))
 		{
-			const char *cputag_name = cpunode->get_attribute_string("tag", "");
+			const char *cputag_name = cpunode.attribute("tag").as_string( "");
 			device_t *device = m_machine.device(cputag_name);
 			if (device != nullptr)
 			{
 				if(is_inline == false)
 					m_machine.debugger().console().printf("@%s\n", cputag_name);
 
-				if (!device->debug()->comment_import(*cpunode,is_inline))
+				if (!device->debug()->comment_import(cpunode,is_inline))
 					throw emu_exception();
 			}
 		}
 	}
 	catch (emu_exception &)
 	{
-		// clean up in case of error
-		if (root != nullptr)
-			root->file_free();
 		return false;
 	}
 
-	// free the parser
-	root->file_free();
 	return true;
 }
 
@@ -2525,12 +2512,13 @@ bool device_debug::comment_export(util::xml::data_node &curnode)
 	// iterate through the comments
 	for (const auto & elem : m_comment_set)
 	{
-		util::xml::data_node *datanode = curnode.add_child("comment", util::xml::normalize_string(elem.m_text.c_str()));
+		util::xml::data_node datanode = curnode.append_child("comment");
 		if (datanode == nullptr)
 			return false;
-		datanode->set_attribute_int("address", elem.m_address);
-		datanode->set_attribute_int("color", elem.m_color);
-		datanode->set_attribute("crc", string_format("%08X", elem.m_crc).c_str());
+		datanode.set_value(util::xml::normalize_string(elem.m_text.c_str()));
+		datanode.attribute("address").set_value( elem.m_address);
+		datanode.attribute("color").set_value( elem.m_color);
+		datanode.attribute("crc").set_value(string_format("%08X", elem.m_crc).c_str());
 	}
 	return true;
 }
@@ -2544,20 +2532,20 @@ bool device_debug::comment_export(util::xml::data_node &curnode)
 bool device_debug::comment_import(util::xml::data_node const &cpunode, bool is_inline)
 {
 	// iterate through nodes
-	for (util::xml::data_node const *datanode = cpunode.get_child("comment"); datanode; datanode = datanode->get_next_sibling("comment"))
+	for (util::xml::data_node const datanode : cpunode.children("comment"))
 	{
 		// extract attributes
-		offs_t address = datanode->get_attribute_int("address", 0);
-		rgb_t color = datanode->get_attribute_int("color", 0);
+		offs_t address = datanode.attribute("address").as_int( 0);
+		rgb_t color = datanode.attribute("color").as_int( 0);
 
 		u32 crc;
-		sscanf(datanode->get_attribute_string("crc", nullptr), "%08X", &crc);
+		sscanf(datanode.attribute("crc").as_string(nullptr), "%08X", &crc);
 
 		// add the new comment
 		if(is_inline == true)
-			m_comment_set.insert(dasm_comment(address, crc, datanode->get_value(), color));
+			m_comment_set.insert(dasm_comment(address, crc, datanode.text().get(), color));
 		else
-			m_device.machine().debugger().console().printf(" %08X - %s\n", address, datanode->get_value());
+			m_device.machine().debugger().console().printf(" %08X - %s\n", address, datanode.text().get());
 	}
 	return true;
 }

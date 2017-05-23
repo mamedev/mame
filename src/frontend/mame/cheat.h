@@ -52,7 +52,7 @@ public:
 	// construction/destruction
 	constexpr number_and_format(
 			uint64_t value = 0,
-			util::xml::data_node::int_format format = util::xml::data_node::int_format::DECIMAL)
+			util::xml::int_format format = util::xml::int_format::DECIMAL)
 		: m_value(value)
 		, m_format(format)
 	{
@@ -74,7 +74,7 @@ public:
 private:
 	// internal state
 	uint64_t                            m_value;
-	util::xml::data_node::int_format    m_format;
+	util::xml::int_format    m_format;
 };
 
 
@@ -111,7 +111,7 @@ private:
 	{
 	public:
 		// construction/destruction
-		item(const char *text, uint64_t value, util::xml::data_node::int_format valformat)
+		item(const char *text, uint64_t value, util::xml::int_format valformat)
 			: m_text(text)
 			, m_value(value, valformat)
 		{

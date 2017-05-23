@@ -133,5 +133,5 @@ void DeviceInformationWindowQtConfig::addToXmlDataNode(util::xml::data_node &nod
 void DeviceInformationWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_device_tag = node.get_attribute_string("device-tag", ":");
+	m_device_tag = node.attribute("device-tag").as_string( ":");
 }

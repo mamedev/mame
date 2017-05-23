@@ -313,6 +313,6 @@ void DasmWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 void DasmWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_cpu = node.get_attribute_int("cpu", m_cpu);
-	m_rightBar = node.get_attribute_int("rightbar", m_rightBar);
+	m_cpu = node.attribute("cpu").as_int( m_cpu);
+	m_rightBar = node.attribute("rightbar").as_int( m_rightBar);
 }

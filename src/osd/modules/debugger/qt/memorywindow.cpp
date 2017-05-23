@@ -444,8 +444,8 @@ void MemoryWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 void MemoryWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_memoryRegion = node.get_attribute_int("memoryregion", m_memoryRegion);
-	m_reverse = node.get_attribute_int("reverse", m_reverse);
-	m_addressMode = node.get_attribute_int("addressmode", m_addressMode);
-	m_dataFormat = node.get_attribute_int("dataformat", m_dataFormat);
+	m_memoryRegion = node.attribute("memoryregion").as_int( m_memoryRegion);
+	m_reverse = node.attribute("reverse").as_int( m_reverse);
+	m_addressMode = node.attribute("addressmode").as_int( m_addressMode);
+	m_dataFormat = node.attribute("dataformat").as_int( m_dataFormat);
 }

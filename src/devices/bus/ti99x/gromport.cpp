@@ -238,8 +238,8 @@ public:
 
 private:
 	int find_file(util::archive_file &zip, const char *filename, uint32_t crc);
-	std::unique_ptr<rpk_socket> load_rom_resource(util::archive_file &zip, util::xml::data_node const* rom_resource_node, const char* socketname);
-	std::unique_ptr<rpk_socket> load_ram_resource(emu_options &options, util::xml::data_node const* ram_resource_node, const char* socketname, const char* system_name);
+	std::unique_ptr<rpk_socket> load_rom_resource(util::archive_file &zip, util::xml::data_node const &rom_resource_node, const char* socketname);
+	std::unique_ptr<rpk_socket> load_ram_resource(emu_options &options, util::xml::data_node const &ram_resource_node, const char* socketname, const char* system_name);
 	const pcb_type* m_types;
 };
 
@@ -2760,7 +2760,7 @@ int ti99_cartridge_device::rpk_reader::find_file(util::archive_file &zip, const 
 /*
     Load a rom resource and put it in a pcb socket instance.
 */
-std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_reader::load_rom_resource(util::archive_file &zip, util::xml::data_node const* rom_resource_node, const char* socketname)
+std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_reader::load_rom_resource(util::archive_file &zip, util::xml::data_node const &rom_resource_node, const char* socketname)
 {
 	const char* file;
 	const char* crcstr;
@@ -2772,13 +2772,13 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 	int header;
 
 	// find the file attribute (required)
-	file = rom_resource_node->get_attribute_string("file", nullptr);
+	file = rom_resource_node.attribute("file").as_string( nullptr);
 	if (file == nullptr) throw rpk_exception(RPK_INVALID_LAYOUT, "<rom> must have a 'file' attribute");
 
 	if (TRACE_RPK) printf("gromport/RPK: Loading ROM contents for socket '%s' from file %s\n", socketname, file);
 
 	// check for crc
-	crcstr = rom_resource_node->get_attribute_string("crc", nullptr);
+	crcstr = rom_resource_node.attribute("crc").as_string( nullptr);
 	if (crcstr==nullptr)
 	{
 		// no CRC, just find the file in the RPK
@@ -2806,7 +2806,7 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 	}
 
 	// check for sha1
-	sha1 = rom_resource_node->get_attribute_string("sha1", nullptr);
+	sha1 = rom_resource_node.attribute("sha1").as_string( nullptr);
 	if (sha1 != nullptr)
 	{
 		util::hash_collection actual_hashes;
@@ -2825,7 +2825,7 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 /*
     Load a ram resource and put it in a pcb socket instance.
 */
-std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_reader::load_ram_resource(emu_options &options, util::xml::data_node const* ram_resource_node, const char* socketname, const char* system_name)
+std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_reader::load_ram_resource(emu_options &options, util::xml::data_node const &ram_resource_node, const char* socketname, const char* system_name)
 {
 	const char* length_string;
 	const char* ram_type;
@@ -2835,7 +2835,7 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 	uint8_t* contents;
 
 	// find the length attribute
-	length_string = ram_resource_node->get_attribute_string("length", nullptr);
+	length_string = ram_resource_node.attribute("length").as_string( nullptr);
 	if (length_string == nullptr) throw rpk_exception(RPK_MISSING_RAM_LENGTH);
 
 	// parse it
@@ -2870,13 +2870,13 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 	// That's it for pure RAM. Now check whether the RAM is "persistent", i.e. NVRAM.
 	// In that case we must load it from the NVRAM directory.
 	// The file name is given in the RPK file; the subdirectory is the system name.
-	ram_type = ram_resource_node->get_attribute_string("type", nullptr);
+	ram_type = ram_resource_node.attribute("type").as_string( nullptr);
 	if (ram_type != nullptr)
 	{
 		if (strcmp(ram_type, "persistent")==0)
 		{
 			// Get the file name (required if persistent)
-			ram_filename = ram_resource_node->get_attribute_string("file", nullptr);
+			ram_filename = ram_resource_node.attribute("file").as_string( nullptr);
 			if (ram_filename==nullptr)
 			{
 				global_free_array(contents);
@@ -2919,7 +2919,6 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 	util::archive_file::ptr zipfile;
 
 	std::vector<char> layout_text;
-	util::xml::data_node *layout_xml = nullptr;
 
 	int i;
 
@@ -2948,29 +2947,29 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 		layout_text[zipfile->current_uncompressed_length()] = '\0';  // Null-terminate
 
 		/* parse the layout text */
-		layout_xml = util::xml::data_node::string_read(&layout_text[0], nullptr);
+		util::xml::document_node layout_xml(&layout_text[0]);
 		if (!layout_xml) throw rpk_exception(RPK_XML_ERROR);
 
 		// Now we work within the XML tree
 
 		// romset is the root node
-		util::xml::data_node const *const romset_node = layout_xml->get_child("romset");
+		util::xml::data_node const romset_node = layout_xml.child("romset");
 		if (!romset_node) throw rpk_exception(RPK_INVALID_LAYOUT, "document element must be <romset>");
 
 		// resources is a child of romset
-		util::xml::data_node const *const resources_node = romset_node->get_child("resources");
+		util::xml::data_node const resources_node = romset_node.child("resources");
 		if (!resources_node) throw rpk_exception(RPK_INVALID_LAYOUT, "<romset> must have a <resources> child");
 
 		// configuration is a child of romset; we're actually interested in ...
-		util::xml::data_node const *const configuration_node = romset_node->get_child("configuration");
+		util::xml::data_node const configuration_node = romset_node.child("configuration");
 		if (!configuration_node) throw rpk_exception(RPK_INVALID_LAYOUT, "<romset> must have a <configuration> child");
 
 		// ... pcb, which is a child of configuration
-		util::xml::data_node const *const pcb_node = configuration_node->get_child("pcb");
+		util::xml::data_node const pcb_node = configuration_node.child("pcb");
 		if (!pcb_node) throw rpk_exception(RPK_INVALID_LAYOUT, "<configuration> must have a <pcb> child");
 
 		// We'll try to find the PCB type on the provided type list.
-		char const *const pcb_type = pcb_node->get_attribute_string("type", nullptr);
+		char const *const pcb_type = pcb_node.attribute("type").as_string( nullptr);
 		if (!pcb_type) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> must have a 'type' attribute");
 		if (TRACE_RPK) printf("gromport/RPK: Cartridge says it has PCB type '%s'\n", pcb_type);
 
@@ -2988,31 +2987,31 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 		if (m_types[i].id==0) throw rpk_exception(RPK_UNKNOWN_PCB_TYPE);
 
 		// Find the sockets and load their respective resource
-		for (util::xml::data_node const *socket_node = pcb_node->get_first_child();  socket_node != nullptr; socket_node = socket_node->get_next_sibling())
+		for (util::xml::data_node const socket_node: pcb_node.children())
 		{
-			if (strcmp(socket_node->get_name(), "socket")!=0) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> element has only <socket> children");
-			char const *const id = socket_node->get_attribute_string("id", nullptr);
+			if (strcmp(socket_node.name(), "socket")!=0) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> element has only <socket> children");
+			char const *const id = socket_node.attribute("id").as_string( nullptr);
 			if (!id) throw rpk_exception(RPK_INVALID_LAYOUT, "<socket> must have an 'id' attribute");
-			char const *const uses_name = socket_node->get_attribute_string("uses", nullptr);
+			char const *const uses_name = socket_node.attribute("uses").as_string( nullptr);
 			if (!uses_name) throw rpk_exception(RPK_INVALID_LAYOUT, "<socket> must have a 'uses' attribute");
 
 			bool found = false;
 			// Locate the resource node
-			for (util::xml::data_node const *resource_node = resources_node->get_first_child(); resource_node != nullptr; resource_node = resource_node->get_next_sibling())
+			for (util::xml::data_node const resource_node: resources_node.children())
 			{
-				char const *const resource_name = resource_node->get_attribute_string("id", nullptr);
+				char const *const resource_name = resource_node.attribute("id").as_string( nullptr);
 				if (!resource_name) throw rpk_exception(RPK_INVALID_LAYOUT, "resource node must have an 'id' attribute");
 
 				if (strcmp(resource_name, uses_name)==0)
 				{
 					// found it
-					if (strcmp(resource_node->get_name(), "rom")==0)
+					if (strcmp(resource_node.name(), "rom")==0)
 					{
 						newrpk->add_socket(id, load_rom_resource(*zipfile, resource_node, id));
 					}
 					else
 					{
-						if (strcmp(resource_node->get_name(), "ram")==0)
+						if (strcmp(resource_node.name(), "ram")==0)
 						{
 							newrpk->add_socket(id, load_ram_resource(options, resource_node, id, system_name));
 						}
@@ -3027,13 +3026,9 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 	catch (rpk_exception &)
 	{
 		newrpk->close();
-		if (layout_xml) layout_xml->file_free();
-
 		// rethrow the exception
 		throw;
 	}
-
-	if (layout_xml) layout_xml->file_free();
 
 	return newrpk;
 }

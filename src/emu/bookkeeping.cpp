@@ -80,10 +80,8 @@ void bookkeeping_manager::increment_dispensed_tickets(int delta)
     and tickets
 -------------------------------------------------*/
 
-void bookkeeping_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void bookkeeping_manager::config_load(config_type cfg_type, util::xml::data_node const &parentnode)
 {
-	util::xml::data_node const *coinnode, *ticketnode;
-
 	/* on init, reset the counters */
 	if (cfg_type == config_type::INIT)
 	{
@@ -100,17 +98,17 @@ void bookkeeping_manager::config_load(config_type cfg_type, util::xml::data_node
 		return;
 
 	/* iterate over coins nodes */
-	for (coinnode = parentnode->get_child("coins"); coinnode; coinnode = coinnode->get_next_sibling("coins"))
+	for (util::xml::data_node const coinnode : parentnode.children("coins"))
 	{
-		int index = coinnode->get_attribute_int("index", -1);
+		int index = coinnode.attribute("index").as_int( -1);
 		if (index >= 0 && index < COIN_COUNTERS)
-			m_coin_count[index] = coinnode->get_attribute_int("number", 0);
+			m_coin_count[index] = coinnode.attribute("number").as_int( 0);
 	}
 
 	/* get the single tickets node */
-	ticketnode = parentnode->get_child("tickets");
+	util::xml::data_node const ticketnode = parentnode.child("tickets");
 	if (ticketnode != nullptr)
-		m_dispensed_tickets = ticketnode->get_attribute_int("number", 0);
+		m_dispensed_tickets = ticketnode.attribute("number").as_int( 0);
 }
 
 
@@ -119,7 +117,7 @@ void bookkeeping_manager::config_load(config_type cfg_type, util::xml::data_node
     and tickets
 -------------------------------------------------*/
 
-void bookkeeping_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
+void bookkeeping_manager::config_save(config_type cfg_type, util::xml::data_node &parentnode)
 {
 	int i;
 
@@ -132,11 +130,11 @@ void bookkeeping_manager::config_save(config_type cfg_type, util::xml::data_node
 	{
 		if (m_coin_count[i] != 0)
 		{
-			util::xml::data_node *coinnode = parentnode->add_child("coins", nullptr);
+			util::xml::data_node coinnode = parentnode.append_child("coins");
 			if (coinnode != nullptr)
 			{
-				coinnode->set_attribute_int("index", i);
-				coinnode->set_attribute_int("number", m_coin_count[i]);
+				coinnode.attribute("index").set_value( i);
+				coinnode.attribute("number").set_value( m_coin_count[i]);
 			}
 		}
 	}
@@ -144,9 +142,9 @@ void bookkeeping_manager::config_save(config_type cfg_type, util::xml::data_node
 	/* output tickets */
 	if (m_dispensed_tickets != 0)
 	{
-		util::xml::data_node *tickets = parentnode->add_child("tickets", nullptr);
+		util::xml::data_node tickets = parentnode.append_child("tickets");
 		if (tickets != nullptr)
-			tickets->set_attribute_int("number", m_dispensed_tickets);
+			tickets.attribute("number").set_value( m_dispensed_tickets);
 	}
 }
 

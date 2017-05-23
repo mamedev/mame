@@ -32,22 +32,22 @@ network_manager::network_manager(running_machine &machine)
 //  configuration file
 //-------------------------------------------------
 
-void network_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void network_manager::config_load(config_type cfg_type, util::xml::data_node const &parentnode)
 {
 	if ((cfg_type == config_type::GAME) && (parentnode != nullptr))
 	{
-		for (util::xml::data_node const *node = parentnode->get_child("device"); node; node = node->get_next_sibling("device"))
+		for (util::xml::data_node const node : parentnode.children("device"))
 		{
-			const char *tag = node->get_attribute_string("tag", nullptr);
+			const char *tag = node.attribute("tag").as_string( nullptr);
 
 			if ((tag != nullptr) && (tag[0] != '\0'))
 			{
 				for (device_network_interface &network : network_interface_iterator(machine().root_device()))
 				{
 					if (!strcmp(tag, network.device().tag())) {
-						int interface = node->get_attribute_int("interface", 0);
+						int interface = node.attribute("interface").as_int( 0);
 						network.set_interface(interface);
-						const char *mac_addr = node->get_attribute_string("mac", nullptr);
+						const char *mac_addr = node.attribute("mac").as_string( nullptr);
 						if (mac_addr != nullptr && strlen(mac_addr) == 17) {
 							char mac[7];
 							unsigned int mac_num[6];
@@ -67,22 +67,22 @@ void network_manager::config_load(config_type cfg_type, util::xml::data_node con
 //  file
 //-------------------------------------------------
 
-void network_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
+void network_manager::config_save(config_type cfg_type, util::xml::data_node &parentnode)
 {
 	/* only care about game-specific data */
 	if (cfg_type == config_type::GAME)
 	{
 		for (device_network_interface &network : network_interface_iterator(machine().root_device()))
 		{
-			util::xml::data_node *const node = parentnode->add_child("device", nullptr);
+			util::xml::data_node node = parentnode.append_child("device");
 			if (node != nullptr)
 			{
-				node->set_attribute("tag", network.device().tag());
-				node->set_attribute_int("interface", network.get_interface());
+				node.get_or_append_attribute("tag").set_value( network.device().tag());
+				node.get_or_append_attribute("interface").set_value( network.get_interface());
 				const char *mac = network.get_mac();
 				char mac_addr[6 * 3];
 				sprintf(mac_addr, "%02x:%02x:%02x:%02x:%02x:%02x", u8(mac[0]), u8(mac[1]), u8(mac[2]), u8(mac[3]), u8(mac[4]), u8(mac[5]));
-				node->set_attribute("mac", mac_addr);
+				node.get_or_append_attribute("mac").set_value( mac_addr);
 			}
 		}
 	}

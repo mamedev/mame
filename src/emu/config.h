@@ -37,8 +37,8 @@ enum class config_type
  *
  *************************************/
 
-typedef delegate<void (config_type, util::xml::data_node const *)> config_load_delegate;
-typedef delegate<void (config_type, util::xml::data_node *)> config_save_delegate;
+typedef delegate<void (config_type, util::xml::data_node const &)> config_load_delegate;
+typedef delegate<void (config_type, util::xml::data_node &)> config_save_delegate;
 
 // ======================> configuration_manager
 
