@@ -61,15 +61,15 @@ class nes_vt_state : public nes_base_state
 {
 public:
 	nes_vt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: nes_base_state(mconfig, type, tag),
-		m_ppu(*this, "ppu"),
-		m_apu(*this, "apu"),
-		m_prg(*this, "prg"),
-		m_prgbank0(*this, "prg_bank0"),
-		m_prgbank1(*this, "prg_bank1"),
-		m_prgbank2(*this, "prg_bank2"),
-		m_prgbank3(*this, "prg_bank3"),
-		m_prgrom(*this, "mainrom")
+		: nes_base_state(mconfig, type, tag)
+		, m_ppu(*this, "ppu")
+		, m_apu(*this, "apu")
+		, m_prg(*this, "prg")
+		, m_prgbank0(*this, "prg_bank0")
+		, m_prgbank1(*this, "prg_bank1")
+		, m_prgbank2(*this, "prg_bank2")
+		, m_prgbank3(*this, "prg_bank3")
+		, m_prgrom(*this, "mainrom")
 		{ }
 
 	/* APU handling */
@@ -83,7 +83,6 @@ public:
 	/* Misc PPU */
 	DECLARE_WRITE8_MEMBER(nes_vh_sprite_dma_w);
 	void ppu_nmi(int *ppu_regs);
-	void scanline_irq(int scanline, int vblank, int blanked);
 	uint32_t screen_update_vt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(nesvt);
 
@@ -91,6 +90,12 @@ public:
 	DECLARE_WRITE8_MEMBER(vt03_410x_w);
 	DECLARE_WRITE8_MEMBER(vt03_8000_w);
 
+	/* OneBus read callbacks for getting sprite and tile data during rendering*/
+	DECLARE_READ8_MEMBER(spr_r);
+	DECLARE_READ8_MEMBER(chr_r);
+
+private:
+	void scanline_irq(int scanline, int vblank, int blanked);
 	uint8_t m_410x[0xc];
 
 	int m_timer_irq_enabled;
@@ -105,9 +110,6 @@ public:
 	uint32_t get_banks(uint8_t bnk);
 	void update_banks();
 
-	/* OneBus read callbacks for getting sprite and tile data during rendering*/
-	DECLARE_READ8_MEMBER(spr_r);
-	DECLARE_READ8_MEMBER(chr_r);
 	int calculate_real_video_address(int addr, int extended, int readtype);
 
 	virtual void machine_start() override;
@@ -121,7 +123,6 @@ public:
 	required_memory_bank m_prgbank2;
 	required_memory_bank m_prgbank3;
 	required_region_ptr<uint8_t> m_prgrom;
-private:
 };
 
 uint32_t nes_vt_state::get_banks(uint8_t bnk)
@@ -884,21 +885,21 @@ ROM_START( ii32in1 )
 ROM_END
 
 // this is glitchy even in other emulators, might just be entirely unfinished, it selects banks but they don't contain the required gfx?
-GAME( 200?, vdogdemo,  0,    nes_vt,    nes_vt, nes_vt_state,  0, ROT0, "VRT", "V-Dog (prototype)", MACHINE_NOT_WORKING )
+CONS( 200?, vdogdemo,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype)", MACHINE_NOT_WORKING )
 
 // should be VT03 based
 // for testing 'Shark', 'Octopus', 'Harbor', and 'Earth Fighter' use the extended colour modes, other games just seem to use standard NES modes
-GAME( 200?, mc_dgear,  0,    nes_vt,    nes_vt, nes_vt_state,  0, ROT0, "dreamGEAR", "dreamGEAR 75-in-1", MACHINE_NOT_WORKING )
+CONS( 200?, mc_dgear,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR 75-in-1", MACHINE_NOT_WORKING )
 
 // this is VT09 based, and needs 8bpp modes at least
 // it boots, but gfx look wrong due to unsupported mode
-GAME( 2009, cybar120,  0,    nes_vt_xx, nes_vt, nes_vt_state,  0, ROT0, "<unknown>", "Cyber Arcade 120-in-1", MACHINE_NOT_WORKING )
+CONS( 2009, cybar120,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "<unknown>", "Cyber Arcade 120-in-1", MACHINE_NOT_WORKING )
 
 // these are NOT VT03, but something newer but based around the same basic designs
-GAME( 200?, dgun2500,  0,    nes_vt,    nes_vt, nes_vt_state,  0, ROT0, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_NOT_WORKING )
-GAME( 2012, dgun2561,  0,    nes_vt,    nes_vt, nes_vt_state,  0, ROT0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
-GAME( 200?, lexcyber,  0,    nes_vt_xx, nes_vt, nes_vt_state,  0, ROT0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
+CONS( 200?, dgun2500,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_NOT_WORKING )
+CONS( 2012, dgun2561,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
+CONS( 200?, lexcyber,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
 
 // these seem to have custom CPU opcodes? looks similar, has many of the same games, but isn't 100% valid 6502
-GAME( 200?, ii8in1,    0,    nes_vt,    nes_vt, nes_vt_state,  0, ROT0, "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING )
-GAME( 200?, ii32in1,   0,    nes_vt,    nes_vt, nes_vt_state,  0, ROT0, "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING )
+CONS( 200?, ii8in1,    0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING )
+CONS( 200?, ii32in1,   0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING )
