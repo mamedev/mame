@@ -56,11 +56,11 @@ public:
 	ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// accessors
-	uint32_t size(void) const { return m_size; }
-	uint32_t mask(void) const { return m_size - 1; }
-	uint8_t *pointer(void) { return &m_pointer[0]; }
-	uint32_t default_size(void) const;
-	const std::vector<uint32_t> &extra_options(void) const;
+	uint32_t size() const { return m_size; }
+	uint32_t mask() const { return m_size - 1; }
+	uint8_t *pointer() { return &m_pointer[0]; }
+	uint32_t default_size() const;
+	const std::vector<uint32_t> &extra_options() const;
 
 	// read/write
 	uint8_t read(offs_t offset)               { return m_pointer[offset % m_size]; }
@@ -72,7 +72,7 @@ public:
 	static void static_set_default_value(device_t &device, uint8_t default_value)       { downcast<ram_device &>(device).m_default_value = default_value; }
 
 protected:
-	virtual void device_start(void) override;
+	virtual void device_start() override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
@@ -81,14 +81,14 @@ private:
 	bool is_valid_size(uint32_t size) const;
 
 	// device state
-	uint32_t						m_size;
-	std::vector<uint8_t>			m_pointer;
+	uint32_t                        m_size;
+	std::vector<uint8_t>            m_pointer;
 
 	// device config
-	const char *					m_default_size;
-	uint8_t							m_default_value;
-	mutable std::vector<uint32_t>	m_extra_options;
-	const char *					m_extra_options_string;
+	const char *                    m_default_size;
+	uint8_t                         m_default_value;
+	mutable std::vector<uint32_t>   m_extra_options;
+	const char *                    m_extra_options_string;
 };
 
 

@@ -111,7 +111,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 
 
 //-------------------------------------------------
-//	is_valid_size
+//  is_valid_size
 //-------------------------------------------------
 
 bool ram_device::is_valid_size(uint32_t size) const
@@ -191,11 +191,11 @@ std::vector<uint32_t> ram_device::calculate_extra_options(const char *extra_opti
 	std::string options(extra_options_string);
 
 	bool done = false;
-	for (int start = 0, end = options.find_first_of(','); !done; start = end + 1, end = options.find_first_of(',', start))
+	for (std::string::size_type start = 0, end = options.find_first_of(','); !done; start = end + 1, end = options.find_first_of(',', start))
 	{
 		// parse the option
-		std::string ram_option_string = options.substr(start, (end == -1) ? -1 : end - start);
-		uint32_t ram_option = parse_string(ram_option_string.c_str());
+		const std::string ram_option_string = options.substr(start, (end == -1) ? -1 : end - start);
+		const uint32_t ram_option = parse_string(ram_option_string.c_str());
 		if (ram_option == 0)
 		{
 			if (bad_option)
