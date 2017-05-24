@@ -13,29 +13,6 @@ DEFINE_DEVICE_TYPE_NS(TI8X_SPEAKER_MONO,   bus::ti8x, mono_speaker_device,   "ti
 
 namespace bus { namespace ti8x {
 
-namespace {
-
-MACHINE_CONFIG_START(ti_speaker_stereo)
-	MCFG_SPEAKER_STANDARD_STEREO("outl", "outr")
-
-	MCFG_SOUND_ADD("lspkr", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "outl", 0.50)
-
-	MCFG_SOUND_ADD("rspkr", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "outr", 0.50)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(ti_speaker_mono)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("spkr", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-} // anonymous namespace
-
-
 stereo_speaker_device::stereo_speaker_device(
 		machine_config const &mconfig,
 		char const *tag,
@@ -49,10 +26,15 @@ stereo_speaker_device::stereo_speaker_device(
 }
 
 
-machine_config_constructor stereo_speaker_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(ti_speaker_stereo);
-}
+MACHINE_CONFIG_MEMBER(stereo_speaker_device::device_add_mconfig)
+	MCFG_SPEAKER_STANDARD_STEREO("outl", "outr")
+
+	MCFG_SOUND_ADD("lspkr", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "outl", 0.50)
+
+	MCFG_SOUND_ADD("rspkr", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "outr", 0.50)
+MACHINE_CONFIG_END
 
 
 void stereo_speaker_device::device_start()
@@ -87,10 +69,12 @@ mono_speaker_device::mono_speaker_device(
 }
 
 
-machine_config_constructor mono_speaker_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(ti_speaker_mono);
-}
+MACHINE_CONFIG_MEMBER(mono_speaker_device::device_add_mconfig)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("spkr", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
 
 void mono_speaker_device::device_start()
