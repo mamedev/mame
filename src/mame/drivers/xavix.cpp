@@ -4,11 +4,28 @@
 
     Skeleton driver for XaviX TV PNP console and childs (Let's! Play TV Classic)
 
-    CPU is M6502 derivative, almost likely to be a G65816
+    CPU is an M6502 derivative where opcode 0x22 has 3 bytes of operands.
+	Definitely not: 65C816 or Mitsu M740.
+    
+    Code at F34F is thus:
+    
+    F34F:  STA $6200,X
+    F352:  INX
+    F353:  BNE $F34F
+    F355:  UNK 12 FA 80
+    F359:  UNK 12 A8 80
+    F35D:  UNK 12 1B 80
+    F361:  SEC
+    F362:  LDA #$CD
+    F364:  SBC #$CA
+    
+    later on
+    
+    F3C9:  UNK 00 E4 C4
 
     TODO:
-    - understand how to map ROM at 0x800000-0x9fffff / 0xc00000 / 0xdfffff
-      banks (granted that we have the ROM for that, of course)
+    - identify CPU
+    - figure out ROM banking
 
 ***************************************************************************/
 
