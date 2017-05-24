@@ -2042,17 +2042,10 @@ uint32_t vic3_device::video_update( bitmap_ind16 &bitmap, const rectangle &clipr
 	return 0;
 }
 
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
 
-static MACHINE_CONFIG_START( vic3 )
+MACHINE_CONFIG_MEMBER( vic3_device::device_add_mconfig )
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x100)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor vic3_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vic3 );
-}

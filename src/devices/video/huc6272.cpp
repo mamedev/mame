@@ -379,7 +379,11 @@ WRITE32_MEMBER( huc6272_device::write )
 	}
 }
 
-static MACHINE_CONFIG_START( king_scsi_intf )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( huc6272_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSI_RST_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit7))
 	MCFG_SCSI_BSY_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit6))
@@ -397,13 +401,3 @@ static MACHINE_CONFIG_START( king_scsi_intf )
 
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_1)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor huc6272_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( king_scsi_intf );
-}

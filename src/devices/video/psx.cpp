@@ -3799,7 +3799,12 @@ PALETTE_INIT_MEMBER( psxgpu_device, psx )
 	}
 }
 
-MACHINE_CONFIG_START( psxgpu )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( psxgpu_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -3812,13 +3817,3 @@ MACHINE_CONFIG_START( psxgpu )
 	MCFG_PALETTE_ADD( "palette", 65536 )
 	MCFG_PALETTE_INIT_OWNER(psxgpu_device, psx)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor psxgpu_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( psxgpu );
-}
