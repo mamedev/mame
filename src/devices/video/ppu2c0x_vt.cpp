@@ -128,32 +128,64 @@ void ppu_vt03_device::read_sprite_plane_data(int address)
 	m_va34 = 0;
 	m_planebuf[0] = m_read_sp((address + 0) & 0x1fff);
 	m_planebuf[1] = m_read_sp((address + 8) & 0x1fff);
-	m_va34 = 1;
-	m_extplanebuf[0] = m_read_sp((address + 0) & 0x1fff);
-	m_extplanebuf[1] = m_read_sp((address + 8) & 0x1fff);
+
+	int is4bpp = get_201x_reg(0x0) & 0x04;
+	
+	if (is4bpp)
+	{
+		m_va34 = 1;
+		m_extplanebuf[0] = m_read_sp((address + 0) & 0x1fff);
+		m_extplanebuf[1] = m_read_sp((address + 8) & 0x1fff);
+	}
 }
 
 void ppu_vt03_device::make_sprite_pixel_data(uint8_t &pixel_data, int flipx)
 {
 	ppu2c0x_device::make_sprite_pixel_data(pixel_data, flipx);
 
-	if (flipx)
+	int is4bpp = get_201x_reg(0x0) & 0x04;
+
+	if (is4bpp)
 	{
-		pixel_data |= (((m_extplanebuf[0] & 1) << 5) | ((m_extplanebuf[1] & 1) << 6)); // yes, shift by 5 and 6 because of the way the palette is arranged in RAM
-		m_extplanebuf[0] = m_extplanebuf[0] >> 1;
-		m_extplanebuf[1] = m_extplanebuf[1] >> 1;
-	}
-	else
-	{
-		pixel_data |= (((m_extplanebuf[0] >> 7) & 1) << 5) | (((m_extplanebuf[1] >> 7) & 1) << 6); // yes, shift by 5 and 6 because of the way the palette is arranged in RAM
-		m_extplanebuf[0] = m_extplanebuf[0] << 1;
-		m_extplanebuf[1] = m_extplanebuf[1] << 1;
+		if (flipx)
+		{
+			// yes, shift by 5 and 6 because of the way the palette is arranged in RAM
+			pixel_data |= (((m_extplanebuf[0] & 1) << 5) | ((m_extplanebuf[1] & 1) << 6)); 
+			m_extplanebuf[0] = m_extplanebuf[0] >> 1;
+			m_extplanebuf[1] = m_extplanebuf[1] >> 1;
+		}
+		else
+		{
+			pixel_data |= (((m_extplanebuf[0] >> 7) & 1) << 5) | (((m_extplanebuf[1] >> 7) & 1) << 6);
+			m_extplanebuf[0] = m_extplanebuf[0] << 1;
+			m_extplanebuf[1] = m_extplanebuf[1] << 1;
+		}
 	}
 }
 
 void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_ind16& bitmap)
 {
-	bitmap.pix16(m_scanline, sprite_xpos + pixel) = pixel_data + (4 * color);
+	int is4bpp = get_201x_reg(0x0) & 0x04;
+	int is16pix = get_201x_reg(0x0) & 0x01;
+
+	if (is4bpp)
+	{
+		if (!is16pix)
+		{
+			bitmap.pix16(m_scanline, sprite_xpos + pixel) = pixel_data + (4 * color);
+		}
+		else
+		{
+			/* this mode makes use of the extra planes to increase sprite width instead
+			   we probably need to split them out again and draw them at xpos+8 with a
+			   cliprect - not seen used yet */
+			bitmap.pix16(m_scanline, sprite_xpos + pixel) = pixel_data + (machine().rand()&3);
+		}
+	}
+	else
+	{
+		ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data, bitmap);
+	}
 }
 
 void ppu_vt03_device::read_tile_plane_data(int address, int color)

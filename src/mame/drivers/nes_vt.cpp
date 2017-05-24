@@ -366,7 +366,7 @@ void nes_vt_state::machine_reset()
 
 int nes_vt_state::calculate_real_video_address(int addr, int extended, int readtype)
 {
-	// might be a VT09 only feature (8bpp or 4bpp direct colour mode??)
+	// might be a VT09 only feature (8bpp?) but where are the other 4 bits?
 	int alt_order = m_ppu->get_201x_reg(0x0) & 0x40;
 
 	if (readtype == 0)
