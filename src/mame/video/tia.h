@@ -212,10 +212,11 @@ class tia_pal_video_device : public tia_video_device
 public:
 	tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(tia_pal);
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	DECLARE_PALETTE_INIT(tia_pal);
 };
 
 class tia_ntsc_video_device : public tia_video_device
@@ -223,10 +224,11 @@ class tia_ntsc_video_device : public tia_video_device
 public:
 	tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(tia_ntsc);
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	DECLARE_PALETTE_INIT(tia_ntsc);
 };
 
 

@@ -373,20 +373,14 @@ tia_pal_video_device::tia_pal_video_device(const machine_config &mconfig, const 
 {
 }
 
-static MACHINE_CONFIG_START( tia_pal )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( tia_pal_video_device::device_add_mconfig )
 	MCFG_PALETTE_ADD("palette", TIA_PALETTE_LENGTH)
 	MCFG_PALETTE_INIT_OWNER(tia_pal_video_device, tia_pal)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor tia_pal_video_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tia_pal );
-}
 
 // device type definition
 DEFINE_DEVICE_TYPE(TIA_NTSC_VIDEO, tia_ntsc_video_device, "tia_ntsc_video", "TIA Video (NTSC)")
@@ -400,20 +394,14 @@ tia_ntsc_video_device::tia_ntsc_video_device(const machine_config &mconfig, cons
 {
 }
 
-static MACHINE_CONFIG_START( tia_ntsc )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( tia_ntsc_video_device::device_add_mconfig )
 	MCFG_PALETTE_ADD("palette", TIA_PALETTE_LENGTH)
 	MCFG_PALETTE_INIT_OWNER(tia_ntsc_video_device, tia_ntsc)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor tia_ntsc_video_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tia_ntsc );
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

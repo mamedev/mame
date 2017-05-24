@@ -18,18 +18,6 @@ DEVICE_ADDRESS_MAP_START( registers, 8, wpc_dmd_device )
 	AM_RANGE(7, 7) AM_WRITE(visible_page_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( wpc_dmd )
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, wpc_dmd_device, screen_update)
-	MCFG_SCREEN_SIZE(128*4, 32*4)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128*4-1, 0, 32*4-1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("scanline", wpc_dmd_device, scanline_timer, attotime::from_hz(60*4*32))
-MACHINE_CONFIG_END
-
 
 wpc_dmd_device::wpc_dmd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WPC_DMD, tag, owner, clock),
@@ -47,10 +35,17 @@ wpc_dmd_device::~wpc_dmd_device()
 {
 }
 
-machine_config_constructor wpc_dmd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wpc_dmd );
-}
+MACHINE_CONFIG_MEMBER( wpc_dmd_device::device_add_mconfig )
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, wpc_dmd_device, screen_update)
+	MCFG_SCREEN_SIZE(128*4, 32*4)
+	MCFG_SCREEN_VISIBLE_AREA(0, 128*4-1, 0, 32*4-1)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("scanline", wpc_dmd_device, scanline_timer, attotime::from_hz(60*4*32))
+MACHINE_CONFIG_END
 
 void wpc_dmd_device::device_start()
 {
