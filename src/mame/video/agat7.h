@@ -26,13 +26,6 @@ public:
 	// construction/destruction
 	agat7video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	DECLARE_PALETTE_INIT(agat7);
-
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
@@ -43,6 +36,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	void text_update_lores(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void text_update_hires(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
@@ -64,7 +58,10 @@ private:
 
 	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg);
 
-public:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_PALETTE_INIT(agat7);
+
 	required_device<palette_device> m_palette;
 };
 

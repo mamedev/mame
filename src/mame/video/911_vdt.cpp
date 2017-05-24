@@ -798,7 +798,11 @@ INPUT_PORTS_START( vdt911 )
 		PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(not on US keyboard)") PORT_CODE(KEYCODE_PLUS_PAD)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vdt911 )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( vdt911_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -816,16 +820,6 @@ static MACHINE_CONFIG_START( vdt911 )
 	MCFG_PALETTE_INDIRECT_ENTRIES(3)
 	MCFG_PALETTE_INIT_OWNER(vdt911_device, vdt911)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor vdt911_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vdt911 );
-}
 
 ioport_constructor vdt911_device::device_input_ports() const
 {

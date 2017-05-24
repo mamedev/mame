@@ -14,8 +14,7 @@ public:
 
 	TILE_GET_INFO_MEMBER( get_tile0_info );
 	TILE_GET_INFO_MEMBER( get_tile1_info );
-	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER( adder2_vbl );
+
 	DECLARE_READ8_MEMBER( screen_ram_r );
 	DECLARE_WRITE8_MEMBER( screen_ram_w );
 	DECLARE_READ8_MEMBER( normal_ram_r );
@@ -42,9 +41,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	
 private:
-
 	int m_adder2_screen_page_reg;        // access/display select
 	int m_adder2_c101;
 	int m_adder2_rx;
@@ -64,6 +63,9 @@ private:
 	uint8_t m_adder2_sc2data;
 
 	optional_device<cpu_device> m_cpu;
+
+	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER( adder2_vbl );
 };
 
 // device type definition
