@@ -874,7 +874,7 @@ ROM_START( lexcyber )
 	ROM_LOAD( "lexcyber.bin", 0x00000, 0x4000000, CRC(3f3af72c) SHA1(76127054291568fcce1431d21af71f775cfb05a6) )
 ROM_END
 
-ROM_START( dfm2500p )
+ROM_START( cybar120 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "M2500P-VT09-EPSON_(20091222VER05,_30R-SX1067-01_PCB,_12R0COB128M_12001-3D05_FW).bin", 0x00000, 0x1000000, CRC(f7138980) SHA1(de31264ee3a5a5c77a86733b2e2d6845fee91ea5) )
 ROM_END
@@ -901,7 +901,7 @@ CONS( 200?, mc_dgear,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR",
 
 // this is VT09 based, and needs 8bpp modes at least
 // it boots, but gfx look wrong due to unsupported mode
-CONS( 2009, dfm2500p,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "Defender", "Defender M2500P 120-in-1", MACHINE_NOT_WORKING )
+CONS( 2009, cybar120,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "Defender", "Defender M2500P 120-in-1", MACHINE_NOT_WORKING )
 
 // these are NOT VT03, but something newer but based around the same basic designs
 CONS( 200?, dgun2500,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_NOT_WORKING )
