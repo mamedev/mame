@@ -496,28 +496,28 @@ bool device_image_interface::load_software_region(const char *tag, optional_shar
 // to be loaded
 // ****************************************************************************
 
-bool device_image_interface::run_hash(util::core_file &file, uint32_t skip_bytes, util::hash_collection &hashes, const char *types)
+bool device_image_interface::run_hash(util::core_file &file, u32 skip_bytes, util::hash_collection &hashes, const char *types)
 {
 	// reset the hash; we want to override existing data
 	hashes.reset();
 
 	// figure out the size, and "cap" the skip bytes
-	uint64_t size = file.size();
-	skip_bytes = (uint32_t) std::min((uint64_t) skip_bytes, size);
+	u64 size = file.size();
+	skip_bytes = (u32) std::min((u64) skip_bytes, size);
 
 	// seek to the beginning
 	file.seek(skip_bytes, SEEK_SET);
-	uint64_t position = skip_bytes;
+	u64 position = skip_bytes;
 
 	// keep on reading hashes
 	hashes.begin(types);
-	while(position < size)
+	while (position < size)
 	{
 		uint8_t buffer[8192];
 
 		// read bytes
-		const uint32_t count = (uint32_t) std::min(size - position, (uint64_t) sizeof(buffer));
-		const uint32_t actual_count = file.read(buffer, count);
+		const u32 count = (u32) std::min(size - position, (u64) sizeof(buffer));
+		const u32 actual_count = file.read(buffer, count);
 		if (actual_count == 0)
 			return false;
 		position += actual_count;		
@@ -561,7 +561,8 @@ util::hash_collection device_image_interface::calculate_hash_on_file(util::core_
 {
 	// calculate the hash
 	util::hash_collection hash;
-	run_hash(file, unhashed_header_length(), hash, util::hash_collection::HASH_TYPES_ALL);
+	if (!run_hash(file, unhashed_header_length(), hash, util::hash_collection::HASH_TYPES_ALL))
+		hash.reset();
 	return hash;
 }
 

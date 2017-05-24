@@ -309,7 +309,7 @@ private:
 	bool load_software_part(const std::string &identifier);
 
 	bool init_phase() const;
-	static bool run_hash(util::core_file &file, uint32_t skip_bytes, util::hash_collection &hashes, const char *types);
+	static bool run_hash(util::core_file &file, u32 skip_bytes, util::hash_collection &hashes, const char *types);
 
 	// loads an image or software items and resets - called internally when we
 	// load an is_reset_on_load() item
