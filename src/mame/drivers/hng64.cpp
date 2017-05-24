@@ -1516,6 +1516,8 @@ void hng64_state::machine_start()
 	{
 		m_videoregs[i] = 0xdeadbeef;
 	}
+
+	m_3dfifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
 }
 
 void hng64_state::machine_reset()
