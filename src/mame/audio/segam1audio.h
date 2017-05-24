@@ -31,9 +31,6 @@ public:
 	// construction/destruction
 	segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// static configuration
 	template <class Object> static devcb_base &set_rxd_handler(device_t &device, Object &&cb) { return downcast<segam1audio_device &>(device).m_rxd_handler.set_callback(std::forward<Object>(cb)); }
 
@@ -41,12 +38,12 @@ public:
 	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);
 
 	DECLARE_WRITE_LINE_MEMBER(write_txd);
-	DECLARE_WRITE_LINE_MEMBER(output_txd);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<cpu_device> m_audiocpu;
@@ -56,6 +53,8 @@ private:
 	required_device<i8251_device> m_uart;
 
 	devcb_write_line   m_rxd_handler;
+
+	DECLARE_WRITE_LINE_MEMBER(output_txd);
 };
 
 

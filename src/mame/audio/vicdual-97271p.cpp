@@ -69,20 +69,6 @@ enum
 
 
 //**************************************************************************
-//  MACHINE FRAGMENTS
-//**************************************************************************
-
-static MACHINE_CONFIG_START( nsub_audio )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	/* samples */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(13)
-	MCFG_SAMPLES_NAMES(nsub_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -97,14 +83,18 @@ s97271p_device::s97271p_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor s97271p_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( nsub_audio );
-}
+MACHINE_CONFIG_MEMBER( s97271p_device::device_add_mconfig )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	/* samples */
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(13)
+	MCFG_SAMPLES_NAMES(nsub_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_start - device-specific startup

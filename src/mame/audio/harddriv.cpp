@@ -423,7 +423,11 @@ static ADDRESS_MAP_START( driversnd_dsp_io_map, AS_IO, 16, harddriv_sound_board_
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( harddriv_snd )
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( harddriv_sound_board_device::device_add_mconfig )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", M68000, XTAL_16MHz/2)
@@ -442,13 +446,3 @@ static MACHINE_CONFIG_START( harddriv_snd )
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor harddriv_sound_board_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( harddriv_snd );
-}
