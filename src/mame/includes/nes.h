@@ -72,11 +72,11 @@ class nes_state : public nes_base_state
 public:
 	nes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: nes_base_state(mconfig, type, tag),
-			m_ppu(*this, "ppu"),
-			m_exp(*this, "exp"),
-			m_cartslot(*this, "nes_slot"),
-			m_disk(*this, "disk")
-		{ }
+		m_ppu(*this, "ppu"),
+		m_exp(*this, "exp"),
+		m_cartslot(*this, "nes_slot"),
+		m_disk(*this, "disk")
+	{ }
 
 
 	int nes_ppu_vidaccess(int address, int data);

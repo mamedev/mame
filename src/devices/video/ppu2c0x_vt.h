@@ -9,7 +9,11 @@
 
 ******************************************************************************/
 
-#include "emu.h"
+#ifndef MAME_VIDEO_PPU_VT03_H
+#define MAME_VIDEO_PPU_VT03_H
+
+#pragma once
+
 #include "video/ppu2c0x.h"
 
 #define MCFG_PPU_VT03_ADD(_tag)   \
@@ -25,8 +29,8 @@ class ppu_vt03_device : public ppu2c0x_device {
 public:
 	ppu_vt03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_read_bg_callback(device_t &device, _Object object) { return downcast<ppu_vt03_device &>(device).m_read_bg.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_sp_callback(device_t &device, _Object object) { return downcast<ppu_vt03_device &>(device).m_read_sp.set_callback(object); }
+	template <class Object> static devcb_base &set_read_bg_callback(device_t &device, Object &&cb) { return downcast<ppu_vt03_device &>(device).m_read_bg.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_sp_callback(device_t &device, Object &&cb) { return downcast<ppu_vt03_device &>(device).m_read_sp.set_callback(std::forward<Object>(cb)); }
 
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
@@ -75,4 +79,6 @@ private:
 	void set_new_pen(int i);
 };
 
-DECLARE_DEVICE_TYPE(PPU_VT03,    ppu_vt03_device) 
+DECLARE_DEVICE_TYPE(PPU_VT03,    ppu_vt03_device)
+
+#endif // MAME_VIDEO_PPU_VT03_H

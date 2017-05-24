@@ -52,8 +52,8 @@ public:
 	nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<nesapu_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_mem_read_callback(device_t &device, _Object object) { return downcast<nesapu_device &>(device).m_mem_read_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<nesapu_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_mem_read_callback(device_t &device, Object &&cb) { return downcast<nesapu_device &>(device).m_mem_read_cb.set_callback(std::forward<Object>(cb)); }
 
 	virtual void device_clock_changed() override;
 
