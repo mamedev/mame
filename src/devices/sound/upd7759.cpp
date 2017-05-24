@@ -128,7 +128,6 @@
 
 
 #define DEBUG_STATES    (0)
-#define DEBUG_METHOD    osd_printf_debug
 
 
 
@@ -503,7 +502,7 @@ void upd775x_device::advance_state()
 		/* Start state: we begin here as soon as a sample is triggered */
 		case STATE_START:
 			m_req_sample = m_rom ? m_fifo_in : 0x10;
-			if (DEBUG_STATES) DEBUG_METHOD("uPD7759: req_sample = %02X\n", m_req_sample);
+			if (DEBUG_STATES) logerror("req_sample = %02X\n", m_req_sample);
 
 			/* 35+ cycles after we get here, the /DRQ goes low
 			 *     (first byte (number of samples in ROM) should be sent in response)
@@ -519,7 +518,7 @@ void upd775x_device::advance_state()
 		/* First request state: issue a request for the first byte */
 		/* The expected response will be the index of the last sample */
 		case STATE_FIRST_REQ:
-			if (DEBUG_STATES) DEBUG_METHOD("uPD7759: first data request\n");
+			if (DEBUG_STATES) logerror("first data request\n");
 			m_drq = 1;
 
 			/* 44 cycles later, we will latch this value and request another byte */
@@ -531,7 +530,7 @@ void upd775x_device::advance_state()
 		/* The second byte read will be just a dummy */
 		case STATE_LAST_SAMPLE:
 			m_last_sample = m_rom ? m_rom[0] : m_fifo_in;
-			if (DEBUG_STATES) DEBUG_METHOD("uPD7759: last_sample = %02X, requesting dummy 1\n", m_last_sample);
+			if (DEBUG_STATES) logerror("last_sample = %02X, requesting dummy 1\n", m_last_sample);
 			m_drq = 1;
 
 			/* 28 cycles later, we will latch this value and request another byte */
@@ -542,7 +541,7 @@ void upd775x_device::advance_state()
 		/* First dummy state: ignore any data here and issue a request for the third byte */
 		/* The expected response will be the MSB of the sample address */
 		case STATE_DUMMY1:
-			if (DEBUG_STATES) DEBUG_METHOD("uPD7759: dummy1, requesting offset_hi\n");
+			if (DEBUG_STATES) logerror("dummy1, requesting offset_hi\n");
 			m_drq = 1;
 
 			/* 32 cycles later, we will latch this value and request another byte */
@@ -554,7 +553,7 @@ void upd775x_device::advance_state()
 		/* The expected response will be the LSB of the sample address */
 		case STATE_ADDR_MSB:
 			m_offset = (m_rom ? m_rom[m_req_sample * 2 + 5] : m_fifo_in) << (8 + m_sample_offset_shift);
-			if (DEBUG_STATES) DEBUG_METHOD("uPD7759: offset_hi = %02X, requesting offset_lo\n", m_offset >> (8 + m_sample_offset_shift));
+			if (DEBUG_STATES) logerror("offset_hi = %02X, requesting offset_lo\n", m_offset >> (8 + m_sample_offset_shift));
 			m_drq = 1;
 
 			/* 44 cycles later, we will latch this value and request another byte */
@@ -566,7 +565,7 @@ void upd775x_device::advance_state()
 		/* The expected response will be just a dummy */
 		case STATE_ADDR_LSB:
 			m_offset |= (m_rom ? m_rom[m_req_sample * 2 + 6] : m_fifo_in) << m_sample_offset_shift;
-			if (DEBUG_STATES) DEBUG_METHOD("uPD7759: offset_lo = %02X, requesting dummy 2\n", (m_offset >> m_sample_offset_shift) & 0xff);
+			if (DEBUG_STATES) logerror("offset_lo = %02X, requesting dummy 2\n", (m_offset >> m_sample_offset_shift) & 0xff);
 			if (m_offset > m_rommask) logerror("uPD7759 offset %X > rommask %X\n",m_offset, m_rommask);
 			m_drq = 1;
 
@@ -580,7 +579,7 @@ void upd775x_device::advance_state()
 		case STATE_DUMMY2:
 			m_offset++;
 			m_first_valid_header = 0;
-			if (DEBUG_STATES) DEBUG_METHOD("uPD7759: dummy2, requesting block header\n");
+			if (DEBUG_STATES) logerror("dummy2, requesting block header\n");
 			m_drq = 1;
 
 			/* 36?? cycles later, we will latch this value and request another byte */
@@ -598,7 +597,7 @@ void upd775x_device::advance_state()
 				m_offset = m_repeat_offset;
 			}
 			m_block_header = m_rom ? m_rom[m_offset++ & m_rommask] : m_fifo_in;
-			if (DEBUG_STATES) DEBUG_METHOD("uPD7759: header (@%05X) = %02X, requesting next byte\n", m_offset, m_block_header);
+			if (DEBUG_STATES) logerror("header (@%05X) = %02X, requesting next byte\n", m_offset, m_block_header);
 			m_drq = 1;
 
 			/* our next step depends on the top two bits */
@@ -641,7 +640,7 @@ void upd775x_device::advance_state()
 		/* The expected response will be the first data byte */
 		case STATE_NIBBLE_COUNT:
 			m_nibbles_left = (m_rom ? m_rom[m_offset++ & m_rommask] : m_fifo_in) + 1;
-			if (DEBUG_STATES) DEBUG_METHOD("uPD7759: nibble_count = %u, requesting next byte\n", (unsigned)m_nibbles_left);
+			if (DEBUG_STATES) logerror("nibble_count = %u, requesting next byte\n", (unsigned)m_nibbles_left);
 			m_drq = 1;
 
 			/* 36?? cycles later, we will latch this value and request another byte */
@@ -708,7 +707,8 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		advance_state();
 
 		/* if the DRQ changed, update it */
-		logerror("upd7759_slave_update: DRQ %d->%d\n", olddrq, m_drq);
+		if (DEBUG_STATES)
+			logerror("upd7759_slave_update: DRQ %d->%d\n", olddrq, m_drq);
 		if (olddrq != m_drq)
 			m_drqcallback(m_drq);
 
@@ -762,7 +762,8 @@ WRITE_LINE_MEMBER( upd7759_device::start_w )
 	uint8_t oldstart = m_start;
 	m_start = (state != 0);
 
-	logerror("upd7759_start_w: %d->%d\n", oldstart, m_start);
+	if (DEBUG_STATES)
+		logerror("upd7759_start_w: %d->%d\n", oldstart, m_start);
 
 	/* update the stream first */
 	m_channel->update();
@@ -784,7 +785,8 @@ WRITE_LINE_MEMBER( upd7756_device::start_w )
 	uint8_t oldstart = m_start;
 	m_start = (state != 0);
 
-	logerror("upd7759_start_w: %d->%d\n", oldstart, m_start);
+	if (DEBUG_STATES)
+		logerror("upd7759_start_w: %d->%d\n", oldstart, m_start);
 
 	/* update the stream first */
 	m_channel->update();
