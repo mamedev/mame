@@ -39,10 +39,21 @@
  * processor, as each is shared.
  */
 
-class nesapu_device : public device_t, public device_sound_interface
+#define MCFG_NES_APU_IRQ_HANDLER(_devcb) \
+	devcb = &nesapu_device::set_irq_handler(*device, DEVCB_##_devcb);
+
+#define MCFG_NES_APU_MEM_READ_CALLBACK(_devcb) \
+	devcb = &nesapu_device::set_mem_read_callback(*device, DEVCB_##_devcb);
+
+class nesapu_device : public device_t,
+						public device_sound_interface
 {
 public:
 	nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	// static configuration helpers
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<nesapu_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_mem_read_callback(device_t &device, _Object object) { return downcast<nesapu_device &>(device).m_mem_read_cb.set_callback(object); }
 
 	virtual void device_clock_changed() override;
 
@@ -72,6 +83,8 @@ private:
 	u32     m_sync_times1[SYNCS_MAX1]; /* Samples per sync table */
 	u32     m_sync_times2[SYNCS_MAX2]; /* Samples per sync table */
 	sound_stream *m_stream;
+	devcb_write_line m_irq_handler;
+	devcb_read8 m_mem_read_cb;
 
 	void calculate_rates();
 	void create_syncs(unsigned long sps);

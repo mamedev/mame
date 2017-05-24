@@ -49,7 +49,6 @@
 #include "emu.h"
 #include "nes_apu.h"
 
-#include "cpu/m6502/n2a03.h"
 #include "screen.h"
 
 
@@ -112,7 +111,9 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 		m_samps_per_sync(0),
 		m_buffer_size(0),
 		m_real_rate(0),
-		m_stream(nullptr)
+		m_stream(nullptr),
+		m_irq_handler(*this),
+		m_mem_read_cb(*this)
 {
 	for (auto & elem : m_noise_lut)
 	{
@@ -176,9 +177,11 @@ void nesapu_device::calculate_rates()
 
 void nesapu_device::device_start()
 {
-	create_noise(m_noise_lut, 13, apu_t::NOISE_LONG);
+	// resolve callbacks
+	m_irq_handler.resolve_safe();
+	m_mem_read_cb.resolve_safe(0x00);
 
-	(m_APU.dpcm).memory = &downcast<n2a03_device &>(*owner()).space(AS_PROGRAM);
+	create_noise(m_noise_lut, 13, apu_t::NOISE_LONG);
 
 	calculate_rates();
 
@@ -484,7 +487,7 @@ s8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 					if (chan->regs[0] & 0x80) /* IRQ Generator */
 					{
 						chan->irq_occurred = true;
-						downcast<n2a03_device &>(m_APU.dpcm.memory->device()).set_input_line(N2A03_APU_IRQ_LINE, ASSERT_LINE);
+						m_irq_handler(true);
 					}
 					break;
 				}
@@ -495,7 +498,7 @@ s8 nesapu_device::apu_dpcm(apu_t::dpcm_t *chan)
 			bit_pos = 7 - (chan->bits_left & 7);
 			if (7 == bit_pos)
 			{
-				chan->cur_byte = m_APU.dpcm.memory->read_byte(chan->address);
+				chan->cur_byte = m_mem_read_cb(chan->address);
 				chan->address++;
 				chan->length--;
 			}
@@ -634,7 +637,7 @@ inline void nesapu_device::apu_regwrite(int address, u8 value)
 	case apu_t::WRE0:
 		m_APU.dpcm.regs[0] = value;
 		if (0 == (value & 0x80)) {
-			downcast<n2a03_device &>(m_APU.dpcm.memory->device()).set_input_line(N2A03_APU_IRQ_LINE, CLEAR_LINE);
+			m_irq_handler(false);
 			m_APU.dpcm.irq_occurred = false;
 		}
 		break;
@@ -709,6 +712,7 @@ inline void nesapu_device::apu_regwrite(int address, u8 value)
 		else
 			m_APU.dpcm.enabled = false;
 
+		//m_irq_handler(false);
 		m_APU.dpcm.irq_occurred = false;
 
 		break;
