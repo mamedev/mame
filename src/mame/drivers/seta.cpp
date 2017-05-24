@@ -89,7 +89,9 @@ P0-122A  (SZR-001)      95 Zombie Raid                          American Sammy
 
 Notes:
 - The NEC D4701 used by Caliber 50 is a mouse interface IC (uPD4701c).
-  Of course it's used to control the spinner. DownTown probably has it as well.
+  Of course it's used to control the spinners. U.S. Classic also uses one to control both trackballs.
+- DownTown receives the joystick rotation counts through a pair of JST13 connectors (CN1, CN2).
+  On Meta Fox, these connectors are present but unused; they are not populated on Arbalester.
 - jjsquawk is modified from jjsquawko so nuts don't fall from the trees shaken by white animal.
 
 DIP Locations verified from manuals for:
