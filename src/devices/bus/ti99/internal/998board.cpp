@@ -157,7 +157,7 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_sound(*owner, TISOUNDCHIP_TAG),
 	m_speech(*owner, SPEECHSYN_TAG),
 	m_gromport(*owner, GROMPORT_TAG),
-	m_peb(*owner, PERIBOX_TAG),
+	m_ioport(*owner, TI99_IOPORT_TAG),
 	m_sram(*owner, SRAM_TAG),
 	m_dram(*owner, DRAM_TAG),
 	m_sgrom_idle(true),
@@ -214,9 +214,9 @@ READ8_MEMBER( mainboard8_device::debugger_read )
 		// Internal DSR, Hexbus DSR, or PEB
 		if (m_mofetta->hexbus_access_debug()) return m_rom1[(physical_address & 0x1fff) | 0x6000];
 		if (m_mofetta->intdsr_access_debug()) return m_rom1[(physical_address & 0x1fff) | 0x4000];
-		m_peb->memen_in(ASSERT_LINE);
-		m_peb->readz(space, physical_address & 0xffff, &value);
-		m_peb->memen_in(CLEAR_LINE);
+		m_ioport->memen_in(ASSERT_LINE);
+		m_ioport->readz(space, physical_address & 0xffff, &value);
+		m_ioport->memen_in(CLEAR_LINE);
 		return value;
 	}
 	if ((physical_address & 0x00ffe000)==0x00ff6000)
@@ -295,10 +295,9 @@ WRITE8_MEMBER( mainboard8_device::debugger_write )
 	{
 		if (m_mofetta->hexbus_access_debug()) return;
 		if (m_mofetta->intdsr_access_debug()) return;
-		m_peb->memen_in(ASSERT_LINE);
-		m_peb->write(space, physical_address & 0xffff, data & 0xff);
-		m_peb->memen_in(CLEAR_LINE);
-		return;
+		m_ioport->memen_in(ASSERT_LINE);
+		m_ioport->write(space, physical_address & 0xffff, data & 0xff);
+		m_ioport->memen_in(CLEAR_LINE);     return;
 	}
 	if ((physical_address & 0x00ffe000)==0x00ff6000)
 	{
@@ -325,7 +324,7 @@ WRITE8_MEMBER( mainboard8_device::debugger_write )
 
 READ8Z_MEMBER(mainboard8_device::crureadz)
 {
-	m_peb->crureadz(space, offset, value);
+	m_ioport->crureadz(space, offset, value);
 }
 
 /*
@@ -334,7 +333,7 @@ READ8Z_MEMBER(mainboard8_device::crureadz)
 WRITE8_MEMBER(mainboard8_device::cruwrite)
 {
 	m_mofetta->cruwrite(space, offset, data);
-	m_peb->cruwrite(space, offset, data);
+	m_ioport->cruwrite(space, offset, data);
 }
 
 // =============== Memory bus access ==================
@@ -508,7 +507,7 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 
 		if (m_mofetta->dbc_out()==ASSERT_LINE)
 		{
-			m_peb->write(*m_space, m_physical_address, m_latched_data);
+			m_ioport->write(*m_space, m_physical_address, m_latched_data);
 			m_pending_write = false;
 			if (TRACE_MEM) logerror("Write %04x (phys %06x, PEB) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
 		}
@@ -609,7 +608,7 @@ void mainboard8_device::set_paddress(int address)
 	if (TRACE_DETAIL) logerror("Setting physical address %06x\n", m_physical_address);
 
 	m_mofetta->set_address(*m_space, address, m_dbin_level);
-	m_peb->setaddress_dbin(*m_space, address, m_dbin_level);
+	m_ioport->setaddress_dbin(*m_space, address, m_dbin_level);
 }
 
 WRITE_LINE_MEMBER( mainboard8_device::msast_in )
@@ -620,10 +619,10 @@ WRITE_LINE_MEMBER( mainboard8_device::msast_in )
 	if (state==CLEAR_LINE)
 	{
 		m_mofetta->pmemen_in(ASSERT_LINE);
-		m_peb->memen_in(ASSERT_LINE);
+		m_ioport->memen_in(ASSERT_LINE);
 	}
 	m_mofetta->msast_in(state);
-	m_peb->msast_in(state);
+	m_ioport->msast_in(state);
 }
 
 
@@ -785,7 +784,7 @@ READ8_MEMBER( mainboard8_device::read )
 
 		if (m_mofetta->dbc_out()==ASSERT_LINE)
 		{
-			m_peb->readz(*m_space, m_physical_address & 0xffff, &value);
+			m_ioport->readz(*m_space, m_physical_address & 0xffff, &value);
 			what = "PEB";
 			goto readdonephys;
 		}
@@ -815,7 +814,7 @@ void mainboard8_device::cycle_end()
 	m_vaquerro->memen_in(CLEAR_LINE);
 	m_amigo->memen_in(CLEAR_LINE);
 	m_mofetta->pmemen_in(CLEAR_LINE);
-	m_peb->memen_in(CLEAR_LINE);
+	m_ioport->memen_in(CLEAR_LINE);
 }
 
 /*

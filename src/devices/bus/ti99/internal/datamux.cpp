@@ -82,7 +82,7 @@ datamux_device::datamux_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, TI99_DATAMUX, tag, owner, clock),
 	m_video(*owner, VDP_TAG),
 	m_sound(*owner, TISOUNDCHIP_TAG),
-	m_peb(*owner, PERIBOX_TAG),
+	m_ioport(*owner, TI99_IOPORT_TAG),
 	m_gromport(*owner, GROMPORT_TAG),
 	m_ram16b(*owner, EXPRAM_TAG),
 	m_padram(*owner, PADRAM_TAG),
@@ -144,9 +144,9 @@ void datamux_device::read_all(address_space& space, uint16_t addr, uint8_t *valu
 	// GROMport (ROMs)
 	if ((addr & 0xe000)==0x6000) m_gromport->readz(space, addr, value);
 
-	// PEB gets all accesses
-	m_peb->readz(space, addr, value);
-	m_peb->memen_in(CLEAR_LINE);
+	// I/O port gets all accesses
+	m_ioport->readz(space, addr, value);
+	m_ioport->memen_in(CLEAR_LINE);
 }
 
 void datamux_device::write_all(address_space& space, uint16_t addr, uint8_t value)
@@ -180,9 +180,9 @@ void datamux_device::write_all(address_space& space, uint16_t addr, uint8_t valu
 		if (m_video != nullptr) m_video->write(space, addr>>1, value);   // A14 determines data or register write
 	}
 
-	// PEB gets all accesses
-	m_peb->write(space, addr, value);
-	m_peb->memen_in(CLEAR_LINE);
+	// I/O port gets all accesses
+	m_ioport->write(space, addr, value);
+	m_ioport->memen_in(CLEAR_LINE);
 }
 
 void datamux_device::setaddress_all(address_space& space, uint16_t addr)
@@ -217,9 +217,9 @@ void datamux_device::setaddress_all(address_space& space, uint16_t addr)
 	// GROMport (ROMs)
 	m_gromport->romgq_line(iscartrom? ASSERT_LINE : CLEAR_LINE);
 
-	// PEB gets all accesses
-	m_peb->memen_in(ASSERT_LINE);
-	m_peb->setaddress_dbin(space, addr, m_dbin);
+	// I/O port gets all accesses
+	m_ioport->memen_in(ASSERT_LINE);
+	m_ioport->setaddress_dbin(space, addr, m_dbin);
 }
 
 /*
@@ -263,10 +263,10 @@ uint16_t datamux_device::debugger_read(address_space& space, uint16_t addr)
 					m_gromport->readz(space, addrb, &hval);
 					m_gromport->romgq_line(CLEAR_LINE);
 				}
-				m_peb->memen_in(ASSERT_LINE);
-				m_peb->readz(space, addrb+1, &lval);
-				m_peb->readz(space, addrb, &hval);
-				m_peb->memen_in(CLEAR_LINE);
+				m_ioport->memen_in(ASSERT_LINE);
+				m_ioport->readz(space, addrb+1, &lval);
+				m_ioport->readz(space, addrb, &hval);
+				m_ioport->memen_in(CLEAR_LINE);
 				value = ((hval << 8)&0xff00) | (lval & 0xff);
 			}
 		}
@@ -309,10 +309,10 @@ void datamux_device::debugger_write(address_space& space, uint16_t addr, uint16_
 				m_gromport->romgq_line(CLEAR_LINE);
 			}
 
-			m_peb->memen_in(ASSERT_LINE);
-			m_peb->write(space, addr+1, data & 0xff);
-			m_peb->write(space, addr,  (data>>8) & 0xff);
-			m_peb->memen_in(CLEAR_LINE);
+			m_ioport->memen_in(ASSERT_LINE);
+			m_ioport->write(space, addr+1, data & 0xff);
+			m_ioport->write(space, addr,  (data>>8) & 0xff);
+			m_ioport->memen_in(CLEAR_LINE);
 		}
 	}
 }

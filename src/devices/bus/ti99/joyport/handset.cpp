@@ -45,8 +45,8 @@ DEFINE_DEVICE_TYPE_NS(TI99_HANDSET, bus::ti99::joyport, ti99_handset_device, "ti
 
 namespace bus { namespace ti99 { namespace joyport {
 
-#define LOG logerror
-#define VERBOSE 1
+#define TRACE_HANDSET 0
+#define TRACE_JOYSTICK 0
 
 static const char *const joynames[2][4] =
 {
@@ -81,7 +81,7 @@ uint8_t ti99_handset_device::read_dev()
 
 void ti99_handset_device::write_dev(uint8_t data)
 {
-	if (VERBOSE>7) LOG("ti99_handset_device: Set ack %d\n", data);
+	if (TRACE_HANDSET) logerror("Set ack %d\n", data);
 	set_acknowledge(data);
 }
 
@@ -146,7 +146,7 @@ void ti99_handset_device::post_message(int message)
 	m_clock_high = true;
 	m_buf = ~message;
 	m_buflen = 3;
-	if (VERBOSE>5) LOG("ti99_handset_device: trigger interrupt\n");
+	if (TRACE_HANDSET) logerror("trigger interrupt\n");
 	m_joyport->set_interrupt(ASSERT_LINE);
 }
 
@@ -335,7 +335,7 @@ void ti99_handset_device::device_start()
 
 void ti99_handset_device::device_reset()
 {
-	if (VERBOSE>5) LOG("ti99_handset_device: Reset\n");
+	if (TRACE_HANDSET) logerror("Reset\n");
 	m_delay_timer->enable(true);
 	m_buf = 0;
 	m_buflen = 0;
@@ -523,13 +523,13 @@ uint8_t ti99_twin_joystick_device::read_dev()
 		if (m_joystick==2) value = ioport("JOY2")->read();
 		else value = 0xff;
 	}
-	if (VERBOSE>6) LOG("ti99_twin_joystick_device: joy%d = %02x\n", m_joystick, value);
+	if (TRACE_JOYSTICK) logerror("joy%d = %02x\n", m_joystick, value);
 	return value;
 }
 
 void ti99_twin_joystick_device::write_dev(uint8_t data)
 {
-	if (VERBOSE>7) LOG("ti99_twin_joystick_device: Select joystick %d\n", data);
+	if (TRACE_JOYSTICK) logerror("Select joystick %d\n", data);
 	m_joystick = data & 0x03;
 }
 

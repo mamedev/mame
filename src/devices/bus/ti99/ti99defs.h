@@ -24,6 +24,7 @@
 #define GROM0_TAG       "console_grom_0"
 #define GROM1_TAG       "console_grom_1"
 #define GROM2_TAG       "console_grom_2"
+#define TI99_IOPORT_TAG "ioport"
 #define JOYPORT_TAG     "joyport"
 #define EVPC_CONN_TAG   "evpc_conn"
 #define DATAMUX_TAG     "datamux_16_8"

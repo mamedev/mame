@@ -720,7 +720,7 @@ static MACHINE_CONFIG_START( geneve_60hz )
 	MCFG_MM58274C_DAY1(0)   // sunday
 
 	// Peripheral expansion box (Geneve composition)
-	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX_GEN, 0)
+	MCFG_DEVICE_ADD( PERIBOX_TAG, TI99_PERIBOX_GEN, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(geneve_state, inta) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(geneve_state, intb) )
 	MCFG_PERIBOX_READY_HANDLER( WRITELINE(geneve_state, ext_ready) )

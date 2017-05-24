@@ -185,7 +185,7 @@ Known Issues (MZ, 2010-11-07)
 #include "bus/ti99/internal/gromport.h"
 
 #include "bus/ti99/joyport/joyport.h"
-#include "bus/ti99/peb/peribox.h"
+#include "bus/ti99/internal/ioport.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -218,7 +218,7 @@ public:
 		m_cpu(*this, "maincpu"),
 		m_tms9901(*this, TMS9901_TAG),
 		m_gromport(*this, GROMPORT_TAG),
-		m_peribox(*this, PERIBOX_TAG),
+		m_ioport(*this, TI99_IOPORT_TAG),
 		m_mainboard(*this, MAINBOARD8_TAG),
 		m_joyport(*this, JOYPORT_TAG),
 		m_cassette(*this, "cassette")
@@ -276,7 +276,7 @@ private:
 	required_device<tms9995_device>     m_cpu;
 	required_device<tms9901_device>     m_tms9901;
 	required_device<bus::ti99::internal::gromport_device> m_gromport;
-	required_device<bus::ti99::peb::peribox_device>     m_peribox;
+	required_device<bus::ti99::internal::ioport_device>     m_ioport;
 	required_device<bus::ti99::internal::mainboard8_device>  m_mainboard;
 	required_device<bus::ti99::joyport::joyport_device> m_joyport;
 	required_device<cassette_image_device> m_cassette;
@@ -418,7 +418,7 @@ READ8_MEMBER( ti99_8_state::cruread )
 	// Also, we translate the bit addresses to base addresses
 	m_mainboard->crureadz(space, offset<<4, &value);
 	m_gromport->crureadz(space, offset<<4, &value);
-	m_peribox->crureadz(space, offset<<4, &value);
+	m_ioport->crureadz(space, offset<<4, &value);
 
 	if (TRACE_CRU) logerror("ti99_8: CRU %04x -> %02x\n", offset<<4, value);
 	return value;
@@ -429,7 +429,7 @@ WRITE8_MEMBER( ti99_8_state::cruwrite )
 	if (TRACE_CRU) logerror("ti99_8: CRU %04x <- %x\n", offset<<1, data);
 	m_mainboard->cruwrite(space, offset<<1, data);
 	m_gromport->cruwrite(space, offset<<1, data);
-	m_peribox->cruwrite(space, offset<<1, data);
+	m_ioport->cruwrite(space, offset<<1, data);
 }
 
 /***************************************************************************
@@ -685,10 +685,6 @@ WRITE_LINE_MEMBER( ti99_8_state::dbin_line )
 
 MACHINE_START_MEMBER(ti99_8_state,ti99_8)
 {
-	m_peribox->senila(CLEAR_LINE);
-	m_peribox->senilb(CLEAR_LINE);
-	// m_mainboard->set_gromport(m_gromport);
-
 	// Need to configure the speech ROM for inverse bit order
 	speechrom_device* mem = subdevice<speechrom_device>(SPEECHROM_REG);
 	mem->set_reverse_bit_order(true);
@@ -762,11 +758,10 @@ static MACHINE_CONFIG_START( ti99_8 )
 	/* Software list */
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
-	// Peripheral expansion box
-	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX_998, 0)
-	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_8_state, extint) )
-	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_8_state, notconnected) )
-	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, pbox_ready) )
+	// I/O port
+	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
+	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(ti99_8_state, extint) )
+	MCFG_IOPORT_READY_HANDLER( DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, pbox_ready) )
 
 	// Sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("sound_out")

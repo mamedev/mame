@@ -19,7 +19,7 @@
 #include "bus/ti99/ti99defs.h"
 #include "machine/tmc0430.h"
 #include "gromport.h"
-#include "bus/ti99/peb/peribox.h"
+#include "bus/ti99/internal/ioport.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "machine/ram.h"
@@ -63,8 +63,8 @@ private:
 	// Link to the sound processor
 	optional_device<sn76496_base_device> m_sound;
 
-	// Link to the peripheral expansion box
-	required_device<bus::ti99::peb::peribox_device> m_peb;
+	// Link to the I/O port
+	required_device<bus::ti99::internal::ioport_device> m_ioport;
 
 	// Link to the cartridge port (aka GROM port)
 	required_device<gromport_device> m_gromport;
@@ -142,5 +142,5 @@ private:
 } } } // end namespace bus::ti99::internal
 
 DECLARE_DEVICE_TYPE_NS(TI99_DATAMUX, bus::ti99::internal, datamux_device)
-	
+
 #endif // MAME_BUS_TI99_INTERNAL_DATAMUX_H

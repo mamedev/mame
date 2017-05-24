@@ -17,6 +17,7 @@
 #pragma once
 
 #include "bus/ti99/ti99defs.h"
+#include "bus/ti99/internal/ioport.h"
 
 namespace bus { namespace ti99 { namespace peb {
 
@@ -28,31 +29,32 @@ class peribox_slot_device;
     See ti99defs.h for bus8z_device
 ******************************************************************************/
 
-class peribox_device : public bus8z_device
+class peribox_device : public bus::ti99::internal::ioport_attached_device
 {
 	friend class peribox_slot_device;
 public:
 	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &static_set_inta_callback(device_t &device, Object &&cb)  { return downcast<peribox_device &>(device).m_console_inta.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_intb_callback(device_t &device, Object &&cb)  { return downcast<peribox_device &>(device).m_console_intb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_ready_callback(device_t &device, Object &&cb) { return downcast<peribox_device &>(device).m_datamux_ready.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_lcp_callback(device_t &device, Object &&cb)   { return downcast<peribox_device &>(device).m_sgcpu_lcp.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_inta_callback(device_t &device, Object &&cb)  { return downcast<peribox_device &>(device).m_slot1_inta.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_intb_callback(device_t &device, Object &&cb)  { return downcast<peribox_device &>(device).m_slot1_intb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_ready_callback(device_t &device, Object &&cb) { return downcast<peribox_device &>(device).m_slot1_ready.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_lcp_callback(device_t &device, Object &&cb)   { return downcast<peribox_device &>(device).m_slot1_lcp.set_callback(std::forward<Object>(cb)); }
 
 	// Next eight methods are called from the console
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
+
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);
 
-	DECLARE_WRITE_LINE_MEMBER( memen_in );
-	DECLARE_WRITE_LINE_MEMBER( msast_in );
+	DECLARE_WRITE_LINE_MEMBER( memen_in ) override;
+	DECLARE_WRITE_LINE_MEMBER( msast_in ) override;
 
-	DECLARE_WRITE_LINE_MEMBER( clock_in );
+	DECLARE_WRITE_LINE_MEMBER( clock_in ) override;
 
 	// Part of configuration
 	void set_prefix(int prefix) { m_address_prefix = prefix; }
@@ -69,11 +71,11 @@ protected:
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	// Next three methods call back the console
-	devcb_write_line m_console_inta;   // INTA line (Box to console)
-	devcb_write_line m_console_intb;   // INTB line
-	devcb_write_line m_sgcpu_lcp;       // For EVPC with SGCPU only
-	devcb_write_line m_datamux_ready;  // READY line (to the datamux)
+	// Next three methods call back the console via slot 1
+	devcb_write_line m_slot1_inta;   // INTA line (Box to console)
+	devcb_write_line m_slot1_intb;   // INTB line
+	devcb_write_line m_slot1_lcp;       // For EVPC with SGCPU only
+	devcb_write_line m_slot1_ready;  // READY line (to the datamux)
 
 	void set_slot_loaded(int slot, peribox_slot_device* slotdev);
 	peribox_slot_device *m_slot[9];     // for the sake of simplicity we donate the first two positions (0,1)
@@ -98,23 +100,14 @@ protected:
 
 	// Memory enable.
 	bool    m_memen;
+
+	// Configured as a slot device (of the ioport)
+	bool    m_ioport_connected;
 };
 
 /************************************************************************
     Specific Box compositions
 ************************************************************************/
-/*
-    Variation for EVPC. We'd like to offer the EVPC slot device only if
-    we started the ti99_4ev driver.
-*/
-class peribox_ev_device : public peribox_device
-{
-public:
-	peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
-};
 
 /*
     Variation for SGCPU (TI-99/4P). We put the EVPC and the HSGPL in slots 2 and 3.
@@ -183,8 +176,6 @@ public:
 	// called from the box itself
 	void set_genmod(bool set);
 
-	device_t*   get_drive(const char* name);
-
 protected:
 	void device_start() override;
 	void device_config_complete() override;
@@ -244,11 +235,11 @@ protected:
 };
 
 #define MCFG_PERIBOX_SLOT_ADD(_tag, _slot_intf) \
-	MCFG_DEVICE_ADD(_tag, PERIBOX_SLOT, 0) \
+	MCFG_DEVICE_ADD(_tag, TI99_PERIBOX_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false)
 
 #define MCFG_PERIBOX_SLOT_ADD_DEF(_tag, _slot_intf, _default) \
-	MCFG_DEVICE_ADD(_tag, PERIBOX_SLOT, 0) \
+	MCFG_DEVICE_ADD(_tag, TI99_PERIBOX_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false)
 
 #define MCFG_PERIBOX_INTA_HANDLER( _inta ) \
@@ -265,12 +256,9 @@ protected:
 
 } } } // end namespace bus::ti99::peb
 
-DECLARE_DEVICE_TYPE_NS(PERIBOX,      bus::ti99::peb, peribox_device)
-DECLARE_DEVICE_TYPE_NS(PERIBOX_SLOT, bus::ti99::peb, peribox_slot_device)
-
-DECLARE_DEVICE_TYPE_NS(PERIBOX_EV,   bus::ti99::peb, peribox_ev_device)
-DECLARE_DEVICE_TYPE_NS(PERIBOX_SG,   bus::ti99::peb, peribox_sg_device)
-DECLARE_DEVICE_TYPE_NS(PERIBOX_GEN,  bus::ti99::peb, peribox_gen_device)
-DECLARE_DEVICE_TYPE_NS(PERIBOX_998,  bus::ti99::peb, peribox_998_device)
+DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX,      bus::ti99::peb, peribox_device)
+DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_SLOT, bus::ti99::peb, peribox_slot_device)
+DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_SG,   bus::ti99::peb, peribox_sg_device)
+DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_GEN,  bus::ti99::peb, peribox_gen_device)
 
 #endif // MAME_BUS_TI99_PEB_PERIBOX_H
