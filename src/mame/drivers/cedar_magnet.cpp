@@ -892,17 +892,17 @@ void cedar_magnet_state::mag_exzi_protection_hack()
 
 DRIVER_INIT_MEMBER(cedar_magnet_state, mag_time)
 {
-	m_prothack = mag_time_protection_hack;
+	m_prothack = &cedar_magnet_state::mag_time_protection_hack;
 }
 
 DRIVER_INIT_MEMBER(cedar_magnet_state, mag_xain)
 {
-	m_prothack = mag_xain_protection_hack;
+	m_prothack = &cedar_magnet_state::mag_xain_protection_hack;
 }
 
 DRIVER_INIT_MEMBER(cedar_magnet_state, mag_exzi)
 {
-	m_prothack = mag_exzi_protection_hack;
+	m_prothack = &cedar_magnet_state::mag_exzi_protection_hack;
 }
 
 GAME( 1987, cedmag,    0,         cedar_magnet, cedar_magnet, cedar_magnet_state,  0,        ROT0,  "EFO SA / Cedar", "Magnet System",                         MACHINE_IS_BIOS_ROOT )
