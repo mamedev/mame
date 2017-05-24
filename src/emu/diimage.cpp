@@ -496,7 +496,7 @@ bool device_image_interface::load_software_region(const char *tag, optional_shar
 // to be loaded
 // ****************************************************************************
 
-void device_image_interface::run_hash(util::core_file &file, uint32_t skip_bytes, util::hash_collection &hashes, const char *types)
+bool device_image_interface::run_hash(util::core_file &file, uint32_t skip_bytes, util::hash_collection &hashes, const char *types)
 {
 	// reset the hash; we want to override existing data
 	hashes.reset();
@@ -510,26 +510,31 @@ void device_image_interface::run_hash(util::core_file &file, uint32_t skip_bytes
 	uint64_t position = skip_bytes;
 
 	// keep on reading hashes
+	hashes.begin(types);
 	while(position < size)
 	{
 		uint8_t buffer[8192];
 
 		// read bytes
-		uint32_t count = (uint32_t) std::min(size - position, (uint64_t) sizeof(buffer));
-		uint32_t actual_count = file.read(buffer, count);
+		const uint32_t count = (uint32_t) std::min(size - position, (uint64_t) sizeof(buffer));
+		const uint32_t actual_count = file.read(buffer, count);
+		if (actual_count == 0)
+			return false;
 		position += actual_count;		
 
 		// and compute the hashes
-		hashes.compute(buffer, actual_count, types);
+		hashes.buffer(buffer, actual_count);
 	}
+	hashes.end();
 
 	// cleanup
 	file.seek(0, SEEK_SET);
+	return true;
 }
 
 
 
-void device_image_interface::image_checkhash()
+bool device_image_interface::image_checkhash()
 {
 	// only calculate CRC if it hasn't been calculated, and the open_mode is read only
 	u32 crcval;
@@ -538,16 +543,17 @@ void device_image_interface::image_checkhash()
 		// do not cause a linear read of 600 megs please
 		// TODO: use SHA1 in the CHD header as the hash
 		if (image_type() == IO_CDROM)
-			return;
+			return true;
 
 		// Skip calculating the hash when we have an image mounted through a software list
 		if (loaded_through_softlist())
-			return;
+			return true;
 
 		// run the hash
-		run_hash(*m_file, unhashed_header_length(), m_hash, util::hash_collection::HASH_TYPES_ALL);
+		if (!run_hash(*m_file, unhashed_header_length(), m_hash, util::hash_collection::HASH_TYPES_ALL))
+			return false;
 	}
-	return;
+	return true;
 }
 
 
@@ -1132,25 +1138,32 @@ image_init_result device_image_interface::finish_load()
 
 	if (m_is_loading)
 	{
-		image_checkhash();
-
-		if (m_created)
+		if (!image_checkhash())
 		{
-			err = call_create(m_create_format, m_create_args);
-			if (err != image_init_result::PASS)
-			{
-				if (!m_err)
-					m_err = IMAGE_ERROR_UNSPECIFIED;
-			}
+			m_err = IMAGE_ERROR_INVALIDIMAGE;
+			err = image_init_result::FAIL;
 		}
-		else
+
+		if (err == image_init_result::PASS)
 		{
-			// using device load
-			err = call_load();
-			if (err != image_init_result::PASS)
+			if (m_created)
 			{
-				if (!m_err)
-					m_err = IMAGE_ERROR_UNSPECIFIED;
+				err = call_create(m_create_format, m_create_args);
+				if (err != image_init_result::PASS)
+				{
+					if (!m_err)
+						m_err = IMAGE_ERROR_UNSPECIFIED;
+				}
+			}
+			else
+			{
+				// using device load
+				err = call_load();
+				if (err != image_init_result::PASS)
+				{
+					if (!m_err)
+						m_err = IMAGE_ERROR_UNSPECIFIED;
+				}
 			}
 		}
 	}

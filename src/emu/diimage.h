@@ -271,7 +271,7 @@ protected:
 
 	void make_readonly() { m_readonly = true; }
 
-	void image_checkhash();
+	bool image_checkhash();
 
 	const software_part *find_software_item(const std::string &identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
 	std::string software_get_default_slot(const char *default_card_slot) const;
@@ -309,7 +309,7 @@ private:
 	bool load_software_part(const std::string &identifier);
 
 	bool init_phase() const;
-	static void run_hash(util::core_file &file, uint32_t skip_bytes, util::hash_collection &hashes, const char *types);
+	static bool run_hash(util::core_file &file, uint32_t skip_bytes, util::hash_collection &hashes, const char *types);
 
 	// loads an image or software items and resets - called internally when we
 	// load an is_reset_on_load() item
