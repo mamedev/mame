@@ -33913,6 +33913,9 @@ shootout                        // (c) 1985 Data East USA (US)
 shootoutb                       // bootleg
 shootoutj                       // (c) 1985 Data East USA (Japan)
 
+@source:shootaway2.cpp
+shootaw2						// (c) 1996 Namco
+
 @source:shougi.cpp
 shougi                          // (c) 1982 (Arcade TV Game List - P.80, Left, 9 from top)
 shougi2                         // (c) 1982 (Arcade TV Game List - P.80, Left, 10 from top)
