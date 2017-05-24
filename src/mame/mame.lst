@@ -29293,6 +29293,7 @@ nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
 
 @source:nes_vt.cpp
+vdogdeme
 vdogdemo
 mc_dgear
 dgun2500
@@ -29300,7 +29301,7 @@ dgun2561
 ii8in1
 ii32in1
 lexcyber
-cybar120
+dfm2500p
 
 @source:newbrain.cpp
 newbrain                        //
