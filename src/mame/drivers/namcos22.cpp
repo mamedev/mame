@@ -2999,7 +2999,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 		const int range = 10000;
 
 		attotime freq = attotime::from_usec(base + range * (1.0 / (double)i));
-		m_pc_pedal_interrupt->adjust(min(freq, m_pc_pedal_interrupt->time_left()), 0, freq);
+		m_pc_pedal_interrupt->adjust(std::min(freq, m_pc_pedal_interrupt->time_left()), 0, freq);
 	}
 	else
 	{
@@ -3056,7 +3056,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)
 			if (t[axis] >  (1.0 / (double)(range)))
 			{
 				attotime freq = attotime::from_usec((base + range) - ((double)(range) * t[axis]));
-				m_ar_tb_interrupt[axis]->adjust(min(freq, m_ar_tb_interrupt[axis]->remaining()), axis, freq);
+				m_ar_tb_interrupt[axis]->adjust(std::min(freq, m_ar_tb_interrupt[axis]->remaining()), axis, freq);
 			}
 			else
 			{
